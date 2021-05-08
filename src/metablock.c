@@ -5,23 +5,20 @@
  */
 
 #include "metablock.h"
+#include "compression/compression.h"
+#include "squash.h"
+#include "superblock.h"
 
 #include <assert.h>
 #include <stdint.h>
 
-struct SquashMetablock *
-squash_metablock_new(struct Squash *squash, off_t offset) {
-	struct SquashMetablock *metablock;
-
-	metablock = calloc(1, sizeof(struct SquashMetablock));
-	if (metablock == NULL) {
-		return NULL;
-	}
-	metablock->root = squash;
+int
+squash_metablock_init(struct SquashMetablock* metablock, struct Squash *squash, off_t offset) {
+	metablock->decompressor = &squash->decompressor;
 	metablock->wrap =
 		(struct SquashMetablockWrap *)&((uint8_t *)squash->superblock)[offset];
 
-	return metablock;
+	return 0;
 }
 
 int
@@ -29,16 +26,35 @@ squash_metablock_is_compressed(struct SquashMetablock *metablock) {
 	return !(metablock->wrap->header & 0x8000);
 }
 
+static int
+uncompress(struct SquashMetablock *metablock) {
+	int compressed_size = squash_metablock_compressed_size(metablock);
+	struct SquashDecompressor *de = metablock->decompressor;
+
+	de->impl->decompress(
+		&de->info, &metablock->data, &metablock->size, metablock->wrap->data, 0,
+		compressed_size);
+
+	return 0;
+}
+
 uint8_t *
 squash_metablock_data(struct SquashMetablock *metablock) {
 	if (metablock->data) {
 		return metablock->data;
 	} else if (squash_metablock_is_compressed(metablock)) {
-		assert(0 == "TODO");
-		return NULL;
+		if (uncompress(metablock) < 0) {
+			return NULL;
+		}
 	} else {
-		return metablock->data = metablock->wrap->data;
+		metablock->data = metablock->wrap->data;
 	}
+	return metablock->data;
+}
+
+size_t
+squash_metablock_compressed_size(struct SquashMetablock *metablock) {
+	return metablock->wrap->header & 0x7FFF;
 }
 
 size_t
@@ -49,20 +65,15 @@ squash_metablock_size(struct SquashMetablock *metablock) {
 		assert(0 == "TODO");
 		return 0;
 	} else {
-		return metablock->size = metablock->wrap->header & 0x7FFF;
+		return metablock->size = squash_metablock_compressed_size(metablock);
 	}
 }
 
 int
 squash_metablock_cleanup(struct SquashMetablock *metablock) {
-	if (metablock == NULL) {
-		return 0;
-	}
-
 	if (squash_metablock_is_compressed(metablock)) {
 		free(metablock->wrap->data);
 	}
-	free(metablock);
 
 	return 0;
 }

@@ -6,8 +6,24 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <stdint.h>
+#include <string.h>
+#include <limits.h>
+#include <assert.h>
+
+#include "printb.h"
 
 #include "../src/squash.h"
+#include "../src/superblock.h"
+#include "../src/metablock.h"
+#include "../src/compression/gzip_handler.h"
+#include "../src/compression/compression.h"
+
+#define KEY_LENGTH "25"
+
+#define KEY(x) fprintf(out, "%-" KEY_LENGTH "s ", x ":")
+
+static FILE *out;
 
 static int
 usage(char *arg0) {
@@ -16,46 +32,103 @@ usage(char *arg0) {
 }
 
 static int
+metablock_info(struct SquashMetablock *metablock) {
+	KEY("METABLOCK_INFO");
+	if (metablock) {
+		fprintf(out, "compressed: %s, ", squash_metablock_is_compressed(metablock) ? "yes" : "no");
+		fprintf(out, "size: %lu, ", squash_metablock_size(metablock));
+		fprintf(out, "compressed_size: %lu, ", squash_metablock_compressed_size(metablock));
+		fprintf(out, "ratio: %f\n", (double)squash_metablock_compressed_size(metablock) / squash_metablock_size(metablock));
+	} else {
+		fputs("(none)\n", out);
+	}
+	return 0;
+}
+
+static int
+compression_info_gzip(struct Squash *squash) {
+	struct SquashGzip *options = &squash->decompressor.info.gzip;
+
+	KEY("COMPRESSION_LEVEL");
+	fprintf(out, "%i\n", options->options->compression_level);
+	KEY("WINDOW_SIZE");
+	fprintf(out, "%i\n", options->options->window_size);
+	KEY("STRATEGIES");
+	printb(options->options->strategies, out);
+	return 0;
+}
+
+static int
 compression_info(struct Squash *squash) {
-	fputs("compression type: ", stdout);
-	switch ((enum CompressionId)squash->superblock->compression_id) {
+	int (*handler)(struct Squash *squash) = NULL;
+	fputs("=== COMPRESSION INFO ===\n", out);
+	KEY("COMPRESSION_TYPE");
+	switch ((enum SquashSuperblockCompressionId)squash->superblock->compression_id) {
 	case SQUASH_COMPRESSION_NONE:
-		fputs("none\n", stdout);
+		fputs("none\n", out);
 		break;
 	case SQUASH_COMPRESSION_GZIP:
-		fputs("gzip\n", stdout);
+		fputs("gzip\n", out);
+		handler = compression_info_gzip;
 		break;
 	case SQUASH_COMPRESSION_LZMA:
-		fputs("lzma\n", stdout);
+		fputs("lzma\n", out);
 		break;
 	case SQUASH_COMPRESSION_LZO:
-		fputs("lzo\n", stdout);
+		fputs("lzo\n", out);
 		break;
 	case SQUASH_COMPRESSION_XZ:
-		fputs("xz\n", stdout);
+		fputs("xz\n", out);
 		break;
 	case SQUASH_COMPRESSION_LZ4:
-		fputs("lz4\n", stdout);
+		fputs("lz4\n", out);
 		break;
 	case SQUASH_COMPRESSION_ZSTD:
-		fputs("zstd\n", stdout);
+		fputs("zstd\n", out);
 		break;
 	}
 
-	fputs("comptession options: ", stdout);
-	fputs((squash->superblock->flags & SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS)
-			  ? "yes\n"
-			  : "no\n",
-		  stdout);
+	metablock_info(&squash->decompressor.metablock);
+	if (handler == NULL) {
+		fputs("WARNING: NO COMPRESSION OPTION HANDLER", stdout);
+	} else if (squash->superblock->flags & SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
+		handler(squash);
+	}
+
+	return 0;
+}
+
+static int
+flag_info(struct Squash *squash) {
+	fputs("=== FLAG INFO ===\n", out);
+	KEY("FLAGS");
+	printb(squash->superblock->flags, out);
+#	define PRINT_FLAG(x) { KEY(#x); fputs(squash->superblock->flags & SQUASH_SUPERBLOCK_##x ? "1\n" : "0\n", out); }
+	PRINT_FLAG(UNCOMPRESSED_INODES);
+	PRINT_FLAG(UNCOMPRESSED_DATA);
+	PRINT_FLAG(CHECK);
+	PRINT_FLAG(UNCOMPRESSED_FRAGMENTS);
+	PRINT_FLAG(NO_FRAGMENTS);
+	PRINT_FLAG(ALWAYS_FRAGMENTS);
+	PRINT_FLAG(DUPLICATES);
+	PRINT_FLAG(EXPORTABLE);
+	PRINT_FLAG(UNCOMPRESSED_XATTRS);
+	PRINT_FLAG(NO_XATTRS);
+	PRINT_FLAG(COMPRESSOR_OPTIONS);
+	PRINT_FLAG(UNCOMPRESSED_IDS);
+#	undef PRINT_FLAG
 
 	return 0;
 }
 
 int
 main(int argc, char *argv[]) {
+	int rv;
 	int opt = 0;
 	const char *image_path;
-	struct Squash *squash = NULL;
+	struct Squash squash = { 0 };
+
+	out = stdout;
 
 	while ((opt = getopt(argc, argv, "h")) != -1) {
 		switch (opt) {
@@ -64,19 +137,20 @@ main(int argc, char *argv[]) {
 		}
 	}
 
-	if (optind + 2 == argc) {
+	if (optind + 1 != argc) {
 		return usage(argv[0]);
 	}
 
-	squash = squash_open(argv[optind]);
-	if (squash == NULL) {
+	rv = squash_open(&squash, argv[optind]);
+	if (rv < 0) {
 		perror(argv[optind]);
 		return EXIT_FAILURE;
 	}
 
-	compression_info(squash);
+	flag_info(&squash);
+	compression_info(&squash);
 
-	squash_cleanup(squash);
+	squash_cleanup(&squash);
 
 	return 0;
 }

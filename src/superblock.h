@@ -13,6 +13,16 @@
 #define SQUASH_SUPERBLOCK_SIZE (sizeof(struct SquashSuperblockWrap))
 #define SQUASH_SUPERBLOCK_MAGIC 0x73717368
 
+enum SquashSuperblockCompressionId {
+	SQUASH_COMPRESSION_NONE = 0,
+	SQUASH_COMPRESSION_GZIP = 1,
+	SQUASH_COMPRESSION_LZMA = 2,
+	SQUASH_COMPRESSION_LZO = 3,
+	SQUASH_COMPRESSION_XZ = 4,
+	SQUASH_COMPRESSION_LZ4 = 5,
+	SQUASH_COMPRESSION_ZSTD = 6,
+};
+
 enum SquashSuperblockFlags {
 	SQUASH_SUPERBLOCK_UNCOMPRESSED_INODES = 0x0001,
 	SQUASH_SUPERBLOCK_UNCOMPRESSED_DATA = 0x0002,
@@ -51,7 +61,7 @@ struct SquashSuperblockWrap {
 };
 
 struct SquashSuperblockWrap *squash_superblock_wrap(uint8_t *bytes,
-													size_t size);
+		size_t size);
 
 uint8_t *squash_superblock_unwrap(struct SquashSuperblockWrap *superblock);
 

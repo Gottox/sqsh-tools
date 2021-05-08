@@ -4,30 +4,52 @@
  * @created     : Friday Apr 30, 2021 19:33:51 CEST
  */
 
+#include "gzip_handler.h"
+#include "../metablock.h"
+
+#include <bits/stdint-uintn.h>
+#include <stdint.h>
+#include <stdlib.h>
+
 #ifndef COMPRESSION_H
 
 #define COMPRESSION_H
 
-#include <stdint.h>
+struct Squash;
 
-enum CompressionId {
-	SQUASH_COMPRESSION_NONE = 0,
-	SQUASH_COMPRESSION_GZIP = 1,
-	SQUASH_COMPRESSION_LZMA = 2,
-	SQUASH_COMPRESSION_LZO = 3,
-	SQUASH_COMPRESSION_XZ = 4,
-	SQUASH_COMPRESSION_LZ4 = 5,
-	SQUASH_COMPRESSION_ZSTD = 6,
+struct SquashDecompressorImpl *squash_decompressor_by_id(int id);
+
+union SquashDecompressorInfo {
+	void *null;
+	struct SquashGzip gzip;
 };
 
-struct DeflateStream {
-	void *(*init)();
-	int (*fill)(void *stream, const uint8_t *data, const int size);
-	int (*collect)(void *stream, uint8_t **data, int *size);
-	int (*cleanup)(void *uncompress_stream);
+struct SquashDecompressorImpl {
+	int (*init)(union SquashDecompressorInfo *info, void *options, size_t size);
+	int (*decompress)(union SquashDecompressorInfo *de, uint8_t **out,
+			size_t *out_size, uint8_t *in, const off_t in_offset,
+			const size_t in_size);
+	int (*cleanup)(union SquashDecompressorInfo *de);
 };
 
-extern struct DeflateStream null_deflate_stream;
-extern struct DeflateStream zlib_deflate_stream;
+struct SquashDecompressor {
+	union SquashDecompressorInfo info;
+	struct SquashMetablock metablock;
+	struct SquashDecompressorImpl *impl;
+};
+
+struct SquashDecompressorStream {
+	struct SquashDecompressor *decompressor;
+	off_t block_offset;
+	off_t available_block_amount;
+
+	uint8_t *data;
+	size_t data_len;
+};
+
+int squash_decompressor_init(struct SquashDecompressor *de, struct Squash *squash);
+
+int squash_decompressor_cleanup(struct SquashDecompressor *de);
+
 
 #endif /* end of include guard COMPRESSION_H */

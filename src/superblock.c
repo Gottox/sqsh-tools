@@ -4,6 +4,7 @@
  * @created     : Friday Apr 30, 2021 12:34:53 CEST
  */
 
+#include "squash.h"
 #include "superblock.h"
 #include "utils.h"
 

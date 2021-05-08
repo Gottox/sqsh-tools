@@ -1,6 +1,6 @@
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : zlib
+ * @file        : null
  * @created     : Friday Apr 30, 2021 20:49:40 CEST
  */
 
@@ -10,55 +10,28 @@
 
 #include "compression.h"
 
-struct NullDeflateStream {
-	uint8_t *data;
-	size_t size;
-};
-
-void *
-null_init() {
-	return calloc(1, sizeof(struct NullDeflateStream));
-}
-
 int
-null_fill(void *stream, const uint8_t *data, const int size) {
-	uint8_t *realloc_data;
-	struct NullDeflateStream *null_stream = (struct NullDeflateStream *)stream;
-	realloc_data = realloc(null_stream->data, null_stream->size + size);
-	if (realloc_data == NULL) {
-		return -1;
-	}
-	memcpy(&realloc_data[null_stream->size], data, size);
-	null_stream->data = realloc_data;
-
-	return size;
-}
-
-int
-null_collect(void *stream, uint8_t **data, int *size) {
-	struct NullDeflateStream *null_stream = (struct NullDeflateStream *)stream;
-
-	*data = null_stream->data;
-	null_stream->data = NULL;
-	*size = null_stream->size;
-	null_stream->size = 0;
-
+squash_null_init(union SquashDecompressorInfo *info, void *options, size_t size) {
 	return 0;
 }
 
 int
-null_cleanup(void *stream) {
-	struct NullDeflateStream *null_stream = (struct NullDeflateStream *)stream;
+squash_null_decompress(union SquashDecompressorInfo *de, uint8_t **out,
+		size_t *out_size, uint8_t *in, const off_t in_offset,
+		const size_t in_size) {
+	*out_size = in_size;
+	*out = in;
 
-	free(null_stream->data);
-	free(null_stream);
+	return in_size;
+}
 
+int
+squash_null_cleanup(union SquashDecompressorInfo *de) {
 	return 0;
 }
 
-struct DeflateStream null_deflate_stream = {
-	.init = null_init,
-	.fill = null_fill,
-	.collect = null_collect,
-	.cleanup = null_cleanup,
+struct SquashDecompressorImpl squash_null_deflate = {
+	.init = squash_null_init,
+	.decompress = squash_null_decompress,
+	.cleanup = squash_null_cleanup,
 };
