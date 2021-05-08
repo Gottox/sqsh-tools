@@ -60,8 +60,8 @@ struct SquashSuperblockWrap {
 	uint64_t export_table_start;
 };
 
-struct SquashSuperblockWrap *squash_superblock_wrap(uint8_t *bytes,
-		size_t size);
+struct SquashSuperblockWrap *squash_superblock_wrap(
+		uint8_t *bytes, size_t size);
 
 uint8_t *squash_superblock_unwrap(struct SquashSuperblockWrap *superblock);
 

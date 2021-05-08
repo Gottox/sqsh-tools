@@ -9,12 +9,12 @@
 #define UTILS_H
 
 #ifdef __ORDER_LITTLE_ENDIAN__
-#define ENSURE_FORMAT_ORDER_16(x) ((void) x)
-#define ENSURE_FORMAT_ORDER_32(x) ((void) x)
-#define ENSURE_FORMAT_ORDER_64(x) ((void) x)
-#define ENSURE_HOST_ORDER_16(x) ((void) x)
-#define ENSURE_HOST_ORDER_32(x) ((void) x)
-#define ENSURE_HOST_ORDER_64(x) ((void) x)
+#define ENSURE_FORMAT_ORDER_16(x) ((void)x)
+#define ENSURE_FORMAT_ORDER_32(x) ((void)x)
+#define ENSURE_FORMAT_ORDER_64(x) ((void)x)
+#define ENSURE_HOST_ORDER_16(x) ((void)x)
+#define ENSURE_HOST_ORDER_32(x) ((void)x)
+#define ENSURE_HOST_ORDER_64(x) ((void)x)
 #else
 #define ENSURE_FORMAT_ORDER_16(x) (x) = htole16(x)
 #define ENSURE_FORMAT_ORDER_32(x) (x) = htole32(x)
@@ -25,4 +25,3 @@
 #endif
 
 #endif /* end of include guard UTILS_H */
-

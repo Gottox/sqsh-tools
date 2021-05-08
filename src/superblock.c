@@ -4,8 +4,8 @@
  * @created     : Friday Apr 30, 2021 12:34:53 CEST
  */
 
-#include "squash.h"
 #include "superblock.h"
+#include "squash.h"
 #include "utils.h"
 
 struct SquashSuperblockWrap *
@@ -15,7 +15,7 @@ squash_superblock_wrap(uint8_t *bytes, size_t size) {
 	}
 
 	struct SquashSuperblockWrap *superblock =
-		(struct SquashSuperblockWrap *)bytes;
+			(struct SquashSuperblockWrap *)bytes;
 
 	if (superblock->magic != htole32(SQUASH_SUPERBLOCK_MAGIC)) {
 		return NULL;

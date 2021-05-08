@@ -24,6 +24,4 @@ struct SquashDirectoryEntry {
 	uint8_t name[0]; // [name_size + 1]
 };
 
-
 #endif /* end of include guard DIRECTORY_H */
-

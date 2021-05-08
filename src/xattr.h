@@ -35,4 +35,3 @@ struct SquashXattrIdTable {
 };
 
 #endif /* end of include guard XATTR_H */
-

@@ -9,7 +9,7 @@
 uint32_t
 squash_inode_hard_link_count(struct SquashInode *inode) {
 	struct SquashInodeWrap *wrap = inode->wrap;
-	switch(wrap->inode_type) {
+	switch (wrap->inode_type) {
 	case SQUASH_INODE_TYPE_BASIC_DIRECTORY:
 		return wrap->data.dir.hard_link_count;
 	case SQUASH_INODE_TYPE_BASIC_FILE:

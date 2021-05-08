@@ -4,20 +4,20 @@
  * @created     : Friday Apr 30, 2021 13:00:20 CEST
  */
 
-#include <stdio.h>
-#include <unistd.h>
-#include <stdint.h>
-#include <string.h>
-#include <limits.h>
 #include <assert.h>
+#include <limits.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "printb.h"
 
+#include "../src/compression/compression.h"
+#include "../src/compression/gzip_handler.h"
+#include "../src/metablock.h"
 #include "../src/squash.h"
 #include "../src/superblock.h"
-#include "../src/metablock.h"
-#include "../src/compression/gzip_handler.h"
-#include "../src/compression/compression.h"
 
 #define KEY_LENGTH "25"
 
@@ -35,10 +35,13 @@ static int
 metablock_info(struct SquashMetablock *metablock) {
 	KEY("METABLOCK_INFO");
 	if (metablock) {
-		fprintf(out, "compressed: %s, ", squash_metablock_is_compressed(metablock) ? "yes" : "no");
-		fprintf(out, "size: %lu, ", squash_metablock_size(metablock));
-		fprintf(out, "compressed_size: %lu, ", squash_metablock_compressed_size(metablock));
-		fprintf(out, "ratio: %f\n", (double)squash_metablock_compressed_size(metablock) / squash_metablock_size(metablock));
+		int is_compressed = squash_metablock_is_compressed(metablock);
+		size_t size = squash_metablock_compressed_size(metablock);
+		size_t compressed_size = squash_metablock_compressed_size(metablock);
+		fprintf(out, "compressed: %s, ", is_compressed ? "yes" : "no");
+		fprintf(out, "size: %lu, ", size);
+		fprintf(out, "compressed_size: %lu, ", compressed_size);
+		fprintf(out, "ratio: %f\n", (double)size / compressed_size);
 	} else {
 		fputs("(none)\n", out);
 	}
@@ -60,10 +63,11 @@ compression_info_gzip(struct Squash *squash) {
 
 static int
 compression_info(struct Squash *squash) {
-	int (*handler)(struct Squash *squash) = NULL;
+	int (*handler)(struct Squash * squash) = NULL;
 	fputs("=== COMPRESSION INFO ===\n", out);
 	KEY("COMPRESSION_TYPE");
-	switch ((enum SquashSuperblockCompressionId)squash->superblock->compression_id) {
+	enum SquashSuperblockCompressionId id = squash->superblock->compression_id;
+	switch (id) {
 	case SQUASH_COMPRESSION_NONE:
 		fputs("none\n", out);
 		break;
@@ -91,7 +95,8 @@ compression_info(struct Squash *squash) {
 	metablock_info(&squash->decompressor.metablock);
 	if (handler == NULL) {
 		fputs("WARNING: NO COMPRESSION OPTION HANDLER", stdout);
-	} else if (squash->superblock->flags & SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
+	} else if (squash->superblock->flags &
+			SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
 		handler(squash);
 	}
 
@@ -103,7 +108,13 @@ flag_info(struct Squash *squash) {
 	fputs("=== FLAG INFO ===\n", out);
 	KEY("FLAGS");
 	printb(squash->superblock->flags, out);
-#	define PRINT_FLAG(x) { KEY(#x); fputs(squash->superblock->flags & SQUASH_SUPERBLOCK_##x ? "1\n" : "0\n", out); }
+#define PRINT_FLAG(x) \
+	{ \
+		KEY(#x); \
+		fputc(squash->superblock->flags &SQUASH_SUPERBLOCK_##x ? '1' : '0', \
+				out); \
+		fputc('\n', out); \
+	}
 	PRINT_FLAG(UNCOMPRESSED_INODES);
 	PRINT_FLAG(UNCOMPRESSED_DATA);
 	PRINT_FLAG(CHECK);
@@ -116,7 +127,7 @@ flag_info(struct Squash *squash) {
 	PRINT_FLAG(NO_XATTRS);
 	PRINT_FLAG(COMPRESSOR_OPTIONS);
 	PRINT_FLAG(UNCOMPRESSED_IDS);
-#	undef PRINT_FLAG
+#undef PRINT_FLAG
 
 	return 0;
 }
@@ -126,7 +137,7 @@ main(int argc, char *argv[]) {
 	int rv;
 	int opt = 0;
 	const char *image_path;
-	struct Squash squash = { 0 };
+	struct Squash squash = {0};
 
 	out = stdout;
 

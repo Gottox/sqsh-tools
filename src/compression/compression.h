@@ -4,8 +4,8 @@
  * @created     : Friday Apr 30, 2021 19:33:51 CEST
  */
 
-#include "gzip_handler.h"
 #include "../metablock.h"
+#include "gzip_handler.h"
 
 #include <bits/stdint-uintn.h>
 #include <stdint.h>
@@ -47,9 +47,9 @@ struct SquashDecompressorStream {
 	size_t data_len;
 };
 
-int squash_decompressor_init(struct SquashDecompressor *de, struct Squash *squash);
+int squash_decompressor_init(
+		struct SquashDecompressor *de, struct Squash *squash);
 
 int squash_decompressor_cleanup(struct SquashDecompressor *de);
-
 
 #endif /* end of include guard COMPRESSION_H */

@@ -17,4 +17,3 @@ struct SquashFragment {
 };
 
 #endif /* end of include guard FRAGMENT_H */
-

@@ -27,7 +27,8 @@ struct SquashMetablock {
 	size_t size;
 };
 
-int squash_metablock_init(struct SquashMetablock* metablock, struct Squash *squash, off_t offset);
+int squash_metablock_init(
+		struct SquashMetablock *metablock, struct Squash *squash, off_t offset);
 
 int squash_metablock_is_compressed(struct SquashMetablock *metablock);
 

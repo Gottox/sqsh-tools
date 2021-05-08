@@ -23,4 +23,3 @@ struct SquashGzip {
 };
 
 #endif /* end of include guard GZIP_HANDLER_H */
-

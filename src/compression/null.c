@@ -11,7 +11,8 @@
 #include "compression.h"
 
 int
-squash_null_init(union SquashDecompressorInfo *info, void *options, size_t size) {
+squash_null_init(
+		union SquashDecompressorInfo *info, void *options, size_t size) {
 	return 0;
 }
 
@@ -31,7 +32,7 @@ squash_null_cleanup(union SquashDecompressorInfo *de) {
 }
 
 struct SquashDecompressorImpl squash_null_deflate = {
-	.init = squash_null_init,
-	.decompress = squash_null_decompress,
-	.cleanup = squash_null_cleanup,
+		.init = squash_null_init,
+		.decompress = squash_null_decompress,
+		.cleanup = squash_null_cleanup,
 };

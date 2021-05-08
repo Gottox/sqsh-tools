@@ -19,11 +19,12 @@
 #include "superblock.h"
 
 int
-squash_init(struct Squash *squash, uint8_t *buffer, const size_t size, const enum SquashDtor dtor) {
+squash_init(struct Squash *squash, uint8_t *buffer, const size_t size,
+		const enum SquashDtor dtor) {
 	int rv = 0;
 
 	struct SquashSuperblockWrap *superblock =
-		squash_superblock_wrap(buffer, size);
+			squash_superblock_wrap(buffer, size);
 	if (superblock == NULL) {
 		errno = EINVAL;
 		return -errno;
@@ -80,7 +81,7 @@ err:
 	if (fd >= 0) {
 		assert(0 == close(fd));
 	}
-	
+
 	if (file_map != MAP_FAILED) {
 		assert(0 == munmap(file_map, st.st_size));
 	}

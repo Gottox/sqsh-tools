@@ -13,11 +13,24 @@
 #include <stdint.h>
 
 int
-squash_metablock_init(struct SquashMetablock* metablock, struct Squash *squash, off_t offset) {
-	metablock->decompressor = &squash->decompressor;
-	metablock->wrap =
-		(struct SquashMetablockWrap *)&((uint8_t *)squash->superblock)[offset];
+squash_metablock_init(struct SquashMetablock *metablock, struct Squash *squash,
+		off_t offset) {
+	uint8_t *dumb_ptr = (uint8_t *)squash->superblock;
 
+	// sanity-checks
+	if (offset < SQUASH_SUPERBLOCK_SIZE)
+		return -SQUASH_ERROR_METABLOCK_INIT;
+
+	struct SquashMetablock *de_block = &squash->decompressor.metablock;
+	if (de_block->wrap) {
+		if (offset < squash_metablock_compressed_size(de_block) +
+						SQUASH_SUPERBLOCK_SIZE) {
+			return -SQUASH_ERROR_METABLOCK_INIT;
+		}
+	}
+
+	metablock->decompressor = &squash->decompressor;
+	metablock->wrap = (struct SquashMetablockWrap *)(dumb_ptr + offset);
 	return 0;
 }
 
@@ -31,9 +44,8 @@ uncompress(struct SquashMetablock *metablock) {
 	int compressed_size = squash_metablock_compressed_size(metablock);
 	struct SquashDecompressor *de = metablock->decompressor;
 
-	de->impl->decompress(
-		&de->info, &metablock->data, &metablock->size, metablock->wrap->data, 0,
-		compressed_size);
+	de->impl->decompress(&de->info, &metablock->data, &metablock->size,
+			metablock->wrap->data, 0, compressed_size);
 
 	return 0;
 }

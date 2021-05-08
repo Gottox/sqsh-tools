@@ -34,7 +34,8 @@ int
 squash_decompressor_init(struct SquashDecompressor *de, struct Squash *squash) {
 	int rv = 0;
 	if (squash->superblock->flags & SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
-		rv = squash_metablock_init(&de->metablock, squash, SQUASH_SUPERBLOCK_SIZE);
+		rv = squash_metablock_init(
+				&de->metablock, squash, SQUASH_SUPERBLOCK_SIZE);
 		if (rv < 0) {
 			goto err;
 		}
@@ -52,7 +53,7 @@ squash_decompressor_init(struct SquashDecompressor *de, struct Squash *squash) {
 	}
 
 	return 0;
-err: 
+err:
 	squash_decompressor_cleanup(de);
 	return rv;
 }
@@ -83,15 +84,14 @@ squash_decompressor_stream_init(struct SquashDecompressorStream *stream,
 }
 
 int
-squash_decompressor_stream_more(struct SquashDecompressorStream *stream,
-		size_t min_read_bytes) {
-
+squash_decompressor_stream_more(
+		struct SquashDecompressorStream *stream, size_t min_read_bytes) {
 	return 0;
 }
 
 int
-squash_decompressor_stream_clean(struct SquashDecompressorStream *stream,
-		 size_t min_read_bytes) {
+squash_decompressor_stream_clean(
+		struct SquashDecompressorStream *stream, size_t min_read_bytes) {
 	int rv = 0;
 	return rv;
 }

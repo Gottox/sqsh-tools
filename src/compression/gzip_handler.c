@@ -18,9 +18,9 @@
 #define METHOD Z_DEFLATED
 
 const static struct SquashGzipOptions default_options = {
-	.compression_level = 9,
-	.window_size = 15,
-	.strategies = 0x01,
+		.compression_level = 9,
+		.window_size = 15,
+		.strategies = 0x01,
 };
 
 static int
@@ -43,7 +43,8 @@ map_strategies(uint8_t squash_id) {
 }
 
 int
-squash_gzip_init(union SquashDecompressorInfo *info, void *options, size_t size) {
+squash_gzip_init(
+		union SquashDecompressorInfo *info, void *options, size_t size) {
 	int rv = 0;
 
 	if (options == NULL) {
@@ -118,7 +119,7 @@ squash_gzip_cleanup(union SquashDecompressorInfo *de) {
 }
 
 struct SquashDecompressorImpl squash_gzip_deflate = {
-	.init = squash_gzip_init,
-	.decompress = squash_gzip_decompress,
-	.cleanup = squash_gzip_cleanup,
+		.init = squash_gzip_init,
+		.decompress = squash_gzip_decompress,
+		.cleanup = squash_gzip_cleanup,
 };
