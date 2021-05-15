@@ -4,14 +4,14 @@
  * @created     : Friday Apr 30, 2021 20:49:40 CEST
  */
 
-#include "../utils.h"
 #include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <zlib.h>
 
-#include "../squash.h"
+#include "../utils.h"
+#include "../error.h"
 #include "compression.h"
 #include "gzip_handler.h"
 #define MEM_LEVEL 8
@@ -72,7 +72,7 @@ int
 squash_gzip_decompress(union SquashDecompressorInfo *de, uint8_t **out,
 		size_t *out_size, uint8_t *in, const off_t in_offset,
 		const size_t in_size) {
-	int rv = 0, flush = 0;
+	int rv = 0;
 	struct SquashGzip *gzip = &de->gzip;
 	z_stream stream = {0};
 	int strategy = map_strategies(gzip->options->strategies);

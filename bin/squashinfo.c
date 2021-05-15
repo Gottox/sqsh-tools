@@ -4,6 +4,8 @@
  * @created     : Friday Apr 30, 2021 13:00:20 CEST
  */
 
+#define _XOPEN_SOURCE
+
 #include <assert.h>
 #include <limits.h>
 #include <stdint.h>
@@ -136,7 +138,6 @@ int
 main(int argc, char *argv[]) {
 	int rv;
 	int opt = 0;
-	const char *image_path;
 	struct Squash squash = {0};
 
 	out = stdout;

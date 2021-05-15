@@ -5,6 +5,9 @@
  */
 
 #include "inode.h"
+#include "error.h"
+#include "inode_table.h"
+#include "stream.h"
 
 uint32_t
 squash_inode_hard_link_count(struct SquashInode *inode) {
@@ -36,5 +39,31 @@ squash_inode_hard_link_count(struct SquashInode *inode) {
 	case SQUASH_INODE_TYPE_EXTENDED_SOCKET:
 		return wrap->data.xipc.hard_link_count;
 	}
-	return -1;
+	return -SQUASH_ERROR_UNKOWN_INODE_TYPE;
+}
+
+int
+squash_inode_init_root(struct SquashInode *inode, struct Squash *squash,
+		struct SquashInodeTable *table) {
+	int rv = 0;
+	inode->wrap = NULL;
+
+	rv = squash_stream_init(inode->stream, squash, table->metablock, 0, 0);
+	if (rv < 0) {
+		return rv;
+	}
+
+	squash_stream_more(inode->stream, sizeof(struct SquashInodeWrap));
+	if (rv < 0) {
+		return rv;
+	}
+
+	return 0;
+}
+
+int
+squash_inode_cleanup(struct SquashInode *inode) {
+	int rv = 0;
+	rv = squash_stream_cleanup(inode->stream);
+	return rv;
 }

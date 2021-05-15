@@ -133,7 +133,6 @@ struct SquashInodeWrap {
 
 struct SquashInode {
 	struct SquashInodeWrap *wrap;
-	struct Squash *root;
+	struct SquashStream *stream;
 };
-
 #endif /* end of include guard INODE_H */

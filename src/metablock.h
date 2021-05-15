@@ -4,12 +4,13 @@
  * @created     : Friday Apr 30, 2021 21:22:31 CEST
  */
 
+#include <stdint.h>
+#include <stdlib.h>
+#include <sys/types.h>
+
 #ifndef METABLOCK_H
 
 #define METABLOCK_H
-
-#include <stdint.h>
-#include <stdlib.h>
 
 struct Squash;
 

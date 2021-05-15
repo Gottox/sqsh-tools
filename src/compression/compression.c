@@ -70,28 +70,3 @@ squash_decompressor_cleanup(struct SquashDecompressor *de) {
 	return 0;
 }
 
-int
-squash_decompressor_stream_init(struct SquashDecompressorStream *stream,
-		struct SquashDecompressor *de, off_t block_offset) {
-	stream->decompressor = de;
-	stream->block_offset = block_offset;
-	stream->available_block_amount = 0;
-
-	stream->data = NULL;
-	stream->data_len = 0;
-
-	return 0;
-}
-
-int
-squash_decompressor_stream_more(
-		struct SquashDecompressorStream *stream, size_t min_read_bytes) {
-	return 0;
-}
-
-int
-squash_decompressor_stream_clean(
-		struct SquashDecompressorStream *stream, size_t min_read_bytes) {
-	int rv = 0;
-	return rv;
-}

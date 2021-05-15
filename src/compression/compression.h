@@ -7,7 +7,6 @@
 #include "../metablock.h"
 #include "gzip_handler.h"
 
-#include <bits/stdint-uintn.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -29,6 +28,10 @@ struct SquashDecompressorImpl {
 	int (*decompress)(union SquashDecompressorInfo *de, uint8_t **out,
 			size_t *out_size, uint8_t *in, const off_t in_offset,
 			const size_t in_size);
+	int (*decompress_into)(union SquashDecompressorInfo *de, uint8_t **out,
+			off_t *out_offset, const uint8_t *in,
+			size_t *in_size);
+
 	int (*cleanup)(union SquashDecompressorInfo *de);
 };
 
@@ -38,18 +41,8 @@ struct SquashDecompressor {
 	struct SquashDecompressorImpl *impl;
 };
 
-struct SquashDecompressorStream {
-	struct SquashDecompressor *decompressor;
-	off_t block_offset;
-	off_t available_block_amount;
-
-	uint8_t *data;
-	size_t data_len;
-};
-
 int squash_decompressor_init(
 		struct SquashDecompressor *de, struct Squash *squash);
 
 int squash_decompressor_cleanup(struct SquashDecompressor *de);
-
 #endif /* end of include guard COMPRESSION_H */
