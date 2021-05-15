@@ -69,4 +69,3 @@ squash_decompressor_cleanup(struct SquashDecompressor *de) {
 	squash_metablock_cleanup(&de->metablock);
 	return 0;
 }
-

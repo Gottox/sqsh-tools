@@ -29,8 +29,7 @@ struct SquashDecompressorImpl {
 			size_t *out_size, uint8_t *in, const off_t in_offset,
 			const size_t in_size);
 	int (*decompress_into)(union SquashDecompressorInfo *de, uint8_t **out,
-			off_t *out_offset, const uint8_t *in,
-			size_t *in_size);
+			off_t *out_offset, const uint8_t *in, size_t *in_size);
 
 	int (*cleanup)(union SquashDecompressorInfo *de);
 };

@@ -10,8 +10,8 @@
 #include <string.h>
 #include <zlib.h>
 
-#include "../utils.h"
 #include "../error.h"
+#include "../utils.h"
 #include "compression.h"
 #include "gzip_handler.h"
 #define MEM_LEVEL 8

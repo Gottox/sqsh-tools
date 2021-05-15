@@ -5,8 +5,8 @@
  */
 
 #include "compression/compression.h"
-#include "inode_table.h"
 #include "error.h"
+#include "inode_table.h"
 
 #include <stdint.h>
 #include <stdlib.h>
