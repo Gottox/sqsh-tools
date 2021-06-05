@@ -4,6 +4,8 @@
  * @created     : Friday Apr 30, 2021 12:35:31 CEST
  */
 
+#include <stdint.h>
+
 #ifndef UTILS_H
 
 #define UTILS_H
@@ -23,5 +25,7 @@
 #define ENSURE_HOST_ORDER_32(x) (x) = le32toh(x)
 #define ENSURE_HOST_ORDER_64(x) (x) = le64toh(x)
 #endif
+
+uint32_t log2_u32(uint32_t x);
 
 #endif /* end of include guard UTILS_H */

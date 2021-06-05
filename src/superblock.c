@@ -4,8 +4,8 @@
  * @created     : Friday Apr 30, 2021 12:34:53 CEST
  */
 
-#include "superblock.h"
 #include "squash.h"
+#include "superblock.h"
 #include "utils.h"
 
 struct SquashSuperblockWrap *
@@ -40,6 +40,11 @@ squash_superblock_wrap(uint8_t *bytes, size_t size) {
 	ENSURE_HOST_ORDER_64(superblock->directory_table_start);
 	ENSURE_HOST_ORDER_64(superblock->fragment_table_start);
 	ENSURE_HOST_ORDER_64(superblock->export_table_start);
+
+	if (superblock->block_log != log2_u32(superblock->block_size)) {
+		// TODO Change function to not return pointer but errorcode instead.
+		return NULL;
+	}
 
 	return superblock;
 }
