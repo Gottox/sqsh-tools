@@ -6,6 +6,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <zlib.h>
@@ -22,25 +23,6 @@ const static struct SquashGzipOptions default_options = {
 		.window_size = 15,
 		.strategies = 0x01,
 };
-
-static int
-map_strategies(uint8_t squash_id) {
-	switch (squash_id) {
-	case 0x00:
-	case 0x01:
-		return Z_DEFAULT_STRATEGY;
-	case 0x02:
-		return Z_FILTERED;
-	case 0x04:
-		return Z_HUFFMAN_ONLY;
-	case 0x08:
-		return Z_RLE;
-	case 0x10:
-		return Z_FIXED;
-	default:
-		return -1;
-	}
-}
 
 int
 squash_gzip_init(
@@ -69,46 +51,81 @@ err:
 }
 
 int
-squash_gzip_decompress(union SquashDecompressorInfo *de, uint8_t **out,
-		size_t *out_size, uint8_t *in, const off_t in_offset,
-		const size_t in_size) {
+squash_gzip_stream_init(union SquashDecompressorInfo *info,
+		union SquashDecompressorStreamInfo *stream_info,
+		uint8_t *data, size_t data_size, off_t read_start) {
 	int rv = 0;
-	struct SquashGzip *gzip = &de->gzip;
-	z_stream stream = {0};
-	int strategy = map_strategies(gzip->options->strategies);
-	uint8_t *tmp = NULL;
+	struct SquashGzip *gzip = &info->gzip;
+	stream_info->gzip.stream.zalloc = Z_NULL;
+	stream_info->gzip.stream.zfree = Z_NULL;
+	stream_info->gzip.stream.opaque = Z_NULL;
 
-	*out = NULL;
-	*out_size = 0;
-	stream.zalloc = Z_NULL;
-	stream.zfree = Z_NULL;
-	stream.opaque = Z_NULL;
-	rv = deflateInit2(&stream, gzip->options->compression_level, METHOD,
-			gzip->options->window_size, MEM_LEVEL, strategy);
+	stream_info->gzip.gzip = gzip;
+	stream_info->gzip.out = NULL;
+	stream_info->gzip.out_size = 0;
+
+	rv = inflateInit2(&stream_info->gzip.stream, gzip->options->window_size);
 	if (rv != Z_OK) {
+		return -SQUASH_ERROR_COMPRESSION_STREAM_INIT;
+	}
+
+	stream_info->gzip.stream.next_in = data;
+	stream_info->gzip.stream.avail_in = data_size;
+
+	return 0;
+}
+
+int
+squash_gzip_stream_decompress(union SquashDecompressorStreamInfo *info) {
+	struct SquashGzipStream *stream = &info->gzip;
+	int block_size = stream->gzip->page_size;
+
+	int rv = 0;
+	uint8_t *tmp = realloc(stream->out, stream->out_size + block_size);
+	if (tmp == NULL) {
+		return -1;
+	}
+	stream->out = tmp;
+
+	stream->stream.avail_out = block_size;
+	stream->stream.next_out = &stream->out[stream->out_size];
+
+	rv = inflate(&stream->stream, Z_SYNC_FLUSH);
+	switch (rv) {
+	case Z_OK:
+		stream->out_size += block_size;
+		break;
+	case Z_STREAM_END:
+		stream->out_size = stream->stream.total_out;
+		break;
+	default:
 		return -1;
 	}
 
-	stream.avail_in = in_size - in_offset;
-	stream.next_in = &in[in_offset];
+	return stream->stream.total_out;
+}
 
-	do {
-		stream.avail_out = de->gzip.page_size;
-		stream.next_out = &(*out)[*out_size];
-		*out_size += de->gzip.page_size;
+uint8_t *
+squash_gzip_stream_data(union SquashDecompressorStreamInfo *info) {
+	return info->gzip.out;
+}
 
-		tmp = realloc(*out, *out_size);
-		if (tmp == NULL) {
-			free(*out);
-			*out = NULL;
-			return -errno;
-		}
-		*out = tmp;
+size_t
+squash_gzip_stream_size(union SquashDecompressorStreamInfo *info) {
+	return info->gzip.out_size;
+}
 
-		rv = deflate(&stream, Z_FINISH);
-	} while (stream.avail_out == 0);
+int
+squash_gzip_stream_cleanup(union SquashDecompressorStreamInfo *info) {
+	struct SquashGzipStream *stream = &info->gzip;
+	int rv = 0;
 
-	*out_size = stream.avail_out;
+	rv = inflateEnd(&stream->stream);
+	if (rv != Z_OK) {
+		return -SQUASH_ERROR_COMPRESSION_STREAM_CLEANUP;
+	}
+
+	free(stream->out);
 
 	return 0;
 }
@@ -119,7 +136,15 @@ squash_gzip_cleanup(union SquashDecompressorInfo *de) {
 }
 
 struct SquashDecompressorImpl squash_gzip_deflate = {
+		.stream =
+				{
+						.init = squash_gzip_stream_init,
+						.decompress = squash_gzip_stream_decompress,
+						.data = squash_gzip_stream_data,
+						.size = squash_gzip_stream_size,
+						.cleanup = squash_gzip_stream_cleanup,
+				},
+
 		.init = squash_gzip_init,
-		.decompress = squash_gzip_decompress,
 		.cleanup = squash_gzip_cleanup,
 };

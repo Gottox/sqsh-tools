@@ -7,6 +7,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "compression/compression.h"
+
 #ifndef STREAM_H
 
 #define STREAM_H
@@ -14,13 +16,10 @@
 struct Squash;
 
 struct SquashStream {
+	union SquashDecompressorStreamInfo wrap;
 	struct SquashDecompressor *decompressor;
 	struct SquashMetablock *metablock;
-	off_t block;
 	off_t offset;
-
-	uint8_t *data;
-	size_t data_len;
 };
 
 int squash_stream_init(struct SquashStream *stream, struct Squash *squash,
@@ -29,6 +28,8 @@ int squash_stream_init(struct SquashStream *stream, struct Squash *squash,
 size_t squash_stream_size(struct SquashStream *stream);
 
 int squash_stream_more(struct SquashStream *stream, size_t min_read_bytes);
+
+int squash_stream_to_end(struct SquashStream *stream);
 
 uint8_t *squash_stream_data(struct SquashStream *stream);
 

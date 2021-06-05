@@ -16,7 +16,7 @@ int
 squash_inode_table_init(struct SquashInodeTable *table, struct Squash *squash) {
 	int rv = 0;
 	rv = squash_metablock_init(
-			table->metablock, squash, squash->superblock->inode_table_start);
+			&table->metablock, squash, squash->superblock->inode_table_start);
 
 	return 0;
 }
@@ -25,6 +25,6 @@ int
 squash_inode_table_cleanup(struct SquashInodeTable *table) {
 	int rv = 0;
 
-	rv = squash_metablock_cleanup(table->metablock);
+	rv = squash_metablock_cleanup(&table->metablock);
 	return rv;
 }

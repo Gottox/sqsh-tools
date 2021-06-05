@@ -6,9 +6,11 @@
 
 #include "../metablock.h"
 #include "gzip_handler.h"
+#include "null_handler.h"
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <zlib.h>
 
 #ifndef COMPRESSION_H
 
@@ -16,27 +18,36 @@
 
 struct Squash;
 
-struct SquashDecompressorImpl *squash_decompressor_by_id(int id);
-
 union SquashDecompressorInfo {
 	void *null;
 	struct SquashGzip gzip;
 };
 
-struct SquashDecompressorImpl {
-	int (*init)(union SquashDecompressorInfo *info, void *options, size_t size);
-	int (*decompress)(union SquashDecompressorInfo *de, uint8_t **out,
-			size_t *out_size, uint8_t *in, const off_t in_offset,
-			const size_t in_size);
-	int (*decompress_into)(union SquashDecompressorInfo *de, uint8_t **out,
-			off_t *out_offset, const uint8_t *in, size_t *in_size);
+union SquashDecompressorStreamInfo {
+	struct SquashGzipStream gzip;
+	struct SquashNullStream null;
+};
 
-	int (*cleanup)(union SquashDecompressorInfo *de);
+struct SquashDecompressorStreamImpl {
+	int (*init)(union SquashDecompressorInfo *info,
+			union SquashDecompressorStreamInfo *stream_info,
+			uint8_t *data, size_t data_size, off_t read_start);
+	int (*decompress)(union SquashDecompressorStreamInfo *stream);
+	uint8_t *(*data)(union SquashDecompressorStreamInfo *stream);
+	size_t (*size)(union SquashDecompressorStreamInfo *stream);
+	int (*cleanup)(union SquashDecompressorStreamInfo *stream);
+};
+
+struct SquashDecompressorImpl {
+	struct SquashDecompressorStreamImpl stream;
+
+	int (*init)(union SquashDecompressorInfo *info, void *options, size_t size);
+	int (*cleanup)(union SquashDecompressorInfo *info);
 };
 
 struct SquashDecompressor {
 	union SquashDecompressorInfo info;
-	struct SquashMetablock metablock;
+	struct SquashMetablock compression_info_block;
 	struct SquashDecompressorImpl *impl;
 };
 

@@ -33,11 +33,11 @@ int squash_metablock_init(
 
 int squash_metablock_is_compressed(struct SquashMetablock *metablock);
 
+int squash_metablock_is_empty(struct SquashMetablock *metablock);
+
 uint8_t *squash_metablock_data(struct SquashMetablock *metablock);
 
 size_t squash_metablock_size(struct SquashMetablock *metablock);
-
-size_t squash_metablock_compressed_size(struct SquashMetablock *metablock);
 
 int squash_metablock_cleanup(struct SquashMetablock *metablock);
 

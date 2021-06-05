@@ -18,8 +18,10 @@
 #include "../src/compression/compression.h"
 #include "../src/compression/gzip_handler.h"
 #include "../src/metablock.h"
+#include "../src/stream.h"
 #include "../src/squash.h"
 #include "../src/superblock.h"
+#include "../src/inode.h"
 
 #define KEY_LENGTH "25"
 
@@ -34,19 +36,28 @@ usage(char *arg0) {
 }
 
 static int
-metablock_info(struct SquashMetablock *metablock) {
+metablock_info(struct SquashMetablock *metablock, struct Squash *squash) {
+	struct SquashStream stream = { 0 };
 	KEY("METABLOCK_INFO");
-	if (metablock) {
-		int is_compressed = squash_metablock_is_compressed(metablock);
-		size_t size = squash_metablock_compressed_size(metablock);
-		size_t compressed_size = squash_metablock_compressed_size(metablock);
-		fprintf(out, "compressed: %s, ", is_compressed ? "yes" : "no");
-		fprintf(out, "size: %lu, ", size);
-		fprintf(out, "compressed_size: %lu, ", compressed_size);
-		fprintf(out, "ratio: %f\n", (double)size / compressed_size);
-	} else {
+	if (squash_metablock_is_empty(metablock)) {
 		fputs("(none)\n", out);
+		return 0;
 	}
+
+	int is_compressed = squash_metablock_is_compressed(metablock);
+	squash_stream_init(&stream, squash, metablock, 0, 0);
+	squash_stream_to_end(&stream);
+	size_t size = squash_stream_size(&stream);
+	squash_stream_cleanup(&stream);
+
+	size_t compressed_size = squash_metablock_size(metablock);
+	fprintf(out,
+			"compressed: %s, "
+			"size: %lu, "
+			"compressed_size: %lu, "
+			"ratio: %f\n",
+			is_compressed ? "yes" : "no", size, compressed_size,
+			(double)compressed_size / size);
 	return 0;
 }
 
@@ -61,6 +72,24 @@ compression_info_gzip(struct Squash *squash) {
 	KEY("STRATEGIES");
 	printb(options->options->strategies, out);
 	return 0;
+}
+
+static int
+inode_info(struct Squash *squash) {
+	struct SquashInode inode = { 0 };
+	int rv = 0;
+	fputs("=== INODE TABLE ===\n", out);
+	rv = metablock_info(&squash->inodes.metablock, squash);
+	if (rv < 0) {
+		return rv;
+	}
+
+	rv = squash_inode_load(&inode, squash, squash->superblock->root_inode_ref);
+	if (rv < 0) {
+		return rv;
+	}
+	rv = squash_inode_cleanup(&inode);
+	return rv;
 }
 
 static int
@@ -94,14 +123,12 @@ compression_info(struct Squash *squash) {
 		break;
 	}
 
-	metablock_info(&squash->decompressor.metablock);
 	if (handler == NULL) {
-		fputs("WARNING: NO COMPRESSION OPTION HANDLER", stdout);
-	} else if (squash->superblock->flags &
-			SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
+		fputs("WARNING: NO COMPRESSION OPTION HANDLER\n", stdout);
+	} else {
+		metablock_info(&squash->decompressor.compression_info_block, squash);
 		handler(squash);
 	}
-
 	return 0;
 }
 
@@ -161,6 +188,8 @@ main(int argc, char *argv[]) {
 
 	flag_info(&squash);
 	compression_info(&squash);
+
+	inode_info(&squash);
 
 	squash_cleanup(&squash);
 

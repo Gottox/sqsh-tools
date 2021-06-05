@@ -35,7 +35,9 @@ struct Squash {
 
 int squash_init(struct Squash *squash, uint8_t *buffer, const size_t size,
 		const enum SquashDtor dtor);
+
 int squash_open(struct Squash *squash, const char *path);
+
 int squash_cleanup(struct Squash *squash);
 
 #endif /* end of include guard SQUASH_H */

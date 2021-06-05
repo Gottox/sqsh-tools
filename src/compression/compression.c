@@ -13,8 +13,8 @@
 extern struct SquashDecompressorImpl squash_null_deflate;
 extern struct SquashDecompressorImpl squash_gzip_deflate;
 
-struct SquashDecompressorImpl *
-squash_decompressor_by_id(int id) {
+static struct SquashDecompressorImpl *
+decompressor_by_id(int id) {
 	switch ((enum SquashSuperblockCompressionId)id) {
 	case SQUASH_COMPRESSION_NONE:
 		return &squash_null_deflate;
@@ -26,28 +26,37 @@ squash_decompressor_by_id(int id) {
 	case SQUASH_COMPRESSION_LZ4:
 	case SQUASH_COMPRESSION_ZSTD:
 		return NULL;
+	default:
+		return NULL;
 	}
-	return NULL;
 }
 
 int
 squash_decompressor_init(struct SquashDecompressor *de, struct Squash *squash) {
 	int rv = 0;
+	uint8_t *compression_info = NULL;
+	size_t compression_info_size = 0;
+
 	if (squash->superblock->flags & SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
 		rv = squash_metablock_init(
-				&de->metablock, squash, SQUASH_SUPERBLOCK_SIZE);
+				&de->compression_info_block, squash, SQUASH_SUPERBLOCK_SIZE);
 		if (rv < 0) {
 			goto err;
 		}
+		if (squash_metablock_is_compressed(&de->compression_info_block)) {
+			rv = -SQUASH_ERROR_METABLOCK_INFO_IS_COMPRESSED;
+			goto err;
+		}
+		compression_info = squash_metablock_data(&de->compression_info_block);
+		compression_info_size = squash_metablock_size(&de->compression_info_block);
 	}
 
-	de->impl = squash_decompressor_by_id(squash->superblock->compression_id);
+	de->impl = decompressor_by_id(squash->superblock->compression_id);
 	if (de->impl == NULL) {
-		rv = -SQUASH_ERROR_UNSUPPORTED_COMPRESSION;
+		rv = -SQUASH_ERROR_METABLOCK_UNSUPPORTED_COMPRESSION;
+		goto err;
 	}
-	uint8_t *data = squash_metablock_data(&de->metablock);
-	size_t size = squash_metablock_size(&de->metablock);
-	rv = de->impl->init(&de->info, data, size);
+	rv = de->impl->init(&de->info, compression_info, compression_info_size);
 	if (rv < 0) {
 		goto err;
 	}
@@ -66,6 +75,6 @@ squash_decompressor_cleanup(struct SquashDecompressor *de) {
 	if (de->impl) {
 		de->impl->cleanup(&de->info);
 	}
-	squash_metablock_cleanup(&de->metablock);
+	squash_metablock_cleanup(&de->compression_info_block);
 	return 0;
 }

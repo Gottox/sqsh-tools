@@ -7,12 +7,71 @@
 #include "inode.h"
 #include "error.h"
 #include "inode_table.h"
+#include "squash.h"
 #include "stream.h"
+#include "superblock.h"
+#include <stdint.h>
+
+static int
+inode_data_more(struct SquashInode *inode, size_t size) {
+	int rv = squash_stream_more(&inode->stream, size);
+
+	if (rv < 0) {
+		return rv;
+	}
+	inode->wrap = (struct SquashInodeWrap *)squash_stream_data(&inode->stream);
+	return 0;
+}
+
+static int
+inode_load(struct SquashInode *inode) {
+	int rv = 0;
+	size_t size = sizeof(struct SquashInodeHeader);
+
+	switch (inode->wrap->header.inode_type) {
+	case SQUASH_INODE_TYPE_BASIC_DIRECTORY:
+		size += sizeof(struct SquashInodeDirectory);
+		break;
+	case SQUASH_INODE_TYPE_BASIC_FILE:
+		size += sizeof(struct SquashInodeFileExt);
+		break;
+	case SQUASH_INODE_TYPE_BASIC_SYMLINK:
+		size += sizeof(struct SquashInodeSymlink);
+		break;
+	case SQUASH_INODE_TYPE_BASIC_BLOCK:
+	case SQUASH_INODE_TYPE_BASIC_CHAR:
+		size += sizeof(struct SquashInodeDevice);
+		break;
+	case SQUASH_INODE_TYPE_BASIC_FIFO:
+	case SQUASH_INODE_TYPE_BASIC_SOCKET:
+		size += sizeof(struct SquashInodeIpc);
+		break;
+	case SQUASH_INODE_TYPE_EXTENDED_DIRECTORY:
+		size += sizeof(struct SquashInodeDirectoryExt);
+		break;
+	case SQUASH_INODE_TYPE_EXTENDED_FILE:
+		size += sizeof(struct SquashInodeFileExt);
+		break;
+	case SQUASH_INODE_TYPE_EXTENDED_SYMLINK:
+		size += sizeof(struct SquashInodeSymlinkExt);
+		break;
+	case SQUASH_INODE_TYPE_EXTENDED_BLOCK:
+	case SQUASH_INODE_TYPE_EXTENDED_CHAR:
+		size += sizeof(struct SquashInodeDeviceExt);
+		break;
+	case SQUASH_INODE_TYPE_EXTENDED_FIFO:
+	case SQUASH_INODE_TYPE_EXTENDED_SOCKET:
+		size += sizeof(struct SquashInodeIpcExt);
+		break;
+	}
+	rv = inode_data_more(inode, size);
+	return rv;
+}
 
 uint32_t
 squash_inode_hard_link_count(struct SquashInode *inode) {
 	struct SquashInodeWrap *wrap = inode->wrap;
-	switch (wrap->inode_type) {
+	switch (wrap->header.inode_type) {
 	case SQUASH_INODE_TYPE_BASIC_DIRECTORY:
 		return wrap->data.dir.hard_link_count;
 	case SQUASH_INODE_TYPE_BASIC_FILE:
@@ -43,27 +102,32 @@ squash_inode_hard_link_count(struct SquashInode *inode) {
 }
 
 int
-squash_inode_init_root(struct SquashInode *inode, struct Squash *squash,
-		struct SquashInodeTable *table) {
+squash_inode_load(struct SquashInode *inode, struct Squash *squash, uint64_t number) {
 	int rv = 0;
 	inode->wrap = NULL;
+	int block = number >> 16;
+	int offset = number & 0xffff;
 
-	rv = squash_stream_init(inode->stream, squash, table->metablock, 0, 0);
+	rv = squash_stream_init(
+			&inode->stream, squash, &squash->inodes.metablock, block, offset);
 	if (rv < 0) {
 		return rv;
 	}
 
-	squash_stream_more(inode->stream, sizeof(struct SquashInodeWrap));
+	// loading enough data to identify the inode
+	rv = inode_data_more(inode, sizeof(struct SquashInodeHeader));
 	if (rv < 0) {
 		return rv;
 	}
 
-	return 0;
+	rv = inode_load(inode);
+
+	return rv;
 }
 
 int
 squash_inode_cleanup(struct SquashInode *inode) {
 	int rv = 0;
-	rv = squash_stream_cleanup(inode->stream);
+	rv = squash_stream_cleanup(&inode->stream);
 	return rv;
 }

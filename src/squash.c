@@ -14,6 +14,7 @@
 #include <unistd.h>
 
 #include "compression/compression.h"
+#include "inode_table.h"
 #include "metablock.h"
 #include "squash.h"
 #include "superblock.h"
@@ -34,13 +35,17 @@ squash_init(struct Squash *squash, uint8_t *buffer, const size_t size,
 	squash->size = size;
 	squash->dtor = dtor;
 
-	if (squash->superblock->flags & SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
-		rv = squash_decompressor_init(&squash->decompressor, squash);
-		if (rv < 0)
-			return rv;
+	rv = squash_decompressor_init(&squash->decompressor, squash);
+	if (rv < 0) {
+		return rv;
 	}
 
-	return 0;
+	rv = squash_inode_table_init(&squash->inodes, squash);
+	if (rv < 0) {
+		return rv;
+	}
+
+	return rv;
 }
 
 int
@@ -92,7 +97,11 @@ int
 squash_cleanup(struct Squash *squash) {
 	int rv = 0;
 
-	squash_decompressor_cleanup(&squash->decompressor);
+	if (squash->superblock->flags & SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
+		rv = squash_decompressor_cleanup(&squash->decompressor);
+		if (rv < 0)
+			return rv;
+	}
 
 	switch (squash->dtor) {
 	case SQUASH_DTOR_FREE:

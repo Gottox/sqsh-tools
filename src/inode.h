@@ -4,14 +4,17 @@
  * @created     : Thursday May 06, 2021 15:22:00 CEST
  */
 
+#include <stdint.h>
+#include <stdlib.h>
+
+#include "stream.h"
+
 #ifndef INODE_H
 
 #define INODE_H
 
-#include <stdint.h>
-#include <stdlib.h>
-
 struct Squash;
+struct SquashInodeTable;
 
 enum SquashInodeType {
 	SQUASH_INODE_TYPE_BASIC_DIRECTORY = 1,
@@ -85,7 +88,10 @@ struct SquashInodeSymlinkExt {
 	uint32_t hard_link_count;
 	uint32_t target_size;
 	uint8_t target_path[0]; // [target_size]
-	// uint32_t xattr_idx;
+};
+
+struct SquashInodeSymlinkExtTail {
+	uint32_t xattr_idx;
 };
 
 struct SquashInodeDevice {
@@ -121,18 +127,27 @@ union SquashInodeData {
 	struct SquashInodeIpcExt xipc;
 };
 
-struct SquashInodeWrap {
+struct SquashInodeHeader {
 	uint16_t inode_type;
 	uint16_t permissions;
 	uint16_t uid_idx;
 	uint16_t gid_idx;
 	uint32_t modified_time;
 	uint32_t inode_number;
+};
+
+struct SquashInodeWrap {
+	struct SquashInodeHeader header;
 	union SquashInodeData data;
 };
 
 struct SquashInode {
 	struct SquashInodeWrap *wrap;
-	struct SquashStream *stream;
+	struct SquashStream stream;
 };
+
+int squash_inode_load(struct SquashInode *inode, struct Squash *squash, uint64_t number);
+
+int squash_inode_cleanup(struct SquashInode *inode);
+
 #endif /* end of include guard INODE_H */
