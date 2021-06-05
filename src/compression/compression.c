@@ -48,7 +48,8 @@ squash_decompressor_init(struct SquashDecompressor *de, struct Squash *squash) {
 			goto err;
 		}
 		compression_info = squash_metablock_data(&de->compression_info_block);
-		compression_info_size = squash_metablock_size(&de->compression_info_block);
+		compression_info_size =
+				squash_metablock_size(&de->compression_info_block);
 	}
 
 	de->impl = decompressor_by_id(squash->superblock->compression_id);

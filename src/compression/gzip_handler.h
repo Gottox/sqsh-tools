@@ -12,7 +12,6 @@
 
 #define GZIP_HANDLER_H
 
-
 struct SquashGzipOptions {
 	uint32_t compression_level;
 	uint16_t window_size;

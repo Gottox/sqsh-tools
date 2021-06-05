@@ -30,8 +30,8 @@ union SquashDecompressorStreamInfo {
 
 struct SquashDecompressorStreamImpl {
 	int (*init)(union SquashDecompressorInfo *info,
-			union SquashDecompressorStreamInfo *stream_info,
-			uint8_t *data, size_t data_size, off_t read_start);
+			union SquashDecompressorStreamInfo *stream_info, uint8_t *data,
+			size_t data_size, off_t read_start);
 	int (*decompress)(union SquashDecompressorStreamInfo *stream);
 	uint8_t *(*data)(union SquashDecompressorStreamInfo *stream);
 	size_t (*size)(union SquashDecompressorStreamInfo *stream);

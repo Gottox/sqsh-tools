@@ -52,8 +52,8 @@ err:
 
 int
 squash_gzip_stream_init(union SquashDecompressorInfo *info,
-		union SquashDecompressorStreamInfo *stream_info,
-		uint8_t *data, size_t data_size, off_t read_start) {
+		union SquashDecompressorStreamInfo *stream_info, uint8_t *data,
+		size_t data_size, off_t read_start) {
 	int rv = 0;
 	struct SquashGzip *gzip = &info->gzip;
 	stream_info->gzip.stream.zalloc = Z_NULL;

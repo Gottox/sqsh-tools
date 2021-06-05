@@ -4,21 +4,21 @@
  * @created     : Tuesday May 18, 2021 21:57:27 CEST
  */
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <zlib.h>
 #include <assert.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <zlib.h>
 
 #define BLOCK_SIZE 1024
 
 static int
-read_file(const char* filename, uint8_t **buffer, size_t *size) {
+read_file(const char *filename, uint8_t **buffer, size_t *size) {
 	FILE *file;
 	int rv = 0;
 	uint8_t *p;
 	if (filename) {
-		file = fopen (filename, "r");
+		file = fopen(filename, "r");
 	} else {
 		file = stdin;
 	}
@@ -34,7 +34,7 @@ read_file(const char* filename, uint8_t **buffer, size_t *size) {
 		*buffer = realloc(*buffer, *size + BUFSIZ);
 		p = &(*buffer)[*size];
 		rv = fread(p, sizeof(uint8_t), BUFSIZ, file);
-	} while(rv > 0);
+	} while (rv > 0);
 	fclose(file);
 
 	return 0;
@@ -69,7 +69,7 @@ do_decompress(z_stream *stream, uint8_t **out, size_t *size) {
 	stream->next_out = &(*out)[*size];
 
 	rv = inflate(stream, Z_SYNC_FLUSH);
-	switch(rv) {
+	switch (rv) {
 	case Z_OK:
 		*size += BLOCK_SIZE;
 		return 0;
@@ -98,7 +98,7 @@ decompress(uint8_t *compressed, size_t in_size) {
 	fflush(stdout);
 	do {
 		rv = do_decompress(&stream, &buffer, &buffer_size);
-	} while(rv == 0);
+	} while (rv == 0);
 
 	cleanup_decompress(&stream);
 
@@ -122,8 +122,7 @@ main(int argc, char *argv[]) {
 	}
 	assert(read_file(filename, &buffer, &size) >= 0);
 	free(buffer);
-	assert(decompress(buffer+10, size-10) >= 0);
-	//fwrite(buffer+10, sizeof(uint8_t), size-10, stdout);
+	assert(decompress(buffer + 10, size - 10) >= 0);
+	// fwrite(buffer+10, sizeof(uint8_t), size-10, stdout);
 	return 0;
 }
-

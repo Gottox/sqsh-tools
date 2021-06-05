@@ -17,11 +17,11 @@
 
 #include "../src/compression/compression.h"
 #include "../src/compression/gzip_handler.h"
-#include "../src/metablock.h"
-#include "../src/stream.h"
-#include "../src/squash.h"
-#include "../src/superblock.h"
 #include "../src/inode.h"
+#include "../src/metablock.h"
+#include "../src/squash.h"
+#include "../src/stream.h"
+#include "../src/superblock.h"
 
 #define KEY_LENGTH "25"
 
@@ -37,7 +37,7 @@ usage(char *arg0) {
 
 static int
 metablock_info(struct SquashMetablock *metablock, struct Squash *squash) {
-	struct SquashStream stream = { 0 };
+	struct SquashStream stream = {0};
 	KEY("METABLOCK_INFO");
 	if (squash_metablock_is_empty(metablock)) {
 		fputs("(none)\n", out);
@@ -76,7 +76,7 @@ compression_info_gzip(struct Squash *squash) {
 
 static int
 inode_info(struct Squash *squash) {
-	struct SquashInode inode = { 0 };
+	struct SquashInode inode = {0};
 	int rv = 0;
 	fputs("=== INODE TABLE ===\n", out);
 	rv = metablock_info(&squash->inodes.metablock, squash);

@@ -102,7 +102,8 @@ squash_inode_hard_link_count(struct SquashInode *inode) {
 }
 
 int
-squash_inode_load(struct SquashInode *inode, struct Squash *squash, uint64_t number) {
+squash_inode_load(
+		struct SquashInode *inode, struct Squash *squash, uint64_t number) {
 	int rv = 0;
 	inode->wrap = NULL;
 	int block = number >> 16;

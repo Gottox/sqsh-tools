@@ -146,7 +146,8 @@ struct SquashInode {
 	struct SquashStream stream;
 };
 
-int squash_inode_load(struct SquashInode *inode, struct Squash *squash, uint64_t number);
+int squash_inode_load(
+		struct SquashInode *inode, struct Squash *squash, uint64_t number);
 
 int squash_inode_cleanup(struct SquashInode *inode);
 
