@@ -37,7 +37,7 @@ squash_decompressor_init(struct SquashDecompressor *de, struct Squash *squash) {
 	uint8_t *compression_info = NULL;
 	size_t compression_info_size = 0;
 
-	if (squash->superblock->flags & SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
+	if (squash->superblock.wrap->flags & SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
 		rv = squash_metablock_init(
 				&de->compression_info_block, squash, SQUASH_SUPERBLOCK_SIZE);
 		if (rv < 0) {
@@ -52,7 +52,7 @@ squash_decompressor_init(struct SquashDecompressor *de, struct Squash *squash) {
 				squash_metablock_size(&de->compression_info_block);
 	}
 
-	de->impl = decompressor_by_id(squash->superblock->compression_id);
+	de->impl = decompressor_by_id(squash->superblock.wrap->compression_id);
 	if (de->impl == NULL) {
 		rv = -SQUASH_ERROR_METABLOCK_UNSUPPORTED_COMPRESSION;
 		goto err;

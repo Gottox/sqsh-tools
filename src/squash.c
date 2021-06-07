@@ -24,14 +24,11 @@ squash_init(struct Squash *squash, uint8_t *buffer, const size_t size,
 		const enum SquashDtor dtor) {
 	int rv = 0;
 
-	struct SquashSuperblockWrap *superblock =
-			squash_superblock_wrap(buffer, size);
-	if (superblock == NULL) {
-		errno = EINVAL;
-		return -errno;
+	rv = squash_superblock_init(&squash->superblock, buffer, size);
+	if (rv < 0) {
+		return rv;
 	}
 
-	squash->superblock = superblock;
 	squash->size = size;
 	squash->dtor = dtor;
 
@@ -97,18 +94,19 @@ int
 squash_cleanup(struct Squash *squash) {
 	int rv = 0;
 
-	if (squash->superblock->flags & SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
+	if (squash->superblock.wrap->flags & SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
 		rv = squash_decompressor_cleanup(&squash->decompressor);
 		if (rv < 0)
 			return rv;
 	}
 
+	// TODO this should go into superblock.c
 	switch (squash->dtor) {
 	case SQUASH_DTOR_FREE:
-		free(squash->superblock);
+		free(squash->superblock.wrap);
 		break;
 	case SQUASH_DTOR_MUNMAP:
-		rv |= munmap(squash->superblock, squash->size);
+		rv |= munmap(squash->superblock.wrap, squash->size);
 		break;
 	case SQUASH_DTOR_NONE:
 		// noop

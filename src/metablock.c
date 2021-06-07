@@ -22,7 +22,7 @@ static struct SquashDecompressor null_decompressor = {
 int
 squash_metablock_init(struct SquashMetablock *metablock, struct Squash *squash,
 		off_t offset) {
-	uint8_t *dumb_ptr = (uint8_t *)squash->superblock;
+	uint8_t *dumb_ptr = (uint8_t *)squash->superblock.wrap;
 
 	// sanity-checks
 	if (offset < SQUASH_SUPERBLOCK_SIZE)

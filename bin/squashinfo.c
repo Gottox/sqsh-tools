@@ -84,7 +84,8 @@ inode_info(struct Squash *squash) {
 		return rv;
 	}
 
-	rv = squash_inode_load(&inode, squash, squash->superblock->root_inode_ref);
+	rv = squash_inode_load(
+			&inode, squash, squash->superblock.wrap->root_inode_ref);
 	if (rv < 0) {
 		return rv;
 	}
@@ -97,7 +98,8 @@ compression_info(struct Squash *squash) {
 	int (*handler)(struct Squash * squash) = NULL;
 	fputs("=== COMPRESSION INFO ===\n", out);
 	KEY("COMPRESSION_TYPE");
-	enum SquashSuperblockCompressionId id = squash->superblock->compression_id;
+	enum SquashSuperblockCompressionId id =
+			squash->superblock.wrap->compression_id;
 	switch (id) {
 	case SQUASH_COMPRESSION_NONE:
 		fputs("none\n", out);
@@ -134,14 +136,14 @@ compression_info(struct Squash *squash) {
 
 static int
 flag_info(struct Squash *squash) {
+	enum SquashSuperblockFlags flags = squash->superblock.wrap->flags;
 	fputs("=== FLAG INFO ===\n", out);
 	KEY("FLAGS");
-	printb(squash->superblock->flags, out);
+	printb(squash->superblock.wrap->flags, out);
 #define PRINT_FLAG(x) \
 	{ \
 		KEY(#x); \
-		fputc(squash->superblock->flags &SQUASH_SUPERBLOCK_##x ? '1' : '0', \
-				out); \
+		fputc(flags &SQUASH_SUPERBLOCK_##x ? '1' : '0', out); \
 		fputc('\n', out); \
 	}
 	PRINT_FLAG(UNCOMPRESSED_INODES);

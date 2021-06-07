@@ -60,9 +60,13 @@ struct SquashSuperblockWrap {
 	uint64_t export_table_start;
 };
 
-struct SquashSuperblockWrap *squash_superblock_wrap(
-		uint8_t *bytes, size_t size);
+struct SquashSuperblock {
+	struct SquashSuperblockWrap *wrap;
+};
 
-uint8_t *squash_superblock_unwrap(struct SquashSuperblockWrap *superblock);
+int squash_superblock_init(
+		struct SquashSuperblock *superblock, uint8_t *bytes, size_t size);
+
+int squash_superblock_cleanup(struct SquashSuperblockWrap *superblock);
 
 #endif /* end of include guard SUPERBLOCK_H */

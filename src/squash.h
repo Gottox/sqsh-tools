@@ -7,6 +7,7 @@
 #include "compression/compression.h"
 #include "error.h"
 #include "inode_table.h"
+#include "superblock.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -26,7 +27,7 @@ enum SquashDtor {
 
 struct Squash {
 	uint32_t error;
-	struct SquashSuperblockWrap *superblock;
+	struct SquashSuperblock superblock;
 	int size;
 	enum SquashDtor dtor;
 	struct SquashDecompressor decompressor;
