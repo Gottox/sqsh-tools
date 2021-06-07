@@ -15,8 +15,8 @@
 int
 squash_inode_table_init(struct SquashInodeTable *table, struct Squash *squash) {
 	int rv = 0;
-	rv = squash_metablock_init(
-			&table->metablock, squash, squash->superblock.wrap->inode_table_start);
+	rv = squash_metablock_init(&table->metablock, squash,
+			squash->superblock.wrap->inode_table_start);
 
 	return 0;
 }
