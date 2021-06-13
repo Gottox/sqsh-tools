@@ -7,9 +7,6 @@ find_package(ZLIB REQUIRED)
 
 file(GLOB sources src/*.c src/compression/*.c)
 
-add_executable(zlib_test tinker/zlib_test.c)
-target_link_libraries(zlib_test ${ZLIB_LIBRARY})
-
 add_library(squash SHARED ${sources})
 set_property(TARGET squash PROPERTY VERSION ${CMAKE_PROJECT_VERSION})
 set_property(TARGET squash PROPERTY SOVERSION 0 )
