@@ -17,6 +17,7 @@
 
 #include "../src/compression/compression.h"
 #include "../src/compression/gzip_handler.h"
+#include "../src/directory.h"
 #include "../src/inode.h"
 #include "../src/metablock.h"
 #include "../src/squash.h"
@@ -75,20 +76,70 @@ compression_info_gzip(struct Squash *squash) {
 }
 
 static int
-inode_info(struct Squash *squash) {
+inode_info(struct Squash *squash, struct SquashInode *inode) {
+	int rv = 0;
+
+	KEY("HARDLINK COUNT");
+	fprintf(out, "%u\n", squash_inode_hard_link_count(inode));
+
+	return rv;
+}
+
+static int
+dir_info(struct Squash *squash, struct SquashDirectory *dir) {
+	int rv = 0;
+	size_t size = squash_directory_count(dir);
+	struct SquashDirectoryEntryIterator iter = {0};
+	struct SquashDirectoryEntry *entry;
+	fputs("=== ROOT DIRECTORY ===\n", out);
+	KEY("DIRECTORY_SIZE");
+	fprintf(out, "%ld\n", size);
+
+	squash_directory_iterator(&iter, dir);
+	while ((entry = squash_directory_iterator_next(&iter))) {
+		char *name = NULL;
+		squash_directory_entry_name(entry, &name);
+		KEY("FILE");
+		fputs(name, out);
+		fputc('\n', out);
+		free(name);
+	}
+
+	return rv;
+}
+
+static int
+root_inode_info(struct Squash *squash) {
 	struct SquashInode inode = {0};
+	struct SquashDirectory dir = {0};
 	int rv = 0;
 	fputs("=== INODE TABLE ===\n", out);
-	rv = metablock_info(&squash->inodes.metablock, squash);
+	rv = metablock_info(&squash->inode_table, squash);
 	if (rv < 0) {
 		return rv;
 	}
 
-	rv = squash_inode_load(
+	fputs("=== ROOT INODE ===\n", out);
+	KEY("ROOT_INODE_ADDRESS");
+	fprintf(out, "0x%lx\n", squash->superblock.wrap->root_inode_ref);
+
+	KEY("ROOT_INODE_REF");
+	fprintf(out, "0x%lx\n", squash->superblock.wrap->root_inode_ref);
+	rv = squash_inode_load_ref(
 			&inode, squash, squash->superblock.wrap->root_inode_ref);
 	if (rv < 0) {
 		return rv;
 	}
+	inode_info(squash, &inode);
+	rv = squash_directory_init(&dir, squash, &inode);
+	if (rv < 0) {
+		return rv;
+	}
+
+	dir_info(squash, &dir);
+
+	squash_directory_cleanup(&dir);
+
 	rv = squash_inode_cleanup(&inode);
 	return rv;
 }
@@ -191,7 +242,7 @@ main(int argc, char *argv[]) {
 	flag_info(&squash);
 	compression_info(&squash);
 
-	inode_info(&squash);
+	root_inode_info(&squash);
 
 	squash_cleanup(&squash);
 

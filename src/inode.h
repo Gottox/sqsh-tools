@@ -41,7 +41,7 @@ struct SquashInodeDirectoryIndex {
 };
 
 struct SquashInodeDirectory {
-	uint32_t block_idx;
+	uint32_t dir_block_start;
 	uint32_t hard_link_count;
 	uint16_t file_size;
 	uint16_t block_offset;
@@ -51,7 +51,7 @@ struct SquashInodeDirectory {
 struct SquashInodeDirectoryExt {
 	uint32_t hard_link_count;
 	uint32_t file_size;
-	uint32_t block_idx;
+	uint32_t dir_block_start;
 	uint32_t parent_inode_number;
 	uint16_t index_count;
 	uint16_t block_offset;
@@ -146,8 +146,13 @@ struct SquashInode {
 	struct SquashStream stream;
 };
 
-int squash_inode_load(
-		struct SquashInode *inode, struct Squash *squash, uint64_t number);
+int squash_inode_load_ref(
+		struct SquashInode *inode, struct Squash *squash, uint64_t inode_ref);
+
+int squash_inode_load(struct SquashInode *inode, struct Squash *squash,
+		int block, int offset);
+
+uint32_t squash_inode_hard_link_count(struct SquashInode *inode);
 
 int squash_inode_cleanup(struct SquashInode *inode);
 

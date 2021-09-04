@@ -6,10 +6,10 @@
 
 #include "inode.h"
 #include "error.h"
-#include "inode_table.h"
 #include "squash.h"
 #include "stream.h"
 #include "superblock.h"
+#include "utils.h"
 #include <stdint.h>
 
 static int
@@ -101,16 +101,60 @@ squash_inode_hard_link_count(struct SquashInode *inode) {
 	return -SQUASH_ERROR_UNKOWN_INODE_TYPE;
 }
 
+static int
+inode_data_ensure_host_order(struct SquashInode *inode) {
+	struct SquashInodeWrap *wrap = inode->wrap;
+	switch (wrap->header.inode_type) {
+	case SQUASH_INODE_TYPE_BASIC_DIRECTORY:
+		ENSURE_FORMAT_ORDER_32(wrap->data.dir.dir_block_start);
+		ENSURE_FORMAT_ORDER_32(wrap->data.dir.hard_link_count);
+		ENSURE_FORMAT_ORDER_16(wrap->data.dir.file_size);
+		ENSURE_FORMAT_ORDER_16(wrap->data.dir.block_offset);
+		ENSURE_FORMAT_ORDER_32(wrap->data.dir.parent_inode_number);
+		return 0;
+	case SQUASH_INODE_TYPE_BASIC_FILE:
+		ENSURE_FORMAT_ORDER_32(wrap->data.file.blocks_start);
+		ENSURE_FORMAT_ORDER_32(wrap->data.file.fragment_block_index);
+		ENSURE_FORMAT_ORDER_32(wrap->data.file.block_offset);
+		ENSURE_FORMAT_ORDER_32(wrap->data.file.file_size);
+		// TODO: block_sizes
+		return 0;
+	case SQUASH_INODE_TYPE_BASIC_SYMLINK:
+		ENSURE_FORMAT_ORDER_32(wrap->data.sym.hard_link_count);
+		ENSURE_FORMAT_ORDER_32(wrap->data.sym.target_size);
+		// target_path is 8 bit.
+		return 0;
+	case SQUASH_INODE_TYPE_BASIC_BLOCK:
+	case SQUASH_INODE_TYPE_BASIC_CHAR:
+		return -SQUASH_ERROR_UNKOWN_INODE_TYPE;
+	case SQUASH_INODE_TYPE_BASIC_FIFO:
+	case SQUASH_INODE_TYPE_BASIC_SOCKET:
+		return -SQUASH_ERROR_UNKOWN_INODE_TYPE;
+
+	case SQUASH_INODE_TYPE_EXTENDED_DIRECTORY:
+		return -SQUASH_ERROR_UNKOWN_INODE_TYPE;
+	case SQUASH_INODE_TYPE_EXTENDED_FILE:
+		return -SQUASH_ERROR_UNKOWN_INODE_TYPE;
+	case SQUASH_INODE_TYPE_EXTENDED_SYMLINK:
+		return -SQUASH_ERROR_UNKOWN_INODE_TYPE;
+	case SQUASH_INODE_TYPE_EXTENDED_BLOCK:
+	case SQUASH_INODE_TYPE_EXTENDED_CHAR:
+		return -SQUASH_ERROR_UNKOWN_INODE_TYPE;
+	case SQUASH_INODE_TYPE_EXTENDED_FIFO:
+	case SQUASH_INODE_TYPE_EXTENDED_SOCKET:
+		return -SQUASH_ERROR_UNKOWN_INODE_TYPE;
+	}
+	return -SQUASH_ERROR_UNKOWN_INODE_TYPE;
+}
+
 int
-squash_inode_load(
-		struct SquashInode *inode, struct Squash *squash, uint64_t number) {
+squash_inode_load(struct SquashInode *inode, struct Squash *squash,
+		int inode_block, int inode_offset) {
 	int rv = 0;
 	inode->wrap = NULL;
-	int block = number >> 16;
-	int offset = number & 0xffff;
 
-	rv = squash_stream_init(
-			&inode->stream, squash, &squash->inodes.metablock, block, offset);
+	rv = squash_stream_init(&inode->stream, squash, &squash->inode_table,
+			inode_block, inode_offset);
 	if (rv < 0) {
 		return rv;
 	}
@@ -121,9 +165,29 @@ squash_inode_load(
 		return rv;
 	}
 
+	ENSURE_HOST_ORDER_16(inode->wrap->header.inode_type);
+	ENSURE_HOST_ORDER_16(inode->wrap->header.permissions);
+	ENSURE_HOST_ORDER_16(inode->wrap->header.uid_idx);
+	ENSURE_HOST_ORDER_16(inode->wrap->header.gid_idx);
+	ENSURE_HOST_ORDER_32(inode->wrap->header.modified_time);
+	ENSURE_HOST_ORDER_32(inode->wrap->header.inode_number);
+
 	rv = inode_load(inode);
+	if (rv < 0) {
+		return rv;
+	}
+
+	rv = inode_data_ensure_host_order(inode);
 
 	return rv;
+}
+int
+squash_inode_load_ref(
+		struct SquashInode *inode, struct Squash *squash, uint64_t inode_ref) {
+	int block = (inode_ref & 0x0000FFFFFFFF0000) >> 16;
+	int offset = inode_ref & 0x000000000000FFFF;
+
+	return squash_inode_load(inode, squash, block, offset);
 }
 
 int

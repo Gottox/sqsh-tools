@@ -56,6 +56,8 @@ squash_gzip_stream_init(union SquashDecompressorInfo *info,
 		size_t data_size, off_t read_start) {
 	int rv = 0;
 	struct SquashGzip *gzip = &info->gzip;
+	int window_bits = gzip->options->window_size;
+
 	stream_info->gzip.stream.zalloc = Z_NULL;
 	stream_info->gzip.stream.zfree = Z_NULL;
 	stream_info->gzip.stream.opaque = Z_NULL;
@@ -64,14 +66,22 @@ squash_gzip_stream_init(union SquashDecompressorInfo *info,
 	stream_info->gzip.out = NULL;
 	stream_info->gzip.out_size = 0;
 
-	rv = inflateInit2(&stream_info->gzip.stream, gzip->options->window_size);
+	if (read_start > data_size) {
+		return -SQUASH_ERROR_GZIP_READ_AFTER_END;
+	}
+
+	if (read_start != 0) {
+		window_bits = -window_bits;
+	}
+
+	rv = inflateInit2(&stream_info->gzip.stream, window_bits);
 	if (rv != Z_OK) {
 		return -SQUASH_ERROR_COMPRESSION_STREAM_INIT;
 	}
 
-	stream_info->gzip.stream.next_in = data;
-	stream_info->gzip.stream.avail_in = data_size;
-
+	// rv = gzip_read_header(&stream_info->gzip, data, data_size);
+	stream_info->gzip.stream.next_in = &data[read_start];
+	stream_info->gzip.stream.avail_in = data_size - read_start;
 	return 0;
 }
 

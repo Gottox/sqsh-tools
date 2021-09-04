@@ -14,7 +14,6 @@
 #include <unistd.h>
 
 #include "compression/compression.h"
-#include "inode_table.h"
 #include "metablock.h"
 #include "squash.h"
 #include "superblock.h"
@@ -37,7 +36,14 @@ squash_init(struct Squash *squash, uint8_t *buffer, const size_t size,
 		return rv;
 	}
 
-	rv = squash_inode_table_init(&squash->inodes, squash);
+	rv = squash_metablock_init(&squash->inode_table, squash,
+			squash->superblock.wrap->inode_table_start);
+	if (rv < 0) {
+		return rv;
+	}
+
+	rv = squash_metablock_init(&squash->directory_table, squash,
+			squash->superblock.wrap->directory_table_start);
 	if (rv < 0) {
 		return rv;
 	}

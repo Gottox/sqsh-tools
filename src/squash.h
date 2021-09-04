@@ -6,7 +6,6 @@
 
 #include "compression/compression.h"
 #include "error.h"
-#include "inode_table.h"
 #include "superblock.h"
 
 #include <stdint.h>
@@ -31,7 +30,8 @@ struct Squash {
 	int size;
 	enum SquashDtor dtor;
 	struct SquashDecompressor decompressor;
-	struct SquashInodeTable inodes;
+	struct SquashMetablock inode_table;
+	struct SquashMetablock directory_table;
 };
 
 int squash_init(struct Squash *squash, uint8_t *buffer, const size_t size,
