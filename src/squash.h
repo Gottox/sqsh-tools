@@ -4,9 +4,9 @@
  * @created     : Friday Apr 30, 2021 10:58:14 CEST
  */
 
-#include "compression/compression.h"
 #include "error.h"
 #include "superblock.h"
+#include "extractor/extractor.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -29,9 +29,7 @@ struct Squash {
 	struct SquashSuperblock superblock;
 	int size;
 	enum SquashDtor dtor;
-	struct SquashDecompressor decompressor;
-	struct SquashMetablock inode_table;
-	struct SquashMetablock directory_table;
+	struct SquashExtractor extractor;
 };
 
 int squash_init(struct Squash *squash, uint8_t *buffer, const size_t size,

@@ -13,10 +13,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "compression/compression.h"
-#include "metablock.h"
+#include "format/metablock.h"
 #include "squash.h"
 #include "superblock.h"
+#include "extractor/extractor.h"
 
 int
 squash_init(struct Squash *squash, uint8_t *buffer, const size_t size,
@@ -31,19 +31,7 @@ squash_init(struct Squash *squash, uint8_t *buffer, const size_t size,
 	squash->size = size;
 	squash->dtor = dtor;
 
-	rv = squash_decompressor_init(&squash->decompressor, squash);
-	if (rv < 0) {
-		return rv;
-	}
-
-	rv = squash_metablock_init(&squash->inode_table, squash,
-			squash->superblock.wrap->inode_table_start);
-	if (rv < 0) {
-		return rv;
-	}
-
-	rv = squash_metablock_init(&squash->directory_table, squash,
-			squash->superblock.wrap->directory_table_start);
+	rv = squash_extractor_init(squash, &squash->extractor);
 	if (rv < 0) {
 		return rv;
 	}
@@ -101,7 +89,7 @@ squash_cleanup(struct Squash *squash) {
 	int rv = 0;
 
 	if (squash->superblock.wrap->flags & SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
-		rv = squash_decompressor_cleanup(&squash->decompressor);
+		rv = squash_extractor_cleanup(&squash->extractor);
 		if (rv < 0)
 			return rv;
 	}

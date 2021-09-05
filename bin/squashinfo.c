@@ -15,13 +15,12 @@
 
 #include "printb.h"
 
-#include "../src/compression/compression.h"
-#include "../src/compression/gzip_handler.h"
 #include "../src/directory.h"
+#include "../src/extractor/extractor.h"
+#include "../src/extractor/gzip.h"
 #include "../src/inode.h"
-#include "../src/metablock.h"
+#include "../src/format/metablock.h"
 #include "../src/squash.h"
-#include "../src/stream.h"
 #include "../src/superblock.h"
 
 #define KEY_LENGTH "25"
@@ -37,19 +36,19 @@ usage(char *arg0) {
 }
 
 static int
-metablock_info(struct SquashMetablock *metablock, struct Squash *squash) {
-	struct SquashStream stream = {0};
+metablock_info(const struct SquashMetablock *metablock, struct Squash *squash) {
+	struct SquashExtract extract = {0};
 	KEY("METABLOCK_INFO");
-	if (squash_metablock_is_empty(metablock)) {
+	if (metablock == NULL) {
 		fputs("(none)\n", out);
 		return 0;
 	}
 
 	int is_compressed = squash_metablock_is_compressed(metablock);
-	squash_stream_init(&stream, squash, metablock, 0, 0);
-	squash_stream_to_end(&stream);
-	size_t size = squash_stream_size(&stream);
-	squash_stream_cleanup(&stream);
+	squash_extract_init(&extract, squash, metablock, 0, 0);
+	squash_extract_more(&extract, squash->superblock.wrap->block_size);
+	size_t size = squash_extract_size(&extract);
+	squash_extract_cleanup(&extract);
 
 	size_t compressed_size = squash_metablock_size(metablock);
 	fprintf(out,
@@ -64,14 +63,15 @@ metablock_info(struct SquashMetablock *metablock, struct Squash *squash) {
 
 static int
 compression_info_gzip(struct Squash *squash) {
-	struct SquashGzip *options = &squash->decompressor.info.gzip;
+	const struct SquashExtractorGzipOptions *options =
+			squash->extractor.options.gzip;
 
 	KEY("COMPRESSION_LEVEL");
-	fprintf(out, "%i\n", options->options->compression_level);
+	fprintf(out, "%i\n", options->compression_level);
 	KEY("WINDOW_SIZE");
-	fprintf(out, "%i\n", options->options->window_size);
+	fprintf(out, "%i\n", options->window_size);
 	KEY("STRATEGIES");
-	printb(options->options->strategies, out);
+	printb(options->strategies, out);
 	return 0;
 }
 
@@ -88,12 +88,9 @@ inode_info(struct Squash *squash, struct SquashInode *inode) {
 static int
 dir_info(struct Squash *squash, struct SquashDirectory *dir) {
 	int rv = 0;
-	size_t size = squash_directory_count(dir);
-	struct SquashDirectoryEntryIterator iter = {0};
+	struct SquashDirectoryIterator iter = {0};
 	struct SquashDirectoryEntry *entry;
 	fputs("=== ROOT DIRECTORY ===\n", out);
-	KEY("DIRECTORY_SIZE");
-	fprintf(out, "%ld\n", size);
 
 	squash_directory_iterator(&iter, dir);
 	while ((entry = squash_directory_iterator_next(&iter))) {
@@ -114,7 +111,9 @@ root_inode_info(struct Squash *squash) {
 	struct SquashDirectory dir = {0};
 	int rv = 0;
 	fputs("=== INODE TABLE ===\n", out);
-	rv = metablock_info(&squash->inode_table, squash);
+	rv = metablock_info(squash_metablock_from_offset(squash,
+								squash->superblock.wrap->inode_table_start),
+			squash);
 	if (rv < 0) {
 		return rv;
 	}
@@ -179,7 +178,7 @@ compression_info(struct Squash *squash) {
 	if (handler == NULL) {
 		fputs("WARNING: NO COMPRESSION OPTION HANDLER\n", stdout);
 	} else {
-		metablock_info(&squash->decompressor.compression_info_block, squash);
+		metablock_info(squash_metablock_from_offset(squash, sizeof(struct SquashSuperblockWrap)), squash);
 		handler(squash);
 	}
 	return 0;

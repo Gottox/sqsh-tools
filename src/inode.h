@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "stream.h"
+#include "extract.h"
 
 #ifndef INODE_H
 
@@ -143,7 +143,7 @@ struct SquashInodeWrap {
 
 struct SquashInode {
 	struct SquashInodeWrap *wrap;
-	struct SquashStream stream;
+	struct SquashExtract extract;
 };
 
 int squash_inode_load_ref(

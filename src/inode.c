@@ -6,20 +6,21 @@
 
 #include "inode.h"
 #include "error.h"
+#include "extract.h"
 #include "squash.h"
-#include "stream.h"
 #include "superblock.h"
 #include "utils.h"
 #include <stdint.h>
 
 static int
 inode_data_more(struct SquashInode *inode, size_t size) {
-	int rv = squash_stream_more(&inode->stream, size);
+	int rv = squash_extract_more(&inode->extract, size);
 
 	if (rv < 0) {
 		return rv;
 	}
-	inode->wrap = (struct SquashInodeWrap *)squash_stream_data(&inode->stream);
+	inode->wrap =
+			(struct SquashInodeWrap *)squash_extract_data(&inode->extract);
 	return 0;
 }
 
@@ -132,7 +133,16 @@ inode_data_ensure_host_order(struct SquashInode *inode) {
 		return -SQUASH_ERROR_UNKOWN_INODE_TYPE;
 
 	case SQUASH_INODE_TYPE_EXTENDED_DIRECTORY:
-		return -SQUASH_ERROR_UNKOWN_INODE_TYPE;
+		ENSURE_FORMAT_ORDER_32(wrap->data.xdir.hard_link_count);
+		ENSURE_FORMAT_ORDER_32(wrap->data.xdir.file_size);
+		ENSURE_FORMAT_ORDER_32(wrap->data.xdir.dir_block_start);
+		ENSURE_FORMAT_ORDER_32(wrap->data.xdir.parent_inode_number);
+		ENSURE_FORMAT_ORDER_16(wrap->data.xdir.index_count);
+		ENSURE_FORMAT_ORDER_16(wrap->data.xdir.block_offset);
+		ENSURE_FORMAT_ORDER_32(wrap->data.xdir.xattr_idx);
+		// Note: struct SquashInodeDirectoryIndex dir_index[0]; // [index_count]
+		// This is loaded by the directory implementation
+		return 0;
 	case SQUASH_INODE_TYPE_EXTENDED_FILE:
 		return -SQUASH_ERROR_UNKOWN_INODE_TYPE;
 	case SQUASH_INODE_TYPE_EXTENDED_SYMLINK:
@@ -153,8 +163,13 @@ squash_inode_load(struct SquashInode *inode, struct Squash *squash,
 	int rv = 0;
 	inode->wrap = NULL;
 
-	rv = squash_stream_init(&inode->stream, squash, &squash->inode_table,
-			inode_block, inode_offset);
+	const struct SquashMetablock *metablock = squash_metablock_from_offset(
+			squash, squash->superblock.wrap->inode_table_start);
+	if (metablock == NULL) {
+		return -SQUASH_ERROR_INODE_INIT;
+	}
+	rv = squash_extract_init(
+			&inode->extract, squash, metablock, inode_block, inode_offset);
 	if (rv < 0) {
 		return rv;
 	}
@@ -193,6 +208,6 @@ squash_inode_load_ref(
 int
 squash_inode_cleanup(struct SquashInode *inode) {
 	int rv = 0;
-	rv = squash_stream_cleanup(&inode->stream);
+	rv = squash_extract_cleanup(&inode->extract);
 	return rv;
 }
