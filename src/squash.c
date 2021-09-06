@@ -5,7 +5,6 @@
  */
 
 #include <assert.h>
-#include <endian.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdint.h>
@@ -13,10 +12,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "compression/compression.h"
 #include "format/metablock.h"
+#include "format/superblock.h"
 #include "squash.h"
-#include "superblock.h"
-#include "extractor/extractor.h"
+#include "format/superblock.h"
 
 int
 squash_init(struct Squash *squash, uint8_t *buffer, const size_t size,
@@ -71,6 +71,7 @@ squash_open(struct Squash *squash, const char *path) {
 	if (rv < 0) {
 		goto err;
 	}
+	squash->buffer = file_map;
 
 	return rv;
 err:
@@ -88,7 +89,8 @@ int
 squash_cleanup(struct Squash *squash) {
 	int rv = 0;
 
-	if (squash->superblock.wrap->flags & SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
+	if (squash_superblock_flags(squash->superblock) &
+			SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
 		rv = squash_extractor_cleanup(&squash->extractor);
 		if (rv < 0)
 			return rv;
@@ -97,10 +99,11 @@ squash_cleanup(struct Squash *squash) {
 	// TODO this should go into superblock.c
 	switch (squash->dtor) {
 	case SQUASH_DTOR_FREE:
-		free(squash->superblock.wrap);
+		// Discard const qualifier
+		free(squash->buffer);
 		break;
 	case SQUASH_DTOR_MUNMAP:
-		rv |= munmap(squash->superblock.wrap, squash->size);
+		rv |= munmap(squash->buffer, squash->size);
 		break;
 	case SQUASH_DTOR_NONE:
 		// noop

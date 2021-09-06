@@ -4,23 +4,17 @@
  * @created     : Sunday Sep 05, 2021 11:09:51 CEST
  */
 
-#include "null.h"
 #include "../error.h"
-#include "extractor.h"
+#include "../format/compression_options.h"
+#include "compression.h"
 
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 
-int
-squash_null_init(union SquashExtractorOptions *options, const void *option_buffer,
-		const size_t option_buffer_size) {
-	return 0;
-}
-
 static int
-squash_null_extract(const union SquashExtractorOptions *options,
+squash_null_extract(const union SquashCompressionOptions *options,
 		uint8_t **target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	size_t new_target_size = *target_size + compressed_size;
@@ -37,13 +31,7 @@ squash_null_extract(const union SquashExtractorOptions *options,
 	return 0;
 }
 
-int
-squash_null_cleanup(union SquashExtractorOptions *options) {
-	return 0;
-}
-
 const struct SquashExtractorImplementation squash_extractor_null = {
-		.init = squash_null_init,
 		.extract = squash_null_extract,
-		.cleanup = squash_null_cleanup,
+		.default_options = NULL,
 };

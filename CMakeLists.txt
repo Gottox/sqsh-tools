@@ -5,7 +5,7 @@ set(CMAKE_C_FLAGS "-Wall")
 
 find_package(ZLIB REQUIRED)
 
-file(GLOB sources src/format/*.c src/*.c src/extractor/*.c)
+file(GLOB sources src/format/*.c src/*.c src/compression/*.c)
 
 add_library(squash SHARED ${sources})
 set_property(TARGET squash PROPERTY VERSION ${CMAKE_PROJECT_VERSION})

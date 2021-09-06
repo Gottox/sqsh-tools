@@ -6,29 +6,26 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "../format/compression_options.h"
 
 #ifndef EXTRACTOR_H
 
 #define EXTRACTOR_H
 
+extern const struct SquashExtractorImplementation squash_extractor_null;
+extern const struct SquashExtractorImplementation squash_extractor_gzip;
+
 struct Squash;
 
-union SquashExtractorOptions {
-	const struct SquashExtractorNullOptions *null;
-	const struct SquashExtractorGzipOptions *gzip;
-};
-
 struct SquashExtractorImplementation {
-	int (*init)(union SquashExtractorOptions *options, const void *option_buffer,
-			const size_t option_buffer_size);
-	int (*extract)(const union SquashExtractorOptions *options,
+	const union SquashCompressionOptions *default_options;
+	int (*extract)(const union SquashCompressionOptions *options,
 			uint8_t **target, size_t *target_size, const uint8_t *compressed,
 			const size_t compressed_size);
-	int (*cleanup)(union SquashExtractorOptions *options);
 };
 
 struct SquashExtractor {
-	union SquashExtractorOptions options;
+	const union SquashCompressionOptions *options;
 	const struct SquashExtractorImplementation *impl;
 };
 

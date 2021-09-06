@@ -7,8 +7,8 @@
 #include "inode.h"
 #include "error.h"
 #include "extract.h"
+#include "format/superblock.h"
 #include "squash.h"
-#include "superblock.h"
 #include "utils.h"
 #include <stdint.h>
 
@@ -164,7 +164,7 @@ squash_inode_load(struct SquashInode *inode, struct Squash *squash,
 	inode->wrap = NULL;
 
 	const struct SquashMetablock *metablock = squash_metablock_from_offset(
-			squash, squash->superblock.wrap->inode_table_start);
+			squash, squash_superblock_inode_table_start(squash->superblock));
 	if (metablock == NULL) {
 		return -SQUASH_ERROR_INODE_INIT;
 	}

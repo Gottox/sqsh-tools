@@ -14,8 +14,8 @@
 #include <unistd.h>
 
 #include "../src/directory.h"
-#include "../src/inode.h"
 #include "../src/format/metablock.h"
+#include "../src/inode.h"
 #include "../src/squash.h"
 
 static int
@@ -32,7 +32,7 @@ main(int argc, char *argv[]) {
 	struct SquashDirectory dir = {0};
 	struct SquashDirectoryIterator iter = {0};
 	struct Squash squash = {0};
-	struct SquashDirectoryEntry *entry;
+	const struct SquashDirectoryEntry *entry;
 
 	while ((opt = getopt(argc, argv, "h")) != -1) {
 		switch (opt) {
@@ -51,7 +51,8 @@ main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	rv = squash_inode_load_ref(&inode, &squash, squash.superblock.wrap->root_inode_ref);
+	rv = squash_inode_load_ref(&inode, &squash,
+			squash_superblock_root_inode_ref(squash.superblock));
 	if (rv < 0) {
 		perror(argv[optind]);
 		return EXIT_FAILURE;
@@ -68,7 +69,7 @@ main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	while((entry = squash_directory_iterator_next(&iter))) {
+	while ((entry = squash_directory_iterator_next(&iter))) {
 		char *name;
 		squash_directory_entry_name(entry, &name);
 		printf("%s\n", name);

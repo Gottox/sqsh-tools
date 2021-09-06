@@ -6,14 +6,14 @@
 
 #include "metablock.h"
 #include "../squash.h"
-#include "../superblock.h"
+#include "superblock.h"
 
 #include <assert.h>
 #include <stdint.h>
 
 const struct SquashMetablock *
 squash_metablock_from_offset(struct Squash *squash, off_t offset) {
-	void *tmp = squash->superblock.wrap;
+	const void *tmp = squash->superblock;
 
 	if (offset >= squash->size) {
 		return NULL;

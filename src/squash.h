@@ -4,9 +4,9 @@
  * @created     : Friday Apr 30, 2021 10:58:14 CEST
  */
 
+#include "compression/compression.h"
 #include "error.h"
-#include "superblock.h"
-#include "extractor/extractor.h"
+#include "format/superblock.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -14,9 +14,6 @@
 #ifndef SQUASH_H
 
 #define SQUASH_H
-
-#define SQUASH_SUPERBLOCK_SIZE (sizeof(struct SquashSuperblockWrap))
-#define SQUASH_SUPERBLOCK_MAGIC 0x73717368
 
 enum SquashDtor {
 	SQUASH_DTOR_NONE,
@@ -26,8 +23,9 @@ enum SquashDtor {
 
 struct Squash {
 	uint32_t error;
-	struct SquashSuperblock superblock;
+	const struct SquashSuperblock *superblock;
 	int size;
+	uint8_t *buffer;
 	enum SquashDtor dtor;
 	struct SquashExtractor extractor;
 };

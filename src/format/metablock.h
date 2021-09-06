@@ -6,11 +6,10 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <sys/types.h>
 
-#ifndef METABLOCK_H
+#ifndef SQUASH_FORMAT_METABLOCK_H
 
-#define METABLOCK_H
+#define SQUASH_FORMAT_METABLOCK_H
 
 struct Squash;
 
@@ -33,4 +32,4 @@ const uint8_t *squash_metablock_data(const struct SquashMetablock *metablock);
 
 size_t squash_metablock_size(const struct SquashMetablock *metablock);
 
-#endif /* end of include guard METABLOCK_H */
+#endif /* end of include guard SQUASH_FORMAT_METABLOCK_H */

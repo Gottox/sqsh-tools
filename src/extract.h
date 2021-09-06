@@ -4,7 +4,7 @@
  * @created     : Saturday Sep 04, 2021 23:13:19 CEST
  */
 
-#include "extractor/extractor.h"
+#include "compression/compression.h"
 #include "format/metablock.h"
 #include <stdint.h>
 
