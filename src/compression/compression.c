@@ -21,9 +21,11 @@ extractor_by_id(int id) {
 	case SQUASH_COMPRESSION_XZ:
 		return &squash_extractor_xz;
 	case SQUASH_COMPRESSION_LZO:
+		return &squash_extractor_lzo;
 	case SQUASH_COMPRESSION_LZ4:
+		return &squash_extractor_lz4;
 	case SQUASH_COMPRESSION_ZSTD:
-		return NULL;
+		return &squash_extractor_zstd;
 	default:
 		return NULL;
 	}

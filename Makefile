@@ -32,6 +32,9 @@ SRC = \
 	src/compression/compression.c \
 	src/compression/lzma.c \
 	src/compression/xz.c \
+	src/compression/lzo.c \
+	src/compression/lz4.c \
+	src/compression/zstd.c \
 	src/squash.c \
 	src/inode.c \
 	src/extract.c \
@@ -59,10 +62,10 @@ BCH_CFLAGS = \
 MAJOR=$(shell echo $(VERSION) | cut -d . -f 1)
 
 CFLAGS += \
-	$(shell pkg-config --cflags zlib liblzma) \
+	$(shell pkg-config --cflags zlib liblzma lzo2 liblz4 libzstd) \
 
 LDFLAGS += \
-	$(shell pkg-config --libs zlib liblzma) \
+	$(shell pkg-config --libs zlib liblzma lzo2 liblz4 libzstd) \
 
 all: $(BIN) libsquashfs.a libsquashfs.so
 

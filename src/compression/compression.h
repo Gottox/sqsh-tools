@@ -4,9 +4,10 @@
  * @created     : Sunday Sep 05, 2021 10:50:12 CEST
  */
 
-#include <stddef.h>
-#include <stdint.h>
 #include "../format/compression_options.h"
+
+#include <stddef.h>
+#include <stdlib.h>
 
 #ifndef EXTRACTOR_H
 
@@ -16,6 +17,9 @@ extern const struct SquashExtractorImplementation squash_extractor_null;
 extern const struct SquashExtractorImplementation squash_extractor_gzip;
 extern const struct SquashExtractorImplementation squash_extractor_lzma;
 extern const struct SquashExtractorImplementation squash_extractor_xz;
+extern const struct SquashExtractorImplementation squash_extractor_lzo;
+extern const struct SquashExtractorImplementation squash_extractor_lz4;
+extern const struct SquashExtractorImplementation squash_extractor_zstd;
 
 struct Squash;
 
