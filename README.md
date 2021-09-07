@@ -4,7 +4,11 @@ squashfs implementation as library.
 
 WIP Status:
 * [x] data model
-* [ ] compression: zlib
+* [x] compression: gzip
+* [x] compression: lzma
+* [x] compression: lzo
+* [x] compression: lz4
+* [x] compression: zstd
 * [x] superblock parsing
 * [x] metablock resolution
 * [x] inode resolution
