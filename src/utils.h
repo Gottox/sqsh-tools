@@ -26,10 +26,11 @@
 #define ENSURE_HOST_ORDER_64(x) (x) = le64toh(x)
 #endif
 
-#define CASSERT(predicate) _impl_CASSERT_LINE(predicate,__LINE__)
-#define _impl_PASTE(a,b) a##b
+#define CASSERT(predicate) _impl_CASSERT_LINE(predicate, __LINE__)
+#define _impl_PASTE(a, b) a##b
 #define _impl_CASSERT_LINE(predicate, line) \
-    typedef char _impl_PASTE(assertion_failed_##file##_,line)[2*!!(predicate)-1];
+	typedef char _impl_PASTE( \
+			assertion_failed_##file##_, line)[2 * !!(predicate)-1]
 
 uint32_t log2_u32(uint32_t x);
 

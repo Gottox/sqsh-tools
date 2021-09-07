@@ -42,7 +42,7 @@ squash_extract_more(struct SquashExtract *extract, const size_t size) {
 		rv = impl->extract(options, &extract->extracted,
 				&extract->extracted_size, squash_metablock_data(block),
 				block_size);
-		extract->index += block_size + sizeof(struct SquashMetablock);
+		extract->index += block_size + SQUASH_METABLOCK_SIZE;
 	}
 	return 0;
 }

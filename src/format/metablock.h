@@ -11,12 +11,11 @@
 
 #define SQUASH_FORMAT_METABLOCK_H
 
+#define SQUASH_METABLOCK_SIZE 2
+
 struct Squash;
 
-struct SquashMetablock {
-	uint16_t header;
-	uint8_t data[0];
-};
+struct SquashMetablock;
 
 const struct SquashMetablock *squash_metablock_from_offset(
 		struct Squash *squash, off_t offset);

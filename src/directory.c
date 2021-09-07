@@ -26,15 +26,15 @@ directory_data_more(struct SquashDirectoryIterator *iterator, size_t size) {
 	return 0;
 }
 
-static struct SquashDirectoryFragment *
+static const struct SquashDirectoryFragment *
 fragment_by_offset(struct SquashDirectoryIterator *iterator, off_t offset) {
-	void *tmp = iterator->directory->fragments;
-	return &tmp[offset];
+	const uint8_t *tmp = (const uint8_t *)iterator->directory->fragments;
+	return (const struct SquashDirectoryFragment *)&tmp[offset];
 }
 
 static struct SquashDirectoryEntry *
 entry_by_offset(struct SquashDirectoryIterator *iterator, off_t offset) {
-	void *tmp = iterator->directory->fragments;
+	const uint8_t *tmp = (const uint8_t *)iterator->directory->fragments;
 	return (struct SquashDirectoryEntry *)&tmp[offset];
 }
 
@@ -74,7 +74,7 @@ squash_directory_init(struct SquashDirectory *directory, struct Squash *squash,
 	return rv;
 }
 
-const struct SquashDirectoryEntry*
+const struct SquashDirectoryEntry *
 squash_directory_lookup(struct SquashDirectory *directory, const char *name) {
 	int rv = 0;
 	struct SquashDirectoryIterator iterator = {0};
@@ -132,10 +132,11 @@ squash_directory_iterator_next(struct SquashDirectoryIterator *iterator) {
 		}
 		iterator->current_fragment_offset = current_offset;
 
-		struct SquashDirectoryFragment *current_fragment =
+		const struct SquashDirectoryFragment *current_fragment =
 				fragment_by_offset(iterator, iterator->current_fragment_offset);
 		current_offset = iterator->next_offset;
-		iterator->remaining_entries = squash_format_directory_fragment_count(current_fragment) + 1;
+		iterator->remaining_entries =
+				squash_format_directory_fragment_count(current_fragment) + 1;
 	}
 	iterator->remaining_entries--;
 

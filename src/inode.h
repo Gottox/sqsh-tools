@@ -37,7 +37,7 @@ struct SquashInodeDirectoryIndex {
 	uint32_t index;
 	uint32_t start;
 	uint32_t name_size;
-	uint8_t name[0]; // [name_size + 1]
+	// uint8_t name[0]; // [name_size + 1]
 };
 
 struct SquashInodeDirectory {
@@ -56,7 +56,7 @@ struct SquashInodeDirectoryExt {
 	uint16_t index_count;
 	uint16_t block_offset;
 	uint32_t xattr_idx;
-	struct SquashInodeDirectoryIndex dir_index[0]; // [index_count]
+	// struct SquashInodeDirectoryIndex dir_index[0]; // [index_count]
 };
 
 struct SquashInodeFile {
@@ -64,7 +64,7 @@ struct SquashInodeFile {
 	uint32_t fragment_block_index;
 	uint32_t block_offset;
 	uint32_t file_size;
-	uint32_t block_sizes[0];
+	// uint32_t block_sizes[0];
 };
 
 struct SquashInodeFileExt {
@@ -75,19 +75,19 @@ struct SquashInodeFileExt {
 	uint32_t fragment_block_index;
 	uint32_t block_offset;
 	uint32_t xattr_idx;
-	uint32_t block_sizes[0];
+	// uint32_t block_sizes[0];
 };
 
 struct SquashInodeSymlink {
 	uint32_t hard_link_count;
 	uint32_t target_size;
-	uint8_t target_path[0]; // [target_size]
+	// uint8_t target_path[0]; // [target_size]
 };
 
 struct SquashInodeSymlinkExt {
 	uint32_t hard_link_count;
 	uint32_t target_size;
-	uint8_t target_path[0]; // [target_size]
+	// uint8_t target_path[0]; // [target_size]
 };
 
 struct SquashInodeSymlinkExtTail {
