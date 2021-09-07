@@ -22,14 +22,14 @@
 #endif
 
 #define printb(value, out) \
-	({ \
+	{ \
 		const typeof(value) _v = value; \
 		__printb((typeof(_v) *)&_v, sizeof(_v), out); \
-	})
+	}
 
 #define MSB_MASK 1 << (CHAR_BIT - 1)
 
-void
+static void
 __printb(const void *value, size_t size, FILE *out) {
 	unsigned char uc;
 	unsigned char bits[CHAR_BIT + 1];
