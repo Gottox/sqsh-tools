@@ -45,8 +45,7 @@ metablock_info(const struct SquashMetablock *metablock, struct Squash *squash) {
 
 	int is_compressed = squash_metablock_is_compressed(metablock);
 	squash_extract_init(&extract, squash, metablock, 0, 0);
-	squash_extract_more(
-			&extract, squash_metablock_size(metablock));
+	squash_extract_more(&extract, squash_metablock_size(metablock));
 	size_t size = squash_extract_size(&extract);
 	squash_extract_cleanup(&extract);
 
@@ -179,12 +178,13 @@ compression_info(struct Squash *squash) {
 
 	if (handler == NULL) {
 		fputs("WARNING: NO COMPRESSION OPTION HANDLER\n", stdout);
-	} else if (squash_superblock_flags(squash->superblock) & SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
+	} else if (squash_superblock_flags(squash->superblock) &
+			SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
 		metablock_info(
 				squash_metablock_from_offset(squash, SQUASH_SUPERBLOCK_SIZE),
 				squash);
 		handler(squash);
-	} else{
+	} else {
 		fputs("NO COMPRESSION OPTION\n", stdout);
 	}
 	return 0;
