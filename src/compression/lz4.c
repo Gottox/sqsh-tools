@@ -45,7 +45,7 @@ squash_lz4_cleanup(union SquashCompressionOptions *options) {
 	return 0;
 }
 
-const struct SquashExtractorImplementation squash_extractor_lz4 = {
+const struct SquashCompressionImplementation squash_compression_lz4 = {
 		.extract = squash_lz4_extract,
 		.default_options = NULL,
 };

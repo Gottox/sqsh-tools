@@ -43,7 +43,6 @@ union SquashCompressionOptions {
 	struct SquashCompressionOptionsLzo lzo;
 };
 
-
 uint32_t squash_compression_options_gzip_compression_level(
 		const union SquashCompressionOptions *options);
 uint16_t squash_compression_options_gzip_window_size(

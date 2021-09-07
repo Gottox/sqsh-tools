@@ -63,7 +63,7 @@ metablock_info(const struct SquashMetablock *metablock, struct Squash *squash) {
 static int
 compression_info_gzip(struct Squash *squash) {
 	const struct SquashCompressionOptionsGzip *options =
-			&squash->extractor.options->gzip;
+			&squash->compression.options->gzip;
 
 	KEY("COMPRESSION_LEVEL");
 	fprintf(out, "%i\n", options->compression_level);

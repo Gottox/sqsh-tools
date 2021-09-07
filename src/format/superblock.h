@@ -41,11 +41,10 @@ enum SquashSuperblockFlags {
 
 struct SquashSuperblock;
 
-int squash_superblock_init(
-		const struct SquashSuperblock **superblock, uint8_t *bytes, size_t size);
+int squash_superblock_init(const struct SquashSuperblock **superblock,
+		uint8_t *bytes, size_t size);
 
-uint32_t squash_superblock_magic(
-		const struct SquashSuperblock *superblock);
+uint32_t squash_superblock_magic(const struct SquashSuperblock *superblock);
 uint32_t squash_superblock_inode_count(
 		const struct SquashSuperblock *superblock);
 uint32_t squash_superblock_modification_time(

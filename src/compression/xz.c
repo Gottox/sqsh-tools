@@ -48,7 +48,7 @@ squash_xz_extract(const union SquashCompressionOptions *options,
 	return rv;
 }
 
-const struct SquashExtractorImplementation squash_extractor_xz = {
+const struct SquashCompressionImplementation squash_compression_xz = {
 		.extract = squash_xz_extract,
 		.default_options = NULL,
 };

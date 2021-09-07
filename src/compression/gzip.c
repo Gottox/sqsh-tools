@@ -12,8 +12,8 @@
 #include <zlib.h>
 
 #include "../error.h"
-#include "compression.h"
 #include "../format/compression_options.h"
+#include "compression.h"
 
 #define BLOCK_SIZE 8192
 
@@ -28,8 +28,8 @@ squash_gzip_extract(const union SquashCompressionOptions *options,
 		return -SQUASH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
-	rv = uncompress(&target_buffer[*target_size], &write_chunk_size,
-			compressed, compressed_size);
+	rv = uncompress(&target_buffer[*target_size], &write_chunk_size, compressed,
+			compressed_size);
 
 	*target = target_buffer;
 	*target_size += write_chunk_size;
@@ -45,7 +45,7 @@ squash_gzip_cleanup(union SquashCompressionOptions *options) {
 	return 0;
 }
 
-const struct SquashExtractorImplementation squash_extractor_gzip = {
+const struct SquashCompressionImplementation squash_compression_gzip = {
 		.extract = squash_gzip_extract,
 		.default_options = NULL,
 };

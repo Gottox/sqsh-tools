@@ -16,7 +16,6 @@
 #include "format/metablock.h"
 #include "format/superblock.h"
 #include "squash.h"
-#include "format/superblock.h"
 
 int
 squash_init(struct Squash *squash, uint8_t *buffer, const size_t size,
@@ -31,7 +30,7 @@ squash_init(struct Squash *squash, uint8_t *buffer, const size_t size,
 	squash->size = size;
 	squash->dtor = dtor;
 
-	rv = squash_extractor_init(squash, &squash->extractor);
+	rv = squash_compression_init(squash, &squash->compression);
 	if (rv < 0) {
 		return rv;
 	}
@@ -91,7 +90,7 @@ squash_cleanup(struct Squash *squash) {
 
 	if (squash_superblock_flags(squash->superblock) &
 			SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
-		rv = squash_extractor_cleanup(&squash->extractor);
+		rv = squash_compression_cleanup(&squash->compression);
 		if (rv < 0)
 			return rv;
 	}

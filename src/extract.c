@@ -1,6 +1,6 @@
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : extractor
+ * @file        : extract
  * @created     : Saturday Sep 04, 2021 23:15:47 CEST
  */
 
@@ -8,8 +8,8 @@
 #include "compression/compression.h"
 #include "squash.h"
 
-const struct SquashExtractor static_null_extractor = {
-		.impl = &squash_extractor_null, .options = NULL};
+const struct SquashCompression static_null_compression = {
+		.impl = &squash_compression_null, .options = NULL};
 
 int
 squash_extract_init(struct SquashExtract *extract, const struct Squash *squash,
@@ -21,9 +21,9 @@ squash_extract_init(struct SquashExtract *extract, const struct Squash *squash,
 	extract->index = block_index;
 	extract->offset = block_offset;
 	if (squash_metablock_is_compressed(block)) {
-		extract->extractor = &squash->extractor;
+		extract->compression = &squash->compression;
 	} else {
-		extract->extractor = &static_null_extractor;
+		extract->compression = &static_null_compression;
 	}
 	return 0;
 }
@@ -31,8 +31,10 @@ squash_extract_init(struct SquashExtract *extract, const struct Squash *squash,
 int
 squash_extract_more(struct SquashExtract *extract, const size_t size) {
 	int rv = 0;
-	const struct SquashExtractorImplementation *impl = extract->extractor->impl;
-	const union SquashCompressionOptions *options = extract->extractor->options;
+	const struct SquashCompressionImplementation *impl =
+			extract->compression->impl;
+	const union SquashCompressionOptions *options =
+			extract->compression->options;
 	const struct SquashMetablock *start_block = extract->start_block;
 
 	for (; rv == 0 && size > squash_extract_size(extract);) {

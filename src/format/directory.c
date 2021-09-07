@@ -73,5 +73,6 @@ const struct SquashDirectoryEntry *
 squash_format_directory_fragment_entries(
 		const struct SquashDirectoryFragment *fragment) {
 	const uint8_t *tmp = (const uint8_t *)fragment;
-	return (const struct SquashDirectoryEntry *)&tmp[sizeof(struct SquashDirectoryFragment)];
+	return (const struct SquashDirectoryEntry
+					*)&tmp[sizeof(struct SquashDirectoryFragment)];
 }

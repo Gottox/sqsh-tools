@@ -59,8 +59,8 @@ squash_lzma_extract(const union SquashCompressionOptions *options,
 		return -SQUASH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
-	rv = lzma_uncompress(&target_buffer[*target_size], &write_chunk_size, compressed,
-			compressed_size);
+	rv = lzma_uncompress(&target_buffer[*target_size], &write_chunk_size,
+			compressed, compressed_size);
 
 	*target = target_buffer;
 	*target_size += write_chunk_size;
@@ -71,7 +71,7 @@ squash_lzma_extract(const union SquashCompressionOptions *options,
 	return rv;
 }
 
-const struct SquashExtractorImplementation squash_extractor_lzma = {
+const struct SquashCompressionImplementation squash_compression_lzma = {
 		.extract = squash_lzma_extract,
 		.default_options = NULL,
 };

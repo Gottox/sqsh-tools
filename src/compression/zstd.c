@@ -12,8 +12,8 @@
 #include <zstd.h>
 
 #include "../error.h"
-#include "compression.h"
 #include "../format/compression_options.h"
+#include "compression.h"
 
 #define BLOCK_SIZE 8192
 
@@ -45,7 +45,7 @@ squash_zstd_cleanup(union SquashCompressionOptions *options) {
 	return 0;
 }
 
-const struct SquashExtractorImplementation squash_extractor_zstd = {
+const struct SquashCompressionImplementation squash_compression_zstd = {
 		.extract = squash_zstd_extract,
 		.default_options = NULL,
 };

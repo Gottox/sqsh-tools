@@ -6,8 +6,8 @@
 
 #include "metablock.h"
 #include "../squash.h"
-#include "superblock.h"
 #include "../utils.h"
+#include "superblock.h"
 
 #include <assert.h>
 #include <stdint.h>

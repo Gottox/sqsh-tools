@@ -31,7 +31,7 @@ squash_null_extract(const union SquashCompressionOptions *options,
 	return 0;
 }
 
-const struct SquashExtractorImplementation squash_extractor_null = {
+const struct SquashCompressionImplementation squash_compression_null = {
 		.extract = squash_null_extract,
 		.default_options = NULL,
 };

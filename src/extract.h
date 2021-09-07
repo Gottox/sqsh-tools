@@ -15,7 +15,7 @@
 struct Squash;
 
 struct SquashExtract {
-	const struct SquashExtractor *extractor;
+	const struct SquashCompression *compression;
 	const struct SquashMetablock *start_block;
 	off_t index;
 	off_t offset;

@@ -27,7 +27,7 @@ struct Squash {
 	int size;
 	uint8_t *buffer;
 	enum SquashDtor dtor;
-	struct SquashExtractor extractor;
+	struct SquashCompression compression;
 };
 
 int squash_init(struct Squash *squash, uint8_t *buffer, const size_t size,
