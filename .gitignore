@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/cmake,c++
-# Edit at https://www.toptal.com/developers/gitignore?templates=cmake,c++
+# Created by https://www.toptal.com/developers/gitignore/api/c++
+# Edit at https://www.toptal.com/developers/gitignore?templates=c++
 
 ### C++ ###
 # Prerequisites
@@ -41,24 +41,6 @@
 *.out
 *.app
 
-### CMake ###
-CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-_deps
-CMakeUserPresets.json
-
-### CMake Patch ###
-# External projects
-*-prefix/
-
-# End of https://www.toptal.com/developers/gitignore/api/cmake,c++
+# End of https://www.toptal.com/developers/gitignore/api/c++
 .cache
 .gdb_history
