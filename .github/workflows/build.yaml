@@ -1,0 +1,28 @@
+name: Check
+on:
+- push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: voidlinux/voidlinux
+    strategy:
+      matrix:
+        cc: [gcc, clang]
+    steps:
+    - name: install dependencies
+      run: |
+        xbps-install -Syu
+        xbps-install -yu
+        xbps-install -Sy base-devel clang libsanitizer-devel zlib-devel
+    - uses: actions/checkout@v2
+    - name: make
+      run: make CC=clang
+    - name: make check
+      run: make check CC=${{ matrix.cc }}
+    - name: IRC Message Action
+      uses: Gottox/irc-message-action@v3
+      if: failure()
+      with:
+        channel: "Gottox"
+        nickname: gh-gottox
+        message: "https://github.com/${{ github.repository }} failed on push ${{ github.event.compare }}"
