@@ -17,15 +17,6 @@
 
 #define BLOCK_SIZE 8192
 
-// TODO: Endianess
-const static union SquashCompressionOptions default_options = {
-	.gzip = {
-		.compression_level = 9,
-		.window_size = 15,
-		.strategies = 0x01,
-	}
-};
-
 static int
 squash_gzip_extract(const union SquashCompressionOptions *options,
 		uint8_t **target, size_t *target_size, const uint8_t *compressed,
@@ -56,5 +47,5 @@ squash_gzip_cleanup(union SquashCompressionOptions *options) {
 
 const struct SquashExtractorImplementation squash_extractor_gzip = {
 		.extract = squash_gzip_extract,
-		.default_options = &default_options,
+		.default_options = NULL,
 };
