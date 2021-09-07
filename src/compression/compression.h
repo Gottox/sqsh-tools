@@ -14,6 +14,8 @@
 
 extern const struct SquashExtractorImplementation squash_extractor_null;
 extern const struct SquashExtractorImplementation squash_extractor_gzip;
+extern const struct SquashExtractorImplementation squash_extractor_lzma;
+extern const struct SquashExtractorImplementation squash_extractor_xz;
 
 struct Squash;
 

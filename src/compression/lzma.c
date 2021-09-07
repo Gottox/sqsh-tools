@@ -4,18 +4,49 @@
  * @created     : Sunday Sep 05, 2021 11:09:51 CEST
  */
 
+#include <lzma.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <zconf.h>
-#include <zlib.h>
 
 #include "../error.h"
-#include "compression.h"
 #include "../format/compression_options.h"
+#include "compression.h"
 
 #define BLOCK_SIZE 8192
+
+static int
+lzma_uncompress(uint8_t *dest, size_t *dest_len, const uint8_t *source,
+		size_t source_len) {
+	lzma_ret rv = LZMA_OK;
+
+	lzma_stream strm = LZMA_STREAM_INIT;
+
+	rv = lzma_alone_decoder(&strm, UINT64_MAX);
+	if (rv != LZMA_OK) {
+		lzma_end(&strm);
+		return rv;
+	}
+
+	lzma_action action = LZMA_RUN;
+
+	strm.next_in = source;
+	strm.avail_in = source_len;
+
+	strm.next_out = dest;
+	strm.avail_out = *dest_len;
+
+	action = LZMA_FINISH;
+
+	*dest_len = strm.avail_out;
+
+	rv = lzma_code(&strm, action);
+	lzma_end(&strm);
+
+	return rv;
+}
 
 static int
 squash_lzma_extract(const union SquashCompressionOptions *options,
@@ -28,21 +59,16 @@ squash_lzma_extract(const union SquashCompressionOptions *options,
 		return -SQUASH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
-	rv = uncompress(&target_buffer[*target_size], &write_chunk_size,
-			compressed, compressed_size);
+	rv = lzma_uncompress(&target_buffer[*target_size], &write_chunk_size, compressed,
+			compressed_size);
 
 	*target = target_buffer;
 	*target_size += write_chunk_size;
 
-	if (rv != Z_OK) {
+	if (rv != LZMA_STREAM_END) {
 		return -SQUASH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 	return rv;
-}
-
-int
-squash_lzma_cleanup(union SquashCompressionOptions *options) {
-	return 0;
 }
 
 const struct SquashExtractorImplementation squash_extractor_lzma = {

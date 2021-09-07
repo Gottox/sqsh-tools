@@ -17,8 +17,10 @@ extractor_by_id(int id) {
 	case SQUASH_COMPRESSION_GZIP:
 		return &squash_extractor_gzip;
 	case SQUASH_COMPRESSION_LZMA:
-	case SQUASH_COMPRESSION_LZO:
+		return &squash_extractor_lzma;
 	case SQUASH_COMPRESSION_XZ:
+		return &squash_extractor_xz;
+	case SQUASH_COMPRESSION_LZO:
 	case SQUASH_COMPRESSION_LZ4:
 	case SQUASH_COMPRESSION_ZSTD:
 		return NULL;
@@ -39,13 +41,16 @@ squash_extractor_init(
 		return -SQUASH_ERROR_COMPRESSION_INIT;
 	}
 
-	if (squash_superblock_flags(squash->superblock) & SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
-		const struct SquashMetablock *metablock = squash_metablock_from_offset(
-				squash, SQUASH_SUPERBLOCK_SIZE);
+	if (squash_superblock_flags(squash->superblock) &
+			SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
+		const struct SquashMetablock *metablock =
+				squash_metablock_from_offset(squash, SQUASH_SUPERBLOCK_SIZE);
 		if (metablock == NULL) {
 			return -SQUASH_ERROR_TODO;
 		}
-		extractor->options = (const union SquashCompressionOptions *)squash_metablock_data(metablock);
+		extractor->options =
+				(const union SquashCompressionOptions *)squash_metablock_data(
+						metablock);
 	} else {
 		extractor->options = impl->default_options;
 	}
@@ -71,6 +76,5 @@ squash_extractor_extract(struct SquashExtractor *extractor, uint8_t **target,
 
 int
 squash_extractor_cleanup(struct SquashExtractor *extractor) {
-
 	return 0;
 }
