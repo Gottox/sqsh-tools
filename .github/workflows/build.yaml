@@ -20,7 +20,7 @@ jobs:
     - name: make check
       run: make check CC=${{ matrix.cc }}
     - name: IRC Message Action
-      uses: Gottox/irc-message-action@v3
+      uses: Gottox/irc-message-action@v2
       if: failure()
       with:
         channel: "Gottox"
