@@ -4,13 +4,14 @@
  * @created     : Thursday May 06, 2021 15:22:00 CEST
  */
 
-#include "inode.h"
+#include "inode_context.h"
 #include "../error.h"
 #include "../extract.h"
 #include "../format/inode_internal.h"
 #include "../format/superblock.h"
 #include "../squash.h"
 #include "../utils.h"
+#include "metablock_context.h"
 #include <stdint.h>
 
 static int

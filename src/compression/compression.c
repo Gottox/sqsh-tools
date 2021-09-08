@@ -5,6 +5,7 @@
  */
 
 #include "compression.h"
+#include "../context/metablock_context.h"
 #include "../error.h"
 #include "../format/metablock.h"
 #include "../squash.h"
@@ -50,9 +51,8 @@ squash_compression_init(
 		if (metablock == NULL) {
 			return -SQUASH_ERROR_TODO;
 		}
-		compression->options =
-				(const union SquashCompressionOptions *)squash_metablock_data(
-						metablock);
+		compression->options = (const union SquashCompressionOptions *)
+				squash_format_metablock_data(metablock);
 	} else {
 		compression->options = impl->default_options;
 	}

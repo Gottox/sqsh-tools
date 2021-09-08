@@ -6,9 +6,9 @@
 
 #include <stdint.h>
 
-#ifndef FORMAT_INODE_H
+#ifndef SQUASHFS_FORMAT_INODE_H
 
-#define FORMAT_INODE_H
+#define SQUASHFS_FORMAT_INODE_H
 
 enum SquashInodeType {
 	SQUASH_INODE_TYPE_BASIC_DIRECTORY = 1,
@@ -106,4 +106,4 @@ uint32_t squash_format_inode_directory_index_name_size(
 		const struct SquashInodeDirectoryIndex *directory_index);
 const uint8_t *squash_format_inode_directory_index_name(
 		const struct SquashInodeDirectoryIndex *directory_index);
-#endif /* end of include guard FORMAT_INODE_H */
+#endif /* end of include guard SQUASHFS_FORMAT_INODE_H */

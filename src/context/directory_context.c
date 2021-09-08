@@ -9,10 +9,12 @@
 
 #include "../error.h"
 #include "../format/inode_internal.h"
+#include "../format/metablock.h"
 #include "../format/superblock.h"
 #include "../squash.h"
-#include "directory.h"
-#include "inode.h"
+#include "directory_context.h"
+#include "inode_context.h"
+#include "metablock_context.h"
 
 #define BLOCK_SIZE 8192
 
@@ -63,8 +65,8 @@ entry_by_offset(struct SquashDirectoryIterator *iterator, off_t offset) {
 }
 
 int
-squash_directory_init(struct SquashDirectory *directory, struct Squash *squash,
-		struct SquashInodeContext *inode) {
+squash_directory_init(struct SquashDirectoryContext *directory,
+		struct Squash *squash, struct SquashInodeContext *inode) {
 	int rv = 0;
 
 	switch (squash_format_inode_type(inode->inode)) {
@@ -89,7 +91,8 @@ squash_directory_init(struct SquashDirectory *directory, struct Squash *squash,
 }
 
 const struct SquashDirectoryEntry *
-squash_directory_lookup(struct SquashDirectory *directory, const char *name) {
+squash_directory_lookup(
+		struct SquashDirectoryContext *directory, const char *name) {
 	int rv = 0;
 	struct SquashDirectoryIterator iterator = {0};
 	const struct SquashDirectoryEntry *entry;
@@ -115,7 +118,7 @@ squash_directory_lookup(struct SquashDirectory *directory, const char *name) {
 
 int
 squash_directory_iterator_init(struct SquashDirectoryIterator *iterator,
-		struct SquashDirectory *directory) {
+		struct SquashDirectoryContext *directory) {
 	int rv = 0;
 	const struct SquashMetablock *metablock =
 			squash_metablock_from_offset(directory->squash,
@@ -210,6 +213,6 @@ squash_directory_entry_name(
 }
 
 int
-squash_directory_cleanup(struct SquashDirectory *directory) {
+squash_directory_cleanup(struct SquashDirectoryContext *directory) {
 	return 0;
 }

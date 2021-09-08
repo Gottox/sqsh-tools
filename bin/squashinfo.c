@@ -16,8 +16,9 @@
 #include "printb.h"
 
 #include "../src/compression/compression.h"
-#include "../src/context/directory.h"
-#include "../src/context/inode.h"
+#include "../src/context/directory_context.h"
+#include "../src/context/inode_context.h"
+#include "../src/context/metablock_context.h"
 #include "../src/format/compression_options.h"
 #include "../src/format/metablock.h"
 #include "../src/squash.h"
@@ -43,13 +44,13 @@ metablock_info(const struct SquashMetablock *metablock, struct Squash *squash) {
 		return 0;
 	}
 
-	int is_compressed = squash_metablock_is_compressed(metablock);
+	int is_compressed = squash_format_metablock_is_compressed(metablock);
 	squash_extract_init(&extract, squash, metablock, 0, 0);
-	squash_extract_more(&extract, squash_metablock_size(metablock));
+	squash_extract_more(&extract, squash_format_metablock_size(metablock));
 	size_t size = squash_extract_size(&extract);
 	squash_extract_cleanup(&extract);
 
-	size_t compressed_size = squash_metablock_size(metablock);
+	size_t compressed_size = squash_format_metablock_size(metablock);
 	fprintf(out,
 			"compressed: %s, "
 			"size: %lu, "
@@ -85,7 +86,7 @@ inode_info(struct Squash *squash, struct SquashInodeContext *inode) {
 }
 
 static int
-dir_info(struct Squash *squash, struct SquashDirectory *dir) {
+dir_info(struct Squash *squash, struct SquashDirectoryContext *dir) {
 	int rv = 0;
 	struct SquashDirectoryIterator iter = {0};
 	const struct SquashDirectoryEntry *entry;
@@ -108,7 +109,7 @@ dir_info(struct Squash *squash, struct SquashDirectory *dir) {
 static int
 root_inode_info(struct Squash *squash) {
 	struct SquashInodeContext inode = {0};
-	struct SquashDirectory dir = {0};
+	struct SquashDirectoryContext dir = {0};
 	int rv = 0;
 	uint64_t root_inode_ref =
 			squash_superblock_root_inode_ref(squash->superblock);

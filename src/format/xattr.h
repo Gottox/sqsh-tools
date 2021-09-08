@@ -6,9 +6,9 @@
 
 #include <stdint.h>
 
-#ifndef XATTR_H
+#ifndef SQUASH_XATTR_H
 
-#define XATTR_H
+#define SQUASH_XATTR_H
 
 struct SquashXattrKey {
 	uint16_t type;
@@ -34,4 +34,4 @@ struct SquashXattrIdTable {
 	uint64_t table[0]; // [ceil(xattr_ids / 512.0)]
 };
 
-#endif /* end of include guard XATTR_H */
+#endif /* end of include guard SQUASH_XATTR_H */

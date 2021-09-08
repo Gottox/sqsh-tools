@@ -8,9 +8,9 @@
 #include "format/metablock.h"
 #include <stdint.h>
 
-#ifndef EXTRACT_H
+#ifndef SQUASH_EXTRACT_H
 
-#define EXTRACT_H
+#define SQUASH_EXTRACT_H
 
 struct Squash;
 
@@ -31,4 +31,4 @@ void *squash_extract_data(const struct SquashExtract *extract);
 size_t squash_extract_size(const struct SquashExtract *extract);
 int squash_extract_cleanup(struct SquashExtract *extract);
 
-#endif /* end of include guard EXTRACT_H */
+#endif /* end of include guard SQUASH_EXTRACT_H */

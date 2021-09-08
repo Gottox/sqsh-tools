@@ -96,10 +96,8 @@ squash_cleanup(struct Squash *squash) {
 			return rv;
 	}
 
-	// TODO this should go into superblock.c
 	switch (squash->dtor) {
 	case SQUASH_DTOR_FREE:
-		// Discard const qualifier
 		free(squash->buffer);
 		break;
 	case SQUASH_DTOR_MUNMAP:

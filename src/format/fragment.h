@@ -6,9 +6,9 @@
 
 #include <stdint.h>
 
-#ifndef FRAGMENT_H
+#ifndef SQUASH_FORMAT_FRAGMENT_H
 
-#define FRAGMENT_H
+#define SQUASH_FORMAT_FRAGMENT_H
 
 struct SquashFragment {
 	uint64_t start;
@@ -16,4 +16,4 @@ struct SquashFragment {
 	uint32_t unused;
 };
 
-#endif /* end of include guard FRAGMENT_H */
+#endif /* end of include guard SQUASH_FORMAT_FRAGMENT_H */

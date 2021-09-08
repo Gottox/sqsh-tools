@@ -7,20 +7,21 @@ include config.mk
 HDR = \
 	bin/printb.h \
 	src/compression/compression.h \
-	src/context/directory.h \
-	src/context/inode.h \
+	src/context/directory_context.h \
+	src/context/inode_context.h \
+	src/context/metablock_context.h \
 	src/error.h \
 	src/extract.h \
 	src/format/compression_options.h \
 	src/format/directory.h \
+	src/format/fragment.h \
 	src/format/inode.h \
 	src/format/inode_internal.h \
 	src/format/metablock.h \
 	src/format/superblock.h \
-	src/fragment.h \
+	src/format/xattr.h \
 	src/squash.h \
 	src/utils.h \
-	src/xattr.h \
 
 SRC = \
 	src/compression/compression.c \
@@ -31,8 +32,9 @@ SRC = \
 	src/compression/null.c \
 	src/compression/xz.c \
 	src/compression/zstd.c \
-	src/context/directory.c \
-	src/context/inode.c \
+	src/context/directory_context.c \
+	src/context/inode_context.c \
+	src/context/metablock_context.c \
 	src/extract.c \
 	src/format/compression_options.c \
 	src/format/directory.c \
@@ -41,6 +43,7 @@ SRC = \
 	src/format/superblock.c \
 	src/squash.c \
 	src/utils.c \
+
 
 OBJ = $(SRC:.c=.o)
 

@@ -4,9 +4,9 @@
  * @created     : Saturday May 08, 2021 20:03:38 CEST
  */
 
-#ifndef ERROR_H
+#ifndef SQUASH_ERROR_H
 
-#define ERROR_H
+#define SQUASH_ERROR_H
 
 enum SquashError {
 	// Avoid collisions with errno
@@ -34,4 +34,4 @@ enum SquashError {
 	SQUASH_ERROR_TODO,
 };
 
-#endif /* end of include guard ERROR_H */
+#endif /* end of include guard SQUASH_ERROR_H */

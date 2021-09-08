@@ -9,9 +9,9 @@
 
 #include "../extract.h"
 
-#ifndef INODE_H
+#ifndef SQUASH_INODE_CONTEXT_H
 
-#define INODE_H
+#define SQUASH_INODE_CONTEXT_H
 
 struct Squash;
 struct SquashInode;
@@ -32,4 +32,4 @@ uint32_t squash_inode_hard_link_count(struct SquashInodeContext *inode);
 
 int squash_inode_cleanup(struct SquashInodeContext *inode);
 
-#endif /* end of include guard INODE_H */
+#endif /* end of include guard SQUASH_INODE_CONTEXT_H */
