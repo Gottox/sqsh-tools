@@ -7,11 +7,36 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "../error.h"
+#include "../format/inode_internal.h"
+#include "../format/superblock.h"
+#include "../squash.h"
 #include "directory.h"
-#include "error.h"
-#include "format/superblock.h"
 #include "inode.h"
-#include "squash.h"
+
+#define BLOCK_SIZE 8192
+
+int
+directory_iterator_index_lookup(
+		struct SquashDirectoryIterator *iterator, const char *name) {
+	struct SquashInodeContext *inode = iterator->directory->inode;
+	if (squash_format_inode_type(inode->inode) !=
+			SQUASH_INODE_TYPE_EXTENDED_DIRECTORY) {
+		return 0;
+	}
+	const struct SquashInodeDirectoryExt *xdir =
+			squash_format_inode_directory_ext(inode->inode);
+
+	const struct SquashInodeDirectoryIndex *index =
+			squash_format_inode_directory_ext_index(xdir);
+	size_t index_count = squash_format_inode_directory_ext_index_count(xdir);
+	for (int i = 0; i < index_count; i++) {
+		const uint8_t *tmp = (uint8_t *)index;
+		tmp += sizeof(struct SquashInodeDirectoryIndex) +
+				squash_format_inode_directory_index_name_size(index);
+	}
+	return 0;
+}
 
 static int
 directory_data_more(struct SquashDirectoryIterator *iterator, size_t size) {
@@ -39,19 +64,19 @@ entry_by_offset(struct SquashDirectoryIterator *iterator, off_t offset) {
 
 int
 squash_directory_init(struct SquashDirectory *directory, struct Squash *squash,
-		struct SquashInode *inode) {
+		struct SquashInodeContext *inode) {
 	int rv = 0;
 
-	switch (inode->wrap->header.inode_type) {
+	switch (squash_format_inode_type(inode->inode)) {
 	case SQUASH_INODE_TYPE_BASIC_DIRECTORY:
-		directory->block_start = inode->wrap->data.dir.dir_block_start;
-		directory->block_offset = inode->wrap->data.dir.block_offset;
-		directory->size = inode->wrap->data.dir.file_size - 3;
+		directory->block_start = inode->inode->data.directory.block_start;
+		directory->block_offset = inode->inode->data.directory.block_offset;
+		directory->size = inode->inode->data.directory.file_size - 3;
 		break;
 	case SQUASH_INODE_TYPE_EXTENDED_DIRECTORY:
-		directory->block_start = inode->wrap->data.xdir.dir_block_start;
-		directory->block_offset = inode->wrap->data.xdir.block_offset;
-		directory->size = inode->wrap->data.xdir.file_size - 3;
+		directory->block_start = inode->inode->data.directory_ext.block_start;
+		directory->block_offset = inode->inode->data.directory_ext.block_offset;
+		directory->size = inode->inode->data.directory_ext.file_size - 3;
 		break;
 	default:
 		return -SQUASH_ERROR_DIRECTORY_WRONG_INODE_TYPE;
@@ -102,7 +127,7 @@ squash_directory_iterator_init(struct SquashDirectoryIterator *iterator,
 	rv = squash_extract_init(&iterator->extract, directory->squash, metablock,
 			directory->block_start, directory->block_offset);
 	if (rv < 0) {
-		return -SQUASH_ERROR_DIRECTORY_INIT;
+		return rv;
 	}
 
 	iterator->directory = directory;

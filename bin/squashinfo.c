@@ -16,10 +16,10 @@
 #include "printb.h"
 
 #include "../src/compression/compression.h"
-#include "../src/directory.h"
+#include "../src/context/directory.h"
+#include "../src/context/inode.h"
 #include "../src/format/compression_options.h"
 #include "../src/format/metablock.h"
-#include "../src/inode.h"
 #include "../src/squash.h"
 
 #define KEY_LENGTH "25"
@@ -75,7 +75,7 @@ compression_info_gzip(struct Squash *squash) {
 }
 
 static int
-inode_info(struct Squash *squash, struct SquashInode *inode) {
+inode_info(struct Squash *squash, struct SquashInodeContext *inode) {
 	int rv = 0;
 
 	KEY("HARDLINK COUNT");
@@ -107,7 +107,7 @@ dir_info(struct Squash *squash, struct SquashDirectory *dir) {
 
 static int
 root_inode_info(struct Squash *squash) {
-	struct SquashInode inode = {0};
+	struct SquashInodeContext inode = {0};
 	struct SquashDirectory dir = {0};
 	int rv = 0;
 	uint64_t root_inode_ref =

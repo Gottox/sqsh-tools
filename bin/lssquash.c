@@ -13,9 +13,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "../src/directory.h"
-#include "../src/format/metablock.h"
-#include "../src/inode.h"
+#include "../src/context/directory.h"
+#include "../src/context/inode.h"
 #include "../src/squash.h"
 
 static int
@@ -28,7 +27,7 @@ int
 main(int argc, char *argv[]) {
 	int rv;
 	int opt = 0;
-	struct SquashInode inode = {0};
+	struct SquashInodeContext inode = {0};
 	struct SquashDirectory dir = {0};
 	struct SquashDirectoryIterator iter = {0};
 	struct Squash squash = {0};

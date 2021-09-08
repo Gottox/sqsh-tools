@@ -7,19 +7,19 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "extract.h"
-#include "format/directory.h"
+#include "../extract.h"
+#include "../format/directory.h"
 
 #ifndef DIRECTORY_H
 
 #define DIRECTORY_H
 
-struct SquashInode;
+struct SquashInodeContext;
 struct Squash;
 
 struct SquashDirectory {
 	struct Squash *squash;
-	struct SquashInode *inode;
+	struct SquashInodeContext *inode;
 	uint32_t block_start;
 	uint32_t block_offset;
 	uint32_t size;
@@ -35,7 +35,7 @@ struct SquashDirectoryIterator {
 };
 
 int squash_directory_init(struct SquashDirectory *directory,
-		struct Squash *squash, struct SquashInode *inode);
+		struct Squash *squash, struct SquashInodeContext *inode);
 const struct SquashDirectoryEntry *squash_directory_lookup(
 		struct SquashDirectory *directory, const char *name);
 int squash_directory_iterator_init(struct SquashDirectoryIterator *iterator,
