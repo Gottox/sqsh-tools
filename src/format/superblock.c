@@ -9,6 +9,12 @@
 #include "../utils.h"
 
 #include <endian.h>
+#include <stdint.h>
+
+static const union {
+	char c[4];
+	uint32_t d;
+} superblock_magic = {.c = "hsqs"};
 
 struct SquashSuperblock {
 	uint32_t magic;
@@ -34,19 +40,18 @@ struct SquashSuperblock {
 CASSERT(sizeof(struct SquashSuperblock) == SQUASH_SUPERBLOCK_SIZE);
 
 int
-squash_superblock_init(const struct SquashSuperblock **superblock,
-		uint8_t *bytes, size_t size) {
+squash_superblock_init(const struct SquashSuperblock *superblock, size_t size) {
 	if (size < sizeof(struct SquashSuperblock)) {
 		return -SQUASH_ERROR_SUPERBLOCK_TOO_SMALL;
 	}
 
-	*superblock = (const struct SquashSuperblock *)bytes;
-
-	if (squash_superblock_magic(*superblock) != SQUASH_SUPERBLOCK_MAGIC) {
+	// Do not use the getter here as it may change the endianess. We don't want
+	// that here.
+	if (superblock->magic != superblock_magic.d) {
 		return -SQUASH_ERROR_WRONG_MAGIG;
 	}
-	if (squash_superblock_block_log(*superblock) !=
-			log2_u32(squash_superblock_block_size(*superblock))) {
+	if (squash_superblock_block_log(superblock) !=
+			log2_u32(squash_superblock_block_size(superblock))) {
 		return -SQUASH_ERROR_BLOCKSIZE_MISSMATCH;
 	}
 

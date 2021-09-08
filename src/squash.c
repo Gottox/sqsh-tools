@@ -22,7 +22,8 @@ squash_init(struct Squash *squash, uint8_t *buffer, const size_t size,
 		const enum SquashDtor dtor) {
 	int rv = 0;
 
-	rv = squash_superblock_init(&squash->superblock, buffer, size);
+	squash->superblock = (const struct SquashSuperblock *)buffer;
+	rv = squash_superblock_init(squash->superblock, size);
 	if (rv < 0) {
 		return rv;
 	}

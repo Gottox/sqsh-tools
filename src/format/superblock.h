@@ -11,7 +11,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define SQUASH_SUPERBLOCK_MAGIC 0x73717368
 #define SQUASH_SUPERBLOCK_SIZE 96
 
 enum SquashSuperblockCompressionId {
@@ -41,8 +40,8 @@ enum SquashSuperblockFlags {
 
 struct SquashSuperblock;
 
-int squash_superblock_init(const struct SquashSuperblock **superblock,
-		uint8_t *bytes, size_t size);
+int squash_superblock_init(
+		const struct SquashSuperblock *superblock, size_t size);
 
 uint32_t squash_superblock_magic(const struct SquashSuperblock *superblock);
 uint32_t squash_superblock_inode_count(
