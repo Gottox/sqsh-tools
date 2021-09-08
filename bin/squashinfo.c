@@ -91,7 +91,7 @@ dir_info(struct Squash *squash, struct SquashDirectory *dir) {
 	const struct SquashDirectoryEntry *entry;
 	fputs("=== ROOT DIRECTORY ===\n", out);
 
-	squash_directory_iterator(&iter, dir);
+	squash_directory_iterator_init(&iter, dir);
 	while ((entry = squash_directory_iterator_next(&iter))) {
 		char *name = NULL;
 		squash_directory_entry_name(entry, &name);
@@ -100,6 +100,7 @@ dir_info(struct Squash *squash, struct SquashDirectory *dir) {
 		fputc('\n', out);
 		free(name);
 	}
+	squash_directory_iterator_clean(&iter);
 
 	return rv;
 }

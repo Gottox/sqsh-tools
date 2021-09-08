@@ -63,7 +63,7 @@ main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	squash_directory_iterator(&iter, &dir);
+	squash_directory_iterator_init(&iter, &dir);
 	if (rv < 0) {
 		perror(argv[optind]);
 		return EXIT_FAILURE;
@@ -76,6 +76,7 @@ main(int argc, char *argv[]) {
 		free(name);
 	}
 
+	squash_directory_iterator_clean(&iter);
 	squash_directory_cleanup(&dir);
 	squash_inode_cleanup(&inode);
 

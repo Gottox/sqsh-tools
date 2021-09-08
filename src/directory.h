@@ -15,16 +15,20 @@
 #define DIRECTORY_H
 
 struct SquashInode;
+struct Squash;
 
 struct SquashDirectory {
+	struct Squash *squash;
 	struct SquashInode *inode;
-	struct SquashDirectoryFragment *fragments;
-	struct SquashExtract extract;
+	uint32_t block_start;
+	uint32_t block_offset;
 	uint32_t size;
 };
 
 struct SquashDirectoryIterator {
 	struct SquashDirectory *directory;
+	struct SquashDirectoryFragment *fragments;
+	struct SquashExtract extract;
 	off_t current_fragment_offset;
 	size_t remaining_entries;
 	off_t next_offset;
@@ -34,11 +38,11 @@ int squash_directory_init(struct SquashDirectory *directory,
 		struct Squash *squash, struct SquashInode *inode);
 const struct SquashDirectoryEntry *squash_directory_lookup(
 		struct SquashDirectory *directory, const char *name);
-int squash_directory_iterator(struct SquashDirectoryIterator *iterator,
+int squash_directory_iterator_init(struct SquashDirectoryIterator *iterator,
 		struct SquashDirectory *directory);
 const struct SquashDirectoryEntry *squash_directory_iterator_next(
 		struct SquashDirectoryIterator *iterator);
-
+int squash_directory_iterator_clean(struct SquashDirectoryIterator *iterator);
 int squash_directory_entry_name_size(const struct SquashDirectoryEntry *entry);
 int squash_directory_entry_name(
 		const struct SquashDirectoryEntry *entry, char **name_buffer);
