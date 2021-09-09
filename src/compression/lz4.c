@@ -22,16 +22,15 @@ squash_lz4_extract(const union SquashCompressionOptions *options,
 		const size_t compressed_size) {
 	int rv = 0;
 	size_t write_chunk_size = BLOCK_SIZE;
-	uint8_t *target_buffer = realloc(*target, *target_size + write_chunk_size);
-	if (target_buffer == NULL) {
+	*target = realloc(*target, *target_size + write_chunk_size);
+	if (*target == NULL) {
 		return -SQUASH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
 	rv = LZ4_decompress_safe((char *)compressed,
-			(char *)&target_buffer[*target_size], compressed_size,
+			(char *)&(*target)[*target_size], compressed_size,
 			write_chunk_size);
 
-	*target = target_buffer;
 	*target_size += write_chunk_size;
 
 	if (rv < 0) {

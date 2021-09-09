@@ -8,12 +8,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#ifndef SQUASH_FORMAT_DIRECTORY_H
+#ifndef SQUASH__DIRECTORY_H
 
-#define SQUASH_FORMAT_DIRECTORY_H
-
-#define SQUASH_DIRECTORY_ENTRY_SIZE 8
-#define SQUASH_DIRECTORY_FRAGMENT_SIZE 12
+#define SQUASH__DIRECTORY_H
 
 struct SquashDirectoryEntry;
 
@@ -39,4 +36,4 @@ uint32_t squash_format_directory_fragment_inode_number(
 const struct SquashDirectoryEntry *squash_format_directory_fragment_entries(
 		const struct SquashDirectoryFragment *fragment);
 
-#endif /* end of include guard SQUASH_FORMAT_DIRECTORY_H */
+#endif /* end of include guard SQUASH__DIRECTORY_H */

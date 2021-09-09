@@ -4,9 +4,6 @@
  * @created     : Friday May 07, 2021 06:56:03 CEST
  */
 
-#include <stdint.h>
-#include <stdlib.h>
-
 #include "../extract.h"
 #include "../format/directory.h"
 
@@ -15,10 +12,10 @@
 #define SQUASH_DIRECTORY_CONTEXT_H
 
 struct SquashInodeContext;
-struct Squash;
+struct SquashSuperblock;
 
 struct SquashDirectoryContext {
-	struct Squash *squash;
+	const struct SquashSuperblock *superblock;
 	struct SquashInodeContext *inode;
 	uint32_t block_start;
 	uint32_t block_offset;
@@ -35,7 +32,8 @@ struct SquashDirectoryIterator {
 };
 
 int squash_directory_init(struct SquashDirectoryContext *directory,
-		struct Squash *squash, struct SquashInodeContext *inode);
+		const struct SquashSuperblock *superblock,
+		struct SquashInodeContext *inode);
 const struct SquashDirectoryEntry *squash_directory_lookup(
 		struct SquashDirectoryContext *directory, const char *name);
 int squash_directory_iterator_init(struct SquashDirectoryIterator *iterator,

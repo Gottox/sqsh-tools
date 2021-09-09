@@ -26,16 +26,15 @@ squash_xz_extract(const union SquashCompressionOptions *options,
 	size_t target_pos = 0;
 	uint64_t memlimit = UINT64_MAX;
 	size_t write_chunk_size = BLOCK_SIZE;
-	uint8_t *target_buffer = realloc(*target, *target_size + write_chunk_size);
-	if (target_buffer == NULL) {
+	*target = realloc(*target, *target_size + write_chunk_size);
+	if (*target == NULL) {
 		return -SQUASH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
 	rv = lzma_stream_buffer_decode(&memlimit, 0, NULL, compressed,
-			&compressed_pos, compressed_size, &target_buffer[*target_size],
+			&compressed_pos, compressed_size, &(*target)[*target_size],
 			&target_pos, write_chunk_size);
 
-	*target = target_buffer;
 	*target_size += target_pos;
 
 	if (rv != LZMA_OK) {

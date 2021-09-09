@@ -18,14 +18,13 @@ squash_null_extract(const union SquashCompressionOptions *options,
 		uint8_t **target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	size_t new_target_size = *target_size + compressed_size;
-	uint8_t *new_target = realloc(*target, new_target_size);
-	if (new_target == NULL) {
+	*target = realloc(*target, new_target_size);
+	if (*target == NULL) {
 		return -SQUASH_ERROR_MALLOC_FAILED;
 	}
 
-	memcpy(&new_target[*target_size], compressed, compressed_size);
+	memcpy(&*target[*target_size], compressed, compressed_size);
 
-	*target = new_target;
 	*target_size = new_target_size;
 
 	return 0;

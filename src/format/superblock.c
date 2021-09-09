@@ -50,9 +50,14 @@ squash_superblock_init(const struct SquashSuperblock *superblock, size_t size) {
 	if (superblock->magic != superblock_magic.d) {
 		return -SQUASH_ERROR_WRONG_MAGIG;
 	}
+
 	if (squash_superblock_block_log(superblock) !=
 			log2_u32(squash_superblock_block_size(superblock))) {
 		return -SQUASH_ERROR_BLOCKSIZE_MISSMATCH;
+	}
+
+	if (squash_superblock_bytes_used(superblock) > size) {
+		return -SQUASH_ERROR_SIZE_MISSMATCH;
 	}
 
 	return 0;

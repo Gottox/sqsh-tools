@@ -33,21 +33,20 @@ compression_by_id(int id) {
 }
 
 int
-squash_compression_init(
-		struct Squash *squash, struct SquashCompression *compression) {
+squash_compression_init(struct SquashCompression *compression,
+		const struct SquashSuperblock *superblock) {
 	int rv = 0;
 	const struct SquashCompressionImplementation *impl;
 
-	impl = compression_by_id(
-			squash_superblock_compression_id(squash->superblock));
+	impl = compression_by_id(squash_superblock_compression_id(superblock));
 	if (impl == NULL) {
 		return -SQUASH_ERROR_COMPRESSION_INIT;
 	}
 
-	if (squash_superblock_flags(squash->superblock) &
+	if (squash_superblock_flags(superblock) &
 			SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
-		const struct SquashMetablock *metablock =
-				squash_metablock_from_offset(squash, SQUASH_SUPERBLOCK_SIZE);
+		const struct SquashMetablock *metablock = squash_metablock_from_offset(
+				superblock, SQUASH_SUPERBLOCK_SIZE);
 		if (metablock == NULL) {
 			return -SQUASH_ERROR_TODO;
 		}
@@ -66,7 +65,7 @@ squash_compression_init(
 }
 
 int
-squash_compression_extract(struct SquashCompression *compression,
+squash_compression_extract(const struct SquashCompression *compression,
 		uint8_t **target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	const struct SquashCompressionImplementation *impl = compression->impl;

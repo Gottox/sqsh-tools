@@ -1,4 +1,4 @@
-VERSION = 0.1
+VERSION = 0.1.0
 
 # release flags
 #CFLAGS = -fstack-protector-strong -D_FORTIFY_SOURCE=2 -Wall -fPIC -Werror -Wpedantic -O2 -pthread

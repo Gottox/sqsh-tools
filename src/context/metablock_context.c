@@ -5,34 +5,69 @@
  */
 
 #include "metablock_context.h"
+#include "../format/metablock_internal.h"
+
 #include "../format/superblock.h"
 #include "../squash.h"
 #include "../utils.h"
-
-#include <assert.h>
 #include <stdint.h>
 
-struct SquashMetablock {
-	uint16_t header;
-	// uint8_t data[0];
-};
+static int
+metablock_bounds_check(const struct SquashSuperblock *superblock,
+		const struct SquashMetablock *block) {
+	int upper_bounds;
+	int header_bounds;
+	int data_bounds;
+
+	if (ADD_OVERFLOW((uint64_t)superblock,
+				squash_superblock_bytes_used(superblock), &upper_bounds)) {
+		return -SQUASH_ERROR_INTEGER_OVERFLOW;
+	}
+
+	if (ADD_OVERFLOW((uint64_t)block, sizeof(struct SquashMetablock),
+				&header_bounds)) {
+		return -SQUASH_ERROR_INTEGER_OVERFLOW;
+	}
+
+	if (header_bounds > upper_bounds) {
+		return -SQUASH_ERROR_SIZE_MISSMATCH;
+	}
+
+	if (ADD_OVERFLOW((uint64_t)squash_format_metablock_data(block),
+				squash_format_metablock_size(block), &data_bounds)) {
+		return -SQUASH_ERROR_INTEGER_OVERFLOW;
+	}
+
+	if (data_bounds > upper_bounds) {
+		return -SQUASH_ERROR_SIZE_MISSMATCH;
+	}
+
+	return 0;
+}
 
 const struct SquashMetablock *
-squash_metablock_from_offset(struct Squash *squash, off_t offset) {
-	const uint8_t *tmp = (uint8_t *)squash->superblock;
-
-	if (offset >= squash->size) {
+squash_metablock_from_offset(
+		const struct SquashSuperblock *superblock, off_t offset) {
+	const uint8_t *tmp = (uint8_t *)superblock;
+	const struct SquashMetablock *block =
+			(const struct SquashMetablock *)&tmp[offset];
+	if (metablock_bounds_check(superblock, block) < 0) {
 		return NULL;
 	} else {
-		return (const struct SquashMetablock *)&tmp[offset];
+		return block;
 	}
 }
 
 const struct SquashMetablock *
-squash_metablock_from_start_block(
+squash_metablock_from_start_block(const struct SquashSuperblock *superblock,
 		const struct SquashMetablock *start_block, off_t offset) {
 	const uint8_t *tmp = (uint8_t *)start_block;
+	const struct SquashMetablock *block =
+			(const struct SquashMetablock *)&tmp[offset];
 
-	// TODO overflow
-	return (const struct SquashMetablock *)&tmp[offset];
+	if (metablock_bounds_check(superblock, block) < 0) {
+		return NULL;
+	} else {
+		return block;
+	}
 }

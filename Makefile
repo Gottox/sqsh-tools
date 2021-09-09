@@ -18,6 +18,7 @@ HDR = \
 	src/format/inode.h \
 	src/format/inode_internal.h \
 	src/format/metablock.h \
+	src/format/metablock_internal.h \
 	src/format/superblock.h \
 	src/format/xattr.h \
 	src/squash.h \

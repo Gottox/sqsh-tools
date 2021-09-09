@@ -6,9 +6,9 @@
 
 #include <stdint.h>
 
-#ifndef SQUASH_FORMAT_COMPRESSION_OPTIONS_H
+#ifndef SQUASH__COMPRESSION_OPTIONS_H
 
-#define SQUASH_FORMAT_COMPRESSION_OPTIONS_H
+#define SQUASH__COMPRESSION_OPTIONS_H
 
 struct SquashCompressionOptionsGzip {
 	uint32_t compression_level;
@@ -68,4 +68,4 @@ uint32_t squash_compression_options_lzo_algorithm(
 uint32_t squash_compression_options_lzo_compression_level(
 		const union SquashCompressionOptions *options);
 
-#endif /* end of include guard SQUASH_FORMAT_COMPRESSION_OPTIONS_H */
+#endif /* end of include guard SQUASH__COMPRESSION_OPTIONS_H */

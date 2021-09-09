@@ -7,50 +7,52 @@
 #include "extract.h"
 #include "compression/compression.h"
 #include "context/metablock_context.h"
-#include "format/metablock.h"
+#include "format/metablock_internal.h"
+#include "format/superblock.h"
 #include "squash.h"
-
-const struct SquashCompression static_null_compression = {
-		.impl = &squash_compression_null, .options = NULL};
+#include <stdint.h>
 
 int
-squash_extract_init(struct SquashExtract *extract, const struct Squash *squash,
+squash_extract_init(struct SquashExtract *extract,
+		const struct SquashSuperblock *superblock,
 		const struct SquashMetablock *block, off_t block_index,
 		off_t block_offset) {
+	int rv = 0;
 	extract->extracted = NULL;
 	extract->extracted_size = 0;
 	extract->start_block = block;
 	extract->index = block_index;
 	extract->offset = block_offset;
+	extract->superblock = superblock;
 	if (squash_format_metablock_is_compressed(block)) {
-		extract->compression = &squash->compression;
+		rv = squash_compression_init(&extract->compression, superblock);
 	} else {
-		extract->compression = &static_null_compression;
+		extract->compression.impl = &squash_compression_null;
+		extract->compression.options = NULL;
 	}
-	return 0;
+	return rv;
 }
-
-#define SQUASH_METABLOCK_HEADER_SIZE 2
 
 int
 squash_extract_more(struct SquashExtract *extract, const size_t size) {
 	int rv = 0;
-	const struct SquashCompressionImplementation *impl =
-			extract->compression->impl;
-	const union SquashCompressionOptions *options =
-			extract->compression->options;
 	const struct SquashMetablock *start_block = extract->start_block;
 
 	for (; rv == 0 && size > squash_extract_size(extract);) {
-		const struct SquashMetablock *block =
-				squash_metablock_from_start_block(start_block, extract->index);
+		const struct SquashMetablock *block = squash_metablock_from_start_block(
+				extract->superblock, start_block, extract->index);
+		if (block == NULL) {
+			return -SQUASH_ERROR_TODO;
+		}
 		const size_t block_size = squash_format_metablock_size(block);
-		rv = impl->extract(options, &extract->extracted,
-				&extract->extracted_size, squash_format_metablock_data(block),
+
+		const void *block_data = squash_format_metablock_data(block);
+		rv = squash_compression_extract(&extract->compression,
+				&extract->extracted, &extract->extracted_size, block_data,
 				block_size);
-		extract->index += block_size + SQUASH_METABLOCK_HEADER_SIZE;
+		extract->index += sizeof(struct SquashMetablock) + block_size;
 	}
-	return 0;
+	return rv;
 }
 
 void *
@@ -70,5 +72,5 @@ squash_extract_size(const struct SquashExtract *extract) {
 int
 squash_extract_cleanup(struct SquashExtract *extract) {
 	free(extract->extracted);
-	return 0;
+	return squash_compression_cleanup(&extract->compression);
 }

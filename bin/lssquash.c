@@ -50,13 +50,13 @@ main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	rv = squash_inode_load_ref(&inode, &squash,
+	rv = squash_inode_load_ref(&inode, squash.superblock,
 			squash_superblock_root_inode_ref(squash.superblock));
 	if (rv < 0) {
 		perror(argv[optind]);
 		return EXIT_FAILURE;
 	}
-	rv = squash_directory_init(&dir, &squash, &inode);
+	rv = squash_directory_init(&dir, squash.superblock, &inode);
 	if (rv < 0) {
 		perror(argv[optind]);
 		return EXIT_FAILURE;

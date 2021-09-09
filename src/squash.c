@@ -31,11 +31,6 @@ squash_init(struct Squash *squash, uint8_t *buffer, const size_t size,
 	squash->size = size;
 	squash->dtor = dtor;
 
-	rv = squash_compression_init(squash, &squash->compression);
-	if (rv < 0) {
-		return rv;
-	}
-
 	return rv;
 }
 
@@ -88,13 +83,6 @@ err:
 int
 squash_cleanup(struct Squash *squash) {
 	int rv = 0;
-
-	if (squash_superblock_flags(squash->superblock) &
-			SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
-		rv = squash_compression_cleanup(&squash->compression);
-		if (rv < 0)
-			return rv;
-	}
 
 	switch (squash->dtor) {
 	case SQUASH_DTOR_FREE:

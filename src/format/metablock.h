@@ -4,12 +4,12 @@
  * @created     : Wednesday Sep 08, 2021 14:27:47 CEST
  */
 
-#include "stddef.h"
-#include "stdint.h"
+#include <stddef.h>
+#include <stdint.h>
 
-#ifndef SQUASH_FORMAT_METABLOCK_H
+#ifndef SQUASH_METABLOCK_H
 
-#define SQUASH_FORMAT_METABLOCK_H
+#define SQUASH_METABLOCK_H
 
 struct SquashMetablock;
 

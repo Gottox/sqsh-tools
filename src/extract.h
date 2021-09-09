@@ -5,17 +5,16 @@
  */
 
 #include "compression/compression.h"
-#include "format/metablock.h"
+
 #include <stdint.h>
 
 #ifndef SQUASH_EXTRACT_H
 
 #define SQUASH_EXTRACT_H
 
-struct Squash;
-
 struct SquashExtract {
-	const struct SquashCompression *compression;
+	const struct SquashSuperblock *superblock;
+	struct SquashCompression compression;
 	const struct SquashMetablock *start_block;
 	off_t index;
 	off_t offset;
@@ -24,8 +23,9 @@ struct SquashExtract {
 };
 
 int squash_extract_init(struct SquashExtract *extract,
-		const struct Squash *squash, const struct SquashMetablock *block,
-		off_t block_index, off_t block_offset);
+		const struct SquashSuperblock *superblock,
+		const struct SquashMetablock *block, off_t block_index,
+		off_t block_offset);
 int squash_extract_more(struct SquashExtract *extract, const size_t size);
 void *squash_extract_data(const struct SquashExtract *extract);
 size_t squash_extract_size(const struct SquashExtract *extract);

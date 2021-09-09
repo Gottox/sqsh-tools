@@ -5,7 +5,6 @@
  */
 
 #include "inode.h"
-#include <stdint.h>
 
 #ifndef FORMAT_INODE_INTERNAL_H
 

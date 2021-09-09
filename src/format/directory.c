@@ -6,7 +6,6 @@
 
 #include "directory.h"
 #include <endian.h>
-#include <stdint.h>
 
 struct SquashDirectoryEntry {
 	uint16_t offset;
@@ -15,7 +14,6 @@ struct SquashDirectoryEntry {
 	uint16_t name_size;
 	// uint8_t name[0]; // [name_size + 1]
 };
-CASSERT(sizeof(struct SquashDirectoryEntry) == SQUASH_DIRECTORY_ENTRY_SIZE);
 
 struct SquashDirectoryFragment {
 	uint32_t count;
@@ -23,8 +21,6 @@ struct SquashDirectoryFragment {
 	uint32_t inode_number;
 	// struct SquashDirectoryEntry entries[0]; // [count + 1]
 };
-CASSERT(sizeof(struct SquashDirectoryFragment) ==
-		SQUASH_DIRECTORY_FRAGMENT_SIZE);
 
 uint16_t
 squash_format_directory_entry_offset(const struct SquashDirectoryEntry *entry) {

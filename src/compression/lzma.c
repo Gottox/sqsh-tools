@@ -54,15 +54,14 @@ squash_lzma_extract(const union SquashCompressionOptions *options,
 		const size_t compressed_size) {
 	int rv = 0;
 	size_t write_chunk_size = BLOCK_SIZE;
-	uint8_t *target_buffer = realloc(*target, *target_size + write_chunk_size);
-	if (target_buffer == NULL) {
+	*target = realloc(*target, *target_size + write_chunk_size);
+	if (*target == NULL) {
 		return -SQUASH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
-	rv = lzma_uncompress(&target_buffer[*target_size], &write_chunk_size,
+	rv = lzma_uncompress(&(*target)[*target_size], &write_chunk_size,
 			compressed, compressed_size);
 
-	*target = target_buffer;
 	*target_size += write_chunk_size;
 
 	if (rv != LZMA_STREAM_END) {

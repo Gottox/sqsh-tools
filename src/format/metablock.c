@@ -4,18 +4,10 @@
  * @created     : Friday Apr 30, 2021 21:39:44 CEST
  */
 
-#include "metablock.h"
 #include "../squash.h"
 #include "../utils.h"
+#include "metablock_internal.h"
 #include "superblock.h"
-
-#include <assert.h>
-#include <stdint.h>
-
-struct SquashMetablock {
-	uint16_t header;
-	// uint8_t data[0];
-};
 
 int
 squash_format_metablock_is_compressed(const struct SquashMetablock *metablock) {

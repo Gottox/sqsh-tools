@@ -5,14 +5,22 @@
  */
 
 #include "inode_context.h"
+#include "../format/inode_internal.h"
+
 #include "../error.h"
 #include "../extract.h"
-#include "../format/inode_internal.h"
 #include "../format/superblock.h"
 #include "../squash.h"
 #include "../utils.h"
 #include "metablock_context.h"
 #include <stdint.h>
+
+static struct SquashInodeDirectoryIndex *
+directory_index_by_offset(
+		struct SquashInodeDirectoryIndexIterator *iterator, off_t offset) {
+	const uint8_t *tmp = (const uint8_t *)iterator->inode->inode;
+	return (struct SquashInodeDirectoryIndex *)&tmp[offset];
+}
 
 static int
 inode_data_more(struct SquashInodeContext *inode, size_t size) {
@@ -22,7 +30,7 @@ inode_data_more(struct SquashInodeContext *inode, size_t size) {
 		return rv;
 	}
 	inode->inode = (struct SquashInode *)squash_extract_data(&inode->extract);
-	return 0;
+	return rv;
 }
 
 static int
@@ -104,18 +112,19 @@ squash_inode_hard_link_count(struct SquashInodeContext *inode) {
 }
 
 int
-squash_inode_load(struct SquashInodeContext *inode, struct Squash *squash,
-		int inode_block, int inode_offset) {
+squash_inode_load(struct SquashInodeContext *inode,
+		const struct SquashSuperblock *superblock, int inode_block,
+		int inode_offset) {
 	int rv = 0;
 	inode->inode = NULL;
 
 	const struct SquashMetablock *metablock = squash_metablock_from_offset(
-			squash, squash_superblock_inode_table_start(squash->superblock));
+			superblock, squash_superblock_inode_table_start(superblock));
 	if (metablock == NULL) {
 		return -SQUASH_ERROR_INODE_INIT;
 	}
 	rv = squash_extract_init(
-			&inode->extract, squash, metablock, inode_block, inode_offset);
+			&inode->extract, superblock, metablock, inode_block, inode_offset);
 	if (rv < 0) {
 		return rv;
 	}
@@ -133,13 +142,14 @@ squash_inode_load(struct SquashInodeContext *inode, struct Squash *squash,
 
 	return rv;
 }
+
 int
-squash_inode_load_ref(struct SquashInodeContext *inode, struct Squash *squash,
-		uint64_t inode_ref) {
+squash_inode_load_ref(struct SquashInodeContext *inode,
+		const struct SquashSuperblock *superblock, uint64_t inode_ref) {
 	int block = (inode_ref & 0x0000FFFFFFFF0000) >> 16;
 	int offset = inode_ref & 0x000000000000FFFF;
 
-	return squash_inode_load(inode, squash, block, offset);
+	return squash_inode_load(inode, superblock, block, offset);
 }
 
 int
@@ -147,4 +157,49 @@ squash_inode_cleanup(struct SquashInodeContext *inode) {
 	int rv = 0;
 	rv = squash_extract_cleanup(&inode->extract);
 	return rv;
+}
+
+int
+squash_inode_directory_iterator_init(
+		struct SquashInodeDirectoryIndexIterator *iterator,
+		struct SquashInodeContext *inode) {
+	int rv = 0;
+	const struct SquashInodeDirectoryExt *xdir =
+			squash_format_inode_directory_ext(inode->inode);
+
+	iterator->inode = inode;
+	iterator->offset = sizeof(struct SquashInodeDirectoryExt);
+	iterator->indices = squash_format_inode_directory_ext_index(xdir);
+	iterator->remaining_entries =
+			squash_format_inode_directory_ext_index_count(xdir);
+	return rv;
+}
+const struct SquashInodeDirectoryIndex *
+squash_inode_directory_index_iterator_next(
+		struct SquashInodeDirectoryIndexIterator *iterator) {
+	int rv = 0;
+	off_t current_offset = iterator->offset;
+	// Make sure next entry is loaded:
+	iterator->offset += sizeof(struct SquashInodeDirectoryIndex);
+	rv = inode_data_more(iterator->inode, iterator->offset);
+	if (rv < 0) {
+		return NULL;
+	}
+
+	const struct SquashInodeDirectoryIndex *current =
+			directory_index_by_offset(iterator, current_offset);
+	// Make sure current index has its name populated
+	iterator->offset += squash_format_inode_directory_index_name_size(
+			directory_index_by_offset(iterator, current_offset));
+	rv = inode_data_more(iterator->inode, iterator->offset);
+	if (rv < 0) {
+		return NULL;
+	}
+
+	return current;
+}
+int
+squash_inode_directory_iterator_clean(
+		struct SquashInodeDirectoryIndexIterator *iterator) {
+	return 0;
 }
