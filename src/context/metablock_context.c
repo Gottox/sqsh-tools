@@ -15,9 +15,9 @@
 static int
 metablock_bounds_check(const struct SquashSuperblock *superblock,
 		const struct SquashMetablock *block) {
-	int upper_bounds;
-	int header_bounds;
-	int data_bounds;
+	uint64_t upper_bounds;
+	uint64_t header_bounds;
+	uint64_t data_bounds;
 
 	if (ADD_OVERFLOW((uint64_t)superblock,
 				squash_superblock_bytes_used(superblock), &upper_bounds)) {
