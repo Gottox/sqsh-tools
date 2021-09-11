@@ -6,9 +6,9 @@
 
 #include "compression.h"
 #include "../context/metablock_context.h"
+#include "../data/metablock.h"
+#include "../data/superblock_internal.h"
 #include "../error.h"
-#include "../format/metablock.h"
-#include "../squash.h"
 
 static const struct SquashCompressionImplementation *
 compression_by_id(int id) {
@@ -38,20 +38,20 @@ squash_compression_init(struct SquashCompression *compression,
 	int rv = 0;
 	const struct SquashCompressionImplementation *impl;
 
-	impl = compression_by_id(squash_superblock_compression_id(superblock));
+	impl = compression_by_id(squash_data_superblock_compression_id(superblock));
 	if (impl == NULL) {
 		return -SQUASH_ERROR_COMPRESSION_INIT;
 	}
 
-	if (squash_superblock_flags(superblock) &
+	if (squash_data_superblock_flags(superblock) &
 			SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
 		const struct SquashMetablock *metablock = squash_metablock_from_offset(
-				superblock, SQUASH_SUPERBLOCK_SIZE);
+				superblock, sizeof(struct SquashSuperblock));
 		if (metablock == NULL) {
 			return -SQUASH_ERROR_TODO;
 		}
 		compression->options = (const union SquashCompressionOptions *)
-				squash_format_metablock_data(metablock);
+				squash_data_metablock_data(metablock);
 	} else {
 		compression->options = impl->default_options;
 	}

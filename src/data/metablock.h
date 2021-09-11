@@ -13,12 +13,12 @@
 
 struct SquashMetablock;
 
-int squash_format_metablock_is_compressed(
+int squash_data_metablock_is_compressed(
 		const struct SquashMetablock *metablock);
 
-const uint8_t *squash_format_metablock_data(
+const uint8_t *squash_data_metablock_data(
 		const struct SquashMetablock *metablock);
 
-size_t squash_format_metablock_size(const struct SquashMetablock *metablock);
+size_t squash_data_metablock_size(const struct SquashMetablock *metablock);
 
 #endif /* end of include guard METABLOCK_H */

@@ -5,46 +5,50 @@
 include config.mk
 
 HDR = \
-	bin/printb.h \
 	src/compression/compression.h \
-	src/context/directory_context.h \
-	src/context/inode_context.h \
 	src/context/metablock_context.h \
-	src/error.h \
+	src/context/inode_context.h \
+	src/context/directory_context.h \
+	src/data/inode.h \
+	src/data/xattr.h \
+	src/data/inode_internal.h \
+	src/data/directory_internal.h \
+	src/data/metablock_internal.h \
+	src/data/compression_options.h \
+	src/data/fragment.h \
+	src/data/directory.h \
+	src/data/metablock.h \
+	src/data/superblock.h \
+	src/data/superblock_internal.h \
 	src/extract.h \
-	src/format/compression_options.h \
-	src/format/directory.h \
-	src/format/fragment.h \
-	src/format/inode.h \
-	src/format/inode_internal.h \
-	src/format/metablock.h \
-	src/format/metablock_internal.h \
-	src/format/superblock.h \
-	src/format/xattr.h \
+	src/resolve_path.h \
 	src/squash.h \
 	src/utils.h \
+	src/error.h \
+	bin/printb.h \
 
 SRC = \
-	src/compression/compression.c \
 	src/compression/gzip.c \
 	src/compression/lz4.c \
 	src/compression/lzma.c \
-	src/compression/lzo.c \
 	src/compression/null.c \
 	src/compression/xz.c \
+	src/compression/lzo.c \
 	src/compression/zstd.c \
+	src/compression/compression.c \
+	src/context/metablock_context.c \
 	src/context/directory_context.c \
 	src/context/inode_context.c \
-	src/context/metablock_context.c \
+	src/data/compression_options.c \
+	src/data/inode.c \
+	src/data/directory.c \
+	src/data/metablock.c \
+	src/data/superblock.c \
 	src/extract.c \
-	src/format/compression_options.c \
-	src/format/directory.c \
-	src/format/inode.c \
-	src/format/metablock.c \
-	src/format/superblock.c \
 	src/squash.c \
 	src/utils.c \
-
+	src/resolve_path.c \
+	src/error.c \
 
 OBJ = $(SRC:.c=.o)
 

@@ -4,8 +4,8 @@
  * @created     : Sunday Sep 05, 2021 11:09:51 CEST
  */
 
+#include "../data/compression_options.h"
 #include "../error.h"
-#include "../format/compression_options.h"
 #include "compression.h"
 
 #include <stdint.h>

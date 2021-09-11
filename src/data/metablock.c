@@ -10,17 +10,17 @@
 #include "superblock.h"
 
 int
-squash_format_metablock_is_compressed(const struct SquashMetablock *metablock) {
+squash_data_metablock_is_compressed(const struct SquashMetablock *metablock) {
 	return !(metablock->header & 0x8000);
 }
 
 const uint8_t *
-squash_format_metablock_data(const struct SquashMetablock *metablock) {
+squash_data_metablock_data(const struct SquashMetablock *metablock) {
 	const uint8_t *tmp = (uint8_t *)metablock;
 	return (uint8_t *)&tmp[sizeof(struct SquashMetablock)];
 }
 
 size_t
-squash_format_metablock_size(const struct SquashMetablock *metablock) {
+squash_data_metablock_size(const struct SquashMetablock *metablock) {
 	return metablock->header & 0x7FFF;
 }

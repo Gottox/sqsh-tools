@@ -5,9 +5,9 @@
  */
 
 #include "metablock_context.h"
-#include "../format/metablock_internal.h"
+#include "../data/metablock_internal.h"
 
-#include "../format/superblock.h"
+#include "../data/superblock.h"
 #include "../squash.h"
 #include "../utils.h"
 #include <stdint.h>
@@ -20,7 +20,7 @@ metablock_bounds_check(const struct SquashSuperblock *superblock,
 	uint64_t data_bounds;
 
 	if (ADD_OVERFLOW((uint64_t)superblock,
-				squash_superblock_bytes_used(superblock), &upper_bounds)) {
+				squash_data_superblock_bytes_used(superblock), &upper_bounds)) {
 		return -SQUASH_ERROR_INTEGER_OVERFLOW;
 	}
 
@@ -33,8 +33,9 @@ metablock_bounds_check(const struct SquashSuperblock *superblock,
 		return -SQUASH_ERROR_SIZE_MISSMATCH;
 	}
 
-	if (ADD_OVERFLOW((uint64_t)squash_format_metablock_data(block),
-				squash_format_metablock_size(block), &data_bounds)) {
+	const uint8_t *data = squash_data_metablock_data(block);
+	const size_t data_size = squash_data_metablock_size(block);
+	if (ADD_OVERFLOW((uint64_t)data, data_size, &data_bounds)) {
 		return -SQUASH_ERROR_INTEGER_OVERFLOW;
 	}
 

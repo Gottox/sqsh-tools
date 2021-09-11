@@ -13,8 +13,8 @@
 #include <unistd.h>
 
 #include "compression/compression.h"
-#include "format/metablock.h"
-#include "format/superblock.h"
+#include "data/metablock.h"
+#include "data/superblock.h"
 #include "squash.h"
 
 int
@@ -23,7 +23,7 @@ squash_init(struct Squash *squash, uint8_t *buffer, const size_t size,
 	int rv = 0;
 
 	squash->superblock = (const struct SquashSuperblock *)buffer;
-	rv = squash_superblock_init(squash->superblock, size);
+	rv = squash_data_superblock_init(squash->superblock, size);
 	if (rv < 0) {
 		return rv;
 	}

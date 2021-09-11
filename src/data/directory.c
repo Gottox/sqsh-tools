@@ -23,50 +23,50 @@ struct SquashDirectoryFragment {
 };
 
 uint16_t
-squash_format_directory_entry_offset(const struct SquashDirectoryEntry *entry) {
+squash_data_directory_entry_offset(const struct SquashDirectoryEntry *entry) {
 	return le16toh(entry->offset);
 }
 
 int16_t
-squash_format_directory_entry_inode_offset(
+squash_data_directory_entry_inode_offset(
 		const struct SquashDirectoryEntry *entry) {
 	return le16toh(entry->inode_offset);
 }
 
 uint16_t
-squash_format_directory_entry_type(const struct SquashDirectoryEntry *entry) {
+squash_data_directory_entry_type(const struct SquashDirectoryEntry *entry) {
 	return le16toh(entry->type);
 }
 
 uint16_t
-squash_format_directory_entry_name_size(
+squash_data_directory_entry_name_size(
 		const struct SquashDirectoryEntry *entry) {
 	return le16toh(entry->name_size);
 }
 
 const uint8_t *
-squash_format_directory_entry_name(const struct SquashDirectoryEntry *entry) {
+squash_data_directory_entry_name(const struct SquashDirectoryEntry *entry) {
 	const uint8_t *tmp = (const uint8_t *)entry;
 	return (const uint8_t *)&tmp[sizeof(struct SquashDirectoryEntry)];
 }
 
 uint32_t
-squash_format_directory_fragment_count(
+squash_data_directory_fragment_count(
 		const struct SquashDirectoryFragment *fragment) {
 	return le32toh(fragment->count);
 }
 uint32_t
-squash_format_directory_fragment_start(
+squash_data_directory_fragment_start(
 		const struct SquashDirectoryFragment *fragment) {
 	return le32toh(fragment->start);
 }
 uint32_t
-squash_format_directory_fragment_inode_number(
+squash_data_directory_fragment_inode_number(
 		const struct SquashDirectoryFragment *fragment) {
 	return le32toh(fragment->inode_number);
 }
 const struct SquashDirectoryEntry *
-squash_format_directory_fragment_entries(
+squash_data_directory_fragment_entries(
 		const struct SquashDirectoryFragment *fragment) {
 	const uint8_t *tmp = (const uint8_t *)fragment;
 	return (const struct SquashDirectoryEntry

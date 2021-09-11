@@ -11,8 +11,8 @@
 #include <zconf.h>
 #include <zstd.h>
 
+#include "../data/compression_options.h"
 #include "../error.h"
-#include "../format/compression_options.h"
 #include "compression.h"
 
 #define BLOCK_SIZE 8192

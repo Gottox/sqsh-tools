@@ -4,7 +4,14 @@
  * @created     : Friday Apr 30, 2021 13:00:20 CEST
  */
 
-#define _XOPEN_SOURCE
+#include "../src/compression/compression.h"
+#include "../src/context/directory_context.h"
+#include "../src/context/inode_context.h"
+#include "../src/context/metablock_context.h"
+#include "../src/data/compression_options.h"
+#include "../src/data/metablock.h"
+#include "../src/data/superblock_internal.h"
+#include "../src/squash.h"
 
 #include <assert.h>
 #include <limits.h>
@@ -14,14 +21,6 @@
 #include <unistd.h>
 
 #include "printb.h"
-
-#include "../src/compression/compression.h"
-#include "../src/context/directory_context.h"
-#include "../src/context/inode_context.h"
-#include "../src/context/metablock_context.h"
-#include "../src/format/compression_options.h"
-#include "../src/format/metablock.h"
-#include "../src/squash.h"
 
 #define KEY_LENGTH "25"
 
@@ -44,13 +43,13 @@ metablock_info(const struct SquashMetablock *metablock, struct Squash *squash) {
 		return 0;
 	}
 
-	int is_compressed = squash_format_metablock_is_compressed(metablock);
+	int is_compressed = squash_data_metablock_is_compressed(metablock);
 	squash_extract_init(&extract, squash->superblock, metablock, 0, 0);
-	squash_extract_more(&extract, squash_format_metablock_size(metablock));
+	squash_extract_more(&extract, squash_data_metablock_size(metablock));
 	size_t size = squash_extract_size(&extract);
 	squash_extract_cleanup(&extract);
 
-	size_t compressed_size = squash_format_metablock_size(metablock);
+	size_t compressed_size = squash_data_metablock_size(metablock);
 	fprintf(out,
 			"compressed: %s, "
 			"size: %lu, "
@@ -117,11 +116,11 @@ root_inode_info(struct Squash *squash) {
 	struct SquashDirectoryContext dir = {0};
 	int rv = 0;
 	uint64_t root_inode_ref =
-			squash_superblock_root_inode_ref(squash->superblock);
+			squash_data_superblock_root_inode_ref(squash->superblock);
 	fputs("=== INODE TABLE ===\n", out);
-	rv = metablock_info(
-			squash_metablock_from_offset(squash->superblock,
-					squash_superblock_inode_table_start(squash->superblock)),
+	rv = metablock_info(squash_metablock_from_offset(squash->superblock,
+								squash_data_superblock_inode_table_start(
+										squash->superblock)),
 			squash);
 	if (rv < 0) {
 		return rv;
@@ -133,7 +132,7 @@ root_inode_info(struct Squash *squash) {
 
 	KEY("ROOT_INODE_REF");
 	fprintf(out, "0x%lx\n", root_inode_ref);
-	rv = squash_inode_load_ref(&inode, squash->superblock, root_inode_ref);
+	rv = squash_inode_load(&inode, squash->superblock, root_inode_ref);
 	if (rv < 0) {
 		return rv;
 	}
@@ -157,7 +156,7 @@ compression_info(struct Squash *squash) {
 	fputs("=== COMPRESSION INFO ===\n", out);
 	KEY("COMPRESSION_TYPE");
 	enum SquashSuperblockCompressionId id =
-			squash_superblock_compression_id(squash->superblock);
+			squash_data_superblock_compression_id(squash->superblock);
 	switch (id) {
 	case SQUASH_COMPRESSION_NONE:
 		fputs("none\n", out);
@@ -185,10 +184,10 @@ compression_info(struct Squash *squash) {
 
 	if (handler == NULL) {
 		fputs("WARNING: NO COMPRESSION OPTION HANDLER\n", stdout);
-	} else if (squash_superblock_flags(squash->superblock) &
+	} else if (squash_data_superblock_flags(squash->superblock) &
 			SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
-		metablock_info(squash_metablock_from_offset(
-							   squash->superblock, SQUASH_SUPERBLOCK_SIZE),
+		metablock_info(squash_metablock_from_offset(squash->superblock,
+							   sizeof(struct SquashSuperblock)),
 				squash);
 		handler(squash);
 	} else {
@@ -200,7 +199,7 @@ compression_info(struct Squash *squash) {
 static int
 flag_info(struct Squash *squash) {
 	enum SquashSuperblockFlags flags =
-			squash_superblock_flags(squash->superblock);
+			squash_data_superblock_flags(squash->superblock);
 	fputs("=== FLAG INFO ===\n", out);
 	KEY("FLAGS");
 	printb(flags, out);

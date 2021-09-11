@@ -10,7 +10,7 @@
 
 enum SquashError {
 	// Avoid collisions with errno
-	SQUASH_SUCCESS = 1 << 8,
+	SQUASH_ERROR_SECTION = 1 << 8,
 	SQUASH_ERROR_SUPERBLOCK_TOO_SMALL,
 	SQUASH_ERROR_WRONG_MAGIG,
 	SQUASH_ERROR_BLOCKSIZE_MISSMATCH,
@@ -33,7 +33,12 @@ enum SquashError {
 	SQUASH_ERROR_DIRECTORY_INIT,
 	SQUASH_ERROR_INODE_INIT,
 	SQUASH_ERROR_INTEGER_OVERFLOW,
+	SQUASH_ERROR_NO_SUCH_FILE,
 	SQUASH_ERROR_TODO,
 };
+
+void squash_perror(const char *msg, int errorcode);
+
+const char *squash_error_str(int errorcode);
 
 #endif /* end of include guard SQUASH_ERROR_H */

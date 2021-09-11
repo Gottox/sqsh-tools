@@ -16,24 +16,24 @@ struct SquashDirectoryEntry;
 
 struct SquashDirectoryFragment;
 
-uint16_t squash_format_directory_entry_offset(
+uint16_t squash_data_directory_entry_offset(
 		const struct SquashDirectoryEntry *entry);
-int16_t squash_format_directory_entry_inode_offset(
+int16_t squash_data_directory_entry_inode_offset(
 		const struct SquashDirectoryEntry *entry);
-uint16_t squash_format_directory_entry_type(
+uint16_t squash_data_directory_entry_type(
 		const struct SquashDirectoryEntry *entry);
-uint16_t squash_format_directory_entry_name_size(
+uint16_t squash_data_directory_entry_name_size(
 		const struct SquashDirectoryEntry *entry);
-const uint8_t *squash_format_directory_entry_name(
+const uint8_t *squash_data_directory_entry_name(
 		const struct SquashDirectoryEntry *entry);
 
-uint32_t squash_format_directory_fragment_count(
+uint32_t squash_data_directory_fragment_count(
 		const struct SquashDirectoryFragment *fragment);
-uint32_t squash_format_directory_fragment_start(
+uint32_t squash_data_directory_fragment_start(
 		const struct SquashDirectoryFragment *fragment);
-uint32_t squash_format_directory_fragment_inode_number(
+uint32_t squash_data_directory_fragment_inode_number(
 		const struct SquashDirectoryFragment *fragment);
-const struct SquashDirectoryEntry *squash_format_directory_fragment_entries(
+const struct SquashDirectoryEntry *squash_data_directory_fragment_entries(
 		const struct SquashDirectoryFragment *fragment);
 
 #endif /* end of include guard SQUASH__DIRECTORY_H */

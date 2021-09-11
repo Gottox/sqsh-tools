@@ -4,8 +4,8 @@
  * @created     : Friday May 07, 2021 06:56:03 CEST
  */
 
+#include "../data/directory.h"
 #include "../extract.h"
-#include "../format/directory.h"
 
 #ifndef SQUASH_DIRECTORY_CONTEXT_H
 
@@ -34,12 +34,16 @@ struct SquashDirectoryIterator {
 int squash_directory_init(struct SquashDirectoryContext *directory,
 		const struct SquashSuperblock *superblock,
 		struct SquashInodeContext *inode);
-const struct SquashDirectoryEntry *squash_directory_lookup(
-		struct SquashDirectoryContext *directory, const char *name);
 int squash_directory_iterator_init(struct SquashDirectoryIterator *iterator,
 		struct SquashDirectoryContext *directory);
+const struct SquashDirectoryFragment *
+squash_directory_iterator_current_fragment(
+		const struct SquashDirectoryIterator *iterator);
 const struct SquashDirectoryEntry *squash_directory_iterator_next(
 		struct SquashDirectoryIterator *iterator);
+const struct SquashDirectoryEntry *squash_directory_iterator_lookup(
+		struct SquashDirectoryIterator *iterator, const char *name,
+		const size_t name_len);
 int squash_directory_iterator_clean(struct SquashDirectoryIterator *iterator);
 int squash_directory_entry_name_size(const struct SquashDirectoryEntry *entry);
 int squash_directory_entry_name(

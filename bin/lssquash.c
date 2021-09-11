@@ -4,7 +4,11 @@
  * @created     : Friday Sep 04, 2021 18:46:20 CEST
  */
 
-#define _XOPEN_SOURCE
+#include "../src/context/directory_context.h"
+#include "../src/context/inode_context.h"
+#include "../src/data/superblock.h"
+#include "../src/resolve_path.h"
+#include "../src/squash.h"
 
 #include <assert.h>
 #include <limits.h>
@@ -12,10 +16,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-
-#include "../src/context/directory_context.h"
-#include "../src/context/inode_context.h"
-#include "../src/squash.h"
 
 static int
 usage(char *arg0) {
@@ -25,8 +25,9 @@ usage(char *arg0) {
 
 int
 main(int argc, char *argv[]) {
-	int rv;
+	int rv = 0;
 	int opt = 0;
+	const char *path = "";
 	struct SquashInodeContext inode = {0};
 	struct SquashDirectoryContext dir = {0};
 	struct SquashDirectoryIterator iter = {0};
@@ -40,32 +41,37 @@ main(int argc, char *argv[]) {
 		}
 	}
 
-	if (optind + 1 != argc) {
+	if (optind + 2 == argc) {
+		path = argv[optind + 1];
+	} else if (optind + 1 != argc) {
 		return usage(argv[0]);
 	}
 
 	rv = squash_open(&squash, argv[optind]);
 	if (rv < 0) {
 		perror(argv[optind]);
-		return EXIT_FAILURE;
+		rv = EXIT_FAILURE;
+		goto out;
 	}
 
-	rv = squash_inode_load_ref(&inode, squash.superblock,
-			squash_superblock_root_inode_ref(squash.superblock));
+	rv = squash_resolve_path(&inode, squash.superblock, path);
 	if (rv < 0) {
 		perror(argv[optind]);
-		return EXIT_FAILURE;
+		rv = EXIT_FAILURE;
+		goto out;
 	}
 	rv = squash_directory_init(&dir, squash.superblock, &inode);
 	if (rv < 0) {
 		perror(argv[optind]);
-		return EXIT_FAILURE;
+		rv = EXIT_FAILURE;
+		goto out;
 	}
 
 	squash_directory_iterator_init(&iter, &dir);
 	if (rv < 0) {
 		perror(argv[optind]);
-		return EXIT_FAILURE;
+		rv = EXIT_FAILURE;
+		goto out;
 	}
 
 	while ((entry = squash_directory_iterator_next(&iter))) {
@@ -75,11 +81,12 @@ main(int argc, char *argv[]) {
 		free(name);
 	}
 
+out:
 	squash_directory_iterator_clean(&iter);
 	squash_directory_cleanup(&dir);
 	squash_inode_cleanup(&inode);
 
 	squash_cleanup(&squash);
 
-	return 0;
+	return rv;
 }

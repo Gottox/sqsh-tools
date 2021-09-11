@@ -8,10 +8,8 @@
 
 #define SQUASH__SUPERBLOCK_H
 
+#include <stddef.h>
 #include <stdint.h>
-#include <stdlib.h>
-
-#define SQUASH_SUPERBLOCK_SIZE 96
 
 enum SquashSuperblockCompressionId {
 	SQUASH_COMPRESSION_NONE = 0,
@@ -40,42 +38,46 @@ enum SquashSuperblockFlags {
 
 struct SquashSuperblock;
 
-int squash_superblock_init(
+int squash_data_superblock_init(
 		const struct SquashSuperblock *superblock, size_t size);
 
-uint32_t squash_superblock_magic(const struct SquashSuperblock *superblock);
-uint32_t squash_superblock_inode_count(
+uint32_t squash_data_superblock_magic(
 		const struct SquashSuperblock *superblock);
-uint32_t squash_superblock_modification_time(
+uint32_t squash_data_superblock_inode_count(
 		const struct SquashSuperblock *superblock);
-uint32_t squash_superblock_block_size(
+uint32_t squash_data_superblock_modification_time(
 		const struct SquashSuperblock *superblock);
-uint32_t squash_superblock_fragment_entry_count(
+uint32_t squash_data_superblock_block_size(
 		const struct SquashSuperblock *superblock);
-uint16_t squash_superblock_compression_id(
+uint32_t squash_data_superblock_fragment_entry_count(
 		const struct SquashSuperblock *superblock);
-uint16_t squash_superblock_block_log(const struct SquashSuperblock *superblock);
-uint16_t squash_superblock_flags(const struct SquashSuperblock *superblock);
-uint16_t squash_superblock_id_count(const struct SquashSuperblock *superblock);
-uint16_t squash_superblock_version_major(
+uint16_t squash_data_superblock_compression_id(
 		const struct SquashSuperblock *superblock);
-uint16_t squash_superblock_version_minor(
+uint16_t squash_data_superblock_block_log(
 		const struct SquashSuperblock *superblock);
-uint64_t squash_superblock_root_inode_ref(
+uint16_t squash_data_superblock_flags(
 		const struct SquashSuperblock *superblock);
-uint64_t squash_superblock_bytes_used(
+uint16_t squash_data_superblock_id_count(
 		const struct SquashSuperblock *superblock);
-uint64_t squash_superblock_id_table_start(
+uint16_t squash_data_superblock_version_major(
 		const struct SquashSuperblock *superblock);
-uint64_t squash_superblock_xattr_id_table_start(
+uint16_t squash_data_superblock_version_minor(
 		const struct SquashSuperblock *superblock);
-uint64_t squash_superblock_inode_table_start(
+uint64_t squash_data_superblock_root_inode_ref(
 		const struct SquashSuperblock *superblock);
-uint64_t squash_superblock_directory_table_start(
+uint64_t squash_data_superblock_bytes_used(
 		const struct SquashSuperblock *superblock);
-uint64_t squash_superblock_fragment_table_start(
+uint64_t squash_data_superblock_id_table_start(
 		const struct SquashSuperblock *superblock);
-uint64_t squash_superblock_export_table_start(
+uint64_t squash_data_superblock_xattr_id_table_start(
+		const struct SquashSuperblock *superblock);
+uint64_t squash_data_superblock_inode_table_start(
+		const struct SquashSuperblock *superblock);
+uint64_t squash_data_superblock_directory_table_start(
+		const struct SquashSuperblock *superblock);
+uint64_t squash_data_superblock_fragment_table_start(
+		const struct SquashSuperblock *superblock);
+uint64_t squash_data_superblock_export_table_start(
 		const struct SquashSuperblock *superblock);
 
 #endif /* end of include guard SQUASH__SUPERBLOCK_H */

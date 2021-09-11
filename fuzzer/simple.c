@@ -7,6 +7,7 @@
 
 #include "../src/context/directory_context.h"
 #include "../src/context/inode_context.h"
+#include "../src/data/superblock.h"
 #include "../src/squash.h"
 #include <stdint.h>
 
@@ -23,7 +24,7 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 	}
 
 	rv = squash_inode_load_ref(&inode, squash.superblock,
-			squash_superblock_root_inode_ref(squash.superblock));
+			squash_data_superblock_root_inode_ref(squash.superblock));
 	if (rv < 0) {
 		goto out;
 	}

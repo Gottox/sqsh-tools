@@ -7,8 +7,8 @@
 #include "extract.h"
 #include "compression/compression.h"
 #include "context/metablock_context.h"
-#include "format/metablock_internal.h"
-#include "format/superblock.h"
+#include "data/metablock_internal.h"
+#include "data/superblock.h"
 #include "squash.h"
 #include <stdint.h>
 
@@ -24,7 +24,7 @@ squash_extract_init(struct SquashExtract *extract,
 	extract->index = block_index;
 	extract->offset = block_offset;
 	extract->superblock = superblock;
-	if (squash_format_metablock_is_compressed(block)) {
+	if (squash_data_metablock_is_compressed(block)) {
 		rv = squash_compression_init(&extract->compression, superblock);
 	} else {
 		extract->compression.impl = &squash_compression_null;
@@ -44,9 +44,9 @@ squash_extract_more(struct SquashExtract *extract, const size_t size) {
 		if (block == NULL) {
 			return -SQUASH_ERROR_TODO;
 		}
-		const size_t block_size = squash_format_metablock_size(block);
+		const size_t block_size = squash_data_metablock_size(block);
 
-		const void *block_data = squash_format_metablock_data(block);
+		const void *block_data = squash_data_metablock_data(block);
 		rv = squash_compression_extract(&extract->compression,
 				&extract->extracted, &extract->extracted_size, block_data,
 				block_size);
