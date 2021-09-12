@@ -220,5 +220,5 @@ squash_inode_ref_to_block(
 }
 uint64_t
 squash_inode_ref_from_block(uint32_t block_index, uint16_t offset) {
-	return (block_index >> 16) | offset;
+	return (block_index << 16) | offset;
 }
