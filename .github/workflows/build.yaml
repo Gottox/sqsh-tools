@@ -13,7 +13,7 @@ jobs:
       run: |
         xbps-install -Syu
         xbps-install -yu
-        xbps-install -Sy base-devel clang libsanitizer-devel zlib-devel
+        xbps-install -y base-devel clang libsanitizer-devel zlib-devel liblzma-devel lzo-devel liblz4-devel libzstd-devel fuse3-devel
     - uses: actions/checkout@v2
     - name: make
       run: make CC=clang
