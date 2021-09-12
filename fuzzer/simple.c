@@ -23,7 +23,7 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 		goto out;
 	}
 
-	rv = squash_inode_load_ref(&inode, squash.superblock,
+	rv = squash_inode_load(&inode, squash.superblock,
 			squash_data_superblock_root_inode_ref(squash.superblock));
 	if (rv < 0) {
 		goto out;
