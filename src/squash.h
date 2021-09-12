@@ -5,6 +5,7 @@
  */
 
 #include "error.h"
+#include "utils.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -27,10 +28,10 @@ struct Squash {
 	enum SquashDtor dtor;
 };
 
-int squash_init(struct Squash *squash, uint8_t *buffer, const size_t size,
-		const enum SquashDtor dtor);
+SQUASH_NO_UNUSED int squash_init(struct Squash *squash, uint8_t *buffer,
+		const size_t size, const enum SquashDtor dtor);
 
-int squash_open(struct Squash *squash, const char *path);
+SQUASH_NO_UNUSED int squash_open(struct Squash *squash, const char *path);
 
 int squash_cleanup(struct Squash *squash);
 

@@ -75,7 +75,6 @@ find_inode_ref(uint64_t *target, uint64_t dir_ref,
 		goto out;
 	}
 
-	// TODO
 	const struct SquashDirectoryFragment *fragment =
 			squash_directory_iterator_current_fragment(&iter);
 	block_index = squash_data_directory_fragment_start(fragment);
@@ -83,7 +82,7 @@ find_inode_ref(uint64_t *target, uint64_t dir_ref,
 	*target = squash_inode_ref_from_block(block_index, block_offset);
 
 out:
-	squash_directory_iterator_clean(&iter);
+	squash_directory_iterator_cleanup(&iter);
 	squash_directory_cleanup(&dir);
 	squash_inode_cleanup(&inode);
 	return rv;

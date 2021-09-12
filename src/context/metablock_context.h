@@ -5,6 +5,7 @@
  */
 
 #include "../data/metablock.h"
+#include "../utils.h"
 
 #include <stdlib.h>
 
@@ -14,11 +15,11 @@
 
 struct SquashSuperblock;
 
-const struct SquashMetablock *squash_metablock_from_offset(
+SQUASH_NO_UNUSED const struct SquashMetablock *squash_metablock_from_offset(
 		const struct SquashSuperblock *superblock, off_t offset);
 
-const struct SquashMetablock *squash_metablock_from_start_block(
-		const struct SquashSuperblock *superblock,
+SQUASH_NO_UNUSED const struct SquashMetablock *
+squash_metablock_from_start_block(const struct SquashSuperblock *superblock,
 		const struct SquashMetablock *start_block, off_t offset);
 
 #endif /* end of include guard SQUASH_FORMAT_METABLOCK_H */

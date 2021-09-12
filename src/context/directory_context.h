@@ -6,6 +6,7 @@
 
 #include "../data/directory.h"
 #include "../extract.h"
+#include "../utils.h"
 
 #ifndef SQUASH_DIRECTORY_CONTEXT_H
 
@@ -31,22 +32,25 @@ struct SquashDirectoryIterator {
 	off_t next_offset;
 };
 
-int squash_directory_init(struct SquashDirectoryContext *directory,
+SQUASH_NO_UNUSED int squash_directory_init(
+		struct SquashDirectoryContext *directory,
 		const struct SquashSuperblock *superblock,
 		struct SquashInodeContext *inode);
-int squash_directory_iterator_init(struct SquashDirectoryIterator *iterator,
+SQUASH_NO_UNUSED int squash_directory_iterator_init(
+		struct SquashDirectoryIterator *iterator,
 		struct SquashDirectoryContext *directory);
-const struct SquashDirectoryFragment *
+SQUASH_NO_UNUSED const struct SquashDirectoryFragment *
 squash_directory_iterator_current_fragment(
 		const struct SquashDirectoryIterator *iterator);
-const struct SquashDirectoryEntry *squash_directory_iterator_next(
-		struct SquashDirectoryIterator *iterator);
-const struct SquashDirectoryEntry *squash_directory_iterator_lookup(
-		struct SquashDirectoryIterator *iterator, const char *name,
-		const size_t name_len);
-int squash_directory_iterator_clean(struct SquashDirectoryIterator *iterator);
-int squash_directory_entry_name_size(const struct SquashDirectoryEntry *entry);
-int squash_directory_entry_name(
+SQUASH_NO_UNUSED const struct SquashDirectoryEntry *
+squash_directory_iterator_next(struct SquashDirectoryIterator *iterator);
+SQUASH_NO_UNUSED const struct SquashDirectoryEntry *
+squash_directory_iterator_lookup(struct SquashDirectoryIterator *iterator,
+		const char *name, const size_t name_len);
+int squash_directory_iterator_cleanup(struct SquashDirectoryIterator *iterator);
+SQUASH_NO_UNUSED int squash_directory_entry_name_size(
+		const struct SquashDirectoryEntry *entry);
+SQUASH_NO_UNUSED int squash_directory_entry_name(
 		const struct SquashDirectoryEntry *entry, char **name_buffer);
 
 int squash_directory_cleanup(struct SquashDirectoryContext *directory);

@@ -15,6 +15,8 @@
 
 #define ADD_OVERFLOW(a, b, res) __builtin_add_overflow(a, b, res)
 
-uint32_t log2_u32(uint32_t x);
+#define SQUASH_NO_UNUSED __attribute__((warn_unused_result))
+
+SQUASH_NO_UNUSED uint32_t log2_u32(uint32_t x);
 
 #endif /* end of include guard SQUASH_UTILS_H */

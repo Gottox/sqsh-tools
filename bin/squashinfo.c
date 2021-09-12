@@ -36,6 +36,7 @@ usage(char *arg0) {
 
 static int
 metablock_info(const struct SquashMetablock *metablock, struct Squash *squash) {
+	int rv = 0;
 	struct SquashExtract extract = {0};
 	KEY("METABLOCK_INFO");
 	if (metablock == NULL) {
@@ -44,8 +45,15 @@ metablock_info(const struct SquashMetablock *metablock, struct Squash *squash) {
 	}
 
 	int is_compressed = squash_data_metablock_is_compressed(metablock);
-	squash_extract_init(&extract, squash->superblock, metablock, 0, 0);
-	squash_extract_more(&extract, squash_data_metablock_size(metablock));
+	rv = squash_extract_init(&extract, squash->superblock, metablock, 0, 0);
+	if (rv < 0) {
+		return 0;
+	}
+	rv = squash_extract_more(&extract, squash_data_metablock_size(metablock));
+	if (rv < 0) {
+		squash_extract_cleanup(&extract);
+		return 0;
+	}
 	size_t size = squash_extract_size(&extract);
 	squash_extract_cleanup(&extract);
 
@@ -57,7 +65,7 @@ metablock_info(const struct SquashMetablock *metablock, struct Squash *squash) {
 			"ratio: %f\n",
 			is_compressed ? "yes" : "no", size, compressed_size,
 			(double)compressed_size / size);
-	return 0;
+	return rv;
 }
 
 static int
@@ -96,16 +104,22 @@ dir_info(struct Squash *squash, struct SquashDirectoryContext *dir) {
 	const struct SquashDirectoryEntry *entry;
 	fputs("=== ROOT DIRECTORY ===\n", out);
 
-	squash_directory_iterator_init(&iter, dir);
+	rv = squash_directory_iterator_init(&iter, dir);
+	if (rv < 0) {
+		return 0;
+	}
 	while ((entry = squash_directory_iterator_next(&iter))) {
 		char *name = NULL;
-		squash_directory_entry_name(entry, &name);
+		rv = squash_directory_entry_name(entry, &name);
+		if (rv < 0) {
+			break;
+		}
 		KEY("FILE");
 		fputs(name, out);
 		fputc('\n', out);
 		free(name);
 	}
-	squash_directory_iterator_clean(&iter);
+	squash_directory_iterator_cleanup(&iter);
 
 	return rv;
 }

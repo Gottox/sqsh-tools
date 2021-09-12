@@ -43,7 +43,7 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 
 out:
 
-	squash_directory_iterator_clean(&iter);
+	squash_directory_iterator_cleanup(&iter);
 	squash_directory_cleanup(&dir);
 	squash_inode_cleanup(&inode);
 

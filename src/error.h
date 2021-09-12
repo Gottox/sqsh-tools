@@ -4,6 +4,8 @@
  * @created     : Saturday May 08, 2021 20:03:38 CEST
  */
 
+#include "utils.h"
+
 #ifndef SQUASH_ERROR_H
 
 #define SQUASH_ERROR_H
@@ -39,6 +41,6 @@ enum SquashError {
 
 void squash_perror(const char *msg, int errorcode);
 
-const char *squash_error_str(int errorcode);
+SQUASH_NO_UNUSED const char *squash_error_str(int errorcode);
 
 #endif /* end of include guard SQUASH_ERROR_H */

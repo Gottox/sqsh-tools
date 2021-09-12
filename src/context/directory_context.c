@@ -22,6 +22,7 @@
 static int
 directory_iterator_index_lookup(struct SquashDirectoryIterator *iterator,
 		const char *name, const size_t name_len) {
+	int rv = 0;
 	struct SquashInodeDirectoryIndexIterator index_iterator;
 	const struct SquashInodeDirectoryIndex *index, *candidate;
 	struct SquashInodeContext *inode = iterator->directory->inode;
@@ -30,7 +31,10 @@ directory_iterator_index_lookup(struct SquashDirectoryIterator *iterator,
 		return 0;
 	}
 
-	squash_inode_directory_iterator_init(&index_iterator, inode);
+	rv = squash_inode_directory_iterator_init(&index_iterator, inode);
+	if (rv < 0) {
+		return 0;
+	}
 	while ((index = squash_inode_directory_index_iterator_next(
 					&index_iterator))) {
 		const uint8_t *index_name =
@@ -49,7 +53,7 @@ directory_iterator_index_lookup(struct SquashDirectoryIterator *iterator,
 		// TODO: do not decompress everything for the lookup.
 		iterator->next_offset = candidate->start;
 	}
-	return 0;
+	return rv;
 }
 
 static int
@@ -204,7 +208,7 @@ squash_directory_iterator_next(struct SquashDirectoryIterator *iterator) {
 }
 
 int
-squash_directory_iterator_clean(struct SquashDirectoryIterator *iterator) {
+squash_directory_iterator_cleanup(struct SquashDirectoryIterator *iterator) {
 	int rv = 0;
 	rv = squash_extract_cleanup(&iterator->extract);
 	return rv;

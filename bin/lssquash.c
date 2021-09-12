@@ -67,7 +67,7 @@ main(int argc, char *argv[]) {
 		goto out;
 	}
 
-	squash_directory_iterator_init(&iter, &dir);
+	rv = squash_directory_iterator_init(&iter, &dir);
 	if (rv < 0) {
 		perror(argv[optind]);
 		rv = EXIT_FAILURE;
@@ -76,13 +76,16 @@ main(int argc, char *argv[]) {
 
 	while ((entry = squash_directory_iterator_next(&iter))) {
 		char *name;
-		squash_directory_entry_name(entry, &name);
+		rv = squash_directory_entry_name(entry, &name);
+		if (rv < 0) {
+			goto out;
+		}
 		printf("%s\n", name);
 		free(name);
 	}
 
 out:
-	squash_directory_iterator_clean(&iter);
+	squash_directory_iterator_cleanup(&iter);
 	squash_directory_cleanup(&dir);
 	squash_inode_cleanup(&inode);
 

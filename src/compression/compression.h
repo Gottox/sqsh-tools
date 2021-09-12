@@ -5,6 +5,7 @@
  */
 
 #include "../data/compression_options.h"
+#include "../utils.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -35,11 +36,13 @@ struct SquashCompression {
 	const struct SquashCompressionImplementation *impl;
 };
 
-int squash_compression_init(struct SquashCompression *compression,
+SQUASH_NO_UNUSED int squash_compression_init(
+		struct SquashCompression *compression,
 		const struct SquashSuperblock *superblock);
 
-int squash_compression_extract(const struct SquashCompression *compression,
-		uint8_t **target, size_t *target_size, const uint8_t *compressed,
+SQUASH_NO_UNUSED int squash_compression_extract(
+		const struct SquashCompression *compression, uint8_t **target,
+		size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size);
 
 int squash_compression_cleanup(struct SquashCompression *compression);

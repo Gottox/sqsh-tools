@@ -5,6 +5,7 @@
  */
 
 #include "compression/compression.h"
+#include "utils.h"
 
 #include <stdint.h>
 
@@ -22,13 +23,15 @@ struct SquashExtract {
 	size_t extracted_size;
 };
 
-int squash_extract_init(struct SquashExtract *extract,
+SQUASH_NO_UNUSED int squash_extract_init(struct SquashExtract *extract,
 		const struct SquashSuperblock *superblock,
 		const struct SquashMetablock *block, off_t block_index,
 		off_t block_offset);
-int squash_extract_more(struct SquashExtract *extract, const size_t size);
-void *squash_extract_data(const struct SquashExtract *extract);
-size_t squash_extract_size(const struct SquashExtract *extract);
+SQUASH_NO_UNUSED int squash_extract_more(
+		struct SquashExtract *extract, const size_t size);
+SQUASH_NO_UNUSED void *squash_extract_data(const struct SquashExtract *extract);
+SQUASH_NO_UNUSED size_t squash_extract_size(
+		const struct SquashExtract *extract);
 int squash_extract_cleanup(struct SquashExtract *extract);
 
 #endif /* end of include guard SQUASH_EXTRACT_H */
