@@ -111,6 +111,109 @@ squash_inode_hard_link_count(struct SquashInodeContext *inode) {
 	return -SQUASH_ERROR_UNKOWN_INODE_TYPE;
 }
 
+uint64_t
+squash_inode_file_size(struct SquashInodeContext *inode) {
+	const struct SquashInodeFile *basic_file;
+	const struct SquashInodeFileExt *extended_file;
+	const struct SquashInodeDirectory *basic_dir;
+	const struct SquashInodeDirectoryExt *extended_dir;
+
+	switch (squash_data_inode_type(inode->inode)) {
+	case SQUASH_INODE_TYPE_BASIC_DIRECTORY:
+		basic_dir = squash_data_inode_directory(inode->inode);
+		return squash_data_inode_directory_file_size(basic_dir);
+	case SQUASH_INODE_TYPE_EXTENDED_DIRECTORY:
+		extended_dir = squash_data_inode_directory_ext(inode->inode);
+		return squash_data_inode_directory_ext_file_size(extended_dir);
+	case SQUASH_INODE_TYPE_BASIC_FILE:
+		basic_file = squash_data_inode_file(inode->inode);
+		return squash_data_inode_file_size(basic_file);
+	case SQUASH_INODE_TYPE_EXTENDED_FILE:
+		extended_file = squash_data_inode_file_ext(inode->inode);
+		return squash_data_inode_file_ext_size(extended_file);
+	}
+	return 0;
+}
+
+uint16_t
+squash_inode_permission(struct SquashInodeContext *inode) {
+	return squash_data_inode_permissions(inode->inode);
+}
+
+uint32_t
+squash_inode_modified_time(struct SquashInodeContext *inode) {
+	return squash_data_inode_modified_time(inode->inode);
+}
+
+enum SquashInodeContextType
+squash_inode_type(struct SquashInodeContext *inode) {
+	switch (squash_data_inode_type(inode->inode)) {
+	case SQUASH_INODE_TYPE_BASIC_DIRECTORY:
+	case SQUASH_INODE_TYPE_EXTENDED_DIRECTORY:
+		return SQUASH_INODE_TYPE_DIRECTORY;
+	case SQUASH_INODE_TYPE_BASIC_FILE:
+	case SQUASH_INODE_TYPE_EXTENDED_FILE:
+		return SQUASH_INODE_TYPE_FILE;
+	case SQUASH_INODE_TYPE_BASIC_SYMLINK:
+	case SQUASH_INODE_TYPE_EXTENDED_SYMLINK:
+		return SQUASH_INODE_TYPE_SYMLINK;
+	case SQUASH_INODE_TYPE_BASIC_BLOCK:
+	case SQUASH_INODE_TYPE_EXTENDED_BLOCK:
+		return SQUASH_INODE_TYPE_BLOCK;
+	case SQUASH_INODE_TYPE_BASIC_CHAR:
+	case SQUASH_INODE_TYPE_EXTENDED_CHAR:
+		return SQUASH_INODE_TYPE_CHAR;
+	case SQUASH_INODE_TYPE_BASIC_FIFO:
+	case SQUASH_INODE_TYPE_EXTENDED_FIFO:
+		return SQUASH_INODE_TYPE_FIFO;
+	case SQUASH_INODE_TYPE_BASIC_SOCKET:
+	case SQUASH_INODE_TYPE_EXTENDED_SOCKET:
+		return SQUASH_INODE_TYPE_SOCKET;
+	}
+	return -SQUASH_INODE_TYPE_UNKNOWN;
+}
+
+const char *
+squash_inode_symlink(struct SquashInodeContext *inode) {
+	const struct SquashInodeSymlink *basic;
+	const struct SquashInodeSymlinkExt *extended;
+
+	switch (squash_data_inode_type(inode->inode)) {
+	case SQUASH_INODE_TYPE_BASIC_SYMLINK:
+		basic = squash_data_inode_symlink(inode->inode);
+		return (const char *)squash_data_inode_symlink_target_path(basic);
+	case SQUASH_INODE_TYPE_EXTENDED_SYMLINK:
+		extended = squash_data_inode_symlink_ext(inode->inode);
+		return (const char *)squash_data_inode_symlink_ext_target_path(
+				extended);
+	}
+	return NULL;
+}
+
+int
+squash_inode_symlink_dup(struct SquashInodeContext *inode, char **namebuffer) {
+	int size = squash_inode_symlink_size(inode);
+	const char *link_target = squash_inode_symlink(inode);
+
+	return squash_memdup(namebuffer, link_target, size);
+}
+
+uint32_t
+squash_inode_symlink_size(struct SquashInodeContext *inode) {
+	const struct SquashInodeSymlink *basic;
+	const struct SquashInodeSymlinkExt *extended;
+
+	switch (squash_data_inode_type(inode->inode)) {
+	case SQUASH_INODE_TYPE_BASIC_SYMLINK:
+		basic = squash_data_inode_symlink(inode->inode);
+		return squash_data_inode_symlink_target_size(basic);
+	case SQUASH_INODE_TYPE_EXTENDED_SYMLINK:
+		extended = squash_data_inode_symlink_ext(inode->inode);
+		return squash_data_inode_symlink_ext_target_size(extended);
+	}
+	return 0;
+}
+
 int
 squash_inode_load_root(struct SquashInodeContext *inode,
 		const struct SquashSuperblock *superblock, uint64_t inode_ref) {
@@ -182,6 +285,7 @@ squash_inode_directory_iterator_init(
 			squash_data_inode_directory_ext_index_count(xdir);
 	return rv;
 }
+
 const struct SquashInodeDirectoryIndex *
 squash_inode_directory_index_iterator_next(
 		struct SquashInodeDirectoryIndexIterator *iterator) {
@@ -207,7 +311,7 @@ squash_inode_directory_index_iterator_next(
 	return current;
 }
 int
-squash_inode_directory_iterator_clean(
+squash_inode_directory_index_iterator_clean(
 		struct SquashInodeDirectoryIndexIterator *iterator) {
 	return 0;
 }

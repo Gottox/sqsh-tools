@@ -110,7 +110,7 @@ dir_info(struct Squash *squash, struct SquashDirectoryContext *dir) {
 	}
 	while ((entry = squash_directory_iterator_next(&iter))) {
 		char *name = NULL;
-		rv = squash_directory_entry_name(entry, &name);
+		rv = squash_directory_entry_name_dup(entry, &name);
 		if (rv < 0) {
 			break;
 		}

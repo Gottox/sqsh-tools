@@ -24,10 +24,10 @@ struct SquashDirectoryContext {
 };
 
 struct SquashDirectoryIterator {
+	const struct SquashDirectoryFragment *fragments;
+	const struct SquashDirectoryFragment *current_fragment;
 	struct SquashDirectoryContext *directory;
-	struct SquashDirectoryFragment *fragments;
 	struct SquashExtract extract;
-	off_t current_fragment_offset;
 	size_t remaining_entries;
 	off_t next_offset;
 };
@@ -50,7 +50,9 @@ squash_directory_iterator_lookup(struct SquashDirectoryIterator *iterator,
 int squash_directory_iterator_cleanup(struct SquashDirectoryIterator *iterator);
 SQUASH_NO_UNUSED int squash_directory_entry_name_size(
 		const struct SquashDirectoryEntry *entry);
-SQUASH_NO_UNUSED int squash_directory_entry_name(
+const char *squash_directory_entry_name(
+		const struct SquashDirectoryEntry *entry);
+SQUASH_NO_UNUSED int squash_directory_entry_name_dup(
 		const struct SquashDirectoryEntry *entry, char **name_buffer);
 
 int squash_directory_cleanup(struct SquashDirectoryContext *directory);

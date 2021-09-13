@@ -75,13 +75,10 @@ main(int argc, char *argv[]) {
 	}
 
 	while ((entry = squash_directory_iterator_next(&iter))) {
-		char *name;
-		rv = squash_directory_entry_name(entry, &name);
-		if (rv < 0) {
-			goto out;
-		}
-		printf("%s\n", name);
-		free(name);
+		const char *name = squash_directory_entry_name(entry);
+		const int name_size = squash_directory_entry_name_size(entry);
+		fwrite(name, sizeof(char), name_size, stdout);
+		fputc('\n', stdout);
 	}
 
 out:
