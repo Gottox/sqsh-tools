@@ -6,7 +6,6 @@
 
 #include "../src/context/directory_context.h"
 #include "../src/context/inode_context.h"
-#include "../src/data/superblock.h"
 #include "../src/resolve_path.h"
 #include "../src/squash.h"
 
