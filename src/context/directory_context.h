@@ -25,10 +25,10 @@ struct SquashDirectoryContext {
 
 struct SquashDirectoryIterator {
 	const struct SquashDirectoryFragment *fragments;
-	const struct SquashDirectoryFragment *current_fragment;
 	struct SquashDirectoryContext *directory;
 	struct SquashExtract extract;
 	size_t remaining_entries;
+	off_t current_fragment_offset;
 	off_t next_offset;
 };
 

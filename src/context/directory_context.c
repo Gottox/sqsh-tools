@@ -20,13 +20,6 @@
 
 #define METABLOCK_SIZE 8192
 
-static const struct SquashDirectoryFragment *
-directory_fragment_from_offset(
-		const struct SquashDirectoryFragment *start, off_t offset) {
-	const uint8_t *tmp = (const uint8_t *)start;
-	return (const struct SquashDirectoryFragment *)&tmp[offset];
-}
-
 static int
 directory_iterator_index_lookup(struct SquashDirectoryIterator *iterator,
 		const char *name, const size_t name_len) {
@@ -151,7 +144,7 @@ squash_directory_iterator_init(struct SquashDirectoryIterator *iterator,
 	}
 
 	iterator->directory = directory;
-	iterator->current_fragment = NULL;
+	iterator->current_fragment_offset = 0;
 	iterator->remaining_entries = 0;
 	iterator->next_offset = 0;
 
@@ -166,7 +159,9 @@ squash_directory_entry_name_size(const struct SquashDirectoryEntry *entry) {
 const struct SquashDirectoryFragment *
 squash_directory_iterator_current_fragment(
 		const struct SquashDirectoryIterator *iterator) {
-	return iterator->current_fragment;
+	const uint8_t *tmp = (const uint8_t *)iterator->fragments;
+	return (const struct SquashDirectoryFragment
+					*)&tmp[iterator->current_fragment_offset];
 }
 
 const struct SquashDirectoryEntry *
@@ -184,8 +179,7 @@ squash_directory_iterator_next(struct SquashDirectoryIterator *iterator) {
 		if (rv < 0) {
 			return NULL;
 		}
-		iterator->current_fragment = directory_fragment_from_offset(
-				iterator->fragments, current_offset);
+		iterator->current_fragment_offset = current_offset;
 
 		const struct SquashDirectoryFragment *current_fragment =
 				squash_directory_iterator_current_fragment(iterator);
@@ -203,17 +197,17 @@ squash_directory_iterator_next(struct SquashDirectoryIterator *iterator) {
 		return NULL;
 	}
 
-	struct SquashDirectoryEntry *current =
-			entry_by_offset(iterator, current_offset);
-	//
 	// Make sure next entry has its name populated
-	iterator->next_offset += squash_directory_entry_name_size(current);
+	iterator->next_offset += squash_directory_entry_name_size(
+			entry_by_offset(iterator, current_offset));
+	// May invalidate pointers into directory entries. that's why the
+	// entry_by_offset() call isn't safed to a pointer and reused later.
 	rv = directory_data_more(iterator, iterator->next_offset);
 	if (rv < 0) {
 		return NULL;
 	}
 
-	return current;
+	return entry_by_offset(iterator, current_offset);
 }
 
 int
