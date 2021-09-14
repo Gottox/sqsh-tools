@@ -23,7 +23,7 @@ squash_null_extract(const union SquashCompressionOptions *options,
 		return -SQUASH_ERROR_MALLOC_FAILED;
 	}
 
-	memcpy(&*target[*target_size], compressed, compressed_size);
+	memcpy(&(*target)[*target_size], compressed, compressed_size);
 
 	*target_size = new_target_size;
 
