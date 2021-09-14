@@ -45,6 +45,9 @@ squash_extract_more(struct SquashExtract *extract, const size_t size) {
 			return -SQUASH_ERROR_TODO;
 		}
 		const size_t block_size = squash_data_metablock_size(block);
+		if (block_size == 0) {
+			return -SQUASH_ERROR_METABLOCK_ZERO_SIZE;
+		}
 
 		const void *block_data = squash_data_metablock_data(block);
 		rv = squash_compression_extract(&extract->compression,
