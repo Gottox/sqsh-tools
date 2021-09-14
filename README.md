@@ -13,8 +13,9 @@ WIP Status:
 * [x] metablock resolution
 * [x] inode resolution
 * [x] directory resolution
-* [ ] fast filename lookup
-* [ ] fragment resolution
+* [x] fast filename lookup
+* [ ] uid/gid tables
+* [ ] data/fragment resolution
 * [ ] xattr support
 * [ ] export
 * [ ] frontend api
