@@ -12,6 +12,9 @@
 
 #define SQUASH__DIRECTORY_H
 
+#define SQUASH_SIZEOF_DIRECTORY_FRAGMENT 12
+#define SQUASH_SIZEOF_DIRECTORY_ENTRY 8
+
 struct SquashDirectoryEntry;
 
 struct SquashDirectoryFragment;

@@ -5,7 +5,7 @@
  */
 
 #include "metablock_context.h"
-#include "../data/metablock_internal.h"
+#include "../data/metablock.h"
 
 #include "../data/superblock.h"
 #include "../squash.h"
@@ -24,8 +24,8 @@ metablock_bounds_check(const struct SquashSuperblock *superblock,
 		return -SQUASH_ERROR_INTEGER_OVERFLOW;
 	}
 
-	if (ADD_OVERFLOW((uint64_t)block, sizeof(struct SquashMetablock),
-				&header_bounds)) {
+	if (ADD_OVERFLOW(
+				(uint64_t)block, SQUASH_SIZEOF_METABLOCK, &header_bounds)) {
 		return -SQUASH_ERROR_INTEGER_OVERFLOW;
 	}
 

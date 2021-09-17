@@ -14,6 +14,8 @@
 
 #define SQUASH_INODE_CONTEXT_H
 
+#define SQUASH_INODE_NO_FRAGMENT 0xFFFFFFFF
+
 struct SquashSuperblock;
 struct SquashInode;
 struct SquashInodeTable;
@@ -33,6 +35,7 @@ enum SquashInodeContextType {
 struct SquashInodeContext {
 	struct SquashInode *inode;
 	struct SquashExtract extract;
+	uint32_t datablock_block_size;
 };
 
 struct SquashInodeDirectoryIndexIterator {
@@ -51,6 +54,14 @@ SQUASH_NO_UNUSED uint32_t squash_inode_hard_link_count(
 uint64_t squash_inode_file_size(struct SquashInodeContext *inode);
 uint16_t squash_inode_permission(struct SquashInodeContext *inode);
 uint32_t squash_inode_modified_time(struct SquashInodeContext *inode);
+uint64_t squash_inode_file_blocks_start(struct SquashInodeContext *inode);
+// TODO: Find right datatype for index
+uint32_t squash_inode_file_block_size(
+		struct SquashInodeContext *inode, int index);
+// TODO: Find right datatype for return value
+int squash_inode_file_block_size_len(struct SquashInodeContext *inode);
+uint32_t squash_inode_file_fragment_block_index(
+		struct SquashInodeContext *inode);
 
 enum SquashInodeContextType squash_inode_type(struct SquashInodeContext *inode);
 

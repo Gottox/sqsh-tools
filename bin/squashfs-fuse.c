@@ -34,14 +34,20 @@ static const struct fuse_opt option_spec[] = {
 };
 // clang-format on
 
-static int
+static void
 help(const char *arg0) {
-	return EXIT_FAILURE;
+	// TODO
 }
 
 static void *
 squashfuse_init(struct fuse_conn_info *conn, struct fuse_config *cfg) {
-	(void)conn;
+	int rv = 0;
+
+	rv = squash_open(&data.squash, options.image_path);
+	if (rv < 0) {
+		perror(options.image_path);
+	}
+
 	cfg->kernel_cache = 1;
 	return NULL;
 }
@@ -236,16 +242,9 @@ main(int argc, char *argv[]) {
 	}
 
 	if (options.show_help) {
-		rv = help(argv[0]);
+		help(argv[0]);
 		fuse_opt_add_arg(&args, "--help");
 		args.argv[0][0] = '\0';
-	}
-
-	rv = squash_open(&data.squash, options.image_path);
-	if (rv < 0) {
-		perror(options.image_path);
-		rv = EXIT_FAILURE;
-		goto out;
 	}
 
 	rv = fuse_main(args.argc, args.argv, &squashfuse_operations, &data);

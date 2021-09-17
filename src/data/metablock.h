@@ -11,6 +11,8 @@
 
 #define SQUASH_METABLOCK_H
 
+#define SQUASH_SIZEOF_METABLOCK 2
+
 struct SquashMetablock;
 
 int squash_data_metablock_is_compressed(

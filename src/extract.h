@@ -8,6 +8,7 @@
 #include "utils.h"
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #ifndef SQUASH_EXTRACT_H
 

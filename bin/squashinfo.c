@@ -8,7 +8,7 @@
 #include "../src/context/directory_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/context/metablock_context.h"
-#include "../src/data/compression_options.h"
+#include "../src/data/compression_options_internal.h"
 #include "../src/data/metablock.h"
 #include "../src/data/superblock_internal.h"
 #include "../src/squash.h"

@@ -10,10 +10,11 @@
 
 #define SQUASH__FRAGMENT_H
 
-struct SquashFragment {
-	uint64_t start;
-	uint32_t size;
-	uint32_t unused;
-};
+#define SQUASH_SIZEOF_FRAGMENT 16
+
+struct SquashFragment;
+
+uint64_t squash_data_fragment_start(const struct SquashFragment *fragment);
+uint32_t squash_data_fragment_size(const struct SquashFragment *fragment);
 
 #endif /* end of include guard SQUASH__FRAGMENT_H */

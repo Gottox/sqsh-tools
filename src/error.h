@@ -40,7 +40,7 @@ enum SquashError {
 	SQUASH_ERROR_TODO,
 };
 
-void squash_perror(const char *msg, int errorcode);
+void squash_perror(int error_code, const char *msg);
 
 SQUASH_NO_UNUSED const char *squash_error_str(int errorcode);
 

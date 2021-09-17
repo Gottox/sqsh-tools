@@ -11,6 +11,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define SQUASH_SIZEOF_SUPERBLOCK 96
+
 enum SquashSuperblockCompressionId {
 	SQUASH_COMPRESSION_NONE = 0,
 	SQUASH_COMPRESSION_GZIP = 1,

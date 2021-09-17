@@ -15,4 +15,6 @@ struct SquashMetablock {
 	// uint8_t data[0];
 };
 
+STATIC_ASSERT(sizeof(struct SquashMetablock) == SQUASH_SIZEOF_METABLOCK);
+
 #endif /* end of include guard METABLOCK_INTERNAL_H */

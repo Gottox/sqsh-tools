@@ -32,4 +32,6 @@ struct SquashSuperblock {
 	uint64_t export_table_start;
 };
 
+STATIC_ASSERT(sizeof(struct SquashSuperblock) == SQUASH_SIZEOF_SUPERBLOCK);
+
 #endif /* end of include guard SUPERBLOCK_INTERNAL_H */

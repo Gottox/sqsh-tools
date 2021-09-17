@@ -10,7 +10,6 @@
 #include "data/metablock_internal.h"
 #include "data/superblock.h"
 #include "squash.h"
-#include <stdint.h>
 
 int
 squash_extract_init(struct SquashExtract *extract,

@@ -4,7 +4,7 @@
  * @created     : Monday Sep 06, 2021 11:30:35 CEST
  */
 
-#include "compression_options.h"
+#include "compression_options_internal.h"
 #include <endian.h>
 
 uint32_t

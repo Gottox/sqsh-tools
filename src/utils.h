@@ -18,7 +18,11 @@
 
 #define SQUASH_NO_UNUSED __attribute__((warn_unused_result))
 
-SQUASH_NO_UNUSED uint32_t log2_u32(uint32_t x);
+#define STATIC_ASSERT(cond) _Static_assert(cond, #cond)
+
+uint32_t squash_log2_u32(uint32_t x);
+
+uint32_t squash_divide_ceil_u32(uint32_t x, uint32_t y);
 
 SQUASH_NO_UNUSED int squash_memdup(
 		char **target, const char *source, size_t size);

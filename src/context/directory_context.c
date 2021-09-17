@@ -5,12 +5,12 @@
  */
 
 #include "directory_context.h"
-#include "../data/directory_internal.h"
+#include "../data/directory.h"
 
 #include <stdint.h>
 #include <string.h>
 
-#include "../data/inode_internal.h"
+#include "../data/inode.h"
 #include "../data/metablock.h"
 #include "../data/superblock.h"
 #include "../error.h"
@@ -23,9 +23,11 @@
 static int
 directory_iterator_index_lookup(struct SquashDirectoryIterator *iterator,
 		const char *name, const size_t name_len) {
+	return 0;
 	int rv = 0;
 	struct SquashInodeDirectoryIndexIterator index_iterator;
-	const struct SquashInodeDirectoryIndex *index, *candidate;
+	const struct SquashInodeDirectoryIndex *index;
+	const struct SquashInodeDirectoryIndex *candidate = NULL;
 	struct SquashInodeContext *inode = iterator->directory->inode;
 	if (squash_data_inode_type(inode->inode) !=
 			SQUASH_INODE_TYPE_EXTENDED_DIRECTORY) {
@@ -52,7 +54,8 @@ directory_iterator_index_lookup(struct SquashDirectoryIterator *iterator,
 	if (candidate) {
 		iterator->remaining_entries = 0;
 		// TODO: do not decompress everything for the lookup.
-		iterator->next_offset = candidate->start;
+		iterator->next_offset =
+				squash_data_inode_directory_index_start(candidate);
 	}
 	return rv;
 }
@@ -80,17 +83,25 @@ squash_directory_init(struct SquashDirectoryContext *directory,
 		const struct SquashSuperblock *superblock,
 		struct SquashInodeContext *inode) {
 	int rv = 0;
+	const struct SquashInodeDirectory *basic;
+	const struct SquashInodeDirectoryExt *extended;
 
 	switch (squash_data_inode_type(inode->inode)) {
 	case SQUASH_INODE_TYPE_BASIC_DIRECTORY:
-		directory->block_start = inode->inode->data.directory.block_start;
-		directory->block_offset = inode->inode->data.directory.block_offset;
-		directory->size = inode->inode->data.directory.file_size - 3;
+		basic = squash_data_inode_directory(inode->inode);
+		directory->block_start = squash_data_inode_directory_block_start(basic);
+		directory->block_offset =
+				squash_data_inode_directory_block_offset(basic);
+		directory->size = squash_data_inode_directory_file_size(basic) - 3;
 		break;
 	case SQUASH_INODE_TYPE_EXTENDED_DIRECTORY:
-		directory->block_start = inode->inode->data.directory_ext.block_start;
-		directory->block_offset = inode->inode->data.directory_ext.block_offset;
-		directory->size = inode->inode->data.directory_ext.file_size - 3;
+		extended = squash_data_inode_directory_ext(inode->inode);
+		directory->block_start =
+				squash_data_inode_directory_ext_block_start(extended);
+		directory->block_offset =
+				squash_data_inode_directory_ext_block_offset(extended);
+		directory->size =
+				squash_data_inode_directory_ext_file_size(extended) - 3;
 		break;
 	default:
 		return -SQUASH_ERROR_DIRECTORY_WRONG_INODE_TYPE;
@@ -173,7 +184,7 @@ squash_directory_iterator_next(struct SquashDirectoryIterator *iterator) {
 		return NULL;
 	} else if (iterator->remaining_entries == 0) {
 		// New fragment begins
-		iterator->next_offset += sizeof(struct SquashDirectoryFragment);
+		iterator->next_offset += SQUASH_SIZEOF_DIRECTORY_FRAGMENT;
 
 		rv = directory_data_more(iterator, iterator->next_offset);
 		if (rv < 0) {
@@ -191,7 +202,7 @@ squash_directory_iterator_next(struct SquashDirectoryIterator *iterator) {
 	iterator->remaining_entries--;
 
 	// Make sure next entry is loaded:
-	iterator->next_offset += sizeof(struct SquashDirectoryEntry);
+	iterator->next_offset += SQUASH_SIZEOF_DIRECTORY_ENTRY;
 	rv = directory_data_more(iterator, iterator->next_offset);
 	if (rv < 0) {
 		return NULL;

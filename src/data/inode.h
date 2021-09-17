@@ -10,6 +10,20 @@
 
 #define SQUASHFS_FORMAT_INODE_H
 
+#define SQUASH_SIZEOF_INODE_DIRECTORY_INDEX 12
+#define SQUASH_SIZEOF_INODE_DIRECTORY 16
+#define SQUASH_SIZEOF_INODE_DIRECTORY_EXT 24
+#define SQUASH_SIZEOF_INODE_FILE 16
+#define SQUASH_SIZEOF_INODE_FILE_EXT 40
+#define SQUASH_SIZEOF_INODE_SYMLINK 8
+#define SQUASH_SIZEOF_INODE_SYMLINK_EXT 8
+#define SQUASH_SIZEOF_INODE_SYMLINK_EXT_TAIL 4
+#define SQUASH_SIZEOF_INODE_DEVICE 8
+#define SQUASH_SIZEOF_INODE_DEVICE_EXT 12
+#define SQUASH_SIZEOF_INODE_IPC 4
+#define SQUASH_SIZEOF_INODE_IPC_EXT 8
+#define SQUASH_SIZEOF_INODE_HEADER 16
+
 enum SquashInodeType {
 	SQUASH_INODE_TYPE_BASIC_DIRECTORY = 1,
 	SQUASH_INODE_TYPE_BASIC_FILE = 2,
@@ -85,7 +99,7 @@ uint32_t squash_data_inode_directory_ext_hard_link_count(
 		const struct SquashInodeDirectoryExt *directory_ext);
 uint32_t squash_data_inode_directory_ext_file_size(
 		const struct SquashInodeDirectoryExt *directory_ext);
-uint32_t squash_data_inode_directory_ext_dir_block_start(
+uint32_t squash_data_inode_directory_ext_block_start(
 		const struct SquashInodeDirectoryExt *directory_ext);
 uint32_t squash_data_inode_directory_ext_parent_inode_number(
 		const struct SquashInodeDirectoryExt *directory_ext);
@@ -116,6 +130,7 @@ uint32_t squash_data_inode_file_block_offset(
 uint32_t squash_data_inode_file_size(const struct SquashInodeFile *file);
 const uint32_t *squash_data_inode_file_block_sizes(
 		const struct SquashInodeFile *file);
+
 uint64_t squash_data_inode_file_ext_blocks_start(
 		const struct SquashInodeFileExt *file_ext);
 uint64_t squash_data_inode_file_ext_size(
@@ -132,6 +147,7 @@ uint32_t squash_data_inode_file_ext_xattr_idx(
 		const struct SquashInodeFileExt *file_ext);
 const uint32_t *squash_data_inode_file_ext_block_sizes(
 		const struct SquashInodeFileExt *file_ext);
+
 uint32_t squash_data_inode_symlink_hard_link_count(
 		const struct SquashInodeSymlink *directory);
 uint32_t squash_data_inode_symlink_target_size(
@@ -147,4 +163,25 @@ const uint8_t *squash_data_inode_symlink_ext_target_path(
 		const struct SquashInodeSymlinkExt *directory);
 uint32_t squash_data_inode_symlink_ext_xattr_idx(
 		const struct SquashInodeSymlinkExt *directory);
+
+uint32_t squash_data_inode_device_hard_link_count(
+		const struct SquashInodeDevice *device);
+uint32_t squash_data_inode_device_device(
+		const struct SquashInodeDevice *device);
+
+uint32_t squash_data_inode_device_ext_hard_link_count(
+		const struct SquashInodeDeviceExt *device);
+uint32_t squash_data_inode_device_ext_device(
+		const struct SquashInodeDeviceExt *device);
+uint32_t squash_data_inode_device_ext_xattr_idx(
+		const struct SquashInodeDeviceExt *device);
+
+uint32_t squash_data_inode_ipc_hard_link_count(
+		const struct SquashInodeIpc *ipc);
+
+uint32_t squash_data_inode_ipc_ext_hard_link_count(
+		const struct SquashInodeIpcExt *ipc);
+uint32_t squash_data_inode_ipc_ext_xattr_idx(
+		const struct SquashInodeIpcExt *ipc);
+
 #endif /* end of include guard SQUASHFS_FORMAT_INODE_H */

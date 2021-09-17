@@ -174,7 +174,7 @@ squash_data_inode_directory_ext_file_size(
 	return htole32(directory_ext->file_size);
 }
 uint32_t
-squash_data_inode_directory_ext_dir_block_start(
+squash_data_inode_directory_ext_block_start(
 		const struct SquashInodeDirectoryExt *directory_ext) {
 	return htole32(directory_ext->block_start);
 }
@@ -269,4 +269,43 @@ squash_data_inode_symlink_ext_xattr_idx(
 	const uint8_t *tmp = (const uint8_t *)symlink_ext;
 	tmp = &tmp[sizeof(struct SquashInodeSymlinkExt) + target_size];
 	return le32toh(*((uint32_t *)tmp));
+}
+
+uint32_t
+squash_data_inode_device_hard_link_count(
+		const struct SquashInodeDevice *device) {
+	return device->hard_link_count;
+}
+uint32_t
+squash_data_inode_device_device(const struct SquashInodeDevice *device) {
+	return device->device;
+}
+
+uint32_t
+squash_data_inode_device_ext_hard_link_count(
+		const struct SquashInodeDeviceExt *device) {
+	return device->hard_link_count;
+}
+uint32_t
+squash_data_inode_device_ext_device(const struct SquashInodeDeviceExt *device) {
+	return device->device;
+}
+uint32_t
+squash_data_inode_device_ext_xattr_idx(
+		const struct SquashInodeDeviceExt *device) {
+	return device->xattr_idx;
+}
+
+uint32_t
+squash_data_inode_ipc_hard_link_count(const struct SquashInodeIpc *ipc) {
+	return ipc->hard_link_count;
+}
+
+uint32_t
+squash_data_inode_ipc_ext_hard_link_count(const struct SquashInodeIpcExt *ipc) {
+	return ipc->hard_link_count;
+}
+uint32_t
+squash_data_inode_ipc_ext_xattr_idx(const struct SquashInodeIpcExt *ipc) {
+	return ipc->xattr_idx;
 }

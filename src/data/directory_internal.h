@@ -18,11 +18,17 @@ struct SquashDirectoryEntry {
 	// uint8_t name[0]; // [name_size + 1]
 };
 
+STATIC_ASSERT(
+		sizeof(struct SquashDirectoryEntry) == SQUASH_SIZEOF_DIRECTORY_ENTRY)
+
 struct SquashDirectoryFragment {
 	uint32_t count;
 	uint32_t start;
 	uint32_t inode_number;
 	// struct SquashDirectoryEntry entries[0]; // [count + 1]
 };
+
+STATIC_ASSERT(sizeof(struct SquashDirectoryFragment) ==
+		SQUASH_SIZEOF_DIRECTORY_FRAGMENT)
 
 #endif /* end of include guard DIRECTORY_INTERNAL_H */

@@ -4,6 +4,7 @@
  * @created     : Wednesday Sep 08, 2021 13:30:05 CEST
  */
 
+#include "../utils.h"
 #include "inode.h"
 
 #ifndef FORMAT_INODE_INTERNAL_H
@@ -16,6 +17,8 @@ struct SquashInodeDirectoryIndex {
 	uint32_t name_size;
 	// uint8_t name[0]; // [name_size + 1]
 };
+STATIC_ASSERT(sizeof(struct SquashInodeDirectoryIndex) ==
+		SQUASH_SIZEOF_INODE_DIRECTORY_INDEX);
 
 struct SquashInodeDirectory {
 	uint32_t block_start;
@@ -24,6 +27,8 @@ struct SquashInodeDirectory {
 	uint16_t block_offset;
 	uint32_t parent_inode_number;
 };
+STATIC_ASSERT(
+		sizeof(struct SquashInodeDirectory) == SQUASH_SIZEOF_INODE_DIRECTORY);
 
 struct SquashInodeDirectoryExt {
 	uint32_t hard_link_count;
@@ -35,6 +40,8 @@ struct SquashInodeDirectoryExt {
 	uint32_t xattr_idx;
 	// struct SquashInodeDirectoryIndex index[0]; // [index_count]
 };
+STATIC_ASSERT(sizeof(struct SquashInodeDirectoryExt) ==
+		SQUASH_SIZEOF_INODE_DIRECTORY_EXT);
 
 struct SquashInodeFile {
 	uint32_t blocks_start;
@@ -43,6 +50,7 @@ struct SquashInodeFile {
 	uint32_t file_size;
 	// uint32_t block_sizes[0];
 };
+STATIC_ASSERT(sizeof(struct SquashInodeFile) == SQUASH_SIZEOF_INODE_FILE);
 
 struct SquashInodeFileExt {
 	uint64_t blocks_start;
@@ -54,42 +62,54 @@ struct SquashInodeFileExt {
 	uint32_t xattr_idx;
 	// uint32_t block_sizes[0];
 };
+STATIC_ASSERT(
+		sizeof(struct SquashInodeFileExt) == SQUASH_SIZEOF_INODE_FILE_EXT);
 
 struct SquashInodeSymlink {
 	uint32_t hard_link_count;
 	uint32_t target_size;
 	// uint8_t target_path[0]; // [target_size]
 };
+STATIC_ASSERT(sizeof(struct SquashInodeSymlink) == SQUASH_SIZEOF_INODE_SYMLINK);
 
 struct SquashInodeSymlinkExt {
 	uint32_t hard_link_count;
 	uint32_t target_size;
 	// uint8_t target_path[0]; // [target_size]
 };
+STATIC_ASSERT(sizeof(struct SquashInodeSymlinkExt) ==
+		SQUASH_SIZEOF_INODE_SYMLINK_EXT);
 
 struct SquashInodeSymlinkExtTail {
 	uint32_t xattr_idx;
 };
+STATIC_ASSERT(sizeof(struct SquashInodeSymlinkExtTail) ==
+		SQUASH_SIZEOF_INODE_SYMLINK_EXT_TAIL);
 
 struct SquashInodeDevice {
 	uint32_t hard_link_count;
 	uint32_t device;
 };
+STATIC_ASSERT(sizeof(struct SquashInodeDevice) == SQUASH_SIZEOF_INODE_DEVICE);
 
 struct SquashInodeDeviceExt {
 	uint32_t hard_link_count;
 	uint32_t device;
 	uint32_t xattr_idx;
 };
+STATIC_ASSERT(
+		sizeof(struct SquashInodeDeviceExt) == SQUASH_SIZEOF_INODE_DEVICE_EXT);
 
 struct SquashInodeIpc {
 	uint32_t hard_link_count;
 };
+STATIC_ASSERT(sizeof(struct SquashInodeIpc) == SQUASH_SIZEOF_INODE_IPC);
 
 struct SquashInodeIpcExt {
 	uint32_t hard_link_count;
 	uint32_t xattr_idx;
 };
+STATIC_ASSERT(sizeof(struct SquashInodeIpcExt) == SQUASH_SIZEOF_INODE_IPC_EXT);
 
 struct SquashInodeHeader {
 	uint16_t type;
@@ -99,6 +119,7 @@ struct SquashInodeHeader {
 	uint32_t modified_time;
 	uint32_t inode_number;
 };
+STATIC_ASSERT(sizeof(struct SquashInodeHeader) == SQUASH_SIZEOF_INODE_HEADER);
 
 struct SquashInode {
 	struct SquashInodeHeader header;

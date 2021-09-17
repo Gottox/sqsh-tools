@@ -10,8 +10,13 @@
 #include <string.h>
 
 uint32_t
-log2_u32(uint32_t x) {
+squash_log2_u32(uint32_t x) {
 	return sizeof(uint32_t) * 8 - 1 - __builtin_clz(x);
+}
+
+uint32_t
+squash_divide_ceil_u32(uint32_t x, uint32_t y) {
+	return x / y + (x % y != 0);
 }
 
 int

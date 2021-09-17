@@ -26,7 +26,8 @@ int
 main(int argc, char *argv[]) {
 	int rv = 0;
 	int opt = 0;
-	const char *path = "";
+	const char *inner_path = "";
+	const char *outer_path;
 	struct SquashInodeContext inode = {0};
 	struct SquashDirectoryContext dir = {0};
 	struct SquashDirectoryIterator iter = {0};
@@ -41,34 +42,35 @@ main(int argc, char *argv[]) {
 	}
 
 	if (optind + 2 == argc) {
-		path = argv[optind + 1];
+		inner_path = argv[optind + 1];
 	} else if (optind + 1 != argc) {
 		return usage(argv[0]);
 	}
+	outer_path = argv[optind];
 
-	rv = squash_open(&squash, argv[optind]);
+	rv = squash_open(&squash, outer_path);
 	if (rv < 0) {
-		perror(argv[optind]);
+		squash_perror(rv, outer_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	rv = squash_resolve_path(&inode, squash.superblock, path);
+	rv = squash_resolve_path(&inode, squash.superblock, inner_path);
 	if (rv < 0) {
-		perror(argv[optind]);
+		squash_perror(rv, inner_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 	rv = squash_directory_init(&dir, squash.superblock, &inode);
 	if (rv < 0) {
-		perror(argv[optind]);
+		squash_perror(rv, inner_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
 	rv = squash_directory_iterator_init(&iter, &dir);
 	if (rv < 0) {
-		perror(argv[optind]);
+		squash_perror(rv, inner_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}

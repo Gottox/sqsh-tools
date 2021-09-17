@@ -10,38 +10,17 @@
 
 #define SQUASH__COMPRESSION_OPTIONS_H
 
-struct SquashCompressionOptionsGzip {
-	uint32_t compression_level;
-	uint16_t window_size;
-	uint16_t strategies;
-};
+struct SquashCompressionOptionsGzip;
 
-struct SquashCompressionOptionsXz {
-	uint32_t dictionary_size;
-	uint32_t filters;
-};
+struct SquashCompressionOptionsXz;
 
-struct SquashCompressionOptionsLz4 {
-	uint32_t version;
-	uint32_t flags;
-};
+struct SquashCompressionOptionsLz4;
 
-struct SquashCompressionOptionsZstd {
-	uint32_t compression_level;
-};
+struct SquashCompressionOptionsZstd;
 
-struct SquashCompressionOptionsLzo {
-	uint32_t algorithm;
-	uint32_t compression_level;
-};
+struct SquashCompressionOptionsLzo;
 
-union SquashCompressionOptions {
-	struct SquashCompressionOptionsGzip gzip;
-	struct SquashCompressionOptionsXz xz;
-	struct SquashCompressionOptionsLz4 lz4;
-	struct SquashCompressionOptionsZstd zstd;
-	struct SquashCompressionOptionsLzo lzo;
-};
+union SquashCompressionOptions;
 
 uint32_t squash_compression_options_gzip_compression_level(
 		const union SquashCompressionOptions *options);

@@ -9,7 +9,6 @@
 #include "../utils.h"
 
 #include <endian.h>
-#include <stdint.h>
 
 static const union {
 	char c[4];
@@ -52,7 +51,7 @@ squash_data_superblock_init(
 	}
 
 	if (squash_data_superblock_block_log(superblock) !=
-			log2_u32(squash_data_superblock_block_size(superblock))) {
+			squash_log2_u32(squash_data_superblock_block_size(superblock))) {
 		return -SQUASH_ERROR_BLOCKSIZE_MISSMATCH;
 	}
 

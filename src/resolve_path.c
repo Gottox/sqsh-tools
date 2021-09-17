@@ -95,7 +95,7 @@ squash_resolve_path(struct SquashInodeContext *inode,
 	int rv = 0;
 	int segment_count = count_path_segments(path);
 	const char *segment = path;
-	uint64_t *inode_refs = calloc(segment_count, sizeof(uint64_t));
+	uint64_t *inode_refs = calloc(MIN(1, segment_count), sizeof(uint64_t));
 	if (inode_refs == NULL) {
 		rv = SQUASH_ERROR_MALLOC_FAILED;
 		goto out;

@@ -8,10 +8,11 @@
 #include "../utils.h"
 #include "metablock_internal.h"
 #include "superblock.h"
+#include <endian.h>
 
 int
 squash_data_metablock_is_compressed(const struct SquashMetablock *metablock) {
-	return !(metablock->header & 0x8000);
+	return !(htole16(metablock->header) & 0x8000);
 }
 
 const uint8_t *
@@ -22,5 +23,5 @@ squash_data_metablock_data(const struct SquashMetablock *metablock) {
 
 size_t
 squash_data_metablock_size(const struct SquashMetablock *metablock) {
-	return metablock->header & 0x7FFF;
+	return htole16(metablock->header) & 0x7FFF;
 }

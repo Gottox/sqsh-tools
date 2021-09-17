@@ -10,23 +10,54 @@
 #include "../data/superblock_internal.h"
 #include "../error.h"
 
+#ifdef CONFIG_COMPRESSION_GZIP
+extern const struct SquashCompressionImplementation squash_compression_gzip;
+#endif
+#ifdef CONFIG_COMPRESSION_LZMA
+extern const struct SquashCompressionImplementation squash_compression_lzma;
+#endif
+#ifdef CONFIG_COMPRESSION_XZ
+extern const struct SquashCompressionImplementation squash_compression_xz;
+#endif
+#ifdef CONFIG_COMPRESSION_LZO
+extern const struct SquashCompressionImplementation squash_compression_lzo;
+#endif
+#ifdef CONFIG_COMPRESSION_LZ4
+extern const struct SquashCompressionImplementation squash_compression_lz4;
+#endif
+#ifdef CONFIG_COMPRESSION_ZSTD
+extern const struct SquashCompressionImplementation squash_compression_zstd;
+#endif
+
 static const struct SquashCompressionImplementation *
 compression_by_id(int id) {
 	switch ((enum SquashSuperblockCompressionId)id) {
 	case SQUASH_COMPRESSION_NONE:
 		return &squash_compression_null;
+#ifdef CONFIG_COMPRESSION_GZIP
 	case SQUASH_COMPRESSION_GZIP:
 		return &squash_compression_gzip;
+#endif
+#ifdef CONFIG_COMPRESSION_LZMA
 	case SQUASH_COMPRESSION_LZMA:
 		return &squash_compression_lzma;
+#endif
+#ifdef CONFIG_COMPRESSION_XZ
 	case SQUASH_COMPRESSION_XZ:
 		return &squash_compression_xz;
+#endif
+#ifdef CONFIG_COMPRESSION_LZO
 	case SQUASH_COMPRESSION_LZO:
 		return &squash_compression_lzo;
+#endif
+#ifdef CONFIG_COMPRESSION_LZ4
 	case SQUASH_COMPRESSION_LZ4:
 		return &squash_compression_lz4;
+#endif
+#ifdef CONFIG_COMPRESSION_ZSTD
 	case SQUASH_COMPRESSION_ZSTD:
 		return &squash_compression_zstd;
+#endif
 	default:
 		return NULL;
 	}

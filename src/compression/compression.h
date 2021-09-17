@@ -8,19 +8,13 @@
 #include "../utils.h"
 
 #include <stddef.h>
-#include <stdlib.h>
+#include <stdint.h>
 
 #ifndef EXTRACTOR_H
 
 #define EXTRACTOR_H
 
 extern const struct SquashCompressionImplementation squash_compression_null;
-extern const struct SquashCompressionImplementation squash_compression_gzip;
-extern const struct SquashCompressionImplementation squash_compression_lzma;
-extern const struct SquashCompressionImplementation squash_compression_xz;
-extern const struct SquashCompressionImplementation squash_compression_lzo;
-extern const struct SquashCompressionImplementation squash_compression_lz4;
-extern const struct SquashCompressionImplementation squash_compression_zstd;
 
 struct SquashSuperblock;
 

@@ -6,6 +6,8 @@ include config.mk
 
 HDR = \
 	src/compression/compression.h \
+	src/context/datablock_context.h \
+	src/context/directory_context.h \
 	src/context/metablock_context.h \
 	src/context/inode_context.h \
 	src/context/directory_context.h \
@@ -28,16 +30,12 @@ HDR = \
 	bin/printb.h \
 
 SRC = \
-	src/compression/gzip.c \
-	src/compression/lz4.c \
-	src/compression/lzma.c \
 	src/compression/null.c \
-	src/compression/xz.c \
-	src/compression/lzo.c \
-	src/compression/zstd.c \
 	src/compression/compression.c \
 	src/context/metablock_context.c \
+	src/context/datablock_context.c \
 	src/context/directory_context.c \
+	src/context/fragment_context.c \
 	src/context/inode_context.c \
 	src/data/compression_options.c \
 	src/data/inode.c \
@@ -49,6 +47,8 @@ SRC = \
 	src/utils.c \
 	src/resolve_path.c \
 	src/error.c \
+
+LIBS = fuse3
 
 OBJ = $(SRC:.c=.o)
 
@@ -71,13 +71,44 @@ BCH = \
 BCH_BIN = $(BCH:.c=-bench)
 BCH_CFLAGS = \
 
+ifeq ($(CONFIG_COMPRESSION_GZIP), 1)
+	SRC += 	src/compression/gzip.c
+	CFLAGS += -DCONFIG_COMPRESSION_GZIP
+	LIBS += zlib
+endif
+ifeq ($(CONFIG_COMPRESSION_LZ4), 1)
+	SRC += 	src/compression/lz4.c
+	CFLAGS += -DCONFIG_COMPRESSION_LZ4
+	LIBS += liblz4
+endif
+ifeq ($(CONFIG_COMPRESSION_LZMA), 1)
+	SRC += 	src/compression/lzma.c
+	CFLAGS += -DCONFIG_COMPRESSION_LZMA
+	LIBS += liblzma
+endif
+ifeq ($(CONFIG_COMPRESSION_LZO), 1)
+	SRC += 	src/compression/lzo.c
+	CFLAGS += -DCONFIG_COMPRESSION_LZO
+	LIBS += lzo2
+endif
+ifeq ($(CONFIG_COMPRESSION_XZ), 1)
+	SRC += 	src/compression/xz.c
+	CFLAGS += -DCONFIG_COMPRESSION_XZ
+	LIBS += liblzma
+endif
+ifeq ($(CONFIG_COMPRESSION_ZSTD), 1)
+	SRC += 	src/compression/zstd.c
+	CFLAGS += -DCONFIG_COMPRESSION_ZSTD
+	LIBS += libzstd
+endif
+
 MAJOR=$(shell echo $(VERSION) | cut -d . -f 1)
 
 CFLAGS += \
-	$(shell pkg-config --cflags zlib liblzma lzo2 liblz4 libzstd fuse3) \
+	$(shell pkg-config --cflags $(LIBS)) \
 
 LDFLAGS += \
-	$(shell pkg-config --libs zlib liblzma lzo2 liblz4 libzstd fuse3) \
+	$(shell pkg-config --libs $(LIBS)) \
 
 all: $(BIN) libsquashfs.a libsquashfs.so
 
