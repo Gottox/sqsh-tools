@@ -23,7 +23,6 @@
 static int
 directory_iterator_index_lookup(struct SquashDirectoryIterator *iterator,
 		const char *name, const size_t name_len) {
-	return 0;
 	int rv = 0;
 	struct SquashInodeDirectoryIndexIterator index_iterator;
 	const struct SquashInodeDirectoryIndex *index;

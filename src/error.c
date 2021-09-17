@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+static __thread char err_str[BUFSIZ] = {0};
+
 void
 squash_perror(int error_code, const char *msg) {
 	if (msg) {
@@ -27,7 +29,7 @@ squash_error_str(int errorcode) {
 	if (errorcode < SQUASH_ERROR_SECTION) {
 		return strerror(errorcode);
 	}
-	switch (errorcode) {
+	switch ((enum SquashError)errorcode) {
 	case SQUASH_ERROR_SUPERBLOCK_TOO_SMALL:
 		return "Superblock too small";
 	case SQUASH_ERROR_WRONG_MAGIG:
@@ -74,9 +76,11 @@ squash_error_str(int errorcode) {
 		return "Integer overflow";
 	case SQUASH_ERROR_NO_SUCH_FILE:
 		return "No such file or directory";
+	case SQUASH_ERROR_METABLOCK_ZERO_SIZE:
+		return "Metablock with size zero";
 	case SQUASH_ERROR_TODO:
 		return "Todo";
-	default:
-		return "Unknown Error";
 	}
+	snprintf(err_str, BUFSIZ-1, "Unknown Error %i", abs(errorcode));
+	return err_str;
 }
