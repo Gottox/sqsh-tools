@@ -10,7 +10,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-static __thread char err_str[BUFSIZ] = {0};
+#define UNKOWN_ERROR_FORMAT "Unknown error %i"
+
+static __thread char
+		err_str[sizeof(UNKOWN_ERROR_FORMAT "18446744073709551615")] = {0};
 
 void
 squash_perror(int error_code, const char *msg) {
@@ -23,13 +26,13 @@ squash_perror(int error_code, const char *msg) {
 }
 
 const char *
-squash_error_str(int errorcode) {
-	errorcode = abs(errorcode);
+squash_error_str(int error_code) {
+	error_code = abs(error_code);
 
-	if (errorcode < SQUASH_ERROR_SECTION) {
-		return strerror(errorcode);
+	if (error_code < SQUASH_ERROR_SECTION) {
+		return strerror(error_code);
 	}
-	switch ((enum SquashError)errorcode) {
+	switch ((enum SquashError)error_code) {
 	case SQUASH_ERROR_SUPERBLOCK_TOO_SMALL:
 		return "Superblock too small";
 	case SQUASH_ERROR_WRONG_MAGIG:
@@ -81,6 +84,6 @@ squash_error_str(int errorcode) {
 	case SQUASH_ERROR_TODO:
 		return "Todo";
 	}
-	snprintf(err_str, BUFSIZ-1, "Unknown Error %i", abs(errorcode));
+	snprintf(err_str, sizeof(err_str), UNKOWN_ERROR_FORMAT, abs(error_code));
 	return err_str;
 }
