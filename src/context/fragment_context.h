@@ -6,7 +6,7 @@
 
 #include "../data/fragment.h"
 #include "../data/superblock.h"
-#include "../extract.h"
+#include "metablock_context.h"
 #include <stdint.h>
 
 #ifndef FRAGMENT_CONTEXT_H
@@ -16,7 +16,7 @@
 struct SquashFragmentContext {
 	const struct SquashSuperblock *superblock;
 	const struct SquashMetablock *table;
-	struct SquashExtract extract;
+	struct SquashMetablockContext extract;
 	uint32_t fragment_count;
 };
 

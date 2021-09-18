@@ -22,7 +22,6 @@ HDR = \
 	src/data/metablock.h \
 	src/data/superblock.h \
 	src/data/superblock_internal.h \
-	src/extract.h \
 	src/resolve_path.h \
 	src/squash.h \
 	src/utils.h \
@@ -42,7 +41,6 @@ SRC = \
 	src/data/directory.c \
 	src/data/metablock.c \
 	src/data/superblock.c \
-	src/extract.c \
 	src/squash.c \
 	src/utils.c \
 	src/resolve_path.c \

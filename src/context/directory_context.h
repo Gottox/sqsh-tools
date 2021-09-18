@@ -5,8 +5,8 @@
  */
 
 #include "../data/directory.h"
-#include "../extract.h"
 #include "../utils.h"
+#include "metablock_context.h"
 
 #ifndef SQUASH_DIRECTORY_CONTEXT_H
 
@@ -26,7 +26,7 @@ struct SquashDirectoryContext {
 struct SquashDirectoryIterator {
 	const struct SquashDirectoryFragment *fragments;
 	struct SquashDirectoryContext *directory;
-	struct SquashExtract extract;
+	struct SquashMetablockContext extract;
 	size_t remaining_entries;
 	off_t current_fragment_offset;
 	off_t next_offset;

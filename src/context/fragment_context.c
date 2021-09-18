@@ -6,8 +6,6 @@
 
 #include "fragment_context.h"
 #include "../data/fragment.h"
-#include "../extract.h"
-#include "metablock_context.h"
 #include <stdint.h>
 
 int

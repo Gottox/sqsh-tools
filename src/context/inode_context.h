@@ -4,8 +4,8 @@
  * @created     : Thursday May 06, 2021 15:22:00 CEST
  */
 
-#include "../extract.h"
 #include "../utils.h"
+#include "metablock_context.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -34,7 +34,7 @@ enum SquashInodeContextType {
 
 struct SquashInodeContext {
 	struct SquashInode *inode;
-	struct SquashExtract extract;
+	struct SquashMetablockContext extract;
 	uint32_t datablock_block_size;
 };
 

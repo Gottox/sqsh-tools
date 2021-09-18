@@ -37,7 +37,7 @@ usage(char *arg0) {
 static int
 metablock_info(const struct SquashMetablock *metablock, struct Squash *squash) {
 	int rv = 0;
-	struct SquashExtract extract = {0};
+	struct SquashMetablockContext extract = {0};
 	KEY("METABLOCK_INFO");
 	if (metablock == NULL) {
 		fputs("(none)\n", out);

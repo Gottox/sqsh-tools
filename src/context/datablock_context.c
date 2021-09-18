@@ -9,7 +9,6 @@
 #include "../data/metablock.h"
 #include "../data/superblock.h"
 #include "../error.h"
-#include "metablock_context.h"
 #include <stdint.h>
 
 int
