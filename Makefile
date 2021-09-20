@@ -5,46 +5,49 @@
 include config.mk
 
 HDR = \
+	src/compression/buffer.h \
 	src/compression/compression.h \
 	src/context/datablock_context.h \
 	src/context/directory_context.h \
-	src/context/metablock_context.h \
+	src/context/fragment_context.h \
 	src/context/inode_context.h \
-	src/context/directory_context.h \
-	src/data/inode.h \
-	src/data/xattr.h \
-	src/data/inode_internal.h \
-	src/data/directory_internal.h \
-	src/data/metablock_internal.h \
+	src/context/metablock_context.h \
 	src/data/compression_options.h \
-	src/data/fragment.h \
+	src/data/compression_options_internal.h \
 	src/data/directory.h \
+	src/data/directory_internal.h \
+	src/data/fragment.h \
+	src/data/fragment_internal.h \
+	src/data/inode.h \
+	src/data/inode_internal.h \
 	src/data/metablock.h \
+	src/data/metablock_internal.h \
 	src/data/superblock.h \
 	src/data/superblock_internal.h \
+	src/data/xattr.h \
+	src/error.h \
 	src/resolve_path.h \
 	src/squash.h \
 	src/utils.h \
-	src/error.h \
-	bin/printb.h \
 
 SRC = \
+	src/compression/buffer.c \
 	src/compression/null.c \
-	src/compression/compression.c \
-	src/context/metablock_context.c \
 	src/context/datablock_context.c \
 	src/context/directory_context.c \
 	src/context/fragment_context.c \
 	src/context/inode_context.c \
+	src/context/metablock_context.c \
 	src/data/compression_options.c \
-	src/data/inode.c \
 	src/data/directory.c \
+	src/data/fragment.c \
+	src/data/inode.c \
 	src/data/metablock.c \
 	src/data/superblock.c \
+	src/error.c \
+	src/resolve_path.c \
 	src/squash.c \
 	src/utils.c \
-	src/resolve_path.c \
-	src/error.c \
 
 LIBS = fuse3
 

@@ -5,30 +5,23 @@
  */
 
 #include "metablock_context.h"
-#include "../compression/compression.h"
+#include "../compression/buffer.h"
 #include "../data/metablock_internal.h"
 #include "../data/superblock.h"
 #include "../error.h"
+
+#define BLOCK_SIZE 8192
 
 int
 squash_extract_init(struct SquashMetablockContext *extract,
 		const struct SquashSuperblock *superblock,
 		const struct SquashMetablock *block, off_t block_index,
 		off_t block_offset) {
-	int rv = 0;
-	extract->extracted = NULL;
-	extract->extracted_size = 0;
 	extract->start_block = block;
 	extract->index = block_index;
 	extract->offset = block_offset;
 	extract->superblock = superblock;
-	if (squash_data_metablock_is_compressed(block)) {
-		rv = squash_compression_init(&extract->compression, superblock);
-	} else {
-		extract->compression.impl = &squash_compression_null;
-		extract->compression.options = NULL;
-	}
-	return rv;
+	return squash_buffer_init(&extract->buffer, superblock, BLOCK_SIZE);
 }
 
 int
@@ -42,36 +35,36 @@ squash_extract_more(struct SquashMetablockContext *extract, const size_t size) {
 		if (block == NULL) {
 			return -SQUASH_ERROR_TODO;
 		}
-		const size_t block_size = squash_data_metablock_size(block);
-		if (block_size == 0) {
+		const size_t metablock_size = squash_data_metablock_size(block);
+		if (metablock_size == 0) {
 			return -SQUASH_ERROR_METABLOCK_ZERO_SIZE;
 		}
 
 		const void *block_data = squash_data_metablock_data(block);
-		rv = squash_compression_extract(&extract->compression,
-				&extract->extracted, &extract->extracted_size, block_data,
-				block_size);
-		extract->index += sizeof(struct SquashMetablock) + block_size;
+		bool is_compressed = squash_data_metablock_is_compressed(block);
+		rv = squash_buffer_append(
+				&extract->buffer, block_data, metablock_size, is_compressed);
+		extract->index += sizeof(struct SquashMetablock) + metablock_size;
 	}
 	return rv;
 }
 
 void *
 squash_extract_data(const struct SquashMetablockContext *extract) {
-	return &extract->extracted[extract->offset];
+	return &extract->buffer.data[extract->offset];
 }
 
 size_t
 squash_extract_size(const struct SquashMetablockContext *extract) {
-	if (extract->offset > extract->extracted_size) {
+	const size_t buffer_size = squash_buffer_size(&extract->buffer);
+	if (extract->offset > buffer_size) {
 		return 0;
 	} else {
-		return extract->extracted_size - extract->offset;
+		return buffer_size - extract->offset;
 	}
 }
 
 int
 squash_extract_cleanup(struct SquashMetablockContext *extract) {
-	free(extract->extracted);
-	return squash_compression_cleanup(&extract->compression);
+	return squash_buffer_cleanup(&extract->buffer);
 }

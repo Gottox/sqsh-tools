@@ -4,11 +4,13 @@
  * @created     : Sunday Sep 05, 2021 12:16:28 CEST
  */
 
-#include "compression.h"
 #include "../context/metablock_context.h"
 #include "../data/metablock.h"
 #include "../data/superblock_internal.h"
 #include "../error.h"
+#include "compression.h"
+
+#include <stdbool.h>
 
 #ifdef CONFIG_COMPRESSION_GZIP
 extern const struct SquashCompressionImplementation squash_compression_gzip;
@@ -28,6 +30,7 @@ extern const struct SquashCompressionImplementation squash_compression_lz4;
 #ifdef CONFIG_COMPRESSION_ZSTD
 extern const struct SquashCompressionImplementation squash_compression_zstd;
 #endif
+extern const struct SquashCompressionImplementation squash_compression_null;
 
 static const struct SquashCompressionImplementation *
 compression_by_id(int id) {
@@ -64,8 +67,8 @@ compression_by_id(int id) {
 }
 
 int
-squash_compression_init(struct SquashCompression *compression,
-		const struct SquashSuperblock *superblock) {
+squash_buffer_init(struct SquashBuffer *compression,
+		const struct SquashSuperblock *superblock, int block_size) {
 	int rv = 0;
 	const struct SquashCompressionImplementation *impl;
 
@@ -84,29 +87,55 @@ squash_compression_init(struct SquashCompression *compression,
 		compression->options = (const union SquashCompressionOptions *)
 				squash_data_metablock_data(metablock);
 	} else {
-		compression->options = impl->default_options;
+		compression->options = NULL;
 	}
 
 	if (rv < 0) {
 		return rv;
 	}
 	compression->impl = impl;
+	compression->block_size = block_size;
 
 	return rv;
 }
 
 int
-squash_compression_extract(const struct SquashCompression *compression,
-		uint8_t **target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size) {
-	const struct SquashCompressionImplementation *impl = compression->impl;
-	const union SquashCompressionOptions *options = compression->options;
+squash_buffer_append(struct SquashBuffer *buffer, const uint8_t *source,
+		const size_t source_size, bool is_compressed) {
+	const union SquashCompressionOptions *options = buffer->options;
+	const struct SquashCompressionImplementation *impl =
+			is_compressed ? buffer->impl : &squash_compression_null;
+	int rv = 0;
+	size_t block_size = buffer->block_size;
+	const size_t buffer_size = buffer->size;
 
-	return impl->extract(
-			options, target, target_size, compressed, compressed_size);
+	buffer->data = realloc(buffer->data, buffer_size + block_size);
+	if (buffer->data == NULL) {
+		return -SQUASH_ERROR_MALLOC_FAILED;
+	}
+
+	rv = impl->extract(options, &buffer->data[buffer_size], &block_size, source,
+			source_size);
+	if (rv < 0)
+		return rv;
+
+	buffer->size += block_size;
+
+	return rv;
+}
+
+const uint8_t *
+squash_buffer_data(const struct SquashBuffer *buffer) {
+	return buffer->data;
+}
+size_t
+squash_buffer_size(const struct SquashBuffer *buffer) {
+	return buffer->size;
 }
 
 int
-squash_compression_cleanup(struct SquashCompression *extractor) {
+squash_buffer_cleanup(struct SquashBuffer *buffer) {
+	free(buffer->data);
+	buffer->size = 0;
 	return 0;
 }

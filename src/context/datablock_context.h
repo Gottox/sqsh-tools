@@ -14,7 +14,7 @@
 
 struct SquashDatablockContext {
 	struct SquashInodeContext *inode;
-	struct SquashCompression compression;
+	struct SquashBuffer buffer;
 	struct SquashSuperblock *superblock;
 	const uint8_t *datablock_start;
 	const uint8_t *fragment_start;

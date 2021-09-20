@@ -25,8 +25,7 @@ squash_fragment_init(struct SquashFragmentContext *fragment,
 }
 
 const uint32_t *
-squash_fragment_get_start(
-		struct SquashFragmentContext *fragment, uint32_t index) {
+squash_fragment_data(struct SquashFragmentContext *fragment, uint32_t index) {
 	int rv = 0;
 	size_t size = (index + 1) * SQUASH_SIZEOF_FRAGMENT;
 	rv = squash_extract_more(&fragment->extract, size);

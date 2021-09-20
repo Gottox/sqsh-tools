@@ -71,10 +71,11 @@ metablock_info(const struct SquashMetablock *metablock, struct Squash *squash) {
 static int
 compression_info_gzip(struct Squash *squash) {
 	int rv = 0;
-	struct SquashCompression compression = {0};
-	rv = squash_compression_init(&compression, squash->superblock);
-	const struct SquashCompressionOptionsGzip *options =
-			&compression.options->gzip;
+	// TODO: use metablock context instead of compression here. this block is
+	// never compressed.
+	struct SquashBuffer buffer = {0};
+	rv = squash_buffer_init(&buffer, squash->superblock, 8192);
+	const struct SquashCompressionOptionsGzip *options = &buffer.options->gzip;
 
 	KEY("COMPRESSION_LEVEL");
 	fprintf(out, "%i\n", options->compression_level);
@@ -83,7 +84,7 @@ compression_info_gzip(struct Squash *squash) {
 	KEY("STRATEGIES");
 	printb(options->strategies, out);
 
-	rv = squash_compression_cleanup(&compression);
+	rv = squash_buffer_cleanup(&buffer);
 	return rv;
 }
 

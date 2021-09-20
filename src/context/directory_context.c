@@ -18,8 +18,6 @@
 #include "inode_context.h"
 #include "metablock_context.h"
 
-#define METABLOCK_SIZE 8192
-
 static int
 directory_iterator_index_lookup(struct SquashDirectoryIterator *iterator,
 		const char *name, const size_t name_len) {

@@ -23,6 +23,9 @@ struct SquashFragmentContext {
 int squash_fragment_init(struct SquashFragmentContext *fragment,
 		const struct SquashSuperblock *superblock);
 
+const uint32_t *squash_fragment_data(
+		struct SquashFragmentContext *fragment, uint32_t index);
+
 uint32_t squash_fragment_count(struct SquashFragmentContext *fragment);
 
 #endif /* end of include guard FRAGMENT_CONTEXT_H */

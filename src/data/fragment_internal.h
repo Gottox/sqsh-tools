@@ -4,6 +4,7 @@
  * @created     : Friday Sep 17, 2021 09:29:00 CEST
  */
 
+#include "../utils.h"
 #include "fragment.h"
 
 #ifndef FRAGMENT_INTERNAL_H
@@ -16,6 +17,6 @@ struct SquashFragment {
 	uint32_t unused;
 };
 
-STATIC_ASSERT(sizeof(struct SquashFragment) == SQUASH_SIZEOF_FRAGMENT)
+STATIC_ASSERT(sizeof(struct SquashFragment) == SQUASH_SIZEOF_FRAGMENT);
 
 #endif /* end of include guard FRAGMENT_INTERNAL_H */

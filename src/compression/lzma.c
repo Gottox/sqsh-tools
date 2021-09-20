@@ -15,11 +15,10 @@
 #include "../error.h"
 #include "compression.h"
 
-#define BLOCK_SIZE 8192
-
 static int
-lzma_uncompress(uint8_t *dest, size_t *dest_len, const uint8_t *source,
-		size_t source_len) {
+squash_lzma_extract(const union SquashCompressionOptions *options,
+		uint8_t *target, size_t *target_size, const uint8_t *compressed,
+		const size_t compressed_size) {
 	lzma_ret rv = LZMA_OK;
 
 	lzma_stream strm = LZMA_STREAM_INIT;
@@ -27,50 +26,27 @@ lzma_uncompress(uint8_t *dest, size_t *dest_len, const uint8_t *source,
 	rv = lzma_alone_decoder(&strm, UINT64_MAX);
 	if (rv != LZMA_OK) {
 		lzma_end(&strm);
-		return rv;
+		return -SQUASH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
 	lzma_action action = LZMA_RUN;
 
-	strm.next_in = source;
-	strm.avail_in = source_len;
+	strm.next_in = compressed;
+	strm.avail_in = compressed_size;
 
-	strm.next_out = dest;
-	strm.avail_out = *dest_len;
+	strm.next_out = target;
+	strm.avail_out = *target_size;
 
 	action = LZMA_FINISH;
 
-	*dest_len = strm.avail_out;
-
 	rv = lzma_code(&strm, action);
+
+	*target_size = strm.avail_out;
 	lzma_end(&strm);
 
-	return rv;
-}
-
-static int
-squash_lzma_extract(const union SquashCompressionOptions *options,
-		uint8_t **target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size) {
-	int rv = 0;
-	size_t write_chunk_size = BLOCK_SIZE;
-	*target = realloc(*target, *target_size + write_chunk_size);
-	if (*target == NULL) {
-		return -SQUASH_ERROR_COMPRESSION_DECOMPRESS;
-	}
-
-	rv = lzma_uncompress(&(*target)[*target_size], &write_chunk_size,
-			compressed, compressed_size);
-
-	*target_size += write_chunk_size;
-
-	if (rv != LZMA_STREAM_END) {
-		return -SQUASH_ERROR_COMPRESSION_DECOMPRESS;
-	}
-	return rv;
+	return 0;
 }
 
 const struct SquashCompressionImplementation squash_compression_lzma = {
 		.extract = squash_lzma_extract,
-		.default_options = NULL,
 };

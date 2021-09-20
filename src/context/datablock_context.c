@@ -15,9 +15,8 @@ int
 squash_datablock_init(struct SquashDatablockContext *datablock,
 		const struct SquashSuperblock *superblock,
 		struct SquashInodeContext *inode) {
+	size_t block_size = squash_data_superblock_block_size(superblock);
 	int rv = 0;
-	if (rv < 0)
-		goto out;
 	datablock->inode = inode;
 	datablock->datablock_start =
 			(const uint8_t *)superblock + SQUASH_SIZEOF_SUPERBLOCK;
@@ -36,8 +35,7 @@ squash_datablock_init(struct SquashDatablockContext *datablock,
 	datablock->fragment_start = (const uint8_t *)superblock +
 			squash_data_superblock_fragment_table_start(superblock);
 
-	rv = squash_compression_init(&datablock->compression, superblock);
-out:
+	rv = squash_buffer_init(&datablock->buffer, superblock, block_size);
 	return rv;
 }
 
@@ -71,5 +69,5 @@ squash_datablock_decompress(
 
 int
 squash_datablock_clean(struct SquashDatablockContext *datablock) {
-	return squash_compression_cleanup(&datablock->compression);
+	return squash_buffer_cleanup(&datablock->buffer);
 }

@@ -16,28 +16,17 @@
 #include "../error.h"
 #include "compression.h"
 
-#define BLOCK_SIZE 8192
-
 static int
 squash_lzo_extract(const union SquashCompressionOptions *options,
-		uint8_t **target, size_t *target_size, const uint8_t *compressed,
+		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
-	int rv = 0;
-	size_t write_chunk_size = BLOCK_SIZE;
-	*target = realloc(*target, *target_size + write_chunk_size);
-	if (*target == NULL) {
-		return -SQUASH_ERROR_COMPRESSION_DECOMPRESS;
-	}
-
-	rv = lzo1x_decompress_safe(compressed, compressed_size,
-			&(*target)[*target_size], &write_chunk_size, NULL);
-
-	*target_size += write_chunk_size;
+	int rv = lzo1x_decompress_safe(
+			compressed, compressed_size, target, target_size, NULL);
 
 	if (rv != LZO_E_OK) {
 		return -SQUASH_ERROR_COMPRESSION_DECOMPRESS;
 	}
-	return rv;
+	return 0;
 }
 
 int
@@ -47,5 +36,4 @@ squash_lzo_cleanup(union SquashCompressionOptions *options) {
 
 const struct SquashCompressionImplementation squash_compression_lzo = {
 		.extract = squash_lzo_extract,
-		.default_options = NULL,
 };
