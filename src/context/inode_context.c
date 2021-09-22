@@ -14,69 +14,6 @@
 #include "metablock_context.h"
 #include <stdint.h>
 
-static int
-metablock_bounds_check(const struct SquashSuperblock *superblock,
-		const struct SquashMetablock *block) {
-	uint64_t upper_bounds;
-	uint64_t header_bounds;
-	uint64_t data_bounds;
-
-	if (ADD_OVERFLOW((uint64_t)superblock,
-				squash_data_superblock_bytes_used(superblock), &upper_bounds)) {
-		return -SQUASH_ERROR_INTEGER_OVERFLOW;
-	}
-
-	if (ADD_OVERFLOW(
-				(uint64_t)block, SQUASH_SIZEOF_METABLOCK, &header_bounds)) {
-		return -SQUASH_ERROR_INTEGER_OVERFLOW;
-	}
-
-	if (header_bounds > upper_bounds) {
-		return -SQUASH_ERROR_SIZE_MISSMATCH;
-	}
-
-	const uint8_t *data = squash_data_metablock_data(block);
-	const size_t data_size = squash_data_metablock_size(block);
-	if (ADD_OVERFLOW((uint64_t)data, data_size, &data_bounds)) {
-		return -SQUASH_ERROR_INTEGER_OVERFLOW;
-	}
-
-	if (data_bounds > upper_bounds) {
-		return -SQUASH_ERROR_SIZE_MISSMATCH;
-	}
-
-	return 0;
-}
-
-const struct SquashMetablock *
-squash_metablock_from_offset(
-		const struct SquashSuperblock *superblock, off_t offset) {
-	const uint8_t *tmp = (uint8_t *)superblock;
-	const struct SquashMetablock *block =
-			(const struct SquashMetablock *)&tmp[offset];
-	if (metablock_bounds_check(superblock, block) < 0) {
-		return NULL;
-	} else {
-		return block;
-	}
-}
-
-const struct SquashMetablock *
-squash_metablock_from_start_block(const struct SquashSuperblock *superblock,
-		const struct SquashMetablock *start_block, off_t offset) {
-	const uint8_t *tmp = (uint8_t *)start_block;
-	const struct SquashMetablock *block =
-			(const struct SquashMetablock *)&tmp[offset];
-
-	if (metablock_bounds_check(superblock, block) < 0) {
-		return NULL;
-	} else {
-		return block;
-	}
-}
-
-/////////////////////
-
 static struct SquashInodeDirectoryIndex *
 directory_index_by_offset(
 		struct SquashInodeDirectoryIndexIterator *iterator, off_t offset) {
@@ -86,12 +23,12 @@ directory_index_by_offset(
 
 static int
 inode_data_more(struct SquashInodeContext *inode, size_t size) {
-	int rv = squash_extract_more(&inode->extract, size);
+	int rv = squash_metablock_more(&inode->extract, size);
 
 	if (rv < 0) {
 		return rv;
 	}
-	inode->inode = (struct SquashInode *)squash_extract_data(&inode->extract);
+	inode->inode = (struct SquashInode *)squash_metablock_data(&inode->extract);
 	return rv;
 }
 
@@ -370,13 +307,12 @@ squash_inode_load(struct SquashInodeContext *inode,
 	int rv = 0;
 	inode->inode = NULL;
 
-	const struct SquashMetablock *metablock = squash_metablock_from_offset(
-			superblock, squash_data_superblock_inode_table_start(superblock));
-	if (metablock == NULL) {
-		return -SQUASH_ERROR_INODE_INIT;
+	rv = squash_metablock_init(&inode->extract, superblock,
+			squash_data_superblock_inode_table_start(superblock));
+	if (rv < 0) {
+		return rv;
 	}
-	rv = squash_extract_init(
-			&inode->extract, superblock, metablock, inode_block, inode_offset);
+	rv = squash_metablock_seek(&inode->extract, inode_block, inode_offset);
 	if (rv < 0) {
 		return rv;
 	}
@@ -400,7 +336,7 @@ squash_inode_load(struct SquashInodeContext *inode,
 int
 squash_inode_cleanup(struct SquashInodeContext *inode) {
 	int rv = 0;
-	rv = squash_extract_cleanup(&inode->extract);
+	rv = squash_metablock_cleanup(&inode->extract);
 	return rv;
 }
 
@@ -412,7 +348,7 @@ squash_inode_directory_iterator_init(
 
 	if (squash_data_inode_type(inode->inode) !=
 			SQUASH_INODE_TYPE_EXTENDED_DIRECTORY) {
-		return SQUASH_ERROR_TODO;
+		return -SQUASH_ERROR_TODO;
 	}
 
 	const struct SquashInodeDirectoryExt *xdir =

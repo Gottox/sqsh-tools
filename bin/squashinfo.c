@@ -14,6 +14,7 @@
 #include "../src/squash.h"
 
 #include <assert.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -45,17 +46,18 @@ metablock_info(const struct SquashMetablock *metablock, struct Squash *squash) {
 	}
 
 	int is_compressed = squash_data_metablock_is_compressed(metablock);
-	rv = squash_extract_init(&extract, squash->superblock, metablock, 0, 0);
+	rv = squash_metablock_init(&extract, squash->superblock,
+			(uint8_t *)metablock - (uint8_t *)squash->superblock);
 	if (rv < 0) {
 		return 0;
 	}
-	rv = squash_extract_more(&extract, squash_data_metablock_size(metablock));
+	rv = squash_metablock_more(&extract, squash_data_metablock_size(metablock));
 	if (rv < 0) {
-		squash_extract_cleanup(&extract);
+		squash_metablock_cleanup(&extract);
 		return 0;
 	}
-	size_t size = squash_extract_size(&extract);
-	squash_extract_cleanup(&extract);
+	size_t size = squash_metablock_size(&extract);
+	squash_metablock_cleanup(&extract);
 
 	size_t compressed_size = squash_data_metablock_size(metablock);
 	fprintf(out,
@@ -241,6 +243,29 @@ flag_info(struct Squash *squash) {
 	return 0;
 }
 
+static int
+section_info(struct Squash *squash) {
+	const struct SquashSuperblock *s = squash->superblock;
+	KEY("ID TABLE");
+	fprintf(out, "%" PRId64 "\n", squash_data_superblock_id_table_start(s));
+	KEY("XATTR TABLE");
+	fprintf(out, "%" PRId64 "\n",
+			squash_data_superblock_xattr_id_table_start(s));
+	KEY("INODE TABLE");
+	fprintf(out, "%" PRId64 "\n", squash_data_superblock_inode_table_start(s));
+	KEY("DIR. TABLE");
+	fprintf(out, "%" PRId64 "\n",
+			squash_data_superblock_directory_table_start(s));
+	KEY("FRAG TABLE");
+	fprintf(out, "%" PRId64 "\n",
+			squash_data_superblock_fragment_table_start(s));
+	KEY("FRAGMENT ENTRIES");
+	fprintf(out, "%u\n", squash_data_superblock_fragment_entry_count(s));
+	KEY("EXPORT TABLE");
+	fprintf(out, "%" PRId64 "\n", squash_data_superblock_export_table_start(s));
+	return 0;
+}
+
 int
 main(int argc, char *argv[]) {
 	int rv;
@@ -267,6 +292,7 @@ main(int argc, char *argv[]) {
 	}
 
 	flag_info(&squash);
+	section_info(&squash);
 	compression_info(&squash);
 
 	root_inode_info(&squash);

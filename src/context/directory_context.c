@@ -59,13 +59,14 @@ directory_iterator_index_lookup(struct SquashDirectoryIterator *iterator,
 
 static int
 directory_data_more(struct SquashDirectoryIterator *iterator, size_t size) {
-	int rv = squash_extract_more(&iterator->extract, size);
+	int rv = squash_metablock_more(&iterator->extract, size);
 	if (rv < 0) {
 		return rv;
 	}
 
-	iterator->fragments = (struct SquashDirectoryFragment *)squash_extract_data(
-			&iterator->extract);
+	iterator->fragments =
+			(struct SquashDirectoryFragment *)squash_metablock_data(
+					&iterator->extract);
 	return 0;
 }
 
@@ -101,7 +102,7 @@ squash_directory_init(struct SquashDirectoryContext *directory,
 				squash_data_inode_directory_ext_file_size(extended) - 3;
 		break;
 	default:
-		return -SQUASH_ERROR_DIRECTORY_WRONG_INODE_TYPE;
+		return -SQUASH_ERROR_NOT_A_DIRECTORY;
 	}
 
 	directory->inode = inode;
@@ -138,15 +139,14 @@ int
 squash_directory_iterator_init(struct SquashDirectoryIterator *iterator,
 		struct SquashDirectoryContext *directory) {
 	int rv = 0;
-	const struct SquashMetablock *metablock =
-			squash_metablock_from_offset(directory->superblock,
-					squash_data_superblock_directory_table_start(
-							directory->superblock));
-	if (metablock == NULL) {
-		return -SQUASH_ERROR_DIRECTORY_INIT;
+	rv = squash_metablock_init(&iterator->extract, directory->superblock,
+			squash_data_superblock_directory_table_start(
+					directory->superblock));
+	if (rv < 0) {
+		return rv;
 	}
-	rv = squash_extract_init(&iterator->extract, directory->superblock,
-			metablock, directory->block_start, directory->block_offset);
+	rv = squash_metablock_seek(&iterator->extract, directory->block_start,
+			directory->block_offset);
 	if (rv < 0) {
 		return rv;
 	}
@@ -221,7 +221,7 @@ squash_directory_iterator_next(struct SquashDirectoryIterator *iterator) {
 int
 squash_directory_iterator_cleanup(struct SquashDirectoryIterator *iterator) {
 	int rv = 0;
-	rv = squash_extract_cleanup(&iterator->extract);
+	rv = squash_metablock_cleanup(&iterator->extract);
 	return rv;
 }
 

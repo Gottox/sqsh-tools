@@ -67,8 +67,10 @@ squash_error_str(int error_code) {
 		return "Gzip header read";
 	case SQUASH_ERROR_GZIP_READ_AFTER_END:
 		return "Gzip read after end";
-	case SQUASH_ERROR_DIRECTORY_WRONG_INODE_TYPE:
-		return "Directory wrong inode type";
+	case SQUASH_ERROR_NOT_A_DIRECTORY:
+		return "Not a directory";
+	case SQUASH_ERROR_NOT_A_FILE:
+		return "Not a file";
 	case SQUASH_ERROR_MALLOC_FAILED:
 		return "Malloc Failed";
 	case SQUASH_ERROR_DIRECTORY_INIT:

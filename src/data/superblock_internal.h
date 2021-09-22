@@ -4,6 +4,7 @@
  * @created     : Friday Sep 10, 2021 09:25:32 CEST
  */
 
+#include "../utils.h"
 #include "superblock.h"
 
 #ifndef SUPERBLOCK_INTERNAL_H

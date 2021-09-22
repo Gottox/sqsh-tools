@@ -11,6 +11,7 @@
 #include "compression.h"
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #ifdef CONFIG_COMPRESSION_GZIP
 extern const struct SquashCompressionImplementation squash_compression_gzip;
@@ -79,11 +80,10 @@ squash_buffer_init(struct SquashBuffer *compression,
 
 	if (squash_data_superblock_flags(superblock) &
 			SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
-		const struct SquashMetablock *metablock = squash_metablock_from_offset(
-				superblock, sizeof(struct SquashSuperblock));
-		if (metablock == NULL) {
-			return -SQUASH_ERROR_TODO;
-		}
+		// TODO: manually calculating the offset does not honour bounds checks
+		const struct SquashMetablock *metablock =
+				(const struct SquashMetablock *)&((const uint8_t *)
+								superblock)[sizeof(struct SquashSuperblock)];
 		compression->options = (const union SquashCompressionOptions *)
 				squash_data_metablock_data(metablock);
 	} else {

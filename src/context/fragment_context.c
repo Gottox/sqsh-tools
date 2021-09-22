@@ -28,7 +28,7 @@ const uint32_t *
 squash_fragment_data(struct SquashFragmentContext *fragment, uint32_t index) {
 	int rv = 0;
 	size_t size = (index + 1) * SQUASH_SIZEOF_FRAGMENT;
-	rv = squash_extract_more(&fragment->extract, size);
+	rv = squash_metablock_more(&fragment->extract, size);
 	if (rv < 0) {
 		return NULL;
 	}
@@ -42,7 +42,7 @@ squash_fragment_count(struct SquashFragmentContext *fragment) {
 
 int
 squash_fragment_clean(struct SquashFragmentContext *fragment) {
-	squash_extract_cleanup(&fragment->extract);
+	squash_metablock_cleanup(&fragment->extract);
 
 	return 0;
 }

@@ -18,26 +18,23 @@
 struct SquashMetablockContext {
 	const struct SquashSuperblock *superblock;
 	struct SquashBuffer buffer;
-	const struct SquashMetablock *start_block;
+	off_t start_block;
 	off_t index;
 	off_t offset;
 };
 
-SQUASH_NO_UNUSED const struct SquashMetablock *squash_metablock_from_offset(
+// DEPRECATED:
+const struct SquashMetablock *squash_metablock_from_offset(
 		const struct SquashSuperblock *superblock, off_t offset);
-
-SQUASH_NO_UNUSED const struct SquashMetablock *
-squash_metablock_from_start_block(const struct SquashSuperblock *superblock,
-		const struct SquashMetablock *start_block, off_t offset);
-
-SQUASH_NO_UNUSED int squash_extract_init(struct SquashMetablockContext *extract,
-		const struct SquashSuperblock *superblock,
-		const struct SquashMetablock *block, off_t block_index,
-		off_t block_offset);
-SQUASH_NO_UNUSED int squash_extract_more(
-		struct SquashMetablockContext *extract, const size_t size);
-void *squash_extract_data(const struct SquashMetablockContext *extract);
-size_t squash_extract_size(const struct SquashMetablockContext *extract);
-int squash_extract_cleanup(struct SquashMetablockContext *extract);
+SQUASH_NO_UNUSED int squash_metablock_init(
+		struct SquashMetablockContext *extract,
+		const struct SquashSuperblock *superblock, off_t start_block);
+SQUASH_NO_UNUSED int squash_metablock_seek(
+		struct SquashMetablockContext *metablock, off_t index, off_t offset);
+SQUASH_NO_UNUSED int squash_metablock_more(
+		struct SquashMetablockContext *metablock, const size_t size);
+void *squash_metablock_data(const struct SquashMetablockContext *metablock);
+size_t squash_metablock_size(const struct SquashMetablockContext *metablock);
+int squash_metablock_cleanup(struct SquashMetablockContext *metablock);
 
 #endif /* end of include guard SQUASH_EXTRACT_H */
