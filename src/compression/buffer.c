@@ -68,7 +68,7 @@ compression_by_id(int id) {
 }
 
 int
-squash_buffer_init(struct SquashBuffer *compression,
+squash_buffer_init(struct SquashBuffer *buffer,
 		const struct SquashSuperblock *superblock, int block_size) {
 	int rv = 0;
 	const struct SquashCompressionImplementation *impl;
@@ -84,17 +84,17 @@ squash_buffer_init(struct SquashBuffer *compression,
 		const struct SquashMetablock *metablock =
 				(const struct SquashMetablock *)&((const uint8_t *)
 								superblock)[sizeof(struct SquashSuperblock)];
-		compression->options = (const union SquashCompressionOptions *)
+		buffer->options = (const union SquashCompressionOptions *)
 				squash_data_metablock_data(metablock);
 	} else {
-		compression->options = NULL;
+		buffer->options = NULL;
 	}
 
 	if (rv < 0) {
 		return rv;
 	}
-	compression->impl = impl;
-	compression->block_size = block_size;
+	buffer->impl = impl;
+	buffer->block_size = block_size;
 
 	return rv;
 }

@@ -23,18 +23,10 @@ squash_file_content_init(struct SquashFileContentContext *file_content,
 	}
 	file_content->superblock = superblock;
 	file_content->inode = inode;
-	file_content->datablock_start = (const uint8_t *)superblock;
-	if (squash_data_superblock_flags(superblock) &
-			SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
-		const struct SquashMetablock *metablock = squash_metablock_from_offset(
-				superblock, SQUASH_SIZEOF_SUPERBLOCK);
-		if (metablock == NULL) {
-			return -SQUASH_ERROR_TODO;
-		}
-		file_content->datablock_start +=
-				SQUASH_SIZEOF_METABLOCK + squash_data_metablock_size(metablock);
-	}
-	file_content->datablock_start += squash_inode_file_blocks_start(inode);
+	file_content->blocks =
+			(const uint8_t *)superblock + squash_inode_file_blocks_start(inode);
+	file_content->blocks_count = squash_inode_file_size(inode) /
+			squash_data_superblock_block_size(superblock);
 
 	rv = squash_buffer_init(&file_content->buffer, superblock, block_size);
 	if (rv < 0) {
@@ -109,7 +101,7 @@ squash_file_content_read(
 				datablock_is_compressed(context, compressed_offset);
 		uint64_t compressed_size = datablock_size(context, compressed_offset);
 		rv = squash_buffer_append(&context->buffer,
-				&context->datablock_start[compressed_offset], compressed_size,
+				&context->blocks[compressed_offset], compressed_size,
 				is_compressed);
 		compressed_offset += compressed_size;
 		context->datablock_index++;

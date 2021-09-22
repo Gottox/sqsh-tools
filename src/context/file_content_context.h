@@ -16,7 +16,9 @@ struct SquashFileContentContext {
 	struct SquashInodeContext *inode;
 	struct SquashBuffer buffer;
 	const struct SquashSuperblock *superblock;
-	const uint8_t *datablock_start;
+	const uint8_t *blocks;
+	uint32_t blocks_count;
+
 	const uint8_t *fragment_start;
 
 	uint32_t datablock_index;
