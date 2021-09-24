@@ -13,9 +13,9 @@
 #define DATABLOCK_CONTEXT_H
 
 struct SquashDatablockContext {
-	struct SquashInodeContext *inode;
 	struct SquashBuffer buffer;
 	const struct SquashSuperblock *superblock;
+	const struct SquashInodeContext *inode;
 	const uint8_t *blocks;
 	uint32_t blocks_count;
 
@@ -28,7 +28,7 @@ struct SquashDatablockContext {
 SQUASH_NO_UNUSED int squash_datablock_init(
 		struct SquashDatablockContext *file_content,
 		const struct SquashSuperblock *superblock,
-		struct SquashInodeContext *inode);
+		const struct SquashInodeContext *inode);
 
 void *squash_datablock_data(const struct SquashDatablockContext *context);
 

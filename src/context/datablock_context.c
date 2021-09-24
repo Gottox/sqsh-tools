@@ -13,9 +13,9 @@
 #include <stdint.h>
 
 int
-squash_datablock_init(struct SquashDatablockContext *file_content,
+squash_datablock_init(struct SquashDatablockContext *context,
 		const struct SquashSuperblock *superblock,
-		struct SquashInodeContext *inode) {
+		const struct SquashInodeContext *inode) {
 	size_t block_size = squash_data_superblock_block_size(superblock);
 	int rv = 0;
 
@@ -23,20 +23,20 @@ squash_datablock_init(struct SquashDatablockContext *file_content,
 		return -SQUASH_ERROR_NOT_A_FILE;
 	}
 	uint64_t file_size = squash_inode_file_size(inode);
-	file_content->superblock = superblock;
-	file_content->inode = inode;
-	file_content->blocks =
+	context->superblock = superblock;
+	context->inode = inode;
+	context->blocks =
 			(const uint8_t *)superblock + squash_inode_file_blocks_start(inode);
 	if (squash_inode_file_fragment_block_index(inode) ==
 			SQUASH_INODE_NO_FRAGMENT) {
-		file_content->blocks_count = squash_divide_ceil_u32(
+		context->blocks_count = squash_divide_ceil_u32(
 				file_size, squash_data_superblock_block_size(superblock));
 	} else {
-		file_content->blocks_count =
+		context->blocks_count =
 				file_size / squash_data_superblock_block_size(superblock);
 	}
 
-	rv = squash_buffer_init(&file_content->buffer, superblock, block_size);
+	rv = squash_buffer_init(&context->buffer, superblock, block_size);
 	if (rv < 0) {
 		return rv;
 	}
@@ -44,26 +44,26 @@ squash_datablock_init(struct SquashDatablockContext *file_content,
 }
 
 static uint32_t
-datablock_size(struct SquashDatablockContext *file_content, uint64_t index) {
-	struct SquashInodeContext *inode = file_content->inode;
+datablock_size(struct SquashDatablockContext *context, uint64_t index) {
+	const struct SquashInodeContext *inode = context->inode;
 
 	return squash_inode_file_block_size(inode, index) & ~(1 << 24);
 }
 
 static bool
 datablock_is_compressed(
-		struct SquashDatablockContext *file_content, uint64_t index) {
-	struct SquashInodeContext *inode = file_content->inode;
+		struct SquashDatablockContext *context, uint64_t index) {
+	const struct SquashInodeContext *inode = context->inode;
 
 	return 0 == (squash_inode_file_block_size(inode, index) & (1 << 24));
 }
 
 static const uint64_t
-datablock_offset(struct SquashDatablockContext *file_content, uint64_t index) {
+datablock_offset(struct SquashDatablockContext *context, uint64_t index) {
 	off_t offset = 0;
 
 	for (int i = 0; i < index; i++) {
-		offset += datablock_size(file_content, i);
+		offset += datablock_size(context, i);
 	}
 
 	return offset;
@@ -122,6 +122,6 @@ out:
 }
 
 int
-squash_datablock_clean(struct SquashDatablockContext *file_content) {
-	return squash_buffer_cleanup(&file_content->buffer);
+squash_datablock_clean(struct SquashDatablockContext *context) {
+	return squash_buffer_cleanup(&context->buffer);
 }
