@@ -49,28 +49,27 @@ SQUASH_NO_UNUSED int squash_inode_load(struct SquashInodeContext *inode,
 		const struct SquashSuperblock *superblock, uint64_t inode_ref);
 
 SQUASH_NO_UNUSED uint32_t squash_inode_hard_link_count(
-		struct SquashInodeContext *inode);
+		const struct SquashInodeContext *inode);
 
-uint64_t squash_inode_file_size(struct SquashInodeContext *inode);
-uint16_t squash_inode_permission(struct SquashInodeContext *inode);
-uint32_t squash_inode_modified_time(struct SquashInodeContext *inode);
-uint64_t squash_inode_file_blocks_start(struct SquashInodeContext *inode);
+uint64_t squash_inode_file_size(const struct SquashInodeContext *inode);
+uint16_t squash_inode_permission(const struct SquashInodeContext *inode);
+uint32_t squash_inode_modified_time(const struct SquashInodeContext *inode);
+uint64_t squash_inode_file_blocks_start(const struct SquashInodeContext *inode);
 // TODO: Find right datatype for index
 uint32_t squash_inode_file_block_size(
-		struct SquashInodeContext *inode, int index);
+		const struct SquashInodeContext *inode, int index);
 uint32_t squash_inode_file_fragment_block_index(
-		struct SquashInodeContext *inode);
+		const struct SquashInodeContext *inode);
 uint32_t squash_inode_file_fragment_block_offset(
-		struct SquashInodeContext *inode);
+		const struct SquashInodeContext *inode);
 
-enum SquashInodeContextType squash_inode_type(struct SquashInodeContext *inode);
+enum SquashInodeContextType squash_inode_type(
+		const struct SquashInodeContext *inode);
 
-uint32_t squash_inode_hard_link_count(struct SquashInodeContext *inode);
-
-const char *squash_inode_symlink(struct SquashInodeContext *inode);
+const char *squash_inode_symlink(const struct SquashInodeContext *inode);
 SQUASH_NO_UNUSED int squash_inode_symlink_dup(
-		struct SquashInodeContext *inode, char **namebuffer);
-uint32_t squash_inode_symlink_size(struct SquashInodeContext *inode);
+		const struct SquashInodeContext *inode, char **namebuffer);
+uint32_t squash_inode_symlink_size(const struct SquashInodeContext *inode);
 
 int squash_inode_cleanup(struct SquashInodeContext *inode);
 

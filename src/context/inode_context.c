@@ -78,7 +78,7 @@ inode_load(struct SquashInodeContext *inode) {
 }
 
 uint32_t
-squash_inode_hard_link_count(struct SquashInodeContext *inode) {
+squash_inode_hard_link_count(const struct SquashInodeContext *inode) {
 	struct SquashInode *wrap = inode->inode;
 	switch (squash_data_inode_type(wrap)) {
 	case SQUASH_INODE_TYPE_BASIC_DIRECTORY:
@@ -120,7 +120,7 @@ squash_inode_hard_link_count(struct SquashInodeContext *inode) {
 }
 
 uint64_t
-squash_inode_file_size(struct SquashInodeContext *inode) {
+squash_inode_file_size(const struct SquashInodeContext *inode) {
 	const struct SquashInodeFile *basic_file;
 	const struct SquashInodeFileExt *extended_file;
 	const struct SquashInodeDirectory *basic_dir;
@@ -144,17 +144,17 @@ squash_inode_file_size(struct SquashInodeContext *inode) {
 }
 
 uint16_t
-squash_inode_permission(struct SquashInodeContext *inode) {
+squash_inode_permission(const struct SquashInodeContext *inode) {
 	return squash_data_inode_permissions(inode->inode);
 }
 
 uint32_t
-squash_inode_modified_time(struct SquashInodeContext *inode) {
+squash_inode_modified_time(const struct SquashInodeContext *inode) {
 	return squash_data_inode_modified_time(inode->inode);
 }
 
 uint64_t
-squash_inode_file_blocks_start(struct SquashInodeContext *inode) {
+squash_inode_file_blocks_start(const struct SquashInodeContext *inode) {
 	const struct SquashInodeFile *basic_file;
 	const struct SquashInodeFileExt *extended_file;
 
@@ -172,7 +172,8 @@ squash_inode_file_blocks_start(struct SquashInodeContext *inode) {
 }
 
 uint32_t
-squash_inode_file_block_size(struct SquashInodeContext *inode, int index) {
+squash_inode_file_block_size(
+		const struct SquashInodeContext *inode, int index) {
 	const struct SquashInodeFile *basic_file;
 	const struct SquashInodeFileExt *extended_file;
 
@@ -190,7 +191,7 @@ squash_inode_file_block_size(struct SquashInodeContext *inode, int index) {
 }
 
 uint32_t
-squash_inode_file_fragment_block_index(struct SquashInodeContext *inode) {
+squash_inode_file_fragment_block_index(const struct SquashInodeContext *inode) {
 	const struct SquashInodeFile *basic_file;
 	const struct SquashInodeFileExt *extended_file;
 
@@ -206,7 +207,8 @@ squash_inode_file_fragment_block_index(struct SquashInodeContext *inode) {
 }
 
 uint32_t
-squash_inode_file_fragment_block_offset(struct SquashInodeContext *inode) {
+squash_inode_file_fragment_block_offset(
+		const struct SquashInodeContext *inode) {
 	const struct SquashInodeFile *basic_file;
 	const struct SquashInodeFileExt *extended_file;
 
@@ -222,7 +224,7 @@ squash_inode_file_fragment_block_offset(struct SquashInodeContext *inode) {
 }
 
 enum SquashInodeContextType
-squash_inode_type(struct SquashInodeContext *inode) {
+squash_inode_type(const struct SquashInodeContext *inode) {
 	switch (squash_data_inode_type(inode->inode)) {
 	case SQUASH_INODE_TYPE_BASIC_DIRECTORY:
 	case SQUASH_INODE_TYPE_EXTENDED_DIRECTORY:
@@ -250,7 +252,7 @@ squash_inode_type(struct SquashInodeContext *inode) {
 }
 
 const char *
-squash_inode_symlink(struct SquashInodeContext *inode) {
+squash_inode_symlink(const struct SquashInodeContext *inode) {
 	const struct SquashInodeSymlink *basic;
 	const struct SquashInodeSymlinkExt *extended;
 
@@ -267,7 +269,8 @@ squash_inode_symlink(struct SquashInodeContext *inode) {
 }
 
 int
-squash_inode_symlink_dup(struct SquashInodeContext *inode, char **namebuffer) {
+squash_inode_symlink_dup(
+		const struct SquashInodeContext *inode, char **namebuffer) {
 	int size = squash_inode_symlink_size(inode);
 	const char *link_target = squash_inode_symlink(inode);
 
@@ -275,7 +278,7 @@ squash_inode_symlink_dup(struct SquashInodeContext *inode, char **namebuffer) {
 }
 
 uint32_t
-squash_inode_symlink_size(struct SquashInodeContext *inode) {
+squash_inode_symlink_size(const struct SquashInodeContext *inode) {
 	const struct SquashInodeSymlink *basic;
 	const struct SquashInodeSymlinkExt *extended;
 
