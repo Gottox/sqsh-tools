@@ -1,10 +1,10 @@
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : file_content_context
+ * @file        : datablock_context
  * @created     : Tuesday Sep 14, 2021 22:56:07 CEST
  */
 
-#include "file_content_context.h"
+#include "datablock_context.h"
 #include "../data/fragment.h"
 #include "../data/superblock.h"
 #include "../error.h"
@@ -13,7 +13,7 @@
 #include <stdint.h>
 
 int
-squash_file_content_init(struct SquashFileContentContext *file_content,
+squash_datablock_init(struct SquashDatablockContext *file_content,
 		const struct SquashSuperblock *superblock,
 		struct SquashInodeContext *inode) {
 	size_t block_size = squash_data_superblock_block_size(superblock);
@@ -44,7 +44,7 @@ squash_file_content_init(struct SquashFileContentContext *file_content,
 }
 
 static uint32_t
-datablock_size(struct SquashFileContentContext *file_content, uint64_t index) {
+datablock_size(struct SquashDatablockContext *file_content, uint64_t index) {
 	struct SquashInodeContext *inode = file_content->inode;
 
 	return squash_inode_file_block_size(inode, index) & ~(1 << 24);
@@ -52,15 +52,14 @@ datablock_size(struct SquashFileContentContext *file_content, uint64_t index) {
 
 static bool
 datablock_is_compressed(
-		struct SquashFileContentContext *file_content, uint64_t index) {
+		struct SquashDatablockContext *file_content, uint64_t index) {
 	struct SquashInodeContext *inode = file_content->inode;
 
 	return 0 == (squash_inode_file_block_size(inode, index) & (1 << 24));
 }
 
 static const uint64_t
-datablock_offset(
-		struct SquashFileContentContext *file_content, uint64_t index) {
+datablock_offset(struct SquashDatablockContext *file_content, uint64_t index) {
 	off_t offset = 0;
 
 	for (int i = 0; i < index; i++) {
@@ -71,8 +70,8 @@ datablock_offset(
 }
 
 int
-squash_file_content_seek(
-		struct SquashFileContentContext *context, uint64_t seek_pos) {
+squash_datablock_seek(
+		struct SquashDatablockContext *context, uint64_t seek_pos) {
 	size_t block_size = squash_data_superblock_block_size(context->superblock);
 
 	context->datablock_index = seek_pos / block_size;
@@ -82,12 +81,12 @@ squash_file_content_seek(
 }
 
 void *
-squash_file_content_data(const struct SquashFileContentContext *context) {
+squash_datablock_data(const struct SquashDatablockContext *context) {
 	return &context->buffer.data[context->datablock_offset];
 }
 
 size_t
-squash_file_content_size(const struct SquashFileContentContext *context) {
+squash_datablock_size(const struct SquashDatablockContext *context) {
 	const size_t buffer_size = squash_buffer_size(&context->buffer);
 	if (context->datablock_offset > buffer_size) {
 		return 0;
@@ -97,14 +96,13 @@ squash_file_content_size(const struct SquashFileContentContext *context) {
 }
 
 int
-squash_file_content_read(
-		struct SquashFileContentContext *context, uint64_t size) {
+squash_datablock_read(struct SquashDatablockContext *context, uint64_t size) {
 	int rv = 0;
 
 	uint64_t compressed_offset =
 			datablock_offset(context, context->datablock_index);
 
-	while (squash_file_content_size(context) < size &&
+	while (squash_datablock_size(context) < size &&
 			context->datablock_index < context->blocks_count) {
 		bool is_compressed =
 				datablock_is_compressed(context, compressed_offset);
@@ -124,6 +122,6 @@ out:
 }
 
 int
-squash_file_content_clean(struct SquashFileContentContext *file_content) {
+squash_datablock_clean(struct SquashDatablockContext *file_content) {
 	return squash_buffer_cleanup(&file_content->buffer);
 }

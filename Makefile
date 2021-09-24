@@ -7,7 +7,7 @@ include config.mk
 HDR = \
 	src/compression/buffer.h \
 	src/compression/compression.h \
-	src/context/file_content_context.h \
+	src/context/datablock_context.h \
 	src/context/directory_context.h \
 	src/context/fragment_context.h \
 	src/context/inode_context.h \
@@ -33,7 +33,7 @@ HDR = \
 SRC = \
 	src/compression/buffer.c \
 	src/compression/null.c \
-	src/context/file_content_context.c \
+	src/context/datablock_context.c \
 	src/context/directory_context.c \
 	src/context/fragment_context.c \
 	src/context/inode_context.c \
