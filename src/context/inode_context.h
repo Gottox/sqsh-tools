@@ -58,10 +58,9 @@ uint64_t squash_inode_file_blocks_start(struct SquashInodeContext *inode);
 // TODO: Find right datatype for index
 uint32_t squash_inode_file_block_size(
 		struct SquashInodeContext *inode, int index);
-// TODO: Find right datatype for return value
-int squash_inode_file_block_size_len(struct SquashInodeContext *inode);
 uint32_t squash_inode_file_fragment_block_index(
 		struct SquashInodeContext *inode);
+uint32_t squash_inode_file_fragment_block_offset(struct SquashInodeContext *inode);
 
 enum SquashInodeContextType squash_inode_type(struct SquashInodeContext *inode);
 
@@ -71,6 +70,7 @@ const char *squash_inode_symlink(struct SquashInodeContext *inode);
 SQUASH_NO_UNUSED int squash_inode_symlink_dup(
 		struct SquashInodeContext *inode, char **namebuffer);
 uint32_t squash_inode_symlink_size(struct SquashInodeContext *inode);
+
 
 int squash_inode_cleanup(struct SquashInodeContext *inode);
 

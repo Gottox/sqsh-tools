@@ -189,19 +189,6 @@ squash_inode_file_block_size(struct SquashInodeContext *inode, int index) {
 	return 0;
 }
 
-int
-squash_inode_file_block_size_len(struct SquashInodeContext *inode) {
-	uint32_t block_size = inode->datablock_block_size;
-	uint32_t file_size = squash_inode_file_size(inode);
-
-	if (squash_inode_file_fragment_block_index(inode) ==
-			SQUASH_INODE_NO_FRAGMENT) {
-		return squash_divide_ceil_u32(file_size, block_size);
-	} else {
-		return file_size / block_size;
-	}
-}
-
 uint32_t
 squash_inode_file_fragment_block_index(struct SquashInodeContext *inode) {
 	const struct SquashInodeFile *basic_file;
@@ -215,9 +202,23 @@ squash_inode_file_fragment_block_index(struct SquashInodeContext *inode) {
 		extended_file = squash_data_inode_file_ext(inode->inode);
 		return squash_data_inode_file_ext_fragment_block_index(extended_file);
 	}
-	// Should never happen
-	abort();
-	return 0;
+	return SQUASH_INODE_NO_FRAGMENT;
+}
+
+uint32_t
+squash_inode_file_fragment_block_offset(struct SquashInodeContext *inode) {
+	const struct SquashInodeFile *basic_file;
+	const struct SquashInodeFileExt *extended_file;
+
+	switch (squash_data_inode_type(inode->inode)) {
+	case SQUASH_INODE_TYPE_BASIC_FILE:
+		basic_file = squash_data_inode_file(inode->inode);
+		return squash_data_inode_file_block_offset(basic_file);
+	case SQUASH_INODE_TYPE_EXTENDED_FILE:
+		extended_file = squash_data_inode_file_ext(inode->inode);
+		return squash_data_inode_file_ext_block_offset(extended_file);
+	}
+	return SQUASH_INODE_NO_FRAGMENT;
 }
 
 enum SquashInodeContextType
