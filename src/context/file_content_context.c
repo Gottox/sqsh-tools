@@ -5,9 +5,10 @@
  */
 
 #include "file_content_context.h"
-#include "../data/metablock.h"
+#include "../data/fragment.h"
 #include "../data/superblock.h"
 #include "../error.h"
+#include "metablock_context.h"
 
 #include <stdint.h>
 
@@ -21,12 +22,19 @@ squash_file_content_init(struct SquashFileContentContext *file_content,
 	if (squash_inode_type(inode) != SQUASH_INODE_TYPE_FILE) {
 		return -SQUASH_ERROR_NOT_A_FILE;
 	}
+	uint64_t file_size = squash_inode_file_size(inode);
 	file_content->superblock = superblock;
 	file_content->inode = inode;
 	file_content->blocks =
 			(const uint8_t *)superblock + squash_inode_file_blocks_start(inode);
-	file_content->blocks_count = squash_inode_file_size(inode) /
-			squash_data_superblock_block_size(superblock);
+	if (squash_inode_file_fragment_block_index(inode) ==
+			SQUASH_INODE_NO_FRAGMENT) {
+		file_content->blocks_count = squash_divide_ceil_u32(
+				file_size, squash_data_superblock_block_size(superblock));
+	} else {
+		file_content->blocks_count =
+				file_size / squash_data_superblock_block_size(superblock);
+	}
 
 	rv = squash_buffer_init(&file_content->buffer, superblock, block_size);
 	if (rv < 0) {
@@ -96,17 +104,22 @@ squash_file_content_read(
 	uint64_t compressed_offset =
 			datablock_offset(context, context->datablock_index);
 
-	while (rv == 0 && squash_file_content_size(context) < size) {
+	while (squash_file_content_size(context) < size &&
+			context->datablock_index < context->blocks_count) {
 		bool is_compressed =
 				datablock_is_compressed(context, compressed_offset);
 		uint64_t compressed_size = datablock_size(context, compressed_offset);
 		rv = squash_buffer_append(&context->buffer,
 				&context->blocks[compressed_offset], compressed_size,
 				is_compressed);
+		if (rv < 0) {
+			goto out;
+		}
 		compressed_offset += compressed_size;
 		context->datablock_index++;
 	}
 
+out:
 	return rv;
 }
 
