@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#include "inode_context.h"
+#include "../compression/buffer.h"
 
 #ifndef DATABLOCK_CONTEXT_H
 

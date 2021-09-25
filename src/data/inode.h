@@ -4,6 +4,7 @@
  * @created     : Wednesday Sep 08, 2021 12:59:19 CEST
  */
 
+#include "datablock.h"
 #include <stdint.h>
 
 #ifndef SQUASHFS_FORMAT_INODE_H
@@ -128,7 +129,7 @@ uint32_t squash_data_inode_file_fragment_block_index(
 uint32_t squash_data_inode_file_block_offset(
 		const struct SquashInodeFile *file);
 uint32_t squash_data_inode_file_size(const struct SquashInodeFile *file);
-const uint32_t *squash_data_inode_file_block_sizes(
+const struct SquashDatablockSize *squash_data_inode_file_block_sizes(
 		const struct SquashInodeFile *file);
 
 uint64_t squash_data_inode_file_ext_blocks_start(
@@ -145,7 +146,7 @@ uint32_t squash_data_inode_file_ext_block_offset(
 		const struct SquashInodeFileExt *file_ext);
 uint32_t squash_data_inode_file_ext_xattr_idx(
 		const struct SquashInodeFileExt *file_ext);
-const uint32_t *squash_data_inode_file_ext_block_sizes(
+const struct SquashDatablockSize *squash_data_inode_file_ext_block_sizes(
 		const struct SquashInodeFileExt *file_ext);
 
 uint32_t squash_data_inode_symlink_hard_link_count(

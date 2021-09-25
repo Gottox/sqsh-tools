@@ -5,8 +5,6 @@
  */
 
 #include "../compression/buffer.h"
-#include "../data/metablock.h"
-#include "../utils.h"
 
 #include <stdint.h>
 #include <stdlib.h>

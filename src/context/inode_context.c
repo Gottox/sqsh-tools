@@ -5,6 +5,7 @@
  */
 
 #include "inode_context.h"
+#include "../data/datablock_internal.h"
 #include "../data/inode.h"
 
 #include "../data/superblock.h"
@@ -171,23 +172,37 @@ squash_inode_file_blocks_start(const struct SquashInodeContext *inode) {
 	return 0;
 }
 
-uint32_t
-squash_inode_file_block_size(
-		const struct SquashInodeContext *inode, int index) {
+static const struct SquashDatablockSize *
+get_size_info(const struct SquashInodeContext *inode, int index) {
 	const struct SquashInodeFile *basic_file;
 	const struct SquashInodeFileExt *extended_file;
 
 	switch (squash_data_inode_type(inode->inode)) {
 	case SQUASH_INODE_TYPE_BASIC_FILE:
 		basic_file = squash_data_inode_file(inode->inode);
-		return squash_data_inode_file_block_sizes(basic_file)[index];
+		return &squash_data_inode_file_block_sizes(basic_file)[index];
 	case SQUASH_INODE_TYPE_EXTENDED_FILE:
 		extended_file = squash_data_inode_file_ext(inode->inode);
-		return squash_data_inode_file_ext_block_sizes(extended_file)[index];
+		return &squash_data_inode_file_ext_block_sizes(extended_file)[index];
 	}
 	// Should never happen
 	abort();
-	return 0;
+}
+
+uint32_t
+squash_inode_file_block_size(
+		const struct SquashInodeContext *inode, int index) {
+	const struct SquashDatablockSize *size_info = get_size_info(inode, index);
+
+	return squash_data_datablock_size(size_info);
+}
+
+bool
+squash_inode_file_block_is_compressed(
+		const struct SquashInodeContext *inode, int index) {
+	const struct SquashDatablockSize *size_info = get_size_info(inode, index);
+
+	return squash_data_datablock_is_compressed(size_info);
 }
 
 uint32_t

@@ -50,10 +50,11 @@ uint32_t
 squash_data_inode_file_size(const struct SquashInodeFile *file) {
 	return htole32(file->file_size);
 }
-const uint32_t *
+const struct SquashDatablockSize *
 squash_data_inode_file_block_sizes(const struct SquashInodeFile *file) {
 	const uint8_t *tmp = (const uint8_t *)file;
-	return (uint32_t *)&tmp[sizeof(struct SquashInodeFile)];
+	return (const struct SquashDatablockSize
+					*)&tmp[sizeof(struct SquashInodeFile)];
 }
 
 uint64_t
@@ -89,11 +90,12 @@ squash_data_inode_file_ext_xattr_idx(
 		const struct SquashInodeFileExt *file_ext) {
 	return htole32(file_ext->xattr_idx);
 }
-const uint32_t *
+const struct SquashDatablockSize *
 squash_data_inode_file_ext_block_sizes(
 		const struct SquashInodeFileExt *file_ext) {
 	const uint8_t *tmp = (const uint8_t *)file_ext;
-	return (uint32_t *)&tmp[sizeof(struct SquashInodeFile)];
+	return (const struct SquashDatablockSize
+					*)&tmp[sizeof(struct SquashInodeFile)];
 }
 
 const struct SquashInodeDirectory *

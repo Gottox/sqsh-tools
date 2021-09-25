@@ -8,6 +8,7 @@
 #include "../data/fragment.h"
 #include "../data/superblock.h"
 #include "../error.h"
+#include "inode_context.h"
 #include "metablock_context.h"
 
 #include <stdint.h>

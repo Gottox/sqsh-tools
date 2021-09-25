@@ -5,6 +5,7 @@
  */
 
 #include "../utils.h"
+#include "datablock_internal.h"
 #include "fragment.h"
 
 #ifndef FRAGMENT_INTERNAL_H
@@ -13,7 +14,7 @@
 
 struct SquashFragment {
 	uint64_t start;
-	uint32_t size;
+	struct SquashDatablockSize size;
 	uint32_t unused;
 };
 

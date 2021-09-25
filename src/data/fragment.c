@@ -12,7 +12,8 @@ uint64_t
 squash_data_fragment_start(const struct SquashFragment *fragment) {
 	return le64toh(fragment->start);
 }
-uint32_t
-squash_data_fragment_size(const struct SquashFragment *fragment) {
-	return le32toh(fragment->size);
+
+const struct SquashDatablockSize *
+squash_data_fragment_size_info(const struct SquashFragment *fragment) {
+	return &fragment->size;
 }

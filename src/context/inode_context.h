@@ -6,9 +6,7 @@
 
 #include "../utils.h"
 #include "metablock_context.h"
-
-#include <stdint.h>
-#include <stdlib.h>
+#include <sys/types.h>
 
 #ifndef SQUASH_INODE_CONTEXT_H
 

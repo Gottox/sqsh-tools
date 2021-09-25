@@ -7,6 +7,7 @@
 #include "resolve_path.h"
 #include "context/directory_context.h"
 #include "context/inode_context.h"
+#include "data/directory.h"
 #include "data/inode.h"
 #include "data/superblock.h"
 #include "error.h"
