@@ -4,14 +4,14 @@
  * @created     : Monday Sep 20, 2021 13:41:58 CEST
  */
 
-#include "../data/compression_options.h"
-
 #include <stddef.h>
 #include <stdint.h>
 
 #ifndef COMPRESSION_H
 
 #define COMPRESSION_H
+
+union SquashCompressionOptions;
 
 struct SquashCompressionImplementation {
 	int (*extract)(const union SquashCompressionOptions *options,

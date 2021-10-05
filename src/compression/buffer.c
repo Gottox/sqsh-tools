@@ -12,6 +12,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 #ifdef CONFIG_COMPRESSION_GZIP
 extern const struct SquashCompressionImplementation squash_compression_gzip;
@@ -136,6 +137,7 @@ squash_buffer_size(const struct SquashBuffer *buffer) {
 int
 squash_buffer_cleanup(struct SquashBuffer *buffer) {
 	free(buffer->data);
+	buffer->data = NULL;
 	buffer->size = 0;
 	return 0;
 }

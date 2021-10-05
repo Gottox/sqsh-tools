@@ -12,6 +12,7 @@
 #include "../error.h"
 #include "../squash.h"
 #include "../utils.h"
+#include "directory_context.h"
 #include "metablock_context.h"
 #include <stdint.h>
 
@@ -263,7 +264,7 @@ squash_inode_type(const struct SquashInodeContext *inode) {
 	case SQUASH_INODE_TYPE_EXTENDED_SOCKET:
 		return SQUASH_INODE_TYPE_SOCKET;
 	}
-	return -SQUASH_INODE_TYPE_UNKNOWN;
+	return SQUASH_INODE_TYPE_UNKNOWN;
 }
 
 const char *
@@ -354,9 +355,7 @@ squash_inode_load(struct SquashInodeContext *inode,
 
 int
 squash_inode_cleanup(struct SquashInodeContext *inode) {
-	int rv = 0;
-	rv = squash_metablock_cleanup(&inode->extract);
-	return rv;
+	return squash_metablock_cleanup(&inode->extract);
 }
 
 int

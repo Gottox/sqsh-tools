@@ -6,6 +6,7 @@
 
 #include "directory_context.h"
 #include "../data/directory.h"
+#include "inode_context.h"
 
 #include <stdint.h>
 #include <string.h>
@@ -57,6 +58,14 @@ directory_iterator_index_lookup(struct SquashDirectoryIterator *iterator,
 	return rv;
 }
 
+static const struct SquashDirectoryFragment *
+directory_iterator_current_fragment(
+		const struct SquashDirectoryIterator *iterator) {
+	const uint8_t *tmp = (const uint8_t *)iterator->fragments;
+	return (const struct SquashDirectoryFragment
+					*)&tmp[iterator->current_fragment_offset];
+}
+
 static int
 directory_data_more(struct SquashDirectoryIterator *iterator, size_t size) {
 	int rv = squash_metablock_more(&iterator->extract, size);
@@ -71,9 +80,9 @@ directory_data_more(struct SquashDirectoryIterator *iterator, size_t size) {
 }
 
 static struct SquashDirectoryEntry *
-entry_by_offset(struct SquashDirectoryIterator *iterator, off_t offset) {
+current_entry(const struct SquashDirectoryIterator *iterator) {
 	const uint8_t *tmp = (const uint8_t *)iterator->fragments;
-	return (struct SquashDirectoryEntry *)&tmp[offset];
+	return (struct SquashDirectoryEntry *)&tmp[iterator->current_offset];
 }
 
 int
@@ -111,28 +120,27 @@ squash_directory_init(struct SquashDirectoryContext *directory,
 	return rv;
 }
 
-const struct SquashDirectoryEntry *
+int
 squash_directory_iterator_lookup(struct SquashDirectoryIterator *iterator,
 		const char *name, const size_t name_len) {
 	int rv = 0;
-	const struct SquashDirectoryEntry *entry;
 
 	rv = directory_iterator_index_lookup(iterator, name, name_len);
 	if (rv < 0)
-		return NULL;
+		return rv;
 
-	while ((entry = squash_directory_iterator_next(iterator))) {
-		size_t entry_name_size = squash_directory_entry_name_size(entry);
-		const uint8_t *entry_name = squash_data_directory_entry_name(entry);
+	while (squash_directory_iterator_next(iterator) > 0) {
+		size_t entry_name_size = squash_directory_iterator_name_size(iterator);
+		const char *entry_name = squash_directory_iterator_name(iterator);
 		if (name_len != entry_name_size) {
 			continue;
 		}
 		if (strncmp(name, (char *)entry_name, entry_name_size) == 0) {
-			return entry;
+			return 0;
 		}
 	}
 
-	return NULL;
+	return -SQUASH_ERROR_NO_SUCH_FILE;
 }
 
 int
@@ -155,46 +163,85 @@ squash_directory_iterator_init(struct SquashDirectoryIterator *iterator,
 	iterator->current_fragment_offset = 0;
 	iterator->remaining_entries = 0;
 	iterator->next_offset = 0;
+	iterator->current_offset = 0;
 
 	return rv;
 }
 
 int
-squash_directory_entry_name_size(const struct SquashDirectoryEntry *entry) {
+squash_directory_iterator_name_size(
+		const struct SquashDirectoryIterator *iterator) {
+	const struct SquashDirectoryEntry *entry = current_entry(iterator);
 	return squash_data_directory_entry_name_size(entry) + 1;
 }
 
-const struct SquashDirectoryFragment *
-squash_directory_iterator_current_fragment(
+uint64_t
+squash_directory_iterator_inode_ref(
 		const struct SquashDirectoryIterator *iterator) {
-	const uint8_t *tmp = (const uint8_t *)iterator->fragments;
-	return (const struct SquashDirectoryFragment
-					*)&tmp[iterator->current_fragment_offset];
+	const struct SquashDirectoryFragment *fragment =
+			directory_iterator_current_fragment(iterator);
+	uint32_t block_index = squash_data_directory_fragment_start(fragment);
+	uint16_t block_offset =
+			squash_data_directory_entry_offset(current_entry(iterator));
+
+	return squash_inode_ref_from_block(block_index, block_offset);
 }
 
-const struct SquashDirectoryEntry *
+enum SquashInodeContextType
+squash_directory_iterator_inode_type(
+		const struct SquashDirectoryIterator *iterator) {
+	switch (squash_data_directory_entry_type(current_entry(iterator))) {
+	case SQUASH_INODE_TYPE_BASIC_DIRECTORY:
+		return SQUASH_INODE_TYPE_DIRECTORY;
+	case SQUASH_INODE_TYPE_BASIC_FILE:
+		return SQUASH_INODE_TYPE_FILE;
+	case SQUASH_INODE_TYPE_BASIC_SYMLINK:
+		return SQUASH_INODE_TYPE_SYMLINK;
+	case SQUASH_INODE_TYPE_BASIC_BLOCK:
+		return SQUASH_INODE_TYPE_BLOCK;
+	case SQUASH_INODE_TYPE_BASIC_CHAR:
+		return SQUASH_INODE_TYPE_CHAR;
+	case SQUASH_INODE_TYPE_BASIC_FIFO:
+		return SQUASH_INODE_TYPE_FIFO;
+	case SQUASH_INODE_TYPE_BASIC_SOCKET:
+		return SQUASH_INODE_TYPE_SOCKET;
+	}
+	return SQUASH_INODE_TYPE_UNKNOWN;
+}
+
+int
+squash_directory_iterator_inode_load(
+		const struct SquashDirectoryIterator *iterator,
+		struct SquashInodeContext *inode) {
+	uint64_t inode_ref = squash_directory_iterator_inode_ref(iterator);
+
+	return squash_inode_load(inode, iterator->directory->superblock, inode_ref);
+}
+
+int
 squash_directory_iterator_next(struct SquashDirectoryIterator *iterator) {
 	int rv = 0;
-	off_t current_offset = iterator->next_offset;
+	iterator->current_offset = iterator->next_offset;
 
 	if (iterator->next_offset >= iterator->directory->size) {
-		return NULL;
+		// TODO: Check if 0 is really okay here.
+		return 0;
 	} else if (iterator->remaining_entries == 0) {
 		// New fragment begins
 		iterator->next_offset += SQUASH_SIZEOF_DIRECTORY_FRAGMENT;
 
 		rv = directory_data_more(iterator, iterator->next_offset);
 		if (rv < 0) {
-			return NULL;
+			return rv;
 		}
-		iterator->current_fragment_offset = current_offset;
+		iterator->current_fragment_offset = iterator->current_offset;
 
 		const struct SquashDirectoryFragment *current_fragment =
-				squash_directory_iterator_current_fragment(iterator);
+				directory_iterator_current_fragment(iterator);
 		iterator->remaining_entries =
 				squash_data_directory_fragment_count(current_fragment) + 1;
 
-		current_offset = iterator->next_offset;
+		iterator->current_offset = iterator->next_offset;
 	}
 	iterator->remaining_entries--;
 
@@ -202,20 +249,19 @@ squash_directory_iterator_next(struct SquashDirectoryIterator *iterator) {
 	iterator->next_offset += SQUASH_SIZEOF_DIRECTORY_ENTRY;
 	rv = directory_data_more(iterator, iterator->next_offset);
 	if (rv < 0) {
-		return NULL;
+		return rv;
 	}
 
 	// Make sure next entry has its name populated
-	iterator->next_offset += squash_directory_entry_name_size(
-			entry_by_offset(iterator, current_offset));
+	iterator->next_offset += squash_directory_iterator_name_size(iterator);
 	// May invalidate pointers into directory entries. that's why the
-	// entry_by_offset() call isn't safed to a pointer and reused later.
+	// current_entry() call is repeated below.
 	rv = directory_data_more(iterator, iterator->next_offset);
 	if (rv < 0) {
-		return NULL;
+		return rv;
 	}
 
-	return entry_by_offset(iterator, current_offset);
+	return 1;
 }
 
 int
@@ -226,15 +272,16 @@ squash_directory_iterator_cleanup(struct SquashDirectoryIterator *iterator) {
 }
 
 const char *
-squash_directory_entry_name(const struct SquashDirectoryEntry *entry) {
+squash_directory_iterator_name(const struct SquashDirectoryIterator *iterator) {
+	const struct SquashDirectoryEntry *entry = current_entry(iterator);
 	return (char *)squash_data_directory_entry_name(entry);
 }
 
 int
-squash_directory_entry_name_dup(
-		const struct SquashDirectoryEntry *entry, char **name_buffer) {
-	int size = squash_directory_entry_name_size(entry);
-	const char *entry_name = squash_directory_entry_name(entry);
+squash_directory_iterator_name_dup(
+		const struct SquashDirectoryIterator *iterator, char **name_buffer) {
+	int size = squash_directory_iterator_name_size(iterator);
+	const char *entry_name = squash_directory_iterator_name(iterator);
 
 	return squash_memdup(name_buffer, entry_name, size);
 }

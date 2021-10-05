@@ -110,7 +110,6 @@ squashfuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 	struct SquashInodeContext inode = {0};
 	struct SquashDirectoryContext dir = {0};
 	struct SquashDirectoryIterator iter = {0};
-	const struct SquashDirectoryEntry *entry;
 	rv = squash_resolve_path(&inode, data.squash.superblock, path);
 	if (rv < 0) {
 		rv = -ENOENT;
@@ -130,9 +129,9 @@ squashfuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 	filler(buf, ".", NULL, 0, 0);
 	filler(buf, "..", NULL, 0, 0);
 
-	while ((entry = squash_directory_iterator_next(&iter))) {
+	while (squash_directory_iterator_next(&iter) > 0) {
 		char *name;
-		rv = squash_directory_entry_name_dup(entry, &name);
+		rv = squash_directory_iterator_name_dup(&iter, &name);
 		if (rv < 0) {
 			rv = -ENOMEM;
 			goto out;

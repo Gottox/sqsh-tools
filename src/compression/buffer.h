@@ -4,7 +4,6 @@
  * @created     : Sunday Sep 05, 2021 10:50:12 CEST
  */
 
-#include "../data/compression_options.h"
 #include "../utils.h"
 
 #include <stdbool.h>

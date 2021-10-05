@@ -17,6 +17,7 @@
 struct SquashSuperblock;
 struct SquashInode;
 struct SquashInodeTable;
+struct SquashDirectoryIterator;
 
 enum SquashInodeContextType {
 	SQUASH_INODE_TYPE_UNKNOWN = -1,

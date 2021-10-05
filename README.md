@@ -20,6 +20,7 @@ WIP Status:
 * [ ] xattr support
 * [ ] export
 * [ ] frontend api
+* [ ] better fragment support
 
 # Resource
 

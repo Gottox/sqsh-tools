@@ -104,16 +104,15 @@ static int
 dir_info(struct Squash *squash, struct SquashDirectoryContext *dir) {
 	int rv = 0;
 	struct SquashDirectoryIterator iter = {0};
-	const struct SquashDirectoryEntry *entry;
 	fputs("=== ROOT DIRECTORY ===\n", out);
 
 	rv = squash_directory_iterator_init(&iter, dir);
 	if (rv < 0) {
 		return 0;
 	}
-	while ((entry = squash_directory_iterator_next(&iter))) {
+	while (squash_directory_iterator_next(&iter) > 0) {
 		char *name = NULL;
-		rv = squash_directory_entry_name_dup(entry, &name);
+		rv = squash_directory_iterator_name_dup(&iter, &name);
 		if (rv < 0) {
 			break;
 		}
