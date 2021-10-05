@@ -4,7 +4,7 @@
  * @created     : Friday Sep 17, 2021 09:28:28 CEST
  */
 
-#include "metablock_context.h"
+#include "table_context.h"
 #include <stdint.h>
 
 #ifndef FRAGMENT_CONTEXT_H
@@ -15,7 +15,9 @@ struct SquashInodeContext;
 
 struct SquashFragmentContext {
 	const struct SquashSuperblock *superblock;
-	struct SquashMetablockContext table;
+	const struct SquashInodeContext *inode;
+	// TODO: This table should be part of struct Squash.
+	struct SquashTableContext table;
 	const struct SquashFragment *fragment;
 	struct SquashBuffer buffer;
 };

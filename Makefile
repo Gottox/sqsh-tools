@@ -12,6 +12,7 @@ HDR = \
 	src/context/fragment_context.h \
 	src/context/inode_context.h \
 	src/context/metablock_context.h \
+	src/context/table_context.h \
 	src/data/compression_options.h \
 	src/data/compression_options_internal.h \
 	src/data/datablock.h \
@@ -40,6 +41,7 @@ SRC = \
 	src/context/fragment_context.c \
 	src/context/inode_context.c \
 	src/context/metablock_context.c \
+	src/context/table_context.c \
 	src/data/compression_options.c \
 	src/data/datablock.c \
 	src/data/directory.c \

@@ -22,10 +22,7 @@
 #endif
 
 #define printb(value, out) \
-	{ \
-		const typeof(value) _v = value; \
-		__printb((typeof(_v) *)&_v, sizeof(_v), out); \
-	}
+	{ __printb((const void *)&value, sizeof(value), out); }
 
 #define MSB_MASK 1 << (CHAR_BIT - 1)
 

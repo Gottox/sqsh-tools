@@ -88,8 +88,6 @@ int
 squash_metablock_seek(struct SquashMetablockContext *metablock,
 		const off_t index, const off_t offset) {
 	int rv = 0;
-	const uint32_t block_size =
-			squash_data_superblock_block_size(metablock->superblock);
 
 	squash_buffer_cleanup(&metablock->buffer);
 
@@ -97,7 +95,7 @@ squash_metablock_seek(struct SquashMetablockContext *metablock,
 	metablock->offset = offset;
 	squash_buffer_cleanup(&metablock->buffer);
 	rv = squash_buffer_init(
-			&metablock->buffer, metablock->superblock, block_size);
+			&metablock->buffer, metablock->superblock, BLOCK_SIZE);
 
 	return rv;
 }
@@ -108,6 +106,10 @@ squash_metablock_more(
 	int rv = 0;
 	const struct SquashMetablock *start_block = squash_metablock_from_offset(
 			extract->superblock, extract->start_block);
+
+	if (start_block == NULL) {
+		return -SQUASH_ERROR_TODO;
+	}
 
 	for (; rv == 0 && size > squash_metablock_size(extract);) {
 		const struct SquashMetablock *block = squash_metablock_from_start_block(
@@ -129,7 +131,7 @@ squash_metablock_more(
 	return rv;
 }
 
-void *
+const uint8_t *
 squash_metablock_data(const struct SquashMetablockContext *extract) {
 	return &extract->buffer.data[extract->offset];
 }

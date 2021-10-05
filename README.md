@@ -16,7 +16,7 @@ WIP Status:
 * [x] fast filename lookup
 * [ ] uid/gid tables
 * [x] datablock resolution
-* [ ] fragment resolution
+* [x] fragment resolution
 * [ ] xattr support
 * [ ] export
 * [ ] frontend api

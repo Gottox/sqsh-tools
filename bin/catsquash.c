@@ -6,6 +6,7 @@
 
 #include "../src/context/datablock_context.h"
 #include "../src/context/directory_context.h"
+#include "../src/context/fragment_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/resolve_path.h"
 #include "../src/squash.h"
@@ -30,7 +31,8 @@ main(int argc, char *argv[]) {
 	const char *inner_path = "";
 	const char *outer_path;
 	struct SquashInodeContext inode = {0};
-	struct SquashDatablockContext file = {0};
+	struct SquashDatablockContext datablocks = {0};
+	struct SquashFragmentContext fragment = {0};
 	struct Squash squash = {0};
 
 	while ((opt = getopt(argc, argv, "h")) != -1) {
@@ -61,25 +63,38 @@ main(int argc, char *argv[]) {
 		goto out;
 	}
 
-	rv = squash_datablock_init(&file, squash.superblock, &inode);
+	rv = squash_datablock_init(&datablocks, squash.superblock, &inode);
 	if (rv < 0) {
 		squash_perror(rv, inner_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	rv = squash_datablock_read(&file, squash_inode_file_size(&inode));
+	rv = squash_datablock_read(&datablocks, squash_inode_file_size(&inode));
 	if (rv < 0) {
 		squash_perror(rv, inner_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	fwrite(squash_datablock_data(&file), sizeof(uint8_t),
-			squash_datablock_size(&file), stdout);
+	fwrite(squash_datablock_data(&datablocks), sizeof(uint8_t),
+			squash_datablock_size(&datablocks), stdout);
+
+	rv = squash_fragment_init(&fragment, squash.superblock, &inode);
+	if (rv < 0) {
+		// We didn't check for the existence of a fragment. If none is there
+		// just skip it.
+		if (rv == -SQUASH_ERROR_NO_FRAGMENT) {
+			rv = 0;
+		}
+		goto out;
+	}
+
+	fwrite(squash_fragment_data(&fragment), sizeof(uint8_t),
+			squash_fragment_size(&fragment), stdout);
 
 out:
-	squash_datablock_clean(&file);
+	squash_datablock_clean(&datablocks);
 	squash_inode_cleanup(&inode);
 
 	squash_cleanup(&squash);
