@@ -13,7 +13,6 @@
 #include "error.h"
 
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -55,8 +54,6 @@ find_inode_ref(uint64_t *target, uint64_t dir_ref,
 	struct SquashDirectoryContext dir = {0};
 	struct SquashDirectoryIterator iter = {0};
 	int rv = 0;
-	uint32_t block_index;
-	uint16_t block_offset;
 	rv = squash_inode_load(&inode, superblock, dir_ref);
 	if (rv < 0) {
 		goto out;
@@ -69,18 +66,12 @@ find_inode_ref(uint64_t *target, uint64_t dir_ref,
 	if (rv < 0) {
 		goto out;
 	}
-	const struct SquashDirectoryEntry *entry =
-			squash_directory_iterator_lookup(&iter, name, name_len);
-	if (entry == NULL) {
-		rv = -SQUASH_ERROR_NO_SUCH_FILE;
+	rv = squash_directory_iterator_lookup(&iter, name, name_len);
+	if (rv < 0) {
 		goto out;
 	}
 
-	const struct SquashDirectoryFragment *fragment =
-			squash_directory_iterator_current_fragment(&iter);
-	block_index = squash_data_directory_fragment_start(fragment);
-	block_offset = squash_data_directory_entry_offset(entry);
-	*target = squash_inode_ref_from_block(block_index, block_offset);
+	*target = squash_directory_iterator_inode_ref(&iter);
 
 out:
 	squash_directory_iterator_cleanup(&iter);
@@ -96,7 +87,7 @@ squash_resolve_path(struct SquashInodeContext *inode,
 	int rv = 0;
 	int segment_count = count_path_segments(path);
 	const char *segment = path;
-	uint64_t *inode_refs = calloc(MIN(1, segment_count), sizeof(uint64_t));
+	uint64_t *inode_refs = calloc(MAX(1, segment_count), sizeof(uint64_t));
 	if (inode_refs == NULL) {
 		rv = SQUASH_ERROR_MALLOC_FAILED;
 		goto out;
