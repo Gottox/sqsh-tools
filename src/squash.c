@@ -4,7 +4,6 @@
  * @created     : Friday Apr 30, 2021 11:09:40 CEST
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdint.h>
@@ -71,11 +70,11 @@ squash_open(struct Squash *squash, const char *path) {
 	return rv;
 err:
 	if (fd >= 0) {
-		assert(0 == close(fd));
+		close(fd);
 	}
 
 	if (file_map != MAP_FAILED) {
-		assert(0 == munmap(file_map, st.st_size));
+		munmap(file_map, st.st_size);
 	}
 	return rv;
 }
