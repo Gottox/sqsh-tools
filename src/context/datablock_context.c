@@ -106,8 +106,9 @@ squash_datablock_read(struct SquashDatablockContext *context, uint64_t size) {
 	while (squash_datablock_size(context) < size &&
 			context->datablock_index < context->blocks_count) {
 		bool is_compressed =
-				datablock_is_compressed(context, compressed_offset);
-		uint64_t compressed_size = datablock_size(context, compressed_offset);
+				datablock_is_compressed(context, context->datablock_index);
+		uint64_t compressed_size =
+				datablock_size(context, context->datablock_index);
 		rv = squash_buffer_append(&context->buffer,
 				&context->blocks[compressed_offset], compressed_size,
 				is_compressed);
