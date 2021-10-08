@@ -6,11 +6,6 @@
 
 #include "directory_context.h"
 #include "../data/directory.h"
-#include "inode_context.h"
-
-#include <stdint.h>
-#include <string.h>
-
 #include "../data/inode.h"
 #include "../data/metablock.h"
 #include "../data/superblock.h"
@@ -19,42 +14,34 @@
 #include "inode_context.h"
 #include "metablock_context.h"
 
+#include <string.h>
+
 static int
 directory_iterator_index_lookup(struct SquashDirectoryIterator *iterator,
 		const char *name, const size_t name_len) {
 	int rv = 0;
 	struct SquashInodeDirectoryIndexIterator index_iterator;
-	const struct SquashInodeDirectoryIndex *index;
-	const struct SquashInodeDirectoryIndex *candidate = NULL;
 	struct SquashInodeContext *inode = iterator->directory->inode;
-	if (squash_data_inode_type(inode->inode) !=
-			SQUASH_INODE_TYPE_EXTENDED_DIRECTORY) {
-		return 0;
-	}
 
 	rv = squash_inode_directory_iterator_init(&index_iterator, inode);
 	if (rv < 0) {
 		return 0;
 	}
-	while ((index = squash_inode_directory_index_iterator_next(
-					&index_iterator))) {
-		const uint8_t *index_name =
-				squash_data_inode_directory_index_name(index);
+	while (squash_inode_directory_index_iterator_next(&index_iterator)) {
+		const char *index_name =
+				squash_inode_directory_index_iterator_name(&index_iterator);
 		uint32_t index_name_size =
-				squash_data_inode_directory_index_name_size(index) + 1;
+				squash_inode_directory_index_iterator_name_size(
+						&index_iterator);
 
 		if (strncmp(name, (char *)index_name, MIN(index_name_size, name_len)) >
 				0) {
 			break;
 		}
-		candidate = index;
-	}
-	if (candidate) {
-		iterator->remaining_entries = 0;
-		// TODO: do not decompress everything for the lookup.
 		iterator->next_offset =
-				squash_data_inode_directory_index_start(candidate);
+				squash_inode_directory_index_iterator_index(&index_iterator);
 	}
+	iterator->remaining_entries = 0;
 	return rv;
 }
 

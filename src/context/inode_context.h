@@ -6,6 +6,7 @@
 
 #include "../utils.h"
 #include "metablock_context.h"
+#include <stdint.h>
 #include <sys/types.h>
 
 #ifndef SQUASH_INODE_CONTEXT_H
@@ -41,7 +42,8 @@ struct SquashInodeDirectoryIndexIterator {
 	struct SquashInodeContext *inode;
 	const struct SquashInodeDirectoryIndex *indices;
 	size_t remaining_entries;
-	off_t offset;
+	off_t current_offset;
+	off_t next_offset;
 };
 
 SQUASH_NO_UNUSED int squash_inode_load(struct SquashInodeContext *inode,
@@ -75,9 +77,17 @@ int squash_inode_cleanup(struct SquashInodeContext *inode);
 SQUASH_NO_UNUSED int squash_inode_directory_iterator_init(
 		struct SquashInodeDirectoryIndexIterator *iterator,
 		struct SquashInodeContext *inode);
-SQUASH_NO_UNUSED const struct SquashInodeDirectoryIndex *
-squash_inode_directory_index_iterator_next(
+SQUASH_NO_UNUSED int squash_inode_directory_index_iterator_next(
 		struct SquashInodeDirectoryIndexIterator *iterator);
+uint32_t squash_inode_directory_index_iterator_index(
+		struct SquashInodeDirectoryIndexIterator *iterator);
+uint32_t squash_inode_directory_index_iterator_start(
+		struct SquashInodeDirectoryIndexIterator *iterator);
+uint32_t squash_inode_directory_index_iterator_name_size(
+		struct SquashInodeDirectoryIndexIterator *iterator);
+const char *squash_inode_directory_index_iterator_name(
+		struct SquashInodeDirectoryIndexIterator *iterator);
+
 SQUASH_NO_UNUSED int squash_inode_directory_index_iterator_clean(
 		struct SquashInodeDirectoryIndexIterator *iterator);
 

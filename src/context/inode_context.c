@@ -16,11 +16,11 @@
 #include "metablock_context.h"
 #include <stdint.h>
 
-static struct SquashInodeDirectoryIndex *
-directory_index_by_offset(
-		struct SquashInodeDirectoryIndexIterator *iterator, off_t offset) {
+static const struct SquashInodeDirectoryIndex *
+current_directory_index(struct SquashInodeDirectoryIndexIterator *iterator) {
 	const uint8_t *tmp = (const uint8_t *)iterator->inode->inode;
-	return (struct SquashInodeDirectoryIndex *)&tmp[offset];
+	return (const struct SquashInodeDirectoryIndex
+					*)&tmp[iterator->current_offset];
 }
 
 static int
@@ -373,37 +373,65 @@ squash_inode_directory_iterator_init(
 			squash_data_inode_directory_ext(inode->inode);
 
 	iterator->inode = inode;
-	iterator->offset = SQUASH_SIZEOF_INODE_DIRECTORY_EXT;
+	iterator->current_offset = 0;
+	iterator->next_offset = SQUASH_SIZEOF_INODE_DIRECTORY_EXT;
 	iterator->indices = squash_data_inode_directory_ext_index(xdir);
 	iterator->remaining_entries =
 			squash_data_inode_directory_ext_index_count(xdir);
 	return rv;
 }
 
-const struct SquashInodeDirectoryIndex *
+int
 squash_inode_directory_index_iterator_next(
 		struct SquashInodeDirectoryIndexIterator *iterator) {
 	int rv = 0;
-	off_t current_offset = iterator->offset;
 	// Make sure next entry is loaded:
-	iterator->offset += SQUASH_SIZEOF_INODE_DIRECTORY_INDEX;
-	rv = inode_data_more(iterator->inode, iterator->offset);
+	iterator->next_offset += SQUASH_SIZEOF_INODE_DIRECTORY_INDEX;
+	rv = inode_data_more(iterator->inode, iterator->next_offset);
 	if (rv < 0) {
-		return NULL;
+		return rv;
 	}
 
-	const struct SquashInodeDirectoryIndex *current =
-			directory_index_by_offset(iterator, current_offset);
 	// Make sure current index has its name populated
-	iterator->offset += squash_data_inode_directory_index_name_size(
-			directory_index_by_offset(iterator, current_offset));
-	rv = inode_data_more(iterator->inode, iterator->offset);
+	iterator->next_offset += squash_data_inode_directory_index_name_size(
+			current_directory_index(iterator));
+	rv = inode_data_more(iterator->inode, iterator->next_offset);
 	if (rv < 0) {
-		return NULL;
+		return rv;
 	}
 
-	return current;
+	return rv;
 }
+
+uint32_t
+squash_inode_directory_index_iterator_index(
+		struct SquashInodeDirectoryIndexIterator *iterator) {
+	const struct SquashInodeDirectoryIndex *current =
+			current_directory_index(iterator);
+	return squash_data_inode_directory_index_index(current);
+}
+uint32_t
+squash_inode_directory_index_iterator_start(
+		struct SquashInodeDirectoryIndexIterator *iterator) {
+	const struct SquashInodeDirectoryIndex *current =
+			current_directory_index(iterator);
+	return squash_data_inode_directory_index_start(current);
+}
+uint32_t
+squash_inode_directory_index_iterator_name_size(
+		struct SquashInodeDirectoryIndexIterator *iterator) {
+	const struct SquashInodeDirectoryIndex *current =
+			current_directory_index(iterator);
+	return squash_data_inode_directory_index_name_size(current) + 1;
+}
+const char *
+squash_inode_directory_index_iterator_name(
+		struct SquashInodeDirectoryIndexIterator *iterator) {
+	const struct SquashInodeDirectoryIndex *current =
+			current_directory_index(iterator);
+	return (const char *)squash_data_inode_directory_index_name(current);
+}
+
 int
 squash_inode_directory_index_iterator_clean(
 		struct SquashInodeDirectoryIndexIterator *iterator) {

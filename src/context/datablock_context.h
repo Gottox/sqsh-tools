@@ -34,6 +34,9 @@ void *squash_datablock_data(const struct SquashDatablockContext *context);
 
 size_t squash_datablock_size(const struct SquashDatablockContext *context);
 
+SQUASH_NO_UNUSED int squash_datablock_seek(
+		struct SquashDatablockContext *context, uint64_t seek_pos);
+
 SQUASH_NO_UNUSED int squash_datablock_read(
 		struct SquashDatablockContext *context, uint64_t size);
 

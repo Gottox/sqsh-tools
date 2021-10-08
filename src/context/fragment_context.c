@@ -11,19 +11,6 @@
 #include "inode_context.h"
 #include <stdint.h>
 
-static int
-uncompress_fragment(struct SquashFragmentContext *fragment) {
-	const struct SquashDatablockSize *size_info =
-			squash_data_fragment_size_info(fragment->fragment);
-	bool is_compressed = squash_data_datablock_is_compressed(size_info);
-	uint32_t size = squash_data_datablock_size(size_info);
-	uint64_t start = squash_data_fragment_start(fragment->fragment);
-	const uint8_t *tmp = (const uint8_t *)fragment->superblock;
-
-	return squash_buffer_append(
-			&fragment->buffer, &tmp[start], size, is_compressed);
-}
-
 int
 squash_fragment_init(struct SquashFragmentContext *fragment,
 		const struct SquashSuperblock *superblock,
@@ -47,6 +34,10 @@ squash_fragment_init(struct SquashFragmentContext *fragment,
 		goto out;
 	}
 	uint32_t index = squash_inode_file_fragment_block_index(inode);
+	if (index == SQUASH_INODE_NO_FRAGMENT) {
+		rv = -SQUASH_ERROR_NO_FRAGMENT;
+		goto out;
+	}
 	rv = squash_table_get(
 			&fragment->table, index, (const void **)&fragment->fragment);
 	if (rv < 0) {
@@ -59,16 +50,24 @@ squash_fragment_init(struct SquashFragmentContext *fragment,
 		goto out;
 	}
 
-	rv = uncompress_fragment(fragment);
-	if (rv < 0) {
-		goto out;
-	}
-
 out:
 	if (rv < 0) {
 		squash_fragment_clean(fragment);
 	}
 	return rv;
+}
+
+int
+squash_fragment_read(struct SquashFragmentContext *fragment) {
+	const struct SquashDatablockSize *size_info =
+			squash_data_fragment_size_info(fragment->fragment);
+	bool is_compressed = squash_data_datablock_is_compressed(size_info);
+	uint32_t size = squash_data_datablock_size(size_info);
+	uint64_t start = squash_data_fragment_start(fragment->fragment);
+	const uint8_t *tmp = (const uint8_t *)fragment->superblock;
+
+	return squash_buffer_append(
+			&fragment->buffer, &tmp[start], size, is_compressed);
 }
 
 uint32_t

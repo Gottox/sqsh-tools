@@ -83,6 +83,10 @@ squash_error_str(int error_code) {
 		return "No such file or directory";
 	case SQUASH_ERROR_METABLOCK_ZERO_SIZE:
 		return "Metablock with size zero";
+	case SQUASH_ERROR_SEEK_OUT_OF_RANGE:
+		return "Seek out of range";
+	case SQUASH_ERROR_SEEK_IN_FRAGMENT:
+		return "Seek in fragment";
 	case SQUASH_ERROR_NO_FRAGMENT:
 		return "No fragment";
 	case SQUASH_ERROR_TODO:

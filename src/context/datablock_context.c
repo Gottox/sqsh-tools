@@ -74,8 +74,19 @@ int
 squash_datablock_seek(
 		struct SquashDatablockContext *context, uint64_t seek_pos) {
 	size_t block_size = squash_data_superblock_block_size(context->superblock);
+	uint64_t file_size = squash_inode_file_size(context->inode);
 
-	context->datablock_index = seek_pos / block_size;
+	if (seek_pos > file_size) {
+		return -SQUASH_ERROR_SEEK_OUT_OF_RANGE;
+	}
+
+	uint32_t datablock_index = seek_pos / block_size;
+	if (datablock_index >= context->blocks_count) {
+		return -SQUASH_ERROR_SEEK_IN_FRAGMENT;
+	}
+
+	context->datablock_index = datablock_index;
+
 	context->datablock_offset = seek_pos % block_size;
 
 	return 0;
