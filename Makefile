@@ -33,6 +33,7 @@ HDR = \
 	src/resolve_path.h \
 	src/squash.h \
 	src/utils.h \
+	src/utils/lru_hashmap.h \
 
 SRC = \
 	src/compression/buffer.c \
@@ -55,6 +56,7 @@ SRC = \
 	src/resolve_path.c \
 	src/squash.c \
 	src/utils.c \
+	src/utils/lru_hashmap.c \
 
 LIBS = fuse3
 
@@ -67,6 +69,7 @@ BIN = \
 	bin/squashfs-fuse \
 
 TST = \
+	test/utils/lru_hashmap.c
 
 TST_BIN = $(TST:.c=-test)
 
