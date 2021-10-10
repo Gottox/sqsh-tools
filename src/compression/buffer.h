@@ -52,6 +52,9 @@ struct SquashBuffer {
 	size_t size;
 };
 
+SQUASH_NO_UNUSED int squash_buffer_new(struct SquashBuffer **context,
+		const struct SquashSuperblock *superblock, int block_size);
+
 SQUASH_NO_UNUSED int squash_buffer_init(struct SquashBuffer *compression,
 		const struct SquashSuperblock *superblock, int block_size);
 
@@ -62,5 +65,7 @@ const uint8_t *squash_buffer_data(const struct SquashBuffer *buffer);
 size_t squash_buffer_size(const struct SquashBuffer *buffer);
 
 int squash_buffer_cleanup(struct SquashBuffer *compression);
+
+int squash_buffer_free(struct SquashBuffer *compression);
 
 #endif /* end of include guard EXTRACTOR_H */

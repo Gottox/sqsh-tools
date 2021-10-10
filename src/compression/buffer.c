@@ -97,6 +97,23 @@ compression_by_id(int id) {
 }
 
 int
+squash_buffer_new(struct SquashBuffer **context,
+		const struct SquashSuperblock *superblock, int block_size) {
+	int rv = 0;
+
+	*context = calloc(1, sizeof(struct SquashBuffer));
+	if (*context == NULL) {
+		rv = -SQUASH_ERROR_MALLOC_FAILED;
+	} else {
+		rv = squash_buffer_init(*context, superblock, block_size);
+		if (rv < 0) {
+			free(*context);
+		}
+	}
+	return rv;
+}
+
+int
 squash_buffer_init(struct SquashBuffer *buffer,
 		const struct SquashSuperblock *superblock, int block_size) {
 	int rv = 0;
@@ -160,6 +177,16 @@ squash_buffer_data(const struct SquashBuffer *buffer) {
 size_t
 squash_buffer_size(const struct SquashBuffer *buffer) {
 	return buffer->size;
+}
+
+int
+squash_buffer_free(struct SquashBuffer *buffer) {
+	int rv;
+
+	rv = squash_buffer_cleanup(buffer);
+	free(buffer);
+
+	return rv;
 }
 
 int
