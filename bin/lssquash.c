@@ -60,7 +60,7 @@ ls(struct Squash *squash, const char *path, struct SquashInodeContext *inode,
 
 	rv = squash_directory_init(&dir, &squash->superblock, inode);
 	if (rv < 0) {
-		squash_perror(rv, path);
+		squash_perror(rv, path[0] == 0 ? "/" : path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
