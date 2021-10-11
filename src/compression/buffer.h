@@ -42,7 +42,7 @@
 
 #define EXTRACTOR_H
 
-struct SquashSuperblock;
+struct SquashSuperblockContext;
 
 struct SquashBuffer {
 	const union SquashCompressionOptions *options;
@@ -53,10 +53,10 @@ struct SquashBuffer {
 };
 
 SQUASH_NO_UNUSED int squash_buffer_new(struct SquashBuffer **context,
-		const struct SquashSuperblock *superblock, int block_size);
+		const struct SquashSuperblockContext *superblock, int block_size);
 
 SQUASH_NO_UNUSED int squash_buffer_init(struct SquashBuffer *compression,
-		const struct SquashSuperblock *superblock, int block_size);
+		const struct SquashSuperblockContext *superblock, int block_size);
 
 SQUASH_NO_UNUSED int squash_buffer_append(struct SquashBuffer *compression,
 		const uint8_t *source, const size_t source_size, bool is_compressed);

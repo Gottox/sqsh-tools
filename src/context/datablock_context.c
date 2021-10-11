@@ -38,14 +38,16 @@
 #include "../error.h"
 #include "inode_context.h"
 #include "metablock_context.h"
+#include "superblock_context.h"
 
 #include <stdint.h>
 
 int
 squash_datablock_init(struct SquashDatablockContext *context,
-		const struct SquashSuperblock *superblock,
+		const struct SquashSuperblockContext *superblock,
 		const struct SquashInodeContext *inode) {
-	size_t block_size = squash_data_superblock_block_size(superblock);
+	size_t block_size =
+			squash_data_superblock_block_size(superblock->superblock);
 	int rv = 0;
 
 	if (squash_inode_type(inode) != SQUASH_INODE_TYPE_FILE) {
@@ -58,11 +60,11 @@ squash_datablock_init(struct SquashDatablockContext *context,
 			(const uint8_t *)superblock + squash_inode_file_blocks_start(inode);
 	if (squash_inode_file_fragment_block_index(inode) ==
 			SQUASH_INODE_NO_FRAGMENT) {
-		context->blocks_count = squash_divide_ceil_u32(
-				file_size, squash_data_superblock_block_size(superblock));
+		context->blocks_count = squash_divide_ceil_u32(file_size,
+				squash_data_superblock_block_size(superblock->superblock));
 	} else {
-		context->blocks_count =
-				file_size / squash_data_superblock_block_size(superblock);
+		context->blocks_count = file_size /
+				squash_data_superblock_block_size(superblock->superblock);
 	}
 
 	rv = squash_buffer_init(&context->buffer, superblock, block_size);
@@ -101,7 +103,8 @@ datablock_offset(struct SquashDatablockContext *context, uint64_t index) {
 int
 squash_datablock_seek(
 		struct SquashDatablockContext *context, uint64_t seek_pos) {
-	size_t block_size = squash_data_superblock_block_size(context->superblock);
+	size_t block_size =
+			squash_data_superblock_block_size(context->superblock->superblock);
 	uint64_t file_size = squash_inode_file_size(context->inode);
 
 	if (seek_pos > file_size) {

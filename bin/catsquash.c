@@ -82,14 +82,14 @@ main(int argc, char *argv[]) {
 		goto out;
 	}
 
-	rv = squash_resolve_path(&inode, squash.superblock, inner_path);
+	rv = squash_resolve_path(&inode, &squash.superblock, inner_path);
 	if (rv < 0) {
 		squash_perror(rv, inner_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	rv = squash_file_init(&file, squash.superblock, &inode);
+	rv = squash_file_init(&file, &squash.superblock, &inode);
 	if (rv < 0) {
 		squash_perror(rv, inner_path);
 		rv = EXIT_FAILURE;

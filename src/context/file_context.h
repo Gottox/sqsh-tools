@@ -43,12 +43,12 @@
 struct SquashFileContext {
 	struct SquashDatablockContext datablock;
 	struct SquashFragmentContext fragment;
-	const struct SquashSuperblock *superblock;
+	const struct SquashSuperblockContext *superblock;
 	uint32_t fragment_pos;
 };
 
 SQUASH_NO_UNUSED int squash_file_init(struct SquashFileContext *context,
-		const struct SquashSuperblock *superblock,
+		const struct SquashSuperblockContext *superblock,
 		const struct SquashInodeContext *inode);
 
 SQUASH_NO_UNUSED int squash_file_seek(

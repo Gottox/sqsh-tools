@@ -38,7 +38,7 @@
 
 int
 squash_table_init(struct SquashTableContext *table,
-		const struct SquashSuperblock *superblock, off_t start_block,
+		const struct SquashSuperblockContext *superblock, off_t start_block,
 		size_t element_size, size_t element_count) {
 	int rv = 0;
 	size_t byte_size;

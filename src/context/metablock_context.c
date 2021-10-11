@@ -34,22 +34,24 @@
 
 #include "metablock_context.h"
 #include "../compression/buffer.h"
-#include "../data/metablock_internal.h"
+#include "../data/metablock.h"
 #include "../data/superblock.h"
 #include "../error.h"
+#include "superblock_context.h"
 #include <stdint.h>
 
 #define BLOCK_SIZE 8192
 
 static int
-metablock_bounds_check(const struct SquashSuperblock *superblock,
+metablock_bounds_check(const struct SquashSuperblockContext *superblock,
 		const struct SquashMetablock *block) {
 	uint64_t upper_bounds;
 	uint64_t header_bounds;
 	uint64_t data_bounds;
 
 	if (ADD_OVERFLOW((uint64_t)superblock,
-				squash_data_superblock_bytes_used(superblock), &upper_bounds)) {
+				squash_data_superblock_bytes_used(superblock->superblock),
+				&upper_bounds)) {
 		return -SQUASH_ERROR_INTEGER_OVERFLOW;
 	}
 
@@ -77,7 +79,7 @@ metablock_bounds_check(const struct SquashSuperblock *superblock,
 
 const struct SquashMetablock *
 squash_metablock_from_offset(
-		const struct SquashSuperblock *superblock, off_t offset) {
+		const struct SquashSuperblockContext *superblock, off_t offset) {
 	const uint8_t *tmp = (uint8_t *)superblock;
 	const struct SquashMetablock *block =
 			(const struct SquashMetablock *)&tmp[offset];
@@ -88,8 +90,9 @@ squash_metablock_from_offset(
 	}
 }
 
-const struct SquashMetablock *
-squash_metablock_from_start_block(const struct SquashSuperblock *superblock,
+static const struct SquashMetablock *
+squash_metablock_from_start_block(
+		const struct SquashSuperblockContext *superblock,
 		const struct SquashMetablock *start_block, off_t offset) {
 	const uint8_t *tmp = (uint8_t *)start_block;
 	const struct SquashMetablock *block =
@@ -104,7 +107,7 @@ squash_metablock_from_start_block(const struct SquashSuperblock *superblock,
 
 int
 squash_metablock_init(struct SquashMetablockContext *extract,
-		const struct SquashSuperblock *superblock, off_t start_block) {
+		const struct SquashSuperblockContext *superblock, off_t start_block) {
 	extract->start_block = start_block;
 	extract->index = 0;
 	extract->offset = 0;
@@ -154,7 +157,7 @@ squash_metablock_more(
 		bool is_compressed = squash_data_metablock_is_compressed(block);
 		rv = squash_buffer_append(
 				&extract->buffer, block_data, metablock_size, is_compressed);
-		extract->index += sizeof(struct SquashMetablock) + metablock_size;
+		extract->index += SQUASH_SIZEOF_METABLOCK + metablock_size;
 	}
 	return rv;
 }

@@ -32,6 +32,7 @@
  * @created     : Friday Apr 30, 2021 10:58:14 CEST
  */
 
+#include "context/superblock_context.h"
 #include "error.h"
 #include "utils.h"
 
@@ -50,7 +51,7 @@ enum SquashDtor {
 
 struct Squash {
 	uint32_t error;
-	const struct SquashSuperblock *superblock;
+	struct SquashSuperblockContext superblock;
 	int size;
 	uint8_t *buffer;
 	enum SquashDtor dtor;

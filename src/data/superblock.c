@@ -38,11 +38,6 @@
 
 #include <endian.h>
 
-static const union {
-	char c[4];
-	uint32_t d;
-} superblock_magic = {.c = "hsqs"};
-
 struct SquashSuperblock {
 	uint32_t magic;
 	uint32_t inode_count;
@@ -64,31 +59,6 @@ struct SquashSuperblock {
 	uint64_t fragment_table_start;
 	uint64_t export_table_start;
 };
-
-int
-squash_data_superblock_init(
-		const struct SquashSuperblock *superblock, size_t size) {
-	if (size < sizeof(struct SquashSuperblock)) {
-		return -SQUASH_ERROR_SUPERBLOCK_TOO_SMALL;
-	}
-
-	// Do not use the getter here as it may change the endianess. We don't want
-	// that here.
-	if (superblock->magic != superblock_magic.d) {
-		return -SQUASH_ERROR_WRONG_MAGIG;
-	}
-
-	if (squash_data_superblock_block_log(superblock) !=
-			squash_log2_u32(squash_data_superblock_block_size(superblock))) {
-		return -SQUASH_ERROR_BLOCKSIZE_MISSMATCH;
-	}
-
-	if (squash_data_superblock_bytes_used(superblock) > size) {
-		return -SQUASH_ERROR_SIZE_MISSMATCH;
-	}
-
-	return 0;
-}
 
 uint32_t
 squash_data_superblock_magic(const struct SquashSuperblock *superblock) {

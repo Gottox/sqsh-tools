@@ -42,7 +42,7 @@
 #define SQUASH_EXTRACT_H
 
 struct SquashMetablockContext {
-	const struct SquashSuperblock *superblock;
+	const struct SquashSuperblockContext *superblock;
 	struct SquashBuffer buffer;
 	off_t start_block;
 	off_t index;
@@ -51,10 +51,10 @@ struct SquashMetablockContext {
 
 // DEPRECATED:
 const struct SquashMetablock *squash_metablock_from_offset(
-		const struct SquashSuperblock *superblock, off_t offset);
+		const struct SquashSuperblockContext *superblock, off_t offset);
 SQUASH_NO_UNUSED int squash_metablock_init(
 		struct SquashMetablockContext *extract,
-		const struct SquashSuperblock *superblock, off_t start_block);
+		const struct SquashSuperblockContext *superblock, off_t start_block);
 SQUASH_NO_UNUSED int squash_metablock_seek(
 		struct SquashMetablockContext *metablock, off_t index, off_t offset);
 SQUASH_NO_UNUSED int squash_metablock_more(

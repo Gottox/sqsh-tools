@@ -339,14 +339,14 @@ squash_inode_symlink_size(const struct SquashInodeContext *inode) {
 
 int
 squash_inode_load_root(struct SquashInodeContext *inode,
-		const struct SquashSuperblock *superblock, uint64_t inode_ref) {
+		const struct SquashSuperblockContext *superblock, uint64_t inode_ref) {
 	return squash_inode_load(inode, superblock,
-			squash_data_superblock_root_inode_ref(superblock));
+			squash_data_superblock_root_inode_ref(superblock->superblock));
 }
 
 int
 squash_inode_load(struct SquashInodeContext *inode,
-		const struct SquashSuperblock *superblock, uint64_t inode_ref) {
+		const struct SquashSuperblockContext *superblock, uint64_t inode_ref) {
 	uint32_t inode_block;
 	uint16_t inode_offset;
 
@@ -356,7 +356,7 @@ squash_inode_load(struct SquashInodeContext *inode,
 	inode->inode = NULL;
 
 	rv = squash_metablock_init(&inode->extract, superblock,
-			squash_data_superblock_inode_table_start(superblock));
+			squash_data_superblock_inode_table_start(superblock->superblock));
 	if (rv < 0) {
 		return rv;
 	}
@@ -376,7 +376,8 @@ squash_inode_load(struct SquashInodeContext *inode,
 		return rv;
 	}
 
-	inode->datablock_block_size = squash_data_superblock_block_size(superblock);
+	inode->datablock_block_size =
+			squash_data_superblock_block_size(superblock->superblock);
 
 	return rv;
 }

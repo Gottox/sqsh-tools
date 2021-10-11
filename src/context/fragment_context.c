@@ -37,14 +37,15 @@
 #include "../data/superblock.h"
 #include "../error.h"
 #include "inode_context.h"
+#include "superblock_context.h"
 #include <stdint.h>
 
 int
 squash_fragment_init(struct SquashFragmentContext *fragment,
-		const struct SquashSuperblock *superblock,
+		const struct SquashSuperblockContext *superblock,
 		const struct SquashInodeContext *inode) {
 	int rv = 0;
-	if (squash_data_superblock_flags(superblock) &
+	if (squash_data_superblock_flags(superblock->superblock) &
 			SQUASH_SUPERBLOCK_NO_FRAGMENTS) {
 		rv = -SQUASH_ERROR_NO_FRAGMENT;
 		goto out;
@@ -53,9 +54,9 @@ squash_fragment_init(struct SquashFragmentContext *fragment,
 	fragment->superblock = superblock;
 
 	uint32_t fragment_table_count =
-			squash_data_superblock_fragment_entry_count(superblock);
+			squash_data_superblock_fragment_entry_count(superblock->superblock);
 	uint32_t fragment_table_start =
-			squash_data_superblock_fragment_table_start(superblock);
+			squash_data_superblock_fragment_table_start(superblock->superblock);
 	rv = squash_table_init(&fragment->table, superblock, fragment_table_start,
 			SQUASH_SIZEOF_FRAGMENT, fragment_table_count);
 	if (rv < 0) {
@@ -72,7 +73,8 @@ squash_fragment_init(struct SquashFragmentContext *fragment,
 		goto out;
 	}
 
-	uint32_t block_size = squash_data_superblock_block_size(superblock);
+	uint32_t block_size =
+			squash_data_superblock_block_size(superblock->superblock);
 	rv = squash_buffer_init(&fragment->buffer, superblock, block_size);
 	if (rv < 0) {
 		goto out;
@@ -102,7 +104,7 @@ uint32_t
 squash_fragment_size(struct SquashFragmentContext *fragment) {
 	uint64_t file_size = squash_inode_file_size(fragment->inode);
 	uint32_t block_size =
-			squash_data_superblock_block_size(fragment->superblock);
+			squash_data_superblock_block_size(fragment->superblock->superblock);
 
 	return file_size % block_size;
 }

@@ -33,6 +33,7 @@
  */
 
 #include "../context/metablock_context.h"
+#include "../context/superblock_context.h"
 #include "../data/metablock.h"
 #include "../data/superblock_internal.h"
 #include "../error.h"
@@ -98,7 +99,7 @@ compression_by_id(int id) {
 
 int
 squash_buffer_new(struct SquashBuffer **context,
-		const struct SquashSuperblock *superblock, int block_size) {
+		const struct SquashSuperblockContext *superblock, int block_size) {
 	int rv = 0;
 
 	*context = calloc(1, sizeof(struct SquashBuffer));
@@ -115,16 +116,17 @@ squash_buffer_new(struct SquashBuffer **context,
 
 int
 squash_buffer_init(struct SquashBuffer *buffer,
-		const struct SquashSuperblock *superblock, int block_size) {
+		const struct SquashSuperblockContext *superblock, int block_size) {
 	int rv = 0;
 	const struct SquashCompressionImplementation *impl;
 
-	impl = compression_by_id(squash_data_superblock_compression_id(superblock));
+	impl = compression_by_id(
+			squash_data_superblock_compression_id(superblock->superblock));
 	if (impl == NULL) {
 		return -SQUASH_ERROR_COMPRESSION_INIT;
 	}
 
-	if (squash_data_superblock_flags(superblock) &
+	if (squash_data_superblock_flags(superblock->superblock) &
 			SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
 		// TODO: manually calculating the offset does not honour bounds checks
 		const struct SquashMetablock *metablock =

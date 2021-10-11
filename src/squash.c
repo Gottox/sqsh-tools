@@ -40,8 +40,7 @@
 #include <unistd.h>
 
 #include "compression/compression.h"
-#include "data/metablock.h"
-#include "data/superblock.h"
+#include "context/superblock_context.h"
 #include "squash.h"
 
 int
@@ -49,8 +48,7 @@ squash_init(struct Squash *squash, uint8_t *buffer, const size_t size,
 		const enum SquashDtor dtor) {
 	int rv = 0;
 
-	squash->superblock = (const struct SquashSuperblock *)buffer;
-	rv = squash_data_superblock_init(squash->superblock, size);
+	rv = squash_superblock_init(&squash->superblock, buffer, size);
 	if (rv < 0) {
 		return rv;
 	}
@@ -110,6 +108,8 @@ err:
 int
 squash_cleanup(struct Squash *squash) {
 	int rv = 0;
+
+	squash_superblock_cleanup(&squash->superblock);
 
 	switch (squash->dtor) {
 	case SQUASH_DTOR_FREE:

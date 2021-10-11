@@ -41,10 +41,10 @@
 #define SQUASH_DIRECTORY_CONTEXT_H
 
 struct SquashInodeContext;
-struct SquashSuperblock;
+struct SquashSuperblockContext;
 
 struct SquashDirectoryContext {
-	const struct SquashSuperblock *superblock;
+	const struct SquashSuperblockContext *superblock;
 	struct SquashInodeContext *inode;
 	uint32_t block_start;
 	uint32_t block_offset;
@@ -63,7 +63,7 @@ struct SquashDirectoryIterator {
 
 SQUASH_NO_UNUSED int squash_directory_init(
 		struct SquashDirectoryContext *directory,
-		const struct SquashSuperblock *superblock,
+		const struct SquashSuperblockContext *superblock,
 		struct SquashInodeContext *inode);
 SQUASH_NO_UNUSED int squash_directory_iterator_init(
 		struct SquashDirectoryIterator *iterator,

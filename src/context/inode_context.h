@@ -43,7 +43,7 @@
 
 #define SQUASH_INODE_NO_FRAGMENT 0xFFFFFFFF
 
-struct SquashSuperblock;
+struct SquashSuperblockContext;
 struct SquashInode;
 struct SquashInodeTable;
 struct SquashDirectoryIterator;
@@ -75,7 +75,7 @@ struct SquashInodeDirectoryIndexIterator {
 };
 
 SQUASH_NO_UNUSED int squash_inode_load(struct SquashInodeContext *inode,
-		const struct SquashSuperblock *superblock, uint64_t inode_ref);
+		const struct SquashSuperblockContext *superblock, uint64_t inode_ref);
 
 SQUASH_NO_UNUSED uint32_t squash_inode_hard_link_count(
 		const struct SquashInodeContext *inode);

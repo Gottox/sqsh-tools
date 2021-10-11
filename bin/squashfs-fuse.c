@@ -88,7 +88,7 @@ squashfuse_getattr(
 
 	struct SquashInodeContext inode = {0};
 
-	rv = squash_resolve_path(&inode, data.squash.superblock, path);
+	rv = squash_resolve_path(&inode, &data.squash.superblock, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -138,12 +138,12 @@ squashfuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 	struct SquashInodeContext inode = {0};
 	struct SquashDirectoryContext dir = {0};
 	struct SquashDirectoryIterator iter = {0};
-	rv = squash_resolve_path(&inode, data.squash.superblock, path);
+	rv = squash_resolve_path(&inode, &data.squash.superblock, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
 	}
-	rv = squash_directory_init(&dir, data.squash.superblock, &inode);
+	rv = squash_directory_init(&dir, &data.squash.superblock, &inode);
 	if (rv < 0) {
 		rv = -ENOMEM;
 		goto out;
@@ -183,7 +183,7 @@ squashfuse_open(const char *path, struct fuse_file_info *fi) {
 	int rv = 0;
 	struct SquashInodeContext inode = {0};
 
-	rv = squash_resolve_path(&inode, data.squash.superblock, path);
+	rv = squash_resolve_path(&inode, &data.squash.superblock, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -204,7 +204,7 @@ squashfuse_read(const char *path, char *buf, size_t size, off_t offset,
 	int rv = 0;
 	struct SquashInodeContext inode = {0};
 
-	rv = squash_resolve_path(&inode, data.squash.superblock, path);
+	rv = squash_resolve_path(&inode, &data.squash.superblock, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -221,7 +221,7 @@ squashfuse_readlink(const char *path, char *buf, size_t size) {
 	int rv = 0;
 	struct SquashInodeContext inode = {0};
 
-	rv = squash_resolve_path(&inode, data.squash.superblock, path);
+	rv = squash_resolve_path(&inode, &data.squash.superblock, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;

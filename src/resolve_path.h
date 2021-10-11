@@ -39,9 +39,9 @@
 #define RESOLVE_PATH_H
 
 struct SquashInodeContext;
-struct SquashSuperblock;
+struct SquashSuperblockContext;
 
 SQUASH_NO_UNUSED int squash_resolve_path(struct SquashInodeContext *inode,
-		const struct SquashSuperblock *superblock, const char *path);
+		const struct SquashSuperblockContext *superblock, const char *path);
 
 #endif /* end of include guard RESOLVE_PATH_H */

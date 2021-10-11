@@ -35,6 +35,7 @@
 #include "resolve_path.h"
 #include "context/directory_context.h"
 #include "context/inode_context.h"
+#include "context/superblock_context.h"
 #include "data/directory.h"
 #include "data/inode.h"
 #include "data/superblock.h"
@@ -76,7 +77,7 @@ count_path_segments(const char *path) {
 
 static int
 find_inode_ref(uint64_t *target, uint64_t dir_ref,
-		const struct SquashSuperblock *superblock, const char *name,
+		const struct SquashSuperblockContext *superblock, const char *name,
 		const size_t name_len) {
 	struct SquashInodeContext inode = {0};
 	struct SquashDirectoryContext dir = {0};
@@ -110,7 +111,7 @@ out:
 
 int
 squash_resolve_path(struct SquashInodeContext *inode,
-		const struct SquashSuperblock *superblock, const char *path) {
+		const struct SquashSuperblockContext *superblock, const char *path) {
 	int i;
 	int rv = 0;
 	int segment_count = count_path_segments(path) + 1;
@@ -120,7 +121,8 @@ squash_resolve_path(struct SquashInodeContext *inode,
 		rv = SQUASH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
-	inode_refs[0] = squash_data_superblock_root_inode_ref(superblock);
+	inode_refs[0] =
+			squash_data_superblock_root_inode_ref(superblock->superblock);
 
 	for (i = 0; segment; segment = find_next_segment(segment)) {
 		size_t segment_len = get_segment_len(segment);

@@ -102,7 +102,7 @@ current_entry(const struct SquashDirectoryIterator *iterator) {
 
 int
 squash_directory_init(struct SquashDirectoryContext *directory,
-		const struct SquashSuperblock *superblock,
+		const struct SquashSuperblockContext *superblock,
 		struct SquashInodeContext *inode) {
 	int rv = 0;
 	const struct SquashInodeDirectory *basic;
@@ -164,7 +164,7 @@ squash_directory_iterator_init(struct SquashDirectoryIterator *iterator,
 	int rv = 0;
 	rv = squash_metablock_init(&iterator->extract, directory->superblock,
 			squash_data_superblock_directory_table_start(
-					directory->superblock));
+					directory->superblock->superblock));
 	if (rv < 0) {
 		return rv;
 	}

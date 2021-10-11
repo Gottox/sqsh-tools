@@ -7,12 +7,13 @@ include config.mk
 HDR = \
 	src/compression/buffer.h \
 	src/compression/compression.h \
-	src/context/file_context.h \
 	src/context/datablock_context.h \
 	src/context/directory_context.h \
+	src/context/file_context.h \
 	src/context/fragment_context.h \
 	src/context/inode_context.h \
 	src/context/metablock_context.h \
+	src/context/superblock_context.h \
 	src/context/table_context.h \
 	src/data/compression_options.h \
 	src/data/compression_options_internal.h \
@@ -38,12 +39,13 @@ HDR = \
 SRC = \
 	src/compression/buffer.c \
 	src/compression/null.c \
-	src/context/file_context.c \
 	src/context/datablock_context.c \
 	src/context/directory_context.c \
+	src/context/file_context.c \
 	src/context/fragment_context.c \
 	src/context/inode_context.c \
 	src/context/metablock_context.c \
+	src/context/superblock_context.c \
 	src/context/table_context.c \
 	src/data/compression_options.c \
 	src/data/datablock.c \

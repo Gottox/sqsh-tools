@@ -42,7 +42,7 @@
 struct SquashInodeContext;
 
 struct SquashFragmentContext {
-	const struct SquashSuperblock *superblock;
+	const struct SquashSuperblockContext *superblock;
 	const struct SquashInodeContext *inode;
 	// TODO: This table should be part of struct Squash.
 	struct SquashTableContext table;
@@ -52,7 +52,7 @@ struct SquashFragmentContext {
 
 SQUASH_NO_UNUSED int squash_fragment_init(
 		struct SquashFragmentContext *fragment,
-		const struct SquashSuperblock *superblock,
+		const struct SquashSuperblockContext *superblock,
 		const struct SquashInodeContext *inode);
 
 uint64_t squash_fragment_start(struct SquashFragmentContext *fragment);

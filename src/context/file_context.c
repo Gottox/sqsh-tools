@@ -39,11 +39,12 @@
 #include "datablock_context.h"
 #include "fragment_context.h"
 #include "inode_context.h"
+#include "superblock_context.h"
 #include <stdint.h>
 
 int
 squash_file_init(struct SquashFileContext *context,
-		const struct SquashSuperblock *superblock,
+		const struct SquashSuperblockContext *superblock,
 		const struct SquashInodeContext *inode) {
 	int rv = 0;
 	rv = squash_datablock_init(&context->datablock, superblock, inode);
@@ -66,7 +67,8 @@ squash_file_seek(struct SquashFileContext *context, uint64_t seek_pos) {
 	rv = squash_datablock_seek(&context->datablock, seek_pos);
 	if (rv == -SQUASH_ERROR_SEEK_IN_FRAGMENT) {
 		context->fragment_pos = seek_pos %
-				squash_data_superblock_block_size(context->superblock);
+				squash_data_superblock_block_size(
+						context->superblock->superblock);
 	} else {
 		context->fragment_pos = UINT32_MAX;
 	}
