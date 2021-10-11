@@ -112,7 +112,7 @@ squash_superblock_fragment_entry_count(
 
 uint64_t
 squash_superblock_bytes_used(const struct SquashSuperblockContext *context) {
-	return squash_data_superblock_fragment_entry_count(context->superblock);
+	return squash_data_superblock_bytes_used(context->superblock);
 }
 
 int

@@ -393,7 +393,7 @@ squash_inode_directory_iterator_init(
 
 	if (squash_data_inode_type(inode->inode) !=
 			SQUASH_INODE_TYPE_EXTENDED_DIRECTORY) {
-		return -SQUASH_ERROR_TODO;
+		return -SQUASH_ERROR_NO_EXTENDED_DIRECTORY;
 	}
 
 	const struct SquashInodeDirectoryExt *xdir =

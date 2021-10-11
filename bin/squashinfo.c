@@ -158,14 +158,18 @@ static int
 root_inode_info(struct Squash *squash) {
 	struct SquashInodeContext inode = {0};
 	struct SquashDirectoryContext dir = {0};
+	const struct SquashMetablock *metablock = NULL;
 	int rv = 0;
 	uint64_t root_inode_ref = squash_data_superblock_root_inode_ref(
 			squash->superblock.superblock);
 	fputs("=== INODE TABLE ===\n", out);
-	rv = metablock_info(squash_metablock_from_offset(&squash->superblock,
-								squash_data_superblock_inode_table_start(
-										squash->superblock.superblock)),
-			squash);
+	rv = squash_metablock_from_offset(&metablock, &squash->superblock,
+			squash_data_superblock_inode_table_start(
+					squash->superblock.superblock));
+	if (rv < 0) {
+		return rv;
+	}
+	rv = metablock_info(metablock, squash);
 	if (rv < 0) {
 		return rv;
 	}
@@ -196,6 +200,8 @@ root_inode_info(struct Squash *squash) {
 
 static int
 compression_info(struct Squash *squash) {
+	int rv = 0;
+	const struct SquashMetablock *metablock = NULL;
 	int (*handler)(struct Squash * squash) = NULL;
 	fputs("=== COMPRESSION INFO ===\n", out);
 	KEY("COMPRESSION_TYPE");
@@ -231,14 +237,18 @@ compression_info(struct Squash *squash) {
 		fputs("WARNING: NO COMPRESSION OPTION HANDLER\n", stdout);
 	} else if (squash_data_superblock_flags(squash->superblock.superblock) &
 			SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
-		metablock_info(squash_metablock_from_offset(&squash->superblock,
-							   sizeof(struct SquashSuperblock)),
-				squash);
+		rv = squash_metablock_from_offset(&metablock, &squash->superblock,
+				sizeof(struct SquashSuperblock));
+		if (rv < 0) {
+			goto out;
+		}
+		metablock_info(metablock, squash);
 		handler(squash);
 	} else {
 		fputs("NO COMPRESSION OPTION\n", stdout);
 	}
-	return 0;
+out:
+	return rv;
 }
 
 static int

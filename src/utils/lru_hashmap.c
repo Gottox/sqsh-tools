@@ -75,8 +75,8 @@ squash_lru_hashmap_put(
 
 	if (candidate->pointer != NULL) {
 		if (hashmap->oldest == NULL) {
-			// Should never happen;
-			return -SQUASH_ERROR_TODO;
+			// Should never happen:
+			return -SQUASH_ERROR_HASHMAP_INTERNAL_ERROR;
 		}
 
 		// TODO: This is potentional slow. Instead find the current first match

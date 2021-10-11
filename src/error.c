@@ -117,6 +117,10 @@ squash_error_str(int error_code) {
 		return "Seek in fragment";
 	case SQUASH_ERROR_NO_FRAGMENT:
 		return "No fragment";
+	case SQUASH_ERROR_HASHMAP_INTERNAL_ERROR:
+		return "Hashmap internal error";
+	case SQUASH_ERROR_NO_EXTENDED_DIRECTORY:
+		return "No extended directory";
 	case SQUASH_ERROR_TODO:
 		return "Todo";
 	}

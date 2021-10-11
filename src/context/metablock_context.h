@@ -28,7 +28,7 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : metablock2
+ * @file        : metablock
  * @created     : Saturday Sep 04, 2021 23:13:19 CEST
  */
 
@@ -41,6 +41,8 @@
 
 #define SQUASH_EXTRACT_H
 
+struct SquashMetablock;
+
 struct SquashMetablockContext {
 	const struct SquashSuperblockContext *superblock;
 	struct SquashBuffer buffer;
@@ -50,7 +52,8 @@ struct SquashMetablockContext {
 };
 
 // DEPRECATED:
-const struct SquashMetablock *squash_metablock_from_offset(
+SQUASH_NO_UNUSED int squash_metablock_from_offset(
+		const struct SquashMetablock **metablock,
 		const struct SquashSuperblockContext *superblock, off_t offset);
 SQUASH_NO_UNUSED int squash_metablock_init(
 		struct SquashMetablockContext *extract,
