@@ -95,7 +95,7 @@ squash_superblock_inode_root_ref(
 
 bool
 squash_superblock_has_fragments(const struct SquashSuperblockContext *context) {
-	return !(squash_data_superblock_flags(context->superblock) |
+	return !(squash_data_superblock_flags(context->superblock) &
 			SQUASH_SUPERBLOCK_NO_FRAGMENTS);
 }
 
