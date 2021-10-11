@@ -153,9 +153,86 @@ hashmap_overflow() {
 	assert(rv == 0);
 }
 
+static void
+hashmap_add_many() {
+	const int NBR = 2048, SIZE = 512;
+	int rv = 0;
+	int length = 0;
+	struct SquashLruHashMap hashmap = {0};
+	int values[NBR];
+
+	rv = squash_lru_hashmap_init(&hashmap, SIZE, dtor);
+	assert(rv == 0);
+	assert(hashmap.oldest == NULL);
+	assert(hashmap.newest == NULL);
+
+	for (int i = 0; i < NBR; i++) {
+		values[i] = i;
+
+		rv = squash_lru_hashmap_put(&hashmap, i, &values[i]);
+		assert(rv == 0);
+	}
+
+	int *value;
+
+	value = squash_lru_hashmap_get(&hashmap, NBR - SIZE / 2);
+	assert(*value == NBR - SIZE / 2);
+	value = squash_lru_hashmap_get(&hashmap, NBR - SIZE);
+	assert(*value == NBR - SIZE);
+	assert(value == hashmap.oldest->pointer);
+	value = squash_lru_hashmap_get(&hashmap, NBR - SIZE - 1);
+	assert(value == NULL);
+
+	length = 0;
+	for (struct SquashLruEntry *entry = hashmap.newest; entry;
+			entry = entry->older) {
+		assert(NBR - length - 1 == entry->hash);
+		length++;
+	}
+	assert(length == SIZE);
+
+	length = 0;
+	for (struct SquashLruEntry *entry = hashmap.oldest; entry;
+			entry = entry->newer) {
+		assert(NBR - SIZE + length == entry->hash);
+		length++;
+	}
+	assert(length == SIZE);
+
+	rv = squash_lru_hashmap_cleanup(&hashmap);
+	assert(rv == 0);
+}
+
+static void
+hashmap_size_1() {
+	int rv = 0;
+	struct SquashLruHashMap hashmap = {0};
+	char *v1 = "Value1";
+	char *v2 = "Value2";
+	char *p;
+
+	rv = squash_lru_hashmap_init(&hashmap, 1, dummy_dtor);
+	assert(rv == 0);
+
+	rv = squash_lru_hashmap_put(&hashmap, 1, v1);
+	assert(rv == 0);
+	rv = squash_lru_hashmap_put(&hashmap, 2, v2);
+	assert(rv == 0);
+
+	p = squash_lru_hashmap_get(&hashmap, 1);
+	assert(p == NULL);
+	p = squash_lru_hashmap_get(&hashmap, 2);
+	assert(p == v2);
+
+	rv = squash_lru_hashmap_cleanup(&hashmap);
+	assert(rv == 0);
+}
+
 DEFINE
 TEST(init_hashmap);
 TEST(add_to_hashmap);
 TEST(read_from_hashmap);
 TEST(hashmap_overflow);
+TEST(hashmap_add_many);
+TEST(hashmap_size_1);
 DEFINE_END

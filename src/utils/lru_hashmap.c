@@ -82,7 +82,9 @@ squash_lru_hashmap_put(
 		// TODO: This is potentional slow. Instead find the current first match
 		// and switch places with this one.
 		candidate = hashmap->oldest;
-		hashmap->oldest->newer->older = NULL;
+		if (hashmap->oldest->newer) {
+			hashmap->oldest->newer->older = NULL;
+		}
 		hashmap->oldest = hashmap->oldest->newer;
 		hashmap->dtor(candidate->pointer);
 	}
