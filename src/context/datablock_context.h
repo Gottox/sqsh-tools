@@ -55,7 +55,6 @@ struct SquashDatablockContext {
 
 SQUASH_NO_UNUSED int squash_datablock_init(
 		struct SquashDatablockContext *file_content,
-		const struct SquashSuperblockContext *superblock,
 		const struct SquashInodeContext *inode);
 
 void *squash_datablock_data(const struct SquashDatablockContext *context);

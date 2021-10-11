@@ -89,7 +89,7 @@ main(int argc, char *argv[]) {
 		goto out;
 	}
 
-	rv = squash_file_init(&file, &squash.superblock, &inode);
+	rv = squash_file_init(&file, &inode);
 	if (rv < 0) {
 		squash_perror(rv, inner_path);
 		rv = EXIT_FAILURE;

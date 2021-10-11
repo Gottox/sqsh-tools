@@ -35,7 +35,6 @@
 #include "metablock_context.h"
 #include "../compression/buffer.h"
 #include "../data/metablock.h"
-#include "../data/superblock.h"
 #include "../error.h"
 #include "superblock_context.h"
 #include <stdint.h>
@@ -50,8 +49,7 @@ metablock_bounds_check(const struct SquashSuperblockContext *superblock,
 	uint64_t data_bounds;
 
 	if (ADD_OVERFLOW((uint64_t)superblock,
-				squash_data_superblock_bytes_used(superblock->superblock),
-				&upper_bounds)) {
+				squash_superblock_bytes_used(superblock), &upper_bounds)) {
 		return -SQUASH_ERROR_INTEGER_OVERFLOW;
 	}
 

@@ -48,7 +48,6 @@ struct SquashFileContext {
 };
 
 SQUASH_NO_UNUSED int squash_file_init(struct SquashFileContext *context,
-		const struct SquashSuperblockContext *superblock,
 		const struct SquashInodeContext *inode);
 
 SQUASH_NO_UNUSED int squash_file_seek(

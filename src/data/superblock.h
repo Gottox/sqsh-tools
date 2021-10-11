@@ -32,9 +32,9 @@
  * @created     : Friday Apr 30, 2021 12:36:57 CEST
  */
 
-#ifndef SQUASH__SUPERBLOCK_H
+#ifndef SQUASH_SUPERBLOCK_H
 
-#define SQUASH__SUPERBLOCK_H
+#define SQUASH_SUPERBLOCK_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -110,4 +110,4 @@ uint64_t squash_data_superblock_fragment_table_start(
 uint64_t squash_data_superblock_export_table_start(
 		const struct SquashSuperblock *superblock);
 
-#endif /* end of include guard SQUASH__SUPERBLOCK_H */
+#endif /* end of include guard SQUASH_SUPERBLOCK_H */

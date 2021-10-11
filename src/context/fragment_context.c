@@ -42,23 +42,22 @@
 
 int
 squash_fragment_init(struct SquashFragmentContext *fragment,
-		const struct SquashSuperblockContext *superblock,
 		const struct SquashInodeContext *inode) {
 	int rv = 0;
-	if (squash_data_superblock_flags(superblock->superblock) &
-			SQUASH_SUPERBLOCK_NO_FRAGMENTS) {
+	fragment->inode = inode;
+	fragment->superblock = inode->extract.superblock;
+	uint32_t fragment_table_count =
+			squash_superblock_fragment_entry_count(fragment->superblock);
+	uint32_t fragment_table_start =
+			squash_superblock_fragment_table_start(fragment->superblock);
+
+	if (!squash_superblock_has_fragments(fragment->superblock)) {
 		rv = -SQUASH_ERROR_NO_FRAGMENT;
 		goto out;
 	}
-	fragment->inode = inode;
-	fragment->superblock = superblock;
 
-	uint32_t fragment_table_count =
-			squash_data_superblock_fragment_entry_count(superblock->superblock);
-	uint32_t fragment_table_start =
-			squash_data_superblock_fragment_table_start(superblock->superblock);
-	rv = squash_table_init(&fragment->table, superblock, fragment_table_start,
-			SQUASH_SIZEOF_FRAGMENT, fragment_table_count);
+	rv = squash_table_init(&fragment->table, fragment->superblock,
+			fragment_table_start, SQUASH_SIZEOF_FRAGMENT, fragment_table_count);
 	if (rv < 0) {
 		goto out;
 	}
@@ -73,9 +72,9 @@ squash_fragment_init(struct SquashFragmentContext *fragment,
 		goto out;
 	}
 
-	uint32_t block_size =
-			squash_data_superblock_block_size(superblock->superblock);
-	rv = squash_buffer_init(&fragment->buffer, superblock, block_size);
+	uint32_t block_size = squash_superblock_block_size(fragment->superblock);
+	rv = squash_buffer_init(
+			&fragment->buffer, fragment->superblock, block_size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -103,8 +102,7 @@ squash_fragment_read(struct SquashFragmentContext *fragment) {
 uint32_t
 squash_fragment_size(struct SquashFragmentContext *fragment) {
 	uint64_t file_size = squash_inode_file_size(fragment->inode);
-	uint32_t block_size =
-			squash_data_superblock_block_size(fragment->superblock->superblock);
+	uint32_t block_size = squash_superblock_block_size(fragment->superblock);
 
 	return file_size % block_size;
 }

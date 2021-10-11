@@ -36,7 +36,6 @@
 #include "../data/datablock_internal.h"
 #include "../data/inode.h"
 
-#include "../data/superblock.h"
 #include "../error.h"
 #include "../squash.h"
 #include "../utils.h"
@@ -340,8 +339,8 @@ squash_inode_symlink_size(const struct SquashInodeContext *inode) {
 int
 squash_inode_load_root(struct SquashInodeContext *inode,
 		const struct SquashSuperblockContext *superblock, uint64_t inode_ref) {
-	return squash_inode_load(inode, superblock,
-			squash_data_superblock_root_inode_ref(superblock->superblock));
+	return squash_inode_load(
+			inode, superblock, squash_superblock_inode_root_ref(superblock));
 }
 
 int
@@ -356,7 +355,7 @@ squash_inode_load(struct SquashInodeContext *inode,
 	inode->inode = NULL;
 
 	rv = squash_metablock_init(&inode->extract, superblock,
-			squash_data_superblock_inode_table_start(superblock->superblock));
+			squash_superblock_inode_table_start(superblock));
 	if (rv < 0) {
 		return rv;
 	}
@@ -376,8 +375,7 @@ squash_inode_load(struct SquashInodeContext *inode,
 		return rv;
 	}
 
-	inode->datablock_block_size =
-			squash_data_superblock_block_size(superblock->superblock);
+	inode->datablock_block_size = squash_superblock_block_size(superblock);
 
 	return rv;
 }

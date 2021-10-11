@@ -33,8 +33,6 @@
  */
 
 #include "datablock_context.h"
-#include "../data/fragment.h"
-#include "../data/superblock.h"
 #include "../error.h"
 #include "inode_context.h"
 #include "metablock_context.h"
@@ -44,30 +42,26 @@
 
 int
 squash_datablock_init(struct SquashDatablockContext *context,
-		const struct SquashSuperblockContext *superblock,
 		const struct SquashInodeContext *inode) {
-	size_t block_size =
-			squash_data_superblock_block_size(superblock->superblock);
+	size_t block_size = squash_superblock_block_size(inode->extract.superblock);
 	int rv = 0;
 
 	if (squash_inode_type(inode) != SQUASH_INODE_TYPE_FILE) {
 		return -SQUASH_ERROR_NOT_A_FILE;
 	}
 	uint64_t file_size = squash_inode_file_size(inode);
-	context->superblock = superblock;
+	context->superblock = inode->extract.superblock;
 	context->inode = inode;
-	context->blocks =
-			(const uint8_t *)superblock + squash_inode_file_blocks_start(inode);
+	context->blocks = (const uint8_t *)context->superblock +
+			squash_inode_file_blocks_start(inode);
 	if (squash_inode_file_fragment_block_index(inode) ==
 			SQUASH_INODE_NO_FRAGMENT) {
-		context->blocks_count = squash_divide_ceil_u32(file_size,
-				squash_data_superblock_block_size(superblock->superblock));
+		context->blocks_count = squash_divide_ceil_u32(file_size, block_size);
 	} else {
-		context->blocks_count = file_size /
-				squash_data_superblock_block_size(superblock->superblock);
+		context->blocks_count = file_size / block_size;
 	}
 
-	rv = squash_buffer_init(&context->buffer, superblock, block_size);
+	rv = squash_buffer_init(&context->buffer, context->superblock, block_size);
 	if (rv < 0) {
 		return rv;
 	}
@@ -103,8 +97,7 @@ datablock_offset(struct SquashDatablockContext *context, uint64_t index) {
 int
 squash_datablock_seek(
 		struct SquashDatablockContext *context, uint64_t seek_pos) {
-	size_t block_size =
-			squash_data_superblock_block_size(context->superblock->superblock);
+	size_t block_size = squash_superblock_block_size(context->superblock);
 	uint64_t file_size = squash_inode_file_size(context->inode);
 
 	if (seek_pos > file_size) {

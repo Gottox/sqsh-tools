@@ -36,7 +36,6 @@
 #include "../data/directory.h"
 #include "../data/inode.h"
 #include "../data/metablock.h"
-#include "../data/superblock.h"
 #include "../error.h"
 #include "../squash.h"
 #include "inode_context.h"
@@ -163,8 +162,7 @@ squash_directory_iterator_init(struct SquashDirectoryIterator *iterator,
 		struct SquashDirectoryContext *directory) {
 	int rv = 0;
 	rv = squash_metablock_init(&iterator->extract, directory->superblock,
-			squash_data_superblock_directory_table_start(
-					directory->superblock->superblock));
+			squash_superblock_directory_table_start(directory->superblock));
 	if (rv < 0) {
 		return rv;
 	}

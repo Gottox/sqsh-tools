@@ -34,7 +34,6 @@
 
 #include "file_context.h"
 #include "../compression/buffer.h"
-#include "../data/superblock.h"
 #include "../error.h"
 #include "datablock_context.h"
 #include "fragment_context.h"
@@ -44,18 +43,17 @@
 
 int
 squash_file_init(struct SquashFileContext *context,
-		const struct SquashSuperblockContext *superblock,
 		const struct SquashInodeContext *inode) {
 	int rv = 0;
-	rv = squash_datablock_init(&context->datablock, superblock, inode);
+	rv = squash_datablock_init(&context->datablock, inode);
 	if (rv < 0) {
 		return rv;
 	}
-	rv = squash_fragment_init(&context->fragment, superblock, inode);
+	rv = squash_fragment_init(&context->fragment, inode);
 	if (rv < 0 && rv != -SQUASH_ERROR_NO_FRAGMENT) {
 		return rv;
 	}
-	context->superblock = superblock;
+	context->superblock = inode->extract.superblock;
 	context->fragment_pos = UINT32_MAX;
 
 	return squash_file_seek(context, 0);
@@ -66,9 +64,8 @@ squash_file_seek(struct SquashFileContext *context, uint64_t seek_pos) {
 	int rv;
 	rv = squash_datablock_seek(&context->datablock, seek_pos);
 	if (rv == -SQUASH_ERROR_SEEK_IN_FRAGMENT) {
-		context->fragment_pos = seek_pos %
-				squash_data_superblock_block_size(
-						context->superblock->superblock);
+		context->fragment_pos =
+				seek_pos % squash_superblock_block_size(context->superblock);
 	} else {
 		context->fragment_pos = UINT32_MAX;
 	}

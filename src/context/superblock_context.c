@@ -69,6 +69,52 @@ squash_superblock_init(struct SquashSuperblockContext *context,
 	return 0;
 }
 
+uint64_t
+squash_superblock_directory_table_start(
+		const struct SquashSuperblockContext *context) {
+	return squash_data_superblock_directory_table_start(context->superblock);
+}
+
+uint64_t
+squash_superblock_fragment_table_start(
+		const struct SquashSuperblockContext *context) {
+	return squash_data_superblock_fragment_table_start(context->superblock);
+}
+
+uint64_t
+squash_superblock_inode_table_start(
+		const struct SquashSuperblockContext *context) {
+	return squash_data_superblock_inode_table_start(context->superblock);
+}
+
+uint64_t
+squash_superblock_inode_root_ref(
+		const struct SquashSuperblockContext *context) {
+	return squash_data_superblock_root_inode_ref(context->superblock);
+}
+
+bool
+squash_superblock_has_fragments(const struct SquashSuperblockContext *context) {
+	return !(squash_data_superblock_flags(context->superblock) |
+			SQUASH_SUPERBLOCK_NO_FRAGMENTS);
+}
+
+uint32_t
+squash_superblock_block_size(const struct SquashSuperblockContext *context) {
+	return squash_data_superblock_block_size(context->superblock);
+}
+
+uint32_t
+squash_superblock_fragment_entry_count(
+		const struct SquashSuperblockContext *context) {
+	return squash_data_superblock_fragment_entry_count(context->superblock);
+}
+
+uint64_t
+squash_superblock_bytes_used(const struct SquashSuperblockContext *context) {
+	return squash_data_superblock_fragment_entry_count(context->superblock);
+}
+
 int
 squash_superblock_cleanup(struct SquashSuperblockContext *superblock) {
 	return 0;
