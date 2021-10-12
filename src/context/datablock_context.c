@@ -52,7 +52,7 @@ squash_datablock_init(struct SquashDatablockContext *context,
 	uint64_t file_size = squash_inode_file_size(inode);
 	context->superblock = inode->extract.superblock;
 	context->inode = inode;
-	context->blocks = (const uint8_t *)context->superblock +
+	context->blocks = (const uint8_t *)context->superblock->superblock +
 			squash_inode_file_blocks_start(inode);
 	if (squash_inode_file_fragment_block_index(inode) ==
 			SQUASH_INODE_NO_FRAGMENT) {
