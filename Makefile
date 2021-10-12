@@ -183,21 +183,23 @@ coverage: check
 	@mkdir cov
 	@gcovr -r . --html --html-details -o cov/index.html
 
-test/squash_image.h:
+test/squash_image.squashfs:
 	mkdir -p $@_dir
-	echo a > $@_dir/b
+	echo a > $@_dir/a
 	echo b > $@_dir/b
-	rm -f $@.squashfs
-	mksquashfs $@_dir $@.squashfs -noI -noId -noD -noF -noX -nopad
+	rm -f $@
+	mksquashfs $@_dir $@ -noI -noId -noD -noF -noX -nopad
+	rm -r $@_dir
+
+test/squash_image.h: test/squash_image.squashfs
 	printf "%s\n" "#include <stdint.h>" "static const uint8_t squash_image[] = {" > $@
-	od  $@.squashfs -t u1 -v -A n | tr ' ' '\n' | grep -v '^$$' | paste -sd, >> $@
+	od  $< -t u1 -v -A n | tr ' ' '\n' | grep -v '^$$' | paste -sd, >> $@
 	echo "};" >> $@
-	rm -r $@_dir $@.squashfs
 
 clean:
 	@echo cleaning...
 	@rm -rf doc cov
-	@rm -f *.gcnp *.gcda test/squash_image.h
+	@rm -f *.gcnp *.gcda test/squash_image.h test/squash_image.squashfs
 	@rm -f $(TST_BIN) $(BCH_BIN) $(FZZ_BIN) $(OBJ) $(BIN) libsquashfs.so* libsquashfs.a
 
 .PHONY: check all clean speed coverage fuzz
