@@ -55,7 +55,6 @@ squash_ls() {
 
 	rv = squash_inode_load(&inode, &superblock,
 			squash_data_superblock_root_inode_ref(superblock.superblock));
-	squash_perror(rv, NULL);
 	assert(rv == 0);
 
 	rv = squash_directory_init(&dir, &superblock, &inode);
@@ -65,21 +64,22 @@ squash_ls() {
 	assert(rv == 0);
 
 	rv = squash_directory_iterator_next(&iter);
-	assert(rv == 0);
+	assert(rv > 0);
 	rv = squash_directory_iterator_name_dup(&iter, &name);
-	assert(rv == 0);
+	assert(rv == 1);
 	assert(strcmp("a", name) == 0);
 	free(name);
 
 	rv = squash_directory_iterator_next(&iter);
-	assert(rv == 0);
+	assert(rv >= 0);
 	rv = squash_directory_iterator_name_dup(&iter, &name);
-	assert(rv == 0);
+	assert(rv == 1);
 	assert(strcmp("b", name) == 0);
 	free(name);
 
 	rv = squash_directory_iterator_next(&iter);
-	assert(rv != 0);
+	// End of file list
+	assert(rv == 0);
 
 	rv = squash_directory_iterator_cleanup(&iter);
 	assert(rv == 0);
