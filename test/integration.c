@@ -28,18 +28,21 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : list
+ * @file        : integration
  * @created     : Monday Oct 11, 2021 21:43:12 CEST
  */
 
 #include "../src/context/directory_context.h"
+#include "../src/context/file_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/context/superblock_context.h"
 #include "../src/data/superblock.h"
 #include "../src/error.h"
+#include "../src/resolve_path.h"
 #include "common.h"
 #include "squash_image.h"
 #include "test.h"
+#include <stdint.h>
 
 static void
 squash_ls() {
@@ -94,6 +97,43 @@ squash_ls() {
 	assert(rv == 0);
 }
 
+static void
+squash_cat() {
+	int rv;
+	const uint8_t *data;
+	size_t size;
+	struct SquashSuperblockContext superblock = {0};
+	struct SquashInodeContext inode = {0};
+	struct SquashFileContext file = {0};
+	rv = squash_superblock_init(
+			&superblock, squash_image, sizeof(squash_image));
+	assert(rv == 0);
+
+	rv = squash_resolve_path(&inode, &superblock, "a");
+	assert(rv == 0);
+
+	rv = squash_file_init(&file, &inode);
+	assert(rv == 0);
+
+	size = squash_inode_file_size(&inode);
+	assert(size == 2);
+	rv = squash_file_read(&file, size);
+	assert(rv == 0);
+
+	data = squash_file_data(&file);
+	assert(memcmp(data, "a\n", size) == 0);
+
+	rv = squash_file_cleanup(&file);
+	assert(rv == 0);
+
+	rv = squash_inode_cleanup(&inode);
+	assert(rv == 0);
+
+	rv = squash_superblock_cleanup(&superblock);
+	assert(rv == 0);
+}
+
 DEFINE
 TEST(squash_ls);
+TEST(squash_cat);
 DEFINE_END
