@@ -81,8 +81,7 @@ squash_data_inode_file_size(const struct SquashInodeFile *file) {
 const struct SquashDatablockSize *
 squash_data_inode_file_block_sizes(const struct SquashInodeFile *file) {
 	const uint8_t *tmp = (const uint8_t *)file;
-	return (const struct SquashDatablockSize
-					*)&tmp[sizeof(struct SquashInodeFile)];
+	return (const struct SquashDatablockSize *)&tmp[SQUASH_SIZEOF_INODE_FILE];
 }
 
 uint64_t
