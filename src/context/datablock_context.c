@@ -74,27 +74,12 @@ squash_datablock_init(struct SquashDatablockContext *context,
 	return rv;
 }
 
-static uint32_t
-datablock_size(struct SquashDatablockContext *context, uint64_t index) {
-	const struct SquashInodeContext *inode = context->inode;
-
-	return squash_inode_file_block_size(inode, index) & ~(1 << 24);
-}
-
-static bool
-datablock_is_compressed(
-		struct SquashDatablockContext *context, uint64_t index) {
-	const struct SquashInodeContext *inode = context->inode;
-
-	return 0 == (squash_inode_file_block_size(inode, index) & (1 << 24));
-}
-
 static const uint64_t
 datablock_offset(struct SquashDatablockContext *context, uint64_t index) {
 	off_t offset = 0;
 
 	for (int i = 0; i < index; i++) {
-		offset += datablock_size(context, i);
+		offset += squash_inode_file_block_size(context->inode, i);
 	}
 
 	return offset;
@@ -146,10 +131,10 @@ squash_datablock_read(struct SquashDatablockContext *context, uint64_t size) {
 
 	while (squash_datablock_size(context) < size &&
 			context->datablock_index < context->blocks_count) {
-		bool is_compressed =
-				datablock_is_compressed(context, context->datablock_index);
-		uint64_t compressed_size =
-				datablock_size(context, context->datablock_index);
+		bool is_compressed = squash_inode_file_block_is_compressed(
+				context->inode, context->datablock_index);
+		uint64_t compressed_size = squash_inode_file_block_size(
+				context->inode, context->datablock_index);
 		rv = squash_buffer_append(&context->buffer,
 				&context->blocks[compressed_offset], compressed_size,
 				is_compressed);

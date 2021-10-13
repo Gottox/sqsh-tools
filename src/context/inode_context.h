@@ -87,6 +87,8 @@ uint64_t squash_inode_file_blocks_start(const struct SquashInodeContext *inode);
 // TODO: Find right datatype for index
 uint32_t squash_inode_file_block_size(
 		const struct SquashInodeContext *inode, int index);
+bool squash_inode_file_block_is_compressed(
+		const struct SquashInodeContext *inode, int index);
 uint32_t squash_inode_file_fragment_block_index(
 		const struct SquashInodeContext *inode);
 uint32_t squash_inode_file_fragment_block_offset(
