@@ -4,16 +4,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: voidlinux/voidlinux
+    container: gottox/gh-action-libsquashfs
     strategy:
       matrix:
         cc: [gcc, clang]
     steps:
-    - name: install dependencies
-      run: |
-        xbps-install -Syu xbps
-        xbps-install -yu
-        xbps-install -y base-devel clang libsanitizer-devel zlib-devel liblzma-devel lzo-devel liblz4-devel libzstd-devel fuse3-devel squashfs-tools
     - uses: actions/checkout@v2
     - name: make
       run: make CC=clang
