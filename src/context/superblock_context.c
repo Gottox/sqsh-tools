@@ -69,6 +69,20 @@ squash_superblock_init(struct SquashSuperblockContext *context,
 	return 0;
 }
 
+const void *
+squash_superblock_data_from_offset(
+		const struct SquashSuperblockContext *context, uint64_t offset) {
+	const uint8_t *tmp = (uint8_t *)context->superblock;
+	if (offset > squash_superblock_bytes_used(context)) {
+		return NULL;
+	}
+	if (offset < SQUASH_SIZEOF_SUPERBLOCK) {
+		return NULL;
+	}
+
+	return &tmp[offset];
+}
+
 uint64_t
 squash_superblock_directory_table_start(
 		const struct SquashSuperblockContext *context) {

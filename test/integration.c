@@ -98,7 +98,7 @@ squash_ls() {
 }
 
 static void
-squash_cat() {
+squash_cat_fragment() {
 	int rv;
 	const uint8_t *data;
 	size_t size;
@@ -117,6 +117,44 @@ squash_cat() {
 
 	size = squash_inode_file_size(&inode);
 	assert(size == 2);
+
+	rv = squash_file_read(&file, size);
+	assert(rv == 0);
+
+	data = squash_file_data(&file);
+	assert(memcmp(data, "a\n", size) == 0);
+
+	rv = squash_file_cleanup(&file);
+	assert(rv == 0);
+
+	rv = squash_inode_cleanup(&inode);
+	assert(rv == 0);
+
+	rv = squash_superblock_cleanup(&superblock);
+	assert(rv == 0);
+}
+
+static void
+squash_cat_datablock_and_fragment() {
+	int rv;
+	const uint8_t *data;
+	size_t size;
+	struct SquashSuperblockContext superblock = {0};
+	struct SquashInodeContext inode = {0};
+	struct SquashFileContext file = {0};
+	rv = squash_superblock_init(
+			&superblock, squash_image, sizeof(squash_image));
+	assert(rv == 0);
+
+	rv = squash_resolve_path(&inode, &superblock, "b");
+	assert(rv == 0);
+
+	rv = squash_file_init(&file, &inode);
+	assert(rv == 0);
+
+	size = squash_inode_file_size(&inode);
+	assert(size == 1050000);
+
 	rv = squash_file_read(&file, size);
 	assert(rv == 0);
 
@@ -135,5 +173,6 @@ squash_cat() {
 
 DEFINE
 TEST(squash_ls);
-TEST(squash_cat);
+TEST(squash_cat_fragment);
+TEST(squash_cat_datablock_and_fragment);
 DEFINE_END

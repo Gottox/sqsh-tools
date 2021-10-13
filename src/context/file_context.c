@@ -46,7 +46,10 @@ squash_file_init(struct SquashFileContext *context,
 		const struct SquashInodeContext *inode) {
 	int rv = 0;
 	rv = squash_datablock_init(&context->datablock, inode);
-	if (rv < 0) {
+	if (rv == -SQUASH_ERROR_NO_DATABLOCKS) {
+		// TODO Do not ignore this error
+		rv = 0;
+	} else if (rv < 0) {
 		return rv;
 	}
 	rv = squash_fragment_init(&context->fragment, inode);
@@ -66,6 +69,7 @@ squash_file_seek(struct SquashFileContext *context, uint64_t seek_pos) {
 	if (rv == -SQUASH_ERROR_SEEK_IN_FRAGMENT) {
 		context->fragment_pos =
 				seek_pos % squash_superblock_block_size(context->superblock);
+		rv = 0;
 	} else {
 		context->fragment_pos = UINT32_MAX;
 	}

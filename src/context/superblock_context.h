@@ -35,6 +35,7 @@
 
 #include "../utils.h"
 #include <stdbool.h>
+#include <stdint.h>
 
 #ifndef SUPERBLOCK_CONTEXT_H
 
@@ -49,6 +50,9 @@ struct SquashSuperblockContext {
 SQUASH_NO_UNUSED int squash_superblock_init(
 		struct SquashSuperblockContext *context, const uint8_t *buffer,
 		size_t size);
+
+const void *squash_superblock_data_from_offset(
+		const struct SquashSuperblockContext *context, uint64_t offset);
 
 uint64_t squash_superblock_directory_table_start(
 		const struct SquashSuperblockContext *context);

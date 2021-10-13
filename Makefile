@@ -72,7 +72,7 @@ BIN = \
 
 TST = \
 	test/utils/lru_hashmap.c \
-	test/list.c \
+	test/integration.c \
 
 TST_BIN = $(TST:.c=-test)
 
@@ -186,7 +186,7 @@ coverage: check
 test/squash_image.squashfs:
 	mkdir -p $@_dir
 	echo a > $@_dir/a
-	echo b > $@_dir/b
+	seq 1 1050000 | tr -cd "\n" | tr '\n' b > $@_dir/b
 	rm -f $@
 	mksquashfs $@_dir $@ -noI -noId -noD -noF -noX -nopad
 	rm -r $@_dir

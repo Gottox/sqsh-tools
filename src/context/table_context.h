@@ -41,7 +41,7 @@
 
 struct SquashTableContext {
 	struct SquashMetablockContext metablock;
-	uint64_t *lookup_table;
+	const uint64_t *lookup_table;
 	size_t element_size;
 	size_t element_count;
 };

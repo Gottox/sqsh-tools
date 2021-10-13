@@ -34,6 +34,7 @@
 
 #include "table_context.h"
 #include "../error.h"
+#include "superblock_context.h"
 #include <stdint.h>
 
 int
@@ -43,7 +44,11 @@ squash_table_init(struct SquashTableContext *table,
 	int rv = 0;
 	size_t byte_size;
 
-	table->lookup_table = (uint64_t *)&((uint8_t *)superblock)[start_block];
+	table->lookup_table =
+			squash_superblock_data_from_offset(superblock, start_block);
+	if (table->lookup_table == NULL) {
+		return -SQUASH_ERROR_SIZE_MISSMATCH;
+	}
 
 	rv = squash_metablock_init(
 			&table->metablock, superblock, table->lookup_table[0]);

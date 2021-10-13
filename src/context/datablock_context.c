@@ -52,13 +52,19 @@ squash_datablock_init(struct SquashDatablockContext *context,
 	uint64_t file_size = squash_inode_file_size(inode);
 	context->superblock = inode->extract.superblock;
 	context->inode = inode;
-	context->blocks = (const uint8_t *)context->superblock->superblock +
-			squash_inode_file_blocks_start(inode);
 	if (squash_inode_file_fragment_block_index(inode) ==
 			SQUASH_INODE_NO_FRAGMENT) {
 		context->blocks_count = squash_divide_ceil_u32(file_size, block_size);
 	} else {
 		context->blocks_count = file_size / block_size;
+	}
+	if (context->blocks_count == 0) {
+		return -SQUASH_ERROR_NO_DATABLOCKS;
+	}
+	context->blocks = squash_superblock_data_from_offset(
+			context->superblock, squash_inode_file_blocks_start(inode));
+	if (context->blocks == NULL) {
+		return -SQUASH_ERROR_SIZE_MISSMATCH;
 	}
 
 	rv = squash_buffer_init(&context->buffer, context->superblock, block_size);

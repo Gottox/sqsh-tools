@@ -79,9 +79,11 @@ int
 squash_metablock_from_offset(const struct SquashMetablock **metablock,
 		const struct SquashSuperblockContext *superblock, off_t offset) {
 	int rv = 0;
-	const uint8_t *tmp = (uint8_t *)superblock->superblock;
 	const struct SquashMetablock *block =
-			(const struct SquashMetablock *)&tmp[offset];
+			squash_superblock_data_from_offset(superblock, offset);
+	if (block == NULL) {
+		return -SQUASH_ERROR_SIZE_MISSMATCH;
+	}
 	rv = metablock_bounds_check(superblock, block);
 	if (rv < 0) {
 		return rv;

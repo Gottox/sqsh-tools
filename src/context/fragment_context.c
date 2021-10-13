@@ -93,10 +93,10 @@ squash_fragment_read(struct SquashFragmentContext *fragment) {
 	bool is_compressed = squash_data_datablock_is_compressed(size_info);
 	uint32_t size = squash_data_datablock_size(size_info);
 	uint64_t start = squash_data_fragment_start(fragment->fragment);
-	const uint8_t *tmp = (const uint8_t *)fragment->superblock;
+	const uint8_t *data =
+			squash_superblock_data_from_offset(fragment->superblock, start);
 
-	return squash_buffer_append(
-			&fragment->buffer, &tmp[start], size, is_compressed);
+	return squash_buffer_append(&fragment->buffer, data, size, is_compressed);
 }
 
 uint32_t
