@@ -159,7 +159,9 @@ squash_cat_datablock_and_fragment() {
 	assert(rv == 0);
 
 	data = squash_file_data(&file);
-	assert(memcmp(data, "a\n", size) == 0);
+	for (int i = 0; i < size; i++) {
+		assert(data[i] == 'b');
+	}
 
 	rv = squash_file_cleanup(&file);
 	assert(rv == 0);
