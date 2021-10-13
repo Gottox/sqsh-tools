@@ -156,8 +156,13 @@ squash_buffer_append(struct SquashBuffer *buffer, const uint8_t *source,
 	int rv = 0;
 	size_t block_size = buffer->block_size;
 	const size_t buffer_size = buffer->size;
+	size_t new_size;
 
-	buffer->data = realloc(buffer->data, buffer_size + block_size);
+	if (ADD_OVERFLOW(buffer_size, block_size, &new_size)) {
+		return -SQUASH_ERROR_INTEGER_OVERFLOW;
+	}
+
+	buffer->data = realloc(buffer->data, new_size);
 	if (buffer->data == NULL) {
 		return -SQUASH_ERROR_MALLOC_FAILED;
 	}
