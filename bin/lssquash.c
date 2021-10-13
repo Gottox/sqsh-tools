@@ -44,10 +44,52 @@
 #include <string.h>
 #include <unistd.h>
 
+static int ls(struct Squash *squash, const char *path,
+		struct SquashInodeContext *inode, const bool recursive);
+
 static int
 usage(char *arg0) {
 	printf("usage: %s [-r] FILESYSTEM [PATH]\n", arg0);
 	return EXIT_FAILURE;
+}
+
+static int
+ls_item(struct Squash *squash, const char *path,
+		struct SquashDirectoryIterator *iter, const bool recursive) {
+	int rv = 0;
+	struct SquashInodeContext entry_inode = {0};
+	const char *name = squash_directory_iterator_name(iter);
+	const int name_size = squash_directory_iterator_name_size(iter);
+	char *current_path =
+			calloc(name_size + strlen(path ? path : "") + 2, sizeof(char));
+
+	if (current_path == NULL) {
+		rv = -SQUASH_ERROR_MALLOC_FAILED;
+		goto out;
+	}
+	if (path != NULL) {
+		strcpy(current_path, path);
+		strcat(current_path, "/");
+	}
+	strncat(current_path, name, name_size);
+	puts(current_path);
+	if (recursive &&
+			squash_directory_iterator_inode_type(iter) ==
+					SQUASH_INODE_TYPE_DIRECTORY) {
+		rv = squash_directory_iterator_inode_load(iter, &entry_inode);
+		if (rv < 0) {
+			goto out;
+		}
+		rv = ls(squash, current_path, &entry_inode, recursive);
+		if (rv < 0) {
+			goto out;
+		}
+		squash_inode_cleanup(&entry_inode);
+	}
+
+out:
+	free(current_path);
+	return rv;
 }
 
 static int
@@ -56,11 +98,10 @@ ls(struct Squash *squash, const char *path, struct SquashInodeContext *inode,
 	int rv;
 	struct SquashDirectoryContext dir = {0};
 	struct SquashDirectoryIterator iter = {0};
-	struct SquashInodeContext entry_inode = {0};
 
 	rv = squash_directory_init(&dir, &squash->superblock, inode);
 	if (rv < 0) {
-		squash_perror(rv, path[0] == 0 ? "/" : path);
+		squash_perror(rv, path == NULL || path[0] == 0 ? "/" : path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
@@ -73,38 +114,15 @@ ls(struct Squash *squash, const char *path, struct SquashInodeContext *inode,
 	}
 
 	while (squash_directory_iterator_next(&iter) > 0) {
-		const char *name = squash_directory_iterator_name(&iter);
-		const int name_size = squash_directory_iterator_name_size(&iter);
-		char *current_path =
-				calloc(name_size + strlen(path ? path : "") + 2, sizeof(char));
-		if (current_path == NULL) {
-			rv = -SQUASH_ERROR_MALLOC_FAILED;
+		rv = ls_item(squash, path, &iter, recursive);
+		if (rv < 0) {
+			rv = EXIT_FAILURE;
 			goto out;
 		}
-		if (path != NULL) {
-			strcpy(current_path, path);
-			strcat(current_path, "/");
-		}
-		strncat(current_path, name, name_size);
-		puts(current_path);
-		if (recursive &&
-				squash_directory_iterator_inode_type(&iter) ==
-						SQUASH_INODE_TYPE_DIRECTORY) {
-			rv = squash_directory_iterator_inode_load(&iter, &entry_inode);
-			if (rv < 0) {
-				goto out;
-			}
-			rv = ls(squash, current_path, &entry_inode, recursive);
-			if (rv < 0) {
-				goto out;
-			}
-			squash_inode_cleanup(&entry_inode);
-		}
-		free(current_path);
 	}
-	squash_directory_cleanup(&dir);
 
 out:
+	squash_directory_cleanup(&dir);
 	squash_directory_iterator_cleanup(&iter);
 
 	return rv;
