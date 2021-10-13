@@ -67,12 +67,14 @@ squash_lzma_extract(const union SquashCompressionOptions *options,
 
 	action = LZMA_FINISH;
 
-	rv = lzma_code(&strm, action);
+	if (lzma_code(&strm, action) != LZMA_OK) {
+		rv = -SQUASH_ERROR_COMPRESSION_DECOMPRESS;
+	}
 
 	*target_size = strm.avail_out;
 	lzma_end(&strm);
 
-	return 0;
+	return rv;
 }
 
 const struct SquashCompressionImplementation squash_compression_lzma = {
