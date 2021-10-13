@@ -74,8 +74,7 @@ squash_data_directory_entry_name_size(
 
 const uint8_t *
 squash_data_directory_entry_name(const struct SquashDirectoryEntry *entry) {
-	const uint8_t *tmp = (const uint8_t *)entry;
-	return (const uint8_t *)&tmp[sizeof(struct SquashDirectoryEntry)];
+	return (const uint8_t *)&entry[1];
 }
 
 uint32_t
@@ -96,7 +95,5 @@ squash_data_directory_fragment_inode_number(
 const struct SquashDirectoryEntry *
 squash_data_directory_fragment_entries(
 		const struct SquashDirectoryFragment *fragment) {
-	const uint8_t *tmp = (const uint8_t *)fragment;
-	return (const struct SquashDirectoryEntry
-					*)&tmp[sizeof(struct SquashDirectoryFragment)];
+	return (const struct SquashDirectoryEntry *)&fragment[1];
 }

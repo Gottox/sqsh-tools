@@ -80,8 +80,7 @@ squash_data_inode_file_size(const struct SquashInodeFile *file) {
 }
 const struct SquashDatablockSize *
 squash_data_inode_file_block_sizes(const struct SquashInodeFile *file) {
-	const uint8_t *tmp = (const uint8_t *)file;
-	return (const struct SquashDatablockSize *)&tmp[SQUASH_SIZEOF_INODE_FILE];
+	return (const struct SquashDatablockSize *)&file[1];
 }
 
 uint64_t
@@ -120,9 +119,7 @@ squash_data_inode_file_ext_xattr_idx(
 const struct SquashDatablockSize *
 squash_data_inode_file_ext_block_sizes(
 		const struct SquashInodeFileExt *file_ext) {
-	const uint8_t *tmp = (const uint8_t *)file_ext;
-	return (const struct SquashDatablockSize
-					*)&tmp[sizeof(struct SquashInodeFile)];
+	return (const struct SquashDatablockSize *)&file_ext[1];
 }
 
 const struct SquashInodeDirectory *
@@ -230,9 +227,7 @@ squash_data_inode_directory_ext_xattr_idx(
 const struct SquashInodeDirectoryIndex *
 squash_data_inode_directory_ext_index(
 		const struct SquashInodeDirectoryExt *directory_ext) {
-	const uint8_t *tmp = (const uint8_t *)directory_ext;
-	return (const struct SquashInodeDirectoryIndex
-					*)&tmp[sizeof(struct SquashInodeDirectoryExt)];
+	return (const struct SquashInodeDirectoryIndex *)&directory_ext[1];
 }
 
 uint32_t
@@ -253,8 +248,7 @@ squash_data_inode_directory_index_name_size(
 const uint8_t *
 squash_data_inode_directory_index_name(
 		const struct SquashInodeDirectoryIndex *directory_index) {
-	const uint8_t *tmp = (const uint8_t *)directory_index;
-	return &tmp[sizeof(struct SquashInodeDirectoryIndex)];
+	return (const uint8_t *)&directory_index[1];
 }
 
 uint32_t
@@ -270,8 +264,7 @@ squash_data_inode_symlink_target_size(
 const uint8_t *
 squash_data_inode_symlink_target_path(
 		const struct SquashInodeSymlink *symlink) {
-	const uint8_t *tmp = (const uint8_t *)symlink;
-	return &tmp[sizeof(struct SquashInodeSymlink)];
+	return (const uint8_t *)&symlink[1];
 }
 
 uint32_t
@@ -287,17 +280,36 @@ squash_data_inode_symlink_ext_target_size(
 const uint8_t *
 squash_data_inode_symlink_ext_target_path(
 		const struct SquashInodeSymlinkExt *symlink_ext) {
-	const uint8_t *tmp = (const uint8_t *)symlink_ext;
-	return &tmp[sizeof(struct SquashInodeSymlinkExt)];
+	return (const uint8_t *)&symlink_ext[1];
 }
 uint32_t
 squash_data_inode_symlink_ext_xattr_idx(
 		const struct SquashInodeSymlinkExt *symlink_ext) {
+	/*
+	 * The xattr attributes of a symlink are located behind the target_path.
+	 * What we do here is to fetch the size and the pointer of the symlink
+	 * target and create a new uint32_t pointer behind the target path.
+	 * So it looks like that:
+	 *                          _
+	 *  symlink_ext -----> [xxx] \
+	 *                     [xxx]  |
+	 *                     [xxx]  | sizeof(struct SquashInodeSymlinkExt)
+	 *                     [xxx]  |
+	 *                     [xxx]_/
+	 *  target_path -----> [ 0 ] \
+	 *                     [ 1 ]  |
+	 *                     [ 2 ]  | target_size
+	 *                     [...]  |
+	 *                     [ n ]_/
+	 *    xattr_idx -----> [n+1]
+	 */
 	const uint32_t target_size =
 			squash_data_inode_symlink_ext_target_size(symlink_ext) + 1;
-	const uint8_t *tmp = (const uint8_t *)symlink_ext;
-	tmp = &tmp[sizeof(struct SquashInodeSymlinkExt) + target_size];
-	return le32toh(*((uint32_t *)tmp));
+	const uint8_t *target_path =
+			squash_data_inode_symlink_ext_target_path(symlink_ext);
+	const uint8_t *target_path_end = &target_path[target_size];
+	const uint32_t *xattr_idx = (const uint32_t *)target_path_end;
+	return le32toh(*xattr_idx);
 }
 
 uint32_t

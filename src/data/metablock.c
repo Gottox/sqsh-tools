@@ -45,8 +45,7 @@ squash_data_metablock_is_compressed(const struct SquashMetablock *metablock) {
 
 const uint8_t *
 squash_data_metablock_data(const struct SquashMetablock *metablock) {
-	const uint8_t *tmp = (uint8_t *)metablock;
-	return (uint8_t *)&tmp[sizeof(struct SquashMetablock)];
+	return (uint8_t *)&metablock[1];
 }
 
 size_t
