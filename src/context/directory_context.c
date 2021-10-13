@@ -296,7 +296,12 @@ squash_directory_iterator_name_dup(
 	int size = squash_directory_iterator_name_size(iterator);
 	const char *entry_name = squash_directory_iterator_name(iterator);
 
-	return squash_memdup(name_buffer, entry_name, size);
+	*name_buffer = squash_memdup(entry_name, size);
+	if (*name_buffer) {
+		return size;
+	} else {
+		return -SQUASH_ERROR_MALLOC_FAILED;
+	}
 }
 
 int

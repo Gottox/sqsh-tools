@@ -53,7 +53,6 @@ uint32_t squash_log2_u32(uint32_t x);
 
 uint32_t squash_divide_ceil_u32(uint32_t x, uint32_t y);
 
-SQUASH_NO_UNUSED int squash_memdup(
-		char **target, const char *source, size_t size);
+SQUASH_NO_UNUSED void *squash_memdup(const void *source, size_t size);
 
 #endif /* end of include guard SQUASH_UTILS_H */

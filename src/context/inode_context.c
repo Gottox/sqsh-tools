@@ -317,7 +317,12 @@ squash_inode_symlink_dup(
 	int size = squash_inode_symlink_size(inode);
 	const char *link_target = squash_inode_symlink(inode);
 
-	return squash_memdup(namebuffer, link_target, size);
+	*namebuffer = squash_memdup(link_target, size);
+	if (*namebuffer) {
+		return size;
+	} else {
+		return -SQUASH_ERROR_MALLOC_FAILED;
+	}
 }
 
 uint32_t

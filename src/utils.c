@@ -47,13 +47,13 @@ squash_divide_ceil_u32(uint32_t x, uint32_t y) {
 	return x / y + (x % y != 0);
 }
 
-int
-squash_memdup(char **target, const char *source, size_t size) {
-	*target = calloc(size + 2, sizeof(char));
-	if (*target == NULL) {
-		return -SQUASH_ERROR_MALLOC_FAILED;
+void *
+squash_memdup(const void *source, size_t size) {
+	void *target = calloc(size + 2, sizeof(char));
+	if (target == NULL) {
+		return NULL;
 	}
-	memcpy(*target, source, size);
+	memcpy(target, source, size);
 
-	return size;
+	return target;
 }
