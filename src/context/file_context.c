@@ -86,6 +86,11 @@ squash_file_read(struct SquashFileContext *context, uint64_t size) {
 	}
 
 	rv = squash_datablock_read(&context->datablock, size);
+	if (rv == SQUASH_ERROR_NO_DATABLOCKS) {
+		rv = 0;
+	} else if (rv < 0) {
+		goto out;
+	}
 	if (size > squash_file_size(context)) {
 		rv = squash_fragment_read(&context->fragment);
 		if (rv < 0) {
