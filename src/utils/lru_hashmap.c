@@ -39,12 +39,12 @@
 #include <stdlib.h>
 
 static off_t
-lru_hash_to_start_index(struct SquashLruHashMap *hashmap, uint64_t hash) {
+lru_hash_to_start_index(struct SquashLruHashmap *hashmap, uint64_t hash) {
 	return (hash * hash) % hashmap->size;
 }
 
 int
-squash_lru_hashmap_init(struct SquashLruHashMap *hashmap, size_t size,
+squash_lru_hashmap_init(struct SquashLruHashmap *hashmap, size_t size,
 		SquashLruHashmapDtor dtor) {
 	hashmap->dtor = dtor;
 	hashmap->size = size;
@@ -60,7 +60,7 @@ squash_lru_hashmap_init(struct SquashLruHashMap *hashmap, size_t size,
 }
 int
 squash_lru_hashmap_put(
-		struct SquashLruHashMap *hashmap, uint64_t hash, void *pointer) {
+		struct SquashLruHashmap *hashmap, uint64_t hash, void *pointer) {
 	off_t start_index = lru_hash_to_start_index(hashmap, hash);
 	struct SquashLruEntry *candidate = NULL;
 
@@ -112,7 +112,7 @@ squash_lru_hashmap_put(
 	return 0;
 }
 void *
-squash_lru_hashmap_get(struct SquashLruHashMap *hashmap, uint64_t hash) {
+squash_lru_hashmap_get(struct SquashLruHashmap *hashmap, uint64_t hash) {
 	off_t start_index = lru_hash_to_start_index(hashmap, hash);
 
 	for (off_t i = 0; i < hashmap->size; i++) {
@@ -130,7 +130,7 @@ squash_lru_hashmap_get(struct SquashLruHashMap *hashmap, uint64_t hash) {
 }
 
 int
-squash_lru_hashmap_cleanup(struct SquashLruHashMap *hashmap) {
+squash_lru_hashmap_cleanup(struct SquashLruHashmap *hashmap) {
 	for (int i = 0; i < hashmap->size; i++) {
 		if (hashmap->entries[i].pointer != NULL) {
 			hashmap->dtor(&hashmap->entries[i]);

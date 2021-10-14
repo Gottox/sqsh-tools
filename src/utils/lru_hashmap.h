@@ -49,7 +49,7 @@ struct SquashLruEntry {
 	uint64_t hash;
 };
 
-struct SquashLruHashMap {
+struct SquashLruHashmap {
 	size_t size;
 	struct SquashLruEntry *oldest;
 	struct SquashLruEntry *newest;
@@ -57,11 +57,11 @@ struct SquashLruHashMap {
 	SquashLruHashmapDtor dtor;
 };
 
-SQUASH_NO_UNUSED int squash_lru_hashmap_init(struct SquashLruHashMap *hashmap,
+SQUASH_NO_UNUSED int squash_lru_hashmap_init(struct SquashLruHashmap *hashmap,
 		size_t size, SquashLruHashmapDtor dtor);
 SQUASH_NO_UNUSED int squash_lru_hashmap_put(
-		struct SquashLruHashMap *hashmap, uint64_t hash, void *pointer);
-void *squash_lru_hashmap_get(struct SquashLruHashMap *hashmap, uint64_t hash);
-int squash_lru_hashmap_cleanup(struct SquashLruHashMap *hashmap);
+		struct SquashLruHashmap *hashmap, uint64_t hash, void *pointer);
+void *squash_lru_hashmap_get(struct SquashLruHashmap *hashmap, uint64_t hash);
+int squash_lru_hashmap_cleanup(struct SquashLruHashmap *hashmap);
 
 #endif /* end of include guard LRU_HASHMAP_H */

@@ -54,7 +54,7 @@ dummy_dtor(void *pointer) {
 static void
 init_hashmap() {
 	int rv = 0;
-	struct SquashLruHashMap hashmap = {0};
+	struct SquashLruHashmap hashmap = {0};
 
 	rv = squash_lru_hashmap_init(&hashmap, 1024, dummy_dtor);
 	assert(rv == 0);
@@ -65,7 +65,7 @@ init_hashmap() {
 static void
 add_to_hashmap() {
 	int rv = 0;
-	struct SquashLruHashMap hashmap = {0};
+	struct SquashLruHashmap hashmap = {0};
 	char *v1 = "Value1";
 	char *v2 = "Value2";
 
@@ -83,7 +83,7 @@ add_to_hashmap() {
 static void
 read_from_hashmap() {
 	int rv = 0;
-	struct SquashLruHashMap hashmap = {0};
+	struct SquashLruHashmap hashmap = {0};
 	char *v1 = "Value1";
 	char *v2 = "Value2";
 	char *p;
@@ -107,7 +107,7 @@ read_from_hashmap() {
 static void
 hashmap_overflow() {
 	int rv = 0;
-	struct SquashLruHashMap hashmap = {0};
+	struct SquashLruHashmap hashmap = {0};
 	char *v1 = "Value1";
 	char *v2 = "Value2";
 	char *v3 = "Value3";
@@ -158,7 +158,7 @@ hashmap_add_many() {
 	const int NBR = 2048, SIZE = 512;
 	int rv = 0;
 	int length = 0;
-	struct SquashLruHashMap hashmap = {0};
+	struct SquashLruHashmap hashmap = {0};
 	int values[NBR];
 
 	rv = squash_lru_hashmap_init(&hashmap, SIZE, dtor);
@@ -206,7 +206,7 @@ hashmap_add_many() {
 static void
 hashmap_size_1() {
 	int rv = 0;
-	struct SquashLruHashMap hashmap = {0};
+	struct SquashLruHashmap hashmap = {0};
 	char *v1 = "Value1";
 	char *v2 = "Value2";
 	char *p;
