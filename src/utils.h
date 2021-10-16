@@ -43,6 +43,7 @@
 #define MAX(a, b) (a > b ? a : b)
 
 #define ADD_OVERFLOW(a, b, res) __builtin_add_overflow(a, b, res)
+#define SUB_OVERFLOW(a, b, res) __builtin_sub_overflow(a, b, res)
 #define MULT_OVERFLOW(a, b, res) __builtin_mul_overflow(a, b, res)
 
 #define SQUASH_NO_UNUSED __attribute__((warn_unused_result))

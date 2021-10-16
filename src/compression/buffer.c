@@ -146,6 +146,7 @@ squash_buffer_init(
 	}
 	buffer->impl = impl;
 	buffer->block_size = block_size;
+	buffer->data = NULL;
 
 	return rv;
 }
