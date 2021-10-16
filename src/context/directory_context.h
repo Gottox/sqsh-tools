@@ -68,8 +68,8 @@ SQUASH_NO_UNUSED int squash_directory_init(
 SQUASH_NO_UNUSED int squash_directory_iterator_init(
 		struct SquashDirectoryIterator *iterator,
 		struct SquashDirectoryContext *directory);
-SQUASH_NO_UNUSED int squash_directory_iterator_next(
-		struct SquashDirectoryIterator *iterator);
+SQUASH_NO_UNUSED int
+squash_directory_iterator_next(struct SquashDirectoryIterator *iterator);
 SQUASH_NO_UNUSED int squash_directory_iterator_lookup(
 		struct SquashDirectoryIterator *iterator, const char *name,
 		const size_t name_len);
@@ -82,8 +82,8 @@ enum SquashInodeContextType squash_directory_iterator_inode_type(
 SQUASH_NO_UNUSED int squash_directory_iterator_inode_load(
 		const struct SquashDirectoryIterator *iterator,
 		struct SquashInodeContext *inode);
-const char *squash_directory_iterator_name(
-		const struct SquashDirectoryIterator *iterator);
+const char *
+squash_directory_iterator_name(const struct SquashDirectoryIterator *iterator);
 SQUASH_NO_UNUSED int squash_directory_iterator_name_dup(
 		const struct SquashDirectoryIterator *iterator, char **name_buffer);
 int squash_directory_iterator_cleanup(struct SquashDirectoryIterator *iterator);

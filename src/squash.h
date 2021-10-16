@@ -57,8 +57,9 @@ struct Squash {
 	enum SquashDtor dtor;
 };
 
-SQUASH_NO_UNUSED int squash_init(struct Squash *squash, uint8_t *buffer,
-		const size_t size, const enum SquashDtor dtor);
+SQUASH_NO_UNUSED int squash_init(
+		struct Squash *squash, uint8_t *buffer, const size_t size,
+		const enum SquashDtor dtor);
 
 SQUASH_NO_UNUSED int squash_open(struct Squash *squash, const char *path);
 

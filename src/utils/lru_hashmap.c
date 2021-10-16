@@ -44,7 +44,8 @@ lru_hash_to_start_index(struct SquashLruHashmap *hashmap, uint64_t hash) {
 }
 
 int
-squash_lru_hashmap_init(struct SquashLruHashmap *hashmap, size_t size,
+squash_lru_hashmap_init(
+		struct SquashLruHashmap *hashmap, size_t size,
 		SquashLruHashmapDtor dtor) {
 	hashmap->dtor = dtor;
 	hashmap->size = size;

@@ -1,5 +1,5 @@
 ---
-AlignAfterOpenBracket: DontAlign
+AlignAfterOpenBracket: AlwaysBreak
 AlignEscapedNewlines: DontAlign
 AlignOperands: DontAlign
 AlwaysBreakAfterReturnType: AllDefinitions

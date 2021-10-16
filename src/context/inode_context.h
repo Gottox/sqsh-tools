@@ -74,28 +74,29 @@ struct SquashInodeDirectoryIndexIterator {
 	off_t next_offset;
 };
 
-SQUASH_NO_UNUSED int squash_inode_load(struct SquashInodeContext *inode,
+SQUASH_NO_UNUSED int squash_inode_load(
+		struct SquashInodeContext *inode,
 		const struct SquashSuperblockContext *superblock, uint64_t inode_ref);
 
-SQUASH_NO_UNUSED uint32_t squash_inode_hard_link_count(
-		const struct SquashInodeContext *inode);
+SQUASH_NO_UNUSED uint32_t
+squash_inode_hard_link_count(const struct SquashInodeContext *inode);
 
 uint64_t squash_inode_file_size(const struct SquashInodeContext *inode);
 uint16_t squash_inode_permission(const struct SquashInodeContext *inode);
 uint32_t squash_inode_modified_time(const struct SquashInodeContext *inode);
 uint64_t squash_inode_file_blocks_start(const struct SquashInodeContext *inode);
 // TODO: Find right datatype for index
-uint32_t squash_inode_file_block_size(
-		const struct SquashInodeContext *inode, int index);
+uint32_t
+squash_inode_file_block_size(const struct SquashInodeContext *inode, int index);
 bool squash_inode_file_block_is_compressed(
 		const struct SquashInodeContext *inode, int index);
-uint32_t squash_inode_file_fragment_block_index(
-		const struct SquashInodeContext *inode);
-uint32_t squash_inode_file_fragment_block_offset(
-		const struct SquashInodeContext *inode);
+uint32_t
+squash_inode_file_fragment_block_index(const struct SquashInodeContext *inode);
+uint32_t
+squash_inode_file_fragment_block_offset(const struct SquashInodeContext *inode);
 
-enum SquashInodeContextType squash_inode_type(
-		const struct SquashInodeContext *inode);
+enum SquashInodeContextType
+squash_inode_type(const struct SquashInodeContext *inode);
 
 const char *squash_inode_symlink(const struct SquashInodeContext *inode);
 SQUASH_NO_UNUSED int squash_inode_symlink_dup(
@@ -123,7 +124,7 @@ SQUASH_NO_UNUSED int squash_inode_directory_index_iterator_clean(
 
 void squash_inode_ref_to_block(
 		uint64_t ref, uint32_t *block_index, uint16_t *offset);
-SQUASH_NO_UNUSED uint64_t squash_inode_ref_from_block(
-		uint32_t block_index, uint16_t offset);
+SQUASH_NO_UNUSED uint64_t
+squash_inode_ref_from_block(uint32_t block_index, uint16_t offset);
 
 #endif /* end of include guard SQUASH_INODE_CONTEXT_H */

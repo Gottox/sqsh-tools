@@ -342,14 +342,16 @@ squash_inode_symlink_size(const struct SquashInodeContext *inode) {
 }
 
 int
-squash_inode_load_root(struct SquashInodeContext *inode,
+squash_inode_load_root(
+		struct SquashInodeContext *inode,
 		const struct SquashSuperblockContext *superblock, uint64_t inode_ref) {
 	return squash_inode_load(
 			inode, superblock, squash_superblock_inode_root_ref(superblock));
 }
 
 int
-squash_inode_load(struct SquashInodeContext *inode,
+squash_inode_load(
+		struct SquashInodeContext *inode,
 		const struct SquashSuperblockContext *superblock, uint64_t inode_ref) {
 	uint32_t inode_block;
 	uint16_t inode_offset;
@@ -359,7 +361,8 @@ squash_inode_load(struct SquashInodeContext *inode,
 	int rv = 0;
 	inode->inode = NULL;
 
-	rv = squash_metablock_init(&inode->extract, superblock,
+	rv = squash_metablock_init(
+			&inode->extract, superblock,
 			squash_superblock_inode_table_start(superblock));
 	if (rv < 0) {
 		return rv;
@@ -397,7 +400,7 @@ squash_inode_directory_iterator_init(
 	int rv = 0;
 
 	if (squash_data_inode_type(inode->inode) !=
-			SQUASH_INODE_TYPE_EXTENDED_DIRECTORY) {
+		SQUASH_INODE_TYPE_EXTENDED_DIRECTORY) {
 		return -SQUASH_ERROR_NO_EXTENDED_DIRECTORY;
 	}
 

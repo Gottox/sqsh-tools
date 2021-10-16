@@ -42,33 +42,28 @@
 #define BLOCK_SIZE 8192
 
 static int
-metablock_bounds_check(const struct SquashSuperblockContext *superblock,
-		const struct SquashMetablock *block) {
-	uint64_t upper_bounds;
+metablock_bounds_check(
+		const struct SquashSuperblockContext *superblock,
+		const struct SquashMetablock *block, off_t offset) {
 	uint64_t header_bounds;
 	uint64_t data_bounds;
-
-	if (ADD_OVERFLOW((uint64_t)superblock,
-				squash_superblock_bytes_used(superblock), &upper_bounds)) {
-		return -SQUASH_ERROR_INTEGER_OVERFLOW;
-	}
+	uint64_t bytes_used = squash_superblock_bytes_used(superblock);
 
 	if (ADD_OVERFLOW(
-				(uint64_t)block, SQUASH_SIZEOF_METABLOCK, &header_bounds)) {
+				(uint64_t)offset, SQUASH_SIZEOF_METABLOCK, &header_bounds)) {
 		return -SQUASH_ERROR_INTEGER_OVERFLOW;
 	}
 
-	if (header_bounds > upper_bounds) {
+	if (header_bounds > bytes_used) {
 		return -SQUASH_ERROR_SIZE_MISSMATCH;
 	}
 
-	const uint8_t *data = squash_data_metablock_data(block);
 	const size_t data_size = squash_data_metablock_size(block);
-	if (ADD_OVERFLOW((uint64_t)data, data_size, &data_bounds)) {
+	if (ADD_OVERFLOW((uint64_t)header_bounds, data_size, &data_bounds)) {
 		return -SQUASH_ERROR_INTEGER_OVERFLOW;
 	}
 
-	if (data_bounds > upper_bounds) {
+	if (data_bounds > bytes_used) {
 		return -SQUASH_ERROR_SIZE_MISSMATCH;
 	}
 
@@ -76,7 +71,8 @@ metablock_bounds_check(const struct SquashSuperblockContext *superblock,
 }
 
 int
-squash_metablock_from_offset(const struct SquashMetablock **metablock,
+squash_metablock_from_offset(
+		const struct SquashMetablock **metablock,
 		const struct SquashSuperblockContext *superblock, off_t offset) {
 	int rv = 0;
 	const struct SquashMetablock *block =
@@ -84,7 +80,7 @@ squash_metablock_from_offset(const struct SquashMetablock **metablock,
 	if (block == NULL) {
 		return -SQUASH_ERROR_SIZE_MISSMATCH;
 	}
-	rv = metablock_bounds_check(superblock, block);
+	rv = metablock_bounds_check(superblock, block, offset);
 	if (rv < 0) {
 		return rv;
 	}
@@ -100,7 +96,7 @@ squash_metablock_from_start_block(
 	const struct SquashMetablock *block =
 			(const struct SquashMetablock *)&tmp[offset];
 
-	if (metablock_bounds_check(superblock, block) < 0) {
+	if (metablock_bounds_check(superblock, block, offset) < 0) {
 		return NULL;
 	} else {
 		return block;
@@ -108,7 +104,8 @@ squash_metablock_from_start_block(
 }
 
 int
-squash_metablock_init(struct SquashMetablockContext *extract,
+squash_metablock_init(
+		struct SquashMetablockContext *extract,
 		const struct SquashSuperblockContext *superblock, off_t start_block) {
 	extract->start_block = start_block;
 	extract->index = 0;
@@ -118,8 +115,9 @@ squash_metablock_init(struct SquashMetablockContext *extract,
 }
 
 int
-squash_metablock_seek(struct SquashMetablockContext *metablock,
-		const off_t index, const off_t offset) {
+squash_metablock_seek(
+		struct SquashMetablockContext *metablock, const off_t index,
+		const off_t offset) {
 	int rv = 0;
 
 	squash_buffer_cleanup(&metablock->buffer);

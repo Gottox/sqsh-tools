@@ -47,16 +47,16 @@ struct SquashDirectoryEntry;
 
 struct SquashDirectoryFragment;
 
-uint16_t squash_data_directory_entry_offset(
-		const struct SquashDirectoryEntry *entry);
+uint16_t
+squash_data_directory_entry_offset(const struct SquashDirectoryEntry *entry);
 int16_t squash_data_directory_entry_inode_offset(
 		const struct SquashDirectoryEntry *entry);
-uint16_t squash_data_directory_entry_type(
-		const struct SquashDirectoryEntry *entry);
-uint16_t squash_data_directory_entry_name_size(
-		const struct SquashDirectoryEntry *entry);
-const uint8_t *squash_data_directory_entry_name(
-		const struct SquashDirectoryEntry *entry);
+uint16_t
+squash_data_directory_entry_type(const struct SquashDirectoryEntry *entry);
+uint16_t
+squash_data_directory_entry_name_size(const struct SquashDirectoryEntry *entry);
+const uint8_t *
+squash_data_directory_entry_name(const struct SquashDirectoryEntry *entry);
 
 uint32_t squash_data_directory_fragment_count(
 		const struct SquashDirectoryFragment *fragment);

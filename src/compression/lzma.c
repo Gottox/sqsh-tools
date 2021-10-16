@@ -44,8 +44,9 @@
 #include "compression.h"
 
 static int
-squash_lzma_extract(const union SquashCompressionOptions *options,
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
+squash_lzma_extract(
+		const union SquashCompressionOptions *options, uint8_t *target,
+		size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	lzma_ret rv = LZMA_OK;
 

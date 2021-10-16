@@ -46,7 +46,8 @@ struct SquashTableContext {
 	size_t element_count;
 };
 
-int squash_table_init(struct SquashTableContext *table,
+int squash_table_init(
+		struct SquashTableContext *table,
 		const struct SquashSuperblockContext *superblock, off_t start_block,
 		size_t element_size, size_t element_count);
 int squash_table_get(

@@ -41,8 +41,8 @@
 
 struct SquashDatablockSize;
 
-uint32_t squash_data_datablock_size(
-		const struct SquashDatablockSize *datablock_size);
+uint32_t
+squash_data_datablock_size(const struct SquashDatablockSize *datablock_size);
 bool squash_data_datablock_is_compressed(
 		const struct SquashDatablockSize *datablock_size);
 

@@ -63,20 +63,20 @@ uint64_t squash_superblock_fragment_table_start(
 uint64_t squash_superblock_inode_table_start(
 		const struct SquashSuperblockContext *context);
 
-uint64_t squash_superblock_inode_root_ref(
-		const struct SquashSuperblockContext *context);
+uint64_t
+squash_superblock_inode_root_ref(const struct SquashSuperblockContext *context);
 
-bool squash_superblock_has_fragments(
-		const struct SquashSuperblockContext *context);
+bool
+squash_superblock_has_fragments(const struct SquashSuperblockContext *context);
 
-uint32_t squash_superblock_block_size(
-		const struct SquashSuperblockContext *context);
+uint32_t
+squash_superblock_block_size(const struct SquashSuperblockContext *context);
 
 uint32_t squash_superblock_fragment_entry_count(
 		const struct SquashSuperblockContext *context);
 
-uint64_t squash_superblock_bytes_used(
-		const struct SquashSuperblockContext *context);
+uint64_t
+squash_superblock_bytes_used(const struct SquashSuperblockContext *context);
 
 int squash_superblock_cleanup(struct SquashSuperblockContext *superblock);
 

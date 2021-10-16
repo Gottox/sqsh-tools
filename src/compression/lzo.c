@@ -45,8 +45,9 @@
 #include "compression.h"
 
 static int
-squash_lzo_extract(const union SquashCompressionOptions *options,
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
+squash_lzo_extract(
+		const union SquashCompressionOptions *options, uint8_t *target,
+		size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	int rv = lzo1x_decompress_safe(
 			compressed, compressed_size, target, target_size, NULL);

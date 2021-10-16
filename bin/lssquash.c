@@ -44,8 +44,9 @@
 #include <string.h>
 #include <unistd.h>
 
-static int ls(struct Squash *squash, const char *path,
-		struct SquashInodeContext *inode, const bool recursive);
+static int
+ls(struct Squash *squash, const char *path, struct SquashInodeContext *inode,
+   const bool recursive);
 
 static int
 usage(char *arg0) {
@@ -74,8 +75,8 @@ ls_item(struct Squash *squash, const char *path,
 	strncat(current_path, name, name_size);
 	puts(current_path);
 	if (recursive &&
-			squash_directory_iterator_inode_type(iter) ==
-					SQUASH_INODE_TYPE_DIRECTORY) {
+		squash_directory_iterator_inode_type(iter) ==
+				SQUASH_INODE_TYPE_DIRECTORY) {
 		rv = squash_directory_iterator_inode_load(iter, &entry_inode);
 		if (rv < 0) {
 			goto out;
@@ -94,7 +95,7 @@ out:
 
 static int
 ls(struct Squash *squash, const char *path, struct SquashInodeContext *inode,
-		const bool recursive) {
+   const bool recursive) {
 	int rv;
 	struct SquashDirectoryContext dir = {0};
 	struct SquashDirectoryIterator iter = {0};

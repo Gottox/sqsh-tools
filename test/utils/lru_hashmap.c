@@ -185,7 +185,7 @@ hashmap_add_many() {
 
 	length = 0;
 	for (struct SquashLruEntry *entry = hashmap.newest; entry;
-			entry = entry->older) {
+		 entry = entry->older) {
 		assert(NBR - length - 1 == entry->hash);
 		length++;
 	}
@@ -193,7 +193,7 @@ hashmap_add_many() {
 
 	length = 0;
 	for (struct SquashLruEntry *entry = hashmap.oldest; entry;
-			entry = entry->newer) {
+		 entry = entry->newer) {
 		assert(NBR - SIZE + length == entry->hash);
 		length++;
 	}

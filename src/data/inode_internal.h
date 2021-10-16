@@ -45,7 +45,8 @@ struct SquashInodeDirectoryIndex {
 	uint32_t name_size;
 	// uint8_t name[0]; // [name_size + 1]
 };
-STATIC_ASSERT(sizeof(struct SquashInodeDirectoryIndex) ==
+STATIC_ASSERT(
+		sizeof(struct SquashInodeDirectoryIndex) ==
 		SQUASH_SIZEOF_INODE_DIRECTORY_INDEX);
 
 struct SquashInodeDirectory {
@@ -68,7 +69,8 @@ struct SquashInodeDirectoryExt {
 	uint32_t xattr_idx;
 	// struct SquashInodeDirectoryIndex index[0]; // [index_count]
 };
-STATIC_ASSERT(sizeof(struct SquashInodeDirectoryExt) ==
+STATIC_ASSERT(
+		sizeof(struct SquashInodeDirectoryExt) ==
 		SQUASH_SIZEOF_INODE_DIRECTORY_EXT);
 
 struct SquashInodeFile {
@@ -105,13 +107,15 @@ struct SquashInodeSymlinkExt {
 	uint32_t target_size;
 	// uint8_t target_path[0]; // [target_size]
 };
-STATIC_ASSERT(sizeof(struct SquashInodeSymlinkExt) ==
+STATIC_ASSERT(
+		sizeof(struct SquashInodeSymlinkExt) ==
 		SQUASH_SIZEOF_INODE_SYMLINK_EXT);
 
 struct SquashInodeSymlinkExtTail {
 	uint32_t xattr_idx;
 };
-STATIC_ASSERT(sizeof(struct SquashInodeSymlinkExtTail) ==
+STATIC_ASSERT(
+		sizeof(struct SquashInodeSymlinkExtTail) ==
 		SQUASH_SIZEOF_INODE_SYMLINK_EXT_TAIL);
 
 struct SquashInodeDevice {

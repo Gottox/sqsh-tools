@@ -41,7 +41,8 @@
 #include <stdint.h>
 
 int
-squash_datablock_init(struct SquashDatablockContext *context,
+squash_datablock_init(
+		struct SquashDatablockContext *context,
 		const struct SquashInodeContext *inode) {
 	size_t block_size = squash_superblock_block_size(inode->extract.superblock);
 	int rv = 0;
@@ -53,7 +54,7 @@ squash_datablock_init(struct SquashDatablockContext *context,
 	context->superblock = inode->extract.superblock;
 	context->inode = inode;
 	if (squash_inode_file_fragment_block_index(inode) ==
-			SQUASH_INODE_NO_FRAGMENT) {
+		SQUASH_INODE_NO_FRAGMENT) {
 		context->blocks_count = squash_divide_ceil_u32(file_size, block_size);
 	} else {
 		context->blocks_count = file_size / block_size;
@@ -130,14 +131,14 @@ squash_datablock_read(struct SquashDatablockContext *context, uint64_t size) {
 			datablock_offset(context, context->datablock_index);
 
 	while (squash_datablock_size(context) < size &&
-			context->datablock_index < context->blocks_count) {
+		   context->datablock_index < context->blocks_count) {
 		bool is_compressed = squash_inode_file_block_is_compressed(
 				context->inode, context->datablock_index);
 		uint64_t compressed_size = squash_inode_file_block_size(
 				context->inode, context->datablock_index);
-		rv = squash_buffer_append(&context->buffer,
-				&context->blocks[compressed_offset], compressed_size,
-				is_compressed);
+		rv = squash_buffer_append(
+				&context->buffer, &context->blocks[compressed_offset],
+				compressed_size, is_compressed);
 		if (rv < 0) {
 			goto out;
 		}

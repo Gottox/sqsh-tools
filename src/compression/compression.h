@@ -42,8 +42,9 @@
 union SquashCompressionOptions;
 
 struct SquashCompressionImplementation {
-	int (*extract)(const union SquashCompressionOptions *options,
-			uint8_t *target, size_t *target_size, const uint8_t *compressed,
+	int (*extract)(
+			const union SquashCompressionOptions *options, uint8_t *target,
+			size_t *target_size, const uint8_t *compressed,
 			const size_t compressed_size);
 };
 

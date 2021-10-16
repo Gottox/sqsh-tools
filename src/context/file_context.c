@@ -42,7 +42,8 @@
 #include <stdint.h>
 
 int
-squash_file_init(struct SquashFileContext *context,
+squash_file_init(
+		struct SquashFileContext *context,
 		const struct SquashInodeContext *inode) {
 	int rv = 0;
 	rv = squash_datablock_init(&context->datablock, inode);
@@ -100,8 +101,9 @@ squash_file_read(struct SquashFileContext *context, uint64_t size) {
 		const uint8_t *fragment_data = squash_fragment_data(&context->fragment);
 		uint64_t fragment_size = squash_fragment_size(&context->fragment);
 
-		rv = squash_buffer_append(&context->datablock.buffer, fragment_data,
-				fragment_size, false);
+		rv = squash_buffer_append(
+				&context->datablock.buffer, fragment_data, fragment_size,
+				false);
 		if (rv < 0) {
 			goto out;
 		}

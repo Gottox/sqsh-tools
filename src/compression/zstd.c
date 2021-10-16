@@ -44,8 +44,9 @@
 #include "compression.h"
 
 static int
-squash_zstd_extract(const union SquashCompressionOptions *options,
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
+squash_zstd_extract(
+		const union SquashCompressionOptions *options, uint8_t *target,
+		size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	int rv = ZSTD_decompress(target, *target_size, compressed, compressed_size);
 

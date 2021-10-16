@@ -74,7 +74,8 @@ metablock_info(const struct SquashMetablock *metablock, struct Squash *squash) {
 	}
 
 	int is_compressed = squash_data_metablock_is_compressed(metablock);
-	rv = squash_metablock_init(&extract, &squash->superblock,
+	rv = squash_metablock_init(
+			&extract, &squash->superblock,
 			(uint8_t *)metablock - (uint8_t *)squash->superblock.superblock);
 	if (rv < 0) {
 		return 0;
@@ -163,7 +164,8 @@ root_inode_info(struct Squash *squash) {
 	uint64_t root_inode_ref = squash_data_superblock_root_inode_ref(
 			squash->superblock.superblock);
 	fputs("=== INODE TABLE ===\n", out);
-	rv = squash_metablock_from_offset(&metablock, &squash->superblock,
+	rv = squash_metablock_from_offset(
+			&metablock, &squash->superblock,
 			squash_data_superblock_inode_table_start(
 					squash->superblock.superblock));
 	if (rv < 0) {
@@ -235,9 +237,11 @@ compression_info(struct Squash *squash) {
 
 	if (handler == NULL) {
 		fputs("WARNING: NO COMPRESSION OPTION HANDLER\n", stdout);
-	} else if (squash_data_superblock_flags(squash->superblock.superblock) &
+	} else if (
+			squash_data_superblock_flags(squash->superblock.superblock) &
 			SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
-		rv = squash_metablock_from_offset(&metablock, &squash->superblock,
+		rv = squash_metablock_from_offset(
+				&metablock, &squash->superblock,
 				sizeof(struct SquashSuperblock));
 		if (rv < 0) {
 			goto out;

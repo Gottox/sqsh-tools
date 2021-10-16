@@ -44,8 +44,9 @@
 #include <string.h>
 
 static int
-directory_iterator_index_lookup(struct SquashDirectoryIterator *iterator,
-		const char *name, const size_t name_len) {
+directory_iterator_index_lookup(
+		struct SquashDirectoryIterator *iterator, const char *name,
+		const size_t name_len) {
 	int rv = 0;
 	struct SquashInodeDirectoryIndexIterator index_iterator;
 	struct SquashInodeContext *inode = iterator->directory->inode;
@@ -62,7 +63,7 @@ directory_iterator_index_lookup(struct SquashDirectoryIterator *iterator,
 						&index_iterator);
 
 		if (strncmp(name, (char *)index_name, MIN(index_name_size, name_len)) >
-				0) {
+			0) {
 			break;
 		}
 		iterator->next_offset =
@@ -100,7 +101,8 @@ current_entry(const struct SquashDirectoryIterator *iterator) {
 }
 
 int
-squash_directory_init(struct SquashDirectoryContext *directory,
+squash_directory_init(
+		struct SquashDirectoryContext *directory,
 		const struct SquashSuperblockContext *superblock,
 		struct SquashInodeContext *inode) {
 	int rv = 0;
@@ -135,8 +137,9 @@ squash_directory_init(struct SquashDirectoryContext *directory,
 }
 
 int
-squash_directory_iterator_lookup(struct SquashDirectoryIterator *iterator,
-		const char *name, const size_t name_len) {
+squash_directory_iterator_lookup(
+		struct SquashDirectoryIterator *iterator, const char *name,
+		const size_t name_len) {
 	int rv = 0;
 
 	rv = directory_iterator_index_lookup(iterator, name, name_len);
@@ -158,15 +161,18 @@ squash_directory_iterator_lookup(struct SquashDirectoryIterator *iterator,
 }
 
 int
-squash_directory_iterator_init(struct SquashDirectoryIterator *iterator,
+squash_directory_iterator_init(
+		struct SquashDirectoryIterator *iterator,
 		struct SquashDirectoryContext *directory) {
 	int rv = 0;
-	rv = squash_metablock_init(&iterator->extract, directory->superblock,
+	rv = squash_metablock_init(
+			&iterator->extract, directory->superblock,
 			squash_superblock_directory_table_start(directory->superblock));
 	if (rv < 0) {
 		return rv;
 	}
-	rv = squash_metablock_seek(&iterator->extract, directory->block_start,
+	rv = squash_metablock_seek(
+			&iterator->extract, directory->block_start,
 			directory->block_offset);
 	if (rv < 0) {
 		return rv;

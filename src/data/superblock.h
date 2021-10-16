@@ -71,32 +71,32 @@ struct SquashSuperblock;
 int squash_data_superblock_init(
 		const struct SquashSuperblock *superblock, size_t size);
 
-uint32_t squash_data_superblock_magic(
-		const struct SquashSuperblock *superblock);
-uint32_t squash_data_superblock_inode_count(
-		const struct SquashSuperblock *superblock);
+uint32_t
+squash_data_superblock_magic(const struct SquashSuperblock *superblock);
+uint32_t
+squash_data_superblock_inode_count(const struct SquashSuperblock *superblock);
 uint32_t squash_data_superblock_modification_time(
 		const struct SquashSuperblock *superblock);
-uint32_t squash_data_superblock_block_size(
-		const struct SquashSuperblock *superblock);
+uint32_t
+squash_data_superblock_block_size(const struct SquashSuperblock *superblock);
 uint32_t squash_data_superblock_fragment_entry_count(
 		const struct SquashSuperblock *superblock);
 uint16_t squash_data_superblock_compression_id(
 		const struct SquashSuperblock *superblock);
-uint16_t squash_data_superblock_block_log(
-		const struct SquashSuperblock *superblock);
-uint16_t squash_data_superblock_flags(
-		const struct SquashSuperblock *superblock);
-uint16_t squash_data_superblock_id_count(
-		const struct SquashSuperblock *superblock);
-uint16_t squash_data_superblock_version_major(
-		const struct SquashSuperblock *superblock);
-uint16_t squash_data_superblock_version_minor(
-		const struct SquashSuperblock *superblock);
+uint16_t
+squash_data_superblock_block_log(const struct SquashSuperblock *superblock);
+uint16_t
+squash_data_superblock_flags(const struct SquashSuperblock *superblock);
+uint16_t
+squash_data_superblock_id_count(const struct SquashSuperblock *superblock);
+uint16_t
+squash_data_superblock_version_major(const struct SquashSuperblock *superblock);
+uint16_t
+squash_data_superblock_version_minor(const struct SquashSuperblock *superblock);
 uint64_t squash_data_superblock_root_inode_ref(
 		const struct SquashSuperblock *superblock);
-uint64_t squash_data_superblock_bytes_used(
-		const struct SquashSuperblock *superblock);
+uint64_t
+squash_data_superblock_bytes_used(const struct SquashSuperblock *superblock);
 uint64_t squash_data_superblock_id_table_start(
 		const struct SquashSuperblock *superblock);
 uint64_t squash_data_superblock_xattr_id_table_start(

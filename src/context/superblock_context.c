@@ -41,8 +41,9 @@
 const static uint32_t SUPERBLOCK_MAGIC = 0x73717368;
 
 int
-squash_superblock_init(struct SquashSuperblockContext *context,
-		const uint8_t *buffer, size_t size) {
+squash_superblock_init(
+		struct SquashSuperblockContext *context, const uint8_t *buffer,
+		size_t size) {
 	const struct SquashSuperblock *superblock =
 			(const struct SquashSuperblock *)buffer;
 	if (size < SQUASH_SIZEOF_SUPERBLOCK) {
@@ -56,7 +57,7 @@ squash_superblock_init(struct SquashSuperblockContext *context,
 	}
 
 	if (squash_data_superblock_block_log(superblock) !=
-			squash_log2_u32(squash_data_superblock_block_size(superblock))) {
+		squash_log2_u32(squash_data_superblock_block_size(superblock))) {
 		return -SQUASH_ERROR_BLOCKSIZE_MISSMATCH;
 	}
 
@@ -109,7 +110,8 @@ squash_superblock_inode_root_ref(
 
 bool
 squash_superblock_has_fragments(const struct SquashSuperblockContext *context) {
-	return !(squash_data_superblock_flags(context->superblock) &
+	return !(
+			squash_data_superblock_flags(context->superblock) &
 			SQUASH_SUPERBLOCK_NO_FRAGMENTS);
 }
 

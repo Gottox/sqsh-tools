@@ -52,14 +52,17 @@ struct SquashBuffer {
 	size_t size;
 };
 
-SQUASH_NO_UNUSED int squash_buffer_new(struct SquashBuffer **context,
+SQUASH_NO_UNUSED int squash_buffer_new(
+		struct SquashBuffer **context,
 		const struct SquashSuperblockContext *superblock, int block_size);
 
-SQUASH_NO_UNUSED int squash_buffer_init(struct SquashBuffer *compression,
+SQUASH_NO_UNUSED int squash_buffer_init(
+		struct SquashBuffer *compression,
 		const struct SquashSuperblockContext *superblock, int block_size);
 
-SQUASH_NO_UNUSED int squash_buffer_append(struct SquashBuffer *compression,
-		const uint8_t *source, const size_t source_size, bool is_compressed);
+SQUASH_NO_UNUSED int squash_buffer_append(
+		struct SquashBuffer *compression, const uint8_t *source,
+		const size_t source_size, bool is_compressed);
 
 const uint8_t *squash_buffer_data(const struct SquashBuffer *buffer);
 size_t squash_buffer_size(const struct SquashBuffer *buffer);

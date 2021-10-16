@@ -57,8 +57,9 @@ struct SquashLruHashmap {
 	SquashLruHashmapDtor dtor;
 };
 
-SQUASH_NO_UNUSED int squash_lru_hashmap_init(struct SquashLruHashmap *hashmap,
-		size_t size, SquashLruHashmapDtor dtor);
+SQUASH_NO_UNUSED int squash_lru_hashmap_init(
+		struct SquashLruHashmap *hashmap, size_t size,
+		SquashLruHashmapDtor dtor);
 SQUASH_NO_UNUSED int squash_lru_hashmap_put(
 		struct SquashLruHashmap *hashmap, uint64_t hash, void *pointer);
 void *squash_lru_hashmap_get(struct SquashLruHashmap *hashmap, uint64_t hash);

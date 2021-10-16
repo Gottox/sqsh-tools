@@ -42,8 +42,9 @@
 #include <sys/types.h>
 
 static int
-squash_null_extract(const union SquashCompressionOptions *options,
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
+squash_null_extract(
+		const union SquashCompressionOptions *options, uint8_t *target,
+		size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	if (compressed_size > *target_size) {
 		return -SQUASH_ERROR_SIZE_MISSMATCH;

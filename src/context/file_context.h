@@ -47,11 +47,12 @@ struct SquashFileContext {
 	uint32_t fragment_pos;
 };
 
-SQUASH_NO_UNUSED int squash_file_init(struct SquashFileContext *context,
+SQUASH_NO_UNUSED int squash_file_init(
+		struct SquashFileContext *context,
 		const struct SquashInodeContext *inode);
 
-SQUASH_NO_UNUSED int squash_file_seek(
-		struct SquashFileContext *context, uint64_t seek_pos);
+SQUASH_NO_UNUSED int
+squash_file_seek(struct SquashFileContext *context, uint64_t seek_pos);
 
 int squash_file_read(struct SquashFileContext *context, uint64_t size);
 

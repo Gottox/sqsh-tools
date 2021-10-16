@@ -56,7 +56,8 @@ squash_ls() {
 			&superblock, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = squash_inode_load(&inode, &superblock,
+	rv = squash_inode_load(
+			&inode, &superblock,
 			squash_data_superblock_root_inode_ref(superblock.superblock));
 	assert(rv == 0);
 

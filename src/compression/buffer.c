@@ -98,7 +98,8 @@ compression_by_id(int id) {
 }
 
 int
-squash_buffer_new(struct SquashBuffer **context,
+squash_buffer_new(
+		struct SquashBuffer **context,
 		const struct SquashSuperblockContext *superblock, int block_size) {
 	int rv = 0;
 
@@ -115,7 +116,8 @@ squash_buffer_new(struct SquashBuffer **context,
 }
 
 int
-squash_buffer_init(struct SquashBuffer *buffer,
+squash_buffer_init(
+		struct SquashBuffer *buffer,
 		const struct SquashSuperblockContext *superblock, int block_size) {
 	int rv = 0;
 	const struct SquashCompressionImplementation *impl;
@@ -127,10 +129,11 @@ squash_buffer_init(struct SquashBuffer *buffer,
 	}
 
 	if (squash_data_superblock_flags(superblock->superblock) &
-			SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
+		SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
 		// TODO: manually calculating the offset does not honour bounds checks
 		const struct SquashMetablock *metablock =
-				(const struct SquashMetablock *)&((const uint8_t *)
+				(const struct SquashMetablock *)&(
+						(const uint8_t *)
 								superblock)[sizeof(struct SquashSuperblock)];
 		buffer->options = (const union SquashCompressionOptions *)
 				squash_data_metablock_data(metablock);
@@ -148,7 +151,8 @@ squash_buffer_init(struct SquashBuffer *buffer,
 }
 
 int
-squash_buffer_append(struct SquashBuffer *buffer, const uint8_t *source,
+squash_buffer_append(
+		struct SquashBuffer *buffer, const uint8_t *source,
 		const size_t source_size, bool is_compressed) {
 	const union SquashCompressionOptions *options = buffer->options;
 	const struct SquashCompressionImplementation *impl =
@@ -167,7 +171,8 @@ squash_buffer_append(struct SquashBuffer *buffer, const uint8_t *source,
 		return -SQUASH_ERROR_MALLOC_FAILED;
 	}
 
-	rv = impl->extract(options, &buffer->data[buffer_size], &block_size, source,
+	rv = impl->extract(
+			options, &buffer->data[buffer_size], &block_size, source,
 			source_size);
 	if (rv < 0)
 		return rv;

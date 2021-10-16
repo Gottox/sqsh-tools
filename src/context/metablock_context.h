@@ -62,8 +62,8 @@ SQUASH_NO_UNUSED int squash_metablock_seek(
 		struct SquashMetablockContext *metablock, off_t index, off_t offset);
 SQUASH_NO_UNUSED int squash_metablock_more(
 		struct SquashMetablockContext *metablock, const size_t size);
-const uint8_t *squash_metablock_data(
-		const struct SquashMetablockContext *metablock);
+const uint8_t *
+squash_metablock_data(const struct SquashMetablockContext *metablock);
 size_t squash_metablock_size(const struct SquashMetablockContext *metablock);
 int squash_metablock_cleanup(struct SquashMetablockContext *metablock);
 

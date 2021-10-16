@@ -131,9 +131,9 @@ out:
 }
 
 static int
-squashfuse_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
-		off_t offset, struct fuse_file_info *fi,
-		enum fuse_readdir_flags flags) {
+squashfuse_readdir(
+		const char *path, void *buf, fuse_fill_dir_t filler, off_t offset,
+		struct fuse_file_info *fi, enum fuse_readdir_flags flags) {
 	int rv = 0;
 	struct SquashInodeContext inode = {0};
 	struct SquashDirectoryContext dir = {0};
@@ -199,7 +199,8 @@ out:
 }
 
 static int
-squashfuse_read(const char *path, char *buf, size_t size, off_t offset,
+squashfuse_read(
+		const char *path, char *buf, size_t size, off_t offset,
 		struct fuse_file_info *fi) {
 	int rv = 0;
 	struct SquashInodeContext inode = {0};
@@ -262,8 +263,9 @@ int
 main(int argc, char *argv[]) {
 	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 	int rv = 0;
-	if (fuse_opt_parse(&args, &options, option_spec,
-				squashfuse_process_options) == -1) {
+	if (fuse_opt_parse(
+				&args, &options, option_spec, squashfuse_process_options) ==
+		-1) {
 		rv = EXIT_FAILURE;
 		goto out;
 	}

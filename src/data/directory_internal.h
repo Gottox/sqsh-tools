@@ -56,7 +56,8 @@ struct SquashDirectoryFragment {
 	// struct SquashDirectoryEntry entries[0]; // [count + 1]
 };
 
-STATIC_ASSERT(sizeof(struct SquashDirectoryFragment) ==
+STATIC_ASSERT(
+		sizeof(struct SquashDirectoryFragment) ==
 		SQUASH_SIZEOF_DIRECTORY_FRAGMENT)
 
 #endif /* end of include guard DIRECTORY_INTERNAL_H */

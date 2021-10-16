@@ -41,7 +41,8 @@
 #include <stdint.h>
 
 int
-squash_fragment_init(struct SquashFragmentContext *fragment,
+squash_fragment_init(
+		struct SquashFragmentContext *fragment,
 		const struct SquashInodeContext *inode) {
 	int rv = 0;
 	fragment->inode = inode;
@@ -56,8 +57,9 @@ squash_fragment_init(struct SquashFragmentContext *fragment,
 		goto out;
 	}
 
-	rv = squash_table_init(&fragment->table, fragment->superblock,
-			fragment_table_start, SQUASH_SIZEOF_FRAGMENT, fragment_table_count);
+	rv = squash_table_init(
+			&fragment->table, fragment->superblock, fragment_table_start,
+			SQUASH_SIZEOF_FRAGMENT, fragment_table_count);
 	if (rv < 0) {
 		goto out;
 	}

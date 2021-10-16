@@ -44,7 +44,8 @@
 #include "squash.h"
 
 int
-squash_init(struct Squash *squash, uint8_t *buffer, const size_t size,
+squash_init(
+		struct Squash *squash, uint8_t *buffer, const size_t size,
 		const enum SquashDtor dtor) {
 	int rv = 0;
 

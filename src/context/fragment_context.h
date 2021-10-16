@@ -58,8 +58,8 @@ uint64_t squash_fragment_start(struct SquashFragmentContext *fragment);
 
 uint32_t squash_fragment_size(struct SquashFragmentContext *fragment);
 
-SQUASH_NO_UNUSED int squash_fragment_read(
-		struct SquashFragmentContext *fragment);
+SQUASH_NO_UNUSED int
+squash_fragment_read(struct SquashFragmentContext *fragment);
 
 const uint8_t *squash_fragment_data(struct SquashFragmentContext *fragment);
 

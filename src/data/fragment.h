@@ -44,9 +44,9 @@
 struct SquashFragment;
 
 uint64_t squash_data_fragment_start(const struct SquashFragment *fragment);
-const struct SquashDatablockSize *squash_data_fragment_size_info(
-		const struct SquashFragment *fragment);
-uint32_t squash_data_fragment_is_compressed(
-		const struct SquashFragment *fragment);
+const struct SquashDatablockSize *
+squash_data_fragment_size_info(const struct SquashFragment *fragment);
+uint32_t
+squash_data_fragment_is_compressed(const struct SquashFragment *fragment);
 
 #endif /* end of include guard SQUASH__FRAGMENT_H */

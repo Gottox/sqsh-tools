@@ -104,7 +104,7 @@ main(int argc, char *argv[]) {
 	}
 
 	fwrite(squash_file_data(&file), sizeof(uint8_t), squash_file_size(&file),
-			stdout);
+		   stdout);
 
 out:
 	squash_file_cleanup(&file);
