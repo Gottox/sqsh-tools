@@ -32,6 +32,7 @@
  * @created     : Monday Oct 11, 2021 21:43:12 CEST
  */
 
+#include "../gen/squash_image.h"
 #include "../src/context/directory_context.h"
 #include "../src/context/file_context.h"
 #include "../src/context/inode_context.h"
@@ -40,7 +41,6 @@
 #include "../src/error.h"
 #include "../src/resolve_path.h"
 #include "common.h"
-#include "squash_image.h"
 #include "test.h"
 #include <stdint.h>
 

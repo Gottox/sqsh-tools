@@ -146,7 +146,7 @@ bench/%-bench: bench/%.c test/test.h $(OBJ)
 	@echo CCBENCH $@
 	@$(CC) $(CFLAGS) $(LDFLAGS) $(BCH_CFLAGS) $(OBJ) $< -o $@
 
-test/%-test: test/%.c test/test.h $(SRC) test/squash_image.h
+test/%-test: test/%.c test/test.h $(SRC) gen/squash_image.h
 	@echo CCTEST $@
 	@$(CC) $(CFLAGS) $(LDFLAGS) $(TST_CFLAGS) $(SRC) $< -o $@
 
@@ -183,7 +183,7 @@ coverage: check
 	@mkdir cov
 	@gcovr -r . --html --html-details -o cov/index.html
 
-test/squash_image.squashfs:
+gen/squash_image.squashfs:
 	mkdir -p $@_dir
 	echo a > $@_dir/a
 	seq 1 1050000 | tr -cd "\n" | tr '\n' b > $@_dir/b
@@ -191,15 +191,15 @@ test/squash_image.squashfs:
 	mksquashfs $@_dir $@ -noI -noId -noD -noF -noX -nopad
 	rm -r $@_dir
 
-test/squash_image.h: test/squash_image.squashfs
+gen/squash_image.h: gen/squash_image.squashfs
 	printf "%s\n" "#include <stdint.h>" "static const uint8_t squash_image[] = {" > $@
 	od  $< -t u1 -v -A n | tr ' ' '\n' | grep -v '^$$' | paste -sd, >> $@
 	echo "};" >> $@
 
 clean:
 	@echo cleaning...
-	@rm -rf doc cov
-	@rm -f *.gcnp *.gcda test/squash_image.h test/squash_image.squashfs
+	@rm -rf doc cov gen
+	@rm -f *.gcnp *.gcda
 	@rm -f $(TST_BIN) $(BCH_BIN) $(FZZ_BIN) $(OBJ) $(BIN) libsquashfs.so* libsquashfs.a
 
 .PHONY: check all clean speed coverage fuzz
