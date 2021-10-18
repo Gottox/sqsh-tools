@@ -62,7 +62,7 @@ SQUASH_NO_UNUSED int squash_lru_hashmap_init(
 		SquashLruHashmapDtor dtor);
 SQUASH_NO_UNUSED int squash_lru_hashmap_put(
 		struct SquashLruHashmap *hashmap, uint64_t hash, void *pointer);
-void *squash_lru_hashmap_get(struct SquashLruHashmap *hashmap, uint64_t hash);
+void *squash_lru_hashmap_pull(struct SquashLruHashmap *hashmap, uint64_t hash);
 int squash_lru_hashmap_cleanup(struct SquashLruHashmap *hashmap);
 
 #endif /* end of include guard LRU_HASHMAP_H */

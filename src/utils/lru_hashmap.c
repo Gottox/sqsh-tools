@@ -43,6 +43,55 @@ lru_hash_to_start_index(struct SquashLruHashmap *hashmap, uint64_t hash) {
 	return (hash * hash) % hashmap->size;
 }
 
+/*
+static int
+lru_swap(struct SquashLruHashmap *hashmap, struct SquashLruEntry *entry1, struct
+SquashLruEntry *entry2) { struct SquashLruEntry *newer, *older;
+
+	newer = entry1->newer;
+	older = entry1->older;
+	entry1->older = entry2->older;
+	entry1->newer = entry2->newer;
+	entry2->older = older;
+	entry2->newer = newer;
+
+	if (entry1 == hashmap->oldest) {
+		hashmap->oldest = entry2;
+	} else if (entry2 == hashmap->oldest) {
+		hashmap->oldest = entry1;
+	}
+	if (entry1 == hashmap->newest) {
+		hashmap->newest = entry2;
+	} else if (entry2 == hashmap->newest) {
+		hashmap->newest = entry1;
+	}
+	return 0;
+}
+*/
+
+static int
+lru_detach(struct SquashLruHashmap *hashmap, struct SquashLruEntry *entry) {
+	struct SquashLruEntry *tmp;
+
+	if (entry == hashmap->newest) {
+		hashmap->newest = entry->older;
+	}
+	if (entry == hashmap->oldest) {
+		hashmap->oldest = entry->newer;
+	}
+	if (entry->newer) {
+		tmp = entry->newer;
+		tmp->older = entry->older;
+	}
+	if (entry->older) {
+		tmp = entry->older;
+		tmp->newer = entry->newer;
+	}
+	entry->newer = NULL;
+	entry->older = NULL;
+	return 0;
+}
+
 int
 squash_lru_hashmap_init(
 		struct SquashLruHashmap *hashmap, size_t size,
@@ -59,6 +108,7 @@ squash_lru_hashmap_init(
 	}
 	return 0;
 }
+
 int
 squash_lru_hashmap_put(
 		struct SquashLruHashmap *hashmap, uint64_t hash, void *pointer) {
@@ -69,7 +119,8 @@ squash_lru_hashmap_put(
 		off_t index = (start_index + i) % hashmap->size;
 		candidate = &hashmap->entries[index];
 
-		if (candidate->pointer == NULL || candidate->pointer == pointer) {
+		if (candidate->pointer == NULL ||
+			(candidate->pointer == pointer && hash == candidate->hash)) {
 			break;
 		}
 	}
@@ -83,19 +134,10 @@ squash_lru_hashmap_put(
 		// TODO: This is potentional slow. Instead find the current first match
 		// and switch places with this one.
 		candidate = hashmap->oldest;
-		if (hashmap->oldest->newer) {
-			hashmap->oldest->newer->older = NULL;
-		}
-		hashmap->oldest = hashmap->oldest->newer;
 		hashmap->dtor(candidate->pointer);
 	}
 
-	if (candidate->newer) {
-		candidate->newer->older = candidate->older;
-	}
-	if (candidate->older) {
-		candidate->older->newer = candidate->newer;
-	}
+	lru_detach(hashmap, candidate);
 
 	candidate->pointer = pointer;
 	candidate->hash = hash;
@@ -113,7 +155,7 @@ squash_lru_hashmap_put(
 	return 0;
 }
 void *
-squash_lru_hashmap_get(struct SquashLruHashmap *hashmap, uint64_t hash) {
+squash_lru_hashmap_pull(struct SquashLruHashmap *hashmap, uint64_t hash) {
 	off_t start_index = lru_hash_to_start_index(hashmap, hash);
 
 	for (off_t i = 0; i < hashmap->size; i++) {
@@ -124,6 +166,10 @@ squash_lru_hashmap_get(struct SquashLruHashmap *hashmap, uint64_t hash) {
 			continue;
 		}
 
+		// Detaching the entry from the list. The user is responsible to put the
+		// element back through squash_lru_hashmap_put() this way the the entry
+		// cannot be removed when the hashmap is full.
+		lru_detach(hashmap, candidate);
 		return candidate->pointer;
 	}
 

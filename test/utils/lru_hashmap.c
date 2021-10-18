@@ -96,10 +96,13 @@ read_from_hashmap() {
 	rv = squash_lru_hashmap_put(&hashmap, 2, v2);
 	assert(rv == 0);
 
-	p = squash_lru_hashmap_get(&hashmap, 1);
+	p = squash_lru_hashmap_pull(&hashmap, 1);
 	assert(p == v1);
-	p = squash_lru_hashmap_get(&hashmap, 2);
+	p = squash_lru_hashmap_pull(&hashmap, 2);
 	assert(p == v2);
+
+	assert(hashmap.oldest == NULL);
+	assert(hashmap.newest == NULL);
 
 	squash_lru_hashmap_cleanup(&hashmap);
 }
@@ -142,11 +145,11 @@ hashmap_overflow() {
 	assert(hashmap.newest->newer == NULL);
 	assert(last_free == v1);
 
-	p = squash_lru_hashmap_get(&hashmap, 1);
+	p = squash_lru_hashmap_pull(&hashmap, 1);
 	assert(p == NULL);
-	p = squash_lru_hashmap_get(&hashmap, 2);
+	p = squash_lru_hashmap_pull(&hashmap, 2);
 	assert(p == v2);
-	p = squash_lru_hashmap_get(&hashmap, 3);
+	p = squash_lru_hashmap_pull(&hashmap, 3);
 	assert(p == v3);
 
 	rv = squash_lru_hashmap_cleanup(&hashmap);
@@ -175,14 +178,6 @@ hashmap_add_many() {
 
 	int *value;
 
-	value = squash_lru_hashmap_get(&hashmap, NBR - SIZE / 2);
-	assert(*value == NBR - SIZE / 2);
-	value = squash_lru_hashmap_get(&hashmap, NBR - SIZE);
-	assert(*value == NBR - SIZE);
-	assert(value == hashmap.oldest->pointer);
-	value = squash_lru_hashmap_get(&hashmap, NBR - SIZE - 1);
-	assert(value == NULL);
-
 	length = 0;
 	for (struct SquashLruEntry *entry = hashmap.newest; entry;
 		 entry = entry->older) {
@@ -198,6 +193,20 @@ hashmap_add_many() {
 		length++;
 	}
 	assert(length == SIZE);
+
+	value = squash_lru_hashmap_pull(&hashmap, NBR - SIZE / 2);
+	assert(*value == NBR - SIZE / 2);
+	value = squash_lru_hashmap_pull(&hashmap, NBR - SIZE);
+	assert(*value == NBR - SIZE);
+	value = squash_lru_hashmap_pull(&hashmap, NBR - SIZE - 1);
+	assert(value == NULL);
+
+	length = 0;
+	for (struct SquashLruEntry *entry = hashmap.oldest; entry;
+		 entry = entry->newer) {
+		length++;
+	}
+	assert(length == SIZE - 2);
 
 	rv = squash_lru_hashmap_cleanup(&hashmap);
 	assert(rv == 0);
@@ -219,9 +228,9 @@ hashmap_size_1() {
 	rv = squash_lru_hashmap_put(&hashmap, 2, v2);
 	assert(rv == 0);
 
-	p = squash_lru_hashmap_get(&hashmap, 1);
+	p = squash_lru_hashmap_pull(&hashmap, 1);
 	assert(p == NULL);
-	p = squash_lru_hashmap_get(&hashmap, 2);
+	p = squash_lru_hashmap_pull(&hashmap, 2);
 	assert(p == v2);
 
 	rv = squash_lru_hashmap_cleanup(&hashmap);
