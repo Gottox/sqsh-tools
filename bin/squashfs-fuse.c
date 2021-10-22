@@ -169,6 +169,7 @@ squashfuse_readdir(
 			rv = -ENOMEM;
 			goto out;
 		}
+		free(name);
 	}
 
 out:
@@ -278,5 +279,6 @@ main(int argc, char *argv[]) {
 
 	rv = fuse_main(args.argc, args.argv, &squashfuse_operations, &data);
 out:
+	fuse_opt_free_args(&args);
 	return rv;
 }
