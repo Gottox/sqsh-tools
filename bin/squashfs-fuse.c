@@ -41,6 +41,7 @@
 #include <string.h>
 
 #include "../src/context/directory_context.h"
+#include "../src/context/file_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/resolve_path.h"
 #include "../src/squash.h"
@@ -205,15 +206,40 @@ squashfuse_read(
 		struct fuse_file_info *fi) {
 	int rv = 0;
 	struct SquashInodeContext inode = {0};
+	struct SquashFileContext file = {0};
 
 	rv = squash_resolve_path(&inode, &data.squash.superblock, path);
 	if (rv < 0) {
-		rv = -ENOENT;
+		// TODO: Better return type
+		rv = -EINVAL;
 		goto out;
 	}
-	memset(buf, 'a', size);
+	rv = squash_file_init(&file, &inode);
+	if (rv < 0) {
+		// TODO: Better return type
+		rv = -EINVAL;
+		goto out;
+	}
+
+	size = MIN(size, squash_inode_file_size(&inode));
+	rv = squash_file_seek(&file, offset);
+	if (rv < 0) {
+		// TODO: Better return type
+		rv = -EINVAL;
+		goto out;
+	}
+	rv = squash_file_read(&file, size);
+	if (rv < 0) {
+		// TODO: Better return type
+		rv = -EINVAL;
+		goto out;
+	}
+
+	memcpy(buf, squash_file_data(&file), size);
+
 	rv = size;
 out:
+	squash_file_cleanup(&file);
 	squash_inode_cleanup(&inode);
 	return rv;
 }
