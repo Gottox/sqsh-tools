@@ -49,7 +49,7 @@ squash_divide_ceil_u32(uint32_t x, uint32_t y) {
 
 void *
 squash_memdup(const void *source, size_t size) {
-	void *target = calloc(size + 2, sizeof(char));
+	void *target = calloc(size + 1, sizeof(char));
 	if (target == NULL) {
 		return NULL;
 	}
