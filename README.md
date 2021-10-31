@@ -17,7 +17,7 @@ WIP Status:
 * [x] uid/gid tables
 * [x] datablock resolution
 * [x] fragment resolution
-* [ ] xattr support
+* [x] xattr support
 * [ ] export
 * [ ] frontend api
 * [ ] better fragment support
