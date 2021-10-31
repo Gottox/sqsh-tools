@@ -342,14 +342,6 @@ squash_inode_symlink_size(const struct SquashInodeContext *inode) {
 }
 
 int
-squash_inode_load_root(
-		struct SquashInodeContext *inode,
-		const struct SquashSuperblockContext *superblock, uint64_t inode_ref) {
-	return squash_inode_load(
-			inode, superblock, squash_superblock_inode_root_ref(superblock));
-}
-
-int
 squash_inode_load(
 		struct SquashInodeContext *inode,
 		const struct SquashSuperblockContext *superblock, uint64_t inode_ref) {
