@@ -103,6 +103,9 @@ SQUASH_NO_UNUSED int squash_inode_symlink_dup(
 		const struct SquashInodeContext *inode, char **namebuffer);
 uint32_t squash_inode_symlink_size(const struct SquashInodeContext *inode);
 
+uint32_t squash_inode_uid(struct SquashInodeContext *inode);
+uint32_t squash_inode_gid(struct SquashInodeContext *inode);
+
 int squash_inode_cleanup(struct SquashInodeContext *inode);
 
 SQUASH_NO_UNUSED int squash_inode_directory_iterator_init(

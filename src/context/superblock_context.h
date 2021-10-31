@@ -34,6 +34,7 @@
  */
 
 #include "../utils.h"
+#include "table_context.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -45,6 +46,7 @@ struct SquashSuperblock;
 
 struct SquashSuperblockContext {
 	const struct SquashSuperblock *superblock;
+	struct SquashTableContext id_table;
 };
 
 SQUASH_NO_UNUSED int squash_superblock_init(
@@ -77,6 +79,9 @@ uint32_t squash_superblock_fragment_entry_count(
 
 uint64_t
 squash_superblock_bytes_used(const struct SquashSuperblockContext *context);
+
+struct SquashTableContext *
+squash_superblock_id_table(struct SquashSuperblockContext *context);
 
 int squash_superblock_cleanup(struct SquashSuperblockContext *superblock);
 

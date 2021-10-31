@@ -44,6 +44,7 @@ int
 squash_superblock_init(
 		struct SquashSuperblockContext *context, const uint8_t *buffer,
 		size_t size) {
+	int rv = 0;
 	const struct SquashSuperblock *superblock =
 			(const struct SquashSuperblock *)buffer;
 	if (size < SQUASH_SIZEOF_SUPERBLOCK) {
@@ -67,7 +68,13 @@ squash_superblock_init(
 
 	context->superblock = superblock;
 
-	return 0;
+	rv = squash_table_init(
+			&context->id_table, context,
+			squash_data_superblock_id_table_start(context->superblock),
+			sizeof(uint32_t),
+			squash_data_superblock_id_count(context->superblock));
+
+	return rv;
 }
 
 const void *
@@ -131,7 +138,14 @@ squash_superblock_bytes_used(const struct SquashSuperblockContext *context) {
 	return squash_data_superblock_bytes_used(context->superblock);
 }
 
+struct SquashTableContext *
+squash_superblock_id_table(struct SquashSuperblockContext *context) {
+	return &context->id_table;
+}
+
 int
 squash_superblock_cleanup(struct SquashSuperblockContext *superblock) {
-	return 0;
+	int rv;
+	rv = squash_table_cleanup(&superblock->id_table);
+	return rv;
 }

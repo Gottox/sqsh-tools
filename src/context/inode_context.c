@@ -380,6 +380,30 @@ squash_inode_load(
 	return rv;
 }
 
+static uint32_t
+inode_get_id(struct SquashInodeContext *context, off_t idx) {
+	int rv = 0;
+	struct SquashTableContext *id_table =
+			squash_superblock_id_table(context->superblock);
+	const uint32_t *value;
+
+	rv = squash_table_get(id_table, idx, (const void **)&value);
+	if (rv < 0) {
+		return UINT32_MAX;
+	}
+	return *value;
+}
+
+uint32_t
+squash_inode_uid(struct SquashInodeContext *context) {
+	return inode_get_id(context, squash_data_inode_uid_idx(context->inode));
+}
+
+uint32_t
+squash_inode_gid(struct SquashInodeContext *context) {
+	return inode_get_id(context, squash_data_inode_gid_idx(context->inode));
+}
+
 int
 squash_inode_cleanup(struct SquashInodeContext *inode) {
 	return squash_metablock_cleanup(&inode->extract);
