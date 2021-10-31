@@ -344,7 +344,7 @@ squash_inode_symlink_size(const struct SquashInodeContext *inode) {
 int
 squash_inode_load(
 		struct SquashInodeContext *inode,
-		const struct SquashSuperblockContext *superblock, uint64_t inode_ref) {
+		struct SquashSuperblockContext *superblock, uint64_t inode_ref) {
 	uint32_t inode_block;
 	uint16_t inode_offset;
 

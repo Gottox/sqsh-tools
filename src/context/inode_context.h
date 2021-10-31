@@ -76,7 +76,7 @@ struct SquashInodeDirectoryIndexIterator {
 
 SQUASH_NO_UNUSED int squash_inode_load(
 		struct SquashInodeContext *inode,
-		const struct SquashSuperblockContext *superblock, uint64_t inode_ref);
+		struct SquashSuperblockContext *superblock, uint64_t inode_ref);
 
 SQUASH_NO_UNUSED uint32_t
 squash_inode_hard_link_count(const struct SquashInodeContext *inode);

@@ -103,7 +103,7 @@ current_entry(const struct SquashDirectoryIterator *iterator) {
 int
 squash_directory_init(
 		struct SquashDirectoryContext *directory,
-		const struct SquashSuperblockContext *superblock,
+		struct SquashSuperblockContext *superblock,
 		struct SquashInodeContext *inode) {
 	int rv = 0;
 	const struct SquashInodeDirectory *basic;
