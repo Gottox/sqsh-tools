@@ -14,7 +14,7 @@ WIP Status:
 * [x] inode resolution
 * [x] directory resolution
 * [x] fast filename lookup
-* [ ] uid/gid tables
+* [x] uid/gid tables
 * [x] datablock resolution
 * [x] fragment resolution
 * [ ] xattr support
