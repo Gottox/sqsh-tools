@@ -375,7 +375,7 @@ squash_inode_load(
 		return rv;
 	}
 
-	inode->datablock_block_size = squash_superblock_block_size(superblock);
+	inode->superblock = superblock;
 
 	return rv;
 }

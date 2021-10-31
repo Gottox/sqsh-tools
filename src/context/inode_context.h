@@ -63,7 +63,7 @@ enum SquashInodeContextType {
 struct SquashInodeContext {
 	struct SquashInode *inode;
 	struct SquashMetablockContext extract;
-	uint32_t datablock_block_size;
+	struct SquashSuperblockContext *superblock;
 };
 
 struct SquashInodeDirectoryIndexIterator {
