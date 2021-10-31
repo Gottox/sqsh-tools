@@ -5,8 +5,8 @@
  * Distributed under terms of the MIT license.
  */
 
-#include "../src/context/directory_context.h"
 #include "../src/context/content_context.h"
+#include "../src/context/directory_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/context/superblock_context.h"
 #include "../src/squash.h"
@@ -68,7 +68,7 @@ out:
 	squash_directory_iterator_cleanup(&iter);
 	squash_directory_cleanup(&dir);
 	squash_inode_cleanup(&inode);
-	squash_inode_cleanup(&inode);
+	squash_cleanup(&squash);
 
 	return rv; // Non-zero return values are reserved for future use.
 }
