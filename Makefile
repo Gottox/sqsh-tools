@@ -9,7 +9,7 @@ HDR = \
 	src/compression/compression.h \
 	src/context/datablock_context.h \
 	src/context/directory_context.h \
-	src/context/file_context.h \
+	src/context/content_context.h \
 	src/context/fragment_context.h \
 	src/context/inode_context.h \
 	src/context/metablock_context.h \
@@ -41,7 +41,7 @@ SRC = \
 	src/compression/null.c \
 	src/context/datablock_context.c \
 	src/context/directory_context.c \
-	src/context/file_context.c \
+	src/context/content_context.c \
 	src/context/fragment_context.c \
 	src/context/inode_context.c \
 	src/context/metablock_context.c \
@@ -165,7 +165,7 @@ speed: $(BCH_BIN) $(BENCH_JSON) $(BENCH_PLIST)
 	@for i in $(BCH_BIN); do ./$$i; done
 
 fuzz: $(FZZ_BIN)
-	@for i in $(FZZ_BIN); do ./$$i $${i%-fuzz}-corpus -max_total_time=120 -dict=$${i%-fuzz}-dict || exit 1; done
+	@for i in $(FZZ_BIN); do ./$$i $${i%-fuzz}-corpus -rss_limit_mb=0 -jobs=4 -max_total_time=600 -dict=$${i%-fuzz}-dict || exit 1; done
 
 doc: doxygen.conf $(TST) $(SRC) $(HDR) README.md
 	@sed -i "/^PROJECT_NUMBER\s/ s/=.*/= $(VERSION)/" $<
@@ -188,7 +188,7 @@ gen/squash_image.squashfs:
 	echo a > $@_dir/a
 	seq 1 1050000 | tr -cd "\n" | tr '\n' b > $@_dir/b
 	rm -f $@
-	mksquashfs $@_dir $@ -noI -noId -noD -noF -noX -nopad
+	mksquashfs $@_dir $@ -noI -noId -noD -noF -noX -nopad -force-uid 2020 -force-gid 202020
 	rm -r $@_dir
 
 gen/squash_image.h: gen/squash_image.squashfs

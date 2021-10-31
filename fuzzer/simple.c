@@ -6,7 +6,7 @@
  */
 
 #include "../src/context/directory_context.h"
-#include "../src/context/file_context.h"
+#include "../src/context/content_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/context/superblock_context.h"
 #include "../src/squash.h"
