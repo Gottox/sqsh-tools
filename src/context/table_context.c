@@ -44,6 +44,16 @@ squash_table_init(
 		size_t element_size, size_t element_count) {
 	int rv = 0;
 	size_t byte_size;
+	uint_fast64_t table_upper_limit;
+
+	// Make sure the start block is at least big enough to hold one entry.
+	if (ADD_OVERFLOW(start_block, sizeof(uint64_t), &table_upper_limit)) {
+		return -SQUASH_ERROR_INTEGER_OVERFLOW;
+	}
+
+	if (squash_superblock_bytes_used(superblock) < table_upper_limit) {
+		return -SQUASH_ERROR_SIZE_MISSMATCH;
+	}
 
 	table->lookup_table =
 			squash_superblock_data_from_offset(superblock, start_block);
