@@ -30,6 +30,7 @@ HDR = \
 	src/data/superblock.h \
 	src/data/superblock_internal.h \
 	src/data/xattr.h \
+	src/data/xattr_internal.h \
 	src/error.h \
 	src/resolve_path.h \
 	src/squash.h \
@@ -54,6 +55,7 @@ SRC = \
 	src/data/inode.c \
 	src/data/metablock.c \
 	src/data/superblock.c \
+	src/data/xattr.c \
 	src/error.c \
 	src/resolve_path.c \
 	src/squash.c \

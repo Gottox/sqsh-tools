@@ -29,51 +29,66 @@
 /**
  * @author      : Enno Boland (mail@eboland.de)
  * @file        : xattr
- * @created     : Friday May 07, 2021 07:03:51 CEST
+ * @created     : Sunday Oct 31, 2021 10:04:28 CET
  */
 
+#include "xattr_internal.h"
+#include <endian.h>
 #include <stdint.h>
 
-#ifndef SQUASH_XATTR_H
-
-#define SQUASH_XATTR_H
-
-#define SQUASH_SIZEOF_XATTR_KEY 4
-#define SQUASH_SIZEOF_XATTR_VALUE 4
-#define SQUASH_SIZEOF_XATTR_LOOKUP_TABLE 16
-#define SQUASH_SIZEOF_XATTR_ID_TABLE 16
-
-struct SquashXattrKey;
-
-struct SquashXattrValue;
-
-struct SquashXattrLookupTable;
-
-struct SquashXattrIdTable;
-
-uint16_t squash_data_xattr_key_type(const struct SquashXattrKey *xattr_key);
 uint16_t
-squash_data_xattr_key_name_size(const struct SquashXattrKey *xattr_key);
+squash_data_xattr_key_type(const struct SquashXattrKey *xattr_key) {
+	return le16toh(xattr_key->type);
+}
+
+uint16_t
+squash_data_xattr_key_name_size(const struct SquashXattrKey *xattr_key) {
+	return le16toh(xattr_key->name_size);
+}
 const uint8_t *
-squash_data_xattr_key_name(const struct SquashXattrKey *xattr_key);
+squash_data_xattr_key_name(const struct SquashXattrKey *xattr_key) {
+	return (const uint8_t *)&xattr_key[1];
+}
 
 uint32_t
-squash_data_xattr_value_size(const struct SquashXattrValue *xattr_value);
+squash_data_xattr_value_size(const struct SquashXattrValue *xattr_value) {
+	return le32toh(xattr_value->value_size);
+}
 const uint8_t *
-squash_data_xattr_value(const struct SquashXattrValue *xattr_value);
+squash_data_xattr_value(const struct SquashXattrValue *xattr_value) {
+	return (const uint8_t *)&xattr_value[1];
+}
 
-uint64_t squash_data_xattr_lookup_table_xattr_ref(
-		const struct SquashXattrLookupTable *lookup_table);
-uint32_t squash_data_xattr_lookup_table_count(
-		const struct SquashXattrLookupTable *lookup_table);
-uint32_t squash_data_xattr_lookup_table_size(
-		const struct SquashXattrLookupTable *lookup_table);
+uint64_t
+squash_data_xattr_lookup_table_xattr_ref(
+		const struct SquashXattrLookupTable *lookup_table) {
+	return le64toh(lookup_table->xattr_ref);
+}
+uint32_t
+squash_data_xattr_lookup_table_count(
+		const struct SquashXattrLookupTable *lookup_table) {
+	return le32toh(lookup_table->count);
+}
+uint32_t
+squash_data_xattr_lookup_table_size(
+		const struct SquashXattrLookupTable *lookup_table) {
+	return le32toh(lookup_table->size);
+}
 
-uint64_t squash_data_xattr_id_table_xattr_table_start(
-		const struct SquashXattrIdTable *xattr_id_table);
-uint32_t squash_data_xattr_id_table_xattr_ids(
-		const struct SquashXattrIdTable *xattr_id_table);
-const uint64_t *
-squash_data_xattr_id_table(const struct SquashXattrIdTable *xattr_id_table);
+uint64_t
+squash_data_xattr_id_table_xattr_table_start(
+		const struct SquashXattrIdTable *xattr_id_table) {
+	return le64toh(xattr_id_table->xattr_table_start);
+}
+uint32_t
+squash_data_xattr_id_table_xattr_ids(
+		const struct SquashXattrIdTable *xattr_id_table) {
+	return le32toh(xattr_id_table->xattr_ids);
+}
+uint64_t
+squash_data_xattr_id_table_ref(
+		const struct SquashXattrIdTable *xattr_id_table, uint64_t index) {
+	const uint64_t *table = (const uint64_t *)&xattr_id_table[1];
 
-#endif /* end of include guard SQUASH_XATTR_H */
+	return le64toh(table[index]);
+}

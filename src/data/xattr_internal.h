@@ -28,52 +28,47 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : xattr
+ * @file        : xattr_internal
  * @created     : Friday May 07, 2021 07:03:51 CEST
  */
 
+#include "../utils.h"
+#include "xattr.h"
 #include <stdint.h>
 
-#ifndef SQUASH_XATTR_H
+#ifndef SQUASH_XATTR_INTERNAL_H
 
-#define SQUASH_XATTR_H
+#define SQUASH_XATTR_INTERNAL_H
 
-#define SQUASH_SIZEOF_XATTR_KEY 4
-#define SQUASH_SIZEOF_XATTR_VALUE 4
-#define SQUASH_SIZEOF_XATTR_LOOKUP_TABLE 16
-#define SQUASH_SIZEOF_XATTR_ID_TABLE 16
+struct SquashXattrKey {
+	uint16_t type;
+	uint16_t name_size;
+	// uint8_t name[0]; // [name_size - strlen(prefix)];
+};
+STATIC_ASSERT(sizeof(struct SquashXattrKey) == SQUASH_SIZEOF_XATTR_KEY);
 
-struct SquashXattrKey;
+struct SquashXattrValue {
+	uint32_t value_size;
+	// uint8_t value[0]; // [value_size]
+};
+STATIC_ASSERT(sizeof(struct SquashXattrValue) == SQUASH_SIZEOF_XATTR_VALUE);
 
-struct SquashXattrValue;
+struct SquashXattrLookupTable {
+	uint64_t xattr_ref;
+	uint32_t count;
+	uint32_t size;
+};
+STATIC_ASSERT(
+		sizeof(struct SquashXattrLookupTable) ==
+		SQUASH_SIZEOF_XATTR_LOOKUP_TABLE);
 
-struct SquashXattrLookupTable;
+struct SquashXattrIdTable {
+	uint64_t xattr_table_start;
+	uint32_t xattr_ids;
+	uint32_t _unused;
+	// uint64_t table[0]; // [ceil(xattr_ids / 512.0)]
+};
+STATIC_ASSERT(
+		sizeof(struct SquashXattrIdTable) == SQUASH_SIZEOF_XATTR_ID_TABLE);
 
-struct SquashXattrIdTable;
-
-uint16_t squash_data_xattr_key_type(const struct SquashXattrKey *xattr_key);
-uint16_t
-squash_data_xattr_key_name_size(const struct SquashXattrKey *xattr_key);
-const uint8_t *
-squash_data_xattr_key_name(const struct SquashXattrKey *xattr_key);
-
-uint32_t
-squash_data_xattr_value_size(const struct SquashXattrValue *xattr_value);
-const uint8_t *
-squash_data_xattr_value(const struct SquashXattrValue *xattr_value);
-
-uint64_t squash_data_xattr_lookup_table_xattr_ref(
-		const struct SquashXattrLookupTable *lookup_table);
-uint32_t squash_data_xattr_lookup_table_count(
-		const struct SquashXattrLookupTable *lookup_table);
-uint32_t squash_data_xattr_lookup_table_size(
-		const struct SquashXattrLookupTable *lookup_table);
-
-uint64_t squash_data_xattr_id_table_xattr_table_start(
-		const struct SquashXattrIdTable *xattr_id_table);
-uint32_t squash_data_xattr_id_table_xattr_ids(
-		const struct SquashXattrIdTable *xattr_id_table);
-const uint64_t *
-squash_data_xattr_id_table(const struct SquashXattrIdTable *xattr_id_table);
-
-#endif /* end of include guard SQUASH_XATTR_H */
+#endif /* end of include guard SQUASH_XATTR_INTERNAL_H */
