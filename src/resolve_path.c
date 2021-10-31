@@ -78,7 +78,7 @@ count_path_segments(const char *path) {
 static int
 find_inode_ref(
 		uint64_t *target, uint64_t dir_ref,
-		const struct SquashSuperblockContext *superblock, const char *name,
+		struct SquashSuperblockContext *superblock, const char *name,
 		const size_t name_len) {
 	struct SquashInodeContext inode = {0};
 	struct SquashDirectoryContext dir = {0};
@@ -113,7 +113,7 @@ out:
 int
 squash_resolve_path(
 		struct SquashInodeContext *inode,
-		const struct SquashSuperblockContext *superblock, const char *path) {
+		struct SquashSuperblockContext *superblock, const char *path) {
 	int i;
 	int rv = 0;
 	int segment_count = count_path_segments(path) + 1;
