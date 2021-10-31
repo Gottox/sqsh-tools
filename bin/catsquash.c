@@ -32,8 +32,8 @@
  * @created     : Monday Sep 20, 2021 09:48:58 CEST
  */
 
-#include "../src/context/directory_context.h"
 #include "../src/context/content_context.h"
+#include "../src/context/directory_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/resolve_path.h"
 #include "../src/squash.h"
