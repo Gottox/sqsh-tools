@@ -35,6 +35,7 @@
 
 #include "../utils.h"
 #include "table_context.h"
+#include "xattr_table_context.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -47,6 +48,7 @@ struct SquashSuperblock;
 struct SquashSuperblockContext {
 	const struct SquashSuperblock *superblock;
 	struct SquashTableContext id_table;
+	struct SquashXattrTableContext xattr_table;
 };
 
 SQUASH_NO_UNUSED int squash_superblock_init(

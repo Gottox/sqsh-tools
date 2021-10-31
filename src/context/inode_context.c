@@ -381,7 +381,7 @@ squash_inode_load(
 }
 
 static uint32_t
-inode_get_id(struct SquashInodeContext *context, off_t idx) {
+inode_get_id(const struct SquashInodeContext *context, off_t idx) {
 	int rv = 0;
 	struct SquashTableContext *id_table =
 			squash_superblock_id_table(context->superblock);
@@ -395,13 +395,38 @@ inode_get_id(struct SquashInodeContext *context, off_t idx) {
 }
 
 uint32_t
-squash_inode_uid(struct SquashInodeContext *context) {
+squash_inode_uid(const struct SquashInodeContext *context) {
 	return inode_get_id(context, squash_data_inode_uid_idx(context->inode));
 }
 
 uint32_t
-squash_inode_gid(struct SquashInodeContext *context) {
+squash_inode_gid(const struct SquashInodeContext *context) {
 	return inode_get_id(context, squash_data_inode_gid_idx(context->inode));
+}
+
+uint32_t
+squash_inode_xattr_index(const struct SquashInodeContext *inode) {
+	struct SquashInode *wrap = inode->inode;
+	switch (squash_data_inode_type(wrap)) {
+	case SQUASH_INODE_TYPE_EXTENDED_DIRECTORY:
+		return squash_data_inode_directory_ext_xattr_idx(
+				squash_data_inode_directory_ext(wrap));
+	case SQUASH_INODE_TYPE_EXTENDED_FILE:
+		return squash_data_inode_file_ext_xattr_idx(
+				squash_data_inode_file_ext(wrap));
+	case SQUASH_INODE_TYPE_EXTENDED_SYMLINK:
+		return squash_data_inode_symlink_ext_xattr_idx(
+				squash_data_inode_symlink_ext(wrap));
+	case SQUASH_INODE_TYPE_EXTENDED_BLOCK:
+	case SQUASH_INODE_TYPE_EXTENDED_CHAR:
+		return squash_data_inode_device_ext_xattr_idx(
+				squash_data_inode_device_ext(wrap));
+	case SQUASH_INODE_TYPE_EXTENDED_FIFO:
+	case SQUASH_INODE_TYPE_EXTENDED_SOCKET:
+		return squash_data_inode_ipc_ext_xattr_idx(
+				squash_data_inode_ipc_ext(wrap));
+	}
+	return SQUASH_INODE_NO_XATTR;
 }
 
 int

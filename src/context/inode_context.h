@@ -42,6 +42,7 @@
 #define SQUASH_INODE_CONTEXT_H
 
 #define SQUASH_INODE_NO_FRAGMENT 0xFFFFFFFF
+#define SQUASH_INODE_NO_XATTR 0xFFFFFFFF
 
 struct SquashSuperblockContext;
 struct SquashInode;
@@ -103,8 +104,10 @@ SQUASH_NO_UNUSED int squash_inode_symlink_dup(
 		const struct SquashInodeContext *inode, char **namebuffer);
 uint32_t squash_inode_symlink_size(const struct SquashInodeContext *inode);
 
-uint32_t squash_inode_uid(struct SquashInodeContext *inode);
-uint32_t squash_inode_gid(struct SquashInodeContext *inode);
+uint32_t squash_inode_uid(const struct SquashInodeContext *inode);
+uint32_t squash_inode_gid(const struct SquashInodeContext *inode);
+uint32_t squash_inode_xattr_index(const struct SquashInodeContext *inode);
+uint32_t squash_inode_xattr_index(const struct SquashInodeContext *inode);
 
 int squash_inode_cleanup(struct SquashInodeContext *inode);
 

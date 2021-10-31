@@ -43,6 +43,12 @@
 #define SQUASH_SIZEOF_XATTR_LOOKUP_TABLE 16
 #define SQUASH_SIZEOF_XATTR_ID_TABLE 16
 
+enum SquashXattrType {
+	SQUASH_XATTR_USER = 0,
+	SQUASH_XATTR_TRUSTED = 1,
+	SQUASH_XATTR_SECURITY = 2,
+};
+
 struct SquashXattrKey;
 
 struct SquashXattrValue;
@@ -59,6 +65,8 @@ squash_data_xattr_key_name(const struct SquashXattrKey *xattr_key);
 
 uint32_t
 squash_data_xattr_value_size(const struct SquashXattrValue *xattr_value);
+uint64_t
+squash_data_xattr_value_ref(const struct SquashXattrValue *xattr_value);
 const uint8_t *
 squash_data_xattr_value(const struct SquashXattrValue *xattr_value);
 

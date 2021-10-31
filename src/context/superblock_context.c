@@ -39,6 +39,7 @@
 #include <stdint.h>
 
 const static uint32_t SUPERBLOCK_MAGIC = 0x73717368;
+const static uint64_t NO_XATTRS = 0xFFFFFFFFFFFFFFFF;
 
 int
 squash_superblock_init(
@@ -73,7 +74,19 @@ squash_superblock_init(
 			squash_data_superblock_id_table_start(context->superblock),
 			sizeof(uint32_t),
 			squash_data_superblock_id_count(context->superblock));
+	if (rv < 0) {
+		goto out;
+	}
 
+	if (squash_data_superblock_xattr_id_table_start(context->superblock) !=
+		NO_XATTRS) {
+		rv = squash_xattr_table_init(&context->xattr_table, context);
+		if (rv < 0) {
+			squash_superblock_cleanup(context);
+			goto out;
+		}
+	}
+out:
 	return rv;
 }
 
@@ -145,7 +158,7 @@ squash_superblock_id_table(struct SquashSuperblockContext *context) {
 
 int
 squash_superblock_cleanup(struct SquashSuperblockContext *superblock) {
-	int rv;
-	rv = squash_table_cleanup(&superblock->id_table);
-	return rv;
+	squash_table_cleanup(&superblock->id_table);
+	squash_xattr_table_cleanup(&superblock->xattr_table);
+	return 0;
 }

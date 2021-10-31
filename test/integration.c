@@ -37,6 +37,7 @@
 #include "../src/context/directory_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/context/superblock_context.h"
+#include "../src/context/xattr_table_context.h"
 #include "../src/data/superblock.h"
 #include "../src/error.h"
 #include "../src/resolve_path.h"
@@ -201,6 +202,115 @@ squash_test_uid_and_gid() {
 }
 
 static void
+squash_test_xattr() {
+	const char *expected_value = "1234567891234567891234567890001234567890";
+	int rv;
+	char *name, *value;
+	struct SquashSuperblockContext superblock = {0};
+	struct SquashInodeContext inode = {0};
+	struct SquashInodeContext entry_inode = {0};
+	struct SquashDirectoryContext dir = {0};
+	struct SquashDirectoryIterator dir_iter = {0};
+	struct SquashXattrTableIterator xattr_iter = {0};
+	rv = squash_superblock_init(
+			&superblock, squash_image, sizeof(squash_image));
+	assert(rv == 0);
+
+	rv = squash_inode_load(
+			&inode, &superblock,
+			squash_data_superblock_root_inode_ref(superblock.superblock));
+	assert(rv == 0);
+
+	rv = squash_xattr_table_iterator_init(
+			&xattr_iter, &superblock.xattr_table, &inode);
+	assert(rv == 0);
+	rv = squash_xattr_table_iterator_next(&xattr_iter);
+	assert(rv == 0);
+	rv = squash_xattr_table_iterator_cleanup(&xattr_iter);
+	assert(rv == 0);
+
+	rv = squash_directory_init(&dir, &superblock, &inode);
+	assert(rv == 0);
+
+	rv = squash_directory_iterator_init(&dir_iter, &dir);
+	assert(rv == 0);
+
+	rv = squash_directory_iterator_next(&dir_iter);
+	assert(rv > 0);
+	rv = squash_directory_iterator_name_dup(&dir_iter, &name);
+	assert(rv == 1);
+	assert(strcmp("a", name) == 0);
+	free(name);
+	rv = squash_directory_iterator_inode_load(&dir_iter, &entry_inode);
+	assert(rv == 0);
+	rv = squash_xattr_table_iterator_init(
+			&xattr_iter, &superblock.xattr_table, &entry_inode);
+	assert(rv == 0);
+	rv = squash_xattr_table_iterator_next(&xattr_iter);
+	assert(rv > 0);
+	assert(squash_xattr_table_iterator_is_indirect(&xattr_iter) == false);
+	rv = squash_xattr_table_iterator_fullname_dup(&xattr_iter, &name);
+	assert(rv == 8);
+	assert(strcmp("user.foo", name) == 0);
+	free(name);
+	rv = squash_xattr_table_iterator_value_dup(&xattr_iter, &value);
+	assert(rv == strlen(expected_value));
+	assert(strcmp(expected_value, value) == 0);
+	free(value);
+	rv = squash_xattr_table_iterator_next(&xattr_iter);
+	assert(rv == 0);
+	rv = squash_xattr_table_iterator_cleanup(&xattr_iter);
+	assert(rv == 0);
+	rv = squash_inode_cleanup(&entry_inode);
+	assert(rv == 0);
+
+	rv = squash_directory_iterator_next(&dir_iter);
+	assert(rv >= 0);
+	rv = squash_directory_iterator_name_dup(&dir_iter, &name);
+	assert(rv == 1);
+	assert(strcmp("b", name) == 0);
+	free(name);
+	rv = squash_directory_iterator_inode_load(&dir_iter, &entry_inode);
+	assert(rv == 0);
+	rv = squash_xattr_table_iterator_init(
+			&xattr_iter, &superblock.xattr_table, &entry_inode);
+	assert(rv == 0);
+	rv = squash_xattr_table_iterator_next(&xattr_iter);
+	assert(rv > 0);
+	assert(squash_xattr_table_iterator_is_indirect(&xattr_iter) == true);
+	rv = squash_xattr_table_iterator_fullname_dup(&xattr_iter, &name);
+	assert(rv == 8);
+	assert(strcmp("user.bar", name) == 0);
+	free(name);
+	rv = squash_xattr_table_iterator_value_dup(&xattr_iter, &value);
+	assert(rv == strlen(expected_value));
+	assert(strcmp(expected_value, value) == 0);
+	free(value);
+	rv = squash_xattr_table_iterator_next(&xattr_iter);
+	assert(rv == 0);
+	rv = squash_xattr_table_iterator_cleanup(&xattr_iter);
+	assert(rv == 0);
+	rv = squash_inode_cleanup(&entry_inode);
+	assert(rv == 0);
+
+	rv = squash_directory_iterator_next(&dir_iter);
+	// End of file list
+	assert(rv == 0);
+
+	rv = squash_directory_iterator_cleanup(&dir_iter);
+	assert(rv == 0);
+
+	rv = squash_directory_cleanup(&dir);
+	assert(rv == 0);
+
+	rv = squash_inode_cleanup(&inode);
+	assert(rv == 0);
+
+	rv = squash_superblock_cleanup(&superblock);
+	assert(rv == 0);
+}
+
+static void
 fuzz_crash_1() {
 	int rv;
 	static const uint8_t input[] = {
@@ -334,13 +444,47 @@ fuzz_crash_4() {
 	assert(rv == -SQUASH_ERROR_SIZE_MISSMATCH);
 }
 
+static void
+fuzz_crash_5() {
+	int rv;
+	static const uint8_t input[] = {
+			0x68, 0x73, 0x71, 0x73, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0xb1,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x30, 0x00, 0x8c, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0xfb, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x56, 0x00, 0x00, 0x00, 0x00, 0xf1, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x84, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0xf1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x62, 0x00,
+			0x00, 0x00, 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x01, 0x00,
+			0x00, 0x68, 0x73, 0x71, 0x73, 0x0a, 0x00, 0xb1, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x01, 0x68, 0x73, 0x71, 0xaf, 0xaf, 0xaf,
+			0xaf, 0xaf, 0xaf, 0xaf, 0xaf, 0xaf, 0xaf, 0xaf, 0xaf, 0xaf, 0xaf,
+			0xaf, 0xaf, 0xaf, 0xaf, 0x73, 0x0a, 0xff, 0xff, 0x00, 0x23, 0x00,
+			0x62, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x0b, 0x00, 0x02, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x68, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
+			0x73, 0x1d, 0x1d, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x62, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x14, 0x1d, 0x1d, 0x1d,
+			0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x1d, 0x71, 0x3b, 0x3b,
+			0x11, 0x00, 0x00, 0x00, 0x00, 0xff, 0xfd, 0x00, 0x00, 0x00, 0x00,
+			0x68, 0x73, 0x71, 0x73, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0xb1,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00, 0x02, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4f, 0x00, 0x00, 0x00};
+
+	struct SquashSuperblockContext superblock = {0};
+	rv = squash_superblock_init(&superblock, input, sizeof(input));
+	assert(rv == -SQUASH_ERROR_SIZE_MISSMATCH);
+}
+
 DEFINE
 TEST(squash_ls);
 TEST(squash_cat_fragment);
 TEST(squash_cat_datablock_and_fragment);
 TEST(squash_test_uid_and_gid);
+TEST(squash_test_xattr);
 TEST_OFF(fuzz_crash_1); // Fails since the library sets up tables
 TEST_OFF(fuzz_crash_2); // Fails since the library sets up tables
 TEST_OFF(fuzz_crash_3); // Fails since the library sets up tables
 TEST(fuzz_crash_4);
+TEST(fuzz_crash_5);
 DEFINE_END

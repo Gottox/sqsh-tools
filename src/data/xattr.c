@@ -58,6 +58,12 @@ const uint8_t *
 squash_data_xattr_value(const struct SquashXattrValue *xattr_value) {
 	return (const uint8_t *)&xattr_value[1];
 }
+uint64_t
+squash_data_xattr_value_ref(const struct SquashXattrValue *xattr_value) {
+	const uint64_t *ref =
+			(const uint64_t *)squash_data_xattr_value(xattr_value);
+	return le64toh(*ref);
+}
 
 uint64_t
 squash_data_xattr_lookup_table_xattr_ref(

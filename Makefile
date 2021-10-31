@@ -15,6 +15,7 @@ HDR = \
 	src/context/metablock_context.h \
 	src/context/superblock_context.h \
 	src/context/table_context.h \
+	src/context/xattr_table_context.h \
 	src/data/compression_options.h \
 	src/data/compression_options_internal.h \
 	src/data/datablock.h \
@@ -48,6 +49,7 @@ SRC = \
 	src/context/metablock_context.c \
 	src/context/superblock_context.c \
 	src/context/table_context.c \
+	src/context/xattr_table_context.c \
 	src/data/compression_options.c \
 	src/data/datablock.c \
 	src/data/directory.c \
@@ -173,14 +175,6 @@ doc: doxygen.conf $(TST) $(SRC) $(HDR) README.md
 	@sed -i "/^PROJECT_NUMBER\s/ s/=.*/= $(VERSION)/" $<
 	@doxygen $<
 
-bench/bench-file.json:
-	@wget http://eu.battle.net/auction-data/258993a3c6b974ef3e6f22ea6f822720/auctions.json -O $@
-
-bench/bench-file.plist: bench/bench-file.json
-	@npm install plist-cli
-	@node_modules/.bin/plist-cli < $< > $@
-	@rm -rf package-lock.json node_modules
-
 coverage: check
 	@mkdir cov
 	@gcovr -r . --html --html-details -o cov/index.html
@@ -189,6 +183,8 @@ gen/squash_image.squashfs:
 	mkdir -p $@_dir
 	echo a > $@_dir/a
 	seq 1 1050000 | tr -cd "\n" | tr '\n' b > $@_dir/b
+	setfattr -n user.foo -v 1234567891234567891234567890001234567890 $@_dir/a
+	setfattr -n user.bar -v 1234567891234567891234567890001234567890 $@_dir/b
 	rm -f $@
 	mksquashfs $@_dir $@ -noI -noId -noD -noF -noX -nopad -force-uid 2020 -force-gid 202020
 	rm -r $@_dir
