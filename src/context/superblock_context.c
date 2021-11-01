@@ -42,60 +42,60 @@ const static uint32_t SUPERBLOCK_MAGIC = 0x73717368;
 const static uint64_t NO_SEGMENT = 0xFFFFFFFFFFFFFFFF;
 
 int
-squash_superblock_init(
-		struct SquashSuperblockContext *context, const uint8_t *buffer,
+hsqs_superblock_init(
+		struct HsqsSuperblockContext *context, const uint8_t *buffer,
 		size_t size) {
 	int rv = 0;
-	const struct SquashSuperblock *superblock =
-			(const struct SquashSuperblock *)buffer;
-	if (size < SQUASH_SIZEOF_SUPERBLOCK) {
-		return -SQUASH_ERROR_SUPERBLOCK_TOO_SMALL;
+	const struct HsqsSuperblock *superblock =
+			(const struct HsqsSuperblock *)buffer;
+	if (size < HSQS_SIZEOF_SUPERBLOCK) {
+		return -HSQS_ERROR_SUPERBLOCK_TOO_SMALL;
 	}
 
 	// Do not use the getter here as it may change the endianess. We don't want
 	// that here.
-	if (squash_data_superblock_magic(superblock) != SUPERBLOCK_MAGIC) {
-		return -SQUASH_ERROR_WRONG_MAGIG;
+	if (hsqs_data_superblock_magic(superblock) != SUPERBLOCK_MAGIC) {
+		return -HSQS_ERROR_WRONG_MAGIG;
 	}
 
-	if (squash_data_superblock_block_log(superblock) !=
-		squash_log2_u32(squash_data_superblock_block_size(superblock))) {
-		return -SQUASH_ERROR_BLOCKSIZE_MISSMATCH;
+	if (hsqs_data_superblock_block_log(superblock) !=
+		hsqs_log2_u32(hsqs_data_superblock_block_size(superblock))) {
+		return -HSQS_ERROR_BLOCKSIZE_MISSMATCH;
 	}
 
-	if (squash_data_superblock_bytes_used(superblock) > size) {
-		return -SQUASH_ERROR_SIZE_MISSMATCH;
+	if (hsqs_data_superblock_bytes_used(superblock) > size) {
+		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
 
 	context->superblock = superblock;
 
 	uint64_t id_table_start =
-			squash_data_superblock_id_table_start(context->superblock);
+			hsqs_data_superblock_id_table_start(context->superblock);
 	uint64_t xattr_table_start =
-			squash_data_superblock_xattr_id_table_start(context->superblock);
+			hsqs_data_superblock_xattr_id_table_start(context->superblock);
 	uint64_t export_table_start =
-			squash_data_superblock_export_table_start(context->superblock);
-	rv = squash_table_init(
+			hsqs_data_superblock_export_table_start(context->superblock);
+	rv = hsqs_table_init(
 			&context->id_table, context, id_table_start, sizeof(uint32_t),
-			squash_data_superblock_id_count(context->superblock));
+			hsqs_data_superblock_id_count(context->superblock));
 	if (rv < 0) {
 		goto out;
 	}
 
 	if (xattr_table_start != NO_SEGMENT) {
-		rv = squash_xattr_table_init(&context->xattr_table, context);
+		rv = hsqs_xattr_table_init(&context->xattr_table, context);
 		if (rv < 0) {
-			squash_superblock_cleanup(context);
+			hsqs_superblock_cleanup(context);
 			goto out;
 		}
 	}
 	if (export_table_start != NO_SEGMENT) {
-		rv = squash_table_init(
+		rv = hsqs_table_init(
 				&context->export_table, context, export_table_start,
 				sizeof(uint64_t),
-				squash_data_superblock_inode_count(context->superblock));
+				hsqs_data_superblock_inode_count(context->superblock));
 		if (rv < 0) {
-			squash_superblock_cleanup(context);
+			hsqs_superblock_cleanup(context);
 			goto out;
 		}
 	}
@@ -104,13 +104,13 @@ out:
 }
 
 const void *
-squash_superblock_data_from_offset(
-		const struct SquashSuperblockContext *context, uint64_t offset) {
+hsqs_superblock_data_from_offset(
+		const struct HsqsSuperblockContext *context, uint64_t offset) {
 	const uint8_t *tmp = (uint8_t *)context->superblock;
-	if (offset > squash_superblock_bytes_used(context)) {
+	if (offset > hsqs_superblock_bytes_used(context)) {
 		return NULL;
 	}
-	if (offset < SQUASH_SIZEOF_SUPERBLOCK) {
+	if (offset < HSQS_SIZEOF_SUPERBLOCK) {
 		return NULL;
 	}
 
@@ -118,61 +118,59 @@ squash_superblock_data_from_offset(
 }
 
 uint64_t
-squash_superblock_directory_table_start(
-		const struct SquashSuperblockContext *context) {
-	return squash_data_superblock_directory_table_start(context->superblock);
+hsqs_superblock_directory_table_start(
+		const struct HsqsSuperblockContext *context) {
+	return hsqs_data_superblock_directory_table_start(context->superblock);
 }
 
 uint64_t
-squash_superblock_fragment_table_start(
-		const struct SquashSuperblockContext *context) {
-	return squash_data_superblock_fragment_table_start(context->superblock);
+hsqs_superblock_fragment_table_start(
+		const struct HsqsSuperblockContext *context) {
+	return hsqs_data_superblock_fragment_table_start(context->superblock);
 }
 
 uint64_t
-squash_superblock_inode_table_start(
-		const struct SquashSuperblockContext *context) {
-	return squash_data_superblock_inode_table_start(context->superblock);
+hsqs_superblock_inode_table_start(const struct HsqsSuperblockContext *context) {
+	return hsqs_data_superblock_inode_table_start(context->superblock);
 }
 
 uint64_t
-squash_superblock_inode_root_ref(
-		const struct SquashSuperblockContext *context) {
-	return squash_data_superblock_root_inode_ref(context->superblock);
+hsqs_superblock_inode_root_ref(const struct HsqsSuperblockContext *context) {
+	return hsqs_data_superblock_root_inode_ref(context->superblock);
 }
 
 bool
-squash_superblock_has_fragments(const struct SquashSuperblockContext *context) {
+hsqs_superblock_has_fragments(const struct HsqsSuperblockContext *context) {
 	return !(
-			squash_data_superblock_flags(context->superblock) &
-			SQUASH_SUPERBLOCK_NO_FRAGMENTS);
+			hsqs_data_superblock_flags(context->superblock) &
+			HSQS_SUPERBLOCK_NO_FRAGMENTS);
 }
 
 uint32_t
-squash_superblock_block_size(const struct SquashSuperblockContext *context) {
-	return squash_data_superblock_block_size(context->superblock);
+hsqs_superblock_block_size(const struct HsqsSuperblockContext *context) {
+	return hsqs_data_superblock_block_size(context->superblock);
 }
 
 uint32_t
-squash_superblock_fragment_entry_count(
-		const struct SquashSuperblockContext *context) {
-	return squash_data_superblock_fragment_entry_count(context->superblock);
+hsqs_superblock_fragment_entry_count(
+		const struct HsqsSuperblockContext *context) {
+	return hsqs_data_superblock_fragment_entry_count(context->superblock);
 }
 
 uint64_t
-squash_superblock_bytes_used(const struct SquashSuperblockContext *context) {
-	return squash_data_superblock_bytes_used(context->superblock);
+hsqs_superblock_bytes_used(const struct HsqsSuperblockContext *context) {
+	return hsqs_data_superblock_bytes_used(context->superblock);
 }
 
-struct SquashTableContext *
-squash_superblock_id_table(struct SquashSuperblockContext *context) {
+struct HsqsTableContext *
+hsqs_superblock_id_table(struct HsqsSuperblockContext *context) {
 	return &context->id_table;
 }
 
 int
-squash_superblock_cleanup(struct SquashSuperblockContext *superblock) {
-	squash_table_cleanup(&superblock->id_table);
-	squash_xattr_table_cleanup(&superblock->xattr_table);
-	squash_table_cleanup(&superblock->export_table);
+hsqs_superblock_cleanup(struct HsqsSuperblockContext *superblock) {
+	hsqs_table_cleanup(&superblock->id_table);
+	hsqs_xattr_table_cleanup(&superblock->xattr_table);
+	hsqs_table_cleanup(&superblock->export_table);
 	return 0;
 }

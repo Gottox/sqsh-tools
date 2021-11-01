@@ -40,29 +40,28 @@
 
 #define LRU_HASHMAP_H
 
-typedef int (*SquashLruHashmapDtor)(void *);
+typedef int (*HsqsLruHashmapDtor)(void *);
 
-struct SquashLruEntry {
+struct HsqsLruEntry {
 	void *pointer;
-	struct SquashLruEntry *newer;
-	struct SquashLruEntry *older;
+	struct HsqsLruEntry *newer;
+	struct HsqsLruEntry *older;
 	uint64_t hash;
 };
 
-struct SquashLruHashmap {
+struct HsqsLruHashmap {
 	size_t size;
-	struct SquashLruEntry *oldest;
-	struct SquashLruEntry *newest;
-	struct SquashLruEntry *entries;
-	SquashLruHashmapDtor dtor;
+	struct HsqsLruEntry *oldest;
+	struct HsqsLruEntry *newest;
+	struct HsqsLruEntry *entries;
+	HsqsLruHashmapDtor dtor;
 };
 
-SQUASH_NO_UNUSED int squash_lru_hashmap_init(
-		struct SquashLruHashmap *hashmap, size_t size,
-		SquashLruHashmapDtor dtor);
-SQUASH_NO_UNUSED int squash_lru_hashmap_put(
-		struct SquashLruHashmap *hashmap, uint64_t hash, void *pointer);
-void *squash_lru_hashmap_pull(struct SquashLruHashmap *hashmap, uint64_t hash);
-int squash_lru_hashmap_cleanup(struct SquashLruHashmap *hashmap);
+HSQS_NO_UNUSED int hsqs_lru_hashmap_init(
+		struct HsqsLruHashmap *hashmap, size_t size, HsqsLruHashmapDtor dtor);
+HSQS_NO_UNUSED int hsqs_lru_hashmap_put(
+		struct HsqsLruHashmap *hashmap, uint64_t hash, void *pointer);
+void *hsqs_lru_hashmap_pull(struct HsqsLruHashmap *hashmap, uint64_t hash);
+int hsqs_lru_hashmap_cleanup(struct HsqsLruHashmap *hashmap);
 
 #endif /* end of include guard LRU_HASHMAP_H */

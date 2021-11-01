@@ -40,26 +40,25 @@
 
 #define FILE_CONTEXT_H
 
-struct SquashFileContext {
-	struct SquashDatablockContext datablock;
-	struct SquashFragmentContext fragment;
-	const struct SquashSuperblockContext *superblock;
+struct HsqsFileContext {
+	struct HsqsDatablockContext datablock;
+	struct HsqsFragmentContext fragment;
+	const struct HsqsSuperblockContext *superblock;
 	uint32_t fragment_pos;
 };
 
-SQUASH_NO_UNUSED int squash_file_init(
-		struct SquashFileContext *context,
-		const struct SquashInodeContext *inode);
+HSQS_NO_UNUSED int hsqs_file_init(
+		struct HsqsFileContext *context, const struct HsqsInodeContext *inode);
 
-SQUASH_NO_UNUSED int
-squash_file_seek(struct SquashFileContext *context, uint64_t seek_pos);
+HSQS_NO_UNUSED int
+hsqs_file_seek(struct HsqsFileContext *context, uint64_t seek_pos);
 
-int squash_file_read(struct SquashFileContext *context, uint64_t size);
+int hsqs_file_read(struct HsqsFileContext *context, uint64_t size);
 
-const uint8_t *squash_file_data(struct SquashFileContext *context);
+const uint8_t *hsqs_file_data(struct HsqsFileContext *context);
 
-uint64_t squash_file_size(struct SquashFileContext *context);
+uint64_t hsqs_file_size(struct HsqsFileContext *context);
 
-int squash_file_cleanup(struct SquashFileContext *context);
+int hsqs_file_cleanup(struct HsqsFileContext *context);
 
 #endif /* end of include guard FILE_CONTEXT_H */

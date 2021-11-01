@@ -39,27 +39,26 @@
 
 #define FORMAT_INODE_INTERNAL_H
 
-struct SquashInodeDirectoryIndex {
+struct HsqsInodeDirectoryIndex {
 	uint32_t index;
 	uint32_t start;
 	uint32_t name_size;
 	// uint8_t name[0]; // [name_size + 1]
 };
 STATIC_ASSERT(
-		sizeof(struct SquashInodeDirectoryIndex) ==
-		SQUASH_SIZEOF_INODE_DIRECTORY_INDEX);
+		sizeof(struct HsqsInodeDirectoryIndex) ==
+		HSQS_SIZEOF_INODE_DIRECTORY_INDEX);
 
-struct SquashInodeDirectory {
+struct HsqsInodeDirectory {
 	uint32_t block_start;
 	uint32_t hard_link_count;
 	uint16_t file_size;
 	uint16_t block_offset;
 	uint32_t parent_inode_number;
 };
-STATIC_ASSERT(
-		sizeof(struct SquashInodeDirectory) == SQUASH_SIZEOF_INODE_DIRECTORY);
+STATIC_ASSERT(sizeof(struct HsqsInodeDirectory) == HSQS_SIZEOF_INODE_DIRECTORY);
 
-struct SquashInodeDirectoryExt {
+struct HsqsInodeDirectoryExt {
 	uint32_t hard_link_count;
 	uint32_t file_size;
 	uint32_t block_start;
@@ -67,22 +66,22 @@ struct SquashInodeDirectoryExt {
 	uint16_t index_count;
 	uint16_t block_offset;
 	uint32_t xattr_idx;
-	// struct SquashInodeDirectoryIndex index[0]; // [index_count]
+	// struct HsqsInodeDirectoryIndex index[0]; // [index_count]
 };
 STATIC_ASSERT(
-		sizeof(struct SquashInodeDirectoryExt) ==
-		SQUASH_SIZEOF_INODE_DIRECTORY_EXT);
+		sizeof(struct HsqsInodeDirectoryExt) ==
+		HSQS_SIZEOF_INODE_DIRECTORY_EXT);
 
-struct SquashInodeFile {
+struct HsqsInodeFile {
 	uint32_t blocks_start;
 	uint32_t fragment_block_index;
 	uint32_t block_offset;
 	uint32_t file_size;
 	// uint32_t block_sizes[0];
 };
-STATIC_ASSERT(sizeof(struct SquashInodeFile) == SQUASH_SIZEOF_INODE_FILE);
+STATIC_ASSERT(sizeof(struct HsqsInodeFile) == HSQS_SIZEOF_INODE_FILE);
 
-struct SquashInodeFileExt {
+struct HsqsInodeFileExt {
 	uint64_t blocks_start;
 	uint64_t file_size;
 	uint64_t sparse;
@@ -92,58 +91,56 @@ struct SquashInodeFileExt {
 	uint32_t xattr_idx;
 	// uint32_t block_sizes[0];
 };
-STATIC_ASSERT(
-		sizeof(struct SquashInodeFileExt) == SQUASH_SIZEOF_INODE_FILE_EXT);
+STATIC_ASSERT(sizeof(struct HsqsInodeFileExt) == HSQS_SIZEOF_INODE_FILE_EXT);
 
-struct SquashInodeSymlink {
+struct HsqsInodeSymlink {
 	uint32_t hard_link_count;
 	uint32_t target_size;
 	// uint8_t target_path[0]; // [target_size]
 };
-STATIC_ASSERT(sizeof(struct SquashInodeSymlink) == SQUASH_SIZEOF_INODE_SYMLINK);
+STATIC_ASSERT(sizeof(struct HsqsInodeSymlink) == HSQS_SIZEOF_INODE_SYMLINK);
 
-struct SquashInodeSymlinkExt {
+struct HsqsInodeSymlinkExt {
 	uint32_t hard_link_count;
 	uint32_t target_size;
 	// uint8_t target_path[0]; // [target_size]
 };
 STATIC_ASSERT(
-		sizeof(struct SquashInodeSymlinkExt) ==
-		SQUASH_SIZEOF_INODE_SYMLINK_EXT);
+		sizeof(struct HsqsInodeSymlinkExt) == HSQS_SIZEOF_INODE_SYMLINK_EXT);
 
-struct SquashInodeSymlinkExtTail {
+struct HsqsInodeSymlinkExtTail {
 	uint32_t xattr_idx;
 };
 STATIC_ASSERT(
-		sizeof(struct SquashInodeSymlinkExtTail) ==
-		SQUASH_SIZEOF_INODE_SYMLINK_EXT_TAIL);
+		sizeof(struct HsqsInodeSymlinkExtTail) ==
+		HSQS_SIZEOF_INODE_SYMLINK_EXT_TAIL);
 
-struct SquashInodeDevice {
+struct HsqsInodeDevice {
 	uint32_t hard_link_count;
 	uint32_t device;
 };
-STATIC_ASSERT(sizeof(struct SquashInodeDevice) == SQUASH_SIZEOF_INODE_DEVICE);
+STATIC_ASSERT(sizeof(struct HsqsInodeDevice) == HSQS_SIZEOF_INODE_DEVICE);
 
-struct SquashInodeDeviceExt {
+struct HsqsInodeDeviceExt {
 	uint32_t hard_link_count;
 	uint32_t device;
 	uint32_t xattr_idx;
 };
 STATIC_ASSERT(
-		sizeof(struct SquashInodeDeviceExt) == SQUASH_SIZEOF_INODE_DEVICE_EXT);
+		sizeof(struct HsqsInodeDeviceExt) == HSQS_SIZEOF_INODE_DEVICE_EXT);
 
-struct SquashInodeIpc {
+struct HsqsInodeIpc {
 	uint32_t hard_link_count;
 };
-STATIC_ASSERT(sizeof(struct SquashInodeIpc) == SQUASH_SIZEOF_INODE_IPC);
+STATIC_ASSERT(sizeof(struct HsqsInodeIpc) == HSQS_SIZEOF_INODE_IPC);
 
-struct SquashInodeIpcExt {
+struct HsqsInodeIpcExt {
 	uint32_t hard_link_count;
 	uint32_t xattr_idx;
 };
-STATIC_ASSERT(sizeof(struct SquashInodeIpcExt) == SQUASH_SIZEOF_INODE_IPC_EXT);
+STATIC_ASSERT(sizeof(struct HsqsInodeIpcExt) == HSQS_SIZEOF_INODE_IPC_EXT);
 
-struct SquashInodeHeader {
+struct HsqsInodeHeader {
 	uint16_t type;
 	uint16_t permissions;
 	uint16_t uid_idx;
@@ -151,21 +148,21 @@ struct SquashInodeHeader {
 	uint32_t modified_time;
 	uint32_t inode_number;
 };
-STATIC_ASSERT(sizeof(struct SquashInodeHeader) == SQUASH_SIZEOF_INODE_HEADER);
+STATIC_ASSERT(sizeof(struct HsqsInodeHeader) == HSQS_SIZEOF_INODE_HEADER);
 
-struct SquashInode {
-	struct SquashInodeHeader header;
+struct HsqsInode {
+	struct HsqsInodeHeader header;
 	union {
-		struct SquashInodeDirectory directory;
-		struct SquashInodeDirectoryExt directory_ext;
-		struct SquashInodeFile file;
-		struct SquashInodeFileExt file_ext;
-		struct SquashInodeSymlink symlink;
-		struct SquashInodeSymlinkExt symlink_ext;
-		struct SquashInodeDevice device;
-		struct SquashInodeDeviceExt device_ext;
-		struct SquashInodeIpc ipc;
-		struct SquashInodeIpcExt ipc_ext;
+		struct HsqsInodeDirectory directory;
+		struct HsqsInodeDirectoryExt directory_ext;
+		struct HsqsInodeFile file;
+		struct HsqsInodeFileExt file_ext;
+		struct HsqsInodeSymlink symlink;
+		struct HsqsInodeSymlinkExt symlink_ext;
+		struct HsqsInodeDevice device;
+		struct HsqsInodeDeviceExt device_ext;
+		struct HsqsInodeIpc ipc;
+		struct HsqsInodeIpcExt ipc_ext;
 	} data;
 };
 

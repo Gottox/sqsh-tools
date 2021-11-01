@@ -14,10 +14,11 @@ CONFIG_COMPRESSION_ZSTD = 1
 CFLAGS = -Wall -Werror -Wpedantic -O0 -g -fPIC -pthread -D_FILE_OFFSET_BITS=64 -fsanitize=address
 LDFLAGS = -pthread -fsanitize=address
 
+#TST_CFLAGS = -fsanitize=address -fprofile-arcs -ftest-coverage -lgcov --coverage
 TST_CFLAGS = -fsanitize=address
 #TST_CFLAGS += -fprofile-arcs
 #TST_CFLAGS += -ftest-coverage
-FZZ_CFLAGS = -fsanitize=fuzzer,address -fcoverage-mapping -fprofile-instr-generate -g
+FZZ_CFLAGS = -fsanitize=fuzzer
 
 # if you're feeling lucky:
 #CFLAGS += -DNDEBUG

@@ -39,11 +39,11 @@
 
 #define DATABLOCK_H
 
-struct SquashDatablockSize;
+struct HsqsDatablockSize;
 
 uint32_t
-squash_data_datablock_size(const struct SquashDatablockSize *datablock_size);
-bool squash_data_datablock_is_compressed(
-		const struct SquashDatablockSize *datablock_size);
+hsqs_data_datablock_size(const struct HsqsDatablockSize *datablock_size);
+bool hsqs_data_datablock_is_compressed(
+		const struct HsqsDatablockSize *datablock_size);
 
 #endif /* end of include guard DATABLOCK_H */

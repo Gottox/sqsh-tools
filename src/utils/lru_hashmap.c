@@ -39,14 +39,14 @@
 #include <stdlib.h>
 
 static off_t
-lru_hash_to_start_index(struct SquashLruHashmap *hashmap, uint64_t hash) {
+lru_hash_to_start_index(struct HsqsLruHashmap *hashmap, uint64_t hash) {
 	return (hash * hash) % hashmap->size;
 }
 
 /*
 static int
-lru_swap(struct SquashLruHashmap *hashmap, struct SquashLruEntry *entry1, struct
-SquashLruEntry *entry2) { struct SquashLruEntry *newer, *older;
+lru_swap(struct HsqsLruHashmap *hashmap, struct HsqsLruEntry *entry1, struct
+HsqsLruEntry *entry2) { struct HsqsLruEntry *newer, *older;
 
 	newer = entry1->newer;
 	older = entry1->older;
@@ -70,8 +70,8 @@ SquashLruEntry *entry2) { struct SquashLruEntry *newer, *older;
 */
 
 static int
-lru_detach(struct SquashLruHashmap *hashmap, struct SquashLruEntry *entry) {
-	struct SquashLruEntry *tmp;
+lru_detach(struct HsqsLruHashmap *hashmap, struct HsqsLruEntry *entry) {
+	struct HsqsLruEntry *tmp;
 
 	if (entry == hashmap->newest) {
 		hashmap->newest = entry->older;
@@ -93,27 +93,26 @@ lru_detach(struct SquashLruHashmap *hashmap, struct SquashLruEntry *entry) {
 }
 
 int
-squash_lru_hashmap_init(
-		struct SquashLruHashmap *hashmap, size_t size,
-		SquashLruHashmapDtor dtor) {
+hsqs_lru_hashmap_init(
+		struct HsqsLruHashmap *hashmap, size_t size, HsqsLruHashmapDtor dtor) {
 	hashmap->dtor = dtor;
 	hashmap->size = size;
 	hashmap->newest = NULL;
 	hashmap->oldest = NULL;
 	hashmap->entries = NULL;
 
-	hashmap->entries = calloc(size, sizeof(struct SquashLruEntry));
+	hashmap->entries = calloc(size, sizeof(struct HsqsLruEntry));
 	if (hashmap->entries == NULL) {
-		return -SQUASH_ERROR_MALLOC_FAILED;
+		return -HSQS_ERROR_MALLOC_FAILED;
 	}
 	return 0;
 }
 
 int
-squash_lru_hashmap_put(
-		struct SquashLruHashmap *hashmap, uint64_t hash, void *pointer) {
+hsqs_lru_hashmap_put(
+		struct HsqsLruHashmap *hashmap, uint64_t hash, void *pointer) {
 	off_t start_index = lru_hash_to_start_index(hashmap, hash);
-	struct SquashLruEntry *candidate = NULL;
+	struct HsqsLruEntry *candidate = NULL;
 
 	for (off_t i = 0; i < hashmap->size; i++) {
 		off_t index = (start_index + i) % hashmap->size;
@@ -128,7 +127,7 @@ squash_lru_hashmap_put(
 	if (candidate->pointer != NULL) {
 		if (hashmap->oldest == NULL) {
 			// Should never happen:
-			return -SQUASH_ERROR_HASHMAP_INTERNAL_ERROR;
+			return -HSQS_ERROR_HASHMAP_INTERNAL_ERROR;
 		}
 
 		// TODO: This is potentional slow. Instead find the current first match
@@ -155,19 +154,19 @@ squash_lru_hashmap_put(
 	return 0;
 }
 void *
-squash_lru_hashmap_pull(struct SquashLruHashmap *hashmap, uint64_t hash) {
+hsqs_lru_hashmap_pull(struct HsqsLruHashmap *hashmap, uint64_t hash) {
 	off_t start_index = lru_hash_to_start_index(hashmap, hash);
 
 	for (off_t i = 0; i < hashmap->size; i++) {
 		off_t index = (start_index + i) % hashmap->size;
-		struct SquashLruEntry *candidate = &hashmap->entries[index];
+		struct HsqsLruEntry *candidate = &hashmap->entries[index];
 
 		if (candidate->hash != hash) {
 			continue;
 		}
 
 		// Detaching the entry from the list. The user is responsible to put the
-		// element back through squash_lru_hashmap_put() this way the the entry
+		// element back through hsqs_lru_hashmap_put() this way the the entry
 		// cannot be removed when the hashmap is full.
 		lru_detach(hashmap, candidate);
 		return candidate->pointer;
@@ -177,7 +176,7 @@ squash_lru_hashmap_pull(struct SquashLruHashmap *hashmap, uint64_t hash) {
 }
 
 int
-squash_lru_hashmap_cleanup(struct SquashLruHashmap *hashmap) {
+hsqs_lru_hashmap_cleanup(struct HsqsLruHashmap *hashmap) {
 	for (int i = 0; i < hashmap->size; i++) {
 		if (hashmap->entries[i].pointer != NULL) {
 			hashmap->dtor(&hashmap->entries[i]);

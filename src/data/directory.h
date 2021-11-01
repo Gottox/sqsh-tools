@@ -36,35 +36,34 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#ifndef SQUASH__DIRECTORY_H
+#ifndef HSQS__DIRECTORY_H
 
-#define SQUASH__DIRECTORY_H
+#define HSQS__DIRECTORY_H
 
-#define SQUASH_SIZEOF_DIRECTORY_FRAGMENT 12
-#define SQUASH_SIZEOF_DIRECTORY_ENTRY 8
+#define HSQS_SIZEOF_DIRECTORY_FRAGMENT 12
+#define HSQS_SIZEOF_DIRECTORY_ENTRY 8
 
-struct SquashDirectoryEntry;
+struct HsqsDirectoryEntry;
 
-struct SquashDirectoryFragment;
+struct HsqsDirectoryFragment;
 
 uint16_t
-squash_data_directory_entry_offset(const struct SquashDirectoryEntry *entry);
-int16_t squash_data_directory_entry_inode_offset(
-		const struct SquashDirectoryEntry *entry);
+hsqs_data_directory_entry_offset(const struct HsqsDirectoryEntry *entry);
+int16_t
+hsqs_data_directory_entry_inode_offset(const struct HsqsDirectoryEntry *entry);
+uint16_t hsqs_data_directory_entry_type(const struct HsqsDirectoryEntry *entry);
 uint16_t
-squash_data_directory_entry_type(const struct SquashDirectoryEntry *entry);
-uint16_t
-squash_data_directory_entry_name_size(const struct SquashDirectoryEntry *entry);
+hsqs_data_directory_entry_name_size(const struct HsqsDirectoryEntry *entry);
 const uint8_t *
-squash_data_directory_entry_name(const struct SquashDirectoryEntry *entry);
+hsqs_data_directory_entry_name(const struct HsqsDirectoryEntry *entry);
 
-uint32_t squash_data_directory_fragment_count(
-		const struct SquashDirectoryFragment *fragment);
-uint32_t squash_data_directory_fragment_start(
-		const struct SquashDirectoryFragment *fragment);
-uint32_t squash_data_directory_fragment_inode_number(
-		const struct SquashDirectoryFragment *fragment);
-const struct SquashDirectoryEntry *squash_data_directory_fragment_entries(
-		const struct SquashDirectoryFragment *fragment);
+uint32_t hsqs_data_directory_fragment_count(
+		const struct HsqsDirectoryFragment *fragment);
+uint32_t hsqs_data_directory_fragment_start(
+		const struct HsqsDirectoryFragment *fragment);
+uint32_t hsqs_data_directory_fragment_inode_number(
+		const struct HsqsDirectoryFragment *fragment);
+const struct HsqsDirectoryEntry *hsqs_data_directory_fragment_entries(
+		const struct HsqsDirectoryFragment *fragment);
 
-#endif /* end of include guard SQUASH__DIRECTORY_H */
+#endif /* end of include guard HSQS__DIRECTORY_H */

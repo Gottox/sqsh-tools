@@ -35,18 +35,17 @@
 #include "datablock.h"
 #include <stdint.h>
 
-#ifndef SQUASH__FRAGMENT_H
+#ifndef HSQS__FRAGMENT_H
 
-#define SQUASH__FRAGMENT_H
+#define HSQS__FRAGMENT_H
 
-#define SQUASH_SIZEOF_FRAGMENT 16
+#define HSQS_SIZEOF_FRAGMENT 16
 
-struct SquashFragment;
+struct HsqsFragment;
 
-uint64_t squash_data_fragment_start(const struct SquashFragment *fragment);
-const struct SquashDatablockSize *
-squash_data_fragment_size_info(const struct SquashFragment *fragment);
-uint32_t
-squash_data_fragment_is_compressed(const struct SquashFragment *fragment);
+uint64_t hsqs_data_fragment_start(const struct HsqsFragment *fragment);
+const struct HsqsDatablockSize *
+hsqs_data_fragment_size_info(const struct HsqsFragment *fragment);
+uint32_t hsqs_data_fragment_is_compressed(const struct HsqsFragment *fragment);
 
-#endif /* end of include guard SQUASH__FRAGMENT_H */
+#endif /* end of include guard HSQS__FRAGMENT_H */

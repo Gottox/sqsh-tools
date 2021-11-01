@@ -36,39 +36,37 @@
 #include "xattr.h"
 #include <stdint.h>
 
-#ifndef SQUASH_XATTR_INTERNAL_H
+#ifndef HSQS_XATTR_INTERNAL_H
 
-#define SQUASH_XATTR_INTERNAL_H
+#define HSQS_XATTR_INTERNAL_H
 
-struct SquashXattrKey {
+struct HsqsXattrKey {
 	uint16_t type;
 	uint16_t name_size;
 	// uint8_t name[0]; // [name_size - strlen(prefix)];
 };
-STATIC_ASSERT(sizeof(struct SquashXattrKey) == SQUASH_SIZEOF_XATTR_KEY);
+STATIC_ASSERT(sizeof(struct HsqsXattrKey) == HSQS_SIZEOF_XATTR_KEY);
 
-struct SquashXattrValue {
+struct HsqsXattrValue {
 	uint32_t value_size;
 	// uint8_t value[0]; // [value_size]
 };
-STATIC_ASSERT(sizeof(struct SquashXattrValue) == SQUASH_SIZEOF_XATTR_VALUE);
+STATIC_ASSERT(sizeof(struct HsqsXattrValue) == HSQS_SIZEOF_XATTR_VALUE);
 
-struct SquashXattrLookupTable {
+struct HsqsXattrLookupTable {
 	uint64_t xattr_ref;
 	uint32_t count;
 	uint32_t size;
 };
 STATIC_ASSERT(
-		sizeof(struct SquashXattrLookupTable) ==
-		SQUASH_SIZEOF_XATTR_LOOKUP_TABLE);
+		sizeof(struct HsqsXattrLookupTable) == HSQS_SIZEOF_XATTR_LOOKUP_TABLE);
 
-struct SquashXattrIdTable {
+struct HsqsXattrIdTable {
 	uint64_t xattr_table_start;
 	uint32_t xattr_ids;
 	uint32_t _unused;
 	// uint64_t table[0]; // [ceil(xattr_ids / 512.0)]
 };
-STATIC_ASSERT(
-		sizeof(struct SquashXattrIdTable) == SQUASH_SIZEOF_XATTR_ID_TABLE);
+STATIC_ASSERT(sizeof(struct HsqsXattrIdTable) == HSQS_SIZEOF_XATTR_ID_TABLE);
 
-#endif /* end of include guard SQUASH_XATTR_INTERNAL_H */
+#endif /* end of include guard HSQS_XATTR_INTERNAL_H */

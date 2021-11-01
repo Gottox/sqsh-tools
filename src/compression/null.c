@@ -42,12 +42,12 @@
 #include <sys/types.h>
 
 static int
-squash_null_extract(
-		const union SquashCompressionOptions *options, uint8_t *target,
+hsqs_null_extract(
+		const union HsqsCompressionOptions *options, uint8_t *target,
 		size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	if (compressed_size > *target_size) {
-		return -SQUASH_ERROR_SIZE_MISSMATCH;
+		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
 	*target_size = compressed_size;
 	memcpy(target, compressed, compressed_size);
@@ -55,6 +55,6 @@ squash_null_extract(
 	return 0;
 }
 
-const struct SquashCompressionImplementation squash_compression_null = {
-		.extract = squash_null_extract,
+const struct HsqsCompressionImplementation hsqs_compression_null = {
+		.extract = hsqs_null_extract,
 };

@@ -44,86 +44,86 @@
 #include <string.h>
 
 static const char *
-get_xattr_prefix(enum SquashXattrType type) {
+get_xattr_prefix(enum HsqsXattrType type) {
 	switch (type) {
-	case SQUASH_XATTR_USER:
+	case HSQS_XATTR_USER:
 		return "user.";
-	case SQUASH_XATTR_TRUSTED:
+	case HSQS_XATTR_TRUSTED:
 		return "trusted.";
-	case SQUASH_XATTR_SECURITY:
+	case HSQS_XATTR_SECURITY:
 		return "security.";
 	}
 	return NULL;
 }
 
 int
-squash_xattr_table_init(
-		struct SquashXattrTableContext *context,
-		struct SquashSuperblockContext *superblock) {
+hsqs_xattr_table_init(
+		struct HsqsXattrTableContext *context,
+		struct HsqsSuperblockContext *superblock) {
 	int rv = 0;
 	uint64_t offset =
-			squash_data_superblock_xattr_id_table_start(superblock->superblock);
-	uint64_t bytes_used = squash_superblock_bytes_used(superblock);
-	if (offset + SQUASH_SIZEOF_XATTR_ID_TABLE >= bytes_used) {
-		return -SQUASH_ERROR_SIZE_MISSMATCH;
+			hsqs_data_superblock_xattr_id_table_start(superblock->superblock);
+	uint64_t bytes_used = hsqs_superblock_bytes_used(superblock);
+	if (offset + HSQS_SIZEOF_XATTR_ID_TABLE >= bytes_used) {
+		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
-	context->header = squash_superblock_data_from_offset(superblock, offset);
+	context->header = hsqs_superblock_data_from_offset(superblock, offset);
 	context->superblock = superblock;
 	if (context->header == NULL) {
-		return -SQUASH_ERROR_SIZE_MISSMATCH;
+		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
 
-	rv = squash_table_init(
-			&context->table, superblock, offset + SQUASH_SIZEOF_XATTR_ID_TABLE,
-			SQUASH_SIZEOF_XATTR_LOOKUP_TABLE,
-			squash_data_xattr_id_table_xattr_ids(context->header));
+	rv = hsqs_table_init(
+			&context->table, superblock, offset + HSQS_SIZEOF_XATTR_ID_TABLE,
+			HSQS_SIZEOF_XATTR_LOOKUP_TABLE,
+			hsqs_data_xattr_id_table_xattr_ids(context->header));
 	return rv;
 }
 
 int
-squash_xattr_table_iterator_init(
-		struct SquashXattrTableIterator *iterator,
-		struct SquashXattrTableContext *xattr_table,
-		const struct SquashInodeContext *inode) {
+hsqs_xattr_table_iterator_init(
+		struct HsqsXattrTableIterator *iterator,
+		struct HsqsXattrTableContext *xattr_table,
+		const struct HsqsInodeContext *inode) {
 	int rv;
-	const struct SquashXattrLookupTable *ref;
-	uint32_t index = squash_inode_xattr_index(inode);
+	const struct HsqsXattrLookupTable *ref;
+	uint32_t index = hsqs_inode_xattr_index(inode);
 
-	if (index == SQUASH_INODE_NO_XATTR) {
+	if (index == HSQS_INODE_NO_XATTR) {
 		iterator->remaining_entries = 0;
 		return 0;
 	}
 
-	rv = squash_table_get(&xattr_table->table, index, (const void **)&ref);
+	rv = hsqs_table_get(&xattr_table->table, index, (const void **)&ref);
 	if (rv < 0) {
-		squash_xattr_table_iterator_cleanup(iterator);
+		hsqs_xattr_table_iterator_cleanup(iterator);
 		goto out;
 	}
 
 	// TODO: references are used in inodes too. Generalize!
 	uint64_t start_block =
-			squash_data_xattr_id_table_xattr_table_start(xattr_table->header);
-	rv = squash_metablock_init(
+			hsqs_data_xattr_id_table_xattr_table_start(xattr_table->header);
+	rv = hsqs_metablock_init(
 			&iterator->metablock, xattr_table->superblock, start_block);
 	if (rv < 0) {
-		squash_xattr_table_iterator_cleanup(iterator);
+		hsqs_xattr_table_iterator_cleanup(iterator);
 		goto out;
 	}
 	uint64_t metablock_index =
-			squash_data_xattr_lookup_table_xattr_ref(ref) >> 16;
+			hsqs_data_xattr_lookup_table_xattr_ref(ref) >> 16;
 	uint16_t metablock_offset =
-			squash_data_xattr_lookup_table_xattr_ref(ref) & 0xFFFF;
-	rv = squash_metablock_seek(
+			hsqs_data_xattr_lookup_table_xattr_ref(ref) & 0xFFFF;
+	rv = hsqs_metablock_seek(
 			&iterator->metablock, metablock_index, metablock_offset);
 	if (rv < 0) {
-		squash_xattr_table_iterator_cleanup(iterator);
+		hsqs_xattr_table_iterator_cleanup(iterator);
 		goto out;
 	}
 
-	iterator->remaining_entries = squash_data_xattr_lookup_table_count(ref);
+	iterator->remaining_entries = hsqs_data_xattr_lookup_table_count(ref);
 
-	rv = squash_metablock_more(
-			&iterator->metablock, squash_data_xattr_lookup_table_size(ref));
+	rv = hsqs_metablock_more(
+			&iterator->metablock, hsqs_data_xattr_lookup_table_size(ref));
 
 	iterator->current_key = NULL;
 	iterator->current_value = NULL;
@@ -135,18 +135,18 @@ out:
 
 int
 xattr_value_indirect_load(
-		struct SquashXattrTableIterator *iterator,
-		struct SquashXattrValue *ref_value) {
-	struct SquashXattrValue *tmp;
+		struct HsqsXattrTableIterator *iterator,
+		struct HsqsXattrValue *ref_value) {
+	struct HsqsXattrValue *tmp;
 	int rv = 0;
-	if (squash_data_xattr_value_size(ref_value) != 8) {
-		return -SQUASH_ERROR_SIZE_MISSMATCH;
+	if (hsqs_data_xattr_value_size(ref_value) != 8) {
+		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
-	uint64_t ref = squash_data_xattr_value_ref(ref_value);
+	uint64_t ref = hsqs_data_xattr_value_ref(ref_value);
 
-	uint64_t start_block = squash_data_xattr_id_table_xattr_table_start(
+	uint64_t start_block = hsqs_data_xattr_id_table_xattr_table_start(
 			iterator->context->header);
-	rv = squash_metablock_init(
+	rv = hsqs_metablock_init(
 			&iterator->out_of_line_value, iterator->context->superblock,
 			start_block);
 	if (rv < 0) {
@@ -154,24 +154,24 @@ xattr_value_indirect_load(
 	}
 	uint64_t metablock_index = ref >> 16;
 	uint16_t metablock_offset = ref & 0xFFFF;
-	rv = squash_metablock_seek(
+	rv = hsqs_metablock_seek(
 			&iterator->out_of_line_value, metablock_index, metablock_offset);
 	if (rv < 0) {
 		goto out;
 	}
-	size_t size = SQUASH_SIZEOF_XATTR_VALUE;
-	rv = squash_metablock_more(&iterator->out_of_line_value, size);
+	size_t size = HSQS_SIZEOF_XATTR_VALUE;
+	rv = hsqs_metablock_more(&iterator->out_of_line_value, size);
 	if (rv < 0) {
 		goto out;
 	}
-	tmp = (struct SquashXattrValue *)squash_metablock_data(
+	tmp = (struct HsqsXattrValue *)hsqs_metablock_data(
 			&iterator->out_of_line_value);
-	size += squash_data_xattr_value_size(tmp);
-	rv = squash_metablock_more(&iterator->out_of_line_value, size);
+	size += hsqs_data_xattr_value_size(tmp);
+	rv = hsqs_metablock_more(&iterator->out_of_line_value, size);
 	if (rv < 0) {
 		goto out;
 	}
-	iterator->current_value = (struct SquashXattrValue *)squash_metablock_data(
+	iterator->current_value = (struct HsqsXattrValue *)hsqs_metablock_data(
 			&iterator->out_of_line_value);
 
 out:
@@ -179,31 +179,30 @@ out:
 }
 
 int
-squash_xattr_table_iterator_next(struct SquashXattrTableIterator *iterator) {
+hsqs_xattr_table_iterator_next(struct HsqsXattrTableIterator *iterator) {
 	int rv = 0;
-	struct SquashXattrValue *value;
+	struct HsqsXattrValue *value;
 	int remaining_entries = iterator->remaining_entries;
 	if (iterator->remaining_entries == 0) {
 		return 0;
 	}
 	if (iterator->current_key == NULL) {
-		iterator->current_key = (struct SquashXattrKey *)squash_metablock_data(
+		iterator->current_key = (struct HsqsXattrKey *)hsqs_metablock_data(
 				&iterator->metablock);
 	} else {
-		if (squash_xattr_table_iterator_is_indirect(iterator)) {
-			squash_metablock_cleanup(&iterator->out_of_line_value);
+		if (hsqs_xattr_table_iterator_is_indirect(iterator)) {
+			hsqs_metablock_cleanup(&iterator->out_of_line_value);
 		}
-		iterator->current_key =
-				(struct SquashXattrKey *)&squash_data_xattr_value(
-						iterator->current_value)[squash_data_xattr_value_size(
-						iterator->current_value)];
+		iterator->current_key = (struct HsqsXattrKey *)&hsqs_data_xattr_value(
+				iterator->current_value)[hsqs_data_xattr_value_size(
+				iterator->current_value)];
 	}
 
-	value = (struct SquashXattrValue *)&squash_data_xattr_key_name(
-			iterator->current_key)[squash_data_xattr_key_name_size(
+	value = (struct HsqsXattrValue *)&hsqs_data_xattr_key_name(
+			iterator->current_key)[hsqs_data_xattr_key_name_size(
 			iterator->current_key)];
 
-	if (squash_xattr_table_iterator_is_indirect(iterator)) {
+	if (hsqs_xattr_table_iterator_is_indirect(iterator)) {
 		rv = xattr_value_indirect_load(iterator, value);
 		if (rv < 0) {
 			return rv;
@@ -217,80 +216,77 @@ squash_xattr_table_iterator_next(struct SquashXattrTableIterator *iterator) {
 }
 
 uint16_t
-squash_xattr_table_iterator_type(struct SquashXattrTableIterator *iterator) {
-	return squash_data_xattr_key_type(iterator->current_key) & ~0x0100;
+hsqs_xattr_table_iterator_type(struct HsqsXattrTableIterator *iterator) {
+	return hsqs_data_xattr_key_type(iterator->current_key) & ~0x0100;
 }
 
 bool
-squash_xattr_table_iterator_is_indirect(
-		struct SquashXattrTableIterator *iterator) {
-	return (squash_data_xattr_key_type(iterator->current_key) & 0x0100) != 0;
+hsqs_xattr_table_iterator_is_indirect(struct HsqsXattrTableIterator *iterator) {
+	return (hsqs_data_xattr_key_type(iterator->current_key) & 0x0100) != 0;
 }
 
 const char *
-squash_xattr_table_iterator_name(struct SquashXattrTableIterator *iterator) {
-	return (const char *)squash_data_xattr_key_name(iterator->current_key);
+hsqs_xattr_table_iterator_name(struct HsqsXattrTableIterator *iterator) {
+	return (const char *)hsqs_data_xattr_key_name(iterator->current_key);
 }
 
 int
-squash_xattr_table_iterator_fullname_dup(
-		struct SquashXattrTableIterator *iterator, char **fullname_buffer) {
+hsqs_xattr_table_iterator_fullname_dup(
+		struct HsqsXattrTableIterator *iterator, char **fullname_buffer) {
 	const char *prefix =
-			get_xattr_prefix(squash_xattr_table_iterator_type(iterator));
-	size_t name_size = squash_xattr_table_iterator_name_size(iterator);
+			get_xattr_prefix(hsqs_xattr_table_iterator_type(iterator));
+	size_t name_size = hsqs_xattr_table_iterator_name_size(iterator);
 	size_t size = strlen(prefix) + name_size;
 
 	*fullname_buffer = calloc(size + 1, sizeof(char));
 	if (*fullname_buffer) {
 		strcpy(*fullname_buffer, prefix);
-		strncat(*fullname_buffer, squash_xattr_table_iterator_name(iterator),
+		strncat(*fullname_buffer, hsqs_xattr_table_iterator_name(iterator),
 				name_size);
 		return size;
 	} else {
-		return -SQUASH_ERROR_MALLOC_FAILED;
+		return -HSQS_ERROR_MALLOC_FAILED;
 	}
 }
 
 uint16_t
-squash_xattr_table_iterator_name_size(
-		struct SquashXattrTableIterator *iterator) {
-	return squash_data_xattr_key_name_size(iterator->current_key);
+hsqs_xattr_table_iterator_name_size(struct HsqsXattrTableIterator *iterator) {
+	return hsqs_data_xattr_key_name_size(iterator->current_key);
 }
 
 int
-squash_xattr_table_iterator_value_dup(
-		struct SquashXattrTableIterator *iterator, char **value_buffer) {
-	int size = squash_xattr_table_iterator_value_size(iterator);
-	const char *value = squash_xattr_table_iterator_value(iterator);
+hsqs_xattr_table_iterator_value_dup(
+		struct HsqsXattrTableIterator *iterator, char **value_buffer) {
+	int size = hsqs_xattr_table_iterator_value_size(iterator);
+	const char *value = hsqs_xattr_table_iterator_value(iterator);
 
-	*value_buffer = squash_memdup(value, size);
+	*value_buffer = hsqs_memdup(value, size);
 	if (*value_buffer) {
 		return size;
 	} else {
-		return -SQUASH_ERROR_MALLOC_FAILED;
+		return -HSQS_ERROR_MALLOC_FAILED;
 	}
 }
 
 const char *
-squash_xattr_table_iterator_value(struct SquashXattrTableIterator *iterator) {
-	return (const char *)squash_data_xattr_value(iterator->current_value);
+hsqs_xattr_table_iterator_value(struct HsqsXattrTableIterator *iterator) {
+	return (const char *)hsqs_data_xattr_value(iterator->current_value);
 }
 
 uint16_t
-squash_xattr_table_iterator_value_size(
-		struct SquashXattrTableIterator *iterator) {
-	return squash_data_xattr_value_size(iterator->current_value);
+hsqs_xattr_table_iterator_value_size(struct HsqsXattrTableIterator *iterator) {
+	return hsqs_data_xattr_value_size(iterator->current_value);
 }
 
 int
-squash_xattr_table_iterator_cleanup(struct SquashXattrTableIterator *iterator) {
-	squash_metablock_cleanup(&iterator->out_of_line_value);
-	squash_metablock_cleanup(&iterator->metablock);
+hsqs_xattr_table_iterator_cleanup(struct HsqsXattrTableIterator *iterator) {
+	hsqs_metablock_cleanup(&iterator->out_of_line_value);
+	hsqs_metablock_cleanup(&iterator->metablock);
 	return 0;
 }
 
 int
-squash_xattr_table_cleanup(struct SquashXattrTableContext *context) {
-	squash_table_cleanup(&context->table);
+hsqs_xattr_table_cleanup(struct HsqsXattrTableContext *context) {
+	hsqs_table_cleanup(&context->table);
 	return 0;
 }

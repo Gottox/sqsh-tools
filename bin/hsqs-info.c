@@ -39,7 +39,7 @@
 #include "../src/data/compression_options_internal.h"
 #include "../src/data/metablock.h"
 #include "../src/data/superblock_internal.h"
-#include "../src/squash.h"
+#include "../src/hsqs.h"
 
 #include <assert.h>
 #include <inttypes.h>
@@ -64,31 +64,31 @@ usage(char *arg0) {
 }
 
 static int
-metablock_info(const struct SquashMetablock *metablock, struct Squash *squash) {
+metablock_info(const struct HsqsMetablock *metablock, struct Hsqs *squash) {
 	int rv = 0;
-	struct SquashMetablockContext extract = {0};
+	struct HsqsMetablockContext extract = {0};
 	KEY("METABLOCK_INFO");
 	if (metablock == NULL) {
 		fputs("(none)\n", out);
 		return 0;
 	}
 
-	int is_compressed = squash_data_metablock_is_compressed(metablock);
-	rv = squash_metablock_init(
+	int is_compressed = hsqs_data_metablock_is_compressed(metablock);
+	rv = hsqs_metablock_init(
 			&extract, &squash->superblock,
 			(uint8_t *)metablock - (uint8_t *)squash->superblock.superblock);
 	if (rv < 0) {
 		return 0;
 	}
-	rv = squash_metablock_more(&extract, squash_data_metablock_size(metablock));
+	rv = hsqs_metablock_more(&extract, hsqs_data_metablock_size(metablock));
 	if (rv < 0) {
-		squash_metablock_cleanup(&extract);
+		hsqs_metablock_cleanup(&extract);
 		return 0;
 	}
-	size_t size = squash_metablock_size(&extract);
-	squash_metablock_cleanup(&extract);
+	size_t size = hsqs_metablock_size(&extract);
+	hsqs_metablock_cleanup(&extract);
 
-	size_t compressed_size = squash_data_metablock_size(metablock);
+	size_t compressed_size = hsqs_data_metablock_size(metablock);
 	fprintf(out,
 			"compressed: %s, "
 			"size: %lu, "
@@ -100,13 +100,13 @@ metablock_info(const struct SquashMetablock *metablock, struct Squash *squash) {
 }
 
 static int
-compression_info_gzip(struct Squash *squash) {
+compression_info_gzip(struct Hsqs *squash) {
 	int rv = 0;
 	// TODO: use metablock context instead of compression here. this block is
 	// never compressed.
-	struct SquashBuffer buffer = {0};
-	rv = squash_buffer_init(&buffer, &squash->superblock, 8192);
-	const struct SquashCompressionOptionsGzip *options = &buffer.options->gzip;
+	struct HsqsBuffer buffer = {0};
+	rv = hsqs_buffer_init(&buffer, &squash->superblock, 8192);
+	const struct HsqsCompressionOptionsGzip *options = &buffer.options->gzip;
 
 	KEY("COMPRESSION_LEVEL");
 	fprintf(out, "%i\n", options->compression_level);
@@ -115,33 +115,33 @@ compression_info_gzip(struct Squash *squash) {
 	KEY("STRATEGIES");
 	printb(options->strategies, out);
 
-	rv = squash_buffer_cleanup(&buffer);
+	rv = hsqs_buffer_cleanup(&buffer);
 	return rv;
 }
 
 static int
-inode_info(struct Squash *squash, struct SquashInodeContext *inode) {
+inode_info(struct Hsqs *squash, struct HsqsInodeContext *inode) {
 	int rv = 0;
 
 	KEY("HARDLINK COUNT");
-	fprintf(out, "%u\n", squash_inode_hard_link_count(inode));
+	fprintf(out, "%u\n", hsqs_inode_hard_link_count(inode));
 
 	return rv;
 }
 
 static int
-dir_info(struct Squash *squash, struct SquashDirectoryContext *dir) {
+dir_info(struct Hsqs *squash, struct HsqsDirectoryContext *dir) {
 	int rv = 0;
-	struct SquashDirectoryIterator iter = {0};
+	struct HsqsDirectoryIterator iter = {0};
 	fputs("=== ROOT DIRECTORY ===\n", out);
 
-	rv = squash_directory_iterator_init(&iter, dir);
+	rv = hsqs_directory_iterator_init(&iter, dir);
 	if (rv < 0) {
 		return 0;
 	}
-	while (squash_directory_iterator_next(&iter) > 0) {
+	while (hsqs_directory_iterator_next(&iter) > 0) {
 		char *name = NULL;
-		rv = squash_directory_iterator_name_dup(&iter, &name);
+		rv = hsqs_directory_iterator_name_dup(&iter, &name);
 		if (rv < 0) {
 			break;
 		}
@@ -150,23 +150,23 @@ dir_info(struct Squash *squash, struct SquashDirectoryContext *dir) {
 		fputc('\n', out);
 		free(name);
 	}
-	squash_directory_iterator_cleanup(&iter);
+	hsqs_directory_iterator_cleanup(&iter);
 
 	return rv;
 }
 
 static int
-root_inode_info(struct Squash *squash) {
-	struct SquashInodeContext inode = {0};
-	struct SquashDirectoryContext dir = {0};
-	const struct SquashMetablock *metablock = NULL;
+root_inode_info(struct Hsqs *squash) {
+	struct HsqsInodeContext inode = {0};
+	struct HsqsDirectoryContext dir = {0};
+	const struct HsqsMetablock *metablock = NULL;
 	int rv = 0;
-	uint64_t root_inode_ref = squash_data_superblock_root_inode_ref(
-			squash->superblock.superblock);
+	uint64_t root_inode_ref =
+			hsqs_data_superblock_root_inode_ref(squash->superblock.superblock);
 	fputs("=== INODE TABLE ===\n", out);
-	rv = squash_metablock_from_offset(
+	rv = hsqs_metablock_from_offset(
 			&metablock, &squash->superblock,
-			squash_data_superblock_inode_table_start(
+			hsqs_data_superblock_inode_table_start(
 					squash->superblock.superblock));
 	if (rv < 0) {
 		return rv;
@@ -182,55 +182,54 @@ root_inode_info(struct Squash *squash) {
 
 	KEY("ROOT_INODE_REF");
 	fprintf(out, "0x%lx\n", root_inode_ref);
-	rv = squash_inode_load(&inode, &squash->superblock, root_inode_ref);
+	rv = hsqs_inode_load(&inode, &squash->superblock, root_inode_ref);
 	if (rv < 0) {
 		return rv;
 	}
 	inode_info(squash, &inode);
-	rv = squash_directory_init(&dir, &squash->superblock, &inode);
+	rv = hsqs_directory_init(&dir, &squash->superblock, &inode);
 	if (rv < 0) {
 		return rv;
 	}
 
 	dir_info(squash, &dir);
 
-	squash_directory_cleanup(&dir);
+	hsqs_directory_cleanup(&dir);
 
-	rv = squash_inode_cleanup(&inode);
+	rv = hsqs_inode_cleanup(&inode);
 	return rv;
 }
 
 static int
-compression_info(struct Squash *squash) {
+compression_info(struct Hsqs *squash) {
 	int rv = 0;
-	const struct SquashMetablock *metablock = NULL;
-	int (*handler)(struct Squash * squash) = NULL;
+	const struct HsqsMetablock *metablock = NULL;
+	int (*handler)(struct Hsqs * squash) = NULL;
 	fputs("=== COMPRESSION INFO ===\n", out);
 	KEY("COMPRESSION_TYPE");
-	enum SquashSuperblockCompressionId id =
-			squash_data_superblock_compression_id(
-					squash->superblock.superblock);
+	enum HsqsSuperblockCompressionId id =
+			hsqs_data_superblock_compression_id(squash->superblock.superblock);
 	switch (id) {
-	case SQUASH_COMPRESSION_NONE:
+	case HSQS_COMPRESSION_NONE:
 		fputs("none\n", out);
 		break;
-	case SQUASH_COMPRESSION_GZIP:
+	case HSQS_COMPRESSION_GZIP:
 		fputs("gzip\n", out);
 		handler = compression_info_gzip;
 		break;
-	case SQUASH_COMPRESSION_LZMA:
+	case HSQS_COMPRESSION_LZMA:
 		fputs("lzma\n", out);
 		break;
-	case SQUASH_COMPRESSION_LZO:
+	case HSQS_COMPRESSION_LZO:
 		fputs("lzo\n", out);
 		break;
-	case SQUASH_COMPRESSION_XZ:
+	case HSQS_COMPRESSION_XZ:
 		fputs("xz\n", out);
 		break;
-	case SQUASH_COMPRESSION_LZ4:
+	case HSQS_COMPRESSION_LZ4:
 		fputs("lz4\n", out);
 		break;
-	case SQUASH_COMPRESSION_ZSTD:
+	case HSQS_COMPRESSION_ZSTD:
 		fputs("zstd\n", out);
 		break;
 	}
@@ -238,11 +237,10 @@ compression_info(struct Squash *squash) {
 	if (handler == NULL) {
 		fputs("WARNING: NO COMPRESSION OPTION HANDLER\n", stdout);
 	} else if (
-			squash_data_superblock_flags(squash->superblock.superblock) &
-			SQUASH_SUPERBLOCK_COMPRESSOR_OPTIONS) {
-		rv = squash_metablock_from_offset(
-				&metablock, &squash->superblock,
-				sizeof(struct SquashSuperblock));
+			hsqs_data_superblock_flags(squash->superblock.superblock) &
+			HSQS_SUPERBLOCK_COMPRESSOR_OPTIONS) {
+		rv = hsqs_metablock_from_offset(
+				&metablock, &squash->superblock, sizeof(struct HsqsSuperblock));
 		if (rv < 0) {
 			goto out;
 		}
@@ -256,16 +254,16 @@ out:
 }
 
 static int
-flag_info(struct Squash *squash) {
-	enum SquashSuperblockFlags flags =
-			squash_data_superblock_flags(squash->superblock.superblock);
+flag_info(struct Hsqs *squash) {
+	enum HsqsSuperblockFlags flags =
+			hsqs_data_superblock_flags(squash->superblock.superblock);
 	fputs("=== FLAG INFO ===\n", out);
 	KEY("FLAGS");
 	printb(flags, out);
 #define PRINT_FLAG(x) \
 	{ \
 		KEY(#x); \
-		fputc(flags &SQUASH_SUPERBLOCK_##x ? '1' : '0', out); \
+		fputc(flags &HSQS_SUPERBLOCK_##x ? '1' : '0', out); \
 		fputc('\n', out); \
 	}
 	PRINT_FLAG(UNCOMPRESSED_INODES);
@@ -286,25 +284,23 @@ flag_info(struct Squash *squash) {
 }
 
 static int
-section_info(struct Squash *squash) {
-	const struct SquashSuperblock *s = squash->superblock.superblock;
+section_info(struct Hsqs *squash) {
+	const struct HsqsSuperblock *s = squash->superblock.superblock;
 	KEY("ID TABLE");
-	fprintf(out, "%" PRId64 "\n", squash_data_superblock_id_table_start(s));
+	fprintf(out, "%" PRId64 "\n", hsqs_data_superblock_id_table_start(s));
 	KEY("XATTR TABLE");
-	fprintf(out, "%" PRId64 "\n",
-			squash_data_superblock_xattr_id_table_start(s));
+	fprintf(out, "%" PRId64 "\n", hsqs_data_superblock_xattr_id_table_start(s));
 	KEY("INODE TABLE");
-	fprintf(out, "%" PRId64 "\n", squash_data_superblock_inode_table_start(s));
+	fprintf(out, "%" PRId64 "\n", hsqs_data_superblock_inode_table_start(s));
 	KEY("DIR. TABLE");
 	fprintf(out, "%" PRId64 "\n",
-			squash_data_superblock_directory_table_start(s));
+			hsqs_data_superblock_directory_table_start(s));
 	KEY("FRAG TABLE");
-	fprintf(out, "%" PRId64 "\n",
-			squash_data_superblock_fragment_table_start(s));
+	fprintf(out, "%" PRId64 "\n", hsqs_data_superblock_fragment_table_start(s));
 	KEY("FRAGMENT ENTRIES");
-	fprintf(out, "%u\n", squash_data_superblock_fragment_entry_count(s));
+	fprintf(out, "%u\n", hsqs_data_superblock_fragment_entry_count(s));
 	KEY("EXPORT TABLE");
-	fprintf(out, "%" PRId64 "\n", squash_data_superblock_export_table_start(s));
+	fprintf(out, "%" PRId64 "\n", hsqs_data_superblock_export_table_start(s));
 	return 0;
 }
 
@@ -312,7 +308,7 @@ int
 main(int argc, char *argv[]) {
 	int rv;
 	int opt = 0;
-	struct Squash squash = {0};
+	struct Hsqs squash = {0};
 
 	out = stdout;
 
@@ -327,7 +323,7 @@ main(int argc, char *argv[]) {
 		return usage(argv[0]);
 	}
 
-	rv = squash_open(&squash, argv[optind]);
+	rv = hsqs_open(&squash, argv[optind]);
 	if (rv < 0) {
 		perror(argv[optind]);
 		return EXIT_FAILURE;
@@ -339,7 +335,7 @@ main(int argc, char *argv[]) {
 
 	root_inode_info(&squash);
 
-	squash_cleanup(&squash);
+	hsqs_cleanup(&squash);
 
 	return 0;
 }

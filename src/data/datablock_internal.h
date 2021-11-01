@@ -38,7 +38,7 @@
 
 #define DATABLOCK_INTERNAL_H
 
-struct SquashDatablockSize {
+struct HsqsDatablockSize {
 	uint32_t size;
 };
 

@@ -37,34 +37,34 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#ifndef SQUASH_EXTRACT_H
+#ifndef HSQS_EXTRACT_H
 
-#define SQUASH_EXTRACT_H
+#define HSQS_EXTRACT_H
 
-struct SquashMetablock;
+struct HsqsMetablock;
 
-struct SquashMetablockContext {
-	const struct SquashSuperblockContext *superblock;
-	struct SquashBuffer buffer;
+struct HsqsMetablockContext {
+	const struct HsqsSuperblockContext *superblock;
+	struct HsqsBuffer buffer;
 	off_t start_block;
 	off_t index;
 	off_t offset;
 };
 
 // DEPRECATED:
-SQUASH_NO_UNUSED int squash_metablock_from_offset(
-		const struct SquashMetablock **metablock,
-		const struct SquashSuperblockContext *superblock, off_t offset);
-SQUASH_NO_UNUSED int squash_metablock_init(
-		struct SquashMetablockContext *extract,
-		const struct SquashSuperblockContext *superblock, off_t start_block);
-SQUASH_NO_UNUSED int squash_metablock_seek(
-		struct SquashMetablockContext *metablock, off_t index, off_t offset);
-SQUASH_NO_UNUSED int squash_metablock_more(
-		struct SquashMetablockContext *metablock, const size_t size);
+HSQS_NO_UNUSED int hsqs_metablock_from_offset(
+		const struct HsqsMetablock **metablock,
+		const struct HsqsSuperblockContext *superblock, off_t offset);
+HSQS_NO_UNUSED int hsqs_metablock_init(
+		struct HsqsMetablockContext *extract,
+		const struct HsqsSuperblockContext *superblock, off_t start_block);
+HSQS_NO_UNUSED int hsqs_metablock_seek(
+		struct HsqsMetablockContext *metablock, off_t index, off_t offset);
+HSQS_NO_UNUSED int
+hsqs_metablock_more(struct HsqsMetablockContext *metablock, const size_t size);
 const uint8_t *
-squash_metablock_data(const struct SquashMetablockContext *metablock);
-size_t squash_metablock_size(const struct SquashMetablockContext *metablock);
-int squash_metablock_cleanup(struct SquashMetablockContext *metablock);
+hsqs_metablock_data(const struct HsqsMetablockContext *metablock);
+size_t hsqs_metablock_size(const struct HsqsMetablockContext *metablock);
+int hsqs_metablock_cleanup(struct HsqsMetablockContext *metablock);
 
-#endif /* end of include guard SQUASH_EXTRACT_H */
+#endif /* end of include guard HSQS_EXTRACT_H */

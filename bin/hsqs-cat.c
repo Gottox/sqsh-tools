@@ -28,14 +28,15 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : lssquash
- * @created     : Friday Sep 04, 2021 18:46:20 CEST
+ * @file        : catsquash
+ * @created     : Monday Sep 20, 2021 09:48:58 CEST
  */
 
+#include "../src/context/content_context.h"
 #include "../src/context/directory_context.h"
 #include "../src/context/inode_context.h"
+#include "../src/hsqs.h"
 #include "../src/resolve_path.h"
-#include "../src/squash.h"
 
 #include <assert.h>
 #include <limits.h>
@@ -45,105 +46,23 @@
 #include <unistd.h>
 
 static int
-ls(struct Squash *squash, const char *path, struct SquashInodeContext *inode,
-   const bool recursive);
-
-static int
 usage(char *arg0) {
-	printf("usage: %s [-r] FILESYSTEM [PATH]\n", arg0);
+	printf("usage: %s FILESYSTEM [PATH]\n", arg0);
 	return EXIT_FAILURE;
-}
-
-static int
-ls_item(struct Squash *squash, const char *path,
-		struct SquashDirectoryIterator *iter, const bool recursive) {
-	int rv = 0;
-	struct SquashInodeContext entry_inode = {0};
-	const char *name = squash_directory_iterator_name(iter);
-	const int name_size = squash_directory_iterator_name_size(iter);
-	char *current_path =
-			calloc(name_size + strlen(path ? path : "") + 2, sizeof(char));
-
-	if (current_path == NULL) {
-		rv = -SQUASH_ERROR_MALLOC_FAILED;
-		goto out;
-	}
-	if (path != NULL) {
-		strcpy(current_path, path);
-		strcat(current_path, "/");
-	}
-	strncat(current_path, name, name_size);
-	puts(current_path);
-	if (recursive &&
-		squash_directory_iterator_inode_type(iter) ==
-				SQUASH_INODE_TYPE_DIRECTORY) {
-		rv = squash_directory_iterator_inode_load(iter, &entry_inode);
-		if (rv < 0) {
-			goto out;
-		}
-		rv = ls(squash, current_path, &entry_inode, recursive);
-		if (rv < 0) {
-			goto out;
-		}
-		squash_inode_cleanup(&entry_inode);
-	}
-
-out:
-	free(current_path);
-	return rv;
-}
-
-static int
-ls(struct Squash *squash, const char *path, struct SquashInodeContext *inode,
-   const bool recursive) {
-	int rv;
-	struct SquashDirectoryContext dir = {0};
-	struct SquashDirectoryIterator iter = {0};
-
-	rv = squash_directory_init(&dir, &squash->superblock, inode);
-	if (rv < 0) {
-		squash_perror(rv, path == NULL || path[0] == 0 ? "/" : path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-	rv = squash_directory_iterator_init(&iter, &dir);
-	if (rv < 0) {
-		squash_perror(rv, "squash_directory_iterator_init");
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-	while (squash_directory_iterator_next(&iter) > 0) {
-		rv = ls_item(squash, path, &iter, recursive);
-		if (rv < 0) {
-			rv = EXIT_FAILURE;
-			goto out;
-		}
-	}
-
-out:
-	squash_directory_cleanup(&dir);
-	squash_directory_iterator_cleanup(&iter);
-
-	return rv;
 }
 
 int
 main(int argc, char *argv[]) {
 	int rv = 0;
 	int opt = 0;
-	bool recursive = false;
 	const char *inner_path = "";
 	const char *outer_path;
-	struct SquashInodeContext inode = {0};
-	struct Squash squash = {0};
+	struct HsqsInodeContext inode = {0};
+	struct HsqsFileContext file = {0};
+	struct Hsqs squash = {0};
 
-	while ((opt = getopt(argc, argv, "rh")) != -1) {
+	while ((opt = getopt(argc, argv, "h")) != -1) {
 		switch (opt) {
-		case 'r':
-			recursive = true;
-			break;
 		default:
 			return usage(argv[0]);
 		}
@@ -156,26 +75,42 @@ main(int argc, char *argv[]) {
 	}
 	outer_path = argv[optind];
 
-	rv = squash_open(&squash, outer_path);
+	rv = hsqs_open(&squash, outer_path);
 	if (rv < 0) {
-		squash_perror(rv, outer_path);
+		hsqs_perror(rv, outer_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	rv = squash_resolve_path(&inode, &squash.superblock, inner_path);
+	rv = hsqs_resolve_path(&inode, &squash.superblock, inner_path);
 	if (rv < 0) {
-		squash_perror(rv, inner_path);
+		hsqs_perror(rv, inner_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	rv = ls(&squash, NULL, &inode, recursive);
+	rv = hsqs_file_init(&file, &inode);
+	if (rv < 0) {
+		hsqs_perror(rv, inner_path);
+		rv = EXIT_FAILURE;
+		goto out;
+	}
+
+	rv = hsqs_file_read(&file, hsqs_inode_file_size(&inode));
+	if (rv < 0) {
+		hsqs_perror(rv, inner_path);
+		rv = EXIT_FAILURE;
+		goto out;
+	}
+
+	fwrite(hsqs_file_data(&file), sizeof(uint8_t), hsqs_file_size(&file),
+		   stdout);
 
 out:
-	squash_inode_cleanup(&inode);
+	hsqs_file_cleanup(&file);
+	hsqs_inode_cleanup(&inode);
 
-	squash_cleanup(&squash);
+	hsqs_cleanup(&squash);
 
 	return rv;
 }

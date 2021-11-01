@@ -78,53 +78,52 @@ count_path_segments(const char *path) {
 static int
 find_inode_ref(
 		uint64_t *target, uint64_t dir_ref,
-		struct SquashSuperblockContext *superblock, const char *name,
+		struct HsqsSuperblockContext *superblock, const char *name,
 		const size_t name_len) {
-	struct SquashInodeContext inode = {0};
-	struct SquashDirectoryContext dir = {0};
-	struct SquashDirectoryIterator iter = {0};
+	struct HsqsInodeContext inode = {0};
+	struct HsqsDirectoryContext dir = {0};
+	struct HsqsDirectoryIterator iter = {0};
 	int rv = 0;
-	rv = squash_inode_load(&inode, superblock, dir_ref);
+	rv = hsqs_inode_load(&inode, superblock, dir_ref);
 	if (rv < 0) {
 		goto out;
 	}
-	rv = squash_directory_init(&dir, superblock, &inode);
+	rv = hsqs_directory_init(&dir, superblock, &inode);
 	if (rv < 0) {
 		goto out;
 	}
-	rv = squash_directory_iterator_init(&iter, &dir);
+	rv = hsqs_directory_iterator_init(&iter, &dir);
 	if (rv < 0) {
 		goto out;
 	}
-	rv = squash_directory_iterator_lookup(&iter, name, name_len);
+	rv = hsqs_directory_iterator_lookup(&iter, name, name_len);
 	if (rv < 0) {
 		goto out;
 	}
 
-	*target = squash_directory_iterator_inode_ref(&iter);
+	*target = hsqs_directory_iterator_inode_ref(&iter);
 
 out:
-	squash_directory_iterator_cleanup(&iter);
-	squash_directory_cleanup(&dir);
-	squash_inode_cleanup(&inode);
+	hsqs_directory_iterator_cleanup(&iter);
+	hsqs_directory_cleanup(&dir);
+	hsqs_inode_cleanup(&inode);
 	return rv;
 }
 
 int
-squash_resolve_path(
-		struct SquashInodeContext *inode,
-		struct SquashSuperblockContext *superblock, const char *path) {
+hsqs_resolve_path(
+		struct HsqsInodeContext *inode,
+		struct HsqsSuperblockContext *superblock, const char *path) {
 	int i;
 	int rv = 0;
 	int segment_count = count_path_segments(path) + 1;
 	const char *segment = path;
 	uint64_t *inode_refs = calloc(segment_count, sizeof(uint64_t));
 	if (inode_refs == NULL) {
-		rv = SQUASH_ERROR_MALLOC_FAILED;
+		rv = HSQS_ERROR_MALLOC_FAILED;
 		goto out;
 	}
-	inode_refs[0] =
-			squash_data_superblock_root_inode_ref(superblock->superblock);
+	inode_refs[0] = hsqs_data_superblock_root_inode_ref(superblock->superblock);
 
 	for (i = 0; segment; segment = find_next_segment(segment)) {
 		size_t segment_len = get_segment_len(segment);
@@ -146,7 +145,7 @@ squash_resolve_path(
 		}
 	}
 
-	rv = squash_inode_load(inode, superblock, inode_refs[i]);
+	rv = hsqs_inode_load(inode, superblock, inode_refs[i]);
 
 out:
 	free(inode_refs);

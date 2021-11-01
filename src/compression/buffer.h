@@ -42,33 +42,33 @@
 
 #define EXTRACTOR_H
 
-struct SquashSuperblockContext;
+struct HsqsSuperblockContext;
 
-struct SquashBuffer {
-	const union SquashCompressionOptions *options;
-	const struct SquashCompressionImplementation *impl;
+struct HsqsBuffer {
+	const union HsqsCompressionOptions *options;
+	const struct HsqsCompressionImplementation *impl;
 	int block_size;
 	uint8_t *data;
 	size_t size;
 };
 
-SQUASH_NO_UNUSED int squash_buffer_new(
-		struct SquashBuffer **context,
-		const struct SquashSuperblockContext *superblock, int block_size);
+HSQS_NO_UNUSED int hsqs_buffer_new(
+		struct HsqsBuffer **context,
+		const struct HsqsSuperblockContext *superblock, int block_size);
 
-SQUASH_NO_UNUSED int squash_buffer_init(
-		struct SquashBuffer *compression,
-		const struct SquashSuperblockContext *superblock, int block_size);
+HSQS_NO_UNUSED int hsqs_buffer_init(
+		struct HsqsBuffer *compression,
+		const struct HsqsSuperblockContext *superblock, int block_size);
 
-SQUASH_NO_UNUSED int squash_buffer_append(
-		struct SquashBuffer *compression, const uint8_t *source,
+HSQS_NO_UNUSED int hsqs_buffer_append(
+		struct HsqsBuffer *compression, const uint8_t *source,
 		const size_t source_size, bool is_compressed);
 
-const uint8_t *squash_buffer_data(const struct SquashBuffer *buffer);
-size_t squash_buffer_size(const struct SquashBuffer *buffer);
+const uint8_t *hsqs_buffer_data(const struct HsqsBuffer *buffer);
+size_t hsqs_buffer_size(const struct HsqsBuffer *buffer);
 
-int squash_buffer_cleanup(struct SquashBuffer *compression);
+int hsqs_buffer_cleanup(struct HsqsBuffer *compression);
 
-int squash_buffer_free(struct SquashBuffer *compression);
+int hsqs_buffer_free(struct HsqsBuffer *compression);
 
 #endif /* end of include guard EXTRACTOR_H */

@@ -38,11 +38,11 @@
 
 #define RESOLVE_PATH_H
 
-struct SquashInodeContext;
-struct SquashSuperblockContext;
+struct HsqsInodeContext;
+struct HsqsSuperblockContext;
 
-SQUASH_NO_UNUSED int squash_resolve_path(
-		struct SquashInodeContext *inode,
-		struct SquashSuperblockContext *superblock, const char *path);
+HSQS_NO_UNUSED int hsqs_resolve_path(
+		struct HsqsInodeContext *inode,
+		struct HsqsSuperblockContext *superblock, const char *path);
 
 #endif /* end of include guard RESOLVE_PATH_H */

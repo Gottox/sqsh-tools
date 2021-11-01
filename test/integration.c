@@ -46,267 +46,262 @@
 #include <stdint.h>
 
 static void
-squash_ls() {
+hsqs_ls() {
 	int rv;
 	char *name;
-	struct SquashSuperblockContext superblock = {0};
-	struct SquashInodeContext inode = {0};
-	struct SquashDirectoryContext dir = {0};
-	struct SquashDirectoryIterator iter = {0};
-	rv = squash_superblock_init(
-			&superblock, squash_image, sizeof(squash_image));
+	struct HsqsSuperblockContext superblock = {0};
+	struct HsqsInodeContext inode = {0};
+	struct HsqsDirectoryContext dir = {0};
+	struct HsqsDirectoryIterator iter = {0};
+	rv = hsqs_superblock_init(&superblock, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = squash_inode_load(
+	rv = hsqs_inode_load(
 			&inode, &superblock,
-			squash_data_superblock_root_inode_ref(superblock.superblock));
+			hsqs_data_superblock_root_inode_ref(superblock.superblock));
 	assert(rv == 0);
 
-	rv = squash_directory_init(&dir, &superblock, &inode);
+	rv = hsqs_directory_init(&dir, &superblock, &inode);
 	assert(rv == 0);
 
-	rv = squash_directory_iterator_init(&iter, &dir);
+	rv = hsqs_directory_iterator_init(&iter, &dir);
 	assert(rv == 0);
 
-	rv = squash_directory_iterator_next(&iter);
+	rv = hsqs_directory_iterator_next(&iter);
 	assert(rv > 0);
-	rv = squash_directory_iterator_name_dup(&iter, &name);
+	rv = hsqs_directory_iterator_name_dup(&iter, &name);
 	assert(rv == 1);
 	assert(strcmp("a", name) == 0);
 	free(name);
 
-	rv = squash_directory_iterator_next(&iter);
+	rv = hsqs_directory_iterator_next(&iter);
 	assert(rv >= 0);
-	rv = squash_directory_iterator_name_dup(&iter, &name);
+	rv = hsqs_directory_iterator_name_dup(&iter, &name);
 	assert(rv == 1);
 	assert(strcmp("b", name) == 0);
 	free(name);
 
-	rv = squash_directory_iterator_next(&iter);
+	rv = hsqs_directory_iterator_next(&iter);
 	// End of file list
 	assert(rv == 0);
 
-	rv = squash_directory_iterator_cleanup(&iter);
+	rv = hsqs_directory_iterator_cleanup(&iter);
 	assert(rv == 0);
 
-	rv = squash_directory_cleanup(&dir);
+	rv = hsqs_directory_cleanup(&dir);
 	assert(rv == 0);
 
-	rv = squash_inode_cleanup(&inode);
+	rv = hsqs_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = squash_superblock_cleanup(&superblock);
+	rv = hsqs_superblock_cleanup(&superblock);
 	assert(rv == 0);
 }
 
 static void
-squash_cat_fragment() {
+hsqs_cat_fragment() {
 	int rv;
 	const uint8_t *data;
 	size_t size;
-	struct SquashSuperblockContext superblock = {0};
-	struct SquashInodeContext inode = {0};
-	struct SquashFileContext file = {0};
-	rv = squash_superblock_init(
-			&superblock, squash_image, sizeof(squash_image));
+	struct HsqsSuperblockContext superblock = {0};
+	struct HsqsInodeContext inode = {0};
+	struct HsqsFileContext file = {0};
+	rv = hsqs_superblock_init(&superblock, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = squash_resolve_path(&inode, &superblock, "a");
+	rv = hsqs_resolve_path(&inode, &superblock, "a");
 	assert(rv == 0);
 
-	rv = squash_file_init(&file, &inode);
+	rv = hsqs_file_init(&file, &inode);
 	assert(rv == 0);
 
-	size = squash_inode_file_size(&inode);
+	size = hsqs_inode_file_size(&inode);
 	assert(size == 2);
 
-	rv = squash_file_read(&file, size);
+	rv = hsqs_file_read(&file, size);
 	assert(rv == 0);
 
-	data = squash_file_data(&file);
+	data = hsqs_file_data(&file);
 	assert(memcmp(data, "a\n", size) == 0);
 
-	rv = squash_file_cleanup(&file);
+	rv = hsqs_file_cleanup(&file);
 	assert(rv == 0);
 
-	rv = squash_inode_cleanup(&inode);
+	rv = hsqs_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = squash_superblock_cleanup(&superblock);
+	rv = hsqs_superblock_cleanup(&superblock);
 	assert(rv == 0);
 }
 
 static void
-squash_cat_datablock_and_fragment() {
+hsqs_cat_datablock_and_fragment() {
 	int rv;
 	const uint8_t *data;
 	size_t size;
-	struct SquashSuperblockContext superblock = {0};
-	struct SquashInodeContext inode = {0};
-	struct SquashFileContext file = {0};
-	rv = squash_superblock_init(
-			&superblock, squash_image, sizeof(squash_image));
+	struct HsqsSuperblockContext superblock = {0};
+	struct HsqsInodeContext inode = {0};
+	struct HsqsFileContext file = {0};
+	rv = hsqs_superblock_init(&superblock, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = squash_resolve_path(&inode, &superblock, "b");
+	rv = hsqs_resolve_path(&inode, &superblock, "b");
 	assert(rv == 0);
 
-	rv = squash_file_init(&file, &inode);
+	rv = hsqs_file_init(&file, &inode);
 	assert(rv == 0);
 
-	size = squash_inode_file_size(&inode);
+	size = hsqs_inode_file_size(&inode);
 	assert(size == 1050000);
 
-	rv = squash_file_read(&file, size);
+	rv = hsqs_file_read(&file, size);
 	assert(rv == 0);
 
-	data = squash_file_data(&file);
+	data = hsqs_file_data(&file);
 	for (int i = 0; i < size; i++) {
 		assert(data[i] == 'b');
 	}
 
-	rv = squash_file_cleanup(&file);
+	rv = hsqs_file_cleanup(&file);
 	assert(rv == 0);
 
-	rv = squash_inode_cleanup(&inode);
+	rv = hsqs_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = squash_superblock_cleanup(&superblock);
+	rv = hsqs_superblock_cleanup(&superblock);
 	assert(rv == 0);
 }
 
 static void
-squash_test_uid_and_gid() {
+hsqs_test_uid_and_gid() {
 	int rv;
 	uint32_t uid, gid;
-	struct SquashSuperblockContext superblock = {0};
-	struct SquashInodeContext inode = {0};
-	rv = squash_superblock_init(
-			&superblock, squash_image, sizeof(squash_image));
+	struct HsqsSuperblockContext superblock = {0};
+	struct HsqsInodeContext inode = {0};
+	rv = hsqs_superblock_init(&superblock, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = squash_inode_load(
-			&inode, &superblock, squash_superblock_inode_root_ref(&superblock));
+	rv = hsqs_inode_load(
+			&inode, &superblock, hsqs_superblock_inode_root_ref(&superblock));
 	assert(rv == 0);
 
-	uid = squash_inode_uid(&inode);
+	uid = hsqs_inode_uid(&inode);
 	assert(uid == 2020);
-	gid = squash_inode_gid(&inode);
+	gid = hsqs_inode_gid(&inode);
 	assert(gid == 202020);
 
-	rv = squash_inode_cleanup(&inode);
+	rv = hsqs_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = squash_superblock_cleanup(&superblock);
+	rv = hsqs_superblock_cleanup(&superblock);
 	assert(rv == 0);
 }
 
 static void
-squash_test_xattr() {
+hsqs_test_xattr() {
 	const char *expected_value = "1234567891234567891234567890001234567890";
 	int rv;
 	char *name, *value;
-	struct SquashSuperblockContext superblock = {0};
-	struct SquashInodeContext inode = {0};
-	struct SquashInodeContext entry_inode = {0};
-	struct SquashDirectoryContext dir = {0};
-	struct SquashDirectoryIterator dir_iter = {0};
-	struct SquashXattrTableIterator xattr_iter = {0};
-	rv = squash_superblock_init(
-			&superblock, squash_image, sizeof(squash_image));
+	struct HsqsSuperblockContext superblock = {0};
+	struct HsqsInodeContext inode = {0};
+	struct HsqsInodeContext entry_inode = {0};
+	struct HsqsDirectoryContext dir = {0};
+	struct HsqsDirectoryIterator dir_iter = {0};
+	struct HsqsXattrTableIterator xattr_iter = {0};
+	rv = hsqs_superblock_init(&superblock, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = squash_inode_load(
+	rv = hsqs_inode_load(
 			&inode, &superblock,
-			squash_data_superblock_root_inode_ref(superblock.superblock));
+			hsqs_data_superblock_root_inode_ref(superblock.superblock));
 	assert(rv == 0);
 
-	rv = squash_xattr_table_iterator_init(
+	rv = hsqs_xattr_table_iterator_init(
 			&xattr_iter, &superblock.xattr_table, &inode);
 	assert(rv == 0);
-	rv = squash_xattr_table_iterator_next(&xattr_iter);
+	rv = hsqs_xattr_table_iterator_next(&xattr_iter);
 	assert(rv == 0);
-	rv = squash_xattr_table_iterator_cleanup(&xattr_iter);
-	assert(rv == 0);
-
-	rv = squash_directory_init(&dir, &superblock, &inode);
+	rv = hsqs_xattr_table_iterator_cleanup(&xattr_iter);
 	assert(rv == 0);
 
-	rv = squash_directory_iterator_init(&dir_iter, &dir);
+	rv = hsqs_directory_init(&dir, &superblock, &inode);
 	assert(rv == 0);
 
-	rv = squash_directory_iterator_next(&dir_iter);
+	rv = hsqs_directory_iterator_init(&dir_iter, &dir);
+	assert(rv == 0);
+
+	rv = hsqs_directory_iterator_next(&dir_iter);
 	assert(rv > 0);
-	rv = squash_directory_iterator_name_dup(&dir_iter, &name);
+	rv = hsqs_directory_iterator_name_dup(&dir_iter, &name);
 	assert(rv == 1);
 	assert(strcmp("a", name) == 0);
 	free(name);
-	rv = squash_directory_iterator_inode_load(&dir_iter, &entry_inode);
+	rv = hsqs_directory_iterator_inode_load(&dir_iter, &entry_inode);
 	assert(rv == 0);
-	rv = squash_xattr_table_iterator_init(
+	rv = hsqs_xattr_table_iterator_init(
 			&xattr_iter, &superblock.xattr_table, &entry_inode);
 	assert(rv == 0);
-	rv = squash_xattr_table_iterator_next(&xattr_iter);
+	rv = hsqs_xattr_table_iterator_next(&xattr_iter);
 	assert(rv > 0);
-	assert(squash_xattr_table_iterator_is_indirect(&xattr_iter) == false);
-	rv = squash_xattr_table_iterator_fullname_dup(&xattr_iter, &name);
+	assert(hsqs_xattr_table_iterator_is_indirect(&xattr_iter) == false);
+	rv = hsqs_xattr_table_iterator_fullname_dup(&xattr_iter, &name);
 	assert(rv == 8);
 	assert(strcmp("user.foo", name) == 0);
 	free(name);
-	rv = squash_xattr_table_iterator_value_dup(&xattr_iter, &value);
+	rv = hsqs_xattr_table_iterator_value_dup(&xattr_iter, &value);
 	assert(rv == strlen(expected_value));
 	assert(strcmp(expected_value, value) == 0);
 	free(value);
-	rv = squash_xattr_table_iterator_next(&xattr_iter);
+	rv = hsqs_xattr_table_iterator_next(&xattr_iter);
 	assert(rv == 0);
-	rv = squash_xattr_table_iterator_cleanup(&xattr_iter);
+	rv = hsqs_xattr_table_iterator_cleanup(&xattr_iter);
 	assert(rv == 0);
-	rv = squash_inode_cleanup(&entry_inode);
+	rv = hsqs_inode_cleanup(&entry_inode);
 	assert(rv == 0);
 
-	rv = squash_directory_iterator_next(&dir_iter);
+	rv = hsqs_directory_iterator_next(&dir_iter);
 	assert(rv >= 0);
-	rv = squash_directory_iterator_name_dup(&dir_iter, &name);
+	rv = hsqs_directory_iterator_name_dup(&dir_iter, &name);
 	assert(rv == 1);
 	assert(strcmp("b", name) == 0);
 	free(name);
-	rv = squash_directory_iterator_inode_load(&dir_iter, &entry_inode);
+	rv = hsqs_directory_iterator_inode_load(&dir_iter, &entry_inode);
 	assert(rv == 0);
-	rv = squash_xattr_table_iterator_init(
+	rv = hsqs_xattr_table_iterator_init(
 			&xattr_iter, &superblock.xattr_table, &entry_inode);
 	assert(rv == 0);
-	rv = squash_xattr_table_iterator_next(&xattr_iter);
+	rv = hsqs_xattr_table_iterator_next(&xattr_iter);
 	assert(rv > 0);
-	assert(squash_xattr_table_iterator_is_indirect(&xattr_iter) == true);
-	rv = squash_xattr_table_iterator_fullname_dup(&xattr_iter, &name);
+	assert(hsqs_xattr_table_iterator_is_indirect(&xattr_iter) == true);
+	rv = hsqs_xattr_table_iterator_fullname_dup(&xattr_iter, &name);
 	assert(rv == 8);
 	assert(strcmp("user.bar", name) == 0);
 	free(name);
-	rv = squash_xattr_table_iterator_value_dup(&xattr_iter, &value);
+	rv = hsqs_xattr_table_iterator_value_dup(&xattr_iter, &value);
 	assert(rv == strlen(expected_value));
 	assert(strcmp(expected_value, value) == 0);
 	free(value);
-	rv = squash_xattr_table_iterator_next(&xattr_iter);
+	rv = hsqs_xattr_table_iterator_next(&xattr_iter);
 	assert(rv == 0);
-	rv = squash_xattr_table_iterator_cleanup(&xattr_iter);
+	rv = hsqs_xattr_table_iterator_cleanup(&xattr_iter);
 	assert(rv == 0);
-	rv = squash_inode_cleanup(&entry_inode);
+	rv = hsqs_inode_cleanup(&entry_inode);
 	assert(rv == 0);
 
-	rv = squash_directory_iterator_next(&dir_iter);
+	rv = hsqs_directory_iterator_next(&dir_iter);
 	// End of file list
 	assert(rv == 0);
 
-	rv = squash_directory_iterator_cleanup(&dir_iter);
+	rv = hsqs_directory_iterator_cleanup(&dir_iter);
 	assert(rv == 0);
 
-	rv = squash_directory_cleanup(&dir);
+	rv = hsqs_directory_cleanup(&dir);
 	assert(rv == 0);
 
-	rv = squash_inode_cleanup(&inode);
+	rv = hsqs_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = squash_superblock_cleanup(&superblock);
+	rv = hsqs_superblock_cleanup(&superblock);
 	assert(rv == 0);
 }
 
@@ -333,18 +328,18 @@ fuzz_crash_1() {
 			0xff, 0xff, 0xff, 0xff, 0xff, 0x36, 0x62, 0x62, 0x62, 0x62, 0x62,
 			0x62, 0x62, 0x29, 0x62, 0x62, 0x62, 0x62, 0xff, 0xff, 0x62, 0x62};
 
-	struct SquashSuperblockContext superblock = {0};
-	struct SquashInodeContext inode = {0};
-	rv = squash_superblock_init(&superblock, input, sizeof(input));
+	struct HsqsSuperblockContext superblock = {0};
+	struct HsqsInodeContext inode = {0};
+	rv = hsqs_superblock_init(&superblock, input, sizeof(input));
 	assert(rv == 0);
 
-	rv = squash_resolve_path(&inode, &superblock, "");
+	rv = hsqs_resolve_path(&inode, &superblock, "");
 	assert(rv < 0);
 
-	rv = squash_inode_cleanup(&inode);
+	rv = hsqs_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = squash_superblock_cleanup(&superblock);
+	rv = hsqs_superblock_cleanup(&superblock);
 	assert(rv == 0);
 }
 
@@ -364,18 +359,18 @@ fuzz_crash_2() {
 			0x62, 0x62, 0x0,  0x2,
 	};
 
-	struct SquashSuperblockContext superblock = {0};
-	struct SquashInodeContext inode = {0};
-	rv = squash_superblock_init(&superblock, input, sizeof(input));
+	struct HsqsSuperblockContext superblock = {0};
+	struct HsqsInodeContext inode = {0};
+	rv = hsqs_superblock_init(&superblock, input, sizeof(input));
 	assert(rv == 0);
 
-	rv = squash_resolve_path(&inode, &superblock, "");
+	rv = hsqs_resolve_path(&inode, &superblock, "");
 	assert(rv < 0);
 
-	rv = squash_inode_cleanup(&inode);
+	rv = hsqs_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = squash_superblock_cleanup(&superblock);
+	rv = hsqs_superblock_cleanup(&superblock);
 	assert(rv == 0);
 }
 
@@ -396,18 +391,18 @@ fuzz_crash_3() {
 			0x61, 0x1,  0x0,  0x0,  0x2,  0x2,
 	};
 
-	struct SquashSuperblockContext superblock = {0};
-	struct SquashInodeContext inode = {0};
-	rv = squash_superblock_init(&superblock, input, sizeof(input));
+	struct HsqsSuperblockContext superblock = {0};
+	struct HsqsInodeContext inode = {0};
+	rv = hsqs_superblock_init(&superblock, input, sizeof(input));
 	assert(rv == 0);
 
-	rv = squash_resolve_path(&inode, &superblock, "");
+	rv = hsqs_resolve_path(&inode, &superblock, "");
 	assert(rv < 0);
 
-	rv = squash_inode_cleanup(&inode);
+	rv = hsqs_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = squash_superblock_cleanup(&superblock);
+	rv = hsqs_superblock_cleanup(&superblock);
 	assert(rv == 0);
 }
 
@@ -439,9 +434,9 @@ fuzz_crash_4() {
 			0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,
 	};
 
-	struct SquashSuperblockContext superblock = {0};
-	rv = squash_superblock_init(&superblock, input, sizeof(input));
-	assert(rv == -SQUASH_ERROR_SIZE_MISSMATCH);
+	struct HsqsSuperblockContext superblock = {0};
+	rv = hsqs_superblock_init(&superblock, input, sizeof(input));
+	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
 }
 
 static void
@@ -471,17 +466,17 @@ fuzz_crash_5() {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00, 0x02, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4f, 0x00, 0x00, 0x00};
 
-	struct SquashSuperblockContext superblock = {0};
-	rv = squash_superblock_init(&superblock, input, sizeof(input));
-	assert(rv == -SQUASH_ERROR_SIZE_MISSMATCH);
+	struct HsqsSuperblockContext superblock = {0};
+	rv = hsqs_superblock_init(&superblock, input, sizeof(input));
+	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
 }
 
 DEFINE
-TEST(squash_ls);
-TEST(squash_cat_fragment);
-TEST(squash_cat_datablock_and_fragment);
-TEST(squash_test_uid_and_gid);
-TEST(squash_test_xattr);
+TEST(hsqs_ls);
+TEST(hsqs_cat_fragment);
+TEST(hsqs_cat_datablock_and_fragment);
+TEST(hsqs_test_uid_and_gid);
+TEST(hsqs_test_xattr);
 TEST_OFF(fuzz_crash_1); // Fails since the library sets up tables
 TEST_OFF(fuzz_crash_2); // Fails since the library sets up tables
 TEST_OFF(fuzz_crash_3); // Fails since the library sets up tables

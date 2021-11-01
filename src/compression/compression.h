@@ -39,11 +39,11 @@
 
 #define COMPRESSION_H
 
-union SquashCompressionOptions;
+union HsqsCompressionOptions;
 
-struct SquashCompressionImplementation {
+struct HsqsCompressionImplementation {
 	int (*extract)(
-			const union SquashCompressionOptions *options, uint8_t *target,
+			const union HsqsCompressionOptions *options, uint8_t *target,
 			size_t *target_size, const uint8_t *compressed,
 			const size_t compressed_size);
 };

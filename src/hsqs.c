@@ -41,15 +41,15 @@
 
 #include "compression/compression.h"
 #include "context/superblock_context.h"
-#include "squash.h"
+#include "hsqs.h"
 
 int
-squash_init(
-		struct Squash *squash, uint8_t *buffer, const size_t size,
-		const enum SquashDtor dtor) {
+hsqs_init(
+		struct Hsqs *squash, uint8_t *buffer, const size_t size,
+		const enum HsqsDtor dtor) {
 	int rv = 0;
 
-	rv = squash_superblock_init(&squash->superblock, buffer, size);
+	rv = hsqs_superblock_init(&squash->superblock, buffer, size);
 	if (rv < 0) {
 		return rv;
 	}
@@ -61,7 +61,7 @@ squash_init(
 }
 
 int
-squash_open(struct Squash *squash, const char *path) {
+hsqs_open(struct Hsqs *squash, const char *path) {
 	int rv = 0;
 	int fd = -1;
 	uint8_t *file_map = MAP_FAILED;
@@ -88,7 +88,7 @@ squash_open(struct Squash *squash, const char *path) {
 	close(fd);
 	fd = -1;
 
-	rv = squash_init(squash, file_map, st.st_size, SQUASH_DTOR_MUNMAP);
+	rv = hsqs_init(squash, file_map, st.st_size, HSQS_DTOR_MUNMAP);
 	if (rv < 0) {
 		goto err;
 	}
@@ -107,19 +107,19 @@ err:
 }
 
 int
-squash_cleanup(struct Squash *squash) {
+hsqs_cleanup(struct Hsqs *squash) {
 	int rv = 0;
 
-	squash_superblock_cleanup(&squash->superblock);
+	hsqs_superblock_cleanup(&squash->superblock);
 
 	switch (squash->dtor) {
-	case SQUASH_DTOR_FREE:
+	case HSQS_DTOR_FREE:
 		free(squash->buffer);
 		break;
-	case SQUASH_DTOR_MUNMAP:
+	case HSQS_DTOR_MUNMAP:
 		rv |= munmap(squash->buffer, squash->size);
 		break;
-	case SQUASH_DTOR_NONE:
+	case HSQS_DTOR_NONE:
 		// noop
 		break;
 	}

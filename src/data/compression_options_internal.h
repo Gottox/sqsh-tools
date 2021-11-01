@@ -38,37 +38,37 @@
 
 #define COMPRESSION_OPTIONS_INTERNAL_H
 
-struct SquashCompressionOptionsGzip {
+struct HsqsCompressionOptionsGzip {
 	uint32_t compression_level;
 	uint16_t window_size;
 	uint16_t strategies;
 };
 
-struct SquashCompressionOptionsXz {
+struct HsqsCompressionOptionsXz {
 	uint32_t dictionary_size;
 	uint32_t filters;
 };
 
-struct SquashCompressionOptionsLz4 {
+struct HsqsCompressionOptionsLz4 {
 	uint32_t version;
 	uint32_t flags;
 };
 
-struct SquashCompressionOptionsZstd {
+struct HsqsCompressionOptionsZstd {
 	uint32_t compression_level;
 };
 
-struct SquashCompressionOptionsLzo {
+struct HsqsCompressionOptionsLzo {
 	uint32_t algorithm;
 	uint32_t compression_level;
 };
 
-union SquashCompressionOptions {
-	struct SquashCompressionOptionsGzip gzip;
-	struct SquashCompressionOptionsXz xz;
-	struct SquashCompressionOptionsLz4 lz4;
-	struct SquashCompressionOptionsZstd zstd;
-	struct SquashCompressionOptionsLzo lzo;
+union HsqsCompressionOptions {
+	struct HsqsCompressionOptionsGzip gzip;
+	struct HsqsCompressionOptionsXz xz;
+	struct HsqsCompressionOptionsLz4 lz4;
+	struct HsqsCompressionOptionsZstd zstd;
+	struct HsqsCompressionOptionsLzo lzo;
 };
 
 #endif /* end of include guard COMPRESSION_OPTIONS_INTERNAL_H */

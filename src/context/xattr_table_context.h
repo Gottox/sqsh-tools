@@ -13,63 +13,62 @@
 
 #define XATTR_TABLE_CONTEXT_H
 
-struct SquashSuperblockContext;
-struct SquashXattrKey;
-struct SquashXattrValue;
-struct SquashInodeContext;
+struct HsqsSuperblockContext;
+struct HsqsXattrKey;
+struct HsqsXattrValue;
+struct HsqsInodeContext;
 
-struct SquashXattrTableContext {
-	struct SquashSuperblockContext *superblock;
-	const struct SquashXattrIdTable *header;
-	struct SquashTableContext table;
+struct HsqsXattrTableContext {
+	struct HsqsSuperblockContext *superblock;
+	const struct HsqsXattrIdTable *header;
+	struct HsqsTableContext table;
 };
 
-struct SquashXattrTableIterator {
-	struct SquashMetablockContext metablock;
-	struct SquashMetablockContext out_of_line_value;
-	struct SquashXattrTableContext *context;
+struct HsqsXattrTableIterator {
+	struct HsqsMetablockContext metablock;
+	struct HsqsMetablockContext out_of_line_value;
+	struct HsqsXattrTableContext *context;
 	int remaining_entries;
-	struct SquashXattrKey *current_key;
-	struct SquashXattrValue *current_value;
+	struct HsqsXattrKey *current_key;
+	struct HsqsXattrValue *current_value;
 };
 
-SQUASH_NO_UNUSED int squash_xattr_table_init(
-		struct SquashXattrTableContext *context,
-		struct SquashSuperblockContext *superblock);
+HSQS_NO_UNUSED int hsqs_xattr_table_init(
+		struct HsqsXattrTableContext *context,
+		struct HsqsSuperblockContext *superblock);
 
-SQUASH_NO_UNUSED int squash_xattr_table_iterator_init(
-		struct SquashXattrTableIterator *iterator,
-		struct SquashXattrTableContext *xattr_table,
-		const struct SquashInodeContext *inode);
+HSQS_NO_UNUSED int hsqs_xattr_table_iterator_init(
+		struct HsqsXattrTableIterator *iterator,
+		struct HsqsXattrTableContext *xattr_table,
+		const struct HsqsInodeContext *inode);
 
-int squash_xattr_table_iterator_next(struct SquashXattrTableIterator *iterator);
+int hsqs_xattr_table_iterator_next(struct HsqsXattrTableIterator *iterator);
 
 uint16_t
-squash_xattr_table_iterator_type(struct SquashXattrTableIterator *iterator);
+hsqs_xattr_table_iterator_type(struct HsqsXattrTableIterator *iterator);
 
-bool squash_xattr_table_iterator_is_indirect(
-		struct SquashXattrTableIterator *iterator);
-
-const char *
-squash_xattr_table_iterator_name(struct SquashXattrTableIterator *iterator);
-int squash_xattr_table_iterator_fullname_dup(
-		struct SquashXattrTableIterator *iterator, char **fullname_buffer);
-
-uint16_t squash_xattr_table_iterator_name_size(
-		struct SquashXattrTableIterator *iterator);
-
-int squash_xattr_table_iterator_value_dup(
-		struct SquashXattrTableIterator *iterator, char **value_buffer);
+bool
+hsqs_xattr_table_iterator_is_indirect(struct HsqsXattrTableIterator *iterator);
 
 const char *
-squash_xattr_table_iterator_value(struct SquashXattrTableIterator *iterator);
+hsqs_xattr_table_iterator_name(struct HsqsXattrTableIterator *iterator);
+int hsqs_xattr_table_iterator_fullname_dup(
+		struct HsqsXattrTableIterator *iterator, char **fullname_buffer);
 
-uint16_t squash_xattr_table_iterator_value_size(
-		struct SquashXattrTableIterator *iterator);
+uint16_t
+hsqs_xattr_table_iterator_name_size(struct HsqsXattrTableIterator *iterator);
 
-int
-squash_xattr_table_iterator_cleanup(struct SquashXattrTableIterator *iterator);
+int hsqs_xattr_table_iterator_value_dup(
+		struct HsqsXattrTableIterator *iterator, char **value_buffer);
 
-int squash_xattr_table_cleanup(struct SquashXattrTableContext *context);
+const char *
+hsqs_xattr_table_iterator_value(struct HsqsXattrTableIterator *iterator);
+
+uint16_t
+hsqs_xattr_table_iterator_value_size(struct HsqsXattrTableIterator *iterator);
+
+int hsqs_xattr_table_iterator_cleanup(struct HsqsXattrTableIterator *iterator);
+
+int hsqs_xattr_table_cleanup(struct HsqsXattrTableContext *context);
 
 #endif /* end of include guard XATTR_TABLE_CONTEXT_H */

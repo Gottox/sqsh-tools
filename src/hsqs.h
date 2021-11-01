@@ -28,89 +28,41 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : catsquash
- * @created     : Monday Sep 20, 2021 09:48:58 CEST
+ * @file        : squash
+ * @created     : Friday Apr 30, 2021 10:58:14 CEST
  */
 
-#include "../src/context/content_context.h"
-#include "../src/context/directory_context.h"
-#include "../src/context/inode_context.h"
-#include "../src/resolve_path.h"
-#include "../src/squash.h"
+#include "context/superblock_context.h"
+#include "error.h"
+#include "utils.h"
 
-#include <assert.h>
-#include <limits.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+#include <stdlib.h>
 
-static int
-usage(char *arg0) {
-	printf("usage: %s FILESYSTEM [PATH]\n", arg0);
-	return EXIT_FAILURE;
-}
+#ifndef HSQS_H
 
-int
-main(int argc, char *argv[]) {
-	int rv = 0;
-	int opt = 0;
-	const char *inner_path = "";
-	const char *outer_path;
-	struct SquashInodeContext inode = {0};
-	struct SquashFileContext file = {0};
-	struct Squash squash = {0};
+#define HSQS_H
 
-	while ((opt = getopt(argc, argv, "h")) != -1) {
-		switch (opt) {
-		default:
-			return usage(argv[0]);
-		}
-	}
+enum HsqsDtor {
+	HSQS_DTOR_NONE,
+	HSQS_DTOR_FREE,
+	HSQS_DTOR_MUNMAP,
+};
 
-	if (optind + 2 == argc) {
-		inner_path = argv[optind + 1];
-	} else if (optind + 1 != argc) {
-		return usage(argv[0]);
-	}
-	outer_path = argv[optind];
+struct Hsqs {
+	uint32_t error;
+	struct HsqsSuperblockContext superblock;
+	int size;
+	uint8_t *buffer;
+	enum HsqsDtor dtor;
+};
 
-	rv = squash_open(&squash, outer_path);
-	if (rv < 0) {
-		squash_perror(rv, outer_path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
+HSQS_NO_UNUSED int hsqs_init(
+		struct Hsqs *squash, uint8_t *buffer, const size_t size,
+		const enum HsqsDtor dtor);
 
-	rv = squash_resolve_path(&inode, &squash.superblock, inner_path);
-	if (rv < 0) {
-		squash_perror(rv, inner_path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
+HSQS_NO_UNUSED int hsqs_open(struct Hsqs *squash, const char *path);
 
-	rv = squash_file_init(&file, &inode);
-	if (rv < 0) {
-		squash_perror(rv, inner_path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
+int hsqs_cleanup(struct Hsqs *squash);
 
-	rv = squash_file_read(&file, squash_inode_file_size(&inode));
-	if (rv < 0) {
-		squash_perror(rv, inner_path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-	fwrite(squash_file_data(&file), sizeof(uint8_t), squash_file_size(&file),
-		   stdout);
-
-out:
-	squash_file_cleanup(&file);
-	squash_inode_cleanup(&inode);
-
-	squash_cleanup(&squash);
-
-	return rv;
-}
+#endif /* end of include guard HSQS_H */

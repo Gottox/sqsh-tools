@@ -43,20 +43,20 @@
 #include "compression.h"
 
 static int
-squash_lz4_extract(
-		const union SquashCompressionOptions *options, uint8_t *target,
+hsqs_lz4_extract(
+		const union HsqsCompressionOptions *options, uint8_t *target,
 		size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	int rv = LZ4_decompress_safe(
 			(char *)compressed, (char *)target, compressed_size, *target_size);
 	if (rv < 0) {
-		return -SQUASH_ERROR_COMPRESSION_DECOMPRESS;
+		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
 	}
 	*target_size = rv;
 
 	return 0;
 }
 
-const struct SquashCompressionImplementation squash_compression_lz4 = {
-		.extract = squash_lz4_extract,
+const struct HsqsCompressionImplementation hsqs_compression_lz4 = {
+		.extract = hsqs_lz4_extract,
 };

@@ -43,49 +43,48 @@
 
 #define SUPERBLOCK_CONTEXT_H
 
-struct SquashSuperblock;
+struct HsqsSuperblock;
 
-struct SquashSuperblockContext {
-	const struct SquashSuperblock *superblock;
-	struct SquashTableContext id_table;
-	struct SquashTableContext export_table;
-	struct SquashXattrTableContext xattr_table;
+struct HsqsSuperblockContext {
+	const struct HsqsSuperblock *superblock;
+	struct HsqsTableContext id_table;
+	struct HsqsTableContext export_table;
+	struct HsqsXattrTableContext xattr_table;
 };
 
-SQUASH_NO_UNUSED int squash_superblock_init(
-		struct SquashSuperblockContext *context, const uint8_t *buffer,
+HSQS_NO_UNUSED int hsqs_superblock_init(
+		struct HsqsSuperblockContext *context, const uint8_t *buffer,
 		size_t size);
 
-const void *squash_superblock_data_from_offset(
-		const struct SquashSuperblockContext *context, uint64_t offset);
+const void *hsqs_superblock_data_from_offset(
+		const struct HsqsSuperblockContext *context, uint64_t offset);
 
-uint64_t squash_superblock_directory_table_start(
-		const struct SquashSuperblockContext *context);
+uint64_t hsqs_superblock_directory_table_start(
+		const struct HsqsSuperblockContext *context);
 
-uint64_t squash_superblock_fragment_table_start(
-		const struct SquashSuperblockContext *context);
-
-uint64_t squash_superblock_inode_table_start(
-		const struct SquashSuperblockContext *context);
+uint64_t hsqs_superblock_fragment_table_start(
+		const struct HsqsSuperblockContext *context);
 
 uint64_t
-squash_superblock_inode_root_ref(const struct SquashSuperblockContext *context);
+hsqs_superblock_inode_table_start(const struct HsqsSuperblockContext *context);
 
-bool
-squash_superblock_has_fragments(const struct SquashSuperblockContext *context);
+uint64_t
+hsqs_superblock_inode_root_ref(const struct HsqsSuperblockContext *context);
+
+bool hsqs_superblock_has_fragments(const struct HsqsSuperblockContext *context);
 
 uint32_t
-squash_superblock_block_size(const struct SquashSuperblockContext *context);
+hsqs_superblock_block_size(const struct HsqsSuperblockContext *context);
 
-uint32_t squash_superblock_fragment_entry_count(
-		const struct SquashSuperblockContext *context);
+uint32_t hsqs_superblock_fragment_entry_count(
+		const struct HsqsSuperblockContext *context);
 
 uint64_t
-squash_superblock_bytes_used(const struct SquashSuperblockContext *context);
+hsqs_superblock_bytes_used(const struct HsqsSuperblockContext *context);
 
-struct SquashTableContext *
-squash_superblock_id_table(struct SquashSuperblockContext *context);
+struct HsqsTableContext *
+hsqs_superblock_id_table(struct HsqsSuperblockContext *context);
 
-int squash_superblock_cleanup(struct SquashSuperblockContext *superblock);
+int hsqs_superblock_cleanup(struct HsqsSuperblockContext *superblock);
 
 #endif /* end of include guard SUPERBLOCK_CONTEXT_H */

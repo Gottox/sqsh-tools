@@ -37,100 +37,99 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#ifndef SQUASH_INODE_CONTEXT_H
+#ifndef HSQS_INODE_CONTEXT_H
 
-#define SQUASH_INODE_CONTEXT_H
+#define HSQS_INODE_CONTEXT_H
 
-#define SQUASH_INODE_NO_FRAGMENT 0xFFFFFFFF
-#define SQUASH_INODE_NO_XATTR 0xFFFFFFFF
+#define HSQS_INODE_NO_FRAGMENT 0xFFFFFFFF
+#define HSQS_INODE_NO_XATTR 0xFFFFFFFF
 
-struct SquashSuperblockContext;
-struct SquashInode;
-struct SquashInodeTable;
-struct SquashDirectoryIterator;
+struct HsqsSuperblockContext;
+struct HsqsInode;
+struct HsqsInodeTable;
+struct HsqsDirectoryIterator;
 
-enum SquashInodeContextType {
-	SQUASH_INODE_TYPE_UNKNOWN = -1,
+enum HsqsInodeContextType {
+	HSQS_INODE_TYPE_UNKNOWN = -1,
 	// avoid overlapping with the types in ../data/inode.h
-	SQUASH_INODE_TYPE_DIRECTORY = 1 + (1 << 8),
-	SQUASH_INODE_TYPE_FILE,
-	SQUASH_INODE_TYPE_SYMLINK,
-	SQUASH_INODE_TYPE_BLOCK,
-	SQUASH_INODE_TYPE_CHAR,
-	SQUASH_INODE_TYPE_FIFO,
-	SQUASH_INODE_TYPE_SOCKET,
+	HSQS_INODE_TYPE_DIRECTORY = 1 + (1 << 8),
+	HSQS_INODE_TYPE_FILE,
+	HSQS_INODE_TYPE_SYMLINK,
+	HSQS_INODE_TYPE_BLOCK,
+	HSQS_INODE_TYPE_CHAR,
+	HSQS_INODE_TYPE_FIFO,
+	HSQS_INODE_TYPE_SOCKET,
 };
 
-struct SquashInodeContext {
-	struct SquashInode *inode;
-	struct SquashMetablockContext extract;
-	struct SquashSuperblockContext *superblock;
+struct HsqsInodeContext {
+	struct HsqsInode *inode;
+	struct HsqsMetablockContext extract;
+	struct HsqsSuperblockContext *superblock;
 };
 
-struct SquashInodeDirectoryIndexIterator {
-	struct SquashInodeContext *inode;
-	const struct SquashInodeDirectoryIndex *indices;
+struct HsqsInodeDirectoryIndexIterator {
+	struct HsqsInodeContext *inode;
+	const struct HsqsInodeDirectoryIndex *indices;
 	size_t remaining_entries;
 	off_t current_offset;
 	off_t next_offset;
 };
 
-SQUASH_NO_UNUSED int squash_inode_load(
-		struct SquashInodeContext *inode,
-		struct SquashSuperblockContext *superblock, uint64_t inode_ref);
+HSQS_NO_UNUSED int hsqs_inode_load(
+		struct HsqsInodeContext *inode,
+		struct HsqsSuperblockContext *superblock, uint64_t inode_ref);
 
-SQUASH_NO_UNUSED uint32_t
-squash_inode_hard_link_count(const struct SquashInodeContext *inode);
+HSQS_NO_UNUSED uint32_t
+hsqs_inode_hard_link_count(const struct HsqsInodeContext *inode);
 
-uint64_t squash_inode_file_size(const struct SquashInodeContext *inode);
-uint16_t squash_inode_permission(const struct SquashInodeContext *inode);
-uint32_t squash_inode_modified_time(const struct SquashInodeContext *inode);
-uint64_t squash_inode_file_blocks_start(const struct SquashInodeContext *inode);
+uint64_t hsqs_inode_file_size(const struct HsqsInodeContext *inode);
+uint16_t hsqs_inode_permission(const struct HsqsInodeContext *inode);
+uint32_t hsqs_inode_modified_time(const struct HsqsInodeContext *inode);
+uint64_t hsqs_inode_file_blocks_start(const struct HsqsInodeContext *inode);
 // TODO: Find right datatype for index
 uint32_t
-squash_inode_file_block_size(const struct SquashInodeContext *inode, int index);
-bool squash_inode_file_block_is_compressed(
-		const struct SquashInodeContext *inode, int index);
+hsqs_inode_file_block_size(const struct HsqsInodeContext *inode, int index);
+bool hsqs_inode_file_block_is_compressed(
+		const struct HsqsInodeContext *inode, int index);
 uint32_t
-squash_inode_file_fragment_block_index(const struct SquashInodeContext *inode);
+hsqs_inode_file_fragment_block_index(const struct HsqsInodeContext *inode);
 uint32_t
-squash_inode_file_fragment_block_offset(const struct SquashInodeContext *inode);
+hsqs_inode_file_fragment_block_offset(const struct HsqsInodeContext *inode);
 
-enum SquashInodeContextType
-squash_inode_type(const struct SquashInodeContext *inode);
+enum HsqsInodeContextType hsqs_inode_type(const struct HsqsInodeContext *inode);
 
-const char *squash_inode_symlink(const struct SquashInodeContext *inode);
-SQUASH_NO_UNUSED int squash_inode_symlink_dup(
-		const struct SquashInodeContext *inode, char **namebuffer);
-uint32_t squash_inode_symlink_size(const struct SquashInodeContext *inode);
+const char *hsqs_inode_symlink(const struct HsqsInodeContext *inode);
+HSQS_NO_UNUSED int
+hsqs_inode_symlink_dup(const struct HsqsInodeContext *inode, char **namebuffer);
+uint32_t hsqs_inode_symlink_size(const struct HsqsInodeContext *inode);
 
-uint32_t squash_inode_uid(const struct SquashInodeContext *inode);
-uint32_t squash_inode_gid(const struct SquashInodeContext *inode);
-uint32_t squash_inode_xattr_index(const struct SquashInodeContext *inode);
-uint32_t squash_inode_xattr_index(const struct SquashInodeContext *inode);
+uint32_t hsqs_inode_uid(const struct HsqsInodeContext *inode);
+uint32_t hsqs_inode_gid(const struct HsqsInodeContext *inode);
+uint32_t hsqs_inode_xattr_index(const struct HsqsInodeContext *inode);
+uint32_t hsqs_inode_xattr_index(const struct HsqsInodeContext *inode);
 
-int squash_inode_cleanup(struct SquashInodeContext *inode);
+int hsqs_inode_cleanup(struct HsqsInodeContext *inode);
 
-SQUASH_NO_UNUSED int squash_inode_directory_iterator_init(
-		struct SquashInodeDirectoryIndexIterator *iterator,
-		struct SquashInodeContext *inode);
-SQUASH_NO_UNUSED int squash_inode_directory_index_iterator_next(
-		struct SquashInodeDirectoryIndexIterator *iterator);
-uint32_t squash_inode_directory_index_iterator_index(
-		struct SquashInodeDirectoryIndexIterator *iterator);
-uint32_t squash_inode_directory_index_iterator_start(
-		struct SquashInodeDirectoryIndexIterator *iterator);
-uint32_t squash_inode_directory_index_iterator_name_size(
-		struct SquashInodeDirectoryIndexIterator *iterator);
-const char *squash_inode_directory_index_iterator_name(
-		struct SquashInodeDirectoryIndexIterator *iterator);
+HSQS_NO_UNUSED int hsqs_inode_directory_iterator_init(
+		struct HsqsInodeDirectoryIndexIterator *iterator,
+		struct HsqsInodeContext *inode);
+HSQS_NO_UNUSED int hsqs_inode_directory_index_iterator_next(
+		struct HsqsInodeDirectoryIndexIterator *iterator);
+uint32_t hsqs_inode_directory_index_iterator_index(
+		struct HsqsInodeDirectoryIndexIterator *iterator);
+uint32_t hsqs_inode_directory_index_iterator_start(
+		struct HsqsInodeDirectoryIndexIterator *iterator);
+uint32_t hsqs_inode_directory_index_iterator_name_size(
+		struct HsqsInodeDirectoryIndexIterator *iterator);
+const char *hsqs_inode_directory_index_iterator_name(
+		struct HsqsInodeDirectoryIndexIterator *iterator);
 
-SQUASH_NO_UNUSED int squash_inode_directory_index_iterator_clean(
-		struct SquashInodeDirectoryIndexIterator *iterator);
+HSQS_NO_UNUSED int hsqs_inode_directory_index_iterator_clean(
+		struct HsqsInodeDirectoryIndexIterator *iterator);
 
-void squash_inode_ref_to_block(
-		uint64_t ref, uint32_t *block_index, uint16_t *offset);
-SQUASH_NO_UNUSED uint64_t
-squash_inode_ref_from_block(uint32_t block_index, uint16_t offset);
+void
+hsqs_inode_ref_to_block(uint64_t ref, uint32_t *block_index, uint16_t *offset);
+HSQS_NO_UNUSED uint64_t
+hsqs_inode_ref_from_block(uint32_t block_index, uint16_t offset);
 
-#endif /* end of include guard SQUASH_INODE_CONTEXT_H */
+#endif /* end of include guard HSQS_INODE_CONTEXT_H */

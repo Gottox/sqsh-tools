@@ -41,34 +41,33 @@
 #include <stdint.h>
 
 int
-squash_datablock_init(
-		struct SquashDatablockContext *context,
-		const struct SquashInodeContext *inode) {
-	size_t block_size = squash_superblock_block_size(inode->extract.superblock);
+hsqs_datablock_init(
+		struct HsqsDatablockContext *context,
+		const struct HsqsInodeContext *inode) {
+	size_t block_size = hsqs_superblock_block_size(inode->extract.superblock);
 	int rv = 0;
 
-	if (squash_inode_type(inode) != SQUASH_INODE_TYPE_FILE) {
-		return -SQUASH_ERROR_NOT_A_FILE;
+	if (hsqs_inode_type(inode) != HSQS_INODE_TYPE_FILE) {
+		return -HSQS_ERROR_NOT_A_FILE;
 	}
-	uint64_t file_size = squash_inode_file_size(inode);
+	uint64_t file_size = hsqs_inode_file_size(inode);
 	context->superblock = inode->extract.superblock;
 	context->inode = inode;
-	if (squash_inode_file_fragment_block_index(inode) ==
-		SQUASH_INODE_NO_FRAGMENT) {
-		context->blocks_count = squash_divide_ceil_u32(file_size, block_size);
+	if (hsqs_inode_file_fragment_block_index(inode) == HSQS_INODE_NO_FRAGMENT) {
+		context->blocks_count = hsqs_divide_ceil_u32(file_size, block_size);
 	} else {
 		context->blocks_count = file_size / block_size;
 	}
 	if (context->blocks_count == 0) {
-		return -SQUASH_ERROR_NO_DATABLOCKS;
+		return -HSQS_ERROR_NO_DATABLOCKS;
 	}
-	context->blocks = squash_superblock_data_from_offset(
-			context->superblock, squash_inode_file_blocks_start(inode));
+	context->blocks = hsqs_superblock_data_from_offset(
+			context->superblock, hsqs_inode_file_blocks_start(inode));
 	if (context->blocks == NULL) {
-		return -SQUASH_ERROR_SIZE_MISSMATCH;
+		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
 
-	rv = squash_buffer_init(&context->buffer, context->superblock, block_size);
+	rv = hsqs_buffer_init(&context->buffer, context->superblock, block_size);
 	if (rv < 0) {
 		return rv;
 	}
@@ -76,29 +75,28 @@ squash_datablock_init(
 }
 
 static const uint64_t
-datablock_offset(struct SquashDatablockContext *context, uint64_t index) {
+datablock_offset(struct HsqsDatablockContext *context, uint64_t index) {
 	off_t offset = 0;
 
 	for (int i = 0; i < index; i++) {
-		offset += squash_inode_file_block_size(context->inode, i);
+		offset += hsqs_inode_file_block_size(context->inode, i);
 	}
 
 	return offset;
 }
 
 int
-squash_datablock_seek(
-		struct SquashDatablockContext *context, uint64_t seek_pos) {
-	size_t block_size = squash_superblock_block_size(context->superblock);
-	uint64_t file_size = squash_inode_file_size(context->inode);
+hsqs_datablock_seek(struct HsqsDatablockContext *context, uint64_t seek_pos) {
+	size_t block_size = hsqs_superblock_block_size(context->superblock);
+	uint64_t file_size = hsqs_inode_file_size(context->inode);
 
 	if (seek_pos > file_size) {
-		return -SQUASH_ERROR_SEEK_OUT_OF_RANGE;
+		return -HSQS_ERROR_SEEK_OUT_OF_RANGE;
 	}
 
 	uint32_t datablock_index = seek_pos / block_size;
 	if (datablock_index >= context->blocks_count) {
-		return -SQUASH_ERROR_SEEK_IN_FRAGMENT;
+		return -HSQS_ERROR_SEEK_IN_FRAGMENT;
 	}
 
 	context->datablock_index = datablock_index;
@@ -109,13 +107,13 @@ squash_datablock_seek(
 }
 
 void *
-squash_datablock_data(const struct SquashDatablockContext *context) {
+hsqs_datablock_data(const struct HsqsDatablockContext *context) {
 	return &context->buffer.data[context->datablock_offset];
 }
 
 size_t
-squash_datablock_size(const struct SquashDatablockContext *context) {
-	const size_t buffer_size = squash_buffer_size(&context->buffer);
+hsqs_datablock_size(const struct HsqsDatablockContext *context) {
+	const size_t buffer_size = hsqs_buffer_size(&context->buffer);
 	if (context->datablock_offset > buffer_size) {
 		return 0;
 	} else {
@@ -124,19 +122,19 @@ squash_datablock_size(const struct SquashDatablockContext *context) {
 }
 
 int
-squash_datablock_read(struct SquashDatablockContext *context, uint64_t size) {
+hsqs_datablock_read(struct HsqsDatablockContext *context, uint64_t size) {
 	int rv = 0;
 
 	uint64_t compressed_offset =
 			datablock_offset(context, context->datablock_index);
 
-	while (squash_datablock_size(context) < size &&
+	while (hsqs_datablock_size(context) < size &&
 		   context->datablock_index < context->blocks_count) {
-		bool is_compressed = squash_inode_file_block_is_compressed(
+		bool is_compressed = hsqs_inode_file_block_is_compressed(
 				context->inode, context->datablock_index);
-		uint64_t compressed_size = squash_inode_file_block_size(
+		uint64_t compressed_size = hsqs_inode_file_block_size(
 				context->inode, context->datablock_index);
-		rv = squash_buffer_append(
+		rv = hsqs_buffer_append(
 				&context->buffer, &context->blocks[compressed_offset],
 				compressed_size, is_compressed);
 		if (rv < 0) {
@@ -151,6 +149,6 @@ out:
 }
 
 int
-squash_datablock_clean(struct SquashDatablockContext *context) {
-	return squash_buffer_cleanup(&context->buffer);
+hsqs_datablock_clean(struct HsqsDatablockContext *context) {
+	return hsqs_buffer_cleanup(&context->buffer);
 }

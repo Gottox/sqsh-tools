@@ -39,7 +39,7 @@
 
 #define SUPERBLOCK_INTERNAL_H
 
-struct SquashSuperblock {
+struct HsqsSuperblock {
 	uint32_t magic;
 	uint32_t inode_count;
 	uint32_t modification_time;
@@ -61,6 +61,6 @@ struct SquashSuperblock {
 	uint64_t export_table_start;
 };
 
-STATIC_ASSERT(sizeof(struct SquashSuperblock) == SQUASH_SIZEOF_SUPERBLOCK);
+STATIC_ASSERT(sizeof(struct HsqsSuperblock) == HSQS_SIZEOF_SUPERBLOCK);
 
 #endif /* end of include guard SUPERBLOCK_INTERNAL_H */

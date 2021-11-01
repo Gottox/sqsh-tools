@@ -40,12 +40,12 @@
 
 #define FRAGMENT_INTERNAL_H
 
-struct SquashFragment {
+struct HsqsFragment {
 	uint64_t start;
-	struct SquashDatablockSize size;
+	struct HsqsDatablockSize size;
 	uint32_t unused;
 };
 
-STATIC_ASSERT(sizeof(struct SquashFragment) == SQUASH_SIZEOF_FRAGMENT);
+STATIC_ASSERT(sizeof(struct HsqsFragment) == HSQS_SIZEOF_FRAGMENT);
 
 #endif /* end of include guard FRAGMENT_INTERNAL_H */

@@ -39,30 +39,29 @@
 
 #define FRAGMENT_CONTEXT_H
 
-struct SquashInodeContext;
+struct HsqsInodeContext;
 
-struct SquashFragmentContext {
-	const struct SquashSuperblockContext *superblock;
-	const struct SquashInodeContext *inode;
-	// TODO: This table should be part of struct Squash.
-	struct SquashTableContext table;
-	const struct SquashFragment *fragment;
-	struct SquashBuffer buffer;
+struct HsqsFragmentContext {
+	const struct HsqsSuperblockContext *superblock;
+	const struct HsqsInodeContext *inode;
+	// TODO: This table should be part of struct Hsqs.
+	struct HsqsTableContext table;
+	const struct HsqsFragment *fragment;
+	struct HsqsBuffer buffer;
 };
 
-SQUASH_NO_UNUSED int squash_fragment_init(
-		struct SquashFragmentContext *fragment,
-		const struct SquashInodeContext *inode);
+HSQS_NO_UNUSED int hsqs_fragment_init(
+		struct HsqsFragmentContext *fragment,
+		const struct HsqsInodeContext *inode);
 
-uint64_t squash_fragment_start(struct SquashFragmentContext *fragment);
+uint64_t hsqs_fragment_start(struct HsqsFragmentContext *fragment);
 
-uint32_t squash_fragment_size(struct SquashFragmentContext *fragment);
+uint32_t hsqs_fragment_size(struct HsqsFragmentContext *fragment);
 
-SQUASH_NO_UNUSED int
-squash_fragment_read(struct SquashFragmentContext *fragment);
+HSQS_NO_UNUSED int hsqs_fragment_read(struct HsqsFragmentContext *fragment);
 
-const uint8_t *squash_fragment_data(struct SquashFragmentContext *fragment);
+const uint8_t *hsqs_fragment_data(struct HsqsFragmentContext *fragment);
 
-int squash_fragment_clean(struct SquashFragmentContext *fragment);
+int hsqs_fragment_clean(struct HsqsFragmentContext *fragment);
 
 #endif /* end of include guard FRAGMENT_CONTEXT_H */

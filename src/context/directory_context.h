@@ -36,57 +36,57 @@
 #include "inode_context.h"
 #include <stdint.h>
 
-#ifndef SQUASH_DIRECTORY_CONTEXT_H
+#ifndef HSQS_DIRECTORY_CONTEXT_H
 
-#define SQUASH_DIRECTORY_CONTEXT_H
+#define HSQS_DIRECTORY_CONTEXT_H
 
-struct SquashInodeContext;
-struct SquashSuperblockContext;
+struct HsqsInodeContext;
+struct HsqsSuperblockContext;
 
-struct SquashDirectoryContext {
-	struct SquashSuperblockContext *superblock;
-	struct SquashInodeContext *inode;
+struct HsqsDirectoryContext {
+	struct HsqsSuperblockContext *superblock;
+	struct HsqsInodeContext *inode;
 	uint32_t block_start;
 	uint32_t block_offset;
 	uint32_t size;
 };
 
-struct SquashDirectoryIterator {
-	const struct SquashDirectoryFragment *fragments;
-	struct SquashDirectoryContext *directory;
-	struct SquashMetablockContext extract;
+struct HsqsDirectoryIterator {
+	const struct HsqsDirectoryFragment *fragments;
+	struct HsqsDirectoryContext *directory;
+	struct HsqsMetablockContext extract;
 	size_t remaining_entries;
 	off_t current_fragment_offset;
 	off_t next_offset;
 	off_t current_offset;
 };
 
-SQUASH_NO_UNUSED int squash_directory_init(
-		struct SquashDirectoryContext *directory,
-		struct SquashSuperblockContext *superblock,
-		struct SquashInodeContext *inode);
-SQUASH_NO_UNUSED int squash_directory_iterator_init(
-		struct SquashDirectoryIterator *iterator,
-		struct SquashDirectoryContext *directory);
-SQUASH_NO_UNUSED int
-squash_directory_iterator_next(struct SquashDirectoryIterator *iterator);
-SQUASH_NO_UNUSED int squash_directory_iterator_lookup(
-		struct SquashDirectoryIterator *iterator, const char *name,
+HSQS_NO_UNUSED int hsqs_directory_init(
+		struct HsqsDirectoryContext *directory,
+		struct HsqsSuperblockContext *superblock,
+		struct HsqsInodeContext *inode);
+HSQS_NO_UNUSED int hsqs_directory_iterator_init(
+		struct HsqsDirectoryIterator *iterator,
+		struct HsqsDirectoryContext *directory);
+HSQS_NO_UNUSED int
+hsqs_directory_iterator_next(struct HsqsDirectoryIterator *iterator);
+HSQS_NO_UNUSED int hsqs_directory_iterator_lookup(
+		struct HsqsDirectoryIterator *iterator, const char *name,
 		const size_t name_len);
-int squash_directory_iterator_name_size(
-		const struct SquashDirectoryIterator *iterator);
-uint64_t squash_directory_iterator_inode_ref(
-		const struct SquashDirectoryIterator *iterator);
-enum SquashInodeContextType squash_directory_iterator_inode_type(
-		const struct SquashDirectoryIterator *iterator);
-SQUASH_NO_UNUSED int squash_directory_iterator_inode_load(
-		const struct SquashDirectoryIterator *iterator,
-		struct SquashInodeContext *inode);
+int
+hsqs_directory_iterator_name_size(const struct HsqsDirectoryIterator *iterator);
+uint64_t
+hsqs_directory_iterator_inode_ref(const struct HsqsDirectoryIterator *iterator);
+enum HsqsInodeContextType hsqs_directory_iterator_inode_type(
+		const struct HsqsDirectoryIterator *iterator);
+HSQS_NO_UNUSED int hsqs_directory_iterator_inode_load(
+		const struct HsqsDirectoryIterator *iterator,
+		struct HsqsInodeContext *inode);
 const char *
-squash_directory_iterator_name(const struct SquashDirectoryIterator *iterator);
-SQUASH_NO_UNUSED int squash_directory_iterator_name_dup(
-		const struct SquashDirectoryIterator *iterator, char **name_buffer);
-int squash_directory_iterator_cleanup(struct SquashDirectoryIterator *iterator);
+hsqs_directory_iterator_name(const struct HsqsDirectoryIterator *iterator);
+HSQS_NO_UNUSED int hsqs_directory_iterator_name_dup(
+		const struct HsqsDirectoryIterator *iterator, char **name_buffer);
+int hsqs_directory_iterator_cleanup(struct HsqsDirectoryIterator *iterator);
 
-int squash_directory_cleanup(struct SquashDirectoryContext *directory);
-#endif /* end of include guard SQUASH_DIRECTORY_CONTEXT_H */
+int hsqs_directory_cleanup(struct HsqsDirectoryContext *directory);
+#endif /* end of include guard HSQS_DIRECTORY_CONTEXT_H */

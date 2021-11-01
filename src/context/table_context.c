@@ -38,9 +38,9 @@
 #include <stdint.h>
 
 int
-squash_table_init(
-		struct SquashTableContext *table,
-		const struct SquashSuperblockContext *superblock, off_t start_block,
+hsqs_table_init(
+		struct HsqsTableContext *table,
+		const struct HsqsSuperblockContext *superblock, off_t start_block,
 		size_t element_size, size_t element_count) {
 	int rv = 0;
 	size_t byte_size;
@@ -48,20 +48,20 @@ squash_table_init(
 
 	// Make sure the start block is at least big enough to hold one entry.
 	if (ADD_OVERFLOW(start_block, sizeof(uint64_t), &table_upper_limit)) {
-		return -SQUASH_ERROR_INTEGER_OVERFLOW;
+		return -HSQS_ERROR_INTEGER_OVERFLOW;
 	}
 
-	if (squash_superblock_bytes_used(superblock) < table_upper_limit) {
-		return -SQUASH_ERROR_SIZE_MISSMATCH;
+	if (hsqs_superblock_bytes_used(superblock) < table_upper_limit) {
+		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
 
 	table->lookup_table =
-			squash_superblock_data_from_offset(superblock, start_block);
+			hsqs_superblock_data_from_offset(superblock, start_block);
 	if (table->lookup_table == NULL) {
-		return -SQUASH_ERROR_SIZE_MISSMATCH;
+		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
 
-	rv = squash_metablock_init(
+	rv = hsqs_metablock_init(
 			&table->metablock, superblock, table->lookup_table[0]);
 	if (rv < 0) {
 		goto out;
@@ -70,31 +70,31 @@ squash_table_init(
 	table->element_size = element_size;
 	table->element_count = element_count;
 	if (MULT_OVERFLOW(element_size, element_count, &byte_size)) {
-		rv = -SQUASH_ERROR_INTEGER_OVERFLOW;
+		rv = -HSQS_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
 
-	rv = squash_metablock_more(&table->metablock, byte_size);
+	rv = hsqs_metablock_more(&table->metablock, byte_size);
 
 out:
 	return rv;
 }
 
 int
-squash_table_get(
-		struct SquashTableContext *table, off_t index, const void **target) {
+hsqs_table_get(
+		struct HsqsTableContext *table, off_t index, const void **target) {
 	off_t offset;
 
 	if (MULT_OVERFLOW(index, table->element_size, &offset)) {
-		return -SQUASH_ERROR_INTEGER_OVERFLOW;
+		return -HSQS_ERROR_INTEGER_OVERFLOW;
 	}
-	*target = &squash_metablock_data(&table->metablock)[offset];
+	*target = &hsqs_metablock_data(&table->metablock)[offset];
 
 	return 0;
 }
 
 int
-squash_table_cleanup(struct SquashTableContext *table) {
-	squash_metablock_cleanup(&table->metablock);
+hsqs_table_cleanup(struct HsqsTableContext *table) {
+	hsqs_metablock_cleanup(&table->metablock);
 	return 0;
 }

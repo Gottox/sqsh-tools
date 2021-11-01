@@ -35,20 +35,18 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#ifndef SQUASH_METABLOCK_H
+#ifndef HSQS_METABLOCK_H
 
-#define SQUASH_METABLOCK_H
+#define HSQS_METABLOCK_H
 
-#define SQUASH_SIZEOF_METABLOCK 2
+#define HSQS_SIZEOF_METABLOCK 2
 
-struct SquashMetablock;
+struct HsqsMetablock;
 
-int
-squash_data_metablock_is_compressed(const struct SquashMetablock *metablock);
+int hsqs_data_metablock_is_compressed(const struct HsqsMetablock *metablock);
 
-const uint8_t *
-squash_data_metablock_data(const struct SquashMetablock *metablock);
+const uint8_t *hsqs_data_metablock_data(const struct HsqsMetablock *metablock);
 
-size_t squash_data_metablock_size(const struct SquashMetablock *metablock);
+size_t hsqs_data_metablock_size(const struct HsqsMetablock *metablock);
 
 #endif /* end of include guard METABLOCK_H */

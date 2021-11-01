@@ -34,45 +34,45 @@
 
 #include <stdint.h>
 
-#ifndef SQUASH__COMPRESSION_OPTIONS_H
+#ifndef HSQS__COMPRESSION_OPTIONS_H
 
-#define SQUASH__COMPRESSION_OPTIONS_H
+#define HSQS__COMPRESSION_OPTIONS_H
 
-struct SquashCompressionOptionsGzip;
+struct HsqsCompressionOptionsGzip;
 
-struct SquashCompressionOptionsXz;
+struct HsqsCompressionOptionsXz;
 
-struct SquashCompressionOptionsLz4;
+struct HsqsCompressionOptionsLz4;
 
-struct SquashCompressionOptionsZstd;
+struct HsqsCompressionOptionsZstd;
 
-struct SquashCompressionOptionsLzo;
+struct HsqsCompressionOptionsLzo;
 
-union SquashCompressionOptions;
+union HsqsCompressionOptions;
 
-uint32_t squash_compression_options_gzip_compression_level(
-		const union SquashCompressionOptions *options);
-uint16_t squash_compression_options_gzip_window_size(
-		const union SquashCompressionOptions *options);
-uint16_t squash_compression_options_gzip_strategies(
-		const union SquashCompressionOptions *options);
+uint32_t hsqs_compression_options_gzip_compression_level(
+		const union HsqsCompressionOptions *options);
+uint16_t hsqs_compression_options_gzip_window_size(
+		const union HsqsCompressionOptions *options);
+uint16_t hsqs_compression_options_gzip_strategies(
+		const union HsqsCompressionOptions *options);
 
-uint32_t squash_compression_options_xz_dictionary_size(
-		const union SquashCompressionOptions *options);
-uint32_t squash_compression_options_xz_filters(
-		const union SquashCompressionOptions *options);
+uint32_t hsqs_compression_options_xz_dictionary_size(
+		const union HsqsCompressionOptions *options);
+uint32_t hsqs_compression_options_xz_filters(
+		const union HsqsCompressionOptions *options);
 
-uint32_t squash_compression_options_lz4_version(
-		const union SquashCompressionOptions *options);
-uint32_t squash_compression_options_lz4_flags(
-		const union SquashCompressionOptions *options);
+uint32_t hsqs_compression_options_lz4_version(
+		const union HsqsCompressionOptions *options);
+uint32_t
+hsqs_compression_options_lz4_flags(const union HsqsCompressionOptions *options);
 
-uint32_t squash_compression_options_zstd_compression_level(
-		const union SquashCompressionOptions *options);
+uint32_t hsqs_compression_options_zstd_compression_level(
+		const union HsqsCompressionOptions *options);
 
-uint32_t squash_compression_options_lzo_algorithm(
-		const union SquashCompressionOptions *options);
-uint32_t squash_compression_options_lzo_compression_level(
-		const union SquashCompressionOptions *options);
+uint32_t hsqs_compression_options_lzo_algorithm(
+		const union HsqsCompressionOptions *options);
+uint32_t hsqs_compression_options_lzo_compression_level(
+		const union HsqsCompressionOptions *options);
 
-#endif /* end of include guard SQUASH__COMPRESSION_OPTIONS_H */
+#endif /* end of include guard HSQS__COMPRESSION_OPTIONS_H */

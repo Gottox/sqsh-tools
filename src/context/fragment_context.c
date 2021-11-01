@@ -41,87 +41,86 @@
 #include <stdint.h>
 
 int
-squash_fragment_init(
-		struct SquashFragmentContext *fragment,
-		const struct SquashInodeContext *inode) {
+hsqs_fragment_init(
+		struct HsqsFragmentContext *fragment,
+		const struct HsqsInodeContext *inode) {
 	int rv = 0;
 	fragment->inode = inode;
 	fragment->superblock = inode->extract.superblock;
 	uint32_t fragment_table_count =
-			squash_superblock_fragment_entry_count(fragment->superblock);
+			hsqs_superblock_fragment_entry_count(fragment->superblock);
 	uint32_t fragment_table_start =
-			squash_superblock_fragment_table_start(fragment->superblock);
+			hsqs_superblock_fragment_table_start(fragment->superblock);
 
-	if (!squash_superblock_has_fragments(fragment->superblock)) {
-		rv = -SQUASH_ERROR_NO_FRAGMENT;
+	if (!hsqs_superblock_has_fragments(fragment->superblock)) {
+		rv = -HSQS_ERROR_NO_FRAGMENT;
 		goto out;
 	}
 
-	rv = squash_table_init(
+	rv = hsqs_table_init(
 			&fragment->table, fragment->superblock, fragment_table_start,
-			SQUASH_SIZEOF_FRAGMENT, fragment_table_count);
+			HSQS_SIZEOF_FRAGMENT, fragment_table_count);
 	if (rv < 0) {
 		goto out;
 	}
-	uint32_t index = squash_inode_file_fragment_block_index(inode);
-	if (index == SQUASH_INODE_NO_FRAGMENT) {
-		rv = -SQUASH_ERROR_NO_FRAGMENT;
+	uint32_t index = hsqs_inode_file_fragment_block_index(inode);
+	if (index == HSQS_INODE_NO_FRAGMENT) {
+		rv = -HSQS_ERROR_NO_FRAGMENT;
 		goto out;
 	}
-	rv = squash_table_get(
+	rv = hsqs_table_get(
 			&fragment->table, index, (const void **)&fragment->fragment);
 	if (rv < 0) {
 		goto out;
 	}
 
-	uint32_t block_size = squash_superblock_block_size(fragment->superblock);
-	rv = squash_buffer_init(
-			&fragment->buffer, fragment->superblock, block_size);
+	uint32_t block_size = hsqs_superblock_block_size(fragment->superblock);
+	rv = hsqs_buffer_init(&fragment->buffer, fragment->superblock, block_size);
 	if (rv < 0) {
 		goto out;
 	}
 
 out:
 	if (rv < 0) {
-		squash_fragment_clean(fragment);
+		hsqs_fragment_clean(fragment);
 	}
 	return rv;
 }
 
 int
-squash_fragment_read(struct SquashFragmentContext *fragment) {
-	const struct SquashDatablockSize *size_info =
-			squash_data_fragment_size_info(fragment->fragment);
-	bool is_compressed = squash_data_datablock_is_compressed(size_info);
-	uint32_t size = squash_data_datablock_size(size_info);
-	uint64_t start = squash_data_fragment_start(fragment->fragment);
+hsqs_fragment_read(struct HsqsFragmentContext *fragment) {
+	const struct HsqsDatablockSize *size_info =
+			hsqs_data_fragment_size_info(fragment->fragment);
+	bool is_compressed = hsqs_data_datablock_is_compressed(size_info);
+	uint32_t size = hsqs_data_datablock_size(size_info);
+	uint64_t start = hsqs_data_fragment_start(fragment->fragment);
 	const uint8_t *data =
-			squash_superblock_data_from_offset(fragment->superblock, start);
+			hsqs_superblock_data_from_offset(fragment->superblock, start);
 
-	return squash_buffer_append(&fragment->buffer, data, size, is_compressed);
+	return hsqs_buffer_append(&fragment->buffer, data, size, is_compressed);
 }
 
 uint32_t
-squash_fragment_size(struct SquashFragmentContext *fragment) {
-	uint64_t file_size = squash_inode_file_size(fragment->inode);
-	uint32_t block_size = squash_superblock_block_size(fragment->superblock);
+hsqs_fragment_size(struct HsqsFragmentContext *fragment) {
+	uint64_t file_size = hsqs_inode_file_size(fragment->inode);
+	uint32_t block_size = hsqs_superblock_block_size(fragment->superblock);
 
 	return file_size % block_size;
 }
 
 const uint8_t *
-squash_fragment_data(struct SquashFragmentContext *fragment) {
-	const uint8_t *data = squash_buffer_data(&fragment->buffer);
+hsqs_fragment_data(struct HsqsFragmentContext *fragment) {
+	const uint8_t *data = hsqs_buffer_data(&fragment->buffer);
 	const uint32_t offset =
-			squash_inode_file_fragment_block_offset(fragment->inode);
+			hsqs_inode_file_fragment_block_offset(fragment->inode);
 
 	return &data[offset];
 }
 
 int
-squash_fragment_clean(struct SquashFragmentContext *fragment) {
-	squash_table_cleanup(&fragment->table);
-	squash_buffer_cleanup(&fragment->buffer);
+hsqs_fragment_clean(struct HsqsFragmentContext *fragment) {
+	hsqs_table_cleanup(&fragment->table);
+	hsqs_buffer_cleanup(&fragment->buffer);
 
 	return 0;
 }

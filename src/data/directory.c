@@ -35,7 +35,7 @@
 #include "directory.h"
 #include <endian.h>
 
-struct SquashDirectoryEntry {
+struct HsqsDirectoryEntry {
 	uint16_t offset;
 	int16_t inode_offset;
 	uint16_t type;
@@ -43,57 +43,55 @@ struct SquashDirectoryEntry {
 	// uint8_t name[0]; // [name_size + 1]
 };
 
-struct SquashDirectoryFragment {
+struct HsqsDirectoryFragment {
 	uint32_t count;
 	uint32_t start;
 	uint32_t inode_number;
-	// struct SquashDirectoryEntry entries[0]; // [count + 1]
+	// struct HsqsDirectoryEntry entries[0]; // [count + 1]
 };
 
 uint16_t
-squash_data_directory_entry_offset(const struct SquashDirectoryEntry *entry) {
+hsqs_data_directory_entry_offset(const struct HsqsDirectoryEntry *entry) {
 	return le16toh(entry->offset);
 }
 
 int16_t
-squash_data_directory_entry_inode_offset(
-		const struct SquashDirectoryEntry *entry) {
+hsqs_data_directory_entry_inode_offset(const struct HsqsDirectoryEntry *entry) {
 	return le16toh(entry->inode_offset);
 }
 
 uint16_t
-squash_data_directory_entry_type(const struct SquashDirectoryEntry *entry) {
+hsqs_data_directory_entry_type(const struct HsqsDirectoryEntry *entry) {
 	return le16toh(entry->type);
 }
 
 uint16_t
-squash_data_directory_entry_name_size(
-		const struct SquashDirectoryEntry *entry) {
+hsqs_data_directory_entry_name_size(const struct HsqsDirectoryEntry *entry) {
 	return le16toh(entry->name_size);
 }
 
 const uint8_t *
-squash_data_directory_entry_name(const struct SquashDirectoryEntry *entry) {
+hsqs_data_directory_entry_name(const struct HsqsDirectoryEntry *entry) {
 	return (const uint8_t *)&entry[1];
 }
 
 uint32_t
-squash_data_directory_fragment_count(
-		const struct SquashDirectoryFragment *fragment) {
+hsqs_data_directory_fragment_count(
+		const struct HsqsDirectoryFragment *fragment) {
 	return le32toh(fragment->count);
 }
 uint32_t
-squash_data_directory_fragment_start(
-		const struct SquashDirectoryFragment *fragment) {
+hsqs_data_directory_fragment_start(
+		const struct HsqsDirectoryFragment *fragment) {
 	return le32toh(fragment->start);
 }
 uint32_t
-squash_data_directory_fragment_inode_number(
-		const struct SquashDirectoryFragment *fragment) {
+hsqs_data_directory_fragment_inode_number(
+		const struct HsqsDirectoryFragment *fragment) {
 	return le32toh(fragment->inode_number);
 }
-const struct SquashDirectoryEntry *
-squash_data_directory_fragment_entries(
-		const struct SquashDirectoryFragment *fragment) {
-	return (const struct SquashDirectoryEntry *)&fragment[1];
+const struct HsqsDirectoryEntry *
+hsqs_data_directory_fragment_entries(
+		const struct HsqsDirectoryFragment *fragment) {
+	return (const struct HsqsDirectoryEntry *)&fragment[1];
 }

@@ -44,8 +44,8 @@
 #include "compression.h"
 
 static int
-squash_lzma_extract(
-		const union SquashCompressionOptions *options, uint8_t *target,
+hsqs_lzma_extract(
+		const union HsqsCompressionOptions *options, uint8_t *target,
 		size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	lzma_ret rv = LZMA_OK;
@@ -55,7 +55,7 @@ squash_lzma_extract(
 	rv = lzma_alone_decoder(&strm, UINT64_MAX);
 	if (rv != LZMA_OK) {
 		lzma_end(&strm);
-		return -SQUASH_ERROR_COMPRESSION_DECOMPRESS;
+		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
 	lzma_action action = LZMA_RUN;
@@ -69,7 +69,7 @@ squash_lzma_extract(
 	action = LZMA_FINISH;
 
 	if (lzma_code(&strm, action) != LZMA_OK) {
-		rv = -SQUASH_ERROR_COMPRESSION_DECOMPRESS;
+		rv = -HSQS_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
 	*target_size = strm.avail_out;
@@ -78,6 +78,6 @@ squash_lzma_extract(
 	return rv;
 }
 
-const struct SquashCompressionImplementation squash_compression_lzma = {
-		.extract = squash_lzma_extract,
+const struct HsqsCompressionImplementation hsqs_compression_lzma = {
+		.extract = hsqs_lzma_extract,
 };

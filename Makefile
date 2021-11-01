@@ -34,7 +34,7 @@ HDR = \
 	src/data/xattr_internal.h \
 	src/error.h \
 	src/resolve_path.h \
-	src/squash.h \
+	src/hsqs.h \
 	src/utils.h \
 	src/utils/lru_hashmap.h \
 
@@ -60,7 +60,7 @@ SRC = \
 	src/data/xattr.c \
 	src/error.c \
 	src/resolve_path.c \
-	src/squash.c \
+	src/hsqs.c \
 	src/utils.c \
 	src/utils/lru_hashmap.c \
 
@@ -69,10 +69,10 @@ LIBS = fuse3
 OBJ = $(SRC:.c=.o)
 
 BIN = \
-	bin/catsquash \
-	bin/lssquash \
-	bin/squashinfo \
-	bin/squashfs-fuse \
+	bin/hsqs-cat \
+	bin/hsqs-ls \
+	bin/hsqs-info \
+	bin/hsqs-mount \
 
 TST = \
 	test/utils/lru_hashmap.c \
@@ -129,14 +129,14 @@ CFLAGS += \
 LDFLAGS += \
 	$(shell pkg-config --libs $(LIBS)) \
 
-all: $(BIN) libsquashfs.a libsquashfs.so
+all: $(BIN) libhsqs.a libhsqs.so
 
-libsquashfs.a: $(OBJ)
+libhsqs.a: $(OBJ)
 	@echo AR $@
 	@ar rc $@ $(OBJ)
 	@ranlib $@
 
-libsquashfs.so: $(OBJ)
+libhsqs.so: $(OBJ)
 	@echo SH $@
 	@$(CC) -shared $(LDFLAGS) $(OBJ) -o $@.$(VERSION) -Wl,-soname=$@.$(MAJOR)
 	@ln -sf $@.$(VERSION) $@.$(MAJOR)
@@ -198,7 +198,7 @@ clean:
 	@echo cleaning...
 	@rm -rf doc cov gen
 	@rm -f *.gcnp *.gcda
-	@rm -f $(TST_BIN) $(BCH_BIN) $(FZZ_BIN) $(OBJ) $(BIN) libsquashfs.so* libsquashfs.a
+	@rm -f $(TST_BIN) $(BCH_BIN) $(FZZ_BIN) $(OBJ) $(BIN) libhsqs.so* libhsqs.a
 
 .PHONY: check all clean speed coverage fuzz
 

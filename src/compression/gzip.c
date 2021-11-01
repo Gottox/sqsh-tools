@@ -44,23 +44,23 @@
 #include "compression.h"
 
 static int
-squash_gzip_extract(
-		const union SquashCompressionOptions *options, uint8_t *target,
+hsqs_gzip_extract(
+		const union HsqsCompressionOptions *options, uint8_t *target,
 		size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	int rv = uncompress(target, target_size, compressed, compressed_size);
 
 	if (rv != Z_OK) {
-		return -SQUASH_ERROR_COMPRESSION_DECOMPRESS;
+		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
 	}
 	return rv;
 }
 
 int
-squash_gzip_cleanup(union SquashCompressionOptions *options) {
+hsqs_gzip_cleanup(union HsqsCompressionOptions *options) {
 	return 0;
 }
 
-const struct SquashCompressionImplementation squash_compression_gzip = {
-		.extract = squash_gzip_extract,
+const struct HsqsCompressionImplementation hsqs_compression_gzip = {
+		.extract = hsqs_gzip_extract,
 };
