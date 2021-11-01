@@ -28,7 +28,7 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : catsquash
+ * @file        : hsqs-cat
  * @created     : Monday Sep 20, 2021 09:48:58 CEST
  */
 
@@ -59,7 +59,7 @@ main(int argc, char *argv[]) {
 	const char *outer_path;
 	struct HsqsInodeContext inode = {0};
 	struct HsqsFileContext file = {0};
-	struct Hsqs squash = {0};
+	struct Hsqs hsqs = {0};
 
 	while ((opt = getopt(argc, argv, "h")) != -1) {
 		switch (opt) {
@@ -75,14 +75,14 @@ main(int argc, char *argv[]) {
 	}
 	outer_path = argv[optind];
 
-	rv = hsqs_open(&squash, outer_path);
+	rv = hsqs_open(&hsqs, outer_path);
 	if (rv < 0) {
 		hsqs_perror(rv, outer_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	rv = hsqs_resolve_path(&inode, &squash.superblock, inner_path);
+	rv = hsqs_resolve_path(&inode, &hsqs.superblock, inner_path);
 	if (rv < 0) {
 		hsqs_perror(rv, inner_path);
 		rv = EXIT_FAILURE;
@@ -110,7 +110,7 @@ out:
 	hsqs_file_cleanup(&file);
 	hsqs_inode_cleanup(&inode);
 
-	hsqs_cleanup(&squash);
+	hsqs_cleanup(&hsqs);
 
 	return rv;
 }

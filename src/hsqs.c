@@ -28,7 +28,7 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : squash
+ * @file        : hsqs
  * @created     : Friday Apr 30, 2021 11:09:40 CEST
  */
 
@@ -45,23 +45,23 @@
 
 int
 hsqs_init(
-		struct Hsqs *squash, uint8_t *buffer, const size_t size,
+		struct Hsqs *hsqs, uint8_t *buffer, const size_t size,
 		const enum HsqsDtor dtor) {
 	int rv = 0;
 
-	rv = hsqs_superblock_init(&squash->superblock, buffer, size);
+	rv = hsqs_superblock_init(&hsqs->superblock, buffer, size);
 	if (rv < 0) {
 		return rv;
 	}
 
-	squash->size = size;
-	squash->dtor = dtor;
+	hsqs->size = size;
+	hsqs->dtor = dtor;
 
 	return rv;
 }
 
 int
-hsqs_open(struct Hsqs *squash, const char *path) {
+hsqs_open(struct Hsqs *hsqs, const char *path) {
 	int rv = 0;
 	int fd = -1;
 	uint8_t *file_map = MAP_FAILED;
@@ -88,11 +88,11 @@ hsqs_open(struct Hsqs *squash, const char *path) {
 	close(fd);
 	fd = -1;
 
-	rv = hsqs_init(squash, file_map, st.st_size, HSQS_DTOR_MUNMAP);
+	rv = hsqs_init(hsqs, file_map, st.st_size, HSQS_DTOR_MUNMAP);
 	if (rv < 0) {
 		goto err;
 	}
-	squash->buffer = file_map;
+	hsqs->buffer = file_map;
 
 	return rv;
 err:
@@ -107,17 +107,17 @@ err:
 }
 
 int
-hsqs_cleanup(struct Hsqs *squash) {
+hsqs_cleanup(struct Hsqs *hsqs) {
 	int rv = 0;
 
-	hsqs_superblock_cleanup(&squash->superblock);
+	hsqs_superblock_cleanup(&hsqs->superblock);
 
-	switch (squash->dtor) {
+	switch (hsqs->dtor) {
 	case HSQS_DTOR_FREE:
-		free(squash->buffer);
+		free(hsqs->buffer);
 		break;
 	case HSQS_DTOR_MUNMAP:
-		rv |= munmap(squash->buffer, squash->size);
+		rv |= munmap(hsqs->buffer, hsqs->size);
 		break;
 	case HSQS_DTOR_NONE:
 		// noop

@@ -28,7 +28,7 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : lssquash
+ * @file        : hsqs-cat
  * @created     : Friday Apr 30, 2021 13:00:20 CEST
  */
 
@@ -64,7 +64,7 @@ usage(char *arg0) {
 }
 
 static int
-metablock_info(const struct HsqsMetablock *metablock, struct Hsqs *squash) {
+metablock_info(const struct HsqsMetablock *metablock, struct Hsqs *hsqs) {
 	int rv = 0;
 	struct HsqsMetablockContext extract = {0};
 	KEY("METABLOCK_INFO");
@@ -75,8 +75,8 @@ metablock_info(const struct HsqsMetablock *metablock, struct Hsqs *squash) {
 
 	int is_compressed = hsqs_data_metablock_is_compressed(metablock);
 	rv = hsqs_metablock_init(
-			&extract, &squash->superblock,
-			(uint8_t *)metablock - (uint8_t *)squash->superblock.superblock);
+			&extract, &hsqs->superblock,
+			(uint8_t *)metablock - (uint8_t *)hsqs->superblock.superblock);
 	if (rv < 0) {
 		return 0;
 	}
@@ -100,12 +100,12 @@ metablock_info(const struct HsqsMetablock *metablock, struct Hsqs *squash) {
 }
 
 static int
-compression_info_gzip(struct Hsqs *squash) {
+compression_info_gzip(struct Hsqs *hsqs) {
 	int rv = 0;
 	// TODO: use metablock context instead of compression here. this block is
 	// never compressed.
 	struct HsqsBuffer buffer = {0};
-	rv = hsqs_buffer_init(&buffer, &squash->superblock, 8192);
+	rv = hsqs_buffer_init(&buffer, &hsqs->superblock, 8192);
 	const struct HsqsCompressionOptionsGzip *options = &buffer.options->gzip;
 
 	KEY("COMPRESSION_LEVEL");
@@ -120,7 +120,7 @@ compression_info_gzip(struct Hsqs *squash) {
 }
 
 static int
-inode_info(struct Hsqs *squash, struct HsqsInodeContext *inode) {
+inode_info(struct Hsqs *hsqs, struct HsqsInodeContext *inode) {
 	int rv = 0;
 
 	KEY("HARDLINK COUNT");
@@ -130,7 +130,7 @@ inode_info(struct Hsqs *squash, struct HsqsInodeContext *inode) {
 }
 
 static int
-dir_info(struct Hsqs *squash, struct HsqsDirectoryContext *dir) {
+dir_info(struct Hsqs *hsqs, struct HsqsDirectoryContext *dir) {
 	int rv = 0;
 	struct HsqsDirectoryIterator iter = {0};
 	fputs("=== ROOT DIRECTORY ===\n", out);
@@ -156,22 +156,22 @@ dir_info(struct Hsqs *squash, struct HsqsDirectoryContext *dir) {
 }
 
 static int
-root_inode_info(struct Hsqs *squash) {
+root_inode_info(struct Hsqs *hsqs) {
 	struct HsqsInodeContext inode = {0};
 	struct HsqsDirectoryContext dir = {0};
 	const struct HsqsMetablock *metablock = NULL;
 	int rv = 0;
 	uint64_t root_inode_ref =
-			hsqs_data_superblock_root_inode_ref(squash->superblock.superblock);
+			hsqs_data_superblock_root_inode_ref(hsqs->superblock.superblock);
 	fputs("=== INODE TABLE ===\n", out);
 	rv = hsqs_metablock_from_offset(
-			&metablock, &squash->superblock,
+			&metablock, &hsqs->superblock,
 			hsqs_data_superblock_inode_table_start(
-					squash->superblock.superblock));
+					hsqs->superblock.superblock));
 	if (rv < 0) {
 		return rv;
 	}
-	rv = metablock_info(metablock, squash);
+	rv = metablock_info(metablock, hsqs);
 	if (rv < 0) {
 		return rv;
 	}
@@ -182,17 +182,17 @@ root_inode_info(struct Hsqs *squash) {
 
 	KEY("ROOT_INODE_REF");
 	fprintf(out, "0x%lx\n", root_inode_ref);
-	rv = hsqs_inode_load(&inode, &squash->superblock, root_inode_ref);
+	rv = hsqs_inode_load(&inode, &hsqs->superblock, root_inode_ref);
 	if (rv < 0) {
 		return rv;
 	}
-	inode_info(squash, &inode);
-	rv = hsqs_directory_init(&dir, &squash->superblock, &inode);
+	inode_info(hsqs, &inode);
+	rv = hsqs_directory_init(&dir, &hsqs->superblock, &inode);
 	if (rv < 0) {
 		return rv;
 	}
 
-	dir_info(squash, &dir);
+	dir_info(hsqs, &dir);
 
 	hsqs_directory_cleanup(&dir);
 
@@ -201,14 +201,14 @@ root_inode_info(struct Hsqs *squash) {
 }
 
 static int
-compression_info(struct Hsqs *squash) {
+compression_info(struct Hsqs *hsqs) {
 	int rv = 0;
 	const struct HsqsMetablock *metablock = NULL;
-	int (*handler)(struct Hsqs * squash) = NULL;
+	int (*handler)(struct Hsqs * hsqs) = NULL;
 	fputs("=== COMPRESSION INFO ===\n", out);
 	KEY("COMPRESSION_TYPE");
 	enum HsqsSuperblockCompressionId id =
-			hsqs_data_superblock_compression_id(squash->superblock.superblock);
+			hsqs_data_superblock_compression_id(hsqs->superblock.superblock);
 	switch (id) {
 	case HSQS_COMPRESSION_NONE:
 		fputs("none\n", out);
@@ -237,15 +237,15 @@ compression_info(struct Hsqs *squash) {
 	if (handler == NULL) {
 		fputs("WARNING: NO COMPRESSION OPTION HANDLER\n", stdout);
 	} else if (
-			hsqs_data_superblock_flags(squash->superblock.superblock) &
+			hsqs_data_superblock_flags(hsqs->superblock.superblock) &
 			HSQS_SUPERBLOCK_COMPRESSOR_OPTIONS) {
 		rv = hsqs_metablock_from_offset(
-				&metablock, &squash->superblock, sizeof(struct HsqsSuperblock));
+				&metablock, &hsqs->superblock, sizeof(struct HsqsSuperblock));
 		if (rv < 0) {
 			goto out;
 		}
-		metablock_info(metablock, squash);
-		handler(squash);
+		metablock_info(metablock, hsqs);
+		handler(hsqs);
 	} else {
 		fputs("NO COMPRESSION OPTION\n", stdout);
 	}
@@ -254,9 +254,9 @@ out:
 }
 
 static int
-flag_info(struct Hsqs *squash) {
+flag_info(struct Hsqs *hsqs) {
 	enum HsqsSuperblockFlags flags =
-			hsqs_data_superblock_flags(squash->superblock.superblock);
+			hsqs_data_superblock_flags(hsqs->superblock.superblock);
 	fputs("=== FLAG INFO ===\n", out);
 	KEY("FLAGS");
 	printb(flags, out);
@@ -284,8 +284,8 @@ flag_info(struct Hsqs *squash) {
 }
 
 static int
-section_info(struct Hsqs *squash) {
-	const struct HsqsSuperblock *s = squash->superblock.superblock;
+section_info(struct Hsqs *hsqs) {
+	const struct HsqsSuperblock *s = hsqs->superblock.superblock;
 	KEY("ID TABLE");
 	fprintf(out, "%" PRId64 "\n", hsqs_data_superblock_id_table_start(s));
 	KEY("XATTR TABLE");
@@ -308,7 +308,7 @@ int
 main(int argc, char *argv[]) {
 	int rv;
 	int opt = 0;
-	struct Hsqs squash = {0};
+	struct Hsqs hsqs = {0};
 
 	out = stdout;
 
@@ -323,19 +323,19 @@ main(int argc, char *argv[]) {
 		return usage(argv[0]);
 	}
 
-	rv = hsqs_open(&squash, argv[optind]);
+	rv = hsqs_open(&hsqs, argv[optind]);
 	if (rv < 0) {
 		perror(argv[optind]);
 		return EXIT_FAILURE;
 	}
 
-	flag_info(&squash);
-	section_info(&squash);
-	compression_info(&squash);
+	flag_info(&hsqs);
+	section_info(&hsqs);
+	compression_info(&hsqs);
 
-	root_inode_info(&squash);
+	root_inode_info(&hsqs);
 
-	hsqs_cleanup(&squash);
+	hsqs_cleanup(&hsqs);
 
 	return 0;
 }

@@ -34,23 +34,23 @@ out:
 int
 LLVMFuzzerTestOneInput(char *data, size_t size) {
 	int rv = 0;
-	struct Hsqs squash = {0};
+	struct Hsqs hsqs = {0};
 	struct HsqsInodeContext inode = {0};
 	struct HsqsDirectoryContext dir = {0};
 	struct HsqsDirectoryIterator iter = {0};
-	rv = hsqs_init(&squash, (uint8_t *)data, size, HSQS_DTOR_NONE);
+	rv = hsqs_init(&hsqs, (uint8_t *)data, size, HSQS_DTOR_NONE);
 	if (rv < 0) {
 		goto out;
 	}
 
 	rv = hsqs_inode_load(
-			&inode, &squash.superblock,
-			hsqs_superblock_inode_root_ref(&squash.superblock));
+			&inode, &hsqs.superblock,
+			hsqs_superblock_inode_root_ref(&hsqs.superblock));
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = hsqs_directory_init(&dir, &squash.superblock, &inode);
+	rv = hsqs_directory_init(&dir, &hsqs.superblock, &inode);
 	if (rv < 0) {
 		goto out;
 	}
@@ -68,7 +68,7 @@ out:
 	hsqs_directory_iterator_cleanup(&iter);
 	hsqs_directory_cleanup(&dir);
 	hsqs_inode_cleanup(&inode);
-	hsqs_cleanup(&squash);
+	hsqs_cleanup(&hsqs);
 
 	return rv; // Non-zero return values are reserved for future use.
 }

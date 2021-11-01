@@ -28,7 +28,7 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : squash
+ * @file        : hsqs
  * @created     : Friday Apr 30, 2021 10:58:14 CEST
  */
 
@@ -58,11 +58,11 @@ struct Hsqs {
 };
 
 HSQS_NO_UNUSED int hsqs_init(
-		struct Hsqs *squash, uint8_t *buffer, const size_t size,
+		struct Hsqs *hsqs, uint8_t *buffer, const size_t size,
 		const enum HsqsDtor dtor);
 
-HSQS_NO_UNUSED int hsqs_open(struct Hsqs *squash, const char *path);
+HSQS_NO_UNUSED int hsqs_open(struct Hsqs *hsqs, const char *path);
 
-int hsqs_cleanup(struct Hsqs *squash);
+int hsqs_cleanup(struct Hsqs *hsqs);
 
 #endif /* end of include guard HSQS_H */

@@ -35,9 +35,9 @@
 #include "datablock.h"
 #include <stdint.h>
 
-#ifndef SQUASHFS_FORMAT_INODE_H
+#ifndef INODE_H
 
-#define SQUASHFS_FORMAT_INODE_H
+#define INODE_H
 
 #define HSQS_SIZEOF_INODE_DIRECTORY_INDEX 12
 #define HSQS_SIZEOF_INODE_DIRECTORY 16
@@ -205,4 +205,4 @@ uint32_t
 hsqs_data_inode_ipc_ext_hard_link_count(const struct HsqsInodeIpcExt *ipc);
 uint32_t hsqs_data_inode_ipc_ext_xattr_idx(const struct HsqsInodeIpcExt *ipc);
 
-#endif /* end of include guard SQUASHFS_FORMAT_INODE_H */
+#endif /* end of include guard INODE_H */

@@ -28,7 +28,7 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : squashfs-fuse
+ * @file        : hsqs-mount
  * @created     : Wednesday Sep 08, 2021 09:06:25 CEST
  */
 
@@ -46,7 +46,7 @@
 #include "../src/hsqs.h"
 #include "../src/resolve_path.h"
 
-static struct { struct Hsqs squash; } data = {0};
+static struct { struct Hsqs hsqs; } data = {0};
 
 static struct HsqsfuseOptions {
 	int show_help;
@@ -69,10 +69,10 @@ help(const char *arg0) {
 }
 
 static void *
-squashfuse_init(struct fuse_conn_info *conn, struct fuse_config *cfg) {
+hsqsfuse_init(struct fuse_conn_info *conn, struct fuse_config *cfg) {
 	int rv = 0;
 
-	rv = hsqs_open(&data.squash, options.image_path);
+	rv = hsqs_open(&data.hsqs, options.image_path);
 	if (rv < 0) {
 		perror(options.image_path);
 	}
@@ -82,14 +82,14 @@ squashfuse_init(struct fuse_conn_info *conn, struct fuse_config *cfg) {
 }
 
 static int
-squashfuse_getattr(
+hsqsfuse_getattr(
 		const char *path, struct stat *stbuf, struct fuse_file_info *fi) {
 	int rv = 0;
 	memset(stbuf, 0, sizeof(struct stat));
 
 	struct HsqsInodeContext inode = {0};
 
-	rv = hsqs_resolve_path(&inode, &data.squash.superblock, path);
+	rv = hsqs_resolve_path(&inode, &data.hsqs.superblock, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -132,19 +132,19 @@ out:
 }
 
 static int
-squashfuse_readdir(
+hsqsfuse_readdir(
 		const char *path, void *buf, fuse_fill_dir_t filler, off_t offset,
 		struct fuse_file_info *fi, enum fuse_readdir_flags flags) {
 	int rv = 0;
 	struct HsqsInodeContext inode = {0};
 	struct HsqsDirectoryContext dir = {0};
 	struct HsqsDirectoryIterator iter = {0};
-	rv = hsqs_resolve_path(&inode, &data.squash.superblock, path);
+	rv = hsqs_resolve_path(&inode, &data.hsqs.superblock, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
 	}
-	rv = hsqs_directory_init(&dir, &data.squash.superblock, &inode);
+	rv = hsqs_directory_init(&dir, &data.hsqs.superblock, &inode);
 	if (rv < 0) {
 		rv = -ENOMEM;
 		goto out;
@@ -181,11 +181,11 @@ out:
 }
 
 static int
-squashfuse_open(const char *path, struct fuse_file_info *fi) {
+hsqsfuse_open(const char *path, struct fuse_file_info *fi) {
 	int rv = 0;
 	struct HsqsInodeContext inode = {0};
 
-	rv = hsqs_resolve_path(&inode, &data.squash.superblock, path);
+	rv = hsqs_resolve_path(&inode, &data.hsqs.superblock, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -201,14 +201,14 @@ out:
 }
 
 static int
-squashfuse_read(
+hsqsfuse_read(
 		const char *path, char *buf, size_t size, off_t offset,
 		struct fuse_file_info *fi) {
 	int rv = 0;
 	struct HsqsInodeContext inode = {0};
 	struct HsqsFileContext file = {0};
 
-	rv = hsqs_resolve_path(&inode, &data.squash.superblock, path);
+	rv = hsqs_resolve_path(&inode, &data.hsqs.superblock, path);
 	if (rv < 0) {
 		// TODO: Better return type
 		rv = -EINVAL;
@@ -245,11 +245,11 @@ out:
 }
 
 static int
-squashfuse_readlink(const char *path, char *buf, size_t size) {
+hsqsfuse_readlink(const char *path, char *buf, size_t size) {
 	int rv = 0;
 	struct HsqsInodeContext inode = {0};
 
-	rv = hsqs_resolve_path(&inode, &data.squash.superblock, path);
+	rv = hsqs_resolve_path(&inode, &data.hsqs.superblock, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -267,17 +267,17 @@ out:
 	return rv;
 }
 
-static const struct fuse_operations squashfuse_operations = {
-		.init = squashfuse_init,
-		.getattr = squashfuse_getattr,
-		.readdir = squashfuse_readdir,
-		.open = squashfuse_open,
-		.read = squashfuse_read,
-		.readlink = squashfuse_readlink,
+static const struct fuse_operations hsqsfuse_operations = {
+		.init = hsqsfuse_init,
+		.getattr = hsqsfuse_getattr,
+		.readdir = hsqsfuse_readdir,
+		.open = hsqsfuse_open,
+		.read = hsqsfuse_read,
+		.readlink = hsqsfuse_readlink,
 };
 
 static int
-squashfuse_process_options(
+hsqsfuse_process_options(
 		void *data, const char *arg, int key, struct fuse_args *outargs) {
 	if (key == FUSE_OPT_KEY_NONOPT && options.image_path == NULL) {
 		options.image_path = arg;
@@ -291,8 +291,7 @@ main(int argc, char *argv[]) {
 	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 	int rv = 0;
 	if (fuse_opt_parse(
-				&args, &options, option_spec, squashfuse_process_options) ==
-		-1) {
+				&args, &options, option_spec, hsqsfuse_process_options) == -1) {
 		rv = EXIT_FAILURE;
 		goto out;
 	}
@@ -303,7 +302,7 @@ main(int argc, char *argv[]) {
 		args.argv[0][0] = '\0';
 	}
 
-	rv = fuse_main(args.argc, args.argv, &squashfuse_operations, &data);
+	rv = fuse_main(args.argc, args.argv, &hsqsfuse_operations, &data);
 out:
 	fuse_opt_free_args(&args);
 	return rv;

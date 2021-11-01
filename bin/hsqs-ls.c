@@ -28,7 +28,7 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : lssquash
+ * @file        : hsqs-ls
  * @created     : Friday Sep 04, 2021 18:46:20 CEST
  */
 
@@ -45,7 +45,7 @@
 #include <unistd.h>
 
 static int
-ls(struct Hsqs *squash, const char *path, struct HsqsInodeContext *inode,
+ls(struct Hsqs *hsqs, const char *path, struct HsqsInodeContext *inode,
    const bool recursive);
 
 static int
@@ -55,8 +55,8 @@ usage(char *arg0) {
 }
 
 static int
-ls_item(struct Hsqs *squash, const char *path,
-		struct HsqsDirectoryIterator *iter, const bool recursive) {
+ls_item(struct Hsqs *hsqs, const char *path, struct HsqsDirectoryIterator *iter,
+		const bool recursive) {
 	int rv = 0;
 	struct HsqsInodeContext entry_inode = {0};
 	const char *name = hsqs_directory_iterator_name(iter);
@@ -80,7 +80,7 @@ ls_item(struct Hsqs *squash, const char *path,
 		if (rv < 0) {
 			goto out;
 		}
-		rv = ls(squash, current_path, &entry_inode, recursive);
+		rv = ls(hsqs, current_path, &entry_inode, recursive);
 		if (rv < 0) {
 			goto out;
 		}
@@ -93,13 +93,13 @@ out:
 }
 
 static int
-ls(struct Hsqs *squash, const char *path, struct HsqsInodeContext *inode,
+ls(struct Hsqs *hsqs, const char *path, struct HsqsInodeContext *inode,
    const bool recursive) {
 	int rv;
 	struct HsqsDirectoryContext dir = {0};
 	struct HsqsDirectoryIterator iter = {0};
 
-	rv = hsqs_directory_init(&dir, &squash->superblock, inode);
+	rv = hsqs_directory_init(&dir, &hsqs->superblock, inode);
 	if (rv < 0) {
 		hsqs_perror(rv, path == NULL || path[0] == 0 ? "/" : path);
 		rv = EXIT_FAILURE;
@@ -114,7 +114,7 @@ ls(struct Hsqs *squash, const char *path, struct HsqsInodeContext *inode,
 	}
 
 	while (hsqs_directory_iterator_next(&iter) > 0) {
-		rv = ls_item(squash, path, &iter, recursive);
+		rv = ls_item(hsqs, path, &iter, recursive);
 		if (rv < 0) {
 			rv = EXIT_FAILURE;
 			goto out;
@@ -136,7 +136,7 @@ main(int argc, char *argv[]) {
 	const char *inner_path = "";
 	const char *outer_path;
 	struct HsqsInodeContext inode = {0};
-	struct Hsqs squash = {0};
+	struct Hsqs hsqs = {0};
 
 	while ((opt = getopt(argc, argv, "rh")) != -1) {
 		switch (opt) {
@@ -155,26 +155,26 @@ main(int argc, char *argv[]) {
 	}
 	outer_path = argv[optind];
 
-	rv = hsqs_open(&squash, outer_path);
+	rv = hsqs_open(&hsqs, outer_path);
 	if (rv < 0) {
 		hsqs_perror(rv, outer_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	rv = hsqs_resolve_path(&inode, &squash.superblock, inner_path);
+	rv = hsqs_resolve_path(&inode, &hsqs.superblock, inner_path);
 	if (rv < 0) {
 		hsqs_perror(rv, inner_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	rv = ls(&squash, NULL, &inode, recursive);
+	rv = ls(&hsqs, NULL, &inode, recursive);
 
 out:
 	hsqs_inode_cleanup(&inode);
 
-	hsqs_cleanup(&squash);
+	hsqs_cleanup(&hsqs);
 
 	return rv;
 }
