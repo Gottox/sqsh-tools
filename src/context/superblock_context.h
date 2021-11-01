@@ -48,6 +48,7 @@ struct SquashSuperblock;
 struct SquashSuperblockContext {
 	const struct SquashSuperblock *superblock;
 	struct SquashTableContext id_table;
+	struct SquashTableContext export_table;
 	struct SquashXattrTableContext xattr_table;
 };
 

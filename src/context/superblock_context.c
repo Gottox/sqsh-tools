@@ -39,7 +39,7 @@
 #include <stdint.h>
 
 const static uint32_t SUPERBLOCK_MAGIC = 0x73717368;
-const static uint64_t NO_XATTRS = 0xFFFFFFFFFFFFFFFF;
+const static uint64_t NO_SEGMENT = 0xFFFFFFFFFFFFFFFF;
 
 int
 squash_superblock_init(
@@ -69,18 +69,31 @@ squash_superblock_init(
 
 	context->superblock = superblock;
 
+	uint64_t id_table_start =
+			squash_data_superblock_id_table_start(context->superblock);
+	uint64_t xattr_table_start =
+			squash_data_superblock_xattr_id_table_start(context->superblock);
+	uint64_t export_table_start =
+			squash_data_superblock_export_table_start(context->superblock);
 	rv = squash_table_init(
-			&context->id_table, context,
-			squash_data_superblock_id_table_start(context->superblock),
-			sizeof(uint32_t),
+			&context->id_table, context, id_table_start, sizeof(uint32_t),
 			squash_data_superblock_id_count(context->superblock));
 	if (rv < 0) {
 		goto out;
 	}
 
-	if (squash_data_superblock_xattr_id_table_start(context->superblock) !=
-		NO_XATTRS) {
+	if (xattr_table_start != NO_SEGMENT) {
 		rv = squash_xattr_table_init(&context->xattr_table, context);
+		if (rv < 0) {
+			squash_superblock_cleanup(context);
+			goto out;
+		}
+	}
+	if (export_table_start != NO_SEGMENT) {
+		rv = squash_table_init(
+				&context->export_table, context, export_table_start,
+				sizeof(uint64_t),
+				squash_data_superblock_inode_count(context->superblock));
 		if (rv < 0) {
 			squash_superblock_cleanup(context);
 			goto out;
@@ -160,5 +173,6 @@ int
 squash_superblock_cleanup(struct SquashSuperblockContext *superblock) {
 	squash_table_cleanup(&superblock->id_table);
 	squash_xattr_table_cleanup(&superblock->xattr_table);
+	squash_table_cleanup(&superblock->export_table);
 	return 0;
 }
