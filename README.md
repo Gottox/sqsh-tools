@@ -1,4 +1,4 @@
-# libsquash
+# libhsqs
 
 squashfs implementation as library.
 
