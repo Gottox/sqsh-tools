@@ -51,12 +51,15 @@ bool
 hsqs_xattr_table_iterator_is_indirect(struct HsqsXattrTableIterator *iterator);
 
 const char *
+hsqs_xattr_table_iterator_prefix(struct HsqsXattrTableIterator *iterator);
+uint16_t
+hsqs_xattr_table_iterator_prefix_size(struct HsqsXattrTableIterator *iterator);
+const char *
 hsqs_xattr_table_iterator_name(struct HsqsXattrTableIterator *iterator);
-int hsqs_xattr_table_iterator_fullname_dup(
-		struct HsqsXattrTableIterator *iterator, char **fullname_buffer);
-
 uint16_t
 hsqs_xattr_table_iterator_name_size(struct HsqsXattrTableIterator *iterator);
+int hsqs_xattr_table_iterator_fullname_dup(
+		struct HsqsXattrTableIterator *iterator, char **fullname_buffer);
 
 int hsqs_xattr_table_iterator_value_dup(
 		struct HsqsXattrTableIterator *iterator, char **value_buffer);

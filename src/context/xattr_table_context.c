@@ -43,19 +43,6 @@
 #include <stdint.h>
 #include <string.h>
 
-static const char *
-get_xattr_prefix(enum HsqsXattrType type) {
-	switch (type) {
-	case HSQS_XATTR_USER:
-		return "user.";
-	case HSQS_XATTR_TRUSTED:
-		return "trusted.";
-	case HSQS_XATTR_SECURITY:
-		return "security.";
-	}
-	return NULL;
-}
-
 int
 hsqs_xattr_table_init(
 		struct HsqsXattrTableContext *context,
@@ -230,11 +217,28 @@ hsqs_xattr_table_iterator_name(struct HsqsXattrTableIterator *iterator) {
 	return (const char *)hsqs_data_xattr_key_name(iterator->current_key);
 }
 
+const char *
+hsqs_xattr_table_iterator_prefix(struct HsqsXattrTableIterator *iterator) {
+	switch (hsqs_xattr_table_iterator_type(iterator)) {
+	case HSQS_XATTR_USER:
+		return "user.";
+	case HSQS_XATTR_TRUSTED:
+		return "trusted.";
+	case HSQS_XATTR_SECURITY:
+		return "security.";
+	}
+	return NULL;
+}
+
+uint16_t
+hsqs_xattr_table_iterator_prefix_size(struct HsqsXattrTableIterator *iterator) {
+	return strlen(hsqs_xattr_table_iterator_prefix(iterator));
+}
+
 int
 hsqs_xattr_table_iterator_fullname_dup(
 		struct HsqsXattrTableIterator *iterator, char **fullname_buffer) {
-	const char *prefix =
-			get_xattr_prefix(hsqs_xattr_table_iterator_type(iterator));
+	const char *prefix = hsqs_xattr_table_iterator_prefix(iterator);
 	size_t name_size = hsqs_xattr_table_iterator_name_size(iterator);
 	size_t size = strlen(prefix) + name_size;
 
