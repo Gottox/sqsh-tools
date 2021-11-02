@@ -65,6 +65,9 @@ hsqs_file_init(
 int
 hsqs_file_seek(struct HsqsFileContext *context, uint64_t seek_pos) {
 	int rv;
+	if (seek_pos > hsqs_inode_file_size(context->datablock.inode)) {
+		return -HSQS_ERROR_SEEK_OUT_OF_RANGE;
+	}
 	rv = hsqs_datablock_seek(&context->datablock, seek_pos);
 	if (rv == -HSQS_ERROR_SEEK_IN_FRAGMENT) {
 		context->fragment_pos =
