@@ -173,6 +173,45 @@ hsqs_cat_datablock_and_fragment() {
 }
 
 static void
+hsqs_cat_size_overflow() {
+	int rv;
+	const uint8_t *data;
+	size_t size;
+	struct HsqsSuperblockContext superblock = {0};
+	struct HsqsInodeContext inode = {0};
+	struct HsqsFileContext file = {0};
+	rv = hsqs_superblock_init(&superblock, squash_image, sizeof(squash_image));
+	assert(rv == 0);
+
+	rv = hsqs_resolve_path(&inode, &superblock, "b");
+	assert(rv == 0);
+
+	rv = hsqs_file_init(&file, &inode);
+	assert(rv == 0);
+	size = hsqs_inode_file_size(&inode);
+	assert(size == 1050000);
+
+	rv = hsqs_file_read(&file, size + 4096);
+	assert(rv == 0);
+
+	assert(hsqs_file_size(&file) == size);
+
+	data = hsqs_file_data(&file);
+	for (int i = 0; i < size; i++) {
+		assert(data[i] == 'b');
+	}
+
+	rv = hsqs_file_cleanup(&file);
+	assert(rv == 0);
+
+	rv = hsqs_inode_cleanup(&inode);
+	assert(rv == 0);
+
+	rv = hsqs_superblock_cleanup(&superblock);
+	assert(rv == 0);
+}
+
+static void
 hsqs_test_uid_and_gid() {
 	int rv;
 	uint32_t uid, gid;
@@ -475,6 +514,7 @@ DEFINE
 TEST(hsqs_ls);
 TEST(hsqs_cat_fragment);
 TEST(hsqs_cat_datablock_and_fragment);
+TEST(hsqs_cat_size_overflow);
 TEST(hsqs_test_uid_and_gid);
 TEST(hsqs_test_xattr);
 TEST_OFF(fuzz_crash_1); // Fails since the library sets up tables
