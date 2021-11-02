@@ -84,6 +84,10 @@ hsqs_superblock_bytes_used(const struct HsqsSuperblockContext *context);
 
 struct HsqsTableContext *
 hsqs_superblock_id_table(struct HsqsSuperblockContext *context);
+struct HsqsTableContext *
+hsqs_superblock_export_table(struct HsqsSuperblockContext *context);
+struct HsqsXattrTableContext *
+hsqs_superblock_xattr_table(struct HsqsSuperblockContext *context);
 
 int hsqs_superblock_cleanup(struct HsqsSuperblockContext *superblock);
 

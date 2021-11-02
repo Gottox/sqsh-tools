@@ -167,6 +167,16 @@ hsqs_superblock_id_table(struct HsqsSuperblockContext *context) {
 	return &context->id_table;
 }
 
+struct HsqsTableContext *
+hsqs_superblock_export_table(struct HsqsSuperblockContext *context) {
+	return &context->export_table;
+}
+
+struct HsqsXattrTableContext *
+hsqs_superblock_xattr_table(struct HsqsSuperblockContext *context) {
+	return &context->xattr_table;
+}
+
 int
 hsqs_superblock_cleanup(struct HsqsSuperblockContext *superblock) {
 	hsqs_table_cleanup(&superblock->id_table);
