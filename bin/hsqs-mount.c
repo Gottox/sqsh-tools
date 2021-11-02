@@ -70,13 +70,6 @@ help(const char *arg0) {
 
 static void *
 hsqsfuse_init(struct fuse_conn_info *conn, struct fuse_config *cfg) {
-	int rv = 0;
-
-	rv = hsqs_open(&data.hsqs, options.image_path);
-	if (rv < 0) {
-		perror(options.image_path);
-	}
-
 	cfg->kernel_cache = 1;
 	return NULL;
 }
@@ -127,6 +120,123 @@ hsqsfuse_getattr(
 		goto out;
 	}
 out:
+	hsqs_inode_cleanup(&inode);
+	return rv;
+}
+
+static int
+hsqsfuse_getxattr(
+		const char *path, const char *name, char *value, size_t size) {
+	int rv = 0;
+	char *fullname;
+	const char *value_ptr = NULL;
+	size_t value_size;
+	struct HsqsInodeContext inode = {0};
+	struct HsqsXattrTableIterator iter = {0};
+
+	rv = hsqs_resolve_path(&inode, &data.hsqs.superblock, path);
+	if (rv < 0) {
+		rv = -ENOENT;
+		goto out;
+	}
+
+	rv = hsqs_inode_xattr_iterator(&inode, &iter);
+	if (rv < 0) {
+		rv = -EINVAL; // TODO: find correct error code for this.
+		goto out;
+	}
+
+	while (value_ptr == NULL &&
+		   (rv = hsqs_xattr_table_iterator_next(&iter)) > 0) {
+		rv = hsqs_xattr_table_iterator_fullname_dup(&iter, &fullname);
+		if (rv < 0) {
+			rv = -EINVAL; // TODO: find correct error code for this.
+			goto out;
+		}
+
+		if (strcmp(fullname, name) == 0) {
+			value_ptr = hsqs_xattr_table_iterator_value(&iter);
+			value_size = hsqs_xattr_table_iterator_value_size(&iter);
+		}
+		free(fullname);
+	}
+	if (rv < 0) {
+		rv = -EINVAL;
+		goto out;
+	} else if (value_ptr == NULL) {
+		rv = -ENODATA;
+		goto out;
+	} else if (value_size <= size) {
+		value_ptr = hsqs_xattr_table_iterator_value(&iter);
+		memcpy(value, value_ptr, value_size);
+	} else if (size != 0) {
+		rv = ERANGE;
+		goto out;
+	}
+
+	rv = value_size;
+out:
+	hsqs_xattr_table_iterator_cleanup(&iter);
+	hsqs_inode_cleanup(&inode);
+	return rv;
+}
+static int
+hsqsfuse_listxattr(const char *path, char *list, size_t size) {
+	int rv = 0;
+	size_t element_length, length;
+	const char *prefix, *name;
+	char *p;
+	struct HsqsInodeContext inode = {0};
+	struct HsqsXattrTableIterator iter = {0};
+	rv = hsqs_resolve_path(&inode, &data.hsqs.superblock, path);
+	if (rv < 0) {
+		rv = -ENOENT;
+		goto out;
+	}
+
+	rv = hsqs_inode_xattr_iterator(&inode, &iter);
+	if (rv < 0) {
+		rv = -EINVAL; // TODO: find correct error code for this.
+		goto out;
+	}
+
+	p = list;
+	length = 0;
+	while ((rv = hsqs_xattr_table_iterator_next(&iter)) > 0) {
+		prefix = hsqs_xattr_table_iterator_prefix(&iter);
+		if (prefix == NULL) {
+			rv = -EINVAL; // TODO: find correct error code for this.
+			goto out;
+		}
+		element_length = hsqs_xattr_table_iterator_prefix_size(&iter);
+		length += element_length;
+		if (length < size) {
+			strcpy(p, prefix);
+			p = &list[length];
+		}
+
+		name = hsqs_xattr_table_iterator_name(&iter);
+		if (name == NULL) {
+			rv = -EINVAL; // TODO: find correct error code for this.
+			goto out;
+		}
+		element_length = hsqs_xattr_table_iterator_name_size(&iter);
+		length += element_length;
+		if (length + 1 < size) {
+			strcpy(p, name);
+			p[element_length] = '\0';
+			length++;
+			p = &list[length];
+		}
+	}
+	if (rv < 0) {
+		rv = -EINVAL;
+	}
+
+	rv = length;
+
+out:
+	hsqs_xattr_table_iterator_cleanup(&iter);
 	hsqs_inode_cleanup(&inode);
 	return rv;
 }
@@ -270,6 +380,8 @@ out:
 static const struct fuse_operations hsqsfuse_operations = {
 		.init = hsqsfuse_init,
 		.getattr = hsqsfuse_getattr,
+		.getxattr = hsqsfuse_getxattr,
+		.listxattr = hsqsfuse_listxattr,
 		.readdir = hsqsfuse_readdir,
 		.open = hsqsfuse_open,
 		.read = hsqsfuse_read,
@@ -300,6 +412,11 @@ main(int argc, char *argv[]) {
 		help(argv[0]);
 		fuse_opt_add_arg(&args, "--help");
 		args.argv[0][0] = '\0';
+	}
+
+	rv = hsqs_open(&data.hsqs, options.image_path);
+	if (rv < 0) {
+		perror(options.image_path);
 	}
 
 	rv = fuse_main(args.argc, args.argv, &hsqsfuse_operations, &data);
