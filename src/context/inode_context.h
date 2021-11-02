@@ -48,6 +48,7 @@ struct HsqsSuperblockContext;
 struct HsqsInode;
 struct HsqsInodeTable;
 struct HsqsDirectoryIterator;
+struct HsqsXattrTableIterator;
 
 enum HsqsInodeContextType {
 	HSQS_INODE_TYPE_UNKNOWN = -1,
@@ -107,6 +108,9 @@ uint32_t hsqs_inode_uid(const struct HsqsInodeContext *inode);
 uint32_t hsqs_inode_gid(const struct HsqsInodeContext *inode);
 uint32_t hsqs_inode_xattr_index(const struct HsqsInodeContext *inode);
 uint32_t hsqs_inode_xattr_index(const struct HsqsInodeContext *inode);
+HSQS_NO_UNUSED int hsqs_inode_xattr_iterator(
+		const struct HsqsInodeContext *inode,
+		struct HsqsXattrTableIterator *iterator);
 
 int hsqs_inode_cleanup(struct HsqsInodeContext *inode);
 

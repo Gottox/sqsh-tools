@@ -425,6 +425,16 @@ hsqs_inode_xattr_index(const struct HsqsInodeContext *inode) {
 }
 
 int
+hsqs_inode_xattr_iterator(
+		const struct HsqsInodeContext *inode,
+		struct HsqsXattrTableIterator *iterator) {
+	struct HsqsXattrTableContext *table =
+			hsqs_superblock_xattr_table(inode->superblock);
+
+	return hsqs_xattr_table_iterator_init(iterator, table, inode);
+}
+
+int
 hsqs_inode_cleanup(struct HsqsInodeContext *inode) {
 	return hsqs_metablock_cleanup(&inode->extract);
 }
