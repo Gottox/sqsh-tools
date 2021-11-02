@@ -94,7 +94,7 @@ hsqs_file_read(struct HsqsFileContext *context, uint64_t size) {
 	} else if (rv < 0) {
 		goto out;
 	}
-	if (size > hsqs_file_size(context)) {
+	if (size > hsqs_file_size(context) && context->fragment_pos != UINT32_MAX) {
 		rv = hsqs_fragment_read(&context->fragment);
 		if (rv < 0) {
 			goto out;
