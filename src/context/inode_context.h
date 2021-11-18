@@ -88,6 +88,7 @@ hsqs_inode_hard_link_count(const struct HsqsInodeContext *inode);
 
 uint64_t hsqs_inode_file_size(const struct HsqsInodeContext *inode);
 uint16_t hsqs_inode_permission(const struct HsqsInodeContext *inode);
+uint32_t hsqs_inode_number(const struct HsqsInodeContext *inode);
 uint32_t hsqs_inode_modified_time(const struct HsqsInodeContext *inode);
 uint64_t hsqs_inode_file_blocks_start(const struct HsqsInodeContext *inode);
 // TODO: Find right datatype for index
@@ -106,6 +107,8 @@ const char *hsqs_inode_symlink(const struct HsqsInodeContext *inode);
 HSQS_NO_UNUSED int
 hsqs_inode_symlink_dup(const struct HsqsInodeContext *inode, char **namebuffer);
 uint32_t hsqs_inode_symlink_size(const struct HsqsInodeContext *inode);
+
+uint32_t hsqs_inode_device_id(const struct HsqsInodeContext *inode);
 
 uint32_t hsqs_inode_uid(const struct HsqsInodeContext *inode);
 uint32_t hsqs_inode_gid(const struct HsqsInodeContext *inode);

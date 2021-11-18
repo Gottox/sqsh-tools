@@ -88,9 +88,14 @@ hsqsfuse_getattr(
 		goto out;
 	}
 
+	stbuf->st_ino = hsqs_inode_number(&inode);
 	stbuf->st_mode = hsqs_inode_permission(&inode);
 	stbuf->st_nlink = hsqs_inode_hard_link_count(&inode);
+	stbuf->st_uid = hsqs_inode_uid(&inode);
+	stbuf->st_gid = hsqs_inode_gid(&inode);
+	stbuf->st_rdev = hsqs_inode_device_id(&inode);
 	stbuf->st_size = hsqs_inode_file_size(&inode);
+	stbuf->st_blksize = hsqs_superblock_block_size(&data.hsqs.superblock);
 	stbuf->st_mtime = stbuf->st_ctime = stbuf->st_atime =
 			hsqs_inode_modified_time(&inode);
 	switch (hsqs_inode_type(&inode)) {
@@ -170,7 +175,7 @@ hsqsfuse_getxattr(
 		value_ptr = hsqs_xattr_table_iterator_value(&iter);
 		memcpy(value, value_ptr, value_size);
 	} else if (size != 0) {
-		rv = ERANGE;
+		rv = -ERANGE;
 		goto out;
 	}
 

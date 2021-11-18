@@ -177,6 +177,11 @@ hsqs_inode_permission(const struct HsqsInodeContext *inode) {
 }
 
 uint32_t
+hsqs_inode_number(const struct HsqsInodeContext *inode) {
+	return hsqs_data_inode_number(inode->inode);
+}
+
+uint32_t
 hsqs_inode_modified_time(const struct HsqsInodeContext *inode) {
 	return hsqs_data_inode_modified_time(inode->inode);
 }
@@ -333,6 +338,24 @@ hsqs_inode_symlink_size(const struct HsqsInodeContext *inode) {
 	case HSQS_INODE_TYPE_EXTENDED_SYMLINK:
 		extended = hsqs_data_inode_symlink_ext(inode->inode);
 		return hsqs_data_inode_symlink_ext_target_size(extended);
+	}
+	return 0;
+}
+
+uint32_t
+hsqs_inode_device_id(const struct HsqsInodeContext *inode) {
+	const struct HsqsInodeDevice *basic;
+	const struct HsqsInodeDeviceExt *extended;
+
+	switch (hsqs_data_inode_type(inode->inode)) {
+	case HSQS_INODE_TYPE_BASIC_BLOCK:
+	case HSQS_INODE_TYPE_BASIC_CHAR:
+		basic = hsqs_data_inode_device(inode->inode);
+		return hsqs_data_inode_device_device(basic);
+	case HSQS_INODE_TYPE_EXTENDED_BLOCK:
+	case HSQS_INODE_TYPE_EXTENDED_CHAR:
+		extended = hsqs_data_inode_device_ext(inode->inode);
+		return hsqs_data_inode_device_ext_device(extended);
 	}
 	return 0;
 }
