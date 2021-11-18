@@ -89,7 +89,7 @@ hsqs_file_read(struct HsqsFileContext *context, uint64_t size) {
 	}
 
 	rv = hsqs_datablock_read(&context->datablock, size);
-	if (rv == HSQS_ERROR_NO_DATABLOCKS) {
+	if (rv == -HSQS_ERROR_NO_DATABLOCKS) {
 		rv = 0;
 	} else if (rv < 0) {
 		goto out;
