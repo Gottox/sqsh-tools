@@ -79,6 +79,9 @@ struct HsqsInodeDirectoryIndexIterator {
 HSQS_NO_UNUSED int hsqs_inode_load(
 		struct HsqsInodeContext *inode,
 		struct HsqsSuperblockContext *superblock, uint64_t inode_ref);
+HSQS_NO_UNUSED int hsqs_inode_load_by_inode_number(
+		struct HsqsInodeContext *inode,
+		struct HsqsSuperblockContext *superblock, uint64_t inode_number);
 
 HSQS_NO_UNUSED uint32_t
 hsqs_inode_hard_link_count(const struct HsqsInodeContext *inode);

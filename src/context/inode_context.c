@@ -376,6 +376,24 @@ hsqs_inode_load(
 	return rv;
 }
 
+int
+hsqs_inode_load_by_inode_number(
+		struct HsqsInodeContext *inode,
+		struct HsqsSuperblockContext *superblock, uint64_t inode_number) {
+	int rv = 0;
+	const uint64_t *inode_ref;
+	struct HsqsTableContext *export_table = &superblock->export_table;
+
+	if (export_table == NULL) {
+		return HSQS_ERROR_NO_EXPORT_TABLE;
+	}
+	rv = hsqs_table_get(export_table, inode_number, (const void **)&inode_ref);
+	if (rv < 0) {
+		return rv;
+	}
+	return hsqs_inode_load(inode, superblock, *inode_ref);
+}
+
 static uint32_t
 inode_get_id(const struct HsqsInodeContext *context, off_t idx) {
 	int rv = 0;
