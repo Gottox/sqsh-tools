@@ -42,21 +42,108 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <time.h>
 #include <unistd.h>
 
 static int
-ls(struct Hsqs *hsqs, const char *path, struct HsqsInodeContext *inode,
-   const bool recursive);
+print_simple(const struct HsqsDirectoryIterator *iter, const char *path);
+
+static bool recursive = false;
+static int (*print_item)(const struct HsqsDirectoryIterator *, const char *) =
+		print_simple;
+
+static int
+ls(struct Hsqs *hsqs, const char *path, struct HsqsInodeContext *inode);
 
 static int
 usage(char *arg0) {
-	printf("usage: %s [-r] FILESYSTEM [PATH]\n", arg0);
+	printf("usage: %s [-r] [-l] FILESYSTEM [PATH]\n", arg0);
 	return EXIT_FAILURE;
 }
 
 static int
-ls_item(struct Hsqs *hsqs, const char *path, struct HsqsDirectoryIterator *iter,
-		const bool recursive) {
+print_simple(const struct HsqsDirectoryIterator *iter, const char *path) {
+	puts(path);
+	return 0;
+}
+
+static int
+print_detail(const struct HsqsDirectoryIterator *iter, const char *path) {
+	int rv = 0;
+	int mode;
+	char xchar, unxchar;
+	struct HsqsInodeContext inode = {0};
+
+	rv = hsqs_directory_iterator_inode_load(iter, &inode);
+	if (rv < 0) {
+		goto out;
+	}
+	switch (hsqs_inode_type(&inode)) {
+	case HSQS_INODE_TYPE_UNKNOWN:
+		putchar('?');
+		break;
+	case HSQS_INODE_TYPE_DIRECTORY:
+		putchar('d');
+		break;
+	case HSQS_INODE_TYPE_FILE:
+		putchar('-');
+		break;
+	case HSQS_INODE_TYPE_SYMLINK:
+		putchar('l');
+		break;
+	case HSQS_INODE_TYPE_BLOCK:
+		putchar('b');
+		break;
+	case HSQS_INODE_TYPE_CHAR:
+		putchar('c');
+		break;
+	case HSQS_INODE_TYPE_FIFO:
+		putchar('p');
+		break;
+	case HSQS_INODE_TYPE_SOCKET:
+		putchar('s');
+		break;
+	}
+
+	mode = hsqs_inode_permission(&inode);
+#define PRINT_MODE(t) \
+	{ \
+		putchar((S_IR##t & mode) ? 'r' : '-'); \
+		putchar((S_IW##t & mode) ? 'w' : '-'); \
+		putchar((S_IX##t & mode) ? xchar : unxchar); \
+	}
+	xchar = (S_ISUID & mode) ? 's' : 'x';
+	unxchar = (S_ISUID & mode) ? 'S' : '-';
+	PRINT_MODE(USR);
+	xchar = (S_ISGID & mode) ? 's' : 'x';
+	unxchar = (S_ISGID & mode) ? 'S' : '-';
+	PRINT_MODE(GRP);
+	xchar = (S_ISVTX & mode) ? 't' : 'x';
+	unxchar = (S_ISVTX & mode) ? 'T' : '-';
+	PRINT_MODE(OTH);
+#undef PRINT_MODE
+
+	time_t mtime = hsqs_inode_modified_time(&inode);
+	printf(" %6i %6i %10lu %s %s", hsqs_inode_uid(&inode),
+		   hsqs_inode_gid(&inode), hsqs_inode_file_size(&inode),
+		   strtok(ctime(&mtime), "\n"), path);
+
+	if (hsqs_inode_type(&inode) == HSQS_INODE_TYPE_SYMLINK) {
+		fputs(" -> ", stdout);
+		fwrite(hsqs_inode_symlink(&inode), hsqs_inode_symlink_size(&inode),
+			   sizeof(char), stdout);
+	}
+
+	putchar('\n');
+out:
+	hsqs_inode_cleanup(&inode);
+	return rv;
+}
+
+static int
+ls_item(struct Hsqs *hsqs, const char *path,
+		struct HsqsDirectoryIterator *iter) {
 	int rv = 0;
 	struct HsqsInodeContext entry_inode = {0};
 	const char *name = hsqs_directory_iterator_name(iter);
@@ -73,14 +160,15 @@ ls_item(struct Hsqs *hsqs, const char *path, struct HsqsDirectoryIterator *iter,
 		strcat(current_path, "/");
 	}
 	strncat(current_path, name, name_size);
-	puts(current_path);
+	print_item(iter, current_path);
+
 	if (recursive &&
 		hsqs_directory_iterator_inode_type(iter) == HSQS_INODE_TYPE_DIRECTORY) {
 		rv = hsqs_directory_iterator_inode_load(iter, &entry_inode);
 		if (rv < 0) {
 			goto out;
 		}
-		rv = ls(hsqs, current_path, &entry_inode, recursive);
+		rv = ls(hsqs, current_path, &entry_inode);
 		if (rv < 0) {
 			goto out;
 		}
@@ -93,8 +181,7 @@ out:
 }
 
 static int
-ls(struct Hsqs *hsqs, const char *path, struct HsqsInodeContext *inode,
-   const bool recursive) {
+ls(struct Hsqs *hsqs, const char *path, struct HsqsInodeContext *inode) {
 	int rv;
 	struct HsqsDirectoryContext dir = {0};
 	struct HsqsDirectoryIterator iter = {0};
@@ -114,7 +201,7 @@ ls(struct Hsqs *hsqs, const char *path, struct HsqsInodeContext *inode,
 	}
 
 	while (hsqs_directory_iterator_next(&iter) > 0) {
-		rv = ls_item(hsqs, path, &iter, recursive);
+		rv = ls_item(hsqs, path, &iter);
 		if (rv < 0) {
 			rv = EXIT_FAILURE;
 			goto out;
@@ -128,53 +215,80 @@ out:
 	return rv;
 }
 
+static int
+ls_path(struct Hsqs *hsqs, char *path) {
+	struct HsqsInodeContext inode = {0};
+	int rv = 0;
+
+	rv = hsqs_resolve_path(&inode, &hsqs->superblock, path);
+	if (rv < 0) {
+		hsqs_perror(rv, path);
+		rv = EXIT_FAILURE;
+		goto out;
+	}
+
+	rv = ls(hsqs, NULL, &inode);
+	if (rv < 0) {
+		hsqs_perror(rv, path);
+		rv = EXIT_FAILURE;
+		goto out;
+	}
+out:
+	hsqs_inode_cleanup(&inode);
+	return rv;
+}
+
 int
 main(int argc, char *argv[]) {
+	bool has_listed = false;
 	int rv = 0;
 	int opt = 0;
-	bool recursive = false;
-	const char *inner_path = "";
-	const char *outer_path;
-	struct HsqsInodeContext inode = {0};
+	const char *image_path;
 	struct Hsqs hsqs = {0};
 
-	while ((opt = getopt(argc, argv, "rh")) != -1) {
+	while ((opt = getopt(argc, argv, "rhl")) != -1) {
 		switch (opt) {
 		case 'r':
 			recursive = true;
+			break;
+		case 'l':
+			print_item = print_detail;
 			break;
 		default:
 			return usage(argv[0]);
 		}
 	}
 
-	if (optind + 2 == argc) {
-		inner_path = argv[optind + 1];
-	} else if (optind + 1 != argc) {
+	if (optind >= argc) {
 		return usage(argv[0]);
 	}
-	outer_path = argv[optind];
 
-	rv = hsqs_open(&hsqs, outer_path);
+	image_path = argv[optind];
+	optind++;
+
+	rv = hsqs_open(&hsqs, image_path);
 	if (rv < 0) {
-		hsqs_perror(rv, outer_path);
+		hsqs_perror(rv, image_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	rv = hsqs_resolve_path(&inode, &hsqs.superblock, inner_path);
-	if (rv < 0) {
-		hsqs_perror(rv, inner_path);
-		rv = EXIT_FAILURE;
-		goto out;
+	for (; optind < argc; optind++) {
+		has_listed = true;
+		rv = ls_path(&hsqs, argv[optind]);
+		if (rv < 0) {
+			goto out;
+		}
 	}
 
-	rv = ls(&hsqs, NULL, &inode, recursive);
+	if (has_listed == false) {
+		rv = ls_path(&hsqs, "");
+		if (rv < 0) {
+			goto out;
+		}
+	}
 
 out:
-	hsqs_inode_cleanup(&inode);
-
 	hsqs_cleanup(&hsqs);
-
 	return rv;
 }
