@@ -47,18 +47,50 @@
 
 static int
 usage(char *arg0) {
-	printf("usage: %s FILESYSTEM [PATH]\n", arg0);
+	printf("usage: %s FILESYSTEM PATH [PATH ...]\n", arg0);
 	return EXIT_FAILURE;
+}
+
+static int
+cat_path(struct Hsqs *hsqs, char *path) {
+	struct HsqsInodeContext inode = {0};
+	struct HsqsFileContext file = {0};
+
+	int rv = 0;
+	rv = hsqs_resolve_path(&inode, &hsqs->superblock, path);
+	if (rv < 0) {
+		hsqs_perror(rv, path);
+		rv = EXIT_FAILURE;
+		goto out;
+	}
+
+	rv = hsqs_file_init(&file, &inode);
+	if (rv < 0) {
+		hsqs_perror(rv, path);
+		rv = EXIT_FAILURE;
+		goto out;
+	}
+
+	rv = hsqs_file_read(&file, hsqs_inode_file_size(&inode));
+	if (rv < 0) {
+		hsqs_perror(rv, path);
+		rv = EXIT_FAILURE;
+		goto out;
+	}
+
+	fwrite(hsqs_file_data(&file), sizeof(uint8_t), hsqs_file_size(&file),
+		   stdout);
+out:
+	hsqs_file_cleanup(&file);
+	hsqs_inode_cleanup(&inode);
+	return rv;
 }
 
 int
 main(int argc, char *argv[]) {
 	int rv = 0;
 	int opt = 0;
-	const char *inner_path = "";
-	const char *outer_path;
-	struct HsqsInodeContext inode = {0};
-	struct HsqsFileContext file = {0};
+	const char *image_path;
 	struct Hsqs hsqs = {0};
 
 	while ((opt = getopt(argc, argv, "h")) != -1) {
@@ -68,49 +100,28 @@ main(int argc, char *argv[]) {
 		}
 	}
 
-	if (optind + 2 == argc) {
-		inner_path = argv[optind + 1];
-	} else if (optind + 1 != argc) {
+	if (optind + 1 >= argc) {
 		return usage(argv[0]);
 	}
-	outer_path = argv[optind];
 
-	rv = hsqs_open(&hsqs, outer_path);
+	image_path = argv[optind];
+	optind++;
+
+	rv = hsqs_open(&hsqs, image_path);
 	if (rv < 0) {
-		hsqs_perror(rv, outer_path);
+		hsqs_perror(rv, image_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	rv = hsqs_resolve_path(&inode, &hsqs.superblock, inner_path);
-	if (rv < 0) {
-		hsqs_perror(rv, inner_path);
-		rv = EXIT_FAILURE;
-		goto out;
+	for (; optind < argc; optind++) {
+		rv = cat_path(&hsqs, argv[optind]);
+		if (rv < 0) {
+			goto out;
+		}
 	}
-
-	rv = hsqs_file_init(&file, &inode);
-	if (rv < 0) {
-		hsqs_perror(rv, inner_path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-	rv = hsqs_file_read(&file, hsqs_inode_file_size(&inode));
-	if (rv < 0) {
-		hsqs_perror(rv, inner_path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-	fwrite(hsqs_file_data(&file), sizeof(uint8_t), hsqs_file_size(&file),
-		   stdout);
 
 out:
-	hsqs_file_cleanup(&file);
-	hsqs_inode_cleanup(&inode);
-
 	hsqs_cleanup(&hsqs);
-
 	return rv;
 }
