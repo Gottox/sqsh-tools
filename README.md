@@ -18,9 +18,10 @@ WIP Status:
 * [x] datablock resolution
 * [x] fragment resolution
 * [x] xattr support
-* [ ] export
+* [x] export
 * [ ] frontend api
 * [ ] better fragment support
+* [ ] caching system
 
 # Resource
 
