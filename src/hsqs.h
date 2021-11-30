@@ -33,6 +33,7 @@
  */
 
 #include "context/superblock_context.h"
+#include "mapper/mapper.h"
 #include "error.h"
 #include "utils.h"
 
@@ -43,23 +44,14 @@
 
 #define HSQS_H
 
-enum HsqsDtor {
-	HSQS_DTOR_NONE,
-	HSQS_DTOR_FREE,
-	HSQS_DTOR_MUNMAP,
-};
-
 struct Hsqs {
 	uint32_t error;
+	struct HsqsMapper mapper;
 	struct HsqsSuperblockContext superblock;
-	int size;
-	uint8_t *buffer;
-	enum HsqsDtor dtor;
 };
 
 HSQS_NO_UNUSED int hsqs_init(
-		struct Hsqs *hsqs, uint8_t *buffer, const size_t size,
-		const enum HsqsDtor dtor);
+		struct Hsqs *hsqs, uint8_t *buffer, const size_t size);
 
 HSQS_NO_UNUSED int hsqs_open(struct Hsqs *hsqs, const char *path);
 

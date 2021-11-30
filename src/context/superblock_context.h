@@ -34,6 +34,7 @@
  */
 
 #include "../utils.h"
+#include "../mapper/mapper.h"
 #include "table_context.h"
 #include "xattr_table_context.h"
 #include <stdbool.h>
@@ -47,14 +48,14 @@ struct HsqsSuperblock;
 
 struct HsqsSuperblockContext {
 	const struct HsqsSuperblock *superblock;
+	struct HsqsMapperMap map;
 	struct HsqsTableContext id_table;
 	struct HsqsTableContext export_table;
 	struct HsqsXattrTableContext xattr_table;
 };
 
 HSQS_NO_UNUSED int hsqs_superblock_init(
-		struct HsqsSuperblockContext *context, const uint8_t *buffer,
-		size_t size);
+		struct HsqsSuperblockContext *context, struct HsqsMapper *mapper);
 
 const void *hsqs_superblock_data_from_offset(
 		const struct HsqsSuperblockContext *context, uint64_t offset);

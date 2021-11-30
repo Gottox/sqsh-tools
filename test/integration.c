@@ -33,6 +33,7 @@
  */
 
 #include "../gen/squash_image.h"
+#include "../src/mapper/mapper.h"
 #include "../src/context/content_context.h"
 #include "../src/context/directory_context.h"
 #include "../src/context/inode_context.h"
@@ -45,15 +46,42 @@
 #include "test.h"
 #include <stdint.h>
 
+static int
+init_squash(
+		struct HsqsMapper *mapper,
+		struct HsqsSuperblockContext *superblock, const uint8_t *image,
+		size_t size) {
+	int rv = 0;
+	rv = hsqs_mapper_init_static(mapper, image, size);
+	if (rv < 0) {
+		return rv;
+	}
+	rv = hsqs_superblock_init(superblock, mapper);
+	if (rv < 0) {
+		return rv;
+	}
+	return rv;
+}
+
+static void
+hsqs_empty() {
+	int rv;
+	struct HsqsSuperblockContext superblock = {0};
+	struct HsqsMapper mapper = {0};
+	rv = init_squash(&mapper, &superblock, NULL, 0);
+	assert(rv == -HSQS_ERROR_SUPERBLOCK_TOO_SMALL);
+}
+
 static void
 hsqs_ls() {
 	int rv;
 	char *name;
 	struct HsqsSuperblockContext superblock = {0};
+	struct HsqsMapper mapper = {0};
 	struct HsqsInodeContext inode = {0};
 	struct HsqsDirectoryContext dir = {0};
 	struct HsqsDirectoryIterator iter = {0};
-	rv = hsqs_superblock_init(&superblock, squash_image, sizeof(squash_image));
+	rv = init_squash(&mapper, &superblock, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
 	rv = hsqs_inode_load(
@@ -106,7 +134,8 @@ hsqs_cat_fragment() {
 	struct HsqsSuperblockContext superblock = {0};
 	struct HsqsInodeContext inode = {0};
 	struct HsqsFileContext file = {0};
-	rv = hsqs_superblock_init(&superblock, squash_image, sizeof(squash_image));
+	struct HsqsMapper mapper = {0};
+	rv = init_squash(&mapper, &superblock, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
 	rv = hsqs_resolve_path(&inode, &superblock, "a");
@@ -142,7 +171,8 @@ hsqs_cat_datablock_and_fragment() {
 	struct HsqsSuperblockContext superblock = {0};
 	struct HsqsInodeContext inode = {0};
 	struct HsqsFileContext file = {0};
-	rv = hsqs_superblock_init(&superblock, squash_image, sizeof(squash_image));
+	struct HsqsMapper mapper = {0};
+	rv = init_squash(&mapper, &superblock, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
 	rv = hsqs_resolve_path(&inode, &superblock, "b");
@@ -180,7 +210,8 @@ hsqs_cat_size_overflow() {
 	struct HsqsSuperblockContext superblock = {0};
 	struct HsqsInodeContext inode = {0};
 	struct HsqsFileContext file = {0};
-	rv = hsqs_superblock_init(&superblock, squash_image, sizeof(squash_image));
+	struct HsqsMapper mapper = {0};
+	rv = init_squash(&mapper, &superblock, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
 	rv = hsqs_resolve_path(&inode, &superblock, "b");
@@ -217,7 +248,8 @@ hsqs_test_uid_and_gid() {
 	uint32_t uid, gid;
 	struct HsqsSuperblockContext superblock = {0};
 	struct HsqsInodeContext inode = {0};
-	rv = hsqs_superblock_init(&superblock, squash_image, sizeof(squash_image));
+	struct HsqsMapper mapper = {0};
+	rv = init_squash(&mapper, &superblock, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
 	rv = hsqs_inode_load(
@@ -242,12 +274,13 @@ hsqs_test_xattr() {
 	int rv;
 	char *name, *value;
 	struct HsqsSuperblockContext superblock = {0};
+	struct HsqsMapper mapper = {0};
 	struct HsqsInodeContext inode = {0};
 	struct HsqsInodeContext entry_inode = {0};
 	struct HsqsDirectoryContext dir = {0};
 	struct HsqsDirectoryIterator dir_iter = {0};
 	struct HsqsXattrTableIterator xattr_iter = {0};
-	rv = hsqs_superblock_init(&superblock, squash_image, sizeof(squash_image));
+	rv = init_squash(&mapper, &superblock, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
 	rv = hsqs_inode_load(
@@ -368,8 +401,9 @@ fuzz_crash_1() {
 			0x62, 0x62, 0x29, 0x62, 0x62, 0x62, 0x62, 0xff, 0xff, 0x62, 0x62};
 
 	struct HsqsSuperblockContext superblock = {0};
+	struct HsqsMapper mapper = {0};
 	struct HsqsInodeContext inode = {0};
-	rv = hsqs_superblock_init(&superblock, input, sizeof(input));
+	rv = init_squash(&mapper, &superblock, input, sizeof(input));
 	assert(rv == 0);
 
 	rv = hsqs_resolve_path(&inode, &superblock, "");
@@ -399,8 +433,9 @@ fuzz_crash_2() {
 	};
 
 	struct HsqsSuperblockContext superblock = {0};
+	struct HsqsMapper mapper = {0};
 	struct HsqsInodeContext inode = {0};
-	rv = hsqs_superblock_init(&superblock, input, sizeof(input));
+	rv = init_squash(&mapper, &superblock, input, sizeof(input));
 	assert(rv == 0);
 
 	rv = hsqs_resolve_path(&inode, &superblock, "");
@@ -431,8 +466,9 @@ fuzz_crash_3() {
 	};
 
 	struct HsqsSuperblockContext superblock = {0};
+	struct HsqsMapper mapper = {0};
 	struct HsqsInodeContext inode = {0};
-	rv = hsqs_superblock_init(&superblock, input, sizeof(input));
+	rv = init_squash(&mapper, &superblock, input, sizeof(input));
 	assert(rv == 0);
 
 	rv = hsqs_resolve_path(&inode, &superblock, "");
@@ -474,7 +510,8 @@ fuzz_crash_4() {
 	};
 
 	struct HsqsSuperblockContext superblock = {0};
-	rv = hsqs_superblock_init(&superblock, input, sizeof(input));
+	struct HsqsMapper mapper = {0};
+	rv = init_squash(&mapper, &superblock, input, sizeof(input));
 	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
 }
 
@@ -506,11 +543,13 @@ fuzz_crash_5() {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4f, 0x00, 0x00, 0x00};
 
 	struct HsqsSuperblockContext superblock = {0};
-	rv = hsqs_superblock_init(&superblock, input, sizeof(input));
+	struct HsqsMapper mapper = {0};
+	rv = init_squash(&mapper, &superblock, input, sizeof(input));
 	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
 }
 
 DEFINE
+TEST(hsqs_empty);
 TEST(hsqs_ls);
 TEST(hsqs_cat_fragment);
 TEST(hsqs_cat_datablock_and_fragment);

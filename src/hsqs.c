@@ -44,18 +44,18 @@
 #include "hsqs.h"
 
 int
-hsqs_init(
-		struct Hsqs *hsqs, uint8_t *buffer, const size_t size,
-		const enum HsqsDtor dtor) {
+hsqs_init(struct Hsqs *hsqs, uint8_t *buffer, const size_t size) {
 	int rv = 0;
 
-	rv = hsqs_superblock_init(&hsqs->superblock, buffer, size);
+	rv = hsqs_mapper_init_static(&hsqs->mapper, buffer, size);
 	if (rv < 0) {
 		return rv;
 	}
 
-	hsqs->size = size;
-	hsqs->dtor = dtor;
+	rv = hsqs_superblock_init(&hsqs->superblock, &hsqs->mapper);
+	if (rv < 0) {
+		return rv;
+	}
 
 	return rv;
 }
@@ -63,46 +63,17 @@ hsqs_init(
 int
 hsqs_open(struct Hsqs *hsqs, const char *path) {
 	int rv = 0;
-	int fd = -1;
-	uint8_t *file_map = MAP_FAILED;
-	struct stat st = {0};
 
-	fd = open(path, 0);
-	if (fd < 0) {
-		rv = -errno;
-		goto err;
-	}
-
-	if (fstat(fd, &st) < 0) {
-		rv = -errno;
-		goto err;
-	}
-
-	file_map = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-	if (file_map == MAP_FAILED) {
-		rv = -errno;
-		goto err;
-	}
-
-	// mmap outlives the file descriptor, so we can close it now.
-	close(fd);
-	fd = -1;
-
-	rv = hsqs_init(hsqs, file_map, st.st_size, HSQS_DTOR_MUNMAP);
+	rv = hsqs_mapper_init_mmap(&hsqs->mapper, path);
 	if (rv < 0) {
-		goto err;
-	}
-	hsqs->buffer = file_map;
-
-	return rv;
-err:
-	if (fd >= 0) {
-		close(fd);
+		return rv;
 	}
 
-	if (file_map != MAP_FAILED) {
-		munmap(file_map, st.st_size);
+	rv = hsqs_superblock_init(&hsqs->superblock, &hsqs->mapper);
+	if (rv < 0) {
+		return rv;
 	}
+
 	return rv;
 }
 
@@ -110,18 +81,8 @@ int
 hsqs_cleanup(struct Hsqs *hsqs) {
 	int rv = 0;
 
+	hsqs_mapper_cleanup(&hsqs->mapper);
 	hsqs_superblock_cleanup(&hsqs->superblock);
 
-	switch (hsqs->dtor) {
-	case HSQS_DTOR_FREE:
-		free(hsqs->buffer);
-		break;
-	case HSQS_DTOR_MUNMAP:
-		rv |= munmap(hsqs->buffer, hsqs->size);
-		break;
-	case HSQS_DTOR_NONE:
-		// noop
-		break;
-	}
 	return rv;
 }

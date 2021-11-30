@@ -7,9 +7,9 @@ include config.mk
 HDR = \
 	src/compression/buffer.h \
 	src/compression/compression.h \
+	src/context/content_context.h \
 	src/context/datablock_context.h \
 	src/context/directory_context.h \
-	src/context/content_context.h \
 	src/context/fragment_context.h \
 	src/context/inode_context.h \
 	src/context/metablock_context.h \
@@ -33,8 +33,11 @@ HDR = \
 	src/data/xattr.h \
 	src/data/xattr_internal.h \
 	src/error.h \
-	src/resolve_path.h \
 	src/hsqs.h \
+	src/mapper/mapper.h \
+	src/mapper/mmap_complete.h \
+	src/mapper/static_memory.h \
+	src/resolve_path.h \
 	src/utils.h \
 	src/utils/lru_hashmap.h \
 
@@ -61,6 +64,9 @@ SRC = \
 	src/error.c \
 	src/resolve_path.c \
 	src/hsqs.c \
+	src/mapper/mapper.c \
+	src/mapper/mmap_complete.c \
+	src/mapper/static_memory.c \
 	src/utils.c \
 	src/utils/lru_hashmap.c \
 

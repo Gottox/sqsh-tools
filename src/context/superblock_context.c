@@ -43,14 +43,14 @@ const static uint64_t NO_SEGMENT = 0xFFFFFFFFFFFFFFFF;
 
 int
 hsqs_superblock_init(
-		struct HsqsSuperblockContext *context, const uint8_t *buffer,
-		size_t size) {
+		struct HsqsSuperblockContext *context, struct HsqsMapper *mapper) {
 	int rv = 0;
-	const struct HsqsSuperblock *superblock =
-			(const struct HsqsSuperblock *)buffer;
-	if (size < HSQS_SIZEOF_SUPERBLOCK) {
+	rv = hsqs_mapper_map(&context->map, mapper, 0, HSQS_SIZEOF_SUPERBLOCK);
+	if (rv < 0) {
 		return -HSQS_ERROR_SUPERBLOCK_TOO_SMALL;
 	}
+	const struct HsqsSuperblock *superblock =
+			(const struct HsqsSuperblock *)context->map.data;
 
 	// Do not use the getter here as it may change the endianess. We don't want
 	// that here.
@@ -63,7 +63,7 @@ hsqs_superblock_init(
 		return -HSQS_ERROR_BLOCKSIZE_MISSMATCH;
 	}
 
-	if (hsqs_data_superblock_bytes_used(superblock) > size) {
+	if (hsqs_data_superblock_bytes_used(superblock) > hsqs_mapper_size(mapper)) {
 		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
 

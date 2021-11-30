@@ -38,7 +38,7 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 	struct HsqsInodeContext inode = {0};
 	struct HsqsDirectoryContext dir = {0};
 	struct HsqsDirectoryIterator iter = {0};
-	rv = hsqs_init(&hsqs, (uint8_t *)data, size, HSQS_DTOR_NONE);
+	rv = hsqs_init(&hsqs, (uint8_t *)data, size);
 	if (rv < 0) {
 		goto out;
 	}
