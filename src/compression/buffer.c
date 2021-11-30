@@ -130,9 +130,9 @@ hsqs_buffer_init(
 
 	if (hsqs_data_superblock_flags(superblock->superblock) &
 		HSQS_SUPERBLOCK_COMPRESSOR_OPTIONS) {
-		// TODO: manually calculating the offset does not honour bounds checks
-		const struct HsqsMetablock *metablock = (const struct HsqsMetablock *)&(
-				(const uint8_t *)superblock)[sizeof(struct HsqsSuperblock)];
+		const struct HsqsMetablock *metablock =
+				(const struct HsqsMetablock *)hsqs_superblock_data_from_offset(
+						superblock, sizeof(struct HsqsSuperblock));
 		buffer->options =
 				(const union HsqsCompressionOptions *)hsqs_data_metablock_data(
 						metablock);
