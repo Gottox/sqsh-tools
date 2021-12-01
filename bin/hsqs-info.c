@@ -102,11 +102,11 @@ metablock_info(const struct HsqsMetablock *metablock, struct Hsqs *hsqs) {
 static int
 compression_info_gzip(struct Hsqs *hsqs) {
 	int rv = 0;
-	// TODO: use metablock context instead of compression here. this block is
-	// never compressed.
-	struct HsqsBuffer buffer = {0};
-	rv = hsqs_buffer_init(&buffer, &hsqs->superblock, 8192);
-	const struct HsqsCompressionOptionsGzip *options = &buffer.options->gzip;
+	const struct HsqsCompressionOptionsContext *options_context =
+			hsqs_superblock_compression_options(&hsqs->superblock);
+	const struct HsqsCompressionOptionsGzip *options = options_context
+			? &hsqs_compression_options(options_context)->gzip
+			: NULL;
 
 	KEY("COMPRESSION_LEVEL");
 	fprintf(out, "%i\n", options->compression_level);
@@ -115,7 +115,6 @@ compression_info_gzip(struct Hsqs *hsqs) {
 	KEY("STRATEGIES");
 	printb(options->strategies, out);
 
-	rv = hsqs_buffer_cleanup(&buffer);
 	return rv;
 }
 
