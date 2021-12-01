@@ -45,20 +45,20 @@
 
 static int
 hsqs_gzip_extract(
-		const union HsqsCompressionOptions *options, uint8_t *target,
-		size_t *target_size, const uint8_t *compressed,
+		const union HsqsCompressionOptions *options, size_t options_size,
+		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
+	if (options != NULL &&
+		options_size != HSQS_SIZEOF_COMPRESSION_OPTIONS_GZIP) {
+		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
+	}
+
 	int rv = uncompress(target, target_size, compressed, compressed_size);
 
 	if (rv != Z_OK) {
 		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
 	}
 	return rv;
-}
-
-int
-hsqs_gzip_cleanup(union HsqsCompressionOptions *options) {
-	return 0;
 }
 
 const struct HsqsCompressionImplementation hsqs_compression_gzip = {

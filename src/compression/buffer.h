@@ -45,7 +45,7 @@
 struct HsqsSuperblockContext;
 
 struct HsqsBuffer {
-	const union HsqsCompressionOptions *options;
+	const struct HsqsSuperblockContext *superblock;
 	const struct HsqsCompressionImplementation *impl;
 	int block_size;
 	uint8_t *data;

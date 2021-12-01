@@ -7,6 +7,7 @@ include config.mk
 HDR = \
 	src/compression/buffer.h \
 	src/compression/compression.h \
+	src/context/compression_options_context.h \
 	src/context/content_context.h \
 	src/context/datablock_context.h \
 	src/context/directory_context.h \
@@ -34,7 +35,8 @@ HDR = \
 	src/data/xattr_internal.h \
 	src/error.h \
 	src/hsqs.h \
-	src/mapper/mapper.h \
+	src/mapper/memory_mapper.h \
+	src/mapper/mmap.h \
 	src/mapper/mmap_complete.h \
 	src/mapper/static_memory.h \
 	src/resolve_path.h \
@@ -44,9 +46,10 @@ HDR = \
 SRC = \
 	src/compression/buffer.c \
 	src/compression/null.c \
+	src/context/compression_options_context.c \
+	src/context/content_context.c \
 	src/context/datablock_context.c \
 	src/context/directory_context.c \
-	src/context/content_context.c \
 	src/context/fragment_context.c \
 	src/context/inode_context.c \
 	src/context/metablock_context.c \
@@ -62,11 +65,12 @@ SRC = \
 	src/data/superblock.c \
 	src/data/xattr.c \
 	src/error.c \
-	src/resolve_path.c \
 	src/hsqs.c \
-	src/mapper/mapper.c \
+	src/mapper/memory_mapper.c \
+	src/mapper/mmap.c \
 	src/mapper/mmap_complete.c \
 	src/mapper/static_memory.c \
+	src/resolve_path.c \
 	src/utils.c \
 	src/utils/lru_hashmap.c \
 
@@ -77,8 +81,8 @@ OBJ = $(SRC:.c=.o)
 BIN = \
 	bin/hsqs-cat \
 	bin/hsqs-ls \
-	bin/hsqs-info \
 	bin/hsqs-mount \
+	bin/hsqs-info \
 
 TST = \
 	test/utils/lru_hashmap.c \
@@ -182,7 +186,7 @@ doc: doxygen.conf $(TST) $(SRC) $(HDR) README.md
 	@doxygen $<
 
 coverage: check
-	@mkdir cov
+	@mkdir -p cov
 	@gcovr -r . --html --html-details -o cov/index.html
 
 gen/squash_image.squashfs:
@@ -192,7 +196,7 @@ gen/squash_image.squashfs:
 	setfattr -n user.foo -v 1234567891234567891234567890001234567890 $@_dir/a
 	setfattr -n user.bar -v 1234567891234567891234567890001234567890 $@_dir/b
 	rm -f $@
-	mksquashfs $@_dir $@ -noI -noId -noD -noF -noX -nopad -force-uid 2020 -force-gid 202020
+	mksquashfs $@_dir $@ -nopad -force-uid 2020 -force-gid 202020 -Xcompression-level 1 -always-use-fragments
 	rm -r $@_dir
 
 gen/squash_image.h: gen/squash_image.squashfs

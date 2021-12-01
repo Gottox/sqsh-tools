@@ -7,18 +7,18 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#ifndef MMAP_COMPLETE_H
+#ifndef MMAP_H
 
-#define MMAP_COMPLETE_H
+#define MMAP_H
 
-struct HsqsMapperMmapComplete {
+struct HsqsMapperMmap {
+	int fd;
+	size_t size;
+};
+
+struct HsqsMapMmap {
 	uint8_t *data;
 	size_t size;
 };
 
-struct HsqsMapMmapComplete {
-	uint8_t *data;
-	size_t size;
-};
-
-#endif /* end of include guard MMAP_COMPLETE_H */
+#endif /* end of include guard MMAP_H */

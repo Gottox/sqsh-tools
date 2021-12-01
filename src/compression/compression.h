@@ -43,8 +43,8 @@ union HsqsCompressionOptions;
 
 struct HsqsCompressionImplementation {
 	int (*extract)(
-			const union HsqsCompressionOptions *options, uint8_t *target,
-			size_t *target_size, const uint8_t *compressed,
+			const union HsqsCompressionOptions *options, size_t options_size,
+			uint8_t *target, size_t *target_size, const uint8_t *compressed,
 			const size_t compressed_size);
 };
 

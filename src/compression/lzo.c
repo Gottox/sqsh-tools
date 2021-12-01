@@ -46,20 +46,20 @@
 
 static int
 hsqs_lzo_extract(
-		const union HsqsCompressionOptions *options, uint8_t *target,
-		size_t *target_size, const uint8_t *compressed,
+		const union HsqsCompressionOptions *options, size_t options_size,
+		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
+	if (options != NULL &&
+		options_size != HSQS_SIZEOF_COMPRESSION_OPTIONS_LZO) {
+		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
+	}
+
 	int rv = lzo1x_decompress_safe(
 			compressed, compressed_size, target, target_size, NULL);
 
 	if (rv != LZO_E_OK) {
 		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
 	}
-	return 0;
-}
-
-int
-hsqs_lzo_cleanup(union HsqsCompressionOptions *options) {
 	return 0;
 }
 

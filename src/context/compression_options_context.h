@@ -28,40 +28,33 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : lz4
- * @created     : Sunday Sep 05, 2021 11:09:51 CEST
+ * @file        : compression_option_context
+ * @created     : Tuesday Nov 30, 2021 15:21:20 CET
  */
 
-#include <lz4.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
+#include "../utils.h"
+#include "metablock_context.h"
 
-#include "../data/compression_options.h"
-#include "../error.h"
-#include "compression.h"
+#ifndef COMPRESSION_OPTIONS_CONTEXT_H
 
-static int
-hsqs_lz4_extract(
-		const union HsqsCompressionOptions *options, size_t options_size,
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size) {
-	if (options != NULL &&
-		options_size != HSQS_SIZEOF_COMPRESSION_OPTIONS_LZ4) {
-		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
-	}
+#define COMPRESSION_OPTIONS_CONTEXT_H
 
-	int rv = LZ4_decompress_safe(
-			(char *)compressed, (char *)target, compressed_size, *target_size);
-	if (rv < 0) {
-		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
-	}
-	*target_size = rv;
+union HsqsCompressionOptions;
 
-	return 0;
-}
-
-const struct HsqsCompressionImplementation hsqs_compression_lz4 = {
-		.extract = hsqs_lz4_extract,
+struct HsqsCompressionOptionsContext {
+	struct HsqsMetablockContext metablock;
 };
+
+HSQS_NO_UNUSED int hsqs_compression_options_init(
+		struct HsqsCompressionOptionsContext *context,
+		struct HsqsSuperblockContext *superblock);
+
+const union HsqsCompressionOptions *
+hsqs_compression_options(const struct HsqsCompressionOptionsContext *context);
+size_t hsqs_compression_options_size(
+		const struct HsqsCompressionOptionsContext *context);
+
+int
+hsqs_compression_options_cleanup(struct HsqsCompressionOptionsContext *context);
+
+#endif /* end of include guard COMPRESSION_OPTIONS_CONTEXT_H */

@@ -50,6 +50,9 @@ struct HsqsFileContext {
 HSQS_NO_UNUSED int hsqs_file_init(
 		struct HsqsFileContext *context, const struct HsqsInodeContext *inode);
 
+bool hsqs_file_has_datablock(struct HsqsFileContext *context);
+bool hsqs_file_has_fragment(struct HsqsFileContext *context);
+
 HSQS_NO_UNUSED int
 hsqs_file_seek(struct HsqsFileContext *context, uint64_t seek_pos);
 

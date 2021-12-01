@@ -33,8 +33,8 @@
  */
 
 #include "context/superblock_context.h"
-#include "mapper/mapper.h"
 #include "error.h"
+#include "mapper/memory_mapper.h"
 #include "utils.h"
 
 #include <stdint.h>
@@ -46,12 +46,12 @@
 
 struct Hsqs {
 	uint32_t error;
-	struct HsqsMapper mapper;
+	struct HsqsMemoryMapper mapper;
 	struct HsqsSuperblockContext superblock;
 };
 
-HSQS_NO_UNUSED int hsqs_init(
-		struct Hsqs *hsqs, uint8_t *buffer, const size_t size);
+HSQS_NO_UNUSED int
+hsqs_init(struct Hsqs *hsqs, uint8_t *buffer, const size_t size);
 
 HSQS_NO_UNUSED int hsqs_open(struct Hsqs *hsqs, const char *path);
 

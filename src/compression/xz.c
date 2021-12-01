@@ -45,13 +45,16 @@
 
 static int
 hsqs_xz_extract(
-		const union HsqsCompressionOptions *options, uint8_t *target,
-		size_t *target_size, const uint8_t *compressed,
+		const union HsqsCompressionOptions *options, size_t options_size,
+		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	int rv = 0;
 	size_t compressed_pos = 0;
 	size_t target_pos = 0;
 	uint64_t memlimit = UINT64_MAX;
+	if (options != NULL && options_size != HSQS_SIZEOF_COMPRESSION_OPTIONS_XZ) {
+		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
+	}
 
 	rv = lzma_stream_buffer_decode(
 			&memlimit, 0, NULL, compressed, &compressed_pos, compressed_size,

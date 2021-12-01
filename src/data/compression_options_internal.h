@@ -32,6 +32,7 @@
  * @created     : Friday Sep 17, 2021 11:02:51 CEST
  */
 
+#include "../utils.h"
 #include "compression_options.h"
 
 #ifndef COMPRESSION_OPTIONS_INTERNAL_H
@@ -43,25 +44,40 @@ struct HsqsCompressionOptionsGzip {
 	uint16_t window_size;
 	uint16_t strategies;
 };
+STATIC_ASSERT(
+		sizeof(struct HsqsCompressionOptionsGzip) ==
+		HSQS_SIZEOF_COMPRESSION_OPTIONS_GZIP);
 
 struct HsqsCompressionOptionsXz {
 	uint32_t dictionary_size;
 	uint32_t filters;
 };
+STATIC_ASSERT(
+		sizeof(struct HsqsCompressionOptionsXz) ==
+		HSQS_SIZEOF_COMPRESSION_OPTIONS_XZ);
 
 struct HsqsCompressionOptionsLz4 {
 	uint32_t version;
 	uint32_t flags;
 };
+STATIC_ASSERT(
+		sizeof(struct HsqsCompressionOptionsLz4) ==
+		HSQS_SIZEOF_COMPRESSION_OPTIONS_LZ4);
 
 struct HsqsCompressionOptionsZstd {
 	uint32_t compression_level;
 };
+STATIC_ASSERT(
+		sizeof(struct HsqsCompressionOptionsZstd) ==
+		HSQS_SIZEOF_COMPRESSION_OPTIONS_ZSTD);
 
 struct HsqsCompressionOptionsLzo {
 	uint32_t algorithm;
 	uint32_t compression_level;
 };
+STATIC_ASSERT(
+		sizeof(struct HsqsCompressionOptionsLzo) ==
+		HSQS_SIZEOF_COMPRESSION_OPTIONS_LZO);
 
 union HsqsCompressionOptions {
 	struct HsqsCompressionOptionsGzip gzip;

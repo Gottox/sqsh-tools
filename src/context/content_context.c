@@ -62,6 +62,17 @@ hsqs_file_init(
 	return hsqs_file_seek(context, 0);
 }
 
+bool
+hsqs_file_has_datablock(struct HsqsFileContext *context) {
+	return context->datablock.blocks_count != 0;
+}
+
+bool
+hsqs_file_has_fragment(struct HsqsFileContext *context) {
+	return hsqs_inode_file_fragment_block_index(context->fragment.inode) !=
+			HSQS_INODE_NO_FRAGMENT;
+}
+
 int
 hsqs_file_seek(struct HsqsFileContext *context, uint64_t seek_pos) {
 	int rv;
@@ -84,7 +95,7 @@ int
 hsqs_file_read(struct HsqsFileContext *context, uint64_t size) {
 	int rv = 0;
 
-	if (context->fragment_pos != UINT32_MAX) {
+	if (!hsqs_file_has_datablock(context) && hsqs_file_has_fragment(context)) {
 		return hsqs_fragment_read(&context->fragment);
 	}
 
@@ -94,7 +105,8 @@ hsqs_file_read(struct HsqsFileContext *context, uint64_t size) {
 	} else if (rv < 0) {
 		goto out;
 	}
-	if (size > hsqs_file_size(context) && context->fragment_pos != UINT32_MAX) {
+
+	if (hsqs_file_has_fragment(context)) {
 		rv = hsqs_fragment_read(&context->fragment);
 		if (rv < 0) {
 			goto out;

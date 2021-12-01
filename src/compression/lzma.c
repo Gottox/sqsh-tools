@@ -45,9 +45,14 @@
 
 static int
 hsqs_lzma_extract(
-		const union HsqsCompressionOptions *options, uint8_t *target,
-		size_t *target_size, const uint8_t *compressed,
+		const union HsqsCompressionOptions *options, size_t options_size,
+		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
+	// LZMA has no compression options
+	if (options != NULL || options_size != 0) {
+		// TODO: More specific error code
+		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
+	}
 	lzma_ret rv = LZMA_OK;
 
 	lzma_stream strm = LZMA_STREAM_INIT;

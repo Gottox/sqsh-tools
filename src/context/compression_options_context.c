@@ -28,40 +28,52 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : lz4
- * @created     : Sunday Sep 05, 2021 11:09:51 CEST
+ * @file        : compression_option_context
+ * @created     : Tuesday Nov 30, 2021 15:30:08 CET
  */
 
-#include <lz4.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-
+#include "compression_options_context.h"
 #include "../data/compression_options.h"
-#include "../error.h"
-#include "compression.h"
+#include "../data/superblock.h"
 
-static int
-hsqs_lz4_extract(
-		const union HsqsCompressionOptions *options, size_t options_size,
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size) {
-	if (options != NULL &&
-		options_size != HSQS_SIZEOF_COMPRESSION_OPTIONS_LZ4) {
-		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
-	}
+int
+hsqs_compression_options_init(
+		struct HsqsCompressionOptionsContext *context,
+		struct HsqsSuperblockContext *superblock) {
+	int rv = 0;
 
-	int rv = LZ4_decompress_safe(
-			(char *)compressed, (char *)target, compressed_size, *target_size);
+	rv = hsqs_metablock_init(
+			&context->metablock, superblock, HSQS_SIZEOF_SUPERBLOCK);
 	if (rv < 0) {
-		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
+		goto out;
 	}
-	*target_size = rv;
+
+	// size of one decompresses the whole block
+	rv = hsqs_metablock_more(&context->metablock, 1);
+	if (rv < 0) {
+		goto out;
+	}
+
+out:
+	return rv;
+}
+
+const union HsqsCompressionOptions *
+hsqs_compression_options(const struct HsqsCompressionOptionsContext *context) {
+	return (const union HsqsCompressionOptions *)hsqs_metablock_data(
+			&context->metablock);
+}
+
+size_t
+hsqs_compression_options_size(
+		const struct HsqsCompressionOptionsContext *context) {
+	return hsqs_metablock_size(&context->metablock);
+}
+
+int
+hsqs_compression_options_cleanup(
+		struct HsqsCompressionOptionsContext *context) {
+	hsqs_metablock_cleanup(&context->metablock);
 
 	return 0;
 }
-
-const struct HsqsCompressionImplementation hsqs_compression_lz4 = {
-		.extract = hsqs_lz4_extract,
-};

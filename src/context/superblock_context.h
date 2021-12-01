@@ -33,8 +33,9 @@
  * @created     : Monday Oct 11, 2021 13:41:59 CEST
  */
 
+#include "../mapper/memory_mapper.h"
 #include "../utils.h"
-#include "../mapper/mapper.h"
+#include "compression_options_context.h"
 #include "table_context.h"
 #include "xattr_table_context.h"
 #include <stdbool.h>
@@ -48,14 +49,16 @@ struct HsqsSuperblock;
 
 struct HsqsSuperblockContext {
 	const struct HsqsSuperblock *superblock;
-	struct HsqsMapperMap map;
+	struct HsqsMemoryMap map;
+	struct HsqsMemoryMapper *mapper;
 	struct HsqsTableContext id_table;
 	struct HsqsTableContext export_table;
 	struct HsqsXattrTableContext xattr_table;
+	struct HsqsCompressionOptionsContext compression_options;
 };
 
 HSQS_NO_UNUSED int hsqs_superblock_init(
-		struct HsqsSuperblockContext *context, struct HsqsMapper *mapper);
+		struct HsqsSuperblockContext *context, struct HsqsMemoryMapper *mapper);
 
 const void *hsqs_superblock_data_from_offset(
 		const struct HsqsSuperblockContext *context, uint64_t offset);
@@ -89,6 +92,8 @@ struct HsqsTableContext *
 hsqs_superblock_export_table(struct HsqsSuperblockContext *context);
 struct HsqsXattrTableContext *
 hsqs_superblock_xattr_table(struct HsqsSuperblockContext *context);
+const struct HsqsCompressionOptionsContext *hsqs_superblock_compression_options(
+		const struct HsqsSuperblockContext *context);
 
 int hsqs_superblock_cleanup(struct HsqsSuperblockContext *superblock);
 

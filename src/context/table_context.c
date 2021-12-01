@@ -37,6 +37,11 @@
 #include "superblock_context.h"
 #include <stdint.h>
 
+static const uint64_t *
+lookup_table(struct HsqsTableContext *table) {
+	return (const uint64_t *)hsqs_map_data(&table->lookup_table);
+}
+
 int
 hsqs_table_init(
 		struct HsqsTableContext *table,
@@ -45,24 +50,26 @@ hsqs_table_init(
 	int rv = 0;
 	size_t byte_size;
 	uint_fast64_t table_upper_limit;
+	struct HsqsMemoryMapper *mapper = superblock->mapper;
+	size_t size = hsqs_divide_ceil_u32(
+			element_size * element_count, HSQS_METABLOCK_BLOCK_SIZE);
 
 	// Make sure the start block is at least big enough to hold one entry.
 	if (ADD_OVERFLOW(start_block, sizeof(uint64_t), &table_upper_limit)) {
 		return -HSQS_ERROR_INTEGER_OVERFLOW;
 	}
 
-	if (hsqs_superblock_bytes_used(superblock) < table_upper_limit) {
+	if (hsqs_mapper_size(superblock->mapper) < table_upper_limit) {
 		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
 
-	table->lookup_table =
-			hsqs_superblock_data_from_offset(superblock, start_block);
-	if (table->lookup_table == NULL) {
-		return -HSQS_ERROR_SIZE_MISSMATCH;
+	rv = hsqs_mapper_map(&table->lookup_table, mapper, start_block, size);
+	if (rv < 0) {
+		return rv;
 	}
 
 	rv = hsqs_metablock_init(
-			&table->metablock, superblock, table->lookup_table[0]);
+			&table->metablock, superblock, lookup_table(table)[0]);
 	if (rv < 0) {
 		goto out;
 	}

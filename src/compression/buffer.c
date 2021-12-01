@@ -128,21 +128,10 @@ hsqs_buffer_init(
 		return -HSQS_ERROR_COMPRESSION_INIT;
 	}
 
-	if (hsqs_data_superblock_flags(superblock->superblock) &
-		HSQS_SUPERBLOCK_COMPRESSOR_OPTIONS) {
-		const struct HsqsMetablock *metablock =
-				(const struct HsqsMetablock *)hsqs_superblock_data_from_offset(
-						superblock, sizeof(struct HsqsSuperblock));
-		buffer->options =
-				(const union HsqsCompressionOptions *)hsqs_data_metablock_data(
-						metablock);
-	} else {
-		buffer->options = NULL;
-	}
-
 	if (rv < 0) {
 		return rv;
 	}
+	buffer->superblock = superblock;
 	buffer->impl = impl;
 	buffer->block_size = block_size;
 	buffer->data = NULL;
@@ -154,7 +143,9 @@ int
 hsqs_buffer_append(
 		struct HsqsBuffer *buffer, const uint8_t *source,
 		const size_t source_size, bool is_compressed) {
-	const union HsqsCompressionOptions *options = buffer->options;
+	const union HsqsCompressionOptions *options = NULL;
+	size_t options_size = 0;
+	const struct HsqsCompressionOptionsContext *options_context;
 	const struct HsqsCompressionImplementation *impl =
 			is_compressed ? buffer->impl : &hsqs_compression_null;
 	int rv = 0;
@@ -170,10 +161,18 @@ hsqs_buffer_append(
 	if (buffer->data == NULL) {
 		return -HSQS_ERROR_MALLOC_FAILED;
 	}
+	if (is_compressed) {
+		options_context =
+				hsqs_superblock_compression_options(buffer->superblock);
+		if (options_context) {
+			options = hsqs_compression_options(options_context);
+			options_size = hsqs_compression_options_size(options_context);
+		}
+	}
 
 	rv = impl->extract(
-			options, &buffer->data[buffer_size], &block_size, source,
-			source_size);
+			options, options_size, &buffer->data[buffer_size], &block_size,
+			source, source_size);
 	if (rv < 0)
 		return rv;
 

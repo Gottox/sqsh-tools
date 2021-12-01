@@ -43,14 +43,15 @@ const static uint64_t NO_SEGMENT = 0xFFFFFFFFFFFFFFFF;
 
 int
 hsqs_superblock_init(
-		struct HsqsSuperblockContext *context, struct HsqsMapper *mapper) {
+		struct HsqsSuperblockContext *context,
+		struct HsqsMemoryMapper *mapper) {
 	int rv = 0;
 	rv = hsqs_mapper_map(&context->map, mapper, 0, HSQS_SIZEOF_SUPERBLOCK);
 	if (rv < 0) {
 		return -HSQS_ERROR_SUPERBLOCK_TOO_SMALL;
 	}
 	const struct HsqsSuperblock *superblock =
-			(const struct HsqsSuperblock *)context->map.data;
+			(const struct HsqsSuperblock *)hsqs_map_data(&context->map);
 
 	// Do not use the getter here as it may change the endianess. We don't want
 	// that here.
@@ -63,11 +64,23 @@ hsqs_superblock_init(
 		return -HSQS_ERROR_BLOCKSIZE_MISSMATCH;
 	}
 
-	if (hsqs_data_superblock_bytes_used(superblock) > hsqs_mapper_size(mapper)) {
+	if (hsqs_data_superblock_bytes_used(superblock) >
+		hsqs_mapper_size(mapper)) {
 		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
 
 	context->superblock = superblock;
+	context->mapper = mapper;
+
+	if (hsqs_data_superblock_flags(context->superblock) &
+		HSQS_SUPERBLOCK_COMPRESSOR_OPTIONS) {
+		rv = hsqs_compression_options_init(
+				&context->compression_options, context);
+		if (rv < 0) {
+			hsqs_superblock_cleanup(context);
+			goto out;
+		}
+	}
 
 	uint64_t id_table_start =
 			hsqs_data_superblock_id_table_start(context->superblock);
@@ -75,6 +88,7 @@ hsqs_superblock_init(
 			hsqs_data_superblock_xattr_id_table_start(context->superblock);
 	uint64_t export_table_start =
 			hsqs_data_superblock_export_table_start(context->superblock);
+
 	rv = hsqs_table_init(
 			&context->id_table, context, id_table_start, sizeof(uint32_t),
 			hsqs_data_superblock_id_count(context->superblock));
@@ -177,10 +191,23 @@ hsqs_superblock_xattr_table(struct HsqsSuperblockContext *context) {
 	return &context->xattr_table;
 }
 
+const struct HsqsCompressionOptionsContext *
+hsqs_superblock_compression_options(
+		const struct HsqsSuperblockContext *context) {
+	if (hsqs_data_superblock_flags(context->superblock) &
+		HSQS_SUPERBLOCK_COMPRESSOR_OPTIONS) {
+		return &context->compression_options;
+	} else {
+		return NULL;
+	}
+}
+
 int
 hsqs_superblock_cleanup(struct HsqsSuperblockContext *superblock) {
 	hsqs_table_cleanup(&superblock->id_table);
 	hsqs_xattr_table_cleanup(&superblock->xattr_table);
 	hsqs_table_cleanup(&superblock->export_table);
+	hsqs_compression_options_cleanup(&superblock->compression_options);
+	hsqs_map_unmap(&superblock->map);
 	return 0;
 }

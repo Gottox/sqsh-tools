@@ -39,8 +39,6 @@
 #include "superblock_context.h"
 #include <stdint.h>
 
-#define BLOCK_SIZE 8192
-
 static int
 metablock_bounds_check(
 		const struct HsqsSuperblockContext *superblock,
@@ -131,7 +129,8 @@ hsqs_metablock_seek(
 	metablock->offset = offset;
 	hsqs_buffer_cleanup(&metablock->buffer);
 	rv = hsqs_buffer_init(
-			&metablock->buffer, metablock->superblock, BLOCK_SIZE);
+			&metablock->buffer, metablock->superblock,
+			HSQS_METABLOCK_BLOCK_SIZE);
 
 	return rv;
 }

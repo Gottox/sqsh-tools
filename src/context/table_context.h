@@ -32,6 +32,7 @@
  * @created     : Sunday Sep 26, 2021 19:04:39 CEST
  */
 
+#include "../mapper/memory_mapper.h"
 #include "metablock_context.h"
 #include <stdint.h>
 
@@ -41,7 +42,7 @@
 
 struct HsqsTableContext {
 	struct HsqsMetablockContext metablock;
-	const uint64_t *lookup_table;
+	struct HsqsMemoryMap lookup_table;
 	size_t element_size;
 	size_t element_count;
 };

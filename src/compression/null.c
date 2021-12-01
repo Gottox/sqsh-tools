@@ -43,9 +43,15 @@
 
 static int
 hsqs_null_extract(
-		const union HsqsCompressionOptions *options, uint8_t *target,
-		size_t *target_size, const uint8_t *compressed,
+		const union HsqsCompressionOptions *options, size_t options_size,
+		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
+	// the null decompressor has no compression options
+	if (options != NULL || options_size != 0) {
+		// TODO: More specific error code
+		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
+	}
+
 	if (compressed_size > *target_size) {
 		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}

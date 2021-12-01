@@ -41,6 +41,8 @@
 
 #define HSQS_EXTRACT_H
 
+#define HSQS_METABLOCK_BLOCK_SIZE 8192
+
 struct HsqsMetablock;
 
 struct HsqsMetablockContext {

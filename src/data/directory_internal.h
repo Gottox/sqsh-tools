@@ -32,6 +32,7 @@
  * @created     : Wednesday Sep 08, 2021 16:44:48 CEST
  */
 
+#include "../utils.h"
 #include "directory.h"
 
 #ifndef DIRECTORY_INTERNAL_H
