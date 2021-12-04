@@ -32,36 +32,36 @@
  * @created     : Thursday Oct 07, 2021 09:23:05 CEST
  */
 
-#include "datablock_context.h"
-#include "fragment_context.h"
+#include "../compression/buffer.h"
 #include <stdint.h>
 
 #ifndef FILE_CONTEXT_H
 
 #define FILE_CONTEXT_H
 
+struct HsqsInodeContext;
+struct SuperblockContext;
+
 struct HsqsFileContext {
-	struct HsqsDatablockContext datablock;
-	struct HsqsFragmentContext fragment;
-	const struct HsqsSuperblockContext *superblock;
-	uint32_t fragment_pos;
+	struct HsqsSuperblockContext *superblock;
+	struct HsqsFragmentTableContext *fragment_table;
+	struct HsqsInodeContext *inode;
+	struct HsqsBuffer buffer;
+	uint64_t seek_pos;
 };
 
-HSQS_NO_UNUSED int hsqs_file_init(
-		struct HsqsFileContext *context, const struct HsqsInodeContext *inode);
-
-bool hsqs_file_has_datablock(struct HsqsFileContext *context);
-bool hsqs_file_has_fragment(struct HsqsFileContext *context);
+HSQS_NO_UNUSED int hsqs_content_init(
+		struct HsqsFileContext *context, struct HsqsInodeContext *inode);
 
 HSQS_NO_UNUSED int
-hsqs_file_seek(struct HsqsFileContext *context, uint64_t seek_pos);
+hsqs_content_seek(struct HsqsFileContext *context, uint64_t seek_pos);
 
-int hsqs_file_read(struct HsqsFileContext *context, uint64_t size);
+int hsqs_content_read(struct HsqsFileContext *context, uint64_t size);
 
-const uint8_t *hsqs_file_data(struct HsqsFileContext *context);
+const uint8_t *hsqs_content_data(struct HsqsFileContext *context);
 
-uint64_t hsqs_file_size(struct HsqsFileContext *context);
+uint64_t hsqs_content_size(struct HsqsFileContext *context);
 
-int hsqs_file_cleanup(struct HsqsFileContext *context);
+int hsqs_content_cleanup(struct HsqsFileContext *context);
 
 #endif /* end of include guard FILE_CONTEXT_H */

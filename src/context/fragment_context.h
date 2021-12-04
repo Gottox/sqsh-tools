@@ -28,40 +28,32 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : fragment_context
- * @created     : Friday Sep 17, 2021 09:28:28 CEST
+ * @file        : fragment_table_context
+ * @created     : Wednesday Dec 01, 2021 17:22:03 CET
  */
 
 #include "table_context.h"
-#include <stdint.h>
 
-#ifndef FRAGMENT_CONTEXT_H
+#ifndef FRAGMENT_TABLE_CONTEXT_H
 
-#define FRAGMENT_CONTEXT_H
+#define FRAGMENT_TABLE_CONTEXT_H
 
+struct HsqsSuperblockContext;
 struct HsqsInodeContext;
 
-struct HsqsFragmentContext {
+struct HsqsFragmentTableContext {
 	const struct HsqsSuperblockContext *superblock;
-	const struct HsqsInodeContext *inode;
-	// TODO: This table should be part of struct Hsqs.
 	struct HsqsTableContext table;
-	const struct HsqsFragment *fragment;
-	struct HsqsBuffer buffer;
 };
 
-HSQS_NO_UNUSED int hsqs_fragment_init(
-		struct HsqsFragmentContext *fragment,
-		const struct HsqsInodeContext *inode);
+HSQS_NO_UNUSED int hsqs_fragment_table_init(
+		struct HsqsFragmentTableContext *context,
+		const struct HsqsSuperblockContext *superblock);
 
-uint64_t hsqs_fragment_start(struct HsqsFragmentContext *fragment);
+HSQS_NO_UNUSED int hsqs_fragment_table_to_buffer(
+		struct HsqsFragmentTableContext *context,
+		const struct HsqsInodeContext *inode, struct HsqsBuffer *buffer);
 
-uint32_t hsqs_fragment_size(struct HsqsFragmentContext *fragment);
+int hsqs_fragment_table_cleanup(struct HsqsFragmentTableContext *context);
 
-HSQS_NO_UNUSED int hsqs_fragment_read(struct HsqsFragmentContext *fragment);
-
-const uint8_t *hsqs_fragment_data(struct HsqsFragmentContext *fragment);
-
-int hsqs_fragment_clean(struct HsqsFragmentContext *fragment);
-
-#endif /* end of include guard FRAGMENT_CONTEXT_H */
+#endif /* end of include guard FRAGMENT_TABLE_CONTEXT_H */

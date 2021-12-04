@@ -16,18 +16,18 @@ static int
 read_file(struct HsqsInodeContext *inode) {
 	struct HsqsFileContext file = {0};
 	int rv;
-	rv = hsqs_file_init(&file, inode);
+	rv = hsqs_content_init(&file, inode);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = hsqs_file_read(&file, hsqs_inode_file_size(inode));
+	rv = hsqs_content_read(&file, hsqs_inode_file_size(inode));
 	if (rv < 0) {
 		goto out;
 	}
 
 out:
-	hsqs_file_cleanup(&file);
+	hsqs_content_cleanup(&file);
 	// noop
 	return 0;
 }

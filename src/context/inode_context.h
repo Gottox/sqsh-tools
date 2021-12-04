@@ -100,6 +100,7 @@ uint32_t
 hsqs_inode_file_fragment_block_index(const struct HsqsInodeContext *inode);
 uint32_t
 hsqs_inode_file_fragment_block_offset(const struct HsqsInodeContext *inode);
+bool hsqs_inode_file_has_fragment(const struct HsqsInodeContext *inode);
 
 enum HsqsInodeContextType hsqs_inode_type(const struct HsqsInodeContext *inode);
 

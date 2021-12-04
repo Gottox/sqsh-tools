@@ -28,99 +28,119 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : fragment_context
- * @created     : Friday Sep 17, 2021 09:44:12 CEST
+ * @file        : fragment_table_context
+ * @created     : Wednesday Dec 01, 2021 17:35:47 CET
  */
 
 #include "fragment_context.h"
 #include "../data/fragment.h"
-#include "../data/superblock.h"
 #include "../error.h"
+#include "../mapper/memory_mapper.h"
 #include "inode_context.h"
 #include "superblock_context.h"
 #include <stdint.h>
 
 int
-hsqs_fragment_init(
-		struct HsqsFragmentContext *fragment,
-		const struct HsqsInodeContext *inode) {
+hsqs_fragment_table_init(
+		struct HsqsFragmentTableContext *context,
+		const struct HsqsSuperblockContext *superblock) {
 	int rv = 0;
-	fragment->inode = inode;
-	fragment->superblock = inode->extract.superblock;
-	uint32_t fragment_table_count =
-			hsqs_superblock_fragment_entry_count(fragment->superblock);
-	uint32_t fragment_table_start =
-			hsqs_superblock_fragment_table_start(fragment->superblock);
-
-	if (!hsqs_superblock_has_fragments(fragment->superblock)) {
-		rv = -HSQS_ERROR_NO_FRAGMENT;
-		goto out;
-	}
+	uint64_t start = hsqs_superblock_fragment_table_start(superblock);
+	uint32_t count = hsqs_superblock_fragment_entry_count(superblock);
 
 	rv = hsqs_table_init(
-			&fragment->table, fragment->superblock, fragment_table_start,
-			HSQS_SIZEOF_FRAGMENT, fragment_table_count);
-	if (rv < 0) {
-		goto out;
-	}
-	uint32_t index = hsqs_inode_file_fragment_block_index(inode);
-	if (index == HSQS_INODE_NO_FRAGMENT) {
-		rv = -HSQS_ERROR_NO_FRAGMENT;
-		goto out;
-	}
-	rv = hsqs_table_get(
-			&fragment->table, index, (const void **)&fragment->fragment);
+			&context->table, superblock, start, HSQS_SIZEOF_FRAGMENT, count);
 	if (rv < 0) {
 		goto out;
 	}
 
-	uint32_t block_size = hsqs_superblock_block_size(fragment->superblock);
-	rv = hsqs_buffer_init(&fragment->buffer, fragment->superblock, block_size);
-	if (rv < 0) {
-		goto out;
-	}
+	context->superblock = superblock;
 
 out:
+	return rv;
+}
+
+static int
+read_fragment_data(
+		struct HsqsFragmentTableContext *context, struct HsqsBuffer *buffer,
+		uint32_t index) {
+	int rv = 0;
+	uint64_t start;
+	uint32_t size;
+	const struct HsqsDatablockSize *size_info;
+	bool is_compressed;
+	const struct HsqsFragment *fragment;
+	struct HsqsMemoryMap memory_map = {0};
+	const uint8_t *data;
+
+	rv = hsqs_table_get(&context->table, index, (const void **)&fragment);
 	if (rv < 0) {
-		hsqs_fragment_clean(fragment);
+		goto out;
 	}
+
+	start = hsqs_data_fragment_start(fragment);
+	size_info = hsqs_data_fragment_size_info(fragment);
+	size = hsqs_data_datablock_size(size_info);
+	is_compressed = hsqs_data_datablock_is_compressed(size_info);
+
+	rv = hsqs_mapper_map(&memory_map, context->superblock->mapper, start, size);
+	if (rv < 0) {
+		goto out;
+	}
+
+	data = hsqs_map_data(&memory_map);
+	rv = hsqs_buffer_append(buffer, data, size, is_compressed);
+	if (rv < 0) {
+		goto out;
+	}
+out:
+	hsqs_map_unmap(&memory_map);
 	return rv;
 }
 
 int
-hsqs_fragment_read(struct HsqsFragmentContext *fragment) {
-	const struct HsqsDatablockSize *size_info =
-			hsqs_data_fragment_size_info(fragment->fragment);
-	bool is_compressed = hsqs_data_datablock_is_compressed(size_info);
-	uint32_t size = hsqs_data_datablock_size(size_info);
-	uint64_t start = hsqs_data_fragment_start(fragment->fragment);
-	const uint8_t *data =
-			hsqs_superblock_data_from_offset(fragment->superblock, start);
+hsqs_fragment_table_to_buffer(
+		struct HsqsFragmentTableContext *context,
+		const struct HsqsInodeContext *inode, struct HsqsBuffer *buffer) {
+	int rv = 0;
+	struct HsqsBuffer intermediate_buffer = {0};
+	const uint8_t *data;
+	uint32_t block_size = hsqs_superblock_block_size(context->superblock);
+	uint32_t index = hsqs_inode_file_fragment_block_index(inode);
+	uint32_t offset = hsqs_inode_file_fragment_block_offset(inode);
+	uint32_t size = hsqs_inode_file_size(inode) % block_size;
+	uint32_t end_offset;
+	if (ADD_OVERFLOW(offset, size, &end_offset)) {
+		return -HSQS_ERROR_INTEGER_OVERFLOW;
+	}
+	rv = hsqs_buffer_init(
+			&intermediate_buffer, context->superblock, block_size);
+	if (rv < 0) {
+		goto out;
+	}
 
-	return hsqs_buffer_append(&fragment->buffer, data, size, is_compressed);
-}
+	rv = read_fragment_data(context, &intermediate_buffer, index);
+	if (rv < 0) {
+		goto out;
+	}
 
-uint32_t
-hsqs_fragment_size(struct HsqsFragmentContext *fragment) {
-	uint64_t file_size = hsqs_inode_file_size(fragment->inode);
-	uint32_t block_size = hsqs_superblock_block_size(fragment->superblock);
+	if (end_offset > hsqs_buffer_size(&intermediate_buffer)) {
+		return -HSQS_ERROR_TODO;
+	}
 
-	return file_size % block_size;
-}
+	data = hsqs_buffer_data(&intermediate_buffer);
 
-const uint8_t *
-hsqs_fragment_data(struct HsqsFragmentContext *fragment) {
-	const uint8_t *data = hsqs_buffer_data(&fragment->buffer);
-	const uint32_t offset =
-			hsqs_inode_file_fragment_block_offset(fragment->inode);
-
-	return &data[offset];
+	rv = hsqs_buffer_append(buffer, &data[offset], size, false);
+	if (rv < 0) {
+		goto out;
+	}
+out:
+	hsqs_buffer_cleanup(&intermediate_buffer);
+	return 0;
 }
 
 int
-hsqs_fragment_clean(struct HsqsFragmentContext *fragment) {
-	hsqs_table_cleanup(&fragment->table);
-	hsqs_buffer_cleanup(&fragment->buffer);
-
+hsqs_fragment_table_cleanup(struct HsqsFragmentTableContext *context) {
+	hsqs_table_cleanup(&context->table);
 	return 0;
 }

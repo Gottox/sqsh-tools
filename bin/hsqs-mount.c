@@ -329,7 +329,7 @@ hsqsfuse_read(
 		rv = -EINVAL;
 		goto out;
 	}
-	rv = hsqs_file_init(&file, &inode);
+	rv = hsqs_content_init(&file, &inode);
 	if (rv < 0) {
 		// TODO: Better return type
 		rv = -EINVAL;
@@ -337,24 +337,24 @@ hsqsfuse_read(
 	}
 
 	size = MIN(size, hsqs_inode_file_size(&inode));
-	rv = hsqs_file_seek(&file, offset);
+	rv = hsqs_content_seek(&file, offset);
 	if (rv < 0) {
 		// TODO: Better return type
 		rv = -EINVAL;
 		goto out;
 	}
-	rv = hsqs_file_read(&file, size);
+	rv = hsqs_content_read(&file, size);
 	if (rv < 0) {
 		// TODO: Better return type
 		rv = -EINVAL;
 		goto out;
 	}
 
-	memcpy(buf, hsqs_file_data(&file), size);
+	memcpy(buf, hsqs_content_data(&file), size);
 
 	rv = size;
 out:
-	hsqs_file_cleanup(&file);
+	hsqs_content_cleanup(&file);
 	hsqs_inode_cleanup(&inode);
 	return rv;
 }

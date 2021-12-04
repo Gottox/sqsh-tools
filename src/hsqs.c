@@ -81,8 +81,8 @@ int
 hsqs_cleanup(struct Hsqs *hsqs) {
 	int rv = 0;
 
-	hsqs_mapper_cleanup(&hsqs->mapper);
 	hsqs_superblock_cleanup(&hsqs->superblock);
+	hsqs_mapper_cleanup(&hsqs->mapper);
 
 	return rv;
 }

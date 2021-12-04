@@ -64,24 +64,24 @@ cat_path(struct Hsqs *hsqs, char *path) {
 		goto out;
 	}
 
-	rv = hsqs_file_init(&file, &inode);
+	rv = hsqs_content_init(&file, &inode);
 	if (rv < 0) {
 		hsqs_perror(rv, path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	rv = hsqs_file_read(&file, hsqs_inode_file_size(&inode));
+	rv = hsqs_content_read(&file, hsqs_inode_file_size(&inode));
 	if (rv < 0) {
 		hsqs_perror(rv, path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	fwrite(hsqs_file_data(&file), sizeof(uint8_t), hsqs_file_size(&file),
+	fwrite(hsqs_content_data(&file), sizeof(uint8_t), hsqs_content_size(&file),
 		   stdout);
 out:
-	hsqs_file_cleanup(&file);
+	hsqs_content_cleanup(&file);
 	hsqs_inode_cleanup(&inode);
 	return rv;
 }

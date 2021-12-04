@@ -17,7 +17,7 @@ LDFLAGS = -pthread -fsanitize=address
 #TST_CFLAGS = -fsanitize=address -fprofile-arcs -ftest-coverage -lgcov --coverage
 TST_CFLAGS = -fsanitize=address
 #TST_CFLAGS += -fprofile-arcs
-TST_CFLAGS += --coverage
+#TST_CFLAGS += --coverage
 FZZ_CFLAGS = -fsanitize=fuzzer
 
 # if you're feeling lucky:

@@ -268,6 +268,12 @@ hsqs_inode_file_fragment_block_offset(const struct HsqsInodeContext *inode) {
 	return HSQS_INODE_NO_FRAGMENT;
 }
 
+bool
+hsqs_inode_file_has_fragment(const struct HsqsInodeContext *inode) {
+	return hsqs_inode_file_fragment_block_index(inode) !=
+			HSQS_INODE_NO_FRAGMENT;
+}
+
 enum HsqsInodeContextType
 hsqs_inode_type(const struct HsqsInodeContext *inode) {
 	switch (hsqs_data_inode_type(inode->inode)) {
