@@ -125,6 +125,8 @@ hsqs_error_str(int error_code) {
 		return "No extended directory";
 	case HSQS_ERROR_NO_EXPORT_TABLE:
 		return "No export table";
+	case HSQS_ERROR_METABLOCK_TOO_BIG:
+		return "Metablock too big";
 	case HSQS_ERROR_TODO:
 		return "Todo";
 	}

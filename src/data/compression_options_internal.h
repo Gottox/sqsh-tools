@@ -86,5 +86,8 @@ union HsqsCompressionOptions {
 	struct HsqsCompressionOptionsZstd zstd;
 	struct HsqsCompressionOptionsLzo lzo;
 };
+STATIC_ASSERT(
+		sizeof(union HsqsCompressionOptions) ==
+		HSQS_SIZEOF_COMPRESSION_OPTIONS);
 
 #endif /* end of include guard COMPRESSION_OPTIONS_INTERNAL_H */

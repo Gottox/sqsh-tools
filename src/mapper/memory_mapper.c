@@ -40,17 +40,20 @@
 extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_in_memory;
 extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_mmap_complete;
 extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_mmap;
+extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_canary;
 
 int
 hsqs_mapper_init_mmap(struct HsqsMemoryMapper *mapper, const char *path) {
-	mapper->impl = &hsqs_mapper_impl_mmap_complete;
+	// mapper->impl = &hsqs_mapper_impl_mmap_complete;
+	mapper->impl = &hsqs_mapper_impl_mmap;
 	return mapper->impl->init(mapper, path, strlen(path));
 }
 
 int
 hsqs_mapper_init_static(
 		struct HsqsMemoryMapper *mapper, const uint8_t *input, size_t size) {
-	mapper->impl = &hsqs_mapper_impl_in_memory;
+	mapper->impl = &hsqs_mapper_impl_canary;
+	// mapper->impl = &hsqs_mapper_impl_in_memory;
 	return mapper->impl->init(mapper, input, size);
 }
 
@@ -61,13 +64,13 @@ hsqs_mapper_map(
 	size_t end_offset;
 	size_t archive_size = hsqs_mapper_size(mapper);
 	if (offset > archive_size) {
-		return -HSQS_ERROR_TODO;
+		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
 	if (ADD_OVERFLOW(offset, size, &end_offset)) {
 		return -HSQS_ERROR_INTEGER_OVERFLOW;
 	}
 	if (end_offset > archive_size) {
-		return -HSQS_ERROR_TODO;
+		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
 	map->mapper = mapper;
 	return mapper->impl->map(map, mapper, offset, size);
@@ -97,7 +100,7 @@ hsqs_map_size(struct HsqsMemoryMap *map) {
 }
 
 const uint8_t *
-hsqs_map_data(struct HsqsMemoryMap *map) {
+hsqs_map_data(const struct HsqsMemoryMap *map) {
 	return map->mapper->impl->map_data(map);
 }
 

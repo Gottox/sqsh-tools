@@ -54,7 +54,7 @@ struct HsqsDirectoryContext {
 struct HsqsDirectoryIterator {
 	const struct HsqsDirectoryFragment *fragments;
 	struct HsqsDirectoryContext *directory;
-	struct HsqsMetablockContext extract;
+	struct HsqsMetablockStreamContext metablock;
 	size_t remaining_entries;
 	off_t current_fragment_offset;
 	off_t next_offset;

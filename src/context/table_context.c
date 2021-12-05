@@ -34,12 +34,16 @@
 
 #include "table_context.h"
 #include "../error.h"
+#include "metablock_context.h"
 #include "superblock_context.h"
 #include <stdint.h>
+#include <string.h>
 
-static const uint64_t *
-lookup_table(struct HsqsTableContext *table) {
-	return (const uint64_t *)hsqs_map_data(&table->lookup_table);
+static const uint64_t
+lookup_table_get(struct HsqsTableContext *table, off_t index) {
+	const uint64_t *lookup_table =
+			(const uint64_t *)hsqs_map_data(&table->lookup_table);
+	return lookup_table[index];
 }
 
 int
@@ -49,31 +53,21 @@ hsqs_table_init(
 		size_t element_size, size_t element_count) {
 	int rv = 0;
 	size_t byte_size;
-	uint_fast64_t table_upper_limit;
 	struct HsqsMemoryMapper *mapper = superblock->mapper;
-	size_t size = hsqs_divide_ceil_u32(
-			element_size * element_count, HSQS_METABLOCK_BLOCK_SIZE);
+	// TODO: Overflow
+	size_t lookup_table_size =
+			hsqs_divide_ceil_u32(
+					element_size * element_count, HSQS_METABLOCK_BLOCK_SIZE) *
+			sizeof(uint64_t);
 
-	// Make sure the start block is at least big enough to hold one entry.
-	if (ADD_OVERFLOW(start_block, sizeof(uint64_t), &table_upper_limit)) {
-		return -HSQS_ERROR_INTEGER_OVERFLOW;
-	}
-
-	if (hsqs_mapper_size(superblock->mapper) < table_upper_limit) {
-		return -HSQS_ERROR_SIZE_MISSMATCH;
-	}
-
-	rv = hsqs_mapper_map(&table->lookup_table, mapper, start_block, size);
+	rv = hsqs_mapper_map(
+			&table->lookup_table, mapper, start_block, lookup_table_size);
 	if (rv < 0) {
 		return rv;
 	}
 
-	rv = hsqs_metablock_init(
-			&table->metablock, superblock, lookup_table(table)[0]);
-	if (rv < 0) {
-		goto out;
-	}
-
+	table->mapper = superblock->mapper;
+	table->superblock = superblock;
 	table->element_size = element_size;
 	table->element_count = element_count;
 	if (MULT_OVERFLOW(element_size, element_count, &byte_size)) {
@@ -81,27 +75,48 @@ hsqs_table_init(
 		goto out;
 	}
 
-	rv = hsqs_metablock_more(&table->metablock, byte_size);
-
 out:
 	return rv;
 }
 
 int
-hsqs_table_get(
-		struct HsqsTableContext *table, off_t index, const void **target) {
-	off_t offset;
+hsqs_table_get(struct HsqsTableContext *table, off_t index, void *target) {
+	int rv = 0;
+	struct HsqsMetablockContext metablock = {0};
+	struct HsqsBuffer buffer = {0};
+	uint64_t lookup_index =
+			index * table->element_size / HSQS_METABLOCK_BLOCK_SIZE;
+	uint64_t metablock_address = lookup_table_get(table, lookup_index);
+	uint64_t element_index =
+			(index * table->element_size) % HSQS_METABLOCK_BLOCK_SIZE;
 
-	if (MULT_OVERFLOW(index, table->element_size, &offset)) {
-		return -HSQS_ERROR_INTEGER_OVERFLOW;
+	rv = hsqs_buffer_init(
+			&buffer, table->superblock, HSQS_METABLOCK_BLOCK_SIZE);
+	if (rv < 0) {
+		goto out;
 	}
-	*target = &hsqs_metablock_data(&table->metablock)[offset];
 
-	return 0;
+	rv = hsqs_metablock_init(&metablock, table->superblock, metablock_address);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = hsqs_metablock_to_buffer(&metablock, &buffer);
+	if (rv < 0) {
+		goto out;
+	}
+
+	memcpy(target, &hsqs_buffer_data(&buffer)[element_index],
+		   table->element_size);
+
+out:
+	hsqs_metablock_cleanup(&metablock);
+	hsqs_buffer_cleanup(&buffer);
+	return rv;
 }
 
 int
 hsqs_table_cleanup(struct HsqsTableContext *table) {
-	hsqs_metablock_cleanup(&table->metablock);
+	hsqs_map_unmap(&table->lookup_table);
 	return 0;
 }

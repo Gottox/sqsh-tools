@@ -28,45 +28,37 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : metablock
- * @created     : Saturday Sep 04, 2021 23:13:19 CEST
+ * @file        : metablock_context
+ * @created     : Saturday Dec 04, 2021 14:54:28 CET
  */
 
-#include "../compression/buffer.h"
-
+#include "../mapper/memory_mapper.h"
+#include "../utils.h"
 #include <stdint.h>
-#include <stdlib.h>
 
-#ifndef HSQS_EXTRACT_H
+#ifndef METABLOCK_CONTEXT_H
 
-#define HSQS_EXTRACT_H
+#define METABLOCK_CONTEXT_H
 
 #define HSQS_METABLOCK_BLOCK_SIZE 8192
 
-struct HsqsMetablock;
+struct HsqsSuperblockContext;
+struct HsqsBuffer;
 
 struct HsqsMetablockContext {
-	const struct HsqsSuperblockContext *superblock;
-	struct HsqsBuffer buffer;
-	off_t start_block;
-	off_t index;
-	off_t offset;
+	struct HsqsMemoryMap map;
 };
 
-// DEPRECATED:
-HSQS_NO_UNUSED int hsqs_metablock_from_offset(
-		const struct HsqsMetablock **metablock,
-		const struct HsqsSuperblockContext *superblock, off_t offset);
 HSQS_NO_UNUSED int hsqs_metablock_init(
-		struct HsqsMetablockContext *extract,
-		const struct HsqsSuperblockContext *superblock, off_t start_block);
-HSQS_NO_UNUSED int hsqs_metablock_seek(
-		struct HsqsMetablockContext *metablock, off_t index, off_t offset);
-HSQS_NO_UNUSED int
-hsqs_metablock_more(struct HsqsMetablockContext *metablock, const size_t size);
-const uint8_t *
-hsqs_metablock_data(const struct HsqsMetablockContext *metablock);
-size_t hsqs_metablock_size(const struct HsqsMetablockContext *metablock);
-int hsqs_metablock_cleanup(struct HsqsMetablockContext *metablock);
+		struct HsqsMetablockContext *context,
+		const struct HsqsSuperblockContext *superblock, uint64_t address);
 
-#endif /* end of include guard HSQS_EXTRACT_H */
+uint32_t
+hsqs_metablock_compressed_size(const struct HsqsMetablockContext *context);
+
+HSQS_NO_UNUSED int hsqs_metablock_to_buffer(
+		struct HsqsMetablockContext *context, struct HsqsBuffer *buffer);
+
+int hsqs_metablock_cleanup(struct HsqsMetablockContext *context);
+
+#endif /* end of include guard METABLOCK_CONTEXT_H */

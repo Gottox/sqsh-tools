@@ -28,33 +28,45 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : compression_option_context
- * @created     : Tuesday Nov 30, 2021 15:21:20 CET
+ * @file        : metablock_stream_context
+ * @created     : Sunday Dec 05, 2021 10:09:54 CET
  */
 
 #include "../compression/buffer.h"
-#include "../utils.h"
+#include <stdint.h>
 
-#ifndef COMPRESSION_OPTIONS_CONTEXT_H
+#ifndef METABLOCK_STREAM_CONTEXT_H
 
-#define COMPRESSION_OPTIONS_CONTEXT_H
+#define METABLOCK_STREAM_CONTEXT_H
 
-union HsqsCompressionOptions;
-
-struct HsqsCompressionOptionsContext {
+struct HsqsMetablockStreamContext {
+	const struct HsqsSuperblockContext *superblock;
 	struct HsqsBuffer buffer;
+	uint64_t base_address;
+	uint64_t current_address;
+	uint16_t buffer_offset;
 };
 
-HSQS_NO_UNUSED int hsqs_compression_options_init(
-		struct HsqsCompressionOptionsContext *context,
-		struct HsqsSuperblockContext *superblock);
+HSQS_NO_UNUSED int hsqs_metablock_stream_init(
+		struct HsqsMetablockStreamContext *context,
+		const struct HsqsSuperblockContext *superblock, uint64_t address,
+		uint64_t max_address);
 
-const union HsqsCompressionOptions *
-hsqs_compression_options(const struct HsqsCompressionOptionsContext *context);
-size_t hsqs_compression_options_size(
-		const struct HsqsCompressionOptionsContext *context);
+HSQS_NO_UNUSED int hsqs_metablock_stream_seek_ref(
+		struct HsqsMetablockStreamContext *context, uint64_t ref);
 
-int
-hsqs_compression_options_cleanup(struct HsqsCompressionOptionsContext *context);
+HSQS_NO_UNUSED int hsqs_metablock_stream_seek(
+		struct HsqsMetablockStreamContext *context, uint64_t address_offset,
+		uint32_t buffer_offset);
 
-#endif /* end of include guard COMPRESSION_OPTIONS_CONTEXT_H */
+HSQS_NO_UNUSED int hsqs_metablock_stream_more(
+		struct HsqsMetablockStreamContext *context, uint64_t size);
+
+const uint8_t *
+hsqs_metablock_stream_data(struct HsqsMetablockStreamContext *context);
+
+size_t hsqs_metablock_stream_size(struct HsqsMetablockStreamContext *context);
+
+int hsqs_metablock_stream_cleanup(struct HsqsMetablockStreamContext *context);
+
+#endif /* end of include guard METABLOCK_STREAM_CONTEXT_H */

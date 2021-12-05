@@ -29,160 +29,83 @@
 /**
  * @author      : Enno Boland (mail@eboland.de)
  * @file        : metablock_context
- * @created     : Saturday Sep 04, 2021 23:15:47 CEST
+ * @created     : Saturday Dec 04, 2021 16:20:07 CET
  */
 
 #include "metablock_context.h"
-#include "../compression/buffer.h"
 #include "../data/metablock.h"
 #include "../error.h"
 #include "superblock_context.h"
 #include <stdint.h>
 
-static int
-metablock_bounds_check(
-		const struct HsqsSuperblockContext *superblock,
-		const struct HsqsMetablock *block) {
-	uint64_t offset;
-	uint64_t offset_header_end;
-	uint64_t data_bounds;
-	uint64_t bytes_used = hsqs_superblock_bytes_used(superblock);
-
-	if (SUB_OVERFLOW(
-				(uint64_t)block, (uint64_t)superblock->superblock, &offset)) {
-		return -HSQS_ERROR_INTEGER_OVERFLOW;
-	}
-
-	if (ADD_OVERFLOW(offset, HSQS_SIZEOF_METABLOCK, &offset_header_end)) {
-		return -HSQS_ERROR_INTEGER_OVERFLOW;
-	}
-
-	if (offset_header_end > bytes_used) {
-		return -HSQS_ERROR_SIZE_MISSMATCH;
-	}
-
-	const size_t data_size = hsqs_data_metablock_size(block);
-	if (ADD_OVERFLOW((uint64_t)offset_header_end, data_size, &data_bounds)) {
-		return -HSQS_ERROR_INTEGER_OVERFLOW;
-	}
-
-	if (data_bounds > bytes_used) {
-		return -HSQS_ERROR_SIZE_MISSMATCH;
-	}
-
-	return 0;
-}
-
-int
-hsqs_metablock_from_offset(
-		const struct HsqsMetablock **metablock,
-		const struct HsqsSuperblockContext *superblock, off_t offset) {
-	int rv = 0;
-	const struct HsqsMetablock *block =
-			hsqs_superblock_data_from_offset(superblock, offset);
-	if (block == NULL) {
-		return -HSQS_ERROR_SIZE_MISSMATCH;
-	}
-	rv = metablock_bounds_check(superblock, block);
-	if (rv < 0) {
-		return rv;
-	}
-	*metablock = block;
-	return rv;
-}
-
 static const struct HsqsMetablock *
-hsqs_metablock_from_start_block(
-		const struct HsqsSuperblockContext *superblock,
-		const struct HsqsMetablock *start_block, off_t offset) {
-	const uint8_t *tmp = (uint8_t *)start_block;
-	const struct HsqsMetablock *block =
-			(const struct HsqsMetablock *)&tmp[offset];
-
-	if (metablock_bounds_check(superblock, block) < 0) {
-		return NULL;
-	} else {
-		return block;
-	}
+get_metablock(const struct HsqsMetablockContext *context) {
+	return (const struct HsqsMetablock *)hsqs_map_data(&context->map);
 }
 
 int
 hsqs_metablock_init(
-		struct HsqsMetablockContext *extract,
-		const struct HsqsSuperblockContext *superblock, off_t start_block) {
-	extract->start_block = start_block;
-	extract->index = 0;
-	extract->offset = 0;
-	extract->superblock = superblock;
-	return hsqs_metablock_seek(extract, 0, 0);
-}
-
-int
-hsqs_metablock_seek(
-		struct HsqsMetablockContext *metablock, const off_t index,
-		const off_t offset) {
+		struct HsqsMetablockContext *context,
+		const struct HsqsSuperblockContext *superblock, uint64_t address) {
 	int rv = 0;
 
-	hsqs_buffer_cleanup(&metablock->buffer);
-
-	metablock->index = index;
-	metablock->offset = offset;
-	hsqs_buffer_cleanup(&metablock->buffer);
-	rv = hsqs_buffer_init(
-			&metablock->buffer, metablock->superblock,
-			HSQS_METABLOCK_BLOCK_SIZE);
-
-	return rv;
-}
-
-int
-hsqs_metablock_more(struct HsqsMetablockContext *extract, const size_t size) {
-	int rv = 0;
-	const struct HsqsMetablock *start_block = NULL;
-
-	rv = hsqs_metablock_from_offset(
-			&start_block, extract->superblock, extract->start_block);
-
+	rv = hsqs_mapper_map(
+			&context->map, superblock->mapper, address, HSQS_SIZEOF_METABLOCK);
 	if (rv < 0) {
-		return rv;
+		goto out;
 	}
 
-	for (; rv == 0 && size > hsqs_metablock_size(extract);) {
-		const struct HsqsMetablock *block = hsqs_metablock_from_start_block(
-				extract->superblock, start_block, extract->index);
-		if (block == NULL) {
-			return -HSQS_ERROR_TODO;
-		}
-		const size_t metablock_size = hsqs_data_metablock_size(block);
-		if (metablock_size == 0) {
-			return -HSQS_ERROR_METABLOCK_ZERO_SIZE;
-		}
-
-		const void *block_data = hsqs_data_metablock_data(block);
-		bool is_compressed = hsqs_data_metablock_is_compressed(block);
-		rv = hsqs_buffer_append(
-				&extract->buffer, block_data, metablock_size, is_compressed);
-		extract->index += HSQS_SIZEOF_METABLOCK + metablock_size;
+out:
+	if (rv < 0) {
+		hsqs_metablock_cleanup(context);
 	}
+
 	return rv;
 }
 
-const uint8_t *
-hsqs_metablock_data(const struct HsqsMetablockContext *extract) {
-	return &extract->buffer.data[extract->offset];
-}
-
-size_t
-hsqs_metablock_size(const struct HsqsMetablockContext *extract) {
-	const size_t buffer_size = hsqs_buffer_size(&extract->buffer);
-	if (extract->offset > buffer_size) {
-		return 0;
-	} else {
-		return buffer_size - extract->offset;
-	}
+uint32_t
+hsqs_metablock_compressed_size(const struct HsqsMetablockContext *context) {
+	const struct HsqsMetablock *metablock = get_metablock(context);
+	return hsqs_data_metablock_size(metablock);
 }
 
 int
-hsqs_metablock_cleanup(struct HsqsMetablockContext *extract) {
-	return hsqs_buffer_cleanup(&extract->buffer);
+hsqs_metablock_to_buffer(
+		struct HsqsMetablockContext *context, struct HsqsBuffer *buffer) {
+	int rv = 0;
+	const struct HsqsMetablock *metablock = get_metablock(context);
+	uint32_t size = hsqs_data_metablock_size(metablock);
+	bool is_compressed = hsqs_data_metablock_is_compressed(metablock);
+	uint32_t map_size;
+
+	if (size > HSQS_METABLOCK_BLOCK_SIZE) {
+		return -HSQS_ERROR_METABLOCK_TOO_BIG;
+	}
+	if (ADD_OVERFLOW(size, HSQS_SIZEOF_METABLOCK, &map_size)) {
+		rv = -HSQS_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
+
+	rv = hsqs_map_resize(&context->map, map_size);
+	if (rv < 0) {
+		goto out;
+	}
+
+	// metablock may has moved after resize, so re-request it:
+	metablock = get_metablock(context);
+	const uint8_t *data = hsqs_data_metablock_data(metablock);
+
+	rv = hsqs_buffer_append(buffer, data, size, is_compressed);
+	if (rv < 0) {
+		goto out;
+	}
+
+out:
+	return rv;
+}
+
+int
+hsqs_metablock_cleanup(struct HsqsMetablockContext *context) {
+	hsqs_map_unmap(&context->map);
+	return 0;
 }

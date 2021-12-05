@@ -32,6 +32,7 @@
  * @created     : Wednesday Dec 01, 2021 17:22:03 CET
  */
 
+#include "../utils.h"
 #include "table_context.h"
 
 #ifndef FRAGMENT_TABLE_CONTEXT_H
@@ -40,6 +41,7 @@
 
 struct HsqsSuperblockContext;
 struct HsqsInodeContext;
+struct HsqsBuffer;
 
 struct HsqsFragmentTableContext {
 	const struct HsqsSuperblockContext *superblock;

@@ -92,7 +92,6 @@ static size_t
 hsqs_mapper_mmap_complete_size(const struct HsqsMemoryMapper *mapper) {
 	return mapper->data.mc.size;
 }
-
 static int
 hsqs_map_mmap_complete_unmap(struct HsqsMemoryMap *map) {
 	map->data.mc.data = NULL;
@@ -103,6 +102,11 @@ static const uint8_t *
 hsqs_map_mmap_complete_data(const struct HsqsMemoryMap *map) {
 	return map->data.mc.data;
 }
+static int
+hsqs_map_mmap_complete_resize(struct HsqsMemoryMap *mapper, size_t new_size) {
+	return mapper->data.mc.size;
+}
+
 static size_t
 hsqs_map_mmap_complete_size(const struct HsqsMemoryMap *map) {
 	return map->data.mc.size;
@@ -114,6 +118,7 @@ struct HsqsMemoryMapperImpl hsqs_mapper_impl_mmap_complete = {
 		.size = hsqs_mapper_mmap_complete_size,
 		.cleanup = hsqs_mapper_mmap_complete_cleanup,
 		.map_data = hsqs_map_mmap_complete_data,
+		.map_resize = hsqs_map_mmap_complete_resize,
 		.map_size = hsqs_map_mmap_complete_size,
 		.unmap = hsqs_map_mmap_complete_unmap,
 };

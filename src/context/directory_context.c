@@ -39,7 +39,6 @@
 #include "../error.h"
 #include "../hsqs.h"
 #include "inode_context.h"
-#include "metablock_context.h"
 
 #include <string.h>
 
@@ -82,13 +81,14 @@ directory_iterator_current_fragment(
 
 static int
 directory_data_more(struct HsqsDirectoryIterator *iterator, size_t size) {
-	int rv = hsqs_metablock_more(&iterator->extract, size);
+	int rv = hsqs_metablock_stream_more(&iterator->metablock, size);
 	if (rv < 0) {
 		return rv;
 	}
 
-	iterator->fragments = (struct HsqsDirectoryFragment *)hsqs_metablock_data(
-			&iterator->extract);
+	iterator->fragments =
+			(struct HsqsDirectoryFragment *)hsqs_metablock_stream_data(
+					&iterator->metablock);
 	return 0;
 }
 
@@ -161,14 +161,14 @@ hsqs_directory_iterator_init(
 		struct HsqsDirectoryIterator *iterator,
 		struct HsqsDirectoryContext *directory) {
 	int rv = 0;
-	rv = hsqs_metablock_init(
-			&iterator->extract, directory->superblock,
-			hsqs_superblock_directory_table_start(directory->superblock));
+	rv = hsqs_metablock_stream_init(
+			&iterator->metablock, directory->superblock,
+			hsqs_superblock_directory_table_start(directory->superblock), ~0);
 	if (rv < 0) {
 		return rv;
 	}
-	rv = hsqs_metablock_seek(
-			&iterator->extract, directory->block_start,
+	rv = hsqs_metablock_stream_seek(
+			&iterator->metablock, directory->block_start,
 			directory->block_offset);
 	if (rv < 0) {
 		return rv;
@@ -282,7 +282,7 @@ hsqs_directory_iterator_next(struct HsqsDirectoryIterator *iterator) {
 int
 hsqs_directory_iterator_cleanup(struct HsqsDirectoryIterator *iterator) {
 	int rv = 0;
-	rv = hsqs_metablock_cleanup(&iterator->extract);
+	rv = hsqs_metablock_stream_cleanup(&iterator->metablock);
 	return rv;
 }
 

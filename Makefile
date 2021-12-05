@@ -13,6 +13,7 @@ HDR = \
 	src/context/fragment_context.h \
 	src/context/inode_context.h \
 	src/context/metablock_context.h \
+	src/context/metablock_stream_context.h \
 	src/context/superblock_context.h \
 	src/context/table_context.h \
 	src/context/xattr_table_context.h \
@@ -34,6 +35,7 @@ HDR = \
 	src/data/xattr_internal.h \
 	src/error.h \
 	src/hsqs.h \
+	src/mapper/canary.h \
 	src/mapper/memory_mapper.h \
 	src/mapper/mmap.h \
 	src/mapper/mmap_complete.h \
@@ -51,6 +53,7 @@ SRC = \
 	src/context/fragment_context.c \
 	src/context/inode_context.c \
 	src/context/metablock_context.c \
+	src/context/metablock_stream_context.c \
 	src/context/superblock_context.c \
 	src/context/table_context.c \
 	src/context/xattr_table_context.c \
@@ -64,6 +67,7 @@ SRC = \
 	src/data/xattr.c \
 	src/error.c \
 	src/hsqs.c \
+	src/mapper/canary.c \
 	src/mapper/memory_mapper.c \
 	src/mapper/mmap.c \
 	src/mapper/mmap_complete.c \
@@ -80,7 +84,6 @@ BIN = \
 	bin/hsqs-cat \
 	bin/hsqs-ls \
 	bin/hsqs-mount \
-	bin/hsqs-info \
 
 TST = \
 	test/utils/lru_hashmap.c \

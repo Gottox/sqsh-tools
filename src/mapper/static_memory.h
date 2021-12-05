@@ -28,7 +28,7 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : mmap_complete
+ * @file        : static_memory
  * @created     : Sunday Nov 21, 2021 15:58:40 CET
  */
 

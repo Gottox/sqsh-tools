@@ -28,33 +28,25 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : compression_option_context
- * @created     : Tuesday Nov 30, 2021 15:21:20 CET
+ * @file        : canary
+ * @created     : Sunday Nov 21, 2021 15:58:40 CET
  */
 
-#include "../compression/buffer.h"
-#include "../utils.h"
+#include <stddef.h>
+#include <stdint.h>
 
-#ifndef COMPRESSION_OPTIONS_CONTEXT_H
+#ifndef CANARY_H
 
-#define COMPRESSION_OPTIONS_CONTEXT_H
+#define CANARY_H
 
-union HsqsCompressionOptions;
-
-struct HsqsCompressionOptionsContext {
-	struct HsqsBuffer buffer;
+struct HsqsMapperCanary {
+	const uint8_t *data;
+	size_t size;
 };
 
-HSQS_NO_UNUSED int hsqs_compression_options_init(
-		struct HsqsCompressionOptionsContext *context,
-		struct HsqsSuperblockContext *superblock);
-
-const union HsqsCompressionOptions *
-hsqs_compression_options(const struct HsqsCompressionOptionsContext *context);
-size_t hsqs_compression_options_size(
-		const struct HsqsCompressionOptionsContext *context);
-
-int
-hsqs_compression_options_cleanup(struct HsqsCompressionOptionsContext *context);
-
-#endif /* end of include guard COMPRESSION_OPTIONS_CONTEXT_H */
+struct HsqsMapCanary {
+	uint64_t offset;
+	uint8_t *data;
+	size_t size;
+};
+#endif /* end of include guard CANARY_H */

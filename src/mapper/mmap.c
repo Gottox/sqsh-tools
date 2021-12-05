@@ -32,6 +32,8 @@
  * @created     : Sunday Nov 21, 2021 16:01:03 CET
  */
 
+#define _GNU_SOURCE
+#include "../utils.h"
 #include "memory_mapper.h"
 #include <errno.h>
 #include <fcntl.h>
@@ -59,6 +61,7 @@ hsqs_mapper_mmap_init(
 	}
 	mapper->data.mm.fd = fd;
 	mapper->data.mm.size = st.st_size;
+	mapper->data.mm.page_size = sysconf(_SC_PAGESIZE);
 	fd = -1;
 
 out:
@@ -71,14 +74,22 @@ static int
 hsqs_mapper_mmap_map(
 		struct HsqsMemoryMap *map, struct HsqsMemoryMapper *mapper,
 		off_t offset, size_t size) {
-	uint8_t *file_map = MAP_FAILED;
-	file_map = mmap(
-			NULL, size, PROT_READ, MAP_PRIVATE, mapper->data.mm.fd, offset);
-	if (file_map == MAP_FAILED) {
-		return -errno;
+	uint8_t *file_map = NULL;
+	size_t page_offset = offset % mapper->data.mm.page_size;
+
+	if (size != 0) {
+		file_map =
+				mmap(NULL, size + page_offset, PROT_READ, MAP_PRIVATE,
+					 mapper->data.mm.fd, offset - page_offset);
+		if (file_map == MAP_FAILED) {
+			return -errno;
+		}
 	}
+
 	map->data.mm.data = file_map;
 	map->data.mm.size = size;
+	map->data.mm.offset = offset;
+	map->data.mm.page_offset = page_offset;
 	return 0;
 }
 static int
@@ -94,15 +105,49 @@ hsqs_mapper_mmap_size(const struct HsqsMemoryMapper *mapper) {
 static int
 hsqs_map_mmap_unmap(struct HsqsMemoryMap *map) {
 	int rv;
-	rv = munmap(map->data.mm.data, map->data.mm.size);
+	rv = munmap(
+			map->data.mm.data, map->data.mm.size + map->data.mm.page_offset);
 
 	map->data.mm.data = NULL;
 	map->data.mm.size = 0;
+	map->data.mm.page_offset = 0;
+	map->data.mm.offset = 0;
 	return rv;
 }
 static const uint8_t *
 hsqs_map_mmap_data(const struct HsqsMemoryMap *map) {
-	return map->data.mm.data;
+	return &map->data.mm.data[map->data.mm.page_offset];
+}
+
+int
+hsqs_map_mmap_resize(struct HsqsMemoryMap *map, size_t new_size) {
+#ifdef _GNU_SOURCE
+	uint8_t *data = map->data.mm.data;
+	size_t size = map->data.mm.size;
+	size_t page_offset = map->data.mm.page_offset;
+
+	data = mremap(
+			data, page_offset + size, page_offset + new_size, MREMAP_MAYMOVE);
+
+	if (data == MAP_FAILED) {
+		return -errno;
+	}
+
+	map->data.mm.size = new_size;
+	map->data.mm.data = data;
+
+	return 0;
+#else
+	int rv;
+	uint64_t offset = map->data.mm.offset;
+	struct HsqsMemoryMapper *mapper = map->mapper;
+
+	rv = hsqs_map_unmap(map);
+	if (rv < 0) {
+		return rv;
+	}
+	return hsqs_mapper_map(map, mapper, offset, new_size);
+#endif
 }
 static size_t
 hsqs_map_mmap_size(const struct HsqsMemoryMap *map) {
@@ -116,5 +161,6 @@ struct HsqsMemoryMapperImpl hsqs_mapper_impl_mmap = {
 		.cleanup = hsqs_mapper_mmap_cleanup,
 		.map_data = hsqs_map_mmap_data,
 		.map_size = hsqs_map_mmap_size,
+		.map_resize = hsqs_map_mmap_resize,
 		.unmap = hsqs_map_mmap_unmap,
 };

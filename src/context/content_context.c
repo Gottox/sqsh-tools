@@ -115,20 +115,20 @@ hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
 	struct HsqsFragmentTableContext *table =
 			&context->superblock->fragment_table;
 	struct HsqsBuffer *buffer = &context->buffer;
+	uint64_t start_block = hsqs_inode_file_blocks_start(context->inode);
+	bool is_compressed;
 	uint32_t block_size = hsqs_superblock_block_size(context->superblock);
 	uint32_t block_index = context->seek_pos / block_size;
 	uint32_t block_count = datablock_count(context);
-	uint64_t block_offset = hsqs_inode_file_blocks_start(context->inode) +
-			datablock_offset(context, block_index);
-	// TODO: Don't map the whole file, only to cover `size`.
+	uint64_t block_offset = datablock_offset(context, block_index);
 	uint64_t block_whole_size =
 			datablock_offset(context, block_count) - block_offset;
-	bool is_compressed;
 	uint32_t outer_block_size;
-	uint64_t outer_offset;
+	uint64_t outer_offset = 0;
 
 	rv = hsqs_mapper_map(
-			&map, context->superblock->mapper, block_offset, block_whole_size);
+			&map, context->superblock->mapper, start_block + block_offset,
+			block_whole_size);
 
 	if (rv < 0) {
 		goto out;
@@ -137,7 +137,6 @@ hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
 		rv = HSQS_ERROR_TODO;
 	}
 
-	outer_offset = 0;
 	for (; block_index < block_count && hsqs_content_size(context) < size;
 		 block_index++) {
 		is_compressed = hsqs_inode_file_block_is_compressed(

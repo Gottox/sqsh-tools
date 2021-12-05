@@ -34,6 +34,7 @@
 
 #include "../utils.h"
 #include "metablock_context.h"
+#include "metablock_stream_context.h"
 #include "table_context.h"
 #include <stdint.h>
 
@@ -48,17 +49,18 @@ struct HsqsInodeContext;
 
 struct HsqsXattrTableContext {
 	struct HsqsSuperblockContext *superblock;
-	const struct HsqsXattrIdTable *header;
+	struct HsqsMemoryMap header;
 	struct HsqsTableContext table;
 };
 
 struct HsqsXattrTableIterator {
-	struct HsqsMetablockContext metablock;
-	struct HsqsMetablockContext out_of_line_value;
+	struct HsqsMetablockStreamContext metablock;
+	struct HsqsMetablockStreamContext out_of_line_value;
 	struct HsqsXattrTableContext *context;
 	int remaining_entries;
-	struct HsqsXattrKey *current_key;
-	struct HsqsXattrValue *current_value;
+	off_t next_offset;
+	off_t key_offset;
+	off_t value_offset;
 };
 
 HSQS_NO_UNUSED int hsqs_xattr_table_init(

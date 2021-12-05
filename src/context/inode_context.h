@@ -33,7 +33,7 @@
  */
 
 #include "../utils.h"
-#include "metablock_context.h"
+#include "metablock_stream_context.h"
 #include <stdint.h>
 #include <sys/types.h>
 
@@ -64,7 +64,7 @@ enum HsqsInodeContextType {
 
 struct HsqsInodeContext {
 	struct HsqsInode *inode;
-	struct HsqsMetablockContext extract;
+	struct HsqsMetablockStreamContext metablock;
 	struct HsqsSuperblockContext *superblock;
 };
 

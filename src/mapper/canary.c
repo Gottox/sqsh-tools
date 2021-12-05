@@ -28,33 +28,83 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : compression_option_context
- * @created     : Tuesday Nov 30, 2021 15:21:20 CET
+ * @file        : canary
+ * @created     : Sunday Nov 21, 2021 16:01:03 CET
  */
 
-#include "../compression/buffer.h"
-#include "../utils.h"
+#include "memory_mapper.h"
+#include <errno.h>
+#include <fcntl.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <unistd.h>
 
-#ifndef COMPRESSION_OPTIONS_CONTEXT_H
+static int
+hsqs_mapper_canary_init(
+		struct HsqsMemoryMapper *mapper, const void *input, size_t size) {
+	mapper->data.cn.data = input;
+	mapper->data.cn.size = size;
+	return 0;
+}
+static int
+hsqs_mapper_canary_map(
+		struct HsqsMemoryMap *map, struct HsqsMemoryMapper *mapper,
+		off_t offset, size_t size) {
+	uint8_t *data = calloc(size, sizeof(uint8_t));
 
-#define COMPRESSION_OPTIONS_CONTEXT_H
+	memcpy(data, &mapper->data.cn.data[offset], size);
+	map->data.cn.offset = offset;
+	map->data.cn.data = data;
+	map->data.cn.size = size;
+	return 0;
+}
+static size_t
+hsqs_mapper_canary_size(const struct HsqsMemoryMapper *mapper) {
+	return mapper->data.cn.size;
+}
+static int
+hsqs_mapper_canary_cleanup(struct HsqsMemoryMapper *mapper) {
+	return 0;
+}
+static int
+hsqs_map_canary_unmap(struct HsqsMemoryMap *map) {
+	free(map->data.cn.data);
+	map->data.cn.data = NULL;
+	map->data.cn.size = 0;
+	return 0;
+}
+static const uint8_t *
+hsqs_map_canary_data(const struct HsqsMemoryMap *map) {
+	return map->data.cn.data;
+}
 
-union HsqsCompressionOptions;
+static int
+hsqs_map_canary_resize(struct HsqsMemoryMap *map, size_t new_size) {
+	int rv;
+	uint64_t offset = map->data.cn.offset;
+	struct HsqsMemoryMapper *mapper = map->mapper;
 
-struct HsqsCompressionOptionsContext {
-	struct HsqsBuffer buffer;
+	rv = hsqs_map_unmap(map);
+	if (rv < 0) {
+		return rv;
+	}
+	return hsqs_mapper_map(map, mapper, offset, new_size);
+}
+
+static size_t
+hsqs_map_canary_size(const struct HsqsMemoryMap *map) {
+	return map->data.cn.size;
+}
+
+struct HsqsMemoryMapperImpl hsqs_mapper_impl_canary = {
+		.init = hsqs_mapper_canary_init,
+		.map = hsqs_mapper_canary_map,
+		.size = hsqs_mapper_canary_size,
+		.cleanup = hsqs_mapper_canary_cleanup,
+		.map_data = hsqs_map_canary_data,
+		.map_resize = hsqs_map_canary_resize,
+		.map_size = hsqs_map_canary_size,
+		.unmap = hsqs_map_canary_unmap,
 };
-
-HSQS_NO_UNUSED int hsqs_compression_options_init(
-		struct HsqsCompressionOptionsContext *context,
-		struct HsqsSuperblockContext *superblock);
-
-const union HsqsCompressionOptions *
-hsqs_compression_options(const struct HsqsCompressionOptionsContext *context);
-size_t hsqs_compression_options_size(
-		const struct HsqsCompressionOptionsContext *context);
-
-int
-hsqs_compression_options_cleanup(struct HsqsCompressionOptionsContext *context);
-
-#endif /* end of include guard COMPRESSION_OPTIONS_CONTEXT_H */

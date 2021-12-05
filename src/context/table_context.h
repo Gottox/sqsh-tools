@@ -33,7 +33,6 @@
  */
 
 #include "../mapper/memory_mapper.h"
-#include "metablock_context.h"
 #include <stdint.h>
 
 #ifndef TABLE_CONTEXT_H
@@ -41,8 +40,10 @@
 #define TABLE_CONTEXT_H
 
 struct HsqsTableContext {
-	struct HsqsMetablockContext metablock;
+	const struct HsqsSuperblockContext *superblock;
+	struct HsqsMemoryMapper *mapper;
 	struct HsqsMemoryMap lookup_table;
+	uint64_t start_block;
 	size_t element_size;
 	size_t element_count;
 };
@@ -51,8 +52,7 @@ int hsqs_table_init(
 		struct HsqsTableContext *table,
 		const struct HsqsSuperblockContext *superblock, off_t start_block,
 		size_t element_size, size_t element_count);
-int hsqs_table_get(
-		struct HsqsTableContext *table, off_t index, const void **target);
+int hsqs_table_get(struct HsqsTableContext *table, off_t index, void *target);
 int hsqs_table_cleanup(struct HsqsTableContext *table);
 
 #endif /* end of include guard TABLE_CONTEXT_H */

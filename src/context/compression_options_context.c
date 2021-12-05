@@ -35,45 +35,55 @@
 #include "compression_options_context.h"
 #include "../data/compression_options.h"
 #include "../data/superblock.h"
+#include "metablock_context.h"
 
 int
 hsqs_compression_options_init(
 		struct HsqsCompressionOptionsContext *context,
 		struct HsqsSuperblockContext *superblock) {
 	int rv = 0;
+	struct HsqsMetablockContext metablock = {0};
 
-	rv = hsqs_metablock_init(
-			&context->metablock, superblock, HSQS_SIZEOF_SUPERBLOCK);
+	rv = hsqs_metablock_init(&metablock, superblock, HSQS_SIZEOF_SUPERBLOCK);
 	if (rv < 0) {
 		goto out;
 	}
 
-	// size of one decompresses the whole block
-	rv = hsqs_metablock_more(&context->metablock, 1);
+	rv = hsqs_buffer_init(
+			&context->buffer, superblock, HSQS_METABLOCK_BLOCK_SIZE);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = hsqs_metablock_to_buffer(&metablock, &context->buffer);
 	if (rv < 0) {
 		goto out;
 	}
 
 out:
+	hsqs_metablock_cleanup(&metablock);
+	if (rv < 0) {
+		hsqs_compression_options_cleanup(context);
+	}
 	return rv;
 }
 
 const union HsqsCompressionOptions *
 hsqs_compression_options(const struct HsqsCompressionOptionsContext *context) {
-	return (const union HsqsCompressionOptions *)hsqs_metablock_data(
-			&context->metablock);
+	return (const union HsqsCompressionOptions *)hsqs_buffer_data(
+			&context->buffer);
 }
 
 size_t
 hsqs_compression_options_size(
 		const struct HsqsCompressionOptionsContext *context) {
-	return hsqs_metablock_size(&context->metablock);
+	return hsqs_buffer_size(&context->buffer);
 }
 
 int
 hsqs_compression_options_cleanup(
 		struct HsqsCompressionOptionsContext *context) {
-	hsqs_metablock_cleanup(&context->metablock);
+	hsqs_buffer_cleanup(&context->buffer);
 
 	return 0;
 }

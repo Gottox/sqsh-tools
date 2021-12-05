@@ -33,7 +33,7 @@
  */
 
 #include "fragment_context.h"
-#include "../data/fragment.h"
+#include "../data/fragment_internal.h"
 #include "../error.h"
 #include "../mapper/memory_mapper.h"
 #include "inode_context.h"
@@ -69,17 +69,17 @@ read_fragment_data(
 	uint32_t size;
 	const struct HsqsDatablockSize *size_info;
 	bool is_compressed;
-	const struct HsqsFragment *fragment;
+	struct HsqsFragment fragment = {0};
 	struct HsqsMemoryMap memory_map = {0};
 	const uint8_t *data;
 
-	rv = hsqs_table_get(&context->table, index, (const void **)&fragment);
+	rv = hsqs_table_get(&context->table, index, &fragment);
 	if (rv < 0) {
 		goto out;
 	}
 
-	start = hsqs_data_fragment_start(fragment);
-	size_info = hsqs_data_fragment_size_info(fragment);
+	start = hsqs_data_fragment_start(&fragment);
+	size_info = hsqs_data_fragment_size_info(&fragment);
 	size = hsqs_data_datablock_size(size_info);
 	is_compressed = hsqs_data_datablock_is_compressed(size_info);
 

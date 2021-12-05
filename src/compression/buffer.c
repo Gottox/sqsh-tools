@@ -32,7 +32,6 @@
  * @created     : Sunday Sep 05, 2021 12:16:28 CEST
  */
 
-#include "../context/metablock_context.h"
 #include "../context/superblock_context.h"
 #include "../data/metablock.h"
 #include "../data/superblock_internal.h"
@@ -41,6 +40,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 #ifdef CONFIG_COMPRESSION_GZIP

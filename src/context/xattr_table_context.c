@@ -35,35 +35,53 @@
 #include "xattr_table_context.h"
 #include "../compression/buffer.h"
 #include "../data/superblock.h"
-#include "../data/xattr.h"
+#include "../data/xattr_internal.h"
 #include "../error.h"
 #include "inode_context.h"
 #include "superblock_context.h"
 
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
+
+static const struct HsqsXattrIdTable *
+get_header(const struct HsqsXattrTableContext *context) {
+	return (struct HsqsXattrIdTable *)hsqs_map_data(&context->header);
+}
 
 int
 hsqs_xattr_table_init(
 		struct HsqsXattrTableContext *context,
 		struct HsqsSuperblockContext *superblock) {
 	int rv = 0;
-	uint64_t offset =
+	uint64_t xattr_address =
 			hsqs_data_superblock_xattr_id_table_start(superblock->superblock);
 	uint64_t bytes_used = hsqs_superblock_bytes_used(superblock);
-	if (offset + HSQS_SIZEOF_XATTR_ID_TABLE >= bytes_used) {
+	if (xattr_address + HSQS_SIZEOF_XATTR_ID_TABLE >= bytes_used) {
 		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
-	context->header = hsqs_superblock_data_from_offset(superblock, offset);
 	context->superblock = superblock;
-	if (context->header == NULL) {
-		return -HSQS_ERROR_SIZE_MISSMATCH;
+	rv = hsqs_mapper_map(
+			&context->header, superblock->mapper, xattr_address,
+			HSQS_SIZEOF_XATTR_ID_TABLE);
+	if (rv < 0) {
+		goto out;
 	}
 
+	const struct HsqsXattrIdTable *header = get_header(context);
+
 	rv = hsqs_table_init(
-			&context->table, superblock, offset + HSQS_SIZEOF_XATTR_ID_TABLE,
+			&context->table, superblock,
+			xattr_address + HSQS_SIZEOF_XATTR_ID_TABLE,
 			HSQS_SIZEOF_XATTR_LOOKUP_TABLE,
-			hsqs_data_xattr_id_table_xattr_ids(context->header));
+			hsqs_data_xattr_id_table_xattr_ids(header));
+	if (rv < 0) {
+		goto out;
+	}
+out:
+	if (rv < 0) {
+		hsqs_xattr_table_cleanup(context);
+	}
 	return rv;
 }
 
@@ -73,7 +91,7 @@ hsqs_xattr_table_iterator_init(
 		struct HsqsXattrTableContext *xattr_table,
 		const struct HsqsInodeContext *inode) {
 	int rv;
-	const struct HsqsXattrLookupTable *ref;
+	struct HsqsXattrLookupTable ref = {0};
 	uint32_t index = hsqs_inode_xattr_index(inode);
 
 	if (index == HSQS_INODE_NO_XATTR) {
@@ -81,85 +99,103 @@ hsqs_xattr_table_iterator_init(
 		return 0;
 	}
 
-	rv = hsqs_table_get(&xattr_table->table, index, (const void **)&ref);
+	rv = hsqs_table_get(&xattr_table->table, index, &ref);
 	if (rv < 0) {
 		hsqs_xattr_table_iterator_cleanup(iterator);
 		goto out;
 	}
 
+	const struct HsqsXattrIdTable *header = get_header(xattr_table);
 	// TODO: references are used in inodes too. Generalize!
-	uint64_t start_block =
-			hsqs_data_xattr_id_table_xattr_table_start(xattr_table->header);
-	rv = hsqs_metablock_init(
-			&iterator->metablock, xattr_table->superblock, start_block);
+	uint64_t start_block = hsqs_data_xattr_id_table_xattr_table_start(header);
+
+	// TODO upper bounds should not be ~0.
+	rv = hsqs_metablock_stream_init(
+			&iterator->metablock, xattr_table->superblock, start_block, ~0);
 	if (rv < 0) {
-		hsqs_xattr_table_iterator_cleanup(iterator);
 		goto out;
 	}
-	uint64_t metablock_index =
-			hsqs_data_xattr_lookup_table_xattr_ref(ref) >> 16;
-	uint16_t metablock_offset =
-			hsqs_data_xattr_lookup_table_xattr_ref(ref) & 0xFFFF;
-	rv = hsqs_metablock_seek(
-			&iterator->metablock, metablock_index, metablock_offset);
+	rv = hsqs_metablock_stream_seek_ref(
+			&iterator->metablock, hsqs_data_xattr_lookup_table_xattr_ref(&ref));
 	if (rv < 0) {
-		hsqs_xattr_table_iterator_cleanup(iterator);
 		goto out;
 	}
 
-	iterator->remaining_entries = hsqs_data_xattr_lookup_table_count(ref);
+	rv = hsqs_metablock_stream_more(
+			&iterator->metablock, hsqs_data_xattr_lookup_table_size(&ref));
+	if (rv < 0) {
+		goto out;
+	}
 
-	rv = hsqs_metablock_more(
-			&iterator->metablock, hsqs_data_xattr_lookup_table_size(ref));
-
-	iterator->current_key = NULL;
-	iterator->current_value = NULL;
+	iterator->remaining_entries = hsqs_data_xattr_lookup_table_count(&ref);
+	iterator->next_offset = 0;
+	iterator->key_offset = 0;
+	iterator->value_offset = 0;
 	iterator->context = xattr_table;
 
 out:
+	if (rv < 0) {
+		hsqs_xattr_table_iterator_cleanup(iterator);
+	}
 	return rv;
 }
 
-int
-xattr_value_indirect_load(
-		struct HsqsXattrTableIterator *iterator,
-		struct HsqsXattrValue *ref_value) {
-	struct HsqsXattrValue *tmp;
+static const struct HsqsXattrValue *
+get_value(struct HsqsXattrTableIterator *iterator) {
+	const uint8_t *data;
+	if (iterator->value_offset == 0) {
+		data = hsqs_metablock_stream_data(&iterator->out_of_line_value);
+	} else {
+		data = hsqs_metablock_stream_data(&iterator->metablock);
+	}
+	return (const struct HsqsXattrValue *)&data[iterator->value_offset];
+}
+
+static const struct HsqsXattrKey *
+get_key(struct HsqsXattrTableIterator *iterator) {
+	const uint8_t *data = hsqs_metablock_stream_data(&iterator->metablock);
+
+	return (const struct HsqsXattrKey *)&data[iterator->key_offset];
+}
+
+static int
+xattr_value_indirect_load(struct HsqsXattrTableIterator *iterator) {
+	const struct HsqsXattrValue *value = get_value(iterator);
 	int rv = 0;
-	if (hsqs_data_xattr_value_size(ref_value) != 8) {
+	if (hsqs_data_xattr_value_size(value) != 8) {
 		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
-	uint64_t ref = hsqs_data_xattr_value_ref(ref_value);
+	uint64_t ref = hsqs_data_xattr_value_ref(value);
 
-	uint64_t start_block = hsqs_data_xattr_id_table_xattr_table_start(
-			iterator->context->header);
-	rv = hsqs_metablock_init(
+	const struct HsqsXattrIdTable *header = get_header(iterator->context);
+	uint64_t start_block = hsqs_data_xattr_id_table_xattr_table_start(header);
+	rv = hsqs_metablock_stream_init(
 			&iterator->out_of_line_value, iterator->context->superblock,
-			start_block);
+			start_block, ~0);
 	if (rv < 0) {
 		goto out;
 	}
-	uint64_t metablock_index = ref >> 16;
-	uint16_t metablock_offset = ref & 0xFFFF;
-	rv = hsqs_metablock_seek(
-			&iterator->out_of_line_value, metablock_index, metablock_offset);
+	rv = hsqs_metablock_stream_seek_ref(&iterator->out_of_line_value, ref);
 	if (rv < 0) {
 		goto out;
 	}
 	size_t size = HSQS_SIZEOF_XATTR_VALUE;
-	rv = hsqs_metablock_more(&iterator->out_of_line_value, size);
+	rv = hsqs_metablock_stream_more(&iterator->out_of_line_value, size);
 	if (rv < 0) {
 		goto out;
 	}
-	tmp = (struct HsqsXattrValue *)hsqs_metablock_data(
+
+	// Value offset 0 marks an indirect load.
+	iterator->value_offset = 0;
+	value = get_value(iterator);
+
+	value = (struct HsqsXattrValue *)hsqs_metablock_stream_data(
 			&iterator->out_of_line_value);
-	size += hsqs_data_xattr_value_size(tmp);
-	rv = hsqs_metablock_more(&iterator->out_of_line_value, size);
+	size += hsqs_data_xattr_value_size(value);
+	rv = hsqs_metablock_stream_more(&iterator->out_of_line_value, size);
 	if (rv < 0) {
 		goto out;
 	}
-	iterator->current_value = (struct HsqsXattrValue *)hsqs_metablock_data(
-			&iterator->out_of_line_value);
 
 out:
 	return rv;
@@ -168,53 +204,81 @@ out:
 int
 hsqs_xattr_table_iterator_next(struct HsqsXattrTableIterator *iterator) {
 	int rv = 0;
-	struct HsqsXattrValue *value;
-	int remaining_entries = iterator->remaining_entries;
+	off_t offset = iterator->next_offset;
+	size_t size = offset;
+
+	hsqs_metablock_stream_cleanup(&iterator->out_of_line_value);
+
 	if (iterator->remaining_entries == 0) {
 		return 0;
 	}
-	if (iterator->current_key == NULL) {
-		iterator->current_key = (struct HsqsXattrKey *)hsqs_metablock_data(
-				&iterator->metablock);
-	} else {
-		if (hsqs_xattr_table_iterator_is_indirect(iterator)) {
-			hsqs_metablock_cleanup(&iterator->out_of_line_value);
-		}
-		iterator->current_key = (struct HsqsXattrKey *)&hsqs_data_xattr_value(
-				iterator->current_value)[hsqs_data_xattr_value_size(
-				iterator->current_value)];
+
+	// Load Key Header
+	size += HSQS_SIZEOF_XATTR_KEY;
+	rv = hsqs_metablock_stream_more(&iterator->metablock, size);
+	if (rv < 0) {
+		goto out;
+	}
+	iterator->key_offset = offset;
+
+	offset = size;
+
+	// Load Key Name
+	size += hsqs_xattr_table_iterator_name_size(iterator);
+	rv = hsqs_metablock_stream_more(&iterator->metablock, size);
+	if (rv < 0) {
+		goto out;
 	}
 
-	value = (struct HsqsXattrValue *)&hsqs_data_xattr_key_name(
-			iterator->current_key)[hsqs_data_xattr_key_name_size(
-			iterator->current_key)];
+	offset = size;
+
+	// Load Value Header
+	size += HSQS_SIZEOF_XATTR_VALUE;
+	rv = hsqs_metablock_stream_more(&iterator->metablock, size);
+	if (rv < 0) {
+		goto out;
+	}
+	iterator->value_offset = offset;
+
+	offset = size;
+
+	// Load Value
+	size += hsqs_xattr_table_iterator_value_size(iterator);
+	rv = hsqs_metablock_stream_more(&iterator->metablock, size);
+	if (rv < 0) {
+		goto out;
+	}
+
+	iterator->next_offset = size;
 
 	if (hsqs_xattr_table_iterator_is_indirect(iterator)) {
-		rv = xattr_value_indirect_load(iterator, value);
+		rv = xattr_value_indirect_load(iterator);
 		if (rv < 0) {
-			return rv;
+			goto out;
 		}
-	} else {
-		iterator->current_value = value;
 	}
 
+	rv = iterator->remaining_entries;
+
 	iterator->remaining_entries--;
-	return remaining_entries;
+
+out:
+	return rv;
 }
 
 uint16_t
 hsqs_xattr_table_iterator_type(struct HsqsXattrTableIterator *iterator) {
-	return hsqs_data_xattr_key_type(iterator->current_key) & ~0x0100;
+	return hsqs_data_xattr_key_type(get_key(iterator)) & ~0x0100;
 }
 
 bool
 hsqs_xattr_table_iterator_is_indirect(struct HsqsXattrTableIterator *iterator) {
-	return (hsqs_data_xattr_key_type(iterator->current_key) & 0x0100) != 0;
+	return (hsqs_data_xattr_key_type(get_key(iterator)) & 0x0100) != 0;
 }
 
 const char *
 hsqs_xattr_table_iterator_name(struct HsqsXattrTableIterator *iterator) {
-	return (const char *)hsqs_data_xattr_key_name(iterator->current_key);
+	return (const char *)hsqs_data_xattr_key_name(get_key(iterator));
 }
 
 const char *
@@ -255,7 +319,7 @@ hsqs_xattr_table_iterator_fullname_dup(
 
 uint16_t
 hsqs_xattr_table_iterator_name_size(struct HsqsXattrTableIterator *iterator) {
-	return hsqs_data_xattr_key_name_size(iterator->current_key);
+	return hsqs_data_xattr_key_name_size(get_key(iterator));
 }
 
 int
@@ -274,23 +338,24 @@ hsqs_xattr_table_iterator_value_dup(
 
 const char *
 hsqs_xattr_table_iterator_value(struct HsqsXattrTableIterator *iterator) {
-	return (const char *)hsqs_data_xattr_value(iterator->current_value);
+	return (const char *)hsqs_data_xattr_value(get_value(iterator));
 }
 
 uint16_t
 hsqs_xattr_table_iterator_value_size(struct HsqsXattrTableIterator *iterator) {
-	return hsqs_data_xattr_value_size(iterator->current_value);
+	return hsqs_data_xattr_value_size(get_value(iterator));
 }
 
 int
 hsqs_xattr_table_iterator_cleanup(struct HsqsXattrTableIterator *iterator) {
-	hsqs_metablock_cleanup(&iterator->out_of_line_value);
-	hsqs_metablock_cleanup(&iterator->metablock);
+	hsqs_metablock_stream_cleanup(&iterator->out_of_line_value);
+	hsqs_metablock_stream_cleanup(&iterator->metablock);
 	return 0;
 }
 
 int
 hsqs_xattr_table_cleanup(struct HsqsXattrTableContext *context) {
 	hsqs_table_cleanup(&context->table);
+	hsqs_map_unmap(&context->header);
 	return 0;
 }

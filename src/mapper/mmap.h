@@ -28,7 +28,7 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : mmap_complete
+ * @file        : mmap
  * @created     : Sunday Nov 21, 2021 15:58:40 CET
  */
 
@@ -41,11 +41,14 @@
 
 struct HsqsMapperMmap {
 	int fd;
+	long page_size;
 	size_t size;
 };
 
 struct HsqsMapMmap {
 	uint8_t *data;
+	size_t offset;
+	size_t page_offset;
 	size_t size;
 };
 
