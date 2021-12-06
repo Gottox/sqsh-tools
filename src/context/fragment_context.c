@@ -89,7 +89,7 @@ read_fragment_data(
 	}
 
 	data = hsqs_map_data(&memory_map);
-	rv = hsqs_buffer_append(buffer, data, size, is_compressed);
+	rv = hsqs_buffer_append_block(buffer, data, size, is_compressed);
 	if (rv < 0) {
 		goto out;
 	}
@@ -131,7 +131,7 @@ hsqs_fragment_table_to_buffer(
 
 	data = hsqs_buffer_data(&intermediate_buffer);
 
-	rv = hsqs_buffer_append(buffer, &data[offset], size, false);
+	rv = hsqs_buffer_append_block(buffer, &data[offset], size, false);
 	if (rv < 0) {
 		goto out;
 	}

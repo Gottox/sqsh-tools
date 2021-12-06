@@ -50,6 +50,10 @@
 
 #define STATIC_ASSERT(cond) _Static_assert(cond, #cond)
 
+#define HSQS_CEIL_DIVISION(x, y) (((x - 1) / y) + 1)
+
+#define HSQS_PADDING(x, p) HSQS_CEIL_DIVISION(x, p) * p
+
 uint32_t hsqs_log2_u32(uint32_t x);
 
 uint32_t hsqs_divide_ceil_u32(uint32_t x, uint32_t y);

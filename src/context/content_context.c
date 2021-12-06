@@ -146,7 +146,7 @@ hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
 		outer_block_size =
 				hsqs_inode_file_block_size(context->inode, block_index);
 
-		rv = hsqs_buffer_append(
+		rv = hsqs_buffer_append_block(
 				buffer, &hsqs_map_data(&map)[outer_offset], outer_block_size,
 				is_compressed);
 		if (rv < 0) {

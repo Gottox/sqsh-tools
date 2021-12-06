@@ -34,7 +34,6 @@
 
 #include "../error.h"
 #include "memory_mapper.h"
-#include <curl/curl.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdint.h>
@@ -46,18 +45,33 @@
 static size_t
 write_data(void *ptr, size_t size, size_t nmemb, void *userdata) {
 	int rv = 0;
+	size_t byte_size;
 	struct HsqsMemoryMap *map = userdata;
 
-	// TODO integer overflow
-	rv = hsqs_buffer_append(&map->data.cl.buffer, ptr, size * nmemb, false);
+	if (MULT_OVERFLOW(size, nmemb, &byte_size)) {
+		rv = -HSQS_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
+	rv = hsqs_buffer_append(&map->data.cl.buffer, ptr, byte_size);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = size * nmemb;
+	rv = byte_size;
 
 out:
 	return rv;
+}
+
+static CURL *
+get_handle(struct HsqsMemoryMapper *mapper) {
+	CURL *handle = mapper->data.cl.handle;
+	curl_easy_reset(handle);
+	curl_easy_setopt(handle, CURLOPT_URL, mapper->data.cl.url);
+	curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 1L);
+	curl_easy_setopt(handle, CURLOPT_TCP_KEEPALIVE, 1L);
+	curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1L);
+	return handle;
 }
 
 static int
@@ -67,10 +81,9 @@ hsqs_mapper_curl_init(
 	curl_global_init(CURL_GLOBAL_ALL);
 
 	mapper->data.cl.url = input;
+	mapper->data.cl.handle = curl_easy_init();
 
-	CURL *handle = curl_easy_init();
-	curl_easy_setopt(handle, CURLOPT_URL, mapper->data.cl.url);
-	curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 1L);
+	CURL *handle = get_handle(mapper);
 	curl_easy_setopt(handle, CURLOPT_NOBODY, 1L);
 	rv = curl_easy_perform(handle);
 	if (rv != CURLE_OK) {
@@ -94,36 +107,20 @@ static int
 hsqs_mapper_curl_map(
 		struct HsqsMemoryMap *map, struct HsqsMemoryMapper *mapper,
 		off_t offset, size_t size) {
-	char range_buffer[512] = {0};
 	int rv = 0;
-	CURL *handle = curl_easy_init();
+
 	map->data.cl.offset = offset;
 	rv = hsqs_buffer_init(&map->data.cl.buffer, HSQS_COMPRESSION_NONE, 8192);
 	if (rv < 0) {
 		goto out;
 	}
 
-	curl_easy_setopt(handle, CURLOPT_URL, mapper->data.cl.url);
-	curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 1L);
-	curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_data);
-	curl_easy_setopt(handle, CURLOPT_WRITEDATA, map);
-	// TODO: check for negative values of offset
-	rv = snprintf(
-			range_buffer, sizeof(range_buffer), "%lu-%lu", offset,
-			offset + size - 1);
-	if (rv >= sizeof(range_buffer)) {
-		rv = -HSQS_ERROR_TODO;
+	rv = hsqs_map_resize(map, size);
+	if (rv < 0) {
 		goto out;
-	}
-	curl_easy_setopt(handle, CURLOPT_RANGE, range_buffer);
-
-	rv = curl_easy_perform(handle);
-	if (rv != CURLE_OK) {
-		rv = -HSQS_ERROR_TODO;
 	}
 
 out:
-	curl_easy_cleanup(handle);
 	return rv;
 }
 static size_t
@@ -132,12 +129,12 @@ hsqs_mapper_curl_size(const struct HsqsMemoryMapper *mapper) {
 }
 static int
 hsqs_mapper_curl_cleanup(struct HsqsMemoryMapper *mapper) {
+	curl_easy_cleanup(mapper->data.cl.handle);
 	return 0;
 }
 static int
 hsqs_map_curl_unmap(struct HsqsMemoryMap *map) {
 	hsqs_buffer_cleanup(&map->data.cl.buffer);
-
 	return 0;
 }
 static const uint8_t *
@@ -147,15 +144,42 @@ hsqs_map_curl_data(const struct HsqsMemoryMap *map) {
 
 static int
 hsqs_map_curl_resize(struct HsqsMemoryMap *map, size_t new_size) {
-	int rv;
-	uint64_t offset = map->data.cl.offset;
-	struct HsqsMemoryMapper *mapper = map->mapper;
+	int rv = 0;
+	char range_buffer[512] = {0};
+	CURL *handle = get_handle(map->mapper);
+	new_size = HSQS_PADDING(new_size, 512);
+	size_t current_size = hsqs_map_size(map);
+	uint64_t new_offset = map->data.cl.offset + current_size;
+	uint64_t end_offset = new_offset + new_size - current_size - 1;
 
-	rv = hsqs_map_unmap(map);
-	if (rv < 0) {
-		return rv;
+	if (new_size <= current_size) {
+		return 0;
 	}
-	return hsqs_mapper_map(map, mapper, offset, new_size);
+
+	if (end_offset > map->mapper->data.cl.content_length - 1) {
+		end_offset = map->mapper->data.cl.content_length - 1;
+	}
+
+	// TODO: check for negative values of offset
+	rv = snprintf(
+			range_buffer, sizeof(range_buffer), "%lu-%lu", new_offset,
+			end_offset);
+	if (rv >= sizeof(range_buffer)) {
+		rv = -HSQS_ERROR_TODO;
+		goto out;
+	}
+	printf("%lx: %s %lu\n", (size_t)map, range_buffer, end_offset - new_offset);
+	curl_easy_setopt(handle, CURLOPT_RANGE, range_buffer);
+	curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_data);
+	curl_easy_setopt(handle, CURLOPT_WRITEDATA, map);
+
+	rv = curl_easy_perform(handle);
+	if (rv != CURLE_OK) {
+		rv = -HSQS_ERROR_TODO;
+	}
+
+out:
+	return rv;
 }
 
 static size_t

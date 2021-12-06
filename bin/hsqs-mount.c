@@ -80,7 +80,6 @@ hsqsfuse_init(struct fuse_conn_info *conn, struct fuse_config *cfg) {
 		exit(EXIT_FAILURE);
 	}
 
-	cfg->kernel_cache = 1;
 	return NULL;
 }
 

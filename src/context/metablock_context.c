@@ -95,7 +95,7 @@ hsqs_metablock_to_buffer(
 	metablock = get_metablock(context);
 	const uint8_t *data = hsqs_data_metablock_data(metablock);
 
-	rv = hsqs_buffer_append(buffer, data, size, is_compressed);
+	rv = hsqs_buffer_append_block(buffer, data, size, is_compressed);
 	if (rv < 0) {
 		goto out;
 	}

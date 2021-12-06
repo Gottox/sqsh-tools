@@ -58,9 +58,13 @@ HSQS_NO_UNUSED int hsqs_buffer_new(
 HSQS_NO_UNUSED int hsqs_buffer_init(
 		struct HsqsBuffer *compression, int compression_id, int block_size);
 
-HSQS_NO_UNUSED int hsqs_buffer_append(
+HSQS_NO_UNUSED int hsqs_buffer_append_block(
 		struct HsqsBuffer *compression, const uint8_t *source,
 		const size_t source_size, bool is_compressed);
+
+HSQS_NO_UNUSED int hsqs_buffer_append(
+		struct HsqsBuffer *compression, const uint8_t *source,
+		const size_t source_size);
 
 const uint8_t *hsqs_buffer_data(const struct HsqsBuffer *buffer);
 size_t hsqs_buffer_size(const struct HsqsBuffer *buffer);

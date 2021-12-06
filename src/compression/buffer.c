@@ -36,6 +36,7 @@
 #include "../data/metablock.h"
 #include "../data/superblock_internal.h"
 #include "../error.h"
+#include "../utils.h"
 #include "compression.h"
 
 #include <stdbool.h>
@@ -137,6 +138,35 @@ hsqs_buffer_init(
 
 int
 hsqs_buffer_append(
+		struct HsqsBuffer *buffer, const uint8_t *source,
+		const size_t source_size) {
+	int rv = 0;
+	const size_t buffer_size = buffer->size;
+	size_t target_size;
+	size_t new_size;
+
+	if (ADD_OVERFLOW(buffer_size, source_size, &new_size)) {
+		return -HSQS_ERROR_INTEGER_OVERFLOW;
+	}
+
+	buffer->data = realloc(buffer->data, new_size);
+	if (buffer->data == NULL) {
+		return -HSQS_ERROR_MALLOC_FAILED;
+	}
+
+	target_size = source_size;
+	rv = hsqs_compression_null.extract(
+			NULL, 0, &buffer->data[buffer_size], &target_size, source,
+			source_size);
+	if (rv < 0)
+		return rv;
+
+	buffer->size += target_size;
+
+	return rv;
+}
+int
+hsqs_buffer_append_block(
 		struct HsqsBuffer *buffer, const uint8_t *source,
 		const size_t source_size, bool is_compressed) {
 	const union HsqsCompressionOptions *options = NULL;

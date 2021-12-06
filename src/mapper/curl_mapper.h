@@ -33,6 +33,7 @@
  */
 
 #include "../compression/buffer.h"
+#include <curl/curl.h>
 #include <stdint.h>
 
 #ifndef CURL_MAPPER_H
@@ -42,6 +43,7 @@
 struct HsqsMapperCurl {
 	const char *url;
 	size_t content_length;
+	CURL *handle;
 };
 
 struct HsqsMapCurl {
