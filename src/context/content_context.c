@@ -88,8 +88,10 @@ hsqs_content_init(
 		context->fragment_table = NULL;
 	}
 
+	enum HsqsSuperblockCompressionId compression_id =
+			hsqs_superblock_compression_id(context->superblock);
 	rv = hsqs_buffer_init(
-			&context->buffer, context->superblock,
+			&context->buffer, compression_id,
 			hsqs_superblock_block_size(context->superblock));
 	if (rv < 0) {
 		return rv;

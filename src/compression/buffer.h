@@ -34,6 +34,7 @@
 
 #include "../utils.h"
 
+#include "../data/superblock.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -45,7 +46,6 @@
 struct HsqsSuperblockContext;
 
 struct HsqsBuffer {
-	const struct HsqsSuperblockContext *superblock;
 	const struct HsqsCompressionImplementation *impl;
 	int block_size;
 	uint8_t *data;
@@ -53,12 +53,10 @@ struct HsqsBuffer {
 };
 
 HSQS_NO_UNUSED int hsqs_buffer_new(
-		struct HsqsBuffer **context,
-		const struct HsqsSuperblockContext *superblock, int block_size);
+		struct HsqsBuffer **context, int compression_id, int block_size);
 
 HSQS_NO_UNUSED int hsqs_buffer_init(
-		struct HsqsBuffer *compression,
-		const struct HsqsSuperblockContext *superblock, int block_size);
+		struct HsqsBuffer *compression, int compression_id, int block_size);
 
 HSQS_NO_UNUSED int hsqs_buffer_append(
 		struct HsqsBuffer *compression, const uint8_t *source,

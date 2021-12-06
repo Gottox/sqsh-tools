@@ -36,6 +36,7 @@ HDR = \
 	src/error.h \
 	src/hsqs.h \
 	src/mapper/canary.h \
+	src/mapper/curl_mapper.h \
 	src/mapper/memory_mapper.h \
 	src/mapper/mmap.h \
 	src/mapper/mmap_complete.h \
@@ -68,6 +69,7 @@ SRC = \
 	src/error.c \
 	src/hsqs.c \
 	src/mapper/canary.c \
+	src/mapper/curl_mapper.c \
 	src/mapper/memory_mapper.c \
 	src/mapper/mmap.c \
 	src/mapper/mmap_complete.c \
@@ -76,7 +78,7 @@ SRC = \
 	src/utils.c \
 	src/utils/lru_hashmap.c \
 
-LIBS = fuse3
+LIBS = fuse3 libcurl
 
 OBJ = $(SRC:.c=.o)
 

@@ -64,6 +64,9 @@ HSQS_NO_UNUSED int hsqs_superblock_init(
 const void *hsqs_superblock_data_from_offset(
 		const struct HsqsSuperblockContext *context, uint64_t offset);
 
+enum HsqsSuperblockCompressionId
+hsqs_superblock_compression_id(const struct HsqsSuperblockContext *context);
+
 uint64_t hsqs_superblock_directory_table_start(
 		const struct HsqsSuperblockContext *context);
 

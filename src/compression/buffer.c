@@ -99,15 +99,14 @@ compression_by_id(int id) {
 
 int
 hsqs_buffer_new(
-		struct HsqsBuffer **context,
-		const struct HsqsSuperblockContext *superblock, int block_size) {
+		struct HsqsBuffer **context, int compression_id, int block_size) {
 	int rv = 0;
 
 	*context = calloc(1, sizeof(struct HsqsBuffer));
 	if (*context == NULL) {
 		rv = -HSQS_ERROR_MALLOC_FAILED;
 	} else {
-		rv = hsqs_buffer_init(*context, superblock, block_size);
+		rv = hsqs_buffer_init(*context, compression_id, block_size);
 		if (rv < 0) {
 			free(*context);
 		}
@@ -117,13 +116,11 @@ hsqs_buffer_new(
 
 int
 hsqs_buffer_init(
-		struct HsqsBuffer *buffer,
-		const struct HsqsSuperblockContext *superblock, int block_size) {
+		struct HsqsBuffer *buffer, int compression_id, int block_size) {
 	int rv = 0;
 	const struct HsqsCompressionImplementation *impl;
 
-	impl = compression_by_id(
-			hsqs_data_superblock_compression_id(superblock->superblock));
+	impl = compression_by_id(compression_id);
 	if (impl == NULL) {
 		return -HSQS_ERROR_COMPRESSION_INIT;
 	}
@@ -131,7 +128,6 @@ hsqs_buffer_init(
 	if (rv < 0) {
 		return rv;
 	}
-	buffer->superblock = superblock;
 	buffer->impl = impl;
 	buffer->block_size = block_size;
 	buffer->data = NULL;
@@ -145,7 +141,7 @@ hsqs_buffer_append(
 		const size_t source_size, bool is_compressed) {
 	const union HsqsCompressionOptions *options = NULL;
 	size_t options_size = 0;
-	const struct HsqsCompressionOptionsContext *options_context;
+	// const struct HsqsCompressionOptionsContext *options_context;
 	const struct HsqsCompressionImplementation *impl =
 			is_compressed ? buffer->impl : &hsqs_compression_null;
 	int rv = 0;
@@ -161,14 +157,14 @@ hsqs_buffer_append(
 	if (buffer->data == NULL) {
 		return -HSQS_ERROR_MALLOC_FAILED;
 	}
-	if (is_compressed) {
-		options_context =
-				hsqs_superblock_compression_options(buffer->superblock);
-		if (options_context) {
-			options = hsqs_compression_options(options_context);
-			options_size = hsqs_compression_options_size(options_context);
-		}
-	}
+	// if (is_compressed) {
+	//	options_context = NULL;
+	//			//hsqs_superblock_compression_options(buffer->superblock);
+	//	if (options_context) {
+	//		options = hsqs_compression_options(options_context);
+	//		options_size = hsqs_compression_options_size(options_context);
+	//	}
+	//}
 
 	rv = impl->extract(
 			options, options_size, &buffer->data[buffer_size], &block_size,

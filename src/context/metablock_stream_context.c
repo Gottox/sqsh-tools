@@ -37,6 +37,7 @@
 #include "../data/metablock.h"
 #include "../error.h"
 #include "metablock_context.h"
+#include "superblock_context.h"
 #include <stdint.h>
 
 HSQS_NO_UNUSED int
@@ -83,8 +84,10 @@ hsqs_metablock_stream_seek(
 	}
 	context->buffer_offset = buffer_offset;
 
+	enum HsqsSuperblockCompressionId compression_id =
+			hsqs_superblock_compression_id(context->superblock);
 	rv = hsqs_buffer_init(
-			&context->buffer, context->superblock, HSQS_METABLOCK_BLOCK_SIZE);
+			&context->buffer, compression_id, HSQS_METABLOCK_BLOCK_SIZE);
 	if (rv < 0) {
 		goto out;
 	}

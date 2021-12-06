@@ -90,8 +90,9 @@ hsqs_table_get(struct HsqsTableContext *table, off_t index, void *target) {
 	uint64_t element_index =
 			(index * table->element_size) % HSQS_METABLOCK_BLOCK_SIZE;
 
-	rv = hsqs_buffer_init(
-			&buffer, table->superblock, HSQS_METABLOCK_BLOCK_SIZE);
+	enum HsqsSuperblockCompressionId compression_id =
+			hsqs_superblock_compression_id(table->superblock);
+	rv = hsqs_buffer_init(&buffer, compression_id, HSQS_METABLOCK_BLOCK_SIZE);
 	if (rv < 0) {
 		goto out;
 	}

@@ -134,6 +134,11 @@ hsqs_superblock_data_from_offset(
 	return &tmp[offset];
 }
 
+enum HsqsSuperblockCompressionId
+hsqs_superblock_compression_id(const struct HsqsSuperblockContext *context) {
+	return hsqs_data_superblock_compression_id(context->superblock);
+}
+
 uint64_t
 hsqs_superblock_directory_table_start(
 		const struct HsqsSuperblockContext *context) {

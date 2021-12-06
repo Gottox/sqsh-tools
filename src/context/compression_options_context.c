@@ -36,6 +36,7 @@
 #include "../data/compression_options.h"
 #include "../data/superblock.h"
 #include "metablock_context.h"
+#include "superblock_context.h"
 
 int
 hsqs_compression_options_init(
@@ -49,8 +50,10 @@ hsqs_compression_options_init(
 		goto out;
 	}
 
+	enum HsqsSuperblockCompressionId compression_id =
+			hsqs_superblock_compression_id(superblock);
 	rv = hsqs_buffer_init(
-			&context->buffer, superblock, HSQS_METABLOCK_BLOCK_SIZE);
+			&context->buffer, compression_id, HSQS_METABLOCK_BLOCK_SIZE);
 	if (rv < 0) {
 		goto out;
 	}

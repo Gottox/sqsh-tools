@@ -113,8 +113,9 @@ hsqs_fragment_table_to_buffer(
 	if (ADD_OVERFLOW(offset, size, &end_offset)) {
 		return -HSQS_ERROR_INTEGER_OVERFLOW;
 	}
-	rv = hsqs_buffer_init(
-			&intermediate_buffer, context->superblock, block_size);
+	enum HsqsSuperblockCompressionId compression_id =
+			hsqs_superblock_compression_id(context->superblock);
+	rv = hsqs_buffer_init(&intermediate_buffer, compression_id, block_size);
 	if (rv < 0) {
 		goto out;
 	}
