@@ -70,6 +70,16 @@ help(const char *arg0) {
 
 static void *
 hsqsfuse_init(struct fuse_conn_info *conn, struct fuse_config *cfg) {
+	int rv = 0;
+	struct fuse_context *context = fuse_get_context();
+
+	rv = hsqs_open(&data.hsqs, options.image_path);
+	if (rv < 0) {
+		hsqs_perror(rv, options.image_path);
+		fuse_unmount(context->fuse);
+		exit(EXIT_FAILURE);
+	}
+
 	cfg->kernel_cache = 1;
 	return NULL;
 }
@@ -417,11 +427,6 @@ main(int argc, char *argv[]) {
 		help(argv[0]);
 		fuse_opt_add_arg(&args, "--help");
 		args.argv[0][0] = '\0';
-	}
-
-	rv = hsqs_open(&data.hsqs, options.image_path);
-	if (rv < 0) {
-		perror(options.image_path);
 	}
 
 	rv = fuse_main(args.argc, args.argv, &hsqsfuse_operations, &data);
