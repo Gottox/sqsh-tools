@@ -10,14 +10,13 @@ jobs:
         cc: [gcc, clang]
     steps:
     - uses: actions/checkout@v2
+    - name: install dependencies
       run: |
         xbps-install -Syu xbps && \
         xbps-install -yu && \
         xbps-install -y base-devel clang libsanitizer-devel zlib-devel \
           liblzma-devel lzo-devel liblz4-devel libzstd-devel fuse3-devel \
           squashfs-tools attr-progs
-    - name: install dependencies
-      run: apk add alpine-sdk clang curl-dev fuse3-dev lz4-dev xz-dev zstd-dev
     - name: make
       run: make CC=${{ matrix.cc }}
     - name: make check
