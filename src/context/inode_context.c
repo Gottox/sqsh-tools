@@ -222,7 +222,8 @@ get_size_info(const struct HsqsInodeContext *inode, int index) {
 }
 
 uint32_t
-hsqs_inode_file_block_size(const struct HsqsInodeContext *inode, int index) {
+hsqs_inode_file_block_size(
+		const struct HsqsInodeContext *inode, uint32_t index) {
 	const struct HsqsDatablockSize *size_info = get_size_info(inode, index);
 
 	return hsqs_data_datablock_size(size_info);

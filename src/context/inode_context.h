@@ -91,9 +91,8 @@ uint16_t hsqs_inode_permission(const struct HsqsInodeContext *inode);
 uint32_t hsqs_inode_number(const struct HsqsInodeContext *inode);
 uint32_t hsqs_inode_modified_time(const struct HsqsInodeContext *inode);
 uint64_t hsqs_inode_file_blocks_start(const struct HsqsInodeContext *inode);
-// TODO: Find right datatype for index
-uint32_t
-hsqs_inode_file_block_size(const struct HsqsInodeContext *inode, int index);
+uint32_t hsqs_inode_file_block_size(
+		const struct HsqsInodeContext *inode, uint32_t index);
 bool hsqs_inode_file_block_is_compressed(
 		const struct HsqsInodeContext *inode, int index);
 uint32_t
