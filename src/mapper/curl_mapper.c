@@ -168,7 +168,6 @@ hsqs_map_curl_resize(struct HsqsMemoryMap *map, size_t new_size) {
 		rv = -HSQS_ERROR_TODO;
 		goto out;
 	}
-	printf("%lx: %s %lu\n", (size_t)map, range_buffer, end_offset - new_offset);
 	curl_easy_setopt(handle, CURLOPT_RANGE, range_buffer);
 	curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_data);
 	curl_easy_setopt(handle, CURLOPT_WRITEDATA, map);
