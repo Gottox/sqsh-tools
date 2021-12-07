@@ -56,7 +56,7 @@ datablock_count(struct HsqsFileContext *context) {
 	if (has_fragment(context)) {
 		return file_size / block_size;
 	} else {
-		return hsqs_divide_ceil_u32(file_size, block_size);
+		return HSQS_DEVIDE_CEIL(file_size, block_size);
 	}
 }
 

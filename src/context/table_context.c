@@ -56,7 +56,7 @@ hsqs_table_init(
 	struct HsqsMemoryMapper *mapper = superblock->mapper;
 	// TODO: Overflow
 	size_t lookup_table_size =
-			hsqs_divide_ceil_u32(
+			HSQS_DEVIDE_CEIL(
 					element_size * element_count, HSQS_METABLOCK_BLOCK_SIZE) *
 			sizeof(uint64_t);
 

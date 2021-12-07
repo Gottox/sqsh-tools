@@ -42,11 +42,6 @@ hsqs_log2_u32(uint32_t x) {
 	return sizeof(uint32_t) * 8 - 1 - __builtin_clz(x);
 }
 
-uint32_t
-hsqs_divide_ceil_u32(uint32_t x, uint32_t y) {
-	return x / y + (x % y != 0);
-}
-
 void *
 hsqs_memdup(const void *source, size_t size) {
 	void *target = calloc(size + 1, sizeof(char));
