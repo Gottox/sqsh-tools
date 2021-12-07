@@ -28,25 +28,97 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : mmap_complete
- * @created     : Sunday Nov 21, 2021 15:58:40 CET
+ * @file        : mmap_full_mapper
+ * @created     : Sunday Nov 21, 2021 16:01:03 CET
  */
 
-#include <stddef.h>
+#include "mapper.h"
+#include <errno.h>
+#include <fcntl.h>
 #include <stdint.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
-#ifndef MMAP_COMPLETE_H
+static int
+hsqs_mapper_mmap_complete_init(
+		struct HsqsMapper *mapper, const void *input, size_t size) {
+	int rv = 0;
+	int fd = -1;
+	uint8_t *file_map = MAP_FAILED;
+	struct stat st = {0};
 
-#define MMAP_COMPLETE_H
+	fd = open(input, 0);
+	if (fd < 0) {
+		rv = -errno;
+		goto out;
+	}
 
-struct HsqsMapperMmapComplete {
-	uint8_t *data;
-	size_t size;
+	if (fstat(fd, &st) < 0) {
+		rv = -errno;
+		goto out;
+	}
+
+	file_map = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+	if (file_map == MAP_FAILED) {
+		rv = -errno;
+	}
+	mapper->data.mc.data = file_map;
+	mapper->data.mc.size = st.st_size;
+
+out:
+	if (fd >= 0) {
+		close(fd);
+	}
+	return rv;
+}
+static int
+hsqs_mapper_mmap_complete_map(
+		struct HsqsMap *map, struct HsqsMapper *mapper, off_t offset,
+		size_t size) {
+	map->data.mc.data = &mapper->data.mc.data[offset];
+	map->data.mc.size = size;
+	return 0;
+}
+static int
+hsqs_mapper_mmap_complete_cleanup(struct HsqsMapper *mapper) {
+	int rv;
+	size_t size = hsqs_mapper_size(mapper);
+
+	rv = munmap(mapper->data.mc.data, size);
+	return rv;
+}
+static size_t
+hsqs_mapper_mmap_complete_size(const struct HsqsMapper *mapper) {
+	return mapper->data.mc.size;
+}
+static int
+hsqs_map_mmap_complete_unmap(struct HsqsMap *map) {
+	map->data.mc.data = NULL;
+	map->data.mc.size = 0;
+	return 0;
+}
+static const uint8_t *
+hsqs_map_mmap_complete_data(const struct HsqsMap *map) {
+	return map->data.mc.data;
+}
+static int
+hsqs_map_mmap_complete_resize(struct HsqsMap *mapper, size_t new_size) {
+	return mapper->data.mc.size;
+}
+
+static size_t
+hsqs_map_mmap_complete_size(const struct HsqsMap *map) {
+	return map->data.mc.size;
+}
+
+struct HsqsMemoryMapperImpl hsqs_mapper_impl_mmap_full = {
+		.init = hsqs_mapper_mmap_complete_init,
+		.map = hsqs_mapper_mmap_complete_map,
+		.size = hsqs_mapper_mmap_complete_size,
+		.cleanup = hsqs_mapper_mmap_complete_cleanup,
+		.map_data = hsqs_map_mmap_complete_data,
+		.map_resize = hsqs_map_mmap_complete_resize,
+		.map_size = hsqs_map_mmap_complete_size,
+		.unmap = hsqs_map_mmap_complete_unmap,
 };
-
-struct HsqsMapMmapComplete {
-	uint8_t *data;
-	size_t size;
-};
-
-#endif /* end of include guard MMAP_COMPLETE_H */

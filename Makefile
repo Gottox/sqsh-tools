@@ -35,13 +35,12 @@ HDR = \
 	src/data/xattr_internal.h \
 	src/error.h \
 	src/hsqs.h \
-	src/mapper/canary.h \
+	src/mapper/canary_mapper.h \
 	src/mapper/curl_mapper.h \
-	src/mapper/memory_mapper.h \
-	src/mapper/mmap.h \
-	src/mapper/mmap_complete.h \
-	src/mapper/static_memory.h \
-	src/resolve_path.h \
+	src/mapper/mapper.h \
+	src/mapper/mmap_full_mapper.h \
+	src/mapper/mmap_mapper.h \
+	src/mapper/static_mapper.h \
 	src/utils.h \
 	src/utils/lru_hashmap.h \
 
@@ -68,12 +67,12 @@ SRC = \
 	src/data/xattr.c \
 	src/error.c \
 	src/hsqs.c \
-	src/mapper/canary.c \
+	src/mapper/canary_mapper.c \
 	src/mapper/curl_mapper.c \
-	src/mapper/memory_mapper.c \
-	src/mapper/mmap.c \
-	src/mapper/mmap_complete.c \
-	src/mapper/static_memory.c \
+	src/mapper/mapper.c \
+	src/mapper/mmap_full_mapper.c \
+	src/mapper/mmap_mapper.c \
+	src/mapper/static_mapper.c \
 	src/resolve_path.c \
 	src/utils.c \
 	src/utils/lru_hashmap.c \

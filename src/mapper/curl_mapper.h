@@ -40,13 +40,13 @@
 
 #define CURL_MAPPER_H
 
-struct HsqsMapperCurl {
+struct HsqsCurlMapper {
 	const char *url;
 	size_t content_length;
 	CURL *handle;
 };
 
-struct HsqsMapCurl {
+struct HsqsCurlMap {
 	struct HsqsBuffer buffer;
 	uint64_t offset;
 };

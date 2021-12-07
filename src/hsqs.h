@@ -34,7 +34,7 @@
 
 #include "context/superblock_context.h"
 #include "error.h"
-#include "mapper/memory_mapper.h"
+#include "mapper/mapper.h"
 #include "utils.h"
 
 #include <stdint.h>
@@ -46,7 +46,7 @@
 
 struct Hsqs {
 	uint32_t error;
-	struct HsqsMemoryMapper mapper;
+	struct HsqsMapper mapper;
 	struct HsqsSuperblockContext superblock;
 };
 

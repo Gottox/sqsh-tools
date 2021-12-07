@@ -28,24 +28,24 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : static_memory
+ * @file        : static_mapper
  * @created     : Sunday Nov 21, 2021 15:58:40 CET
  */
 
 #include <stddef.h>
 #include <stdint.h>
 
-#ifndef STATIC_H
+#ifndef STATIC_MAPPER_H
 
-#define STATIC_H
+#define STATIC_MAPPER_H
 
-struct HsqsMapperStaticMemory {
+struct HsqsStaticMapper {
 	const uint8_t *data;
 	size_t size;
 };
 
-struct HsqsMapStaticMemory {
+struct HsqsStaticMap {
 	const uint8_t *data;
 	size_t size;
 };
-#endif /* end of include guard STATIC_H */
+#endif /* end of include guard STATIC_MAPPER_H */

@@ -35,7 +35,7 @@
 #include "content_context.h"
 #include "../compression/buffer.h"
 #include "../error.h"
-#include "../mapper/memory_mapper.h"
+#include "../mapper/mapper.h"
 #include "fragment_context.h"
 #include "inode_context.h"
 #include "superblock_context.h"
@@ -113,7 +113,7 @@ hsqs_content_seek(struct HsqsFileContext *context, uint64_t seek_pos) {
 int
 hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
 	int rv = 0;
-	struct HsqsMemoryMap map = {0};
+	struct HsqsMap map = {0};
 	struct HsqsFragmentTableContext *table =
 			&context->superblock->fragment_table;
 	struct HsqsBuffer *buffer = &context->buffer;

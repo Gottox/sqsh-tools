@@ -28,25 +28,69 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : canary
- * @created     : Sunday Nov 21, 2021 15:58:40 CET
+ * @file        : mmap_mapper
+ * @created     : Sunday Nov 21, 2021 16:01:03 CET
  */
 
-#include <stddef.h>
+#include "mapper.h"
+#include <errno.h>
+#include <fcntl.h>
 #include <stdint.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
-#ifndef CANARY_H
+static int
+hsqs_mapper_static_mem_init(
+		struct HsqsMapper *mapper, const void *input, size_t size) {
+	mapper->data.sm.data = input;
+	mapper->data.sm.size = size;
+	return 0;
+}
+static int
+hsqs_mapper_static_mem_map(
+		struct HsqsMap *map, struct HsqsMapper *mapper, off_t offset,
+		size_t size) {
+	map->data.sm.data = &mapper->data.sm.data[offset];
+	map->data.sm.size = size;
+	return 0;
+}
+static size_t
+hsqs_mapper_static_mem_size(const struct HsqsMapper *mapper) {
+	return mapper->data.sm.size;
+}
+static int
+hsqs_mapper_static_mem_cleanup(struct HsqsMapper *mapper) {
+	return 0;
+}
+static int
+hsqs_map_static_mem_unmap(struct HsqsMap *map) {
+	map->data.sm.data = NULL;
+	map->data.sm.size = 0;
+	return 0;
+}
+static const uint8_t *
+hsqs_map_static_mem_data(const struct HsqsMap *map) {
+	return map->data.sm.data;
+}
 
-#define CANARY_H
+static int
+hsqs_map_static_mem_resize(struct HsqsMap *map, size_t new_size) {
+	return map->data.sm.size;
+}
 
-struct HsqsMapperCanary {
-	const uint8_t *data;
-	size_t size;
+static size_t
+hsqs_map_static_mem_size(const struct HsqsMap *map) {
+	return map->data.sm.size;
+}
+
+struct HsqsMemoryMapperImpl hsqs_mapper_impl_static = {
+		.init = hsqs_mapper_static_mem_init,
+		.map = hsqs_mapper_static_mem_map,
+		.size = hsqs_mapper_static_mem_size,
+		.cleanup = hsqs_mapper_static_mem_cleanup,
+		.map_data = hsqs_map_static_mem_data,
+		.map_resize = hsqs_map_static_mem_resize,
+		.map_size = hsqs_map_static_mem_size,
+		.unmap = hsqs_map_static_mem_unmap,
 };
-
-struct HsqsMapCanary {
-	uint64_t offset;
-	uint8_t *data;
-	size_t size;
-};
-#endif /* end of include guard CANARY_H */

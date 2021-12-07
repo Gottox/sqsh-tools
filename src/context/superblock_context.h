@@ -32,7 +32,7 @@
  * @created     : Monday Oct 11, 2021 13:41:59 CEST
  */
 
-#include "../mapper/memory_mapper.h"
+#include "../mapper/mapper.h"
 #include "../utils.h"
 #include "compression_options_context.h"
 #include "fragment_context.h"
@@ -49,8 +49,8 @@ struct HsqsSuperblock;
 
 struct HsqsSuperblockContext {
 	const struct HsqsSuperblock *superblock;
-	struct HsqsMemoryMap map;
-	struct HsqsMemoryMapper *mapper;
+	struct HsqsMap map;
+	struct HsqsMapper *mapper;
 	struct HsqsTableContext id_table;
 	struct HsqsTableContext export_table;
 	struct HsqsXattrTableContext xattr_table;
@@ -59,7 +59,7 @@ struct HsqsSuperblockContext {
 };
 
 HSQS_NO_UNUSED int hsqs_superblock_init(
-		struct HsqsSuperblockContext *context, struct HsqsMemoryMapper *mapper);
+		struct HsqsSuperblockContext *context, struct HsqsMapper *mapper);
 
 const void *hsqs_superblock_data_from_offset(
 		const struct HsqsSuperblockContext *context, uint64_t offset);

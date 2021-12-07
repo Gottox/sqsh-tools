@@ -32,7 +32,7 @@
  * @created     : Saturday Dec 04, 2021 14:54:28 CET
  */
 
-#include "../mapper/memory_mapper.h"
+#include "../mapper/mapper.h"
 #include "../utils.h"
 #include <stdint.h>
 
@@ -46,7 +46,7 @@ struct HsqsSuperblockContext;
 struct HsqsBuffer;
 
 struct HsqsMetablockContext {
-	struct HsqsMemoryMap map;
+	struct HsqsMap map;
 };
 
 HSQS_NO_UNUSED int hsqs_metablock_init(

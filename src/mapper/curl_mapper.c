@@ -33,7 +33,7 @@
  */
 
 #include "../error.h"
-#include "memory_mapper.h"
+#include "mapper.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <stdint.h>
@@ -46,7 +46,7 @@ static size_t
 write_data(void *ptr, size_t size, size_t nmemb, void *userdata) {
 	int rv = 0;
 	size_t byte_size;
-	struct HsqsMemoryMap *map = userdata;
+	struct HsqsMap *map = userdata;
 
 	if (MULT_OVERFLOW(size, nmemb, &byte_size)) {
 		rv = -HSQS_ERROR_INTEGER_OVERFLOW;
@@ -64,7 +64,7 @@ out:
 }
 
 static CURL *
-get_handle(struct HsqsMemoryMapper *mapper) {
+get_handle(struct HsqsMapper *mapper) {
 	CURL *handle = mapper->data.cl.handle;
 	curl_easy_reset(handle);
 	curl_easy_setopt(handle, CURLOPT_URL, mapper->data.cl.url);
@@ -76,7 +76,7 @@ get_handle(struct HsqsMemoryMapper *mapper) {
 
 static int
 hsqs_mapper_curl_init(
-		struct HsqsMemoryMapper *mapper, const void *input, size_t size) {
+		struct HsqsMapper *mapper, const void *input, size_t size) {
 	int rv = 0;
 	curl_global_init(CURL_GLOBAL_ALL);
 
@@ -105,8 +105,8 @@ out:
 }
 static int
 hsqs_mapper_curl_map(
-		struct HsqsMemoryMap *map, struct HsqsMemoryMapper *mapper,
-		off_t offset, size_t size) {
+		struct HsqsMap *map, struct HsqsMapper *mapper, off_t offset,
+		size_t size) {
 	int rv = 0;
 
 	map->data.cl.offset = offset;
@@ -124,26 +124,26 @@ out:
 	return rv;
 }
 static size_t
-hsqs_mapper_curl_size(const struct HsqsMemoryMapper *mapper) {
+hsqs_mapper_curl_size(const struct HsqsMapper *mapper) {
 	return mapper->data.cl.content_length;
 }
 static int
-hsqs_mapper_curl_cleanup(struct HsqsMemoryMapper *mapper) {
+hsqs_mapper_curl_cleanup(struct HsqsMapper *mapper) {
 	curl_easy_cleanup(mapper->data.cl.handle);
 	return 0;
 }
 static int
-hsqs_map_curl_unmap(struct HsqsMemoryMap *map) {
+hsqs_map_curl_unmap(struct HsqsMap *map) {
 	hsqs_buffer_cleanup(&map->data.cl.buffer);
 	return 0;
 }
 static const uint8_t *
-hsqs_map_curl_data(const struct HsqsMemoryMap *map) {
+hsqs_map_curl_data(const struct HsqsMap *map) {
 	return hsqs_buffer_data(&map->data.cl.buffer);
 }
 
 static int
-hsqs_map_curl_resize(struct HsqsMemoryMap *map, size_t new_size) {
+hsqs_map_curl_resize(struct HsqsMap *map, size_t new_size) {
 	int rv = 0;
 	char range_buffer[512] = {0};
 	CURL *handle = get_handle(map->mapper);
@@ -182,7 +182,7 @@ out:
 }
 
 static size_t
-hsqs_map_curl_size(const struct HsqsMemoryMap *map) {
+hsqs_map_curl_size(const struct HsqsMap *map) {
 	return hsqs_buffer_size(&map->data.cl.buffer);
 }
 

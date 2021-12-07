@@ -32,7 +32,7 @@
  * @created     : Sunday Sep 26, 2021 19:04:39 CEST
  */
 
-#include "../mapper/memory_mapper.h"
+#include "../mapper/mapper.h"
 #include <stdint.h>
 
 #ifndef TABLE_CONTEXT_H
@@ -41,8 +41,8 @@
 
 struct HsqsTableContext {
 	const struct HsqsSuperblockContext *superblock;
-	struct HsqsMemoryMapper *mapper;
-	struct HsqsMemoryMap lookup_table;
+	struct HsqsMapper *mapper;
+	struct HsqsMap lookup_table;
 	uint64_t start_block;
 	size_t element_size;
 	size_t element_count;

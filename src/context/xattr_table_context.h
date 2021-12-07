@@ -49,7 +49,7 @@ struct HsqsInodeContext;
 
 struct HsqsXattrTableContext {
 	struct HsqsSuperblockContext *superblock;
-	struct HsqsMemoryMap header;
+	struct HsqsMap header;
 	struct HsqsTableContext table;
 };
 

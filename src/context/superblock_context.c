@@ -42,8 +42,7 @@ const static uint64_t NO_SEGMENT = 0xFFFFFFFFFFFFFFFF;
 
 int
 hsqs_superblock_init(
-		struct HsqsSuperblockContext *context,
-		struct HsqsMemoryMapper *mapper) {
+		struct HsqsSuperblockContext *context, struct HsqsMapper *mapper) {
 	int rv = 0;
 	rv = hsqs_mapper_map(&context->map, mapper, 0, HSQS_SIZEOF_SUPERBLOCK);
 	if (rv < 0) {

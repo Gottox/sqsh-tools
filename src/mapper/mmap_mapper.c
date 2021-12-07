@@ -28,13 +28,13 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : mmap
+ * @file        : mmap_mapper
  * @created     : Sunday Nov 21, 2021 16:01:03 CET
  */
 
 #define _GNU_SOURCE
 #include "../utils.h"
-#include "memory_mapper.h"
+#include "mapper.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <stdint.h>
@@ -44,7 +44,7 @@
 
 static int
 hsqs_mapper_mmap_init(
-		struct HsqsMemoryMapper *mapper, const void *input, size_t size) {
+		struct HsqsMapper *mapper, const void *input, size_t size) {
 	int rv = 0;
 	int fd = -1;
 	struct stat st = {0};
@@ -72,8 +72,8 @@ out:
 }
 static int
 hsqs_mapper_mmap_map(
-		struct HsqsMemoryMap *map, struct HsqsMemoryMapper *mapper,
-		off_t offset, size_t size) {
+		struct HsqsMap *map, struct HsqsMapper *mapper, off_t offset,
+		size_t size) {
 	uint8_t *file_map = NULL;
 	size_t page_offset = offset % mapper->data.mm.page_size;
 
@@ -93,17 +93,17 @@ hsqs_mapper_mmap_map(
 	return 0;
 }
 static int
-hsqs_mapper_mmap_cleanup(struct HsqsMemoryMapper *mapper) {
+hsqs_mapper_mmap_cleanup(struct HsqsMapper *mapper) {
 	close(mapper->data.mm.fd);
 	return 0;
 }
 static size_t
-hsqs_mapper_mmap_size(const struct HsqsMemoryMapper *mapper) {
+hsqs_mapper_mmap_size(const struct HsqsMapper *mapper) {
 	return mapper->data.mm.size;
 }
 
 static int
-hsqs_map_mmap_unmap(struct HsqsMemoryMap *map) {
+hsqs_map_mmap_unmap(struct HsqsMap *map) {
 	int rv;
 	rv = munmap(
 			map->data.mm.data, map->data.mm.size + map->data.mm.page_offset);
@@ -115,12 +115,12 @@ hsqs_map_mmap_unmap(struct HsqsMemoryMap *map) {
 	return rv;
 }
 static const uint8_t *
-hsqs_map_mmap_data(const struct HsqsMemoryMap *map) {
+hsqs_map_mmap_data(const struct HsqsMap *map) {
 	return &map->data.mm.data[map->data.mm.page_offset];
 }
 
 int
-hsqs_map_mmap_resize(struct HsqsMemoryMap *map, size_t new_size) {
+hsqs_map_mmap_resize(struct HsqsMap *map, size_t new_size) {
 #ifdef _GNU_SOURCE
 	uint8_t *data = map->data.mm.data;
 	size_t size = map->data.mm.size;
@@ -150,7 +150,7 @@ hsqs_map_mmap_resize(struct HsqsMemoryMap *map, size_t new_size) {
 #endif
 }
 static size_t
-hsqs_map_mmap_size(const struct HsqsMemoryMap *map) {
+hsqs_map_mmap_size(const struct HsqsMap *map) {
 	return map->data.mm.size;
 }
 

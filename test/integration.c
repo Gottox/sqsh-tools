@@ -40,7 +40,7 @@
 #include "../src/context/xattr_table_context.h"
 #include "../src/data/superblock.h"
 #include "../src/error.h"
-#include "../src/mapper/memory_mapper.h"
+#include "../src/mapper/mapper.h"
 #include "../src/resolve_path.h"
 #include "common.h"
 #include "test.h"
@@ -48,7 +48,7 @@
 
 static int
 init_squash(
-		struct HsqsMemoryMapper *mapper,
+		struct HsqsMapper *mapper,
 		struct HsqsSuperblockContext *superblock, const uint8_t *image,
 		size_t size) {
 	int rv = 0;
@@ -67,7 +67,7 @@ static void
 hsqs_empty() {
 	int rv;
 	struct HsqsSuperblockContext superblock = {0};
-	struct HsqsMemoryMapper mapper = {0};
+	struct HsqsMapper mapper = {0};
 	rv = init_squash(&mapper, &superblock, NULL, 0);
 	assert(rv == -HSQS_ERROR_SUPERBLOCK_TOO_SMALL);
 }
@@ -77,7 +77,7 @@ hsqs_ls() {
 	int rv;
 	char *name;
 	struct HsqsSuperblockContext superblock = {0};
-	struct HsqsMemoryMapper mapper = {0};
+	struct HsqsMapper mapper = {0};
 	struct HsqsInodeContext inode = {0};
 	struct HsqsDirectoryContext dir = {0};
 	struct HsqsDirectoryIterator iter = {0};
@@ -134,7 +134,7 @@ hsqs_cat_fragment() {
 	struct HsqsSuperblockContext superblock = {0};
 	struct HsqsInodeContext inode = {0};
 	struct HsqsFileContext file = {0};
-	struct HsqsMemoryMapper mapper = {0};
+	struct HsqsMapper mapper = {0};
 	rv = init_squash(&mapper, &superblock, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
@@ -171,7 +171,7 @@ hsqs_cat_datablock_and_fragment() {
 	struct HsqsSuperblockContext superblock = {0};
 	struct HsqsInodeContext inode = {0};
 	struct HsqsFileContext file = {0};
-	struct HsqsMemoryMapper mapper = {0};
+	struct HsqsMapper mapper = {0};
 	rv = init_squash(&mapper, &superblock, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
@@ -211,7 +211,7 @@ hsqs_cat_size_overflow() {
 	struct HsqsSuperblockContext superblock = {0};
 	struct HsqsInodeContext inode = {0};
 	struct HsqsFileContext file = {0};
-	struct HsqsMemoryMapper mapper = {0};
+	struct HsqsMapper mapper = {0};
 	rv = init_squash(&mapper, &superblock, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
@@ -249,7 +249,7 @@ hsqs_test_uid_and_gid() {
 	uint32_t uid, gid;
 	struct HsqsSuperblockContext superblock = {0};
 	struct HsqsInodeContext inode = {0};
-	struct HsqsMemoryMapper mapper = {0};
+	struct HsqsMapper mapper = {0};
 	rv = init_squash(&mapper, &superblock, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
@@ -275,7 +275,7 @@ hsqs_test_xattr() {
 	int rv;
 	char *name, *value;
 	struct HsqsSuperblockContext superblock = {0};
-	struct HsqsMemoryMapper mapper = {0};
+	struct HsqsMapper mapper = {0};
 	struct HsqsInodeContext inode = {0};
 	struct HsqsInodeContext entry_inode = {0};
 	struct HsqsDirectoryContext dir = {0};
@@ -402,7 +402,7 @@ fuzz_crash_1() {
 			0x62, 0x62, 0x29, 0x62, 0x62, 0x62, 0x62, 0xff, 0xff, 0x62, 0x62};
 
 	struct HsqsSuperblockContext superblock = {0};
-	struct HsqsMemoryMapper mapper = {0};
+	struct HsqsMapper mapper = {0};
 	struct HsqsInodeContext inode = {0};
 	rv = init_squash(&mapper, &superblock, input, sizeof(input));
 	assert(rv == 0);
@@ -434,7 +434,7 @@ fuzz_crash_2() {
 	};
 
 	struct HsqsSuperblockContext superblock = {0};
-	struct HsqsMemoryMapper mapper = {0};
+	struct HsqsMapper mapper = {0};
 	struct HsqsInodeContext inode = {0};
 	rv = init_squash(&mapper, &superblock, input, sizeof(input));
 	assert(rv == 0);
@@ -467,7 +467,7 @@ fuzz_crash_3() {
 	};
 
 	struct HsqsSuperblockContext superblock = {0};
-	struct HsqsMemoryMapper mapper = {0};
+	struct HsqsMapper mapper = {0};
 	struct HsqsInodeContext inode = {0};
 	rv = init_squash(&mapper, &superblock, input, sizeof(input));
 	assert(rv == 0);
@@ -511,9 +511,10 @@ fuzz_crash_4() {
 	};
 
 	struct HsqsSuperblockContext superblock = {0};
-	struct HsqsMemoryMapper mapper = {0};
+	struct HsqsMapper mapper = {0};
 	rv = init_squash(&mapper, &superblock, input, sizeof(input));
 	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
+	hsqs_superblock_cleanup(&superblock);
 }
 
 static void
@@ -545,9 +546,10 @@ fuzz_crash_5() {
 	};
 
 	struct HsqsSuperblockContext superblock = {0};
-	struct HsqsMemoryMapper mapper = {0};
+	struct HsqsMapper mapper = {0};
 	rv = init_squash(&mapper, &superblock, input, sizeof(input));
 	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
+	hsqs_superblock_cleanup(&superblock);
 }
 
 static void
@@ -565,7 +567,7 @@ fuzz_crash_6() {
 	};
 
 	struct HsqsSuperblockContext superblock = {0};
-	struct HsqsMemoryMapper mapper = {0};
+	struct HsqsMapper mapper = {0};
 	rv = init_squash(&mapper, &superblock, input, sizeof(input));
 	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
 	hsqs_superblock_cleanup(&superblock);
@@ -587,7 +589,7 @@ fuzz_crash_7() {
 	};
 
 	struct HsqsSuperblockContext superblock = {0};
-	struct HsqsMemoryMapper mapper = {0};
+	struct HsqsMapper mapper = {0};
 	rv = init_squash(&mapper, &superblock, input, sizeof(input));
 	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
 	hsqs_superblock_cleanup(&superblock);

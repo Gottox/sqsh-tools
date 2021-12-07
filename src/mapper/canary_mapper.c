@@ -28,28 +28,83 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : mmap
- * @created     : Sunday Nov 21, 2021 15:58:40 CET
+ * @file        : canary_mapper
+ * @created     : Sunday Nov 21, 2021 16:01:03 CET
  */
 
-#include <stddef.h>
+#include "mapper.h"
+#include <errno.h>
+#include <fcntl.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <unistd.h>
 
-#ifndef MMAP_H
+static int
+hsqs_mapper_canary_init(
+		struct HsqsMapper *mapper, const void *input, size_t size) {
+	mapper->data.cn.data = input;
+	mapper->data.cn.size = size;
+	return 0;
+}
+static int
+hsqs_mapper_canary_map(
+		struct HsqsMap *map, struct HsqsMapper *mapper, off_t offset,
+		size_t size) {
+	uint8_t *data = calloc(size, sizeof(uint8_t));
 
-#define MMAP_H
+	memcpy(data, &mapper->data.cn.data[offset], size);
+	map->data.cn.offset = offset;
+	map->data.cn.data = data;
+	map->data.cn.size = size;
+	return 0;
+}
+static size_t
+hsqs_mapper_canary_size(const struct HsqsMapper *mapper) {
+	return mapper->data.cn.size;
+}
+static int
+hsqs_mapper_canary_cleanup(struct HsqsMapper *mapper) {
+	return 0;
+}
+static int
+hsqs_map_canary_unmap(struct HsqsMap *map) {
+	free(map->data.cn.data);
+	map->data.cn.data = NULL;
+	map->data.cn.size = 0;
+	return 0;
+}
+static const uint8_t *
+hsqs_map_canary_data(const struct HsqsMap *map) {
+	return map->data.cn.data;
+}
 
-struct HsqsMapperMmap {
-	int fd;
-	long page_size;
-	size_t size;
+static int
+hsqs_map_canary_resize(struct HsqsMap *map, size_t new_size) {
+	int rv;
+	uint64_t offset = map->data.cn.offset;
+	struct HsqsMapper *mapper = map->mapper;
+
+	rv = hsqs_map_unmap(map);
+	if (rv < 0) {
+		return rv;
+	}
+	return hsqs_mapper_map(map, mapper, offset, new_size);
+}
+
+static size_t
+hsqs_map_canary_size(const struct HsqsMap *map) {
+	return map->data.cn.size;
+}
+
+struct HsqsMemoryMapperImpl hsqs_mapper_impl_canary = {
+		.init = hsqs_mapper_canary_init,
+		.map = hsqs_mapper_canary_map,
+		.size = hsqs_mapper_canary_size,
+		.cleanup = hsqs_mapper_canary_cleanup,
+		.map_data = hsqs_map_canary_data,
+		.map_resize = hsqs_map_canary_resize,
+		.map_size = hsqs_map_canary_size,
+		.unmap = hsqs_map_canary_unmap,
 };
-
-struct HsqsMapMmap {
-	uint8_t *data;
-	size_t offset;
-	size_t page_offset;
-	size_t size;
-};
-
-#endif /* end of include guard MMAP_H */

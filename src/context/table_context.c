@@ -53,7 +53,7 @@ hsqs_table_init(
 		size_t element_size, size_t element_count) {
 	int rv = 0;
 	size_t byte_size;
-	struct HsqsMemoryMapper *mapper = superblock->mapper;
+	struct HsqsMapper *mapper = superblock->mapper;
 	// TODO: Overflow
 	size_t lookup_table_size =
 			HSQS_DEVIDE_CEIL(
