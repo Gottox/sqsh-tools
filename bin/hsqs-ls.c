@@ -230,6 +230,10 @@ ls_path(struct Hsqs *hsqs, char *path) {
 	int rv = 0;
 
 	rv = hsqs_resolve_path(&inode, &hsqs->superblock, path);
+	if (rv < 0) {
+		hsqs_perror(rv, path);
+		goto out;
+	}
 	if (hsqs_inode_type(&inode) == HSQS_INODE_TYPE_DIRECTORY) {
 		if (rv < 0) {
 			hsqs_perror(rv, path);
