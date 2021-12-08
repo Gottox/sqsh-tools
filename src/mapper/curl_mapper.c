@@ -72,6 +72,7 @@ get_handle(struct HsqsMapper *mapper) {
 	curl_easy_setopt(handle, CURLOPT_TCP_KEEPALIVE, 1L);
 	curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1L);
 	curl_easy_setopt(handle, CURLOPT_FAILONERROR, 1L);
+	curl_easy_setopt(handle, CURLOPT_FILETIME, 1L);
 	return handle;
 }
 
@@ -100,6 +101,14 @@ hsqs_mapper_curl_init(
 		goto out;
 	}
 	mapper->data.cl.content_length = content_length;
+
+	long file_time;
+	rv = curl_easy_getinfo(handle, CURLINFO_FILETIME, &file_time);
+	if (rv != CURLE_OK) {
+		rv = -HSQS_ERROR_MAPPER_INIT;
+		goto out;
+	}
+	mapper->data.cl.file_time = file_time;
 
 out:
 	return rv;
@@ -183,6 +192,17 @@ hsqs_map_curl_resize(struct HsqsMap *map, size_t new_size) {
 	rv = curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &http_code);
 
 	if (http_code != 206 || rv != CURLE_OK) {
+		rv = -HSQS_ERROR_MAPPER_MAP;
+		goto out;
+	}
+
+	long file_time;
+	rv = curl_easy_getinfo(handle, CURLINFO_FILETIME, &file_time);
+	if (rv != CURLE_OK) {
+		rv = -HSQS_ERROR_MAPPER_MAP;
+		goto out;
+	}
+	if (map->mapper->data.cl.file_time != file_time) {
 		rv = -HSQS_ERROR_MAPPER_MAP;
 		goto out;
 	}

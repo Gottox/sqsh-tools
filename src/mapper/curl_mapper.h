@@ -42,6 +42,7 @@
 
 struct HsqsCurlMapper {
 	const char *url;
+	long file_time;
 	size_t content_length;
 	CURL *handle;
 };
