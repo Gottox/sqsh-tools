@@ -126,7 +126,7 @@ hsqs_fragment_table_to_buffer(
 	}
 
 	if (end_offset > hsqs_buffer_size(&intermediate_buffer)) {
-		return -HSQS_ERROR_TODO;
+		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
 
 	data = hsqs_buffer_data(&intermediate_buffer);

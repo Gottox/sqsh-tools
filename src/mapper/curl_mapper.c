@@ -88,7 +88,7 @@ hsqs_mapper_curl_init(
 	curl_easy_setopt(handle, CURLOPT_NOBODY, 1L);
 	rv = curl_easy_perform(handle);
 	if (rv != CURLE_OK) {
-		rv = -HSQS_ERROR_TODO;
+		rv = -HSQS_ERROR_MAPPER_INIT;
 		goto out;
 	}
 
@@ -96,7 +96,7 @@ hsqs_mapper_curl_init(
 	rv = curl_easy_getinfo(
 			handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &content_length);
 	if (rv != CURLE_OK) {
-		rv = -HSQS_ERROR_TODO;
+		rv = -HSQS_ERROR_MAPPER_INIT;
 		goto out;
 	}
 	mapper->data.cl.content_length = content_length;
@@ -167,7 +167,7 @@ hsqs_map_curl_resize(struct HsqsMap *map, size_t new_size) {
 			range_buffer, sizeof(range_buffer), "%lu-%lu", new_offset,
 			end_offset);
 	if (rv >= sizeof(range_buffer)) {
-		rv = -HSQS_ERROR_TODO;
+		rv = -HSQS_ERROR_MAPPER_MAP;
 		goto out;
 	}
 	curl_easy_setopt(handle, CURLOPT_RANGE, range_buffer);
@@ -176,14 +176,14 @@ hsqs_map_curl_resize(struct HsqsMap *map, size_t new_size) {
 
 	rv = curl_easy_perform(handle);
 	if (rv != CURLE_OK) {
-		rv = -HSQS_ERROR_TODO;
+		rv = -HSQS_ERROR_MAPPER_MAP;
 		goto out;
 	}
 
 	rv = curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &http_code);
 
 	if (http_code != 206 || rv != CURLE_OK) {
-		rv = -HSQS_ERROR_TODO;
+		rv = -HSQS_ERROR_MAPPER_MAP;
 		goto out;
 	}
 

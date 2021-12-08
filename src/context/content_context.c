@@ -139,7 +139,7 @@ hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
 		goto out;
 	}
 	if (hsqs_inode_file_size(context->inode) > size) {
-		rv = HSQS_ERROR_TODO;
+		rv = HSQS_ERROR_SIZE_MISSMATCH;
 	}
 
 	for (; block_index < block_count && hsqs_content_size(context) < size;

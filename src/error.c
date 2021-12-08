@@ -129,6 +129,10 @@ hsqs_error_str(int error_code) {
 		return "No xattr table";
 	case HSQS_ERROR_METABLOCK_TOO_BIG:
 		return "Metablock too big";
+	case HSQS_ERROR_MAPPER_INIT:
+		return "Mapper init error";
+	case HSQS_ERROR_MAPPER_MAP:
+		return "Mapper map error";
 	case HSQS_ERROR_TODO:
 		return "Todo";
 	}
