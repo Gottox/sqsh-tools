@@ -48,9 +48,8 @@
 
 static int
 init_squash(
-		struct HsqsMapper *mapper,
-		struct HsqsSuperblockContext *superblock, const uint8_t *image,
-		size_t size) {
+		struct HsqsMapper *mapper, struct HsqsSuperblockContext *superblock,
+		const uint8_t *image, size_t size) {
 	int rv = 0;
 	rv = hsqs_mapper_init_static(mapper, image, size);
 	if (rv < 0) {
@@ -289,8 +288,7 @@ hsqs_test_xattr() {
 			hsqs_data_superblock_root_inode_ref(superblock.superblock));
 	assert(rv == 0);
 
-	rv = hsqs_xattr_table_iterator_init(
-			&xattr_iter, &superblock.xattr_table, &inode);
+	rv = hsqs_inode_xattr_iterator(&inode, &xattr_iter);
 	assert(rv == 0);
 	rv = hsqs_xattr_table_iterator_next(&xattr_iter);
 	assert(rv == 0);
@@ -512,7 +510,10 @@ fuzz_crash_4() {
 
 	struct HsqsSuperblockContext superblock = {0};
 	struct HsqsMapper mapper = {0};
+	struct HsqsTableContext *id_table = NULL;
 	rv = init_squash(&mapper, &superblock, input, sizeof(input));
+	assert(rv == 0);
+	rv = hsqs_superblock_id_table(&superblock, &id_table);
 	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
 	hsqs_superblock_cleanup(&superblock);
 }
@@ -547,7 +548,10 @@ fuzz_crash_5() {
 
 	struct HsqsSuperblockContext superblock = {0};
 	struct HsqsMapper mapper = {0};
+	struct HsqsTableContext *id_table = NULL;
 	rv = init_squash(&mapper, &superblock, input, sizeof(input));
+	assert(rv == 0);
+	rv = hsqs_superblock_id_table(&superblock, &id_table);
 	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
 	hsqs_superblock_cleanup(&superblock);
 }
@@ -568,7 +572,10 @@ fuzz_crash_6() {
 
 	struct HsqsSuperblockContext superblock = {0};
 	struct HsqsMapper mapper = {0};
+	struct HsqsTableContext *id_table = NULL;
 	rv = init_squash(&mapper, &superblock, input, sizeof(input));
+	assert(rv == 0);
+	rv = hsqs_superblock_id_table(&superblock, &id_table);
 	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
 	hsqs_superblock_cleanup(&superblock);
 }
@@ -590,7 +597,10 @@ fuzz_crash_7() {
 
 	struct HsqsSuperblockContext superblock = {0};
 	struct HsqsMapper mapper = {0};
+	struct HsqsTableContext *id_table = NULL;
 	rv = init_squash(&mapper, &superblock, input, sizeof(input));
+	assert(rv == 0);
+	rv = hsqs_superblock_id_table(&superblock, &id_table);
 	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
 	hsqs_superblock_cleanup(&superblock);
 }

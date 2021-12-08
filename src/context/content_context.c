@@ -83,7 +83,11 @@ hsqs_content_init(
 	context->inode = inode;
 
 	if (has_fragment(context)) {
-		context->fragment_table = &inode->superblock->fragment_table;
+		rv = hsqs_superblock_fragment_table(
+				context->superblock, &context->fragment_table);
+		if (rv < 0) {
+			return rv;
+		}
 	} else {
 		context->fragment_table = NULL;
 	}
@@ -114,8 +118,7 @@ int
 hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
 	int rv = 0;
 	struct HsqsMap map = {0};
-	struct HsqsFragmentTableContext *table =
-			&context->superblock->fragment_table;
+	struct HsqsFragmentTableContext *table = context->fragment_table;
 	struct HsqsBuffer *buffer = &context->buffer;
 	uint64_t start_block = hsqs_inode_file_blocks_start(context->inode);
 	bool is_compressed;

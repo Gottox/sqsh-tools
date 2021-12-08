@@ -56,6 +56,7 @@ struct HsqsSuperblockContext {
 	struct HsqsXattrTableContext xattr_table;
 	struct HsqsFragmentTableContext fragment_table;
 	struct HsqsCompressionOptionsContext compression_options;
+	uint8_t initialized;
 };
 
 HSQS_NO_UNUSED int hsqs_superblock_init(
@@ -90,12 +91,18 @@ uint32_t hsqs_superblock_fragment_entry_count(
 uint64_t
 hsqs_superblock_bytes_used(const struct HsqsSuperblockContext *context);
 
-struct HsqsTableContext *
-hsqs_superblock_id_table(struct HsqsSuperblockContext *context);
-struct HsqsTableContext *
-hsqs_superblock_export_table(struct HsqsSuperblockContext *context);
-struct HsqsXattrTableContext *
-hsqs_superblock_xattr_table(struct HsqsSuperblockContext *context);
+int hsqs_superblock_id_table(
+		struct HsqsSuperblockContext *context,
+		struct HsqsTableContext **id_table);
+int hsqs_superblock_export_table(
+		struct HsqsSuperblockContext *context,
+		struct HsqsTableContext **export_table);
+int hsqs_superblock_fragment_table(
+		struct HsqsSuperblockContext *context,
+		struct HsqsFragmentTableContext **fragment_table);
+int hsqs_superblock_xattr_table(
+		struct HsqsSuperblockContext *context,
+		struct HsqsXattrTableContext **xattr_table);
 const struct HsqsCompressionOptionsContext *hsqs_superblock_compression_options(
 		const struct HsqsSuperblockContext *context);
 

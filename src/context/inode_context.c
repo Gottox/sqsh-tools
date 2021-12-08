@@ -428,10 +428,13 @@ hsqs_inode_load_by_inode_number(
 static uint32_t
 inode_get_id(const struct HsqsInodeContext *context, off_t idx) {
 	int rv = 0;
-	struct HsqsTableContext *id_table =
-			hsqs_superblock_id_table(context->superblock);
+	struct HsqsTableContext *id_table;
 	uint32_t id;
 
+	rv = hsqs_superblock_id_table(context->superblock, &id_table);
+	if (rv < 0) {
+		return UINT32_MAX;
+	}
 	rv = hsqs_table_get(id_table, idx, &id);
 	if (rv < 0) {
 		return UINT32_MAX;
@@ -477,9 +480,13 @@ int
 hsqs_inode_xattr_iterator(
 		const struct HsqsInodeContext *inode,
 		struct HsqsXattrTableIterator *iterator) {
-	struct HsqsXattrTableContext *table =
-			hsqs_superblock_xattr_table(inode->superblock);
+	int rv = 0;
+	struct HsqsXattrTableContext *table;
 
+	rv = hsqs_superblock_xattr_table(inode->superblock, &table);
+	if (rv < 0) {
+		return rv;
+	}
 	return hsqs_xattr_table_iterator_init(iterator, table, inode);
 }
 
