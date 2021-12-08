@@ -71,6 +71,7 @@ get_handle(struct HsqsMapper *mapper) {
 	curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 1L);
 	curl_easy_setopt(handle, CURLOPT_TCP_KEEPALIVE, 1L);
 	curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1L);
+	curl_easy_setopt(handle, CURLOPT_FAILONERROR, 1L);
 	return handle;
 }
 
@@ -151,6 +152,7 @@ hsqs_map_curl_resize(struct HsqsMap *map, size_t new_size) {
 	size_t current_size = hsqs_map_size(map);
 	uint64_t new_offset = map->data.cl.offset + current_size;
 	uint64_t end_offset = new_offset + new_size - current_size - 1;
+	long http_code = 0;
 
 	if (new_size <= current_size) {
 		return 0;
@@ -175,7 +177,17 @@ hsqs_map_curl_resize(struct HsqsMap *map, size_t new_size) {
 	rv = curl_easy_perform(handle);
 	if (rv != CURLE_OK) {
 		rv = -HSQS_ERROR_TODO;
+		goto out;
 	}
+
+	rv = curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &http_code);
+
+	if (http_code != 206 || rv != CURLE_OK) {
+		rv = -HSQS_ERROR_TODO;
+		goto out;
+	}
+
+	rv = 0;
 
 out:
 	return rv;
