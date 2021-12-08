@@ -68,18 +68,12 @@ print_simple(const struct HsqsDirectoryIterator *iter, const char *path) {
 	return 0;
 }
 
-static int
-print_detail(const struct HsqsDirectoryIterator *iter, const char *path) {
-	int rv = 0;
+void
+print_detail_inode(struct HsqsInodeContext *inode, const char *path) {
 	int mode;
 	char xchar, unxchar;
-	struct HsqsInodeContext inode = {0};
 
-	rv = hsqs_directory_iterator_inode_load(iter, &inode);
-	if (rv < 0) {
-		goto out;
-	}
-	switch (hsqs_inode_type(&inode)) {
+	switch (hsqs_inode_type(inode)) {
 	case HSQS_INODE_TYPE_UNKNOWN:
 		putchar('?');
 		break;
@@ -106,7 +100,7 @@ print_detail(const struct HsqsDirectoryIterator *iter, const char *path) {
 		break;
 	}
 
-	mode = hsqs_inode_permission(&inode);
+	mode = hsqs_inode_permission(inode);
 #define PRINT_MODE(t) \
 	{ \
 		putchar((S_IR##t & mode) ? 'r' : '-'); \
@@ -124,18 +118,29 @@ print_detail(const struct HsqsDirectoryIterator *iter, const char *path) {
 	PRINT_MODE(OTH);
 #undef PRINT_MODE
 
-	time_t mtime = hsqs_inode_modified_time(&inode);
-	printf(" %6i %6i %10lu %s %s", hsqs_inode_uid(&inode),
-		   hsqs_inode_gid(&inode), hsqs_inode_file_size(&inode),
-		   strtok(ctime(&mtime), "\n"), path);
+	time_t mtime = hsqs_inode_modified_time(inode);
+	printf(" %6u %6u %10lu %s %s", hsqs_inode_uid(inode), hsqs_inode_gid(inode),
+		   hsqs_inode_file_size(inode), strtok(ctime(&mtime), "\n"), path);
 
-	if (hsqs_inode_type(&inode) == HSQS_INODE_TYPE_SYMLINK) {
+	if (hsqs_inode_type(inode) == HSQS_INODE_TYPE_SYMLINK) {
 		fputs(" -> ", stdout);
-		fwrite(hsqs_inode_symlink(&inode), hsqs_inode_symlink_size(&inode),
+		fwrite(hsqs_inode_symlink(inode), hsqs_inode_symlink_size(inode),
 			   sizeof(char), stdout);
 	}
 
 	putchar('\n');
+}
+
+static int
+print_detail(const struct HsqsDirectoryIterator *iter, const char *path) {
+	int rv = 0;
+	struct HsqsInodeContext inode = {0};
+
+	rv = hsqs_directory_iterator_inode_load(iter, &inode);
+	if (rv < 0) {
+		goto out;
+	}
+	print_detail_inode(&inode, path);
 out:
 	hsqs_inode_cleanup(&inode);
 	return rv;
@@ -221,17 +226,25 @@ ls_path(struct Hsqs *hsqs, char *path) {
 	int rv = 0;
 
 	rv = hsqs_resolve_path(&inode, &hsqs->superblock, path);
-	if (rv < 0) {
-		hsqs_perror(rv, path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
+	if (hsqs_inode_type(&inode) == HSQS_INODE_TYPE_DIRECTORY) {
+		if (rv < 0) {
+			hsqs_perror(rv, path);
+			rv = EXIT_FAILURE;
+			goto out;
+		}
 
-	rv = ls(hsqs, NULL, &inode);
-	if (rv < 0) {
-		hsqs_perror(rv, path);
-		rv = EXIT_FAILURE;
-		goto out;
+		rv = ls(hsqs, path, &inode);
+		if (rv < 0) {
+			hsqs_perror(rv, path);
+			rv = EXIT_FAILURE;
+			goto out;
+		}
+	} else {
+		if (print_item == print_detail) {
+			print_detail_inode(&inode, path);
+		} else {
+			puts(path);
+		}
 	}
 out:
 	hsqs_inode_cleanup(&inode);
