@@ -93,7 +93,11 @@ hsqs_mapper_cleanup(struct HsqsMapper *mapper) {
 
 int
 hsqs_map_resize(struct HsqsMap *map, size_t new_size) {
-	return map->mapper->impl->map_resize(map, new_size);
+	if (new_size <= hsqs_map_size(map)) {
+		return 0;
+	} else {
+		return map->mapper->impl->map_resize(map, new_size);
+	}
 }
 
 size_t
