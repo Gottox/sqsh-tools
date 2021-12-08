@@ -150,6 +150,7 @@ static int
 ls_item(struct Hsqs *hsqs, const char *path,
 		struct HsqsDirectoryIterator *iter) {
 	int rv = 0;
+	int len = 0;
 	struct HsqsInodeContext entry_inode = {0};
 	const char *name = hsqs_directory_iterator_name(iter);
 	const int name_size = hsqs_directory_iterator_name_size(iter);
@@ -162,7 +163,10 @@ ls_item(struct Hsqs *hsqs, const char *path,
 	}
 	if (path != NULL) {
 		strcpy(current_path, path);
-		strcat(current_path, "/");
+		len = strlen(path);
+		if (len > 0 && path[len - 1] != '/') {
+			strcat(current_path, "/");
+		}
 	}
 	strncat(current_path, name, name_size);
 	print_item(iter, current_path);
@@ -295,7 +299,7 @@ main(int argc, char *argv[]) {
 	}
 
 	if (has_listed == false) {
-		rv = ls_path(&hsqs, "");
+		rv = ls_path(&hsqs, NULL);
 		if (rv < 0) {
 			goto out;
 		}
