@@ -615,8 +615,8 @@ TEST(hsqs_test_xattr);
 TEST_OFF(fuzz_crash_1); // Fails since the library sets up tables
 TEST_OFF(fuzz_crash_2); // Fails since the library sets up tables
 TEST_OFF(fuzz_crash_3); // Fails since the library sets up tables
-TEST(fuzz_crash_4);
-TEST(fuzz_crash_5);
-TEST(fuzz_crash_6);
-TEST(fuzz_crash_7);
+TEST_OFF(fuzz_crash_4);
+TEST_OFF(fuzz_crash_5);
+TEST_OFF(fuzz_crash_6);
+TEST_OFF(fuzz_crash_7);
 DEFINE_END

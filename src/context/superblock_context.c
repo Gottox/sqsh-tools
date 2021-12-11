@@ -47,6 +47,15 @@ enum HsqsInitialized {
 	HSQS_INITIALIZED_FRAGMENT_TABLE = 1 << 4,
 };
 
+static uint16_t
+log2_u32(uint32_t x) {
+	if (x == 0) {
+		return UINT16_MAX;
+	} else {
+		return sizeof(uint32_t) * 8 - 1 - __builtin_clz(x);
+	}
+}
+
 int
 hsqs_superblock_init(
 		struct HsqsSuperblockContext *context, struct HsqsMapper *mapper) {
@@ -69,8 +78,13 @@ hsqs_superblock_init(
 		goto out;
 	}
 
-	if (hsqs_data_superblock_block_log(superblock) !=
-		hsqs_log2_u32(hsqs_data_superblock_block_size(superblock))) {
+	uint32_t block_size = hsqs_data_superblock_block_size(superblock);
+	if (block_size < 4096 || block_size > 1048576) {
+		rv = -HSQS_ERROR_BLOCKSIZE_MISSMATCH;
+		goto out;
+	}
+
+	if (hsqs_data_superblock_block_log(superblock) != log2_u32(block_size)) {
 		rv = -HSQS_ERROR_BLOCKSIZE_MISSMATCH;
 		goto out;
 	}
