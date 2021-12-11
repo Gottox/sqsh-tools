@@ -1,0 +1,51 @@
+name: CI
+on:
+- push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container: gottox/hsqs-build
+    strategy:
+      matrix:
+        cc: [clang]
+    steps:
+    - uses: actions/checkout@v2
+    - name: configure
+      run: |
+        meson setup /tmp/build \
+          -Dcurl=false \
+          -Dzlib=false \
+          -Dlz4=false\
+          -Dlzma=false \
+          -Dlzo2=false \
+          -Dzstd=false \
+          -Dtest=true
+    - name: configure
+      run: |
+         ninja -C /tmp/build test
+  build:
+    runs-on: ubuntu-latest
+    container: gottox/hsqs-build
+    strategy:
+      matrix:
+        cc: [gcc, clang]
+        curl: [true, false]
+        zlib: [true, false]
+        lz4: [true, false]
+        lzma: [true, false]
+        lzo2: [true, false]
+        zstd: [true, false]
+    steps:
+    - uses: actions/checkout@v2
+    - name: configure
+      run: |
+        meson setup /tmp/build \
+          -Dcurl=${{ matrix.curl }} \
+          -Dzlib=${{ matrix.zlib }} \
+          -Dlz4=${{ matrix.lz4 }} \
+          -Dlzma=${{ matrix.lzma }} \
+          -Dlzo2=${{ matrix.lzo2 }} \
+          -Dzstd=${{ matrix.zstd }}
+    - name: configure
+      run: |
+         ninja -C /tmp/build build

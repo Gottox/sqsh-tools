@@ -1,0 +1,8 @@
+option('curl', type : 'boolean')
+option('zlib', type : 'boolean')
+option('lz4',  type : 'boolean')
+option('lzma',  type : 'boolean')
+option('lzo2', type : 'boolean', value : false)
+option('zstd', type : 'boolean')
+option('fuse', type : 'boolean')
+option('test', type : 'boolean', value : false)
