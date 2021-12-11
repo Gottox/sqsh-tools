@@ -307,6 +307,7 @@ hsqs_directory_iterator_name_dup(
 }
 
 int
-hsqs_directory_cleanup(struct HsqsDirectoryContext *directory) {
+hsqs_directory_cleanup(
+		struct HsqsDirectoryContext __attribute__((unused)) * directory) {
 	return 0;
 }

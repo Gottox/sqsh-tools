@@ -48,6 +48,7 @@
 static int
 usage(char *arg0) {
 	printf("usage: %s FILESYSTEM PATH [PATH ...]\n", arg0);
+	printf("       %s -v\n", arg0);
 	return EXIT_FAILURE;
 }
 
@@ -93,8 +94,11 @@ main(int argc, char *argv[]) {
 	const char *image_path;
 	struct Hsqs hsqs = {0};
 
-	while ((opt = getopt(argc, argv, "h")) != -1) {
+	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {
+		case 'v':
+			puts("hsqs-cat-" VERSION);
+			return 0;
 		default:
 			return usage(argv[0]);
 		}

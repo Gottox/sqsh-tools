@@ -103,7 +103,8 @@ hsqs_map_mmap_complete_data(const struct HsqsMap *map) {
 	return map->data.mc.data;
 }
 static int
-hsqs_map_mmap_complete_resize(struct HsqsMap *mapper, size_t new_size) {
+hsqs_map_mmap_complete_resize(
+		struct HsqsMap *mapper, size_t __attribute__((unused)) new_size) {
 	return mapper->data.mc.size;
 }
 

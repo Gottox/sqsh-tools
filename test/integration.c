@@ -32,7 +32,6 @@
  * @created     : Monday Oct 11, 2021 21:43:12 CEST
  */
 
-#include "../gen/squash_image.h"
 #include "../src/context/content_context.h"
 #include "../src/context/directory_context.h"
 #include "../src/context/inode_context.h"
@@ -44,6 +43,7 @@
 #include "../src/resolve_path.h"
 #include "common.h"
 #include "test.h"
+#include <squashfs_image.h>
 #include <stdint.h>
 
 static int

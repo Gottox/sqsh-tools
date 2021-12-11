@@ -89,7 +89,7 @@ int hsqs_mapper_init_static(
 int hsqs_mapper_map(
 		struct HsqsMap *map, struct HsqsMapper *mapper, off_t offset,
 		size_t size);
-int hsqs_mapper_size(const struct HsqsMapper *mapper);
+size_t hsqs_mapper_size(const struct HsqsMapper *mapper);
 int hsqs_mapper_cleanup(struct HsqsMapper *mapper);
 size_t hsqs_map_size(struct HsqsMap *map);
 int hsqs_map_resize(struct HsqsMap *map, size_t new_size);

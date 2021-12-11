@@ -78,7 +78,7 @@ hsqs_mapper_map(
 	return mapper->impl->map(map, mapper, offset, size);
 }
 
-int
+size_t
 hsqs_mapper_size(const struct HsqsMapper *mapper) {
 	return mapper->impl->size(mapper);
 }

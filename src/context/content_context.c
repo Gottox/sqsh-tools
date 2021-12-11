@@ -64,7 +64,7 @@ static uint64_t
 datablock_offset(struct HsqsFileContext *context, uint32_t block_index) {
 	uint64_t offset = 0;
 
-	for (int i = 0; i < block_index; i++) {
+	for (uint32_t i = 0; i < block_index; i++) {
 		offset += hsqs_inode_file_block_size(context->inode, i);
 	}
 	return offset;
@@ -195,7 +195,7 @@ hsqs_content_data(struct HsqsFileContext *context) {
 uint64_t
 hsqs_content_size(struct HsqsFileContext *context) {
 	uint32_t block_size = hsqs_superblock_block_size(context->superblock);
-	off_t offset = context->seek_pos % block_size;
+	size_t offset = context->seek_pos % block_size;
 	size_t buffer_size = hsqs_buffer_size(&context->buffer);
 
 	if (buffer_size < offset)

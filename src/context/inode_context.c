@@ -571,7 +571,8 @@ hsqs_inode_directory_index_iterator_name(
 
 int
 hsqs_inode_directory_index_iterator_clean(
-		struct HsqsInodeDirectoryIndexIterator *iterator) {
+		struct HsqsInodeDirectoryIndexIterator __attribute__((unused)) *
+		iterator) {
 	return 0;
 }
 

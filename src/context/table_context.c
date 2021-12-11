@@ -39,10 +39,11 @@
 #include <stdint.h>
 #include <string.h>
 
-static const uint64_t
+static uint64_t
 lookup_table_get(struct HsqsTableContext *table, off_t index) {
 	const uint64_t *lookup_table =
 			(const uint64_t *)hsqs_map_data(&table->lookup_table);
+
 	return lookup_table[index];
 }
 

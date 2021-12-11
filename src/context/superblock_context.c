@@ -37,8 +37,8 @@
 #include "../error.h"
 #include <stdint.h>
 
-const static uint32_t SUPERBLOCK_MAGIC = 0x73717368;
-const static uint64_t NO_SEGMENT = 0xFFFFFFFFFFFFFFFF;
+static const uint32_t SUPERBLOCK_MAGIC = 0x73717368;
+static const uint64_t NO_SEGMENT = 0xFFFFFFFFFFFFFFFF;
 
 enum HsqsInitialized {
 	HSQS_INITIALIZED_ID_TABLE = 1 << 0,

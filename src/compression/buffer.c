@@ -44,22 +44,20 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef CONFIG_COMPRESSION_GZIP
-extern const struct HsqsCompressionImplementation hsqs_compression_gzip;
+#ifdef CONFIG_ZLIB
+extern const struct HsqsCompressionImplementation hsqs_compression_zlib;
 #endif
-#ifdef CONFIG_COMPRESSION_LZMA
+#ifdef CONFIG_LZMA
 extern const struct HsqsCompressionImplementation hsqs_compression_lzma;
-#endif
-#ifdef CONFIG_COMPRESSION_XZ
 extern const struct HsqsCompressionImplementation hsqs_compression_xz;
 #endif
-#ifdef CONFIG_COMPRESSION_LZO
+#ifdef CONFIG_LZO
 extern const struct HsqsCompressionImplementation hsqs_compression_lzo;
 #endif
-#ifdef CONFIG_COMPRESSION_LZ4
+#ifdef CONFIG_LZ4
 extern const struct HsqsCompressionImplementation hsqs_compression_lz4;
 #endif
-#ifdef CONFIG_COMPRESSION_ZSTD
+#ifdef CONFIG_ZSTD
 extern const struct HsqsCompressionImplementation hsqs_compression_zstd;
 #endif
 extern const struct HsqsCompressionImplementation hsqs_compression_null;
@@ -69,27 +67,27 @@ compression_by_id(int id) {
 	switch ((enum HsqsSuperblockCompressionId)id) {
 	case HSQS_COMPRESSION_NONE:
 		return &hsqs_compression_null;
-#ifdef CONFIG_COMPRESSION_GZIP
+#ifdef CONFIG_ZLIB
 	case HSQS_COMPRESSION_GZIP:
-		return &hsqs_compression_gzip;
+		return &hsqs_compression_zlib;
 #endif
-#ifdef CONFIG_COMPRESSION_LZMA
+#ifdef CONFIG_LZMA
 	case HSQS_COMPRESSION_LZMA:
 		return &hsqs_compression_lzma;
 #endif
-#ifdef CONFIG_COMPRESSION_XZ
+#ifdef CONFIG_XZ
 	case HSQS_COMPRESSION_XZ:
 		return &hsqs_compression_xz;
 #endif
-#ifdef CONFIG_COMPRESSION_LZO
+#ifdef CONFIG_LZO
 	case HSQS_COMPRESSION_LZO:
 		return &hsqs_compression_lzo;
 #endif
-#ifdef CONFIG_COMPRESSION_LZ4
+#ifdef CONFIG_LZ4
 	case HSQS_COMPRESSION_LZ4:
 		return &hsqs_compression_lz4;
 #endif
-#ifdef CONFIG_COMPRESSION_ZSTD
+#ifdef CONFIG_ZSTD
 	case HSQS_COMPRESSION_ZSTD:
 		return &hsqs_compression_zstd;
 #endif
@@ -123,7 +121,7 @@ hsqs_buffer_init(
 
 	impl = compression_by_id(compression_id);
 	if (impl == NULL) {
-		return -HSQS_ERROR_COMPRESSION_INIT;
+		return -HSQS_ERROR_COMPRESSION_UNKNOWN;
 	}
 
 	if (rv < 0) {
