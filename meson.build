@@ -94,8 +94,8 @@ hsqs_test = [
 libhsqs_deps = [ ]
 
 build_args = [
-  '-DVERSION="' + meson.project_version() + '"',
-  '-D_DEFAULT_SOURCE'
+	'-DVERSION="' + meson.project_version() + '"',
+	'-D_DEFAULT_SOURCE'
 ]
 
 if get_option('curl')
@@ -138,7 +138,7 @@ endif
 libhsqs = library(
   'hsqs',
   hsqs_src,
-  install : true,
+  install: not meson.is_subproject(),
   c_args : build_args,
   include_directories : 'src',
   dependencies : libhsqs_deps
@@ -150,7 +150,7 @@ endif
 
 foreach p : [ 'hsqs-cat', 'hsqs-ls' ]
 	executable(p, 'bin/'+p+'.c',
-		install : true,
+		install: not meson.is_subproject(),
 		c_args : build_args,
 		link_with : libhsqs
 	)
@@ -159,7 +159,7 @@ endforeach
 if get_option('fuse')
 	executable('hsqs-mount',
 		'bin/hsqs-mount.c',
-		install : true,
+		install: not meson.is_subproject(),
 		c_args : build_args,
 		dependencies: dependency('fuse3'),
 		link_with : libhsqs

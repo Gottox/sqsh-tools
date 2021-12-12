@@ -45,6 +45,8 @@ hsqs_metablock_stream_init(
 		struct HsqsMetablockStreamContext *context,
 		const struct HsqsSuperblockContext *superblock, uint64_t address,
 		uint64_t max_address) {
+	// TODO check for max_address
+	(void)max_address;
 	int rv = 0;
 
 	context->superblock = superblock;
