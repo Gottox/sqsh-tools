@@ -245,6 +245,7 @@ hsqsfuse_listxattr(const char *path, char *list, size_t size) {
 	}
 	if (rv < 0) {
 		rv = -EINVAL;
+		goto out;
 	}
 
 	rv = length;

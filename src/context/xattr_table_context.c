@@ -188,9 +188,6 @@ xattr_value_indirect_load(struct HsqsXattrTableIterator *iterator) {
 	// Value offset 0 marks an indirect load.
 	iterator->value_offset = 0;
 	value = get_value(iterator);
-
-	value = (struct HsqsXattrValue *)hsqs_metablock_stream_data(
-			&iterator->out_of_line_value);
 	size += hsqs_data_xattr_value_size(value);
 	rv = hsqs_metablock_stream_more(&iterator->out_of_line_value, size);
 	if (rv < 0) {
@@ -221,8 +218,6 @@ hsqs_xattr_table_iterator_next(struct HsqsXattrTableIterator *iterator) {
 	}
 	iterator->key_offset = offset;
 
-	offset = size;
-
 	// Load Key Name
 	size += hsqs_xattr_table_iterator_name_size(iterator);
 	rv = hsqs_metablock_stream_more(&iterator->metablock, size);
@@ -230,17 +225,14 @@ hsqs_xattr_table_iterator_next(struct HsqsXattrTableIterator *iterator) {
 		goto out;
 	}
 
-	offset = size;
-
 	// Load Value Header
+	offset = size;
 	size += HSQS_SIZEOF_XATTR_VALUE;
 	rv = hsqs_metablock_stream_more(&iterator->metablock, size);
 	if (rv < 0) {
 		goto out;
 	}
 	iterator->value_offset = offset;
-
-	offset = size;
 
 	// Load Value
 	size += hsqs_xattr_table_iterator_value_size(iterator);
