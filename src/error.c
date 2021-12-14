@@ -63,7 +63,7 @@ hsqs_error_str(int error_code) {
 	switch ((enum HsqsError)error_code) {
 	case HSQS_ERROR_SUPERBLOCK_TOO_SMALL:
 		return "Superblock too small";
-	case HSQS_ERROR_WRONG_MAGIG:
+	case HSQS_ERROR_WRONG_MAGIC:
 		return "Wrong magig";
 	case HSQS_ERROR_BLOCKSIZE_MISSMATCH:
 		return "Blocksize missmatch";
