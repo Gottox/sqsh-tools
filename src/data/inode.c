@@ -202,7 +202,7 @@ hsqs_data_inode_directory_ext_block_start(
 uint32_t
 hsqs_data_inode_directory_ext_parent_inode_number(
 		const struct HsqsInodeDirectoryExt *directory_ext) {
-	return htole32(directory_ext->index_count);
+	return htole32(directory_ext->parent_inode_number);
 }
 uint16_t
 hsqs_data_inode_directory_ext_index_count(
