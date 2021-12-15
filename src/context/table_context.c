@@ -40,7 +40,7 @@
 #include <string.h>
 
 static uint64_t
-lookup_table_get(struct HsqsTableContext *table, off_t index) {
+lookup_table_get(const struct HsqsTableContext *table, off_t index) {
 	const uint64_t *lookup_table =
 			(const uint64_t *)hsqs_map_data(&table->lookup_table);
 
@@ -81,7 +81,8 @@ out:
 }
 
 int
-hsqs_table_get(struct HsqsTableContext *table, off_t index, void *target) {
+hsqs_table_get(
+		const struct HsqsTableContext *table, off_t index, void *target) {
 	int rv = 0;
 	struct HsqsMetablockContext metablock = {0};
 	struct HsqsBuffer buffer = {0};

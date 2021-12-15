@@ -52,7 +52,8 @@ int hsqs_table_init(
 		struct HsqsTableContext *table,
 		const struct HsqsSuperblockContext *superblock, off_t start_block,
 		size_t element_size, size_t element_count);
-int hsqs_table_get(struct HsqsTableContext *table, off_t index, void *target);
+int
+hsqs_table_get(const struct HsqsTableContext *table, off_t index, void *target);
 int hsqs_table_cleanup(struct HsqsTableContext *table);
 
 #endif /* end of include guard TABLE_CONTEXT_H */
