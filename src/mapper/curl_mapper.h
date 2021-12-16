@@ -45,6 +45,7 @@ struct HsqsCurlMapper {
 	long file_time;
 	size_t content_length;
 	CURL *handle;
+	pthread_mutex_t handle_lock;
 };
 
 struct HsqsCurlMap {

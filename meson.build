@@ -95,7 +95,12 @@ libhsqs_deps = [ ]
 
 build_args = [
 	'-DVERSION="' + meson.project_version() + '"',
-	'-D_DEFAULT_SOURCE'
+	'-D_DEFAULT_SOURCE',
+	'-pthread'
+]
+
+link_args = [
+	'-pthread'
 ]
 
 if get_option('curl')
@@ -140,6 +145,7 @@ libhsqs = library(
   hsqs_src,
   install: not meson.is_subproject(),
   c_args : build_args,
+  link_args : link_args,
   include_directories : 'src',
   dependencies : libhsqs_deps
 )

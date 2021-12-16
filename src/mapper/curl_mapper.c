@@ -36,6 +36,7 @@
 #include "mapper.h"
 #include <errno.h>
 #include <fcntl.h>
+#include <pthread.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <sys/mman.h>
@@ -66,6 +67,7 @@ out:
 static CURL *
 get_handle(struct HsqsMapper *mapper) {
 	CURL *handle = mapper->data.cl.handle;
+	pthread_mutex_lock(&mapper->data.cl.handle_lock);
 	curl_easy_reset(handle);
 	curl_easy_setopt(handle, CURLOPT_URL, mapper->data.cl.url);
 	curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 1L);
@@ -76,16 +78,30 @@ get_handle(struct HsqsMapper *mapper) {
 	return handle;
 }
 
+static void
+release_handle(struct HsqsMapper *mapper, CURL *handle) {
+	if (handle == mapper->data.cl.handle) {
+		pthread_mutex_unlock(&mapper->data.cl.handle_lock);
+	}
+}
+
 static int
 hsqs_mapper_curl_init(
 		struct HsqsMapper *mapper, const void *input, size_t size) {
 	int rv = 0;
 	curl_global_init(CURL_GLOBAL_ALL);
+	CURL *handle = NULL;
 
 	mapper->data.cl.url = input;
 	mapper->data.cl.handle = curl_easy_init();
 
-	CURL *handle = get_handle(mapper);
+	rv = pthread_mutex_init(&mapper->data.cl.handle_lock, NULL);
+	if (rv != 0) {
+		rv = -HSQS_ERROR_MAPPER_INIT;
+		goto out;
+	}
+
+	handle = get_handle(mapper);
 	curl_easy_setopt(handle, CURLOPT_NOBODY, 1L);
 	rv = curl_easy_perform(handle);
 	if (rv != CURLE_OK) {
@@ -111,6 +127,7 @@ hsqs_mapper_curl_init(
 	mapper->data.cl.file_time = file_time;
 
 out:
+	release_handle(mapper, handle);
 	return rv;
 }
 static int
@@ -139,6 +156,7 @@ hsqs_mapper_curl_size(const struct HsqsMapper *mapper) {
 }
 static int
 hsqs_mapper_curl_cleanup(struct HsqsMapper *mapper) {
+	pthread_mutex_destroy(&mapper->data.cl.handle_lock);
 	curl_easy_cleanup(mapper->data.cl.handle);
 	return 0;
 }
@@ -210,6 +228,7 @@ hsqs_map_curl_resize(struct HsqsMap *map, size_t new_size) {
 	rv = 0;
 
 out:
+	release_handle(map->mapper, handle);
 	return rv;
 }
 
