@@ -40,14 +40,16 @@
 #define FILE_CONTEXT_H
 
 struct HsqsInodeContext;
-struct SuperblockContext;
+struct Hsqs;
 
 struct HsqsFileContext {
-	struct HsqsSuperblockContext *superblock;
+	struct Hsqs *hsqs;
 	struct HsqsFragmentTableContext *fragment_table;
 	struct HsqsInodeContext *inode;
 	struct HsqsBuffer buffer;
+	struct HsqsMapper *mapper;
 	uint64_t seek_pos;
+	uint32_t block_size;
 };
 
 HSQS_NO_UNUSED int hsqs_content_init(

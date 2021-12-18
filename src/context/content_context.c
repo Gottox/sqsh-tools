@@ -35,6 +35,7 @@
 #include "content_context.h"
 #include "../compression/buffer.h"
 #include "../error.h"
+#include "../hsqs.h"
 #include "../mapper/mapper.h"
 #include "fragment_context.h"
 #include "inode_context.h"
@@ -50,8 +51,9 @@ has_fragment(struct HsqsFileContext *context) {
 
 uint32_t
 datablock_count(struct HsqsFileContext *context) {
+	struct HsqsSuperblockContext *superblock = hsqs_superblock(context->hsqs);
 	uint64_t file_size = hsqs_inode_file_size(context->inode);
-	uint32_t block_size = hsqs_superblock_block_size(context->superblock);
+	uint32_t block_size = hsqs_superblock_block_size(superblock);
 
 	if (has_fragment(context)) {
 		return file_size / block_size;
@@ -74,17 +76,20 @@ int
 hsqs_content_init(
 		struct HsqsFileContext *context, struct HsqsInodeContext *inode) {
 	int rv = 0;
+	struct Hsqs *hsqs = inode->hsqs;
+	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
 
 	if (hsqs_inode_type(inode) != HSQS_INODE_TYPE_FILE) {
 		return -HSQS_ERROR_NOT_A_FILE;
 	}
 
-	context->superblock = inode->superblock;
 	context->inode = inode;
+	context->block_size = hsqs_superblock_block_size(superblock);
+	context->mapper = hsqs_mapper(hsqs);
+	context->hsqs = hsqs;
 
 	if (has_fragment(context)) {
-		rv = hsqs_superblock_fragment_table(
-				context->superblock, &context->fragment_table);
+		rv = hsqs_fragment_table(context->hsqs, &context->fragment_table);
 		if (rv < 0) {
 			return rv;
 		}
@@ -93,10 +98,9 @@ hsqs_content_init(
 	}
 
 	enum HsqsSuperblockCompressionId compression_id =
-			hsqs_superblock_compression_id(context->superblock);
+			hsqs_superblock_compression_id(superblock);
 	rv = hsqs_buffer_init(
-			&context->buffer, compression_id,
-			hsqs_superblock_block_size(context->superblock));
+			&context->buffer, compression_id, context->block_size);
 	if (rv < 0) {
 		return rv;
 	}
@@ -122,8 +126,7 @@ hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
 	struct HsqsBuffer *buffer = &context->buffer;
 	uint64_t start_block = hsqs_inode_file_blocks_start(context->inode);
 	bool is_compressed;
-	uint32_t block_size = hsqs_superblock_block_size(context->superblock);
-	uint32_t block_index = context->seek_pos / block_size;
+	uint32_t block_index = context->seek_pos / context->block_size;
 	uint32_t block_count = datablock_count(context);
 	uint64_t block_offset = datablock_offset(context, block_index);
 	uint64_t block_whole_size =
@@ -132,7 +135,7 @@ hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
 	uint64_t outer_offset = 0;
 
 	rv = hsqs_mapper_map(
-			&map, context->superblock->mapper, start_block + block_offset,
+			&map, context->mapper, start_block + block_offset,
 			block_whole_size);
 
 	if (rv < 0) {
@@ -182,7 +185,8 @@ out:
 
 const uint8_t *
 hsqs_content_data(struct HsqsFileContext *context) {
-	uint32_t block_size = hsqs_superblock_block_size(context->superblock);
+	struct HsqsSuperblockContext *superblock = hsqs_superblock(context->hsqs);
+	uint32_t block_size = hsqs_superblock_block_size(superblock);
 	off_t offset = context->seek_pos % block_size;
 
 	if (hsqs_content_size(context) == 0) {
@@ -194,7 +198,8 @@ hsqs_content_data(struct HsqsFileContext *context) {
 
 uint64_t
 hsqs_content_size(struct HsqsFileContext *context) {
-	uint32_t block_size = hsqs_superblock_block_size(context->superblock);
+	struct HsqsSuperblockContext *superblock = hsqs_superblock(context->hsqs);
+	uint32_t block_size = hsqs_superblock_block_size(superblock);
 	size_t offset = context->seek_pos % block_size;
 	size_t buffer_size = hsqs_buffer_size(&context->buffer);
 

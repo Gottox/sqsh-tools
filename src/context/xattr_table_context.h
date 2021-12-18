@@ -48,7 +48,7 @@ struct HsqsXattrValue;
 struct HsqsInodeContext;
 
 struct HsqsXattrTableContext {
-	struct HsqsSuperblockContext *superblock;
+	struct Hsqs *hsqs;
 	struct HsqsMap header;
 	struct HsqsTableContext table;
 };
@@ -63,9 +63,8 @@ struct HsqsXattrTableIterator {
 	off_t value_offset;
 };
 
-HSQS_NO_UNUSED int hsqs_xattr_table_init(
-		struct HsqsXattrTableContext *context,
-		struct HsqsSuperblockContext *superblock);
+HSQS_NO_UNUSED int
+hsqs_xattr_table_init(struct HsqsXattrTableContext *context, struct Hsqs *hsqs);
 
 HSQS_NO_UNUSED int hsqs_xattr_table_iterator_init(
 		struct HsqsXattrTableIterator *iterator,

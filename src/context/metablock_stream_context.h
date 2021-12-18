@@ -40,7 +40,7 @@
 #define METABLOCK_STREAM_CONTEXT_H
 
 struct HsqsMetablockStreamContext {
-	const struct HsqsSuperblockContext *superblock;
+	struct Hsqs *hsqs;
 	struct HsqsBuffer buffer;
 	uint64_t base_address;
 	uint64_t current_address;
@@ -48,9 +48,8 @@ struct HsqsMetablockStreamContext {
 };
 
 HSQS_NO_UNUSED int hsqs_metablock_stream_init(
-		struct HsqsMetablockStreamContext *context,
-		const struct HsqsSuperblockContext *superblock, uint64_t address,
-		uint64_t max_address);
+		struct HsqsMetablockStreamContext *context, struct Hsqs *hsqs,
+		uint64_t address, uint64_t max_address);
 
 HSQS_NO_UNUSED int hsqs_metablock_stream_seek_ref(
 		struct HsqsMetablockStreamContext *context, uint64_t ref);

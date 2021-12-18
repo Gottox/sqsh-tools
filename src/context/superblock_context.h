@@ -34,10 +34,6 @@
 
 #include "../mapper/mapper.h"
 #include "../utils.h"
-#include "compression_options_context.h"
-#include "fragment_context.h"
-#include "table_context.h"
-#include "xattr_table_context.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -50,13 +46,6 @@ struct HsqsSuperblock;
 struct HsqsSuperblockContext {
 	const struct HsqsSuperblock *superblock;
 	struct HsqsMap map;
-	struct HsqsMapper *mapper;
-	struct HsqsTableContext id_table;
-	struct HsqsTableContext export_table;
-	struct HsqsXattrTableContext xattr_table;
-	struct HsqsFragmentTableContext fragment_table;
-	struct HsqsCompressionOptionsContext compression_options;
-	uint8_t initialized;
 };
 
 HSQS_NO_UNUSED int hsqs_superblock_init(
@@ -74,13 +63,33 @@ uint64_t hsqs_superblock_directory_table_start(
 uint64_t hsqs_superblock_fragment_table_start(
 		const struct HsqsSuperblockContext *context);
 
+uint32_t
+hsqs_superblock_inode_count(const struct HsqsSuperblockContext *context);
+
 uint64_t
 hsqs_superblock_inode_table_start(const struct HsqsSuperblockContext *context);
+
+uint64_t
+hsqs_superblock_id_table_start(const struct HsqsSuperblockContext *context);
+
+uint16_t hsqs_superblock_id_count(const struct HsqsSuperblockContext *context);
+
+uint64_t
+hsqs_superblock_export_table_start(const struct HsqsSuperblockContext *context);
+
+uint64_t hsqs_superblock_xattr_id_table_start(
+		const struct HsqsSuperblockContext *context);
 
 uint64_t
 hsqs_superblock_inode_root_ref(const struct HsqsSuperblockContext *context);
 
 bool hsqs_superblock_has_fragments(const struct HsqsSuperblockContext *context);
+
+bool
+hsqs_superblock_has_export_table(const struct HsqsSuperblockContext *context);
+
+bool hsqs_superblock_has_compression_options(
+		const struct HsqsSuperblockContext *context);
 
 uint32_t
 hsqs_superblock_block_size(const struct HsqsSuperblockContext *context);
@@ -90,21 +99,6 @@ uint32_t hsqs_superblock_fragment_entry_count(
 
 uint64_t
 hsqs_superblock_bytes_used(const struct HsqsSuperblockContext *context);
-
-int hsqs_superblock_id_table(
-		struct HsqsSuperblockContext *context,
-		struct HsqsTableContext **id_table);
-int hsqs_superblock_export_table(
-		struct HsqsSuperblockContext *context,
-		struct HsqsTableContext **export_table);
-int hsqs_superblock_fragment_table(
-		struct HsqsSuperblockContext *context,
-		struct HsqsFragmentTableContext **fragment_table);
-int hsqs_superblock_xattr_table(
-		struct HsqsSuperblockContext *context,
-		struct HsqsXattrTableContext **xattr_table);
-const struct HsqsCompressionOptionsContext *hsqs_superblock_compression_options(
-		const struct HsqsSuperblockContext *context);
 
 int hsqs_superblock_cleanup(struct HsqsSuperblockContext *superblock);
 

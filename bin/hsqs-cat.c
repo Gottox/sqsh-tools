@@ -58,7 +58,7 @@ cat_path(struct Hsqs *hsqs, char *path) {
 	struct HsqsFileContext file = {0};
 
 	int rv = 0;
-	rv = hsqs_resolve_path(&inode, &hsqs->superblock, path);
+	rv = hsqs_resolve_path(&inode, hsqs, path);
 	if (rv < 0) {
 		hsqs_perror(rv, path);
 		rv = EXIT_FAILURE;

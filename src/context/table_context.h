@@ -39,8 +39,10 @@
 
 #define TABLE_CONTEXT_H
 
+struct Hsqs;
+
 struct HsqsTableContext {
-	const struct HsqsSuperblockContext *superblock;
+	struct Hsqs *hsqs;
 	struct HsqsMapper *mapper;
 	struct HsqsMap lookup_table;
 	uint64_t start_block;
@@ -49,8 +51,7 @@ struct HsqsTableContext {
 };
 
 int hsqs_table_init(
-		struct HsqsTableContext *table,
-		const struct HsqsSuperblockContext *superblock, off_t start_block,
+		struct HsqsTableContext *table, struct Hsqs *hsqs, off_t start_block,
 		size_t element_size, size_t element_count);
 int
 hsqs_table_get(const struct HsqsTableContext *table, off_t index, void *target);

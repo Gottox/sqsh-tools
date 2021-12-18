@@ -196,7 +196,7 @@ ls(struct Hsqs *hsqs, const char *path, struct HsqsInodeContext *inode) {
 	struct HsqsDirectoryContext dir = {0};
 	struct HsqsDirectoryIterator iter = {0};
 
-	rv = hsqs_directory_init(&dir, &hsqs->superblock, inode);
+	rv = hsqs_directory_init(&dir, inode);
 	if (rv < 0) {
 		hsqs_perror(rv, path == NULL || path[0] == 0 ? "/" : path);
 		rv = EXIT_FAILURE;
@@ -230,7 +230,7 @@ ls_path(struct Hsqs *hsqs, char *path) {
 	struct HsqsInodeContext inode = {0};
 	int rv = 0;
 
-	rv = hsqs_resolve_path(&inode, &hsqs->superblock, path);
+	rv = hsqs_resolve_path(&inode, hsqs, path);
 	if (rv < 0) {
 		hsqs_perror(rv, path);
 		goto out;

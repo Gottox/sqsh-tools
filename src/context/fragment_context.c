@@ -35,6 +35,7 @@
 #include "fragment_context.h"
 #include "../data/fragment_internal.h"
 #include "../error.h"
+#include "../hsqs.h"
 #include "../mapper/mapper.h"
 #include "inode_context.h"
 #include "superblock_context.h"
@@ -42,19 +43,20 @@
 
 int
 hsqs_fragment_table_init(
-		struct HsqsFragmentTableContext *context,
-		const struct HsqsSuperblockContext *superblock) {
+		struct HsqsFragmentTableContext *context, struct Hsqs *hsqs) {
 	int rv = 0;
+	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
 	uint64_t start = hsqs_superblock_fragment_table_start(superblock);
 	uint32_t count = hsqs_superblock_fragment_entry_count(superblock);
 
 	rv = hsqs_table_init(
-			&context->table, superblock, start, HSQS_SIZEOF_FRAGMENT, count);
+			&context->table, hsqs, start, HSQS_SIZEOF_FRAGMENT, count);
 	if (rv < 0) {
 		goto out;
 	}
 
 	context->superblock = superblock;
+	context->mapper = hsqs_mapper(hsqs);
 
 out:
 	return rv;
@@ -83,7 +85,7 @@ read_fragment_data(
 	size = hsqs_data_datablock_size(size_info);
 	is_compressed = hsqs_data_datablock_is_compressed(size_info);
 
-	rv = hsqs_mapper_map(&memory_map, context->superblock->mapper, start, size);
+	rv = hsqs_mapper_map(&memory_map, context->mapper, start, size);
 	if (rv < 0) {
 		goto out;
 	}

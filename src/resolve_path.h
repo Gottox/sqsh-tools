@@ -39,10 +39,9 @@
 #define RESOLVE_PATH_H
 
 struct HsqsInodeContext;
-struct HsqsSuperblockContext;
+struct Hsqs;
 
 HSQS_NO_UNUSED int hsqs_resolve_path(
-		struct HsqsInodeContext *inode,
-		struct HsqsSuperblockContext *superblock, const char *path);
+		struct HsqsInodeContext *inode, struct Hsqs *hsqs, const char *path);
 
 #endif /* end of include guard RESOLVE_PATH_H */

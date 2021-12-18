@@ -39,6 +39,7 @@
 
 #define COMPRESSION_OPTIONS_CONTEXT_H
 
+struct Hsqs;
 union HsqsCompressionOptions;
 
 struct HsqsCompressionOptionsContext {
@@ -46,11 +47,10 @@ struct HsqsCompressionOptionsContext {
 };
 
 HSQS_NO_UNUSED int hsqs_compression_options_init(
-		struct HsqsCompressionOptionsContext *context,
-		struct HsqsSuperblockContext *superblock);
+		struct HsqsCompressionOptionsContext *context, struct Hsqs *hsqs);
 
-const union HsqsCompressionOptions *
-hsqs_compression_options(const struct HsqsCompressionOptionsContext *context);
+const union HsqsCompressionOptions *hsqs_compression_options_data(
+		const struct HsqsCompressionOptionsContext *context);
 size_t hsqs_compression_options_size(
 		const struct HsqsCompressionOptionsContext *context);
 

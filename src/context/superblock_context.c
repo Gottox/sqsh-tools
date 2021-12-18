@@ -38,7 +38,6 @@
 #include <stdint.h>
 
 static const uint32_t SUPERBLOCK_MAGIC = 0x73717368;
-static const uint64_t NO_SEGMENT = 0xFFFFFFFFFFFFFFFF;
 
 enum HsqsInitialized {
 	HSQS_INITIALIZED_ID_TABLE = 1 << 0,
@@ -54,6 +53,13 @@ log2_u32(uint32_t x) {
 	} else {
 		return sizeof(uint32_t) * 8 - 1 - __builtin_clz(x);
 	}
+}
+
+static bool
+check_flag(
+		const struct HsqsSuperblockContext *context,
+		enum HsqsSuperblockFlags flag) {
+	return hsqs_data_superblock_flags(context->superblock) & flag;
 }
 
 int
@@ -96,18 +102,7 @@ hsqs_superblock_init(
 	}
 
 	context->superblock = superblock;
-	context->mapper = mapper;
-	context->initialized = 0;
 
-	if (hsqs_data_superblock_flags(context->superblock) &
-		HSQS_SUPERBLOCK_COMPRESSOR_OPTIONS) {
-		rv = hsqs_compression_options_init(
-				&context->compression_options, context);
-		if (rv < 0) {
-			hsqs_superblock_cleanup(context);
-			goto out;
-		}
-	}
 out:
 	return rv;
 }
@@ -143,9 +138,36 @@ hsqs_superblock_fragment_table_start(
 	return hsqs_data_superblock_fragment_table_start(context->superblock);
 }
 
+uint32_t
+hsqs_superblock_inode_count(const struct HsqsSuperblockContext *context) {
+	return hsqs_data_superblock_inode_count(context->superblock);
+}
+
 uint64_t
 hsqs_superblock_inode_table_start(const struct HsqsSuperblockContext *context) {
 	return hsqs_data_superblock_inode_table_start(context->superblock);
+}
+
+uint64_t
+hsqs_superblock_id_table_start(const struct HsqsSuperblockContext *context) {
+	return hsqs_data_superblock_id_table_start(context->superblock);
+}
+
+uint16_t
+hsqs_superblock_id_count(const struct HsqsSuperblockContext *context) {
+	return hsqs_data_superblock_id_count(context->superblock);
+}
+
+uint64_t
+hsqs_superblock_export_table_start(
+		const struct HsqsSuperblockContext *context) {
+	return hsqs_data_superblock_export_table_start(context->superblock);
+}
+
+uint64_t
+hsqs_superblock_xattr_id_table_start(
+		const struct HsqsSuperblockContext *context) {
+	return hsqs_data_superblock_xattr_id_table_start(context->superblock);
 }
 
 uint64_t
@@ -154,10 +176,19 @@ hsqs_superblock_inode_root_ref(const struct HsqsSuperblockContext *context) {
 }
 
 bool
+hsqs_superblock_has_compression_options(
+		const struct HsqsSuperblockContext *context) {
+	return check_flag(context, HSQS_SUPERBLOCK_COMPRESSOR_OPTIONS);
+}
+
+bool
 hsqs_superblock_has_fragments(const struct HsqsSuperblockContext *context) {
-	return !(
-			hsqs_data_superblock_flags(context->superblock) &
-			HSQS_SUPERBLOCK_NO_FRAGMENTS);
+	return !check_flag(context, HSQS_SUPERBLOCK_NO_FRAGMENTS);
+}
+
+bool
+hsqs_superblock_has_export_table(const struct HsqsSuperblockContext *context) {
+	return check_flag(context, HSQS_SUPERBLOCK_EXPORTABLE);
 }
 
 uint32_t
@@ -177,120 +208,7 @@ hsqs_superblock_bytes_used(const struct HsqsSuperblockContext *context) {
 }
 
 int
-hsqs_superblock_id_table(
-		struct HsqsSuperblockContext *context,
-		struct HsqsTableContext **id_table) {
-	int rv = 0;
-	uint64_t table_start =
-			hsqs_data_superblock_id_table_start(context->superblock);
-	if (table_start == NO_SEGMENT) {
-		return -HSQS_ERROR_NO_XATTR_TABLE;
-	}
-
-	if (!(context->initialized & HSQS_INITIALIZED_ID_TABLE)) {
-		rv = hsqs_table_init(
-				&context->id_table, context, table_start, sizeof(uint32_t),
-				hsqs_data_superblock_id_count(context->superblock));
-		if (rv < 0) {
-			goto out;
-		}
-		context->initialized |= HSQS_INITIALIZED_ID_TABLE;
-	}
-	*id_table = &context->id_table;
-out:
-	return rv;
-}
-
-int
-hsqs_superblock_export_table(
-		struct HsqsSuperblockContext *context,
-		struct HsqsTableContext **export_table) {
-	int rv = 0;
-	uint64_t table_start =
-			hsqs_data_superblock_export_table_start(context->superblock);
-	if (table_start == NO_SEGMENT) {
-		return -HSQS_ERROR_NO_XATTR_TABLE;
-	}
-
-	if (!(context->initialized & HSQS_INITIALIZED_EXPORT_TABLE)) {
-		rv = hsqs_table_init(
-				&context->export_table, context, table_start, sizeof(uint64_t),
-				hsqs_data_superblock_inode_count(context->superblock));
-		if (rv < 0) {
-			goto out;
-		}
-		context->initialized |= HSQS_INITIALIZED_EXPORT_TABLE;
-	}
-	*export_table = &context->export_table;
-out:
-	return rv;
-}
-
-int
-hsqs_superblock_fragment_table(
-		struct HsqsSuperblockContext *context,
-		struct HsqsFragmentTableContext **fragment_table) {
-	int rv = 0;
-	uint64_t table_start =
-			hsqs_data_superblock_export_table_start(context->superblock);
-	if (table_start == NO_SEGMENT) {
-		return -HSQS_ERROR_NO_XATTR_TABLE;
-	}
-
-	if (!(context->initialized & HSQS_INITIALIZED_FRAGMENT_TABLE)) {
-		rv = hsqs_fragment_table_init(&context->fragment_table, context);
-
-		if (rv < 0) {
-			goto out;
-		}
-		context->initialized |= HSQS_INITIALIZED_FRAGMENT_TABLE;
-	}
-	*fragment_table = &context->fragment_table;
-out:
-	return rv;
-}
-
-int
-hsqs_superblock_xattr_table(
-		struct HsqsSuperblockContext *context,
-		struct HsqsXattrTableContext **xattr_table) {
-	int rv = 0;
-	uint64_t table_start =
-			hsqs_data_superblock_xattr_id_table_start(context->superblock);
-	if (table_start == NO_SEGMENT) {
-		return -HSQS_ERROR_NO_XATTR_TABLE;
-	}
-
-	if (!(context->initialized & HSQS_INITIALIZED_XATTR_TABLE)) {
-		rv = hsqs_xattr_table_init(&context->xattr_table, context);
-		if (rv < 0) {
-			goto out;
-		}
-		context->initialized |= HSQS_INITIALIZED_XATTR_TABLE;
-	}
-	*xattr_table = &context->xattr_table;
-out:
-	return rv;
-}
-
-const struct HsqsCompressionOptionsContext *
-hsqs_superblock_compression_options(
-		const struct HsqsSuperblockContext *context) {
-	if (hsqs_data_superblock_flags(context->superblock) &
-		HSQS_SUPERBLOCK_COMPRESSOR_OPTIONS) {
-		return &context->compression_options;
-	} else {
-		return NULL;
-	}
-}
-
-int
 hsqs_superblock_cleanup(struct HsqsSuperblockContext *superblock) {
-	hsqs_table_cleanup(&superblock->id_table);
-	hsqs_xattr_table_cleanup(&superblock->xattr_table);
-	hsqs_table_cleanup(&superblock->export_table);
-	hsqs_fragment_table_cleanup(&superblock->fragment_table);
-	hsqs_compression_options_cleanup(&superblock->compression_options);
 	hsqs_map_unmap(&superblock->map);
 	return 0;
 }

@@ -44,6 +44,8 @@
 #define HSQS_INODE_NO_FRAGMENT 0xFFFFFFFF
 #define HSQS_INODE_NO_XATTR 0xFFFFFFFF
 
+struct Hsqs;
+
 struct HsqsSuperblockContext;
 struct HsqsInode;
 struct HsqsInodeTable;
@@ -65,7 +67,7 @@ enum HsqsInodeContextType {
 struct HsqsInodeContext {
 	struct HsqsInode *inode;
 	struct HsqsMetablockStreamContext metablock;
-	struct HsqsSuperblockContext *superblock;
+	struct Hsqs *hsqs;
 };
 
 struct HsqsInodeDirectoryIndexIterator {
@@ -77,11 +79,11 @@ struct HsqsInodeDirectoryIndexIterator {
 };
 
 HSQS_NO_UNUSED int hsqs_inode_load(
-		struct HsqsInodeContext *inode,
-		struct HsqsSuperblockContext *superblock, uint64_t inode_ref);
+		struct HsqsInodeContext *inode, struct Hsqs *hsqs, uint64_t inode_ref);
+int hsqs_inode_load_root(struct HsqsInodeContext *inode, struct Hsqs *hsqs);
 HSQS_NO_UNUSED int hsqs_inode_load_by_inode_number(
-		struct HsqsInodeContext *inode,
-		struct HsqsSuperblockContext *superblock, uint64_t inode_number);
+		struct HsqsInodeContext *inode, struct Hsqs *hsqs,
+		uint64_t inode_number);
 
 HSQS_NO_UNUSED uint32_t
 hsqs_inode_hard_link_count(const struct HsqsInodeContext *inode);

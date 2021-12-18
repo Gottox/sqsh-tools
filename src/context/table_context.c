@@ -34,8 +34,8 @@
 
 #include "table_context.h"
 #include "../error.h"
+#include "../hsqs.h"
 #include "metablock_context.h"
-#include "superblock_context.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -49,12 +49,11 @@ lookup_table_get(const struct HsqsTableContext *table, off_t index) {
 
 int
 hsqs_table_init(
-		struct HsqsTableContext *table,
-		const struct HsqsSuperblockContext *superblock, off_t start_block,
+		struct HsqsTableContext *table, struct Hsqs *hsqs, off_t start_block,
 		size_t element_size, size_t element_count) {
 	int rv = 0;
 	size_t byte_size;
-	struct HsqsMapper *mapper = superblock->mapper;
+	struct HsqsMapper *mapper = hsqs_mapper(hsqs);
 	// TODO: Overflow
 	size_t lookup_table_size =
 			HSQS_DEVIDE_CEIL(
@@ -67,8 +66,7 @@ hsqs_table_init(
 		return rv;
 	}
 
-	table->mapper = superblock->mapper;
-	table->superblock = superblock;
+	table->hsqs = hsqs;
 	table->element_size = element_size;
 	table->element_count = element_count;
 	if (MULT_OVERFLOW(element_size, element_count, &byte_size)) {
@@ -84,6 +82,8 @@ int
 hsqs_table_get(
 		const struct HsqsTableContext *table, off_t index, void *target) {
 	int rv = 0;
+	struct Hsqs *hsqs = table->hsqs;
+	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
 	struct HsqsMetablockContext metablock = {0};
 	struct HsqsBuffer buffer = {0};
 	uint64_t lookup_index =
@@ -93,13 +93,13 @@ hsqs_table_get(
 			(index * table->element_size) % HSQS_METABLOCK_BLOCK_SIZE;
 
 	enum HsqsSuperblockCompressionId compression_id =
-			hsqs_superblock_compression_id(table->superblock);
+			hsqs_superblock_compression_id(superblock);
 	rv = hsqs_buffer_init(&buffer, compression_id, HSQS_METABLOCK_BLOCK_SIZE);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = hsqs_metablock_init(&metablock, table->superblock, metablock_address);
+	rv = hsqs_metablock_init(&metablock, hsqs, metablock_address);
 	if (rv < 0) {
 		goto out;
 	}

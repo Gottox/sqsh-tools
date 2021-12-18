@@ -35,7 +35,7 @@
 #include "metablock_context.h"
 #include "../data/metablock.h"
 #include "../error.h"
-#include "superblock_context.h"
+#include "../hsqs.h"
 #include <stdint.h>
 
 static const struct HsqsMetablock *
@@ -45,12 +45,12 @@ get_metablock(const struct HsqsMetablockContext *context) {
 
 int
 hsqs_metablock_init(
-		struct HsqsMetablockContext *context,
-		const struct HsqsSuperblockContext *superblock, uint64_t address) {
+		struct HsqsMetablockContext *context, struct Hsqs *hsqs,
+		uint64_t address) {
 	int rv = 0;
+	struct HsqsMapper *mapper = hsqs_mapper(hsqs);
 
-	rv = hsqs_mapper_map(
-			&context->map, superblock->mapper, address, HSQS_SIZEOF_METABLOCK);
+	rv = hsqs_mapper_map(&context->map, mapper, address, HSQS_SIZEOF_METABLOCK);
 	if (rv < 0) {
 		goto out;
 	}

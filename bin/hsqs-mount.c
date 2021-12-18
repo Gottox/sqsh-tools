@@ -90,8 +90,9 @@ hsqsfuse_getattr(
 	memset(stbuf, 0, sizeof(struct stat));
 
 	struct HsqsInodeContext inode = {0};
+	struct HsqsSuperblockContext *superblock = hsqs_superblock(&data.hsqs);
 
-	rv = hsqs_resolve_path(&inode, &data.hsqs.superblock, path);
+	rv = hsqs_resolve_path(&inode, &data.hsqs, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -104,7 +105,7 @@ hsqsfuse_getattr(
 	stbuf->st_gid = hsqs_inode_gid(&inode);
 	stbuf->st_rdev = hsqs_inode_device_id(&inode);
 	stbuf->st_size = hsqs_inode_file_size(&inode);
-	stbuf->st_blksize = hsqs_superblock_block_size(&data.hsqs.superblock);
+	stbuf->st_blksize = hsqs_superblock_block_size(superblock);
 	stbuf->st_mtime = stbuf->st_ctime = stbuf->st_atime =
 			hsqs_inode_modified_time(&inode);
 	switch (hsqs_inode_type(&inode)) {
@@ -148,7 +149,7 @@ hsqsfuse_getxattr(
 	struct HsqsInodeContext inode = {0};
 	struct HsqsXattrTableIterator iter = {0};
 
-	rv = hsqs_resolve_path(&inode, &data.hsqs.superblock, path);
+	rv = hsqs_resolve_path(&inode, &data.hsqs, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -202,7 +203,7 @@ hsqsfuse_listxattr(const char *path, char *list, size_t size) {
 	char *p;
 	struct HsqsInodeContext inode = {0};
 	struct HsqsXattrTableIterator iter = {0};
-	rv = hsqs_resolve_path(&inode, &data.hsqs.superblock, path);
+	rv = hsqs_resolve_path(&inode, &data.hsqs, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -264,12 +265,12 @@ hsqsfuse_readdir(
 	struct HsqsInodeContext inode = {0};
 	struct HsqsDirectoryContext dir = {0};
 	struct HsqsDirectoryIterator iter = {0};
-	rv = hsqs_resolve_path(&inode, &data.hsqs.superblock, path);
+	rv = hsqs_resolve_path(&inode, &data.hsqs, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
 	}
-	rv = hsqs_directory_init(&dir, &data.hsqs.superblock, &inode);
+	rv = hsqs_directory_init(&dir, &inode);
 	if (rv < 0) {
 		rv = -ENOMEM;
 		goto out;
@@ -310,7 +311,7 @@ hsqsfuse_open(const char *path, struct fuse_file_info *fi) {
 	int rv = 0;
 	struct HsqsInodeContext inode = {0};
 
-	rv = hsqs_resolve_path(&inode, &data.hsqs.superblock, path);
+	rv = hsqs_resolve_path(&inode, &data.hsqs, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -333,7 +334,7 @@ hsqsfuse_read(
 	struct HsqsInodeContext inode = {0};
 	struct HsqsFileContext file = {0};
 
-	rv = hsqs_resolve_path(&inode, &data.hsqs.superblock, path);
+	rv = hsqs_resolve_path(&inode, &data.hsqs, path);
 	if (rv < 0) {
 		// TODO: Better return type
 		rv = -EINVAL;
@@ -374,7 +375,7 @@ hsqsfuse_readlink(const char *path, char *buf, size_t size) {
 	int rv = 0;
 	struct HsqsInodeContext inode = {0};
 
-	rv = hsqs_resolve_path(&inode, &data.hsqs.superblock, path);
+	rv = hsqs_resolve_path(&inode, &data.hsqs, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;

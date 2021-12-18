@@ -42,6 +42,8 @@
 
 #define HSQS_METABLOCK_BLOCK_SIZE 8192
 
+struct Hsqs;
+
 struct HsqsSuperblockContext;
 struct HsqsBuffer;
 
@@ -49,9 +51,9 @@ struct HsqsMetablockContext {
 	struct HsqsMap map;
 };
 
-HSQS_NO_UNUSED int hsqs_metablock_init(
-		struct HsqsMetablockContext *context,
-		const struct HsqsSuperblockContext *superblock, uint64_t address);
+int hsqs_metablock_init(
+		struct HsqsMetablockContext *context, struct Hsqs *hsqs,
+		uint64_t address);
 
 uint32_t
 hsqs_metablock_compressed_size(const struct HsqsMetablockContext *context);

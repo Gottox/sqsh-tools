@@ -41,10 +41,9 @@
 #define HSQS_DIRECTORY_CONTEXT_H
 
 struct HsqsInodeContext;
-struct HsqsSuperblockContext;
+struct Hsqs;
 
 struct HsqsDirectoryContext {
-	struct HsqsSuperblockContext *superblock;
 	struct HsqsInodeContext *inode;
 	uint32_t block_start;
 	uint32_t block_offset;
@@ -62,9 +61,7 @@ struct HsqsDirectoryIterator {
 };
 
 HSQS_NO_UNUSED int hsqs_directory_init(
-		struct HsqsDirectoryContext *directory,
-		struct HsqsSuperblockContext *superblock,
-		struct HsqsInodeContext *inode);
+		struct HsqsDirectoryContext *directory, struct HsqsInodeContext *inode);
 HSQS_NO_UNUSED int hsqs_directory_iterator_init(
 		struct HsqsDirectoryIterator *iterator,
 		struct HsqsDirectoryContext *directory);

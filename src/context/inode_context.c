@@ -40,6 +40,7 @@
 #include "../hsqs.h"
 #include "../utils.h"
 #include "directory_context.h"
+#include "superblock_context.h"
 #include <stdint.h>
 
 static const struct HsqsInodeDirectoryIndex *
@@ -369,8 +370,7 @@ hsqs_inode_device_id(const struct HsqsInodeContext *inode) {
 
 int
 hsqs_inode_load(
-		struct HsqsInodeContext *inode,
-		struct HsqsSuperblockContext *superblock, uint64_t inode_ref) {
+		struct HsqsInodeContext *inode, struct Hsqs *hsqs, uint64_t inode_ref) {
 	uint32_t inode_block;
 	uint16_t inode_offset;
 
@@ -378,9 +378,10 @@ hsqs_inode_load(
 
 	int rv = 0;
 	inode->inode = NULL;
+	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
 
 	rv = hsqs_metablock_stream_init(
-			&inode->metablock, superblock,
+			&inode->metablock, hsqs,
 			hsqs_superblock_inode_table_start(superblock), ~0);
 	if (rv < 0) {
 		return rv;
@@ -402,27 +403,37 @@ hsqs_inode_load(
 		return rv;
 	}
 
-	inode->superblock = superblock;
+	inode->hsqs = hsqs;
 
 	return rv;
 }
 
 int
+hsqs_inode_load_root(struct HsqsInodeContext *inode, struct Hsqs *hsqs) {
+	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
+	uint64_t inode_ref = hsqs_superblock_inode_root_ref(superblock);
+
+	return hsqs_inode_load(inode, hsqs, inode_ref);
+}
+
+int
 hsqs_inode_load_by_inode_number(
-		struct HsqsInodeContext *inode,
-		struct HsqsSuperblockContext *superblock, uint64_t inode_number) {
+		struct HsqsInodeContext *inode, struct Hsqs *hsqs,
+		uint64_t inode_number) {
 	int rv = 0;
 	uint64_t inode_ref;
-	struct HsqsTableContext *export_table = &superblock->export_table;
+	struct HsqsTableContext *export_table;
 
-	if (export_table == NULL) {
-		return HSQS_ERROR_NO_EXPORT_TABLE;
+	rv = hsqs_export_table(hsqs, &export_table);
+	if (rv < 0) {
+		return rv;
 	}
+
 	rv = hsqs_table_get(export_table, inode_number, &inode_ref);
 	if (rv < 0) {
 		return rv;
 	}
-	return hsqs_inode_load(inode, superblock, inode_ref);
+	return hsqs_inode_load(inode, hsqs, inode_ref);
 }
 
 static uint32_t
@@ -431,10 +442,11 @@ inode_get_id(const struct HsqsInodeContext *context, off_t idx) {
 	struct HsqsTableContext *id_table;
 	uint32_t id;
 
-	rv = hsqs_superblock_id_table(context->superblock, &id_table);
+	rv = hsqs_id_table(context->hsqs, &id_table);
 	if (rv < 0) {
 		return UINT32_MAX;
 	}
+
 	rv = hsqs_table_get(id_table, idx, &id);
 	if (rv < 0) {
 		return UINT32_MAX;
@@ -483,7 +495,7 @@ hsqs_inode_xattr_iterator(
 	int rv = 0;
 	struct HsqsXattrTableContext *table;
 
-	rv = hsqs_superblock_xattr_table(inode->superblock, &table);
+	rv = hsqs_xattr_table(inode->hsqs, &table);
 	if (rv < 0) {
 		return rv;
 	}

@@ -37,6 +37,7 @@
 #include "../data/superblock.h"
 #include "../data/xattr_internal.h"
 #include "../error.h"
+#include "../hsqs.h"
 #include "inode_context.h"
 #include "superblock_context.h"
 
@@ -51,18 +52,18 @@ get_header(const struct HsqsXattrTableContext *context) {
 
 int
 hsqs_xattr_table_init(
-		struct HsqsXattrTableContext *context,
-		struct HsqsSuperblockContext *superblock) {
+		struct HsqsXattrTableContext *context, struct Hsqs *hsqs) {
 	int rv = 0;
-	uint64_t xattr_address =
-			hsqs_data_superblock_xattr_id_table_start(superblock->superblock);
+	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
+	uint64_t xattr_address = hsqs_superblock_xattr_id_table_start(superblock);
 	uint64_t bytes_used = hsqs_superblock_bytes_used(superblock);
+	struct HsqsMapper *mapper = hsqs_mapper(hsqs);
 	if (xattr_address + HSQS_SIZEOF_XATTR_ID_TABLE >= bytes_used) {
 		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
-	context->superblock = superblock;
+	context->hsqs = hsqs;
 	rv = hsqs_mapper_map(
-			&context->header, superblock->mapper, xattr_address,
+			&context->header, mapper, xattr_address,
 			HSQS_SIZEOF_XATTR_ID_TABLE);
 	if (rv < 0) {
 		goto out;
@@ -71,8 +72,7 @@ hsqs_xattr_table_init(
 	const struct HsqsXattrIdTable *header = get_header(context);
 
 	rv = hsqs_table_init(
-			&context->table, superblock,
-			xattr_address + HSQS_SIZEOF_XATTR_ID_TABLE,
+			&context->table, hsqs, xattr_address + HSQS_SIZEOF_XATTR_ID_TABLE,
 			HSQS_SIZEOF_XATTR_LOOKUP_TABLE,
 			hsqs_data_xattr_id_table_xattr_ids(header));
 	if (rv < 0) {
@@ -111,7 +111,7 @@ hsqs_xattr_table_iterator_init(
 
 	// TODO upper bounds should not be ~0.
 	rv = hsqs_metablock_stream_init(
-			&iterator->metablock, xattr_table->superblock, start_block, ~0);
+			&iterator->metablock, xattr_table->hsqs, start_block, ~0);
 	if (rv < 0) {
 		goto out;
 	}
@@ -170,8 +170,8 @@ xattr_value_indirect_load(struct HsqsXattrTableIterator *iterator) {
 	const struct HsqsXattrIdTable *header = get_header(iterator->context);
 	uint64_t start_block = hsqs_data_xattr_id_table_xattr_table_start(header);
 	rv = hsqs_metablock_stream_init(
-			&iterator->out_of_line_value, iterator->context->superblock,
-			start_block, ~0);
+			&iterator->out_of_line_value, iterator->context->hsqs, start_block,
+			~0);
 	if (rv < 0) {
 		goto out;
 	}

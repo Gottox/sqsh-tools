@@ -36,20 +36,21 @@
 #include "../compression/buffer.h"
 #include "../data/metablock.h"
 #include "../error.h"
+#include "../hsqs.h"
+#include "data/superblock.h"
 #include "metablock_context.h"
 #include "superblock_context.h"
 #include <stdint.h>
 
 HSQS_NO_UNUSED int
 hsqs_metablock_stream_init(
-		struct HsqsMetablockStreamContext *context,
-		const struct HsqsSuperblockContext *superblock, uint64_t address,
-		uint64_t max_address) {
+		struct HsqsMetablockStreamContext *context, struct Hsqs *hsqs,
+		uint64_t address, uint64_t max_address) {
 	// TODO check for max_address
 	(void)max_address;
 	int rv = 0;
 
-	context->superblock = superblock;
+	context->hsqs = hsqs;
 	context->base_address = address;
 	rv = hsqs_metablock_stream_seek(context, address, 0);
 	if (rv < 0) {
@@ -77,6 +78,7 @@ hsqs_metablock_stream_seek(
 		uint32_t buffer_offset) {
 	int rv = 0;
 	hsqs_buffer_cleanup(&context->buffer);
+	struct HsqsSuperblockContext *superblock = hsqs_superblock(context->hsqs);
 
 	if (ADD_OVERFLOW(
 				context->base_address, address_offset,
@@ -87,7 +89,7 @@ hsqs_metablock_stream_seek(
 	context->buffer_offset = buffer_offset;
 
 	enum HsqsSuperblockCompressionId compression_id =
-			hsqs_superblock_compression_id(context->superblock);
+			hsqs_superblock_compression_id(superblock);
 	rv = hsqs_buffer_init(
 			&context->buffer, compression_id, HSQS_METABLOCK_BLOCK_SIZE);
 	if (rv < 0) {
@@ -105,7 +107,7 @@ add_block(struct HsqsMetablockStreamContext *context) {
 	uint64_t address = context->current_address;
 	uint32_t metablock_size;
 
-	rv = hsqs_metablock_init(&metablock, context->superblock, address);
+	rv = hsqs_metablock_init(&metablock, context->hsqs, address);
 	if (rv < 0) {
 		goto out;
 	}

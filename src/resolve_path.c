@@ -38,8 +38,8 @@
 #include "context/superblock_context.h"
 #include "data/directory.h"
 #include "data/inode.h"
-#include "data/superblock.h"
 #include "error.h"
+#include "hsqs.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -77,18 +77,17 @@ count_path_segments(const char *path) {
 
 static int
 find_inode_ref(
-		uint64_t *target, uint64_t dir_ref,
-		struct HsqsSuperblockContext *superblock, const char *name,
+		uint64_t *target, uint64_t dir_ref, struct Hsqs *hsqs, const char *name,
 		const size_t name_len) {
 	struct HsqsInodeContext inode = {0};
 	struct HsqsDirectoryContext dir = {0};
 	struct HsqsDirectoryIterator iter = {0};
 	int rv = 0;
-	rv = hsqs_inode_load(&inode, superblock, dir_ref);
+	rv = hsqs_inode_load(&inode, hsqs, dir_ref);
 	if (rv < 0) {
 		goto out;
 	}
-	rv = hsqs_directory_init(&dir, superblock, &inode);
+	rv = hsqs_directory_init(&dir, &inode);
 	if (rv < 0) {
 		goto out;
 	}
@@ -112,18 +111,18 @@ out:
 
 int
 hsqs_resolve_path(
-		struct HsqsInodeContext *inode,
-		struct HsqsSuperblockContext *superblock, const char *path) {
+		struct HsqsInodeContext *inode, struct Hsqs *hsqs, const char *path) {
 	int i;
 	int rv = 0;
 	int segment_count = count_path_segments(path) + 1;
+	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
 	const char *segment = path;
 	uint64_t *inode_refs = calloc(segment_count, sizeof(uint64_t));
 	if (inode_refs == NULL) {
 		rv = HSQS_ERROR_MALLOC_FAILED;
 		goto out;
 	}
-	inode_refs[0] = hsqs_data_superblock_root_inode_ref(superblock->superblock);
+	inode_refs[0] = hsqs_superblock_inode_root_ref(superblock);
 
 	for (i = 0; segment; segment = find_next_segment(segment)) {
 		size_t segment_len = get_segment_len(segment);
@@ -137,7 +136,7 @@ hsqs_resolve_path(
 			uint64_t parent_inode_ref = inode_refs[i];
 			i++;
 			rv = find_inode_ref(
-					&inode_refs[i], parent_inode_ref, superblock, segment,
+					&inode_refs[i], parent_inode_ref, hsqs, segment,
 					segment_len);
 			if (rv < 0) {
 				goto out;
@@ -145,7 +144,7 @@ hsqs_resolve_path(
 		}
 	}
 
-	rv = hsqs_inode_load(inode, superblock, inode_refs[i]);
+	rv = hsqs_inode_load(inode, hsqs, inode_refs[i]);
 
 out:
 	free(inode_refs);

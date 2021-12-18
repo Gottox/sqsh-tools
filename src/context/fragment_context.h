@@ -46,11 +46,11 @@ struct HsqsBuffer;
 struct HsqsFragmentTableContext {
 	const struct HsqsSuperblockContext *superblock;
 	struct HsqsTableContext table;
+	struct HsqsMapper *mapper;
 };
 
 HSQS_NO_UNUSED int hsqs_fragment_table_init(
-		struct HsqsFragmentTableContext *context,
-		const struct HsqsSuperblockContext *superblock);
+		struct HsqsFragmentTableContext *context, struct Hsqs *hsqs);
 
 HSQS_NO_UNUSED int hsqs_fragment_table_to_buffer(
 		struct HsqsFragmentTableContext *context,

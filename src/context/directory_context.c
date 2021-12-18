@@ -101,11 +101,10 @@ current_entry(const struct HsqsDirectoryIterator *iterator) {
 int
 hsqs_directory_init(
 		struct HsqsDirectoryContext *directory,
-		struct HsqsSuperblockContext *superblock,
 		struct HsqsInodeContext *inode) {
 	int rv = 0;
-	const struct HsqsInodeDirectory *basic;
-	const struct HsqsInodeDirectoryExt *extended;
+	const struct HsqsInodeDirectory *basic = NULL;
+	const struct HsqsInodeDirectoryExt *extended = NULL;
 
 	switch (hsqs_data_inode_type(inode->inode)) {
 	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
@@ -127,7 +126,6 @@ hsqs_directory_init(
 	}
 
 	directory->inode = inode;
-	directory->superblock = superblock;
 
 	return rv;
 }
@@ -161,9 +159,11 @@ hsqs_directory_iterator_init(
 		struct HsqsDirectoryIterator *iterator,
 		struct HsqsDirectoryContext *directory) {
 	int rv = 0;
+	struct Hsqs *hsqs = directory->inode->hsqs;
+	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
 	rv = hsqs_metablock_stream_init(
-			&iterator->metablock, directory->superblock,
-			hsqs_superblock_directory_table_start(directory->superblock), ~0);
+			&iterator->metablock, hsqs,
+			hsqs_superblock_directory_table_start(superblock), ~0);
 	if (rv < 0) {
 		return rv;
 	}
@@ -229,8 +229,9 @@ hsqs_directory_iterator_inode_load(
 		const struct HsqsDirectoryIterator *iterator,
 		struct HsqsInodeContext *inode) {
 	uint64_t inode_ref = hsqs_directory_iterator_inode_ref(iterator);
+	struct Hsqs *hsqs = iterator->directory->inode->hsqs;
 
-	return hsqs_inode_load(inode, iterator->directory->superblock, inode_ref);
+	return hsqs_inode_load(inode, hsqs, inode_ref);
 }
 
 int

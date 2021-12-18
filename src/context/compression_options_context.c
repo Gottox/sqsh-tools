@@ -35,21 +35,22 @@
 #include "compression_options_context.h"
 #include "../data/compression_options.h"
 #include "../data/superblock.h"
+#include "../hsqs.h"
 #include "metablock_context.h"
 #include "superblock_context.h"
 
 int
 hsqs_compression_options_init(
-		struct HsqsCompressionOptionsContext *context,
-		struct HsqsSuperblockContext *superblock) {
+		struct HsqsCompressionOptionsContext *context, struct Hsqs *hsqs) {
 	int rv = 0;
 	struct HsqsMetablockContext metablock = {0};
 
-	rv = hsqs_metablock_init(&metablock, superblock, HSQS_SIZEOF_SUPERBLOCK);
+	rv = hsqs_metablock_init(&metablock, hsqs, HSQS_SIZEOF_SUPERBLOCK);
 	if (rv < 0) {
 		goto out;
 	}
 
+	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
 	enum HsqsSuperblockCompressionId compression_id =
 			hsqs_superblock_compression_id(superblock);
 	rv = hsqs_buffer_init(
@@ -72,7 +73,8 @@ out:
 }
 
 const union HsqsCompressionOptions *
-hsqs_compression_options(const struct HsqsCompressionOptionsContext *context) {
+hsqs_compression_options_data(
+		const struct HsqsCompressionOptionsContext *context) {
 	return (const union HsqsCompressionOptions *)hsqs_buffer_data(
 			&context->buffer);
 }

@@ -61,6 +61,8 @@ hsqs_error_str(int error_code) {
 		return strerror(error_code);
 	}
 	switch ((enum HsqsError)error_code) {
+	case HSQS_ERROR_NO_COMPRESSION_OPTIONS:
+		return "No compression options";
 	case HSQS_ERROR_SUPERBLOCK_TOO_SMALL:
 		return "Superblock too small";
 	case HSQS_ERROR_WRONG_MAGIC:
