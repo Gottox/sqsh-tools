@@ -49,12 +49,10 @@ hsqs_mapper_canary_init(
 	return 0;
 }
 static int
-hsqs_mapper_canary_map(
-		struct HsqsMap *map, struct HsqsMapper *mapper, off_t offset,
-		size_t size) {
+hsqs_mapper_canary_map(struct HsqsMap *map, off_t offset, size_t size) {
 	uint8_t *data = calloc(size, sizeof(uint8_t));
 
-	memcpy(data, &mapper->data.cn.data[offset], size);
+	memcpy(data, &map->mapper->data.cn.data[offset], size);
 	map->data.cn.offset = offset;
 	map->data.cn.data = data;
 	map->data.cn.size = size;

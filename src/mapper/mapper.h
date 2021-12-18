@@ -61,9 +61,7 @@ struct HsqsMap {
 
 struct HsqsMemoryMapperImpl {
 	int (*init)(struct HsqsMapper *mapper, const void *input, size_t size);
-	int (*map)(
-			struct HsqsMap *map, struct HsqsMapper *mapper, off_t offset,
-			size_t size);
+	int (*map)(struct HsqsMap *map, off_t offset, size_t size);
 	size_t (*size)(const struct HsqsMapper *mapper);
 	int (*cleanup)(struct HsqsMapper *mapper);
 	const uint8_t *(*map_data)(const struct HsqsMap *map);

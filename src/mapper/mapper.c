@@ -75,7 +75,7 @@ hsqs_mapper_map(
 		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
 	map->mapper = mapper;
-	return mapper->impl->map(map, mapper, offset, size);
+	return mapper->impl->map(map, offset, size);
 }
 
 size_t

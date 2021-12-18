@@ -71,9 +71,8 @@ out:
 	return rv;
 }
 static int
-hsqs_mapper_mmap_map(
-		struct HsqsMap *map, struct HsqsMapper *mapper, off_t offset,
-		size_t size) {
+hsqs_mapper_mmap_map(struct HsqsMap *map, off_t offset, size_t size) {
+	struct HsqsMapper *mapper = map->mapper;
 	uint8_t *file_map = NULL;
 	size_t page_offset = offset % mapper->data.mm.page_size;
 

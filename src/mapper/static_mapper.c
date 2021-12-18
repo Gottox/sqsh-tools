@@ -48,10 +48,8 @@ hsqs_mapper_static_mem_init(
 	return 0;
 }
 static int
-hsqs_mapper_static_mem_map(
-		struct HsqsMap *map, struct HsqsMapper *mapper, off_t offset,
-		size_t size) {
-	map->data.sm.data = &mapper->data.sm.data[offset];
+hsqs_mapper_static_mem_map(struct HsqsMap *map, off_t offset, size_t size) {
+	map->data.sm.data = &map->mapper->data.sm.data[offset];
 	map->data.sm.size = size;
 	return 0;
 }

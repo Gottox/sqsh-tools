@@ -131,9 +131,7 @@ out:
 	return rv;
 }
 static int
-hsqs_mapper_curl_map(
-		struct HsqsMap *map, struct HsqsMapper *mapper, off_t offset,
-		size_t size) {
+hsqs_mapper_curl_map(struct HsqsMap *map, off_t offset, size_t size) {
 	int rv = 0;
 
 	map->data.cl.offset = offset;

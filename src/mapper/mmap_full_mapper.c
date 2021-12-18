@@ -73,10 +73,8 @@ out:
 	return rv;
 }
 static int
-hsqs_mapper_mmap_complete_map(
-		struct HsqsMap *map, struct HsqsMapper *mapper, off_t offset,
-		size_t size) {
-	map->data.mc.data = &mapper->data.mc.data[offset];
+hsqs_mapper_mmap_complete_map(struct HsqsMap *map, off_t offset, size_t size) {
+	map->data.mc.data = &map->mapper->data.mc.data[offset];
 	map->data.mc.size = size;
 	return 0;
 }
