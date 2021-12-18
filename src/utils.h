@@ -54,6 +54,8 @@
 
 #define HSQS_PADDING(x, p) HSQS_DEVIDE_CEIL(x, p) * p
 
+typedef size_t hsqs_index_t;
+
 HSQS_NO_UNUSED void *hsqs_memdup(const void *source, size_t size);
 
 #endif /* end of include guard HSQS_UTILS_H */

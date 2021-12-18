@@ -65,6 +65,7 @@ usage(char *arg0) {
 
 static int
 print_simple(const struct HsqsDirectoryIterator *iter, const char *path) {
+	(void)iter;
 	puts(path);
 	return 0;
 }

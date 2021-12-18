@@ -5,7 +5,7 @@ project(
 		'c_std=c18',
 		'optimization=2',
 		'werror=true',
-		'warning_level=1'
+		'warning_level=3'
 	],
 	version: '0.0.0',
 	meson_version: '>=0.57'

@@ -43,6 +43,7 @@
 static int
 hsqs_mapper_mmap_complete_init(
 		struct HsqsMapper *mapper, const void *input, size_t size) {
+	(void)size;
 	int rv = 0;
 	int fd = -1;
 	uint8_t *file_map = MAP_FAILED;

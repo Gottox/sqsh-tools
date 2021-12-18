@@ -59,6 +59,7 @@ hsqs_mapper_static_mem_size(const struct HsqsMapper *mapper) {
 }
 static int
 hsqs_mapper_static_mem_cleanup(struct HsqsMapper *mapper) {
+	(void)mapper;
 	return 0;
 }
 static int
@@ -74,7 +75,8 @@ hsqs_map_static_mem_data(const struct HsqsMap *map) {
 
 static int
 hsqs_map_static_mem_resize(struct HsqsMap *map, size_t new_size) {
-	return map->data.sm.size;
+	map->data.sm.size = new_size;
+	return 0;
 }
 
 static size_t

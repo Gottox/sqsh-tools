@@ -114,7 +114,7 @@ hsqs_lru_hashmap_put(
 	off_t start_index = lru_hash_to_start_index(hashmap, hash);
 	struct HsqsLruEntry *candidate = NULL;
 
-	for (off_t i = 0; i < hashmap->size; i++) {
+	for (hsqs_index_t i = 0; i < hashmap->size; i++) {
 		off_t index = (start_index + i) % hashmap->size;
 		candidate = &hashmap->entries[index];
 
@@ -157,8 +157,8 @@ void *
 hsqs_lru_hashmap_pull(struct HsqsLruHashmap *hashmap, uint64_t hash) {
 	off_t start_index = lru_hash_to_start_index(hashmap, hash);
 
-	for (off_t i = 0; i < hashmap->size; i++) {
-		off_t index = (start_index + i) % hashmap->size;
+	for (hsqs_index_t i = 0; i < hashmap->size; i++) {
+		hsqs_index_t index = (start_index + i) % hashmap->size;
 		struct HsqsLruEntry *candidate = &hashmap->entries[index];
 
 		if (candidate->hash != hash) {
@@ -177,7 +177,7 @@ hsqs_lru_hashmap_pull(struct HsqsLruHashmap *hashmap, uint64_t hash) {
 
 int
 hsqs_lru_hashmap_cleanup(struct HsqsLruHashmap *hashmap) {
-	for (int i = 0; i < hashmap->size; i++) {
+	for (hsqs_index_t i = 0; i < hashmap->size; i++) {
 		if (hashmap->entries[i].pointer != NULL) {
 			hashmap->dtor(&hashmap->entries[i]);
 		}

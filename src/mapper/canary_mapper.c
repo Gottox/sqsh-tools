@@ -64,6 +64,7 @@ hsqs_mapper_canary_size(const struct HsqsMapper *mapper) {
 }
 static int
 hsqs_mapper_canary_cleanup(struct HsqsMapper *mapper) {
+	(void)mapper;
 	return 0;
 }
 static int

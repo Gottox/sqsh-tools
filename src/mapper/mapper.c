@@ -61,7 +61,7 @@ hsqs_mapper_init_static(
 
 int
 hsqs_mapper_map(
-		struct HsqsMap *map, struct HsqsMapper *mapper, off_t offset,
+		struct HsqsMap *map, struct HsqsMapper *mapper, hsqs_index_t offset,
 		size_t size) {
 	size_t end_offset;
 	size_t archive_size = hsqs_mapper_size(mapper);

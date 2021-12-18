@@ -48,6 +48,7 @@ dtor(void *pointer) {
 
 static int
 dummy_dtor(void *pointer) {
+	(void)pointer;
 	return 0;
 }
 
@@ -181,7 +182,7 @@ hashmap_add_many() {
 	length = 0;
 	for (struct HsqsLruEntry *entry = hashmap.newest; entry;
 		 entry = entry->older) {
-		assert(NBR - length - 1 == entry->hash);
+		assert(NBR - length - 1 == (int)entry->hash);
 		length++;
 	}
 	assert(length == SIZE);
@@ -189,7 +190,7 @@ hashmap_add_many() {
 	length = 0;
 	for (struct HsqsLruEntry *entry = hashmap.oldest; entry;
 		 entry = entry->newer) {
-		assert(NBR - SIZE + length == entry->hash);
+		assert(NBR - SIZE + length == (int)entry->hash);
 		length++;
 	}
 	assert(length == SIZE);

@@ -88,6 +88,7 @@ release_handle(struct HsqsMapper *mapper, CURL *handle) {
 static int
 hsqs_mapper_curl_init(
 		struct HsqsMapper *mapper, const void *input, size_t size) {
+	(void)size;
 	int rv = 0;
 	curl_global_init(CURL_GLOBAL_ALL);
 	CURL *handle = NULL;
@@ -191,7 +192,7 @@ hsqs_map_curl_resize(struct HsqsMap *map, size_t new_size) {
 	rv = snprintf(
 			range_buffer, sizeof(range_buffer), "%lu-%lu", new_offset,
 			end_offset);
-	if (rv >= sizeof(range_buffer)) {
+	if (rv >= (int)sizeof(range_buffer)) {
 		rv = -HSQS_ERROR_MAPPER_MAP;
 		goto out;
 	}

@@ -45,6 +45,7 @@
 static int
 hsqs_mapper_mmap_init(
 		struct HsqsMapper *mapper, const void *input, size_t size) {
+	(void)size;
 	int rv = 0;
 	int fd = -1;
 	struct stat st = {0};

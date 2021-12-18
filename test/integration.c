@@ -166,7 +166,7 @@ hsqs_cat_datablock_and_fragment() {
 	assert(size == hsqs_content_size(&file));
 
 	data = hsqs_content_data(&file);
-	for (int i = 0; i < size; i++) {
+	for (hsqs_index_t i = 0; i < size; i++) {
 		assert(data[i] == 'b');
 	}
 
@@ -205,7 +205,7 @@ hsqs_cat_size_overflow() {
 	assert(hsqs_content_size(&file) == size);
 
 	data = hsqs_content_data(&file);
-	for (int i = 0; i < size; i++) {
+	for (hsqs_index_t i = 0; i < size; i++) {
 		assert(data[i] == 'b');
 	}
 
@@ -291,7 +291,7 @@ hsqs_test_xattr() {
 	assert(strcmp("user.foo", name) == 0);
 	free(name);
 	rv = hsqs_xattr_table_iterator_value_dup(&xattr_iter, &value);
-	assert(rv == strlen(expected_value));
+	assert(rv == (int)strlen(expected_value));
 	assert(strcmp(expected_value, value) == 0);
 	free(value);
 	rv = hsqs_xattr_table_iterator_next(&xattr_iter);
@@ -319,7 +319,7 @@ hsqs_test_xattr() {
 	assert(strcmp("user.bar", name) == 0);
 	free(name);
 	rv = hsqs_xattr_table_iterator_value_dup(&xattr_iter, &value);
-	assert(rv == strlen(expected_value));
+	assert(rv == (int)strlen(expected_value));
 	assert(strcmp(expected_value, value) == 0);
 	free(value);
 	rv = hsqs_xattr_table_iterator_next(&xattr_iter);
