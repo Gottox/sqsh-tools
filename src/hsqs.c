@@ -57,24 +57,20 @@ is_initialized(const struct Hsqs *hsqs, enum InitializedBitmap mask) {
 	return hsqs->initialized & mask;
 }
 
-int
-hsqs_init(struct Hsqs *hsqs, const uint8_t *buffer, const size_t size) {
+static int
+init(struct Hsqs *hsqs) {
 	int rv = 0;
-
-	rv = hsqs_mapper_init_static(&hsqs->mapper, buffer, size);
-	if (rv < 0) {
-		goto out;
-	}
 
 	rv = hsqs_superblock_init(&hsqs->superblock, &hsqs->mapper);
 	if (rv < 0) {
 		goto out;
 	}
 
-	if (hsqs_superblock_has_compression_options(&hsqs->superblock))
+	if (hsqs_superblock_has_compression_options(&hsqs->superblock)) {
 		rv = hsqs_compression_options_init(&hsqs->compression_options, hsqs);
-	if (rv < 0) {
-		goto out;
+		if (rv < 0) {
+			goto out;
+		}
 	}
 
 out:
@@ -85,30 +81,27 @@ out:
 }
 
 int
+hsqs_init(struct Hsqs *hsqs, const uint8_t *buffer, const size_t size) {
+	int rv = 0;
+
+	rv = hsqs_mapper_init_static(&hsqs->mapper, buffer, size);
+	if (rv < 0) {
+		return rv;
+	}
+
+	return init(hsqs);
+}
+
+int
 hsqs_open(struct Hsqs *hsqs, const char *path) {
 	int rv = 0;
 
 	rv = hsqs_mapper_init_mmap(&hsqs->mapper, path);
 	if (rv < 0) {
-		goto out;
+		return rv;
 	}
 
-	rv = hsqs_superblock_init(&hsqs->superblock, &hsqs->mapper);
-	if (rv < 0) {
-		goto out;
-	}
-
-	if (hsqs_superblock_has_compression_options(&hsqs->superblock))
-		rv = hsqs_compression_options_init(&hsqs->compression_options, hsqs);
-	if (rv < 0) {
-		goto out;
-	}
-
-out:
-	if (rv < 0) {
-		hsqs_cleanup(hsqs);
-	}
-	return rv;
+	return init(hsqs);
 }
 
 int
