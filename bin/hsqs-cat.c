@@ -36,7 +36,6 @@
 #include "../src/context/directory_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/hsqs.h"
-#include "../src/resolve_path.h"
 
 #include <assert.h>
 #include <limits.h>
@@ -58,7 +57,7 @@ cat_path(struct Hsqs *hsqs, char *path) {
 	struct HsqsFileContext file = {0};
 
 	int rv = 0;
-	rv = hsqs_resolve_path(&inode, hsqs, path);
+	rv = hsqs_inode_load_by_path(&inode, hsqs, path);
 	if (rv < 0) {
 		hsqs_perror(rv, path);
 		rv = EXIT_FAILURE;

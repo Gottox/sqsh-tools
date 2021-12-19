@@ -40,7 +40,6 @@
 #include "../src/data/superblock.h"
 #include "../src/error.h"
 #include "../src/hsqs.h"
-#include "../src/resolve_path.h"
 #include "common.h"
 #include "test.h"
 #include <squashfs_image.h>
@@ -116,7 +115,7 @@ hsqs_cat_fragment() {
 	rv = hsqs_init(&hsqs, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = hsqs_resolve_path(&inode, &hsqs, "a");
+	rv = hsqs_inode_load_by_path(&inode, &hsqs, "a");
 	assert(rv == 0);
 
 	rv = hsqs_content_init(&file, &inode);
@@ -152,7 +151,7 @@ hsqs_cat_datablock_and_fragment() {
 	rv = hsqs_init(&hsqs, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = hsqs_resolve_path(&inode, &hsqs, "b");
+	rv = hsqs_inode_load_by_path(&inode, &hsqs, "b");
 	assert(rv == 0);
 
 	rv = hsqs_content_init(&file, &inode);
@@ -191,7 +190,7 @@ hsqs_cat_size_overflow() {
 	rv = hsqs_init(&hsqs, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = hsqs_resolve_path(&inode, &hsqs, "b");
+	rv = hsqs_inode_load_by_path(&inode, &hsqs, "b");
 	assert(rv == 0);
 
 	rv = hsqs_content_init(&file, &inode);
@@ -374,7 +373,7 @@ fuzz_crash_1() {
 	rv = hsqs_init(&hsqs, input, sizeof(input));
 	assert(rv == 0);
 
-	rv = hsqs_resolve_path(&inode, &hsqs, "");
+	rv = hsqs_inode_load_by_path(&inode, &hsqs, "");
 	assert(rv < 0);
 
 	rv = hsqs_inode_cleanup(&inode);
@@ -405,7 +404,7 @@ fuzz_crash_2() {
 	rv = hsqs_init(&hsqs, input, sizeof(input));
 	assert(rv == 0);
 
-	rv = hsqs_resolve_path(&inode, &hsqs, "");
+	rv = hsqs_inode_load_by_path(&inode, &hsqs, "");
 	assert(rv < 0);
 
 	rv = hsqs_inode_cleanup(&inode);
@@ -437,7 +436,7 @@ fuzz_crash_3() {
 	rv = hsqs_init(&hsqs, input, sizeof(input));
 	assert(rv == 0);
 
-	rv = hsqs_resolve_path(&inode, &hsqs, "");
+	rv = hsqs_inode_load_by_path(&inode, &hsqs, "");
 	assert(rv < 0);
 
 	rv = hsqs_inode_cleanup(&inode);

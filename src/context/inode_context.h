@@ -78,12 +78,14 @@ struct HsqsInodeDirectoryIndexIterator {
 	off_t next_offset;
 };
 
-HSQS_NO_UNUSED int hsqs_inode_load(
+HSQS_NO_UNUSED int hsqs_inode_load_by_ref(
 		struct HsqsInodeContext *inode, struct Hsqs *hsqs, uint64_t inode_ref);
 int hsqs_inode_load_root(struct HsqsInodeContext *inode, struct Hsqs *hsqs);
 HSQS_NO_UNUSED int hsqs_inode_load_by_inode_number(
 		struct HsqsInodeContext *inode, struct Hsqs *hsqs,
 		uint64_t inode_number);
+HSQS_NO_UNUSED int hsqs_inode_load_by_path(
+		struct HsqsInodeContext *inode, struct Hsqs *hsqs, const char *path);
 
 HSQS_NO_UNUSED uint32_t
 hsqs_inode_hard_link_count(const struct HsqsInodeContext *inode);

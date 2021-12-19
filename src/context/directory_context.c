@@ -231,7 +231,7 @@ hsqs_directory_iterator_inode_load(
 	uint64_t inode_ref = hsqs_directory_iterator_inode_ref(iterator);
 	struct Hsqs *hsqs = iterator->directory->inode->hsqs;
 
-	return hsqs_inode_load(inode, hsqs, inode_ref);
+	return hsqs_inode_load_by_ref(inode, hsqs, inode_ref);
 }
 
 int

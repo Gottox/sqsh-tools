@@ -42,6 +42,71 @@
 #include "directory_context.h"
 #include "superblock_context.h"
 #include <stdint.h>
+#include <string.h>
+
+static const char *
+path_find_next_segment(const char *segment) {
+	segment = strchr(segment, '/');
+	if (segment == NULL) {
+		return NULL;
+	} else {
+		return segment + 1;
+	}
+}
+
+size_t
+path_get_segment_len(const char *segment) {
+	const char *next_segment = path_find_next_segment(segment);
+	if (next_segment == NULL) {
+		return strlen(segment);
+	} else {
+		return next_segment - segment - 1;
+	}
+}
+
+static int
+path_segments_count(const char *path) {
+	int count = 0;
+	for (; path; path = path_find_next_segment(path)) {
+		count++;
+	}
+
+	return count;
+}
+
+static int
+path_find_inode_ref(
+		uint64_t *target, uint64_t dir_ref, struct Hsqs *hsqs, const char *name,
+		const size_t name_len) {
+	struct HsqsInodeContext inode = {0};
+	struct HsqsDirectoryContext dir = {0};
+	struct HsqsDirectoryIterator iter = {0};
+	int rv = 0;
+	rv = hsqs_inode_load_by_ref(&inode, hsqs, dir_ref);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = hsqs_directory_init(&dir, &inode);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = hsqs_directory_iterator_init(&iter, &dir);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = hsqs_directory_iterator_lookup(&iter, name, name_len);
+	if (rv < 0) {
+		goto out;
+	}
+
+	*target = hsqs_directory_iterator_inode_ref(&iter);
+
+out:
+	hsqs_directory_iterator_cleanup(&iter);
+	hsqs_directory_cleanup(&dir);
+	hsqs_inode_cleanup(&inode);
+	return rv;
+}
 
 static const struct HsqsInodeDirectoryIndex *
 current_directory_index(struct HsqsInodeDirectoryIndexIterator *iterator) {
@@ -369,7 +434,7 @@ hsqs_inode_device_id(const struct HsqsInodeContext *inode) {
 }
 
 int
-hsqs_inode_load(
+hsqs_inode_load_by_ref(
 		struct HsqsInodeContext *inode, struct Hsqs *hsqs, uint64_t inode_ref) {
 	uint32_t inode_block;
 	uint16_t inode_offset;
@@ -413,7 +478,7 @@ hsqs_inode_load_root(struct HsqsInodeContext *inode, struct Hsqs *hsqs) {
 	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
 	uint64_t inode_ref = hsqs_superblock_inode_root_ref(superblock);
 
-	return hsqs_inode_load(inode, hsqs, inode_ref);
+	return hsqs_inode_load_by_ref(inode, hsqs, inode_ref);
 }
 
 int
@@ -433,7 +498,49 @@ hsqs_inode_load_by_inode_number(
 	if (rv < 0) {
 		return rv;
 	}
-	return hsqs_inode_load(inode, hsqs, inode_ref);
+	return hsqs_inode_load_by_ref(inode, hsqs, inode_ref);
+}
+
+int
+hsqs_inode_load_by_path(
+		struct HsqsInodeContext *inode, struct Hsqs *hsqs, const char *path) {
+	int i;
+	int rv = 0;
+	int segment_count = path_segments_count(path) + 1;
+	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
+	const char *segment = path;
+	uint64_t *inode_refs = calloc(segment_count, sizeof(uint64_t));
+	if (inode_refs == NULL) {
+		rv = HSQS_ERROR_MALLOC_FAILED;
+		goto out;
+	}
+	inode_refs[0] = hsqs_superblock_inode_root_ref(superblock);
+
+	for (i = 0; segment; segment = path_find_next_segment(segment)) {
+		size_t segment_len = path_get_segment_len(segment);
+
+		if (segment_len == 0 || (segment_len == 1 && segment[0] == '.')) {
+			continue;
+		} else if (segment_len == 2 && strncmp(segment, "..", 2) == 0) {
+			i = MAX(0, i - 1);
+			continue;
+		} else {
+			uint64_t parent_inode_ref = inode_refs[i];
+			i++;
+			rv = path_find_inode_ref(
+					&inode_refs[i], parent_inode_ref, hsqs, segment,
+					segment_len);
+			if (rv < 0) {
+				goto out;
+			}
+		}
+	}
+
+	rv = hsqs_inode_load_by_ref(inode, hsqs, inode_refs[i]);
+
+out:
+	free(inode_refs);
+	return rv;
 }
 
 static uint32_t
