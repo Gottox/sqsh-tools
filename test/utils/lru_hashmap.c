@@ -38,17 +38,18 @@
 
 #include "../../src/utils/lru_hashmap.h"
 
-static char *last_free = NULL;
+static struct HsqsRefCount *last_free = NULL;
 
 static int
 dtor(void *pointer) {
-	last_free = pointer;
+	assert(pointer != NULL);
+	last_free = &((struct HsqsRefCount *)pointer)[-1];
 	return 0;
 }
 
 static int
 dummy_dtor(void *pointer) {
-	(void)pointer;
+	assert(pointer != NULL);
 	return 0;
 }
 
@@ -57,7 +58,7 @@ init_hashmap() {
 	int rv = 0;
 	struct HsqsLruHashmap hashmap = {0};
 
-	rv = hsqs_lru_hashmap_init(&hashmap, 1024, dummy_dtor);
+	rv = hsqs_lru_hashmap_init(&hashmap, 1024);
 	assert(rv == 0);
 
 	hsqs_lru_hashmap_cleanup(&hashmap);
@@ -67,15 +68,20 @@ static void
 add_to_hashmap() {
 	int rv = 0;
 	struct HsqsLruHashmap hashmap = {0};
-	char *v1 = "Value1";
-	char *v2 = "Value2";
+	struct HsqsRefCount *rc1;
+	struct HsqsRefCount *rc2;
 
-	rv = hsqs_lru_hashmap_init(&hashmap, 1024, dummy_dtor);
+	rv = hsqs_ref_count_new(&rc1, sizeof(int), dummy_dtor);
+	assert(rv == 0);
+	rv = hsqs_ref_count_new(&rc2, sizeof(int), dummy_dtor);
 	assert(rv == 0);
 
-	rv = hsqs_lru_hashmap_put(&hashmap, 1, v1);
+	rv = hsqs_lru_hashmap_init(&hashmap, 1024);
 	assert(rv == 0);
-	rv = hsqs_lru_hashmap_put(&hashmap, 2, v2);
+
+	rv = hsqs_lru_hashmap_put(&hashmap, 1, rc1);
+	assert(rv == 0);
+	rv = hsqs_lru_hashmap_put(&hashmap, 2, rc2);
 	assert(rv == 0);
 
 	hsqs_lru_hashmap_cleanup(&hashmap);
@@ -85,25 +91,30 @@ static void
 read_from_hashmap() {
 	int rv = 0;
 	struct HsqsLruHashmap hashmap = {0};
-	char *v1 = "Value1";
-	char *v2 = "Value2";
-	char *p;
+	struct HsqsRefCount *rc1;
+	struct HsqsRefCount *rc2;
+	struct HsqsRefCount *p;
 
-	rv = hsqs_lru_hashmap_init(&hashmap, 1024, dummy_dtor);
+	rv = hsqs_ref_count_new(&rc1, sizeof(int), dummy_dtor);
+	assert(rv == 0);
+	rv = hsqs_ref_count_new(&rc2, sizeof(int), dummy_dtor);
 	assert(rv == 0);
 
-	rv = hsqs_lru_hashmap_put(&hashmap, 1, v1);
-	assert(rv == 0);
-	rv = hsqs_lru_hashmap_put(&hashmap, 2, v2);
+	rv = hsqs_lru_hashmap_init(&hashmap, 1024);
 	assert(rv == 0);
 
-	p = hsqs_lru_hashmap_pull(&hashmap, 1);
-	assert(p == v1);
-	p = hsqs_lru_hashmap_pull(&hashmap, 2);
-	assert(p == v2);
+	rv = hsqs_lru_hashmap_put(&hashmap, 1, rc1);
+	assert(rv == 0);
+	rv = hsqs_lru_hashmap_put(&hashmap, 2, rc2);
+	assert(rv == 0);
 
-	assert(hashmap.oldest == NULL);
-	assert(hashmap.newest == NULL);
+	p = hsqs_lru_hashmap_get(&hashmap, 1);
+	assert(p == rc1);
+	p = hsqs_lru_hashmap_get(&hashmap, 2);
+	assert(p == rc2);
+
+	assert(hashmap.oldest->pointer == rc1);
+	assert(hashmap.newest->pointer == rc2);
 
 	hsqs_lru_hashmap_cleanup(&hashmap);
 }
@@ -112,46 +123,53 @@ static void
 hashmap_overflow() {
 	int rv = 0;
 	struct HsqsLruHashmap hashmap = {0};
-	char *v1 = "Value1";
-	char *v2 = "Value2";
-	char *v3 = "Value3";
-	char *p;
+	struct HsqsRefCount *rc1;
+	struct HsqsRefCount *rc2;
+	struct HsqsRefCount *rc3;
+	struct HsqsRefCount *p;
 
-	rv = hsqs_lru_hashmap_init(&hashmap, 2, dtor);
+	rv = hsqs_ref_count_new(&rc1, sizeof(int), dtor);
+	assert(rv == 0);
+	rv = hsqs_ref_count_new(&rc2, sizeof(int), dtor);
+	assert(rv == 0);
+	rv = hsqs_ref_count_new(&rc3, sizeof(int), dtor);
+	assert(rv == 0);
+
+	rv = hsqs_lru_hashmap_init(&hashmap, 2);
 	assert(rv == 0);
 	assert(hashmap.oldest == NULL);
 	assert(hashmap.newest == NULL);
 
-	rv = hsqs_lru_hashmap_put(&hashmap, 1, v1);
+	rv = hsqs_lru_hashmap_put(&hashmap, 1, rc1);
 	assert(rv == 0);
-	assert(hashmap.oldest->pointer == v1);
-	assert(hashmap.newest->pointer == v1);
+	assert(hashmap.oldest->pointer == rc1);
+	assert(hashmap.newest->pointer == rc1);
 	assert(last_free == NULL);
-	rv = hsqs_lru_hashmap_put(&hashmap, 2, v2);
+	rv = hsqs_lru_hashmap_put(&hashmap, 2, rc2);
 	assert(rv == 0);
-	assert(hashmap.oldest->pointer == v1);
-	assert(hashmap.newest->pointer == v2);
-	assert(hashmap.oldest->newer->pointer == v2);
+	assert(hashmap.oldest->pointer == rc1);
+	assert(hashmap.newest->pointer == rc2);
+	assert(hashmap.oldest->newer->pointer == rc2);
 	assert(hashmap.oldest->older == NULL);
-	assert(hashmap.newest->older->pointer == v1);
+	assert(hashmap.newest->older->pointer == rc1);
 	assert(hashmap.newest->newer == NULL);
 	assert(last_free == NULL);
-	rv = hsqs_lru_hashmap_put(&hashmap, 3, v3);
+	rv = hsqs_lru_hashmap_put(&hashmap, 3, rc3);
 	assert(rv == 0);
-	assert(hashmap.oldest->pointer == v2);
-	assert(hashmap.newest->pointer == v3);
-	assert(hashmap.oldest->newer->pointer == v3);
+	assert(hashmap.oldest->pointer == rc2);
+	assert(hashmap.newest->pointer == rc3);
+	assert(hashmap.oldest->newer->pointer == rc3);
 	assert(hashmap.oldest->older == NULL);
-	assert(hashmap.newest->older->pointer == v2);
+	assert(hashmap.newest->older->pointer == rc2);
 	assert(hashmap.newest->newer == NULL);
-	assert(last_free == v1);
+	assert(last_free == rc1);
 
-	p = hsqs_lru_hashmap_pull(&hashmap, 1);
+	p = hsqs_lru_hashmap_get(&hashmap, 1);
 	assert(p == NULL);
-	p = hsqs_lru_hashmap_pull(&hashmap, 2);
-	assert(p == v2);
-	p = hsqs_lru_hashmap_pull(&hashmap, 3);
-	assert(p == v3);
+	p = hsqs_lru_hashmap_get(&hashmap, 2);
+	assert(p == rc2);
+	p = hsqs_lru_hashmap_get(&hashmap, 3);
+	assert(p == rc3);
 
 	rv = hsqs_lru_hashmap_cleanup(&hashmap);
 	assert(rv == 0);
@@ -163,21 +181,26 @@ hashmap_add_many() {
 	int rv = 0;
 	int length = 0;
 	struct HsqsLruHashmap hashmap = {0};
-	int values[NBR];
+	struct HsqsRefCount *values[NBR];
+	struct HsqsRefCount *rc;
 
-	rv = hsqs_lru_hashmap_init(&hashmap, SIZE, dtor);
+	int *value;
+
+	rv = hsqs_lru_hashmap_init(&hashmap, SIZE);
 	assert(rv == 0);
 	assert(hashmap.oldest == NULL);
 	assert(hashmap.newest == NULL);
 
 	for (int i = 0; i < NBR; i++) {
-		values[i] = i;
-
-		rv = hsqs_lru_hashmap_put(&hashmap, i, &values[i]);
+		rv = hsqs_ref_count_new(&values[i], sizeof(int), dummy_dtor);
 		assert(rv == 0);
-	}
+		value = hsqs_ref_count_retain(values[i]);
+		*value = i;
 
-	int *value;
+		rv = hsqs_lru_hashmap_put(&hashmap, i, values[i]);
+		assert(rv == 0);
+		hsqs_ref_count_release(values[i]);
+	}
 
 	length = 0;
 	for (struct HsqsLruEntry *entry = hashmap.newest; entry;
@@ -195,19 +218,25 @@ hashmap_add_many() {
 	}
 	assert(length == SIZE);
 
-	value = hsqs_lru_hashmap_pull(&hashmap, NBR - SIZE / 2);
+	rc = hsqs_lru_hashmap_get(&hashmap, NBR - SIZE / 2);
+	value = hsqs_ref_count_retain(rc);
 	assert(*value == NBR - SIZE / 2);
-	value = hsqs_lru_hashmap_pull(&hashmap, NBR - SIZE);
+	hsqs_ref_count_release(rc);
+
+	rc = hsqs_lru_hashmap_get(&hashmap, NBR - SIZE);
+	value = hsqs_ref_count_retain(rc);
 	assert(*value == NBR - SIZE);
-	value = hsqs_lru_hashmap_pull(&hashmap, NBR - SIZE - 1);
-	assert(value == NULL);
+	hsqs_ref_count_release(rc);
+
+	rc = hsqs_lru_hashmap_get(&hashmap, NBR - SIZE - 1);
+	assert(rc == NULL);
 
 	length = 0;
 	for (struct HsqsLruEntry *entry = hashmap.oldest; entry;
 		 entry = entry->newer) {
 		length++;
 	}
-	assert(length == SIZE - 2);
+	assert(length == SIZE);
 
 	rv = hsqs_lru_hashmap_cleanup(&hashmap);
 	assert(rv == 0);
@@ -217,22 +246,27 @@ static void
 hashmap_size_1() {
 	int rv = 0;
 	struct HsqsLruHashmap hashmap = {0};
-	char *v1 = "Value1";
-	char *v2 = "Value2";
-	char *p;
+	struct HsqsRefCount *rc1;
+	struct HsqsRefCount *rc2;
+	struct HsqsRefCount *p;
 
-	rv = hsqs_lru_hashmap_init(&hashmap, 1, dummy_dtor);
+	rv = hsqs_ref_count_new(&rc1, sizeof(int), dummy_dtor);
+	assert(rv == 0);
+	rv = hsqs_ref_count_new(&rc2, sizeof(int), dummy_dtor);
 	assert(rv == 0);
 
-	rv = hsqs_lru_hashmap_put(&hashmap, 1, v1);
-	assert(rv == 0);
-	rv = hsqs_lru_hashmap_put(&hashmap, 2, v2);
+	rv = hsqs_lru_hashmap_init(&hashmap, 1);
 	assert(rv == 0);
 
-	p = hsqs_lru_hashmap_pull(&hashmap, 1);
+	rv = hsqs_lru_hashmap_put(&hashmap, 1, rc1);
+	assert(rv == 0);
+	rv = hsqs_lru_hashmap_put(&hashmap, 2, rc2);
+	assert(rv == 0);
+
+	p = hsqs_lru_hashmap_get(&hashmap, 1);
 	assert(p == NULL);
-	p = hsqs_lru_hashmap_pull(&hashmap, 2);
-	assert(p == v2);
+	p = hsqs_lru_hashmap_get(&hashmap, 2);
+	assert(p == rc2);
 
 	rv = hsqs_lru_hashmap_cleanup(&hashmap);
 	assert(rv == 0);

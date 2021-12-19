@@ -35,12 +35,31 @@
 #include "lru_hashmap.h"
 #include "../error.h"
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
 static off_t
-lru_hash_to_start_index(struct HsqsLruHashmap *hashmap, uint64_t hash) {
+hash_to_start_index(struct HsqsLruHashmap *hashmap, uint64_t hash) {
 	return (hash * hash) % hashmap->size;
+}
+
+static struct HsqsLruEntry *
+find_entry(struct HsqsLruHashmap *hashmap, uint64_t hash, bool find_free) {
+	int start_index = hash_to_start_index(hashmap, hash);
+
+	for (hsqs_index_t i = 0; i < hashmap->size; i++) {
+		hsqs_index_t index = (start_index + i) % hashmap->size;
+		struct HsqsLruEntry *candidate = &hashmap->entries[index];
+
+		if (find_free && candidate->pointer == NULL) {
+			return candidate;
+		}
+		if (candidate->hash == hash && candidate->pointer != NULL) {
+			return candidate;
+		}
+	}
+	return NULL;
 }
 
 /*
@@ -92,10 +111,23 @@ lru_detach(struct HsqsLruHashmap *hashmap, struct HsqsLruEntry *entry) {
 	return 0;
 }
 
+static int
+lru_attach(struct HsqsLruHashmap *hashmap, struct HsqsLruEntry *entry) {
+	entry->newer = NULL;
+	entry->older = hashmap->newest;
+	if (hashmap->newest) {
+		hashmap->newest->newer = entry;
+	}
+	hashmap->newest = entry;
+
+	if (hashmap->oldest == NULL) {
+		hashmap->oldest = entry;
+	}
+	return 0;
+}
+
 int
-hsqs_lru_hashmap_init(
-		struct HsqsLruHashmap *hashmap, size_t size, HsqsLruHashmapDtor dtor) {
-	hashmap->dtor = dtor;
+hsqs_lru_hashmap_init(struct HsqsLruHashmap *hashmap, size_t size) {
 	hashmap->size = size;
 	hashmap->newest = NULL;
 	hashmap->oldest = NULL;
@@ -110,21 +142,12 @@ hsqs_lru_hashmap_init(
 
 int
 hsqs_lru_hashmap_put(
-		struct HsqsLruHashmap *hashmap, uint64_t hash, void *pointer) {
-	off_t start_index = lru_hash_to_start_index(hashmap, hash);
-	struct HsqsLruEntry *candidate = NULL;
+		struct HsqsLruHashmap *hashmap, uint64_t hash,
+		struct HsqsRefCount *pointer) {
+	struct HsqsLruEntry *candidate = find_entry(hashmap, hash, true);
+	hsqs_ref_count_retain(pointer);
 
-	for (hsqs_index_t i = 0; i < hashmap->size; i++) {
-		off_t index = (start_index + i) % hashmap->size;
-		candidate = &hashmap->entries[index];
-
-		if (candidate->pointer == NULL ||
-			(candidate->pointer == pointer && hash == candidate->hash)) {
-			break;
-		}
-	}
-
-	if (candidate->pointer != NULL) {
+	if (candidate == NULL) {
 		if (hashmap->oldest == NULL) {
 			// Should never happen:
 			return -HSQS_ERROR_HASHMAP_INTERNAL_ERROR;
@@ -133,53 +156,37 @@ hsqs_lru_hashmap_put(
 		// TODO: This is potentional slow. Instead find the current first match
 		// and switch places with this one.
 		candidate = hashmap->oldest;
-		hashmap->dtor(candidate->pointer);
 	}
 
+	if (candidate->pointer != NULL) {
+		hsqs_ref_count_release(candidate->pointer);
+	}
 	lru_detach(hashmap, candidate);
-
 	candidate->pointer = pointer;
 	candidate->hash = hash;
-	candidate->newer = NULL;
-	candidate->older = hashmap->newest;
-	if (hashmap->newest) {
-		hashmap->newest->newer = candidate;
-	}
-	hashmap->newest = candidate;
-
-	if (hashmap->oldest == NULL) {
-		hashmap->oldest = candidate;
-	}
+	lru_attach(hashmap, candidate);
 
 	return 0;
 }
-void *
-hsqs_lru_hashmap_pull(struct HsqsLruHashmap *hashmap, uint64_t hash) {
-	off_t start_index = lru_hash_to_start_index(hashmap, hash);
 
-	for (hsqs_index_t i = 0; i < hashmap->size; i++) {
-		hsqs_index_t index = (start_index + i) % hashmap->size;
-		struct HsqsLruEntry *candidate = &hashmap->entries[index];
+struct HsqsRefCount *
+hsqs_lru_hashmap_get(struct HsqsLruHashmap *hashmap, uint64_t hash) {
+	struct HsqsLruEntry *candidate = find_entry(hashmap, hash, false);
 
-		if (candidate->hash != hash) {
-			continue;
-		}
-
-		// Detaching the entry from the list. The user is responsible to put the
-		// element back through hsqs_lru_hashmap_put() this way the the entry
-		// cannot be removed when the hashmap is full.
-		lru_detach(hashmap, candidate);
-		return candidate->pointer;
+	if (candidate == NULL) {
+		return NULL;
 	}
+	lru_detach(hashmap, candidate);
+	lru_attach(hashmap, candidate);
 
-	return NULL;
+	return candidate->pointer;
 }
 
 int
 hsqs_lru_hashmap_cleanup(struct HsqsLruHashmap *hashmap) {
 	for (hsqs_index_t i = 0; i < hashmap->size; i++) {
 		if (hashmap->entries[i].pointer != NULL) {
-			hashmap->dtor(&hashmap->entries[i]);
+			hsqs_ref_count_release(hashmap->entries[i].pointer);
 		}
 	}
 	free(hashmap->entries);

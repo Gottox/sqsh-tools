@@ -33,6 +33,7 @@
  */
 
 #include "../utils.h"
+#include "ref_count.h"
 #include <stdint.h>
 #include <sys/types.h>
 
@@ -43,7 +44,7 @@
 typedef int (*HsqsLruHashmapDtor)(void *);
 
 struct HsqsLruEntry {
-	void *pointer;
+	struct HsqsRefCount *pointer;
 	struct HsqsLruEntry *newer;
 	struct HsqsLruEntry *older;
 	uint64_t hash;
@@ -54,14 +55,17 @@ struct HsqsLruHashmap {
 	struct HsqsLruEntry *oldest;
 	struct HsqsLruEntry *newest;
 	struct HsqsLruEntry *entries;
-	HsqsLruHashmapDtor dtor;
 };
 
-HSQS_NO_UNUSED int hsqs_lru_hashmap_init(
-		struct HsqsLruHashmap *hashmap, size_t size, HsqsLruHashmapDtor dtor);
+HSQS_NO_UNUSED int
+hsqs_lru_hashmap_init(struct HsqsLruHashmap *hashmap, size_t size);
 HSQS_NO_UNUSED int hsqs_lru_hashmap_put(
-		struct HsqsLruHashmap *hashmap, uint64_t hash, void *pointer);
-void *hsqs_lru_hashmap_pull(struct HsqsLruHashmap *hashmap, uint64_t hash);
+		struct HsqsLruHashmap *hashmap, uint64_t hash,
+		struct HsqsRefCount *pointer);
+struct HsqsRefCount *
+hsqs_lru_hashmap_get(struct HsqsLruHashmap *hashmap, uint64_t hash);
+struct HsqsRefCount *
+hsqs_lru_hashmap_remove(struct HsqsLruHashmap *hashmap, uint64_t hash);
 int hsqs_lru_hashmap_cleanup(struct HsqsLruHashmap *hashmap);
 
 #endif /* end of include guard LRU_HASHMAP_H */
