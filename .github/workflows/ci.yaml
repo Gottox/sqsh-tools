@@ -16,7 +16,8 @@ jobs:
           -Dlzma=false \
           -Dlzo2=false \
           -Dzstd=false \
-          -Dtest=true
+          -Dtest=true \
+          -Db_sanitize=address,undefined
     - name: test
       run: |
          ninja -C /tmp/build test

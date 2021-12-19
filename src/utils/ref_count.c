@@ -42,6 +42,8 @@ hsqs_ref_count_release(struct HsqsRefCount *ref_count) {
 	if (ref_count->references == 0) {
 		ref_count->dtor(hsqs_ref_count_retain(ref_count));
 		free(ref_count);
+		return 0;
+	} else {
+		return ref_count->references;
 	}
-	return ref_count->references;
 }

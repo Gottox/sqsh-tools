@@ -14,7 +14,7 @@ $(NINJA_TARGETS): builddir
 
 builddir: meson.build
 	[ -d "builddir" ] && rm -r builddir || true
-	meson setup builddir -Dtest=true
+	meson setup builddir -Dtest=true -Db_sanitize=address,undefined
 
 .PHONY: meson_clean
 

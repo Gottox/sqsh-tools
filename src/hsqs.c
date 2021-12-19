@@ -67,6 +67,7 @@ init(struct Hsqs *hsqs) {
 	}
 
 	if (hsqs_superblock_has_compression_options(&hsqs->superblock)) {
+		hsqs->initialized |= INITIALIZED_COMPRESSION_OPTIONS;
 		rv = hsqs_compression_options_init(&hsqs->compression_options, hsqs);
 		if (rv < 0) {
 			goto out;
@@ -220,6 +221,21 @@ int
 hsqs_cleanup(struct Hsqs *hsqs) {
 	int rv = 0;
 
+	if (is_initialized(hsqs, INITIALIZED_ID_TABLE)) {
+		hsqs_table_cleanup(&hsqs->id_table);
+	}
+	if (is_initialized(hsqs, INITIALIZED_EXPORT_TABLE)) {
+		hsqs_table_cleanup(&hsqs->export_table);
+	}
+	if (is_initialized(hsqs, INITIALIZED_XATTR_TABLE)) {
+		hsqs_xattr_table_cleanup(&hsqs->xattr_table);
+	}
+	if (is_initialized(hsqs, INITIALIZED_FRAGMENT_TABLE)) {
+		hsqs_fragment_table_cleanup(&hsqs->fragment_table);
+	}
+	if (is_initialized(hsqs, INITIALIZED_COMPRESSION_OPTIONS)) {
+		hsqs_compression_options_cleanup(&hsqs->compression_options);
+	}
 	hsqs_superblock_cleanup(&hsqs->superblock);
 	hsqs_mapper_cleanup(&hsqs->mapper);
 
