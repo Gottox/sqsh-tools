@@ -36,10 +36,10 @@
 #include "../src/context/directory_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/context/superblock_context.h"
-#include "../src/context/xattr_table_context.h"
 #include "../src/data/superblock.h"
 #include "../src/error.h"
 #include "../src/hsqs.h"
+#include "../src/table/xattr_table.h"
 #include "common.h"
 #include "test.h"
 #include <squashfs_image.h>
@@ -474,7 +474,7 @@ fuzz_crash_4() {
 			0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,
 	};
 
-	struct HsqsTableContext *id_table = NULL;
+	struct HsqsTable *id_table = NULL;
 	struct Hsqs hsqs = {0};
 	rv = hsqs_init(&hsqs, input, sizeof(input));
 	assert(rv == 0);
@@ -511,7 +511,7 @@ fuzz_crash_5() {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4f, 0x00, 0x00, 0x00,
 	};
 
-	struct HsqsTableContext *id_table = NULL;
+	struct HsqsTable *id_table = NULL;
 	struct Hsqs hsqs = {0};
 	rv = hsqs_init(&hsqs, input, sizeof(input));
 	assert(rv == 0);
@@ -534,7 +534,7 @@ fuzz_crash_6() {
 			0x0,  0x0,  0x0,  0x0,  0x0,  0x0, 0x0, 0x0, 0x0,  0x0,  0x0, 0xa,
 	};
 
-	struct HsqsTableContext *id_table = NULL;
+	struct HsqsTable *id_table = NULL;
 	struct Hsqs hsqs = {0};
 	rv = hsqs_init(&hsqs, input, sizeof(input));
 	assert(rv == 0);
@@ -558,7 +558,7 @@ fuzz_crash_7() {
 			0x0,  0x97, 0x97, 0x97, 0x97, 0x74, 0x97, 0x97,
 	};
 
-	struct HsqsTableContext *id_table = NULL;
+	struct HsqsTable *id_table = NULL;
 	struct Hsqs hsqs = {0};
 	rv = hsqs_init(&hsqs, input, sizeof(input));
 	assert(rv == 0);

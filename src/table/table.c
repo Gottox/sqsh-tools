@@ -28,19 +28,19 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : table_context
+ * @file        : table
  * @created     : Sunday Sep 26, 2021 19:11:49 CEST
  */
 
-#include "table_context.h"
+#include "table.h"
+#include "../context/metablock_context.h"
 #include "../error.h"
 #include "../hsqs.h"
-#include "metablock_context.h"
 #include <stdint.h>
 #include <string.h>
 
 static uint64_t
-lookup_table_get(const struct HsqsTableContext *table, off_t index) {
+lookup_table_get(const struct HsqsTable *table, off_t index) {
 	const uint64_t *lookup_table =
 			(const uint64_t *)hsqs_map_data(&table->lookup_table);
 
@@ -49,7 +49,7 @@ lookup_table_get(const struct HsqsTableContext *table, off_t index) {
 
 int
 hsqs_table_init(
-		struct HsqsTableContext *table, struct Hsqs *hsqs, off_t start_block,
+		struct HsqsTable *table, struct Hsqs *hsqs, off_t start_block,
 		size_t element_size, size_t element_count) {
 	int rv = 0;
 	size_t byte_size;
@@ -79,8 +79,7 @@ out:
 }
 
 int
-hsqs_table_get(
-		const struct HsqsTableContext *table, off_t index, void *target) {
+hsqs_table_get(const struct HsqsTable *table, off_t index, void *target) {
 	int rv = 0;
 	struct Hsqs *hsqs = table->hsqs;
 	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
@@ -119,7 +118,7 @@ out:
 }
 
 int
-hsqs_table_cleanup(struct HsqsTableContext *table) {
+hsqs_table_cleanup(struct HsqsTable *table) {
 	hsqs_map_unmap(&table->lookup_table);
 	return 0;
 }

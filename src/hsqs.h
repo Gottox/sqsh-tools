@@ -33,12 +33,12 @@
  */
 
 #include "context/compression_options_context.h"
-#include "context/fragment_context.h"
 #include "context/superblock_context.h"
-#include "context/table_context.h"
-#include "context/xattr_table_context.h"
 #include "error.h"
 #include "mapper/mapper.h"
+#include "table/fragment_table.h"
+#include "table/table.h"
+#include "table/xattr_table.h"
 #include "utils.h"
 
 #include <stdint.h>
@@ -52,10 +52,10 @@ struct Hsqs {
 	uint32_t error;
 	struct HsqsMapper mapper;
 	struct HsqsSuperblockContext superblock;
-	struct HsqsTableContext id_table;
-	struct HsqsTableContext export_table;
-	struct HsqsXattrTableContext xattr_table;
-	struct HsqsFragmentTableContext fragment_table;
+	struct HsqsTable id_table;
+	struct HsqsTable export_table;
+	struct HsqsXattrTable xattr_table;
+	struct HsqsFragmentTable fragment_table;
 	struct HsqsCompressionOptionsContext compression_options;
 	uint8_t initialized;
 };
@@ -69,13 +69,11 @@ struct HsqsMapper *hsqs_mapper(struct Hsqs *hsqs);
 
 struct HsqsSuperblockContext *hsqs_superblock(struct Hsqs *hsqs);
 
-int hsqs_id_table(struct Hsqs *hsqs, struct HsqsTableContext **id_table);
-int
-hsqs_export_table(struct Hsqs *hsqs, struct HsqsTableContext **export_table);
+int hsqs_id_table(struct Hsqs *hsqs, struct HsqsTable **id_table);
+int hsqs_export_table(struct Hsqs *hsqs, struct HsqsTable **export_table);
 int hsqs_fragment_table(
-		struct Hsqs *hsqs, struct HsqsFragmentTableContext **fragment_table);
-int
-hsqs_xattr_table(struct Hsqs *hsqs, struct HsqsXattrTableContext **xattr_table);
+		struct Hsqs *hsqs, struct HsqsFragmentTable **fragment_table);
+int hsqs_xattr_table(struct Hsqs *hsqs, struct HsqsXattrTable **xattr_table);
 int hsqs_compression_options(
 		struct Hsqs *hsqs,
 		struct HsqsCompressionOptionsContext **compression_options);

@@ -105,7 +105,7 @@ hsqs_open(struct Hsqs *hsqs, const char *path) {
 }
 
 int
-hsqs_id_table(struct Hsqs *hsqs, struct HsqsTableContext **id_table) {
+hsqs_id_table(struct Hsqs *hsqs, struct HsqsTable **id_table) {
 	int rv = 0;
 	uint64_t table_start = hsqs_superblock_id_table_start(&hsqs->superblock);
 	if (table_start == NO_SEGMENT) {
@@ -127,7 +127,7 @@ out:
 }
 
 int
-hsqs_export_table(struct Hsqs *hsqs, struct HsqsTableContext **export_table) {
+hsqs_export_table(struct Hsqs *hsqs, struct HsqsTable **export_table) {
 	int rv = 0;
 	uint64_t table_start =
 			hsqs_superblock_export_table_start(&hsqs->superblock);
@@ -151,7 +151,7 @@ out:
 
 int
 hsqs_fragment_table(
-		struct Hsqs *hsqs, struct HsqsFragmentTableContext **fragment_table) {
+		struct Hsqs *hsqs, struct HsqsFragmentTable **fragment_table) {
 	int rv = 0;
 	uint64_t table_start =
 			hsqs_superblock_fragment_table_start(&hsqs->superblock);
@@ -173,8 +173,7 @@ out:
 }
 
 int
-hsqs_xattr_table(
-		struct Hsqs *hsqs, struct HsqsXattrTableContext **xattr_table) {
+hsqs_xattr_table(struct Hsqs *hsqs, struct HsqsXattrTable **xattr_table) {
 	int rv = 0;
 	uint64_t table_start =
 			hsqs_superblock_xattr_id_table_start(&hsqs->superblock);

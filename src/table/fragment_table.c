@@ -28,22 +28,21 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : fragment_table_context
+ * @file        : fragment_table
  * @created     : Wednesday Dec 01, 2021 17:35:47 CET
  */
 
-#include "fragment_context.h"
+#include "fragment_table.h"
+#include "../context/inode_context.h"
+#include "../context/superblock_context.h"
 #include "../data/fragment_internal.h"
 #include "../error.h"
 #include "../hsqs.h"
 #include "../mapper/mapper.h"
-#include "inode_context.h"
-#include "superblock_context.h"
 #include <stdint.h>
 
 int
-hsqs_fragment_table_init(
-		struct HsqsFragmentTableContext *context, struct Hsqs *hsqs) {
+hsqs_fragment_table_init(struct HsqsFragmentTable *context, struct Hsqs *hsqs) {
 	int rv = 0;
 	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
 	uint64_t start = hsqs_superblock_fragment_table_start(superblock);
@@ -64,7 +63,7 @@ out:
 
 static int
 read_fragment_data(
-		struct HsqsFragmentTableContext *context, struct HsqsBuffer *buffer,
+		struct HsqsFragmentTable *context, struct HsqsBuffer *buffer,
 		uint32_t index) {
 	int rv = 0;
 	uint64_t start;
@@ -102,8 +101,8 @@ out:
 
 int
 hsqs_fragment_table_to_buffer(
-		struct HsqsFragmentTableContext *context,
-		const struct HsqsInodeContext *inode, struct HsqsBuffer *buffer) {
+		struct HsqsFragmentTable *context, const struct HsqsInodeContext *inode,
+		struct HsqsBuffer *buffer) {
 	int rv = 0;
 	struct HsqsBuffer intermediate_buffer = {0};
 	const uint8_t *data;
@@ -143,7 +142,7 @@ out:
 }
 
 int
-hsqs_fragment_table_cleanup(struct HsqsFragmentTableContext *context) {
+hsqs_fragment_table_cleanup(struct HsqsFragmentTable *context) {
 	hsqs_table_cleanup(&context->table);
 	return 0;
 }

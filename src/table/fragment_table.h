@@ -28,34 +28,34 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : fragment_table_context
+ * @file        : fragment_table
  * @created     : Wednesday Dec 01, 2021 17:22:03 CET
  */
 
 #include "../utils.h"
-#include "table_context.h"
+#include "table.h"
 
-#ifndef FRAGMENT_TABLE_CONTEXT_H
+#ifndef FRAGMENT_TABLE_H
 
-#define FRAGMENT_TABLE_CONTEXT_H
+#define FRAGMENT_TABLE_H
 
 struct HsqsSuperblockContext;
 struct HsqsInodeContext;
 struct HsqsBuffer;
 
-struct HsqsFragmentTableContext {
+struct HsqsFragmentTable {
 	const struct HsqsSuperblockContext *superblock;
-	struct HsqsTableContext table;
+	struct HsqsTable table;
 	struct HsqsMapper *mapper;
 };
 
-HSQS_NO_UNUSED int hsqs_fragment_table_init(
-		struct HsqsFragmentTableContext *context, struct Hsqs *hsqs);
+HSQS_NO_UNUSED int
+hsqs_fragment_table_init(struct HsqsFragmentTable *context, struct Hsqs *hsqs);
 
 HSQS_NO_UNUSED int hsqs_fragment_table_to_buffer(
-		struct HsqsFragmentTableContext *context,
-		const struct HsqsInodeContext *inode, struct HsqsBuffer *buffer);
+		struct HsqsFragmentTable *context, const struct HsqsInodeContext *inode,
+		struct HsqsBuffer *buffer);
 
-int hsqs_fragment_table_cleanup(struct HsqsFragmentTableContext *context);
+int hsqs_fragment_table_cleanup(struct HsqsFragmentTable *context);
 
-#endif /* end of include guard FRAGMENT_TABLE_CONTEXT_H */
+#endif /* end of include guard FRAGMENT_TABLE_H */

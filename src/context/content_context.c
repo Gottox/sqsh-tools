@@ -37,7 +37,6 @@
 #include "../error.h"
 #include "../hsqs.h"
 #include "../mapper/mapper.h"
-#include "fragment_context.h"
 #include "inode_context.h"
 #include "superblock_context.h"
 #include <stdint.h>
@@ -122,7 +121,7 @@ int
 hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
 	int rv = 0;
 	struct HsqsMap map = {0};
-	struct HsqsFragmentTableContext *table = context->fragment_table;
+	struct HsqsFragmentTable *table = context->fragment_table;
 	struct HsqsBuffer *buffer = &context->buffer;
 	uint64_t start_block = hsqs_inode_file_blocks_start(context->inode);
 	bool is_compressed;

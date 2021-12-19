@@ -28,42 +28,12 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : content_context
- * @created     : Thursday Oct 07, 2021 09:23:05 CEST
+ * @file        : xattr_context
+ * @created     : Sunday Dec 19, 2021 22:13:26 CET
  */
 
-#include "../compression/buffer.h"
-#include <stdint.h>
+#ifndef XATTR_CONTEXT_H
 
-#ifndef FILE_CONTEXT_H
+#define XATTR_CONTEXT_H
 
-#define FILE_CONTEXT_H
-
-struct HsqsInodeContext;
-struct Hsqs;
-
-struct HsqsFileContext {
-	struct Hsqs *hsqs;
-	struct HsqsFragmentTable *fragment_table;
-	struct HsqsInodeContext *inode;
-	struct HsqsBuffer buffer;
-	struct HsqsMapper *mapper;
-	uint64_t seek_pos;
-	uint32_t block_size;
-};
-
-HSQS_NO_UNUSED int hsqs_content_init(
-		struct HsqsFileContext *context, struct HsqsInodeContext *inode);
-
-HSQS_NO_UNUSED int
-hsqs_content_seek(struct HsqsFileContext *context, uint64_t seek_pos);
-
-int hsqs_content_read(struct HsqsFileContext *context, uint64_t size);
-
-const uint8_t *hsqs_content_data(struct HsqsFileContext *context);
-
-uint64_t hsqs_content_size(struct HsqsFileContext *context);
-
-int hsqs_content_cleanup(struct HsqsFileContext *context);
-
-#endif /* end of include guard FILE_CONTEXT_H */
+#endif /* end of include guard XATTR_CONTEXT_H */

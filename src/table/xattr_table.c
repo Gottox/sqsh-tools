@@ -28,31 +28,30 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : xattr_table_context
+ * @file        : xattr_table
  * @created     : Sunday Oct 31, 2021 11:54:09 CET
  */
 
-#include "xattr_table_context.h"
+#include "xattr_table.h"
 #include "../compression/buffer.h"
+#include "../context/inode_context.h"
+#include "../context/superblock_context.h"
 #include "../data/superblock.h"
 #include "../data/xattr_internal.h"
 #include "../error.h"
 #include "../hsqs.h"
-#include "inode_context.h"
-#include "superblock_context.h"
 
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
 static const struct HsqsXattrIdTable *
-get_header(const struct HsqsXattrTableContext *context) {
+get_header(const struct HsqsXattrTable *context) {
 	return (struct HsqsXattrIdTable *)hsqs_map_data(&context->header);
 }
 
 int
-hsqs_xattr_table_init(
-		struct HsqsXattrTableContext *context, struct Hsqs *hsqs) {
+hsqs_xattr_table_init(struct HsqsXattrTable *context, struct Hsqs *hsqs) {
 	int rv = 0;
 	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
 	uint64_t xattr_address = hsqs_superblock_xattr_id_table_start(superblock);
@@ -88,7 +87,7 @@ out:
 int
 hsqs_xattr_table_iterator_init(
 		struct HsqsXattrTableIterator *iterator,
-		struct HsqsXattrTableContext *xattr_table,
+		struct HsqsXattrTable *xattr_table,
 		const struct HsqsInodeContext *inode) {
 	int rv;
 	struct HsqsXattrLookupTable ref = {0};
@@ -346,7 +345,7 @@ hsqs_xattr_table_iterator_cleanup(struct HsqsXattrTableIterator *iterator) {
 }
 
 int
-hsqs_xattr_table_cleanup(struct HsqsXattrTableContext *context) {
+hsqs_xattr_table_cleanup(struct HsqsXattrTable *context) {
 	hsqs_table_cleanup(&context->table);
 	hsqs_map_unmap(&context->header);
 	return 0;

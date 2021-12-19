@@ -487,7 +487,7 @@ hsqs_inode_load_by_inode_number(
 		uint64_t inode_number) {
 	int rv = 0;
 	uint64_t inode_ref;
-	struct HsqsTableContext *export_table;
+	struct HsqsTable *export_table;
 
 	rv = hsqs_export_table(hsqs, &export_table);
 	if (rv < 0) {
@@ -546,7 +546,7 @@ out:
 static uint32_t
 inode_get_id(const struct HsqsInodeContext *context, off_t idx) {
 	int rv = 0;
-	struct HsqsTableContext *id_table;
+	struct HsqsTable *id_table;
 	uint32_t id;
 
 	rv = hsqs_id_table(context->hsqs, &id_table);
@@ -600,7 +600,7 @@ hsqs_inode_xattr_iterator(
 		const struct HsqsInodeContext *inode,
 		struct HsqsXattrTableIterator *iterator) {
 	int rv = 0;
-	struct HsqsXattrTableContext *table;
+	struct HsqsXattrTable *table;
 
 	rv = hsqs_xattr_table(inode->hsqs, &table);
 	if (rv < 0) {
