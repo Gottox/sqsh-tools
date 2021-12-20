@@ -39,7 +39,7 @@
 
 #define FORMAT_INODE_INTERNAL_H
 
-struct HsqsInodeDirectoryIndex {
+struct HSQS_UNALIGNED HsqsInodeDirectoryIndex {
 	uint32_t index;
 	uint32_t start;
 	uint32_t name_size;
@@ -49,7 +49,7 @@ STATIC_ASSERT(
 		sizeof(struct HsqsInodeDirectoryIndex) ==
 		HSQS_SIZEOF_INODE_DIRECTORY_INDEX);
 
-struct HsqsInodeDirectory {
+struct HSQS_UNALIGNED HsqsInodeDirectory {
 	uint32_t block_start;
 	uint32_t hard_link_count;
 	uint16_t file_size;
@@ -58,7 +58,7 @@ struct HsqsInodeDirectory {
 };
 STATIC_ASSERT(sizeof(struct HsqsInodeDirectory) == HSQS_SIZEOF_INODE_DIRECTORY);
 
-struct HsqsInodeDirectoryExt {
+struct HSQS_UNALIGNED HsqsInodeDirectoryExt {
 	uint32_t hard_link_count;
 	uint32_t file_size;
 	uint32_t block_start;
@@ -72,7 +72,7 @@ STATIC_ASSERT(
 		sizeof(struct HsqsInodeDirectoryExt) ==
 		HSQS_SIZEOF_INODE_DIRECTORY_EXT);
 
-struct HsqsInodeFile {
+struct HSQS_UNALIGNED HsqsInodeFile {
 	uint32_t blocks_start;
 	uint32_t fragment_block_index;
 	uint32_t block_offset;
@@ -81,7 +81,7 @@ struct HsqsInodeFile {
 };
 STATIC_ASSERT(sizeof(struct HsqsInodeFile) == HSQS_SIZEOF_INODE_FILE);
 
-struct HsqsInodeFileExt {
+struct HSQS_UNALIGNED HsqsInodeFileExt {
 	uint64_t blocks_start;
 	uint64_t file_size;
 	uint64_t sparse;
@@ -93,14 +93,14 @@ struct HsqsInodeFileExt {
 };
 STATIC_ASSERT(sizeof(struct HsqsInodeFileExt) == HSQS_SIZEOF_INODE_FILE_EXT);
 
-struct HsqsInodeSymlink {
+struct HSQS_UNALIGNED HsqsInodeSymlink {
 	uint32_t hard_link_count;
 	uint32_t target_size;
 	// uint8_t target_path[0]; // [target_size]
 };
 STATIC_ASSERT(sizeof(struct HsqsInodeSymlink) == HSQS_SIZEOF_INODE_SYMLINK);
 
-struct HsqsInodeSymlinkExt {
+struct HSQS_UNALIGNED HsqsInodeSymlinkExt {
 	uint32_t hard_link_count;
 	uint32_t target_size;
 	// uint8_t target_path[0]; // [target_size]
@@ -108,20 +108,20 @@ struct HsqsInodeSymlinkExt {
 STATIC_ASSERT(
 		sizeof(struct HsqsInodeSymlinkExt) == HSQS_SIZEOF_INODE_SYMLINK_EXT);
 
-struct HsqsInodeSymlinkExtTail {
+struct HSQS_UNALIGNED HsqsInodeSymlinkExtTail {
 	uint32_t xattr_idx;
 };
 STATIC_ASSERT(
 		sizeof(struct HsqsInodeSymlinkExtTail) ==
 		HSQS_SIZEOF_INODE_SYMLINK_EXT_TAIL);
 
-struct HsqsInodeDevice {
+struct HSQS_UNALIGNED HsqsInodeDevice {
 	uint32_t hard_link_count;
 	uint32_t device;
 };
 STATIC_ASSERT(sizeof(struct HsqsInodeDevice) == HSQS_SIZEOF_INODE_DEVICE);
 
-struct HsqsInodeDeviceExt {
+struct HSQS_UNALIGNED HsqsInodeDeviceExt {
 	uint32_t hard_link_count;
 	uint32_t device;
 	uint32_t xattr_idx;
@@ -129,18 +129,18 @@ struct HsqsInodeDeviceExt {
 STATIC_ASSERT(
 		sizeof(struct HsqsInodeDeviceExt) == HSQS_SIZEOF_INODE_DEVICE_EXT);
 
-struct HsqsInodeIpc {
+struct HSQS_UNALIGNED HsqsInodeIpc {
 	uint32_t hard_link_count;
 };
 STATIC_ASSERT(sizeof(struct HsqsInodeIpc) == HSQS_SIZEOF_INODE_IPC);
 
-struct HsqsInodeIpcExt {
+struct HSQS_UNALIGNED HsqsInodeIpcExt {
 	uint32_t hard_link_count;
 	uint32_t xattr_idx;
 };
 STATIC_ASSERT(sizeof(struct HsqsInodeIpcExt) == HSQS_SIZEOF_INODE_IPC_EXT);
 
-struct HsqsInodeHeader {
+struct HSQS_UNALIGNED HsqsInodeHeader {
 	uint16_t type;
 	uint16_t permissions;
 	uint16_t uid_idx;
@@ -150,7 +150,7 @@ struct HsqsInodeHeader {
 };
 STATIC_ASSERT(sizeof(struct HsqsInodeHeader) == HSQS_SIZEOF_INODE_HEADER);
 
-struct HsqsInode {
+struct HSQS_UNALIGNED HsqsInode {
 	struct HsqsInodeHeader header;
 	union {
 		struct HsqsInodeDirectory directory;

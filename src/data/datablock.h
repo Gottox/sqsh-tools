@@ -39,6 +39,8 @@
 
 #define DATABLOCK_H
 
+#define HSQS_SIZEOF_DATABLOCK_SIZE 4
+
 struct HsqsDatablockSize;
 
 uint32_t

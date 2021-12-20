@@ -39,7 +39,7 @@
 
 #define DIRECTORY_INTERNAL_H
 
-struct HsqsDirectoryEntry {
+struct HSQS_UNALIGNED HsqsDirectoryEntry {
 	uint16_t offset;
 	int16_t inode_offset;
 	uint16_t type;
@@ -47,9 +47,9 @@ struct HsqsDirectoryEntry {
 	// uint8_t name[0]; // [name_size + 1]
 };
 
-STATIC_ASSERT(sizeof(struct HsqsDirectoryEntry) == HSQS_SIZEOF_DIRECTORY_ENTRY)
+STATIC_ASSERT(sizeof(struct HsqsDirectoryEntry) == HSQS_SIZEOF_DIRECTORY_ENTRY);
 
-struct HsqsDirectoryFragment {
+struct HSQS_UNALIGNED HsqsDirectoryFragment {
 	uint32_t count;
 	uint32_t start;
 	uint32_t inode_number;
@@ -57,6 +57,6 @@ struct HsqsDirectoryFragment {
 };
 
 STATIC_ASSERT(
-		sizeof(struct HsqsDirectoryFragment) == HSQS_SIZEOF_DIRECTORY_FRAGMENT)
+		sizeof(struct HsqsDirectoryFragment) == HSQS_SIZEOF_DIRECTORY_FRAGMENT);
 
 #endif /* end of include guard DIRECTORY_INTERNAL_H */

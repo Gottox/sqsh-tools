@@ -28,39 +28,53 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : superblock_internal
- * @created     : Friday Sep 10, 2021 09:25:32 CEST
+ * @file        : xattr_context
+ * @created     : Sunday Dec 19, 2021 22:13:26 CET
  */
 
+#include "../context/metablock_stream_context.h"
 #include "../utils.h"
-#include "superblock.h"
 
-#ifndef SUPERBLOCK_INTERNAL_H
+#ifndef XATTR_CONTEXT_H
 
-#define SUPERBLOCK_INTERNAL_H
+struct HsqsInodeContext;
 
-struct HSQS_UNALIGNED HsqsSuperblock {
-	uint32_t magic;
-	uint32_t inode_count;
-	uint32_t modification_time;
-	uint32_t block_size;
-	uint32_t fragment_entry_count;
-	uint16_t compression_id;
-	uint16_t block_log;
-	uint16_t flags;
-	uint16_t id_count;
-	uint16_t version_major;
-	uint16_t version_minor;
-	uint64_t root_inode_ref;
-	uint64_t bytes_used;
-	uint64_t id_table_start;
-	uint64_t xattr_id_table_start;
-	uint64_t inode_table_start;
-	uint64_t directory_table_start;
-	uint64_t fragment_table_start;
-	uint64_t export_table_start;
+struct HsqsXattrIterator {
+	struct HsqsMetablockStreamContext metablock;
+	struct HsqsMetablockStreamContext out_of_line_value;
+	struct HsqsXattrTable *context;
+	int remaining_entries;
+	hsqs_index_t next_offset;
+	hsqs_index_t key_offset;
+	hsqs_index_t value_offset;
 };
 
-STATIC_ASSERT(sizeof(struct HsqsSuperblock) == HSQS_SIZEOF_SUPERBLOCK);
+HSQS_NO_UNUSED int hsqs_xattr_iterator_init(
+		struct HsqsXattrIterator *iterator, struct HsqsXattrTable *xattr_table,
+		const struct HsqsInodeContext *inode);
 
-#endif /* end of include guard SUPERBLOCK_INTERNAL_H */
+int hsqs_xattr_iterator_next(struct HsqsXattrIterator *iterator);
+
+uint16_t hsqs_xattr_iterator_type(struct HsqsXattrIterator *iterator);
+
+bool hsqs_xattr_iterator_is_indirect(struct HsqsXattrIterator *iterator);
+
+const char *hsqs_xattr_iterator_prefix(struct HsqsXattrIterator *iterator);
+uint16_t hsqs_xattr_iterator_prefix_size(struct HsqsXattrIterator *iterator);
+const char *hsqs_xattr_iterator_name(struct HsqsXattrIterator *iterator);
+uint16_t hsqs_xattr_iterator_name_size(struct HsqsXattrIterator *iterator);
+int hsqs_xattr_iterator_fullname_dup(
+		struct HsqsXattrIterator *iterator, char **fullname_buffer);
+
+int hsqs_xattr_iterator_value_dup(
+		struct HsqsXattrIterator *iterator, char **value_buffer);
+
+const char *hsqs_xattr_iterator_value(struct HsqsXattrIterator *iterator);
+
+uint16_t hsqs_xattr_iterator_value_size(struct HsqsXattrIterator *iterator);
+
+int hsqs_xattr_iterator_cleanup(struct HsqsXattrIterator *iterator);
+
+#define XATTR_CONTEXT_H
+
+#endif /* end of include guard XATTR_CONTEXT_H */

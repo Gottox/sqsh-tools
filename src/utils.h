@@ -47,6 +47,7 @@
 #define MULT_OVERFLOW(a, b, res) __builtin_mul_overflow(a, b, res)
 
 #define HSQS_NO_UNUSED __attribute__((warn_unused_result))
+#define HSQS_UNALIGNED __attribute__((packed, aligned(1)))
 
 #define STATIC_ASSERT(cond) _Static_assert(cond, #cond)
 

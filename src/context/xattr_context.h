@@ -32,7 +32,48 @@
  * @created     : Sunday Dec 19, 2021 22:13:26 CET
  */
 
+#include "../utils.h"
+#include "metablock_stream_context.h"
+
 #ifndef XATTR_CONTEXT_H
+
+struct HsqsInodeContext;
+
+struct HsqsXattrIterator {
+	struct HsqsMetablockStreamContext metablock;
+	struct HsqsMetablockStreamContext out_of_line_value;
+	struct HsqsXattrTable *context;
+	int remaining_entries;
+	hsqs_index_t next_offset;
+	hsqs_index_t key_offset;
+	hsqs_index_t value_offset;
+};
+
+HSQS_NO_UNUSED int hsqs_xattr_iterator_init(
+		struct HsqsXattrIterator *iterator, struct HsqsXattrTable *xattr_table,
+		const struct HsqsInodeContext *inode);
+
+int hsqs_xattr_iterator_next(struct HsqsXattrIterator *iterator);
+
+uint16_t hsqs_xattr_iterator_type(struct HsqsXattrIterator *iterator);
+
+bool hsqs_xattr_iterator_is_indirect(struct HsqsXattrIterator *iterator);
+
+const char *hsqs_xattr_iterator_prefix(struct HsqsXattrIterator *iterator);
+uint16_t hsqs_xattr_iterator_prefix_size(struct HsqsXattrIterator *iterator);
+const char *hsqs_xattr_iterator_name(struct HsqsXattrIterator *iterator);
+uint16_t hsqs_xattr_iterator_name_size(struct HsqsXattrIterator *iterator);
+int hsqs_xattr_iterator_fullname_dup(
+		struct HsqsXattrIterator *iterator, char **fullname_buffer);
+
+int hsqs_xattr_iterator_value_dup(
+		struct HsqsXattrIterator *iterator, char **value_buffer);
+
+const char *hsqs_xattr_iterator_value(struct HsqsXattrIterator *iterator);
+
+uint16_t hsqs_xattr_iterator_value_size(struct HsqsXattrIterator *iterator);
+
+int hsqs_xattr_iterator_cleanup(struct HsqsXattrIterator *iterator);
 
 #define XATTR_CONTEXT_H
 

@@ -43,14 +43,12 @@
 struct HsqsInodeContext;
 struct Hsqs;
 
-struct HsqsDirectoryContext {
+struct HsqsDirectoryIterator {
 	struct HsqsInodeContext *inode;
 	uint32_t block_start;
 	uint32_t block_offset;
 	uint32_t size;
-};
 
-struct HsqsDirectoryIterator {
 	const struct HsqsDirectoryFragment *fragments;
 	struct HsqsDirectoryContext *directory;
 	struct HsqsMetablockStreamContext metablock;
@@ -60,11 +58,8 @@ struct HsqsDirectoryIterator {
 	off_t current_offset;
 };
 
-HSQS_NO_UNUSED int hsqs_directory_init(
-		struct HsqsDirectoryContext *directory, struct HsqsInodeContext *inode);
 HSQS_NO_UNUSED int hsqs_directory_iterator_init(
-		struct HsqsDirectoryIterator *iterator,
-		struct HsqsDirectoryContext *directory);
+		struct HsqsDirectoryIterator *iterator, struct HsqsInodeContext *inode);
 HSQS_NO_UNUSED int
 hsqs_directory_iterator_next(struct HsqsDirectoryIterator *iterator);
 HSQS_NO_UNUSED int hsqs_directory_iterator_lookup(
@@ -84,6 +79,4 @@ hsqs_directory_iterator_name(const struct HsqsDirectoryIterator *iterator);
 HSQS_NO_UNUSED int hsqs_directory_iterator_name_dup(
 		const struct HsqsDirectoryIterator *iterator, char **name_buffer);
 int hsqs_directory_iterator_cleanup(struct HsqsDirectoryIterator *iterator);
-
-int hsqs_directory_cleanup(struct HsqsDirectoryContext *directory);
 #endif /* end of include guard HSQS_DIRECTORY_CONTEXT_H */

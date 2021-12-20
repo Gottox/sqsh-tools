@@ -28,15 +28,15 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : xattr_context
+ * @file        : xattr_iterator
  * @created     : Sunday Dec 19, 2021 22:19:33 CET
  */
 
-#include "xattr_context.h"
+#include "xattr_iterator.h"
+#include "../context/inode_context.h"
 #include "../data/xattr_internal.h"
 #include "../error.h"
 #include "../table/xattr_table.h"
-#include "inode_context.h"
 #include <stdlib.h>
 #include <string.h>
 

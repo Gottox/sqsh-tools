@@ -39,7 +39,7 @@
 
 #define COMPRESSION_OPTIONS_INTERNAL_H
 
-struct HsqsCompressionOptionsGzip {
+struct HSQS_UNALIGNED HsqsCompressionOptionsGzip {
 	uint32_t compression_level;
 	uint16_t window_size;
 	uint16_t strategies;
@@ -48,7 +48,7 @@ STATIC_ASSERT(
 		sizeof(struct HsqsCompressionOptionsGzip) ==
 		HSQS_SIZEOF_COMPRESSION_OPTIONS_GZIP);
 
-struct HsqsCompressionOptionsXz {
+struct HSQS_UNALIGNED HsqsCompressionOptionsXz {
 	uint32_t dictionary_size;
 	uint32_t filters;
 };
@@ -56,7 +56,7 @@ STATIC_ASSERT(
 		sizeof(struct HsqsCompressionOptionsXz) ==
 		HSQS_SIZEOF_COMPRESSION_OPTIONS_XZ);
 
-struct HsqsCompressionOptionsLz4 {
+struct HSQS_UNALIGNED HsqsCompressionOptionsLz4 {
 	uint32_t version;
 	uint32_t flags;
 };
@@ -64,14 +64,14 @@ STATIC_ASSERT(
 		sizeof(struct HsqsCompressionOptionsLz4) ==
 		HSQS_SIZEOF_COMPRESSION_OPTIONS_LZ4);
 
-struct HsqsCompressionOptionsZstd {
+struct HSQS_UNALIGNED HsqsCompressionOptionsZstd {
 	uint32_t compression_level;
 };
 STATIC_ASSERT(
 		sizeof(struct HsqsCompressionOptionsZstd) ==
 		HSQS_SIZEOF_COMPRESSION_OPTIONS_ZSTD);
 
-struct HsqsCompressionOptionsLzo {
+struct HSQS_UNALIGNED HsqsCompressionOptionsLzo {
 	uint32_t algorithm;
 	uint32_t compression_level;
 };

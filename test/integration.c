@@ -36,6 +36,7 @@
 #include "../src/context/directory_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/context/superblock_context.h"
+#include "../src/context/xattr_context.h"
 #include "../src/data/superblock.h"
 #include "../src/error.h"
 #include "../src/hsqs.h"
@@ -58,7 +59,6 @@ hsqs_ls() {
 	int rv;
 	char *name;
 	struct HsqsInodeContext inode = {0};
-	struct HsqsDirectoryContext dir = {0};
 	struct HsqsDirectoryIterator iter = {0};
 	struct Hsqs hsqs = {0};
 	rv = hsqs_init(&hsqs, squash_image, sizeof(squash_image));
@@ -67,10 +67,7 @@ hsqs_ls() {
 	rv = hsqs_inode_load_root(&inode, &hsqs);
 	assert(rv == 0);
 
-	rv = hsqs_directory_init(&dir, &inode);
-	assert(rv == 0);
-
-	rv = hsqs_directory_iterator_init(&iter, &dir);
+	rv = hsqs_directory_iterator_init(&iter, &inode);
 	assert(rv == 0);
 
 	rv = hsqs_directory_iterator_next(&iter);
@@ -92,9 +89,6 @@ hsqs_ls() {
 	assert(rv == 0);
 
 	rv = hsqs_directory_iterator_cleanup(&iter);
-	assert(rv == 0);
-
-	rv = hsqs_directory_cleanup(&dir);
 	assert(rv == 0);
 
 	rv = hsqs_inode_cleanup(&inode);
@@ -249,9 +243,8 @@ hsqs_test_xattr() {
 	char *name, *value;
 	struct HsqsInodeContext inode = {0};
 	struct HsqsInodeContext entry_inode = {0};
-	struct HsqsDirectoryContext dir = {0};
 	struct HsqsDirectoryIterator dir_iter = {0};
-	struct HsqsXattrTableIterator xattr_iter = {0};
+	struct HsqsXattrIterator xattr_iter = {0};
 	struct Hsqs hsqs = {0};
 	rv = hsqs_init(&hsqs, squash_image, sizeof(squash_image));
 	assert(rv == 0);
@@ -261,15 +254,12 @@ hsqs_test_xattr() {
 
 	rv = hsqs_inode_xattr_iterator(&inode, &xattr_iter);
 	assert(rv == 0);
-	rv = hsqs_xattr_table_iterator_next(&xattr_iter);
+	rv = hsqs_xattr_iterator_next(&xattr_iter);
 	assert(rv == 0);
-	rv = hsqs_xattr_table_iterator_cleanup(&xattr_iter);
-	assert(rv == 0);
-
-	rv = hsqs_directory_init(&dir, &inode);
+	rv = hsqs_xattr_iterator_cleanup(&xattr_iter);
 	assert(rv == 0);
 
-	rv = hsqs_directory_iterator_init(&dir_iter, &dir);
+	rv = hsqs_directory_iterator_init(&dir_iter, &inode);
 	assert(rv == 0);
 
 	rv = hsqs_directory_iterator_next(&dir_iter);
@@ -282,20 +272,20 @@ hsqs_test_xattr() {
 	assert(rv == 0);
 	rv = hsqs_inode_xattr_iterator(&entry_inode, &xattr_iter);
 	assert(rv == 0);
-	rv = hsqs_xattr_table_iterator_next(&xattr_iter);
+	rv = hsqs_xattr_iterator_next(&xattr_iter);
 	assert(rv > 0);
-	assert(hsqs_xattr_table_iterator_is_indirect(&xattr_iter) == false);
-	rv = hsqs_xattr_table_iterator_fullname_dup(&xattr_iter, &name);
+	assert(hsqs_xattr_iterator_is_indirect(&xattr_iter) == false);
+	rv = hsqs_xattr_iterator_fullname_dup(&xattr_iter, &name);
 	assert(rv == 8);
 	assert(strcmp("user.foo", name) == 0);
 	free(name);
-	rv = hsqs_xattr_table_iterator_value_dup(&xattr_iter, &value);
+	rv = hsqs_xattr_iterator_value_dup(&xattr_iter, &value);
 	assert(rv == (int)strlen(expected_value));
 	assert(strcmp(expected_value, value) == 0);
 	free(value);
-	rv = hsqs_xattr_table_iterator_next(&xattr_iter);
+	rv = hsqs_xattr_iterator_next(&xattr_iter);
 	assert(rv == 0);
-	rv = hsqs_xattr_table_iterator_cleanup(&xattr_iter);
+	rv = hsqs_xattr_iterator_cleanup(&xattr_iter);
 	assert(rv == 0);
 	rv = hsqs_inode_cleanup(&entry_inode);
 	assert(rv == 0);
@@ -310,20 +300,20 @@ hsqs_test_xattr() {
 	assert(rv == 0);
 	rv = hsqs_inode_xattr_iterator(&entry_inode, &xattr_iter);
 	assert(rv == 0);
-	rv = hsqs_xattr_table_iterator_next(&xattr_iter);
+	rv = hsqs_xattr_iterator_next(&xattr_iter);
 	assert(rv > 0);
-	assert(hsqs_xattr_table_iterator_is_indirect(&xattr_iter) == true);
-	rv = hsqs_xattr_table_iterator_fullname_dup(&xattr_iter, &name);
+	assert(hsqs_xattr_iterator_is_indirect(&xattr_iter) == true);
+	rv = hsqs_xattr_iterator_fullname_dup(&xattr_iter, &name);
 	assert(rv == 8);
 	assert(strcmp("user.bar", name) == 0);
 	free(name);
-	rv = hsqs_xattr_table_iterator_value_dup(&xattr_iter, &value);
+	rv = hsqs_xattr_iterator_value_dup(&xattr_iter, &value);
 	assert(rv == (int)strlen(expected_value));
 	assert(strcmp(expected_value, value) == 0);
 	free(value);
-	rv = hsqs_xattr_table_iterator_next(&xattr_iter);
+	rv = hsqs_xattr_iterator_next(&xattr_iter);
 	assert(rv == 0);
-	rv = hsqs_xattr_table_iterator_cleanup(&xattr_iter);
+	rv = hsqs_xattr_iterator_cleanup(&xattr_iter);
 	assert(rv == 0);
 	rv = hsqs_inode_cleanup(&entry_inode);
 	assert(rv == 0);
@@ -333,9 +323,6 @@ hsqs_test_xattr() {
 	assert(rv == 0);
 
 	rv = hsqs_directory_iterator_cleanup(&dir_iter);
-	assert(rv == 0);
-
-	rv = hsqs_directory_cleanup(&dir);
 	assert(rv == 0);
 
 	rv = hsqs_inode_cleanup(&inode);

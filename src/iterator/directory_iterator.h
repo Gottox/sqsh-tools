@@ -28,39 +28,56 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : superblock_internal
- * @created     : Friday Sep 10, 2021 09:25:32 CEST
+ * @file        : directory
+ * @created     : Friday May 07, 2021 06:56:03 CEST
  */
 
+#include "../context/inode_context.h"
+#include "../context/metablock_stream_context.h"
 #include "../utils.h"
-#include "superblock.h"
+#include <stdint.h>
 
-#ifndef SUPERBLOCK_INTERNAL_H
+#ifndef HSQS_DIRECTORY_CONTEXT_H
 
-#define SUPERBLOCK_INTERNAL_H
+#define HSQS_DIRECTORY_CONTEXT_H
 
-struct HSQS_UNALIGNED HsqsSuperblock {
-	uint32_t magic;
-	uint32_t inode_count;
-	uint32_t modification_time;
-	uint32_t block_size;
-	uint32_t fragment_entry_count;
-	uint16_t compression_id;
-	uint16_t block_log;
-	uint16_t flags;
-	uint16_t id_count;
-	uint16_t version_major;
-	uint16_t version_minor;
-	uint64_t root_inode_ref;
-	uint64_t bytes_used;
-	uint64_t id_table_start;
-	uint64_t xattr_id_table_start;
-	uint64_t inode_table_start;
-	uint64_t directory_table_start;
-	uint64_t fragment_table_start;
-	uint64_t export_table_start;
+struct HsqsInodeContext;
+struct Hsqs;
+
+struct HsqsDirectoryIterator {
+	struct HsqsInodeContext *inode;
+	uint32_t block_start;
+	uint32_t block_offset;
+	uint32_t size;
+
+	const struct HsqsDirectoryFragment *fragments;
+	struct HsqsDirectoryContext *directory;
+	struct HsqsMetablockStreamContext metablock;
+	size_t remaining_entries;
+	hsqs_index_t current_fragment_offset;
+	hsqs_index_t next_offset;
+	hsqs_index_t current_offset;
 };
 
-STATIC_ASSERT(sizeof(struct HsqsSuperblock) == HSQS_SIZEOF_SUPERBLOCK);
-
-#endif /* end of include guard SUPERBLOCK_INTERNAL_H */
+HSQS_NO_UNUSED int hsqs_directory_iterator_init(
+		struct HsqsDirectoryIterator *iterator, struct HsqsInodeContext *inode);
+HSQS_NO_UNUSED int
+hsqs_directory_iterator_next(struct HsqsDirectoryIterator *iterator);
+HSQS_NO_UNUSED int hsqs_directory_iterator_lookup(
+		struct HsqsDirectoryIterator *iterator, const char *name,
+		const size_t name_len);
+int
+hsqs_directory_iterator_name_size(const struct HsqsDirectoryIterator *iterator);
+uint64_t
+hsqs_directory_iterator_inode_ref(const struct HsqsDirectoryIterator *iterator);
+enum HsqsInodeContextType hsqs_directory_iterator_inode_type(
+		const struct HsqsDirectoryIterator *iterator);
+HSQS_NO_UNUSED int hsqs_directory_iterator_inode_load(
+		const struct HsqsDirectoryIterator *iterator,
+		struct HsqsInodeContext *inode);
+const char *
+hsqs_directory_iterator_name(const struct HsqsDirectoryIterator *iterator);
+HSQS_NO_UNUSED int hsqs_directory_iterator_name_dup(
+		const struct HsqsDirectoryIterator *iterator, char **name_buffer);
+int hsqs_directory_iterator_cleanup(struct HsqsDirectoryIterator *iterator);
+#endif /* end of include guard HSQS_DIRECTORY_CONTEXT_H */

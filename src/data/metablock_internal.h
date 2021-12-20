@@ -38,7 +38,7 @@
 
 #define METABLOCK_INTERNAL_H
 
-struct HsqsMetablock {
+struct HSQS_UNALIGNED HsqsMetablock {
 	uint16_t header;
 	// uint8_t data[0];
 };

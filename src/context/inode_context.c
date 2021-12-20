@@ -35,6 +35,7 @@
 #include "inode_context.h"
 #include "../data/datablock_internal.h"
 #include "../data/inode.h"
+#include "xattr_context.h"
 
 #include "../error.h"
 #include "../hsqs.h"
@@ -79,18 +80,13 @@ path_find_inode_ref(
 		uint64_t *target, uint64_t dir_ref, struct Hsqs *hsqs, const char *name,
 		const size_t name_len) {
 	struct HsqsInodeContext inode = {0};
-	struct HsqsDirectoryContext dir = {0};
 	struct HsqsDirectoryIterator iter = {0};
 	int rv = 0;
 	rv = hsqs_inode_load_by_ref(&inode, hsqs, dir_ref);
 	if (rv < 0) {
 		goto out;
 	}
-	rv = hsqs_directory_init(&dir, &inode);
-	if (rv < 0) {
-		goto out;
-	}
-	rv = hsqs_directory_iterator_init(&iter, &dir);
+	rv = hsqs_directory_iterator_init(&iter, &inode);
 	if (rv < 0) {
 		goto out;
 	}
@@ -103,7 +99,6 @@ path_find_inode_ref(
 
 out:
 	hsqs_directory_iterator_cleanup(&iter);
-	hsqs_directory_cleanup(&dir);
 	hsqs_inode_cleanup(&inode);
 	return rv;
 }
@@ -598,7 +593,7 @@ hsqs_inode_xattr_index(const struct HsqsInodeContext *inode) {
 int
 hsqs_inode_xattr_iterator(
 		const struct HsqsInodeContext *inode,
-		struct HsqsXattrTableIterator *iterator) {
+		struct HsqsXattrIterator *iterator) {
 	int rv = 0;
 	struct HsqsXattrTable *table;
 
@@ -606,7 +601,7 @@ hsqs_inode_xattr_iterator(
 	if (rv < 0) {
 		return rv;
 	}
-	return hsqs_xattr_table_iterator_init(iterator, table, inode);
+	return hsqs_xattr_iterator_init(iterator, table, inode);
 }
 
 int

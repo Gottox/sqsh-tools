@@ -53,8 +53,8 @@ HSQS_NO_UNUSED int
 hsqs_fragment_table_init(struct HsqsFragmentTable *context, struct Hsqs *hsqs);
 
 HSQS_NO_UNUSED int hsqs_fragment_table_to_buffer(
-		struct HsqsFragmentTable *context, const struct HsqsInodeContext *inode,
-		struct HsqsBuffer *buffer);
+		const struct HsqsFragmentTable *context,
+		const struct HsqsInodeContext *inode, struct HsqsBuffer *buffer);
 
 int hsqs_fragment_table_cleanup(struct HsqsFragmentTable *context);
 

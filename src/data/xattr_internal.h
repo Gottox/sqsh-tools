@@ -40,20 +40,20 @@
 
 #define HSQS_XATTR_INTERNAL_H
 
-struct HsqsXattrKey {
+struct HSQS_UNALIGNED HsqsXattrKey {
 	uint16_t type;
 	uint16_t name_size;
 	// uint8_t name[0]; // [name_size - strlen(prefix)];
 };
 STATIC_ASSERT(sizeof(struct HsqsXattrKey) == HSQS_SIZEOF_XATTR_KEY);
 
-struct HsqsXattrValue {
+struct HSQS_UNALIGNED HsqsXattrValue {
 	uint32_t value_size;
 	// uint8_t value[0]; // [value_size]
 };
 STATIC_ASSERT(sizeof(struct HsqsXattrValue) == HSQS_SIZEOF_XATTR_VALUE);
 
-struct HsqsXattrLookupTable {
+struct HSQS_UNALIGNED HsqsXattrLookupTable {
 	uint64_t xattr_ref;
 	uint32_t count;
 	uint32_t size;
@@ -61,7 +61,7 @@ struct HsqsXattrLookupTable {
 STATIC_ASSERT(
 		sizeof(struct HsqsXattrLookupTable) == HSQS_SIZEOF_XATTR_LOOKUP_TABLE);
 
-struct HsqsXattrIdTable {
+struct HSQS_UNALIGNED HsqsXattrIdTable {
 	uint64_t xattr_table_start;
 	uint32_t xattr_ids;
 	uint32_t _unused;

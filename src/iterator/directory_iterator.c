@@ -32,13 +32,13 @@
  * @created     : Saturday May 08, 2021 20:14:25 CEST
  */
 
-#include "directory_context.h"
+#include "directory_iterator.h"
+#include "../context/inode_context.h"
 #include "../data/directory.h"
 #include "../data/inode.h"
 #include "../data/metablock.h"
 #include "../error.h"
 #include "../hsqs.h"
-#include "inode_context.h"
 
 #include <string.h>
 

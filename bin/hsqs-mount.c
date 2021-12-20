@@ -43,6 +43,7 @@
 #include "../src/context/content_context.h"
 #include "../src/context/directory_context.h"
 #include "../src/context/inode_context.h"
+#include "../src/context/xattr_context.h"
 #include "../src/hsqs.h"
 
 static struct { struct Hsqs hsqs; } data = {0};
@@ -150,7 +151,7 @@ hsqsfuse_getxattr(
 	const char *value_ptr = NULL;
 	size_t value_size;
 	struct HsqsInodeContext inode = {0};
-	struct HsqsXattrTableIterator iter = {0};
+	struct HsqsXattrIterator iter = {0};
 
 	rv = hsqs_inode_load_by_path(&inode, &data.hsqs, path);
 	if (rv < 0) {
@@ -164,17 +165,16 @@ hsqsfuse_getxattr(
 		goto out;
 	}
 
-	while (value_ptr == NULL &&
-		   (rv = hsqs_xattr_table_iterator_next(&iter)) > 0) {
-		rv = hsqs_xattr_table_iterator_fullname_dup(&iter, &fullname);
+	while (value_ptr == NULL && (rv = hsqs_xattr_iterator_next(&iter)) > 0) {
+		rv = hsqs_xattr_iterator_fullname_dup(&iter, &fullname);
 		if (rv < 0) {
 			rv = -EINVAL; // TODO: find correct error code for this.
 			goto out;
 		}
 
 		if (strcmp(fullname, name) == 0) {
-			value_ptr = hsqs_xattr_table_iterator_value(&iter);
-			value_size = hsqs_xattr_table_iterator_value_size(&iter);
+			value_ptr = hsqs_xattr_iterator_value(&iter);
+			value_size = hsqs_xattr_iterator_value_size(&iter);
 		}
 		free(fullname);
 	}
@@ -185,7 +185,7 @@ hsqsfuse_getxattr(
 		rv = -ENODATA;
 		goto out;
 	} else if (value_size <= size) {
-		value_ptr = hsqs_xattr_table_iterator_value(&iter);
+		value_ptr = hsqs_xattr_iterator_value(&iter);
 		memcpy(value, value_ptr, value_size);
 	} else if (size != 0) {
 		rv = -ERANGE;
@@ -194,7 +194,7 @@ hsqsfuse_getxattr(
 
 	rv = value_size;
 out:
-	hsqs_xattr_table_iterator_cleanup(&iter);
+	hsqs_xattr_iterator_cleanup(&iter);
 	hsqs_inode_cleanup(&inode);
 	return rv;
 }
@@ -205,7 +205,7 @@ hsqsfuse_listxattr(const char *path, char *list, size_t size) {
 	const char *prefix, *name;
 	char *p;
 	struct HsqsInodeContext inode = {0};
-	struct HsqsXattrTableIterator iter = {0};
+	struct HsqsXattrIterator iter = {0};
 	rv = hsqs_inode_load_by_path(&inode, &data.hsqs, path);
 	if (rv < 0) {
 		rv = -ENOENT;
@@ -220,25 +220,25 @@ hsqsfuse_listxattr(const char *path, char *list, size_t size) {
 
 	p = list;
 	length = 0;
-	while ((rv = hsqs_xattr_table_iterator_next(&iter)) > 0) {
-		prefix = hsqs_xattr_table_iterator_prefix(&iter);
+	while ((rv = hsqs_xattr_iterator_next(&iter)) > 0) {
+		prefix = hsqs_xattr_iterator_prefix(&iter);
 		if (prefix == NULL) {
 			rv = -EINVAL; // TODO: find correct error code for this.
 			goto out;
 		}
-		element_length = hsqs_xattr_table_iterator_prefix_size(&iter);
+		element_length = hsqs_xattr_iterator_prefix_size(&iter);
 		length += element_length;
 		if (length < size) {
 			strcpy(p, prefix);
 			p = &list[length];
 		}
 
-		name = hsqs_xattr_table_iterator_name(&iter);
+		name = hsqs_xattr_iterator_name(&iter);
 		if (name == NULL) {
 			rv = -EINVAL; // TODO: find correct error code for this.
 			goto out;
 		}
-		element_length = hsqs_xattr_table_iterator_name_size(&iter);
+		element_length = hsqs_xattr_iterator_name_size(&iter);
 		length += element_length;
 		if (length + 1 < size) {
 			strcpy(p, name);
@@ -255,7 +255,7 @@ hsqsfuse_listxattr(const char *path, char *list, size_t size) {
 	rv = length;
 
 out:
-	hsqs_xattr_table_iterator_cleanup(&iter);
+	hsqs_xattr_iterator_cleanup(&iter);
 	hsqs_inode_cleanup(&inode);
 	return rv;
 }
@@ -269,19 +269,13 @@ hsqsfuse_readdir(
 	(void)flags; // TODO
 	int rv = 0;
 	struct HsqsInodeContext inode = {0};
-	struct HsqsDirectoryContext dir = {0};
 	struct HsqsDirectoryIterator iter = {0};
 	rv = hsqs_inode_load_by_path(&inode, &data.hsqs, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
 	}
-	rv = hsqs_directory_init(&dir, &inode);
-	if (rv < 0) {
-		rv = -ENOMEM;
-		goto out;
-	}
-	rv = hsqs_directory_iterator_init(&iter, &dir);
+	rv = hsqs_directory_iterator_init(&iter, &inode);
 	if (rv < 0) {
 		rv = -ENOMEM;
 		goto out;
@@ -307,7 +301,6 @@ hsqsfuse_readdir(
 
 out:
 	hsqs_directory_iterator_cleanup(&iter);
-	hsqs_directory_cleanup(&dir);
 	hsqs_inode_cleanup(&inode);
 	return rv;
 }

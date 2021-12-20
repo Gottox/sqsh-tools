@@ -35,6 +35,7 @@
 #include "xattr_internal.h"
 #include <endian.h>
 #include <stdint.h>
+#include <string.h>
 
 uint16_t
 hsqs_data_xattr_key_type(const struct HsqsXattrKey *xattr_key) {
@@ -60,8 +61,10 @@ hsqs_data_xattr_value(const struct HsqsXattrValue *xattr_value) {
 }
 uint64_t
 hsqs_data_xattr_value_ref(const struct HsqsXattrValue *xattr_value) {
-	const uint64_t *ref = (const uint64_t *)hsqs_data_xattr_value(xattr_value);
-	return le64toh(*ref);
+	uint64_t ref = 0;
+
+	memcpy(&ref, hsqs_data_xattr_value(xattr_value), sizeof(uint64_t));
+	return le64toh(ref);
 }
 
 uint64_t

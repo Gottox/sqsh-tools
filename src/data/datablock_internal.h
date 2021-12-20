@@ -33,13 +33,15 @@
  */
 
 #include "datablock.h"
+#include "utils.h"
 
 #ifndef DATABLOCK_INTERNAL_H
 
 #define DATABLOCK_INTERNAL_H
 
-struct HsqsDatablockSize {
+struct HSQS_UNALIGNED HsqsDatablockSize {
 	uint32_t size;
 };
+STATIC_ASSERT(sizeof(struct HsqsDatablockSize) == HSQS_SIZEOF_DATABLOCK_SIZE);
 
 #endif /* end of include guard DATABLOCK_INTERNAL_H */

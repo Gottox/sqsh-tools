@@ -53,53 +53,10 @@ struct HsqsXattrTable {
 	struct HsqsTable table;
 };
 
-struct HsqsXattrTableIterator {
-	struct HsqsMetablockStreamContext metablock;
-	struct HsqsMetablockStreamContext out_of_line_value;
-	struct HsqsXattrTable *context;
-	int remaining_entries;
-	off_t next_offset;
-	off_t key_offset;
-	off_t value_offset;
-};
-
 HSQS_NO_UNUSED int
 hsqs_xattr_table_init(struct HsqsXattrTable *context, struct Hsqs *hsqs);
 
-HSQS_NO_UNUSED int hsqs_xattr_table_iterator_init(
-		struct HsqsXattrTableIterator *iterator,
-		struct HsqsXattrTable *xattr_table,
-		const struct HsqsInodeContext *inode);
-
-int hsqs_xattr_table_iterator_next(struct HsqsXattrTableIterator *iterator);
-
-uint16_t
-hsqs_xattr_table_iterator_type(struct HsqsXattrTableIterator *iterator);
-
-bool
-hsqs_xattr_table_iterator_is_indirect(struct HsqsXattrTableIterator *iterator);
-
-const char *
-hsqs_xattr_table_iterator_prefix(struct HsqsXattrTableIterator *iterator);
-uint16_t
-hsqs_xattr_table_iterator_prefix_size(struct HsqsXattrTableIterator *iterator);
-const char *
-hsqs_xattr_table_iterator_name(struct HsqsXattrTableIterator *iterator);
-uint16_t
-hsqs_xattr_table_iterator_name_size(struct HsqsXattrTableIterator *iterator);
-int hsqs_xattr_table_iterator_fullname_dup(
-		struct HsqsXattrTableIterator *iterator, char **fullname_buffer);
-
-int hsqs_xattr_table_iterator_value_dup(
-		struct HsqsXattrTableIterator *iterator, char **value_buffer);
-
-const char *
-hsqs_xattr_table_iterator_value(struct HsqsXattrTableIterator *iterator);
-
-uint16_t
-hsqs_xattr_table_iterator_value_size(struct HsqsXattrTableIterator *iterator);
-
-int hsqs_xattr_table_iterator_cleanup(struct HsqsXattrTableIterator *iterator);
+uint64_t hsqs_xattr_table_start(struct HsqsXattrTable *table);
 
 int hsqs_xattr_table_cleanup(struct HsqsXattrTable *context);
 

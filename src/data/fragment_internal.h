@@ -40,7 +40,7 @@
 
 #define FRAGMENT_INTERNAL_H
 
-struct HsqsFragment {
+struct HSQS_UNALIGNED HsqsFragment {
 	uint64_t start;
 	struct HsqsDatablockSize size;
 	uint32_t unused;
