@@ -142,7 +142,7 @@ hsqs_metablock_stream_more(
 }
 
 const uint8_t *
-hsqs_metablock_stream_data(struct HsqsMetablockStreamContext *context) {
+hsqs_metablock_stream_data(const struct HsqsMetablockStreamContext *context) {
 	if (hsqs_metablock_stream_size(context) > 0) {
 		return &hsqs_buffer_data(&context->buffer)[context->buffer_offset];
 	} else {
@@ -151,7 +151,7 @@ hsqs_metablock_stream_data(struct HsqsMetablockStreamContext *context) {
 }
 
 size_t
-hsqs_metablock_stream_size(struct HsqsMetablockStreamContext *context) {
+hsqs_metablock_stream_size(const struct HsqsMetablockStreamContext *context) {
 	size_t buffer_size = hsqs_buffer_size(&context->buffer);
 
 	if (buffer_size > context->buffer_offset) {

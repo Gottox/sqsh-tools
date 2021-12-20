@@ -39,6 +39,7 @@
 #include "../data/metablock.h"
 #include "../error.h"
 #include "../hsqs.h"
+#include "directory_index_iterator.h"
 
 #include <string.h>
 
@@ -50,7 +51,7 @@ directory_iterator_index_lookup(
 	struct HsqsInodeDirectoryIndexIterator index_iterator;
 	struct HsqsInodeContext *inode = iterator->inode;
 
-	rv = hsqs_inode_directory_iterator_init(&index_iterator, inode);
+	rv = hsqs_inode_directory_index_iterator_init(&index_iterator, inode);
 	if (rv < 0) {
 		return 0;
 	}
@@ -129,27 +130,13 @@ hsqs_directory_iterator_init(
 	int rv = 0;
 	struct Hsqs *hsqs = inode->hsqs;
 	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
-	const struct HsqsInodeDirectory *basic = NULL;
-	const struct HsqsInodeDirectoryExt *extended = NULL;
 
-	switch (hsqs_data_inode_type(inode->inode)) {
-	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
-		basic = hsqs_data_inode_directory(inode->inode);
-		iterator->block_start = hsqs_data_inode_directory_block_start(basic);
-		iterator->block_offset = hsqs_data_inode_directory_block_offset(basic);
-		iterator->size = hsqs_data_inode_directory_file_size(basic) - 3;
-		break;
-	case HSQS_INODE_TYPE_EXTENDED_DIRECTORY:
-		extended = hsqs_data_inode_directory_ext(inode->inode);
-		iterator->block_start =
-				hsqs_data_inode_directory_ext_block_start(extended);
-		iterator->block_offset =
-				hsqs_data_inode_directory_ext_block_offset(extended);
-		iterator->size = hsqs_data_inode_directory_ext_file_size(extended) - 3;
-		break;
-	default:
+	if (hsqs_inode_type(inode) != HSQS_INODE_TYPE_DIRECTORY) {
 		return -HSQS_ERROR_NOT_A_DIRECTORY;
 	}
+	iterator->block_start = hsqs_inode_directory_block_start(inode);
+	iterator->block_offset = hsqs_inode_directory_block_offset(inode);
+	iterator->size = hsqs_inode_file_size(inode) - 3;
 	iterator->inode = inode;
 
 	rv = hsqs_metablock_stream_init(

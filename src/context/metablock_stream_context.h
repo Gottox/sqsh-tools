@@ -62,9 +62,9 @@ HSQS_NO_UNUSED int hsqs_metablock_stream_more(
 		struct HsqsMetablockStreamContext *context, uint64_t size);
 
 const uint8_t *
-hsqs_metablock_stream_data(struct HsqsMetablockStreamContext *context);
+hsqs_metablock_stream_data(const struct HsqsMetablockStreamContext *context);
 
-size_t hsqs_metablock_stream_size(struct HsqsMetablockStreamContext *context);
+size_t hsqs_metablock_stream_size(const struct HsqsMetablockStreamContext *context);
 
 int hsqs_metablock_stream_cleanup(struct HsqsMetablockStreamContext *context);
 

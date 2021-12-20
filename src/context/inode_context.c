@@ -103,11 +103,10 @@ out:
 	return rv;
 }
 
-static const struct HsqsInodeDirectoryIndex *
-current_directory_index(struct HsqsInodeDirectoryIndexIterator *iterator) {
-	const uint8_t *tmp = (const uint8_t *)iterator->inode->inode;
-	return (const struct HsqsInodeDirectoryIndex
-					*)&tmp[iterator->current_offset];
+static const struct HsqsInode *
+get_inode(const struct HsqsInodeContext *inode) {
+	return (const struct HsqsInode *)hsqs_metablock_stream_data(
+			&inode->metablock);
 }
 
 static int
@@ -117,17 +116,16 @@ inode_data_more(struct HsqsInodeContext *inode, size_t size) {
 	if (rv < 0) {
 		return rv;
 	}
-	inode->inode =
-			(struct HsqsInode *)hsqs_metablock_stream_data(&inode->metablock);
 	return rv;
 }
 
 static int
-inode_load(struct HsqsInodeContext *inode) {
+inode_load(struct HsqsInodeContext *context) {
 	int rv = 0;
 	size_t size = HSQS_SIZEOF_INODE_HEADER;
 
-	switch (hsqs_data_inode_type(inode->inode)) {
+	const struct HsqsInode *inode = get_inode(context);
+	switch (hsqs_data_inode_type(inode)) {
 	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
 		size += HSQS_SIZEOF_INODE_DIRECTORY;
 		break;
@@ -163,269 +161,26 @@ inode_load(struct HsqsInodeContext *inode) {
 		size += HSQS_SIZEOF_INODE_IPC_EXT;
 		break;
 	}
-	rv = inode_data_more(inode, size);
+	rv = inode_data_more(context, size);
 	return rv;
 }
 
-uint32_t
-hsqs_inode_hard_link_count(const struct HsqsInodeContext *inode) {
-	struct HsqsInode *wrap = inode->inode;
-	switch (hsqs_data_inode_type(wrap)) {
-	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
-		return hsqs_data_inode_directory_hard_link_count(
-				hsqs_data_inode_directory(wrap));
-	case HSQS_INODE_TYPE_BASIC_FILE:
-		return 1;
-	case HSQS_INODE_TYPE_BASIC_SYMLINK:
-		return hsqs_data_inode_symlink_hard_link_count(
-				hsqs_data_inode_symlink(wrap));
-	case HSQS_INODE_TYPE_BASIC_BLOCK:
-	case HSQS_INODE_TYPE_BASIC_CHAR:
-		return hsqs_data_inode_device_hard_link_count(
-				hsqs_data_inode_device(wrap));
-	case HSQS_INODE_TYPE_BASIC_FIFO:
-	case HSQS_INODE_TYPE_BASIC_SOCKET:
-		return hsqs_data_inode_ipc_hard_link_count(hsqs_data_inode_ipc(wrap));
-
-	case HSQS_INODE_TYPE_EXTENDED_DIRECTORY:
-		return hsqs_data_inode_directory_ext_hard_link_count(
-				hsqs_data_inode_directory_ext(wrap));
-	case HSQS_INODE_TYPE_EXTENDED_FILE:
-		return hsqs_data_inode_file_ext_hard_link_count(
-				hsqs_data_inode_file_ext(wrap));
-	case HSQS_INODE_TYPE_EXTENDED_SYMLINK:
-		return hsqs_data_inode_symlink_ext_hard_link_count(
-				hsqs_data_inode_symlink_ext(wrap));
-	case HSQS_INODE_TYPE_EXTENDED_BLOCK:
-	case HSQS_INODE_TYPE_EXTENDED_CHAR:
-		return hsqs_data_inode_device_ext_hard_link_count(
-				hsqs_data_inode_device_ext(wrap));
-	case HSQS_INODE_TYPE_EXTENDED_FIFO:
-	case HSQS_INODE_TYPE_EXTENDED_SOCKET:
-		return hsqs_data_inode_ipc_ext_hard_link_count(
-				hsqs_data_inode_ipc_ext(wrap));
-	}
-	return -HSQS_ERROR_UNKOWN_INODE_TYPE;
-}
-
-uint64_t
-hsqs_inode_file_size(const struct HsqsInodeContext *inode) {
-	const struct HsqsInodeFile *basic_file;
-	const struct HsqsInodeFileExt *extended_file;
-	const struct HsqsInodeDirectory *basic_dir;
-	const struct HsqsInodeDirectoryExt *extended_dir;
-
-	switch (hsqs_data_inode_type(inode->inode)) {
-	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
-		basic_dir = hsqs_data_inode_directory(inode->inode);
-		return hsqs_data_inode_directory_file_size(basic_dir);
-	case HSQS_INODE_TYPE_EXTENDED_DIRECTORY:
-		extended_dir = hsqs_data_inode_directory_ext(inode->inode);
-		return hsqs_data_inode_directory_ext_file_size(extended_dir);
-	case HSQS_INODE_TYPE_BASIC_FILE:
-		basic_file = hsqs_data_inode_file(inode->inode);
-		return hsqs_data_inode_file_size(basic_file);
-	case HSQS_INODE_TYPE_EXTENDED_FILE:
-		extended_file = hsqs_data_inode_file_ext(inode->inode);
-		return hsqs_data_inode_file_ext_size(extended_file);
-	}
-	return 0;
-}
-
-uint16_t
-hsqs_inode_permission(const struct HsqsInodeContext *inode) {
-	return hsqs_data_inode_permissions(inode->inode);
-}
-
-uint32_t
-hsqs_inode_number(const struct HsqsInodeContext *inode) {
-	return hsqs_data_inode_number(inode->inode);
-}
-
-uint32_t
-hsqs_inode_modified_time(const struct HsqsInodeContext *inode) {
-	return hsqs_data_inode_modified_time(inode->inode);
-}
-
-uint64_t
-hsqs_inode_file_blocks_start(const struct HsqsInodeContext *inode) {
-	const struct HsqsInodeFile *basic_file;
-	const struct HsqsInodeFileExt *extended_file;
-
-	switch (hsqs_data_inode_type(inode->inode)) {
-	case HSQS_INODE_TYPE_BASIC_FILE:
-		basic_file = hsqs_data_inode_file(inode->inode);
-		return hsqs_data_inode_file_blocks_start(basic_file);
-	case HSQS_INODE_TYPE_EXTENDED_FILE:
-		extended_file = hsqs_data_inode_file_ext(inode->inode);
-		return hsqs_data_inode_file_ext_blocks_start(extended_file);
-	}
-	// Should never happen
-	abort();
-	return 0;
-}
-
 static const struct HsqsDatablockSize *
-get_size_info(const struct HsqsInodeContext *inode, int index) {
+get_size_info(const struct HsqsInodeContext *context, int index) {
 	const struct HsqsInodeFile *basic_file;
 	const struct HsqsInodeFileExt *extended_file;
 
-	switch (hsqs_data_inode_type(inode->inode)) {
+	const struct HsqsInode *inode = get_inode(context);
+	switch (hsqs_data_inode_type(inode)) {
 	case HSQS_INODE_TYPE_BASIC_FILE:
-		basic_file = hsqs_data_inode_file(inode->inode);
+		basic_file = hsqs_data_inode_file(inode);
 		return &hsqs_data_inode_file_block_sizes(basic_file)[index];
 	case HSQS_INODE_TYPE_EXTENDED_FILE:
-		extended_file = hsqs_data_inode_file_ext(inode->inode);
+		extended_file = hsqs_data_inode_file_ext(inode);
 		return &hsqs_data_inode_file_ext_block_sizes(extended_file)[index];
 	}
 	// Should never happen
 	abort();
-}
-
-uint32_t
-hsqs_inode_file_block_size(
-		const struct HsqsInodeContext *inode, uint32_t index) {
-	const struct HsqsDatablockSize *size_info = get_size_info(inode, index);
-
-	return hsqs_data_datablock_size(size_info);
-}
-
-bool
-hsqs_inode_file_block_is_compressed(
-		const struct HsqsInodeContext *inode, int index) {
-	const struct HsqsDatablockSize *size_info = get_size_info(inode, index);
-
-	return hsqs_data_datablock_is_compressed(size_info);
-}
-
-uint32_t
-hsqs_inode_file_fragment_block_index(const struct HsqsInodeContext *inode) {
-	const struct HsqsInodeFile *basic_file;
-	const struct HsqsInodeFileExt *extended_file;
-
-	switch (hsqs_data_inode_type(inode->inode)) {
-	case HSQS_INODE_TYPE_BASIC_FILE:
-		basic_file = hsqs_data_inode_file(inode->inode);
-		return hsqs_data_inode_file_fragment_block_index(basic_file);
-	case HSQS_INODE_TYPE_EXTENDED_FILE:
-		extended_file = hsqs_data_inode_file_ext(inode->inode);
-		return hsqs_data_inode_file_ext_fragment_block_index(extended_file);
-	}
-	return HSQS_INODE_NO_FRAGMENT;
-}
-
-uint32_t
-hsqs_inode_file_fragment_block_offset(const struct HsqsInodeContext *inode) {
-	const struct HsqsInodeFile *basic_file;
-	const struct HsqsInodeFileExt *extended_file;
-
-	switch (hsqs_data_inode_type(inode->inode)) {
-	case HSQS_INODE_TYPE_BASIC_FILE:
-		basic_file = hsqs_data_inode_file(inode->inode);
-		return hsqs_data_inode_file_block_offset(basic_file);
-	case HSQS_INODE_TYPE_EXTENDED_FILE:
-		extended_file = hsqs_data_inode_file_ext(inode->inode);
-		return hsqs_data_inode_file_ext_block_offset(extended_file);
-	}
-	return HSQS_INODE_NO_FRAGMENT;
-}
-
-bool
-hsqs_inode_file_has_fragment(const struct HsqsInodeContext *inode) {
-	return hsqs_inode_file_fragment_block_index(inode) !=
-			HSQS_INODE_NO_FRAGMENT;
-}
-
-enum HsqsInodeContextType
-hsqs_inode_type(const struct HsqsInodeContext *inode) {
-	switch (hsqs_data_inode_type(inode->inode)) {
-	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
-	case HSQS_INODE_TYPE_EXTENDED_DIRECTORY:
-		return HSQS_INODE_TYPE_DIRECTORY;
-	case HSQS_INODE_TYPE_BASIC_FILE:
-	case HSQS_INODE_TYPE_EXTENDED_FILE:
-		return HSQS_INODE_TYPE_FILE;
-	case HSQS_INODE_TYPE_BASIC_SYMLINK:
-	case HSQS_INODE_TYPE_EXTENDED_SYMLINK:
-		return HSQS_INODE_TYPE_SYMLINK;
-	case HSQS_INODE_TYPE_BASIC_BLOCK:
-	case HSQS_INODE_TYPE_EXTENDED_BLOCK:
-		return HSQS_INODE_TYPE_BLOCK;
-	case HSQS_INODE_TYPE_BASIC_CHAR:
-	case HSQS_INODE_TYPE_EXTENDED_CHAR:
-		return HSQS_INODE_TYPE_CHAR;
-	case HSQS_INODE_TYPE_BASIC_FIFO:
-	case HSQS_INODE_TYPE_EXTENDED_FIFO:
-		return HSQS_INODE_TYPE_FIFO;
-	case HSQS_INODE_TYPE_BASIC_SOCKET:
-	case HSQS_INODE_TYPE_EXTENDED_SOCKET:
-		return HSQS_INODE_TYPE_SOCKET;
-	}
-	return HSQS_INODE_TYPE_UNKNOWN;
-}
-
-const char *
-hsqs_inode_symlink(const struct HsqsInodeContext *inode) {
-	const struct HsqsInodeSymlink *basic;
-	const struct HsqsInodeSymlinkExt *extended;
-
-	switch (hsqs_data_inode_type(inode->inode)) {
-	case HSQS_INODE_TYPE_BASIC_SYMLINK:
-		basic = hsqs_data_inode_symlink(inode->inode);
-		return (const char *)hsqs_data_inode_symlink_target_path(basic);
-	case HSQS_INODE_TYPE_EXTENDED_SYMLINK:
-		extended = hsqs_data_inode_symlink_ext(inode->inode);
-		return (const char *)hsqs_data_inode_symlink_ext_target_path(extended);
-	}
-	return NULL;
-}
-
-int
-hsqs_inode_symlink_dup(
-		const struct HsqsInodeContext *inode, char **namebuffer) {
-	int size = hsqs_inode_symlink_size(inode);
-	const char *link_target = hsqs_inode_symlink(inode);
-
-	*namebuffer = hsqs_memdup(link_target, size);
-	if (*namebuffer) {
-		return size;
-	} else {
-		return -HSQS_ERROR_MALLOC_FAILED;
-	}
-}
-
-uint32_t
-hsqs_inode_symlink_size(const struct HsqsInodeContext *inode) {
-	const struct HsqsInodeSymlink *basic;
-	const struct HsqsInodeSymlinkExt *extended;
-
-	switch (hsqs_data_inode_type(inode->inode)) {
-	case HSQS_INODE_TYPE_BASIC_SYMLINK:
-		basic = hsqs_data_inode_symlink(inode->inode);
-		return hsqs_data_inode_symlink_target_size(basic);
-	case HSQS_INODE_TYPE_EXTENDED_SYMLINK:
-		extended = hsqs_data_inode_symlink_ext(inode->inode);
-		return hsqs_data_inode_symlink_ext_target_size(extended);
-	}
-	return 0;
-}
-
-uint32_t
-hsqs_inode_device_id(const struct HsqsInodeContext *inode) {
-	const struct HsqsInodeDevice *basic;
-	const struct HsqsInodeDeviceExt *extended;
-
-	switch (hsqs_data_inode_type(inode->inode)) {
-	case HSQS_INODE_TYPE_BASIC_BLOCK:
-	case HSQS_INODE_TYPE_BASIC_CHAR:
-		basic = hsqs_data_inode_device(inode->inode);
-		return hsqs_data_inode_device_device(basic);
-	case HSQS_INODE_TYPE_EXTENDED_BLOCK:
-	case HSQS_INODE_TYPE_EXTENDED_CHAR:
-		extended = hsqs_data_inode_device_ext(inode->inode);
-		return hsqs_data_inode_device_ext_device(extended);
-	}
-	return 0;
 }
 
 int
@@ -437,7 +192,6 @@ hsqs_inode_load_by_ref(
 	hsqs_inode_ref_to_block(inode_ref, &inode_block, &inode_offset);
 
 	int rv = 0;
-	inode->inode = NULL;
 	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
 
 	rv = hsqs_metablock_stream_init(
@@ -538,6 +292,315 @@ out:
 	return rv;
 }
 
+bool
+hsqs_inode_is_extended(const struct HsqsInodeContext *context) {
+	const struct HsqsInode *inode = get_inode(context);
+	switch (hsqs_data_inode_type(inode)) {
+	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
+	case HSQS_INODE_TYPE_BASIC_FILE:
+	case HSQS_INODE_TYPE_BASIC_SYMLINK:
+	case HSQS_INODE_TYPE_BASIC_BLOCK:
+	case HSQS_INODE_TYPE_BASIC_CHAR:
+	case HSQS_INODE_TYPE_BASIC_FIFO:
+	case HSQS_INODE_TYPE_BASIC_SOCKET:
+		return false;
+	case HSQS_INODE_TYPE_EXTENDED_DIRECTORY:
+	case HSQS_INODE_TYPE_EXTENDED_FILE:
+	case HSQS_INODE_TYPE_EXTENDED_SYMLINK:
+	case HSQS_INODE_TYPE_EXTENDED_BLOCK:
+	case HSQS_INODE_TYPE_EXTENDED_CHAR:
+	case HSQS_INODE_TYPE_EXTENDED_FIFO:
+	case HSQS_INODE_TYPE_EXTENDED_SOCKET:
+		return true;
+	}
+	return false;
+}
+
+uint32_t
+hsqs_inode_hard_link_count(const struct HsqsInodeContext *context) {
+	const struct HsqsInode *inode = get_inode(context);
+	switch (hsqs_data_inode_type(inode)) {
+	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
+		return hsqs_data_inode_directory_hard_link_count(
+				hsqs_data_inode_directory(inode));
+	case HSQS_INODE_TYPE_BASIC_FILE:
+		return 1;
+	case HSQS_INODE_TYPE_BASIC_SYMLINK:
+		return hsqs_data_inode_symlink_hard_link_count(
+				hsqs_data_inode_symlink(inode));
+	case HSQS_INODE_TYPE_BASIC_BLOCK:
+	case HSQS_INODE_TYPE_BASIC_CHAR:
+		return hsqs_data_inode_device_hard_link_count(
+				hsqs_data_inode_device(inode));
+	case HSQS_INODE_TYPE_BASIC_FIFO:
+	case HSQS_INODE_TYPE_BASIC_SOCKET:
+		return hsqs_data_inode_ipc_hard_link_count(hsqs_data_inode_ipc(inode));
+
+	case HSQS_INODE_TYPE_EXTENDED_DIRECTORY:
+		return hsqs_data_inode_directory_ext_hard_link_count(
+				hsqs_data_inode_directory_ext(inode));
+	case HSQS_INODE_TYPE_EXTENDED_FILE:
+		return hsqs_data_inode_file_ext_hard_link_count(
+				hsqs_data_inode_file_ext(inode));
+	case HSQS_INODE_TYPE_EXTENDED_SYMLINK:
+		return hsqs_data_inode_symlink_ext_hard_link_count(
+				hsqs_data_inode_symlink_ext(inode));
+	case HSQS_INODE_TYPE_EXTENDED_BLOCK:
+	case HSQS_INODE_TYPE_EXTENDED_CHAR:
+		return hsqs_data_inode_device_ext_hard_link_count(
+				hsqs_data_inode_device_ext(inode));
+	case HSQS_INODE_TYPE_EXTENDED_FIFO:
+	case HSQS_INODE_TYPE_EXTENDED_SOCKET:
+		return hsqs_data_inode_ipc_ext_hard_link_count(
+				hsqs_data_inode_ipc_ext(inode));
+	}
+	return -HSQS_ERROR_UNKOWN_INODE_TYPE;
+}
+
+uint64_t
+hsqs_inode_file_size(const struct HsqsInodeContext *context) {
+	const struct HsqsInodeFile *basic_file;
+	const struct HsqsInodeFileExt *extended_file;
+	const struct HsqsInodeDirectory *basic_dir;
+	const struct HsqsInodeDirectoryExt *extended_dir;
+
+	const struct HsqsInode *inode = get_inode(context);
+	switch (hsqs_data_inode_type(inode)) {
+	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
+		basic_dir = hsqs_data_inode_directory(inode);
+		return hsqs_data_inode_directory_file_size(basic_dir);
+	case HSQS_INODE_TYPE_EXTENDED_DIRECTORY:
+		extended_dir = hsqs_data_inode_directory_ext(inode);
+		return hsqs_data_inode_directory_ext_file_size(extended_dir);
+	case HSQS_INODE_TYPE_BASIC_FILE:
+		basic_file = hsqs_data_inode_file(inode);
+		return hsqs_data_inode_file_size(basic_file);
+	case HSQS_INODE_TYPE_EXTENDED_FILE:
+		extended_file = hsqs_data_inode_file_ext(inode);
+		return hsqs_data_inode_file_ext_size(extended_file);
+	}
+	return 0;
+}
+
+uint16_t
+hsqs_inode_permission(const struct HsqsInodeContext *inode) {
+	return hsqs_data_inode_permissions(get_inode(inode));
+}
+
+uint32_t
+hsqs_inode_number(const struct HsqsInodeContext *inode) {
+	return hsqs_data_inode_number(get_inode(inode));
+}
+
+uint32_t
+hsqs_inode_modified_time(const struct HsqsInodeContext *inode) {
+	return hsqs_data_inode_modified_time(get_inode(inode));
+}
+
+uint64_t
+hsqs_inode_file_blocks_start(const struct HsqsInodeContext *context) {
+	const struct HsqsInodeFile *basic_file;
+	const struct HsqsInodeFileExt *extended_file;
+
+	const struct HsqsInode *inode = get_inode(context);
+	switch (hsqs_data_inode_type(inode)) {
+	case HSQS_INODE_TYPE_BASIC_FILE:
+		basic_file = hsqs_data_inode_file(inode);
+		return hsqs_data_inode_file_blocks_start(basic_file);
+	case HSQS_INODE_TYPE_EXTENDED_FILE:
+		extended_file = hsqs_data_inode_file_ext(inode);
+		return hsqs_data_inode_file_ext_blocks_start(extended_file);
+	}
+	return UINT64_MAX;
+}
+
+uint32_t
+hsqs_inode_file_block_size(
+		const struct HsqsInodeContext *inode, uint32_t index) {
+	const struct HsqsDatablockSize *size_info = get_size_info(inode, index);
+
+	return hsqs_data_datablock_size(size_info);
+}
+
+bool
+hsqs_inode_file_block_is_compressed(
+		const struct HsqsInodeContext *inode, int index) {
+	const struct HsqsDatablockSize *size_info = get_size_info(inode, index);
+
+	return hsqs_data_datablock_is_compressed(size_info);
+}
+
+uint32_t
+hsqs_inode_file_fragment_block_index(const struct HsqsInodeContext *context) {
+	const struct HsqsInodeFile *basic_file;
+	const struct HsqsInodeFileExt *extended_file;
+
+	const struct HsqsInode *inode = get_inode(context);
+	switch (hsqs_data_inode_type(inode)) {
+	case HSQS_INODE_TYPE_BASIC_FILE:
+		basic_file = hsqs_data_inode_file(inode);
+		return hsqs_data_inode_file_fragment_block_index(basic_file);
+	case HSQS_INODE_TYPE_EXTENDED_FILE:
+		extended_file = hsqs_data_inode_file_ext(inode);
+		return hsqs_data_inode_file_ext_fragment_block_index(extended_file);
+	}
+	return HSQS_INODE_NO_FRAGMENT;
+}
+
+uint32_t
+hsqs_inode_directory_block_start(const struct HsqsInodeContext *context) {
+	const struct HsqsInodeDirectory *basic_file;
+	const struct HsqsInodeDirectoryExt *extended_file;
+	const struct HsqsInode *inode = get_inode(context);
+
+	switch (hsqs_data_inode_type(inode)) {
+	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
+		basic_file = hsqs_data_inode_directory(inode);
+		return hsqs_data_inode_directory_block_start(basic_file);
+	case HSQS_INODE_TYPE_EXTENDED_DIRECTORY:
+		extended_file = hsqs_data_inode_directory_ext(inode);
+		return hsqs_data_inode_directory_ext_block_start(extended_file);
+	}
+	return UINT32_MAX;
+}
+
+uint32_t
+hsqs_inode_directory_block_offset(const struct HsqsInodeContext *context) {
+	const struct HsqsInodeDirectory *basic_directory;
+	const struct HsqsInodeDirectoryExt *extended_directory;
+	const struct HsqsInode *inode = get_inode(context);
+
+	switch (hsqs_data_inode_type(inode)) {
+	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
+		basic_directory = hsqs_data_inode_directory(inode);
+		return hsqs_data_inode_directory_block_offset(basic_directory);
+	case HSQS_INODE_TYPE_EXTENDED_DIRECTORY:
+		extended_directory = hsqs_data_inode_directory_ext(inode);
+		return hsqs_data_inode_directory_ext_block_offset(extended_directory);
+	}
+	return UINT32_MAX;
+}
+
+uint32_t
+hsqs_inode_file_fragment_block_offset(const struct HsqsInodeContext *context) {
+	const struct HsqsInodeFile *basic_file;
+	const struct HsqsInodeFileExt *extended_file;
+	const struct HsqsInode *inode = get_inode(context);
+
+	switch (hsqs_data_inode_type(inode)) {
+	case HSQS_INODE_TYPE_BASIC_FILE:
+		basic_file = hsqs_data_inode_file(inode);
+		return hsqs_data_inode_file_block_offset(basic_file);
+	case HSQS_INODE_TYPE_EXTENDED_FILE:
+		extended_file = hsqs_data_inode_file_ext(inode);
+		return hsqs_data_inode_file_ext_block_offset(extended_file);
+	}
+	return HSQS_INODE_NO_FRAGMENT;
+}
+
+bool
+hsqs_inode_file_has_fragment(const struct HsqsInodeContext *inode) {
+	return hsqs_inode_file_fragment_block_index(inode) !=
+			HSQS_INODE_NO_FRAGMENT;
+}
+
+enum HsqsInodeContextType
+hsqs_inode_type(const struct HsqsInodeContext *context) {
+	const struct HsqsInode *inode = get_inode(context);
+
+	switch (hsqs_data_inode_type(inode)) {
+	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
+	case HSQS_INODE_TYPE_EXTENDED_DIRECTORY:
+		return HSQS_INODE_TYPE_DIRECTORY;
+	case HSQS_INODE_TYPE_BASIC_FILE:
+	case HSQS_INODE_TYPE_EXTENDED_FILE:
+		return HSQS_INODE_TYPE_FILE;
+	case HSQS_INODE_TYPE_BASIC_SYMLINK:
+	case HSQS_INODE_TYPE_EXTENDED_SYMLINK:
+		return HSQS_INODE_TYPE_SYMLINK;
+	case HSQS_INODE_TYPE_BASIC_BLOCK:
+	case HSQS_INODE_TYPE_EXTENDED_BLOCK:
+		return HSQS_INODE_TYPE_BLOCK;
+	case HSQS_INODE_TYPE_BASIC_CHAR:
+	case HSQS_INODE_TYPE_EXTENDED_CHAR:
+		return HSQS_INODE_TYPE_CHAR;
+	case HSQS_INODE_TYPE_BASIC_FIFO:
+	case HSQS_INODE_TYPE_EXTENDED_FIFO:
+		return HSQS_INODE_TYPE_FIFO;
+	case HSQS_INODE_TYPE_BASIC_SOCKET:
+	case HSQS_INODE_TYPE_EXTENDED_SOCKET:
+		return HSQS_INODE_TYPE_SOCKET;
+	}
+	return HSQS_INODE_TYPE_UNKNOWN;
+}
+
+const char *
+hsqs_inode_symlink(const struct HsqsInodeContext *context) {
+	const struct HsqsInodeSymlink *basic;
+	const struct HsqsInodeSymlinkExt *extended;
+
+	const struct HsqsInode *inode = get_inode(context);
+	switch (hsqs_data_inode_type(inode)) {
+	case HSQS_INODE_TYPE_BASIC_SYMLINK:
+		basic = hsqs_data_inode_symlink(inode);
+		return (const char *)hsqs_data_inode_symlink_target_path(basic);
+	case HSQS_INODE_TYPE_EXTENDED_SYMLINK:
+		extended = hsqs_data_inode_symlink_ext(inode);
+		return (const char *)hsqs_data_inode_symlink_ext_target_path(extended);
+	}
+	return NULL;
+}
+
+int
+hsqs_inode_symlink_dup(
+		const struct HsqsInodeContext *inode, char **namebuffer) {
+	int size = hsqs_inode_symlink_size(inode);
+	const char *link_target = hsqs_inode_symlink(inode);
+
+	*namebuffer = hsqs_memdup(link_target, size);
+	if (*namebuffer) {
+		return size;
+	} else {
+		return -HSQS_ERROR_MALLOC_FAILED;
+	}
+}
+
+uint32_t
+hsqs_inode_symlink_size(const struct HsqsInodeContext *context) {
+	const struct HsqsInodeSymlink *basic;
+	const struct HsqsInodeSymlinkExt *extended;
+
+	const struct HsqsInode *inode = get_inode(context);
+	switch (hsqs_data_inode_type(inode)) {
+	case HSQS_INODE_TYPE_BASIC_SYMLINK:
+		basic = hsqs_data_inode_symlink(inode);
+		return hsqs_data_inode_symlink_target_size(basic);
+	case HSQS_INODE_TYPE_EXTENDED_SYMLINK:
+		extended = hsqs_data_inode_symlink_ext(inode);
+		return hsqs_data_inode_symlink_ext_target_size(extended);
+	}
+	return 0;
+}
+
+uint32_t
+hsqs_inode_device_id(const struct HsqsInodeContext *context) {
+	const struct HsqsInodeDevice *basic;
+	const struct HsqsInodeDeviceExt *extended;
+
+	const struct HsqsInode *inode = get_inode(context);
+	switch (hsqs_data_inode_type(inode)) {
+	case HSQS_INODE_TYPE_BASIC_BLOCK:
+	case HSQS_INODE_TYPE_BASIC_CHAR:
+		basic = hsqs_data_inode_device(inode);
+		return hsqs_data_inode_device_device(basic);
+	case HSQS_INODE_TYPE_EXTENDED_BLOCK:
+	case HSQS_INODE_TYPE_EXTENDED_CHAR:
+		extended = hsqs_data_inode_device_ext(inode);
+		return hsqs_data_inode_device_ext_device(extended);
+	}
+	return 0;
+}
+
 static uint32_t
 inode_get_id(const struct HsqsInodeContext *context, off_t idx) {
 	int rv = 0;
@@ -558,34 +621,35 @@ inode_get_id(const struct HsqsInodeContext *context, off_t idx) {
 
 uint32_t
 hsqs_inode_uid(const struct HsqsInodeContext *context) {
-	return inode_get_id(context, hsqs_data_inode_uid_idx(context->inode));
+	return inode_get_id(context, hsqs_data_inode_uid_idx(get_inode(context)));
 }
 
 uint32_t
 hsqs_inode_gid(const struct HsqsInodeContext *context) {
-	return inode_get_id(context, hsqs_data_inode_gid_idx(context->inode));
+	return inode_get_id(context, hsqs_data_inode_gid_idx(get_inode(context)));
 }
 
 uint32_t
-hsqs_inode_xattr_index(const struct HsqsInodeContext *inode) {
-	struct HsqsInode *wrap = inode->inode;
-	switch (hsqs_data_inode_type(wrap)) {
+hsqs_inode_xattr_index(const struct HsqsInodeContext *context) {
+	const struct HsqsInode *inode = get_inode(context);
+	switch (hsqs_data_inode_type(inode)) {
 	case HSQS_INODE_TYPE_EXTENDED_DIRECTORY:
 		return hsqs_data_inode_directory_ext_xattr_idx(
-				hsqs_data_inode_directory_ext(wrap));
+				hsqs_data_inode_directory_ext(inode));
 	case HSQS_INODE_TYPE_EXTENDED_FILE:
 		return hsqs_data_inode_file_ext_xattr_idx(
-				hsqs_data_inode_file_ext(wrap));
+				hsqs_data_inode_file_ext(inode));
 	case HSQS_INODE_TYPE_EXTENDED_SYMLINK:
 		return hsqs_data_inode_symlink_ext_xattr_idx(
-				hsqs_data_inode_symlink_ext(wrap));
+				hsqs_data_inode_symlink_ext(inode));
 	case HSQS_INODE_TYPE_EXTENDED_BLOCK:
 	case HSQS_INODE_TYPE_EXTENDED_CHAR:
 		return hsqs_data_inode_device_ext_xattr_idx(
-				hsqs_data_inode_device_ext(wrap));
+				hsqs_data_inode_device_ext(inode));
 	case HSQS_INODE_TYPE_EXTENDED_FIFO:
 	case HSQS_INODE_TYPE_EXTENDED_SOCKET:
-		return hsqs_data_inode_ipc_ext_xattr_idx(hsqs_data_inode_ipc_ext(wrap));
+		return hsqs_data_inode_ipc_ext_xattr_idx(
+				hsqs_data_inode_ipc_ext(inode));
 	}
 	return HSQS_INODE_NO_XATTR;
 }
@@ -607,87 +671,6 @@ hsqs_inode_xattr_iterator(
 int
 hsqs_inode_cleanup(struct HsqsInodeContext *inode) {
 	return hsqs_metablock_stream_cleanup(&inode->metablock);
-}
-
-int
-hsqs_inode_directory_iterator_init(
-		struct HsqsInodeDirectoryIndexIterator *iterator,
-		struct HsqsInodeContext *inode) {
-	int rv = 0;
-
-	if (hsqs_data_inode_type(inode->inode) !=
-		HSQS_INODE_TYPE_EXTENDED_DIRECTORY) {
-		return -HSQS_ERROR_NO_EXTENDED_DIRECTORY;
-	}
-
-	const struct HsqsInodeDirectoryExt *xdir =
-			hsqs_data_inode_directory_ext(inode->inode);
-
-	iterator->inode = inode;
-	iterator->current_offset = 0;
-	iterator->next_offset = HSQS_SIZEOF_INODE_DIRECTORY_EXT;
-	iterator->indices = hsqs_data_inode_directory_ext_index(xdir);
-	iterator->remaining_entries =
-			hsqs_data_inode_directory_ext_index_count(xdir);
-	return rv;
-}
-
-int
-hsqs_inode_directory_index_iterator_next(
-		struct HsqsInodeDirectoryIndexIterator *iterator) {
-	int rv = 0;
-	// Make sure next entry is loaded:
-	iterator->next_offset += HSQS_SIZEOF_INODE_DIRECTORY_INDEX;
-	rv = inode_data_more(iterator->inode, iterator->next_offset);
-	if (rv < 0) {
-		return rv;
-	}
-
-	// Make sure current index has its name populated
-	iterator->next_offset += hsqs_data_inode_directory_index_name_size(
-			current_directory_index(iterator));
-	rv = inode_data_more(iterator->inode, iterator->next_offset);
-	if (rv < 0) {
-		return rv;
-	}
-
-	return rv;
-}
-
-uint32_t
-hsqs_inode_directory_index_iterator_index(
-		struct HsqsInodeDirectoryIndexIterator *iterator) {
-	const struct HsqsInodeDirectoryIndex *current =
-			current_directory_index(iterator);
-	return hsqs_data_inode_directory_index_index(current);
-}
-uint32_t
-hsqs_inode_directory_index_iterator_start(
-		struct HsqsInodeDirectoryIndexIterator *iterator) {
-	const struct HsqsInodeDirectoryIndex *current =
-			current_directory_index(iterator);
-	return hsqs_data_inode_directory_index_start(current);
-}
-uint32_t
-hsqs_inode_directory_index_iterator_name_size(
-		struct HsqsInodeDirectoryIndexIterator *iterator) {
-	const struct HsqsInodeDirectoryIndex *current =
-			current_directory_index(iterator);
-	return hsqs_data_inode_directory_index_name_size(current) + 1;
-}
-const char *
-hsqs_inode_directory_index_iterator_name(
-		struct HsqsInodeDirectoryIndexIterator *iterator) {
-	const struct HsqsInodeDirectoryIndex *current =
-			current_directory_index(iterator);
-	return (const char *)hsqs_data_inode_directory_index_name(current);
-}
-
-int
-hsqs_inode_directory_index_iterator_clean(
-		struct HsqsInodeDirectoryIndexIterator __attribute__((unused)) *
-		iterator) {
-	return 0;
 }
 
 void

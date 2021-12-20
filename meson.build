@@ -3,7 +3,7 @@ project(
 	['c'],
 	default_options : [
 		'c_std=c18',
-		'optimization=2',
+		'optimization=0',
 		'werror=true',
 		'warning_level=3'
 	],
@@ -17,6 +17,7 @@ hsqs_hdr = [
 	'src/context/compression_options_context.h',
 	'src/context/content_context.h',
 	'src/iterator/directory_iterator.h',
+	'src/iterator/directory_index_iterator.h',
 	'src/context/inode_context.h',
 	'src/context/metablock_context.h',
 	'src/context/metablock_stream_context.h',
@@ -60,6 +61,7 @@ hsqs_src = [
 	'src/context/compression_options_context.c',
 	'src/context/content_context.c',
 	'src/iterator/directory_iterator.c',
+	'src/iterator/directory_index_iterator.c',
 	'src/context/inode_context.c',
 	'src/context/metablock_context.c',
 	'src/context/metablock_stream_context.c',
