@@ -20,7 +20,6 @@ struct HsqsInodeDirectoryIndexIterator {
 	hsqs_index_t next_offset;
 };
 
-
 HSQS_NO_UNUSED int hsqs_inode_directory_index_iterator_init(
 		struct HsqsInodeDirectoryIndexIterator *iterator,
 		struct HsqsInodeContext *inode);
@@ -38,6 +37,4 @@ const char *hsqs_inode_directory_index_iterator_name(
 HSQS_NO_UNUSED int hsqs_inode_directory_index_iterator_clean(
 		struct HsqsInodeDirectoryIndexIterator *iterator);
 
-
 #endif /* end of include guard DIRECTORY_INDEX_ITERATOR_H */
-
