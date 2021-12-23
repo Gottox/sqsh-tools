@@ -32,16 +32,26 @@
  * @created     : Monday Dec 06, 2021 17:51:32 CET
  */
 
+#include "../data/compression_options.h"
+#include "../data/superblock.h"
 #include "../error.h"
+#include "inttypes.h"
 #include "mapper.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+#define SUPERBLOCK_REQUEST_SIZE \
+	(HSQS_SIZEOF_SUPERBLOCK + HSQS_SIZEOF_COMPRESSION_OPTIONS)
+#define CONTENT_RANGE "Content-Range: "
+#define CONTENT_RANGE_LENGTH (sizeof(CONTENT_RANGE) - 1)
 
 static size_t
 write_data(void *ptr, size_t size, size_t nmemb, void *userdata) {
@@ -53,7 +63,7 @@ write_data(void *ptr, size_t size, size_t nmemb, void *userdata) {
 		rv = -HSQS_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
-	rv = hsqs_buffer_append(&map->data.cl.buffer, ptr, byte_size);
+	rv = hsqs_buffer_append(map->data.cl.buffer, ptr, byte_size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -64,17 +74,55 @@ out:
 	return rv;
 }
 
+static size_t
+header_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
+	static const char *format =
+			"Content-Range: bytes %" PRIu64 "-%" PRIu64 "/%" PRIu64 "\r\n%n";
+	int rv = 0;
+	uint64_t start = 0;
+	uint64_t end = 0;
+	uint64_t total = 0;
+	size_t header_size = size * nitems;
+	struct HsqsMap *map = (struct HsqsMap *)userdata;
+
+	if (header_size < CONTENT_RANGE_LENGTH) {
+		return header_size;
+	}
+	if (strncmp(buffer, CONTENT_RANGE, CONTENT_RANGE_LENGTH) != 0) {
+		return header_size;
+	}
+
+	char *header = hsqs_memdup(buffer, header_size);
+	if (header == NULL) {
+		return 0;
+	}
+	rv = 0;
+	sscanf(header, format, &start, &end, &total, &rv);
+
+	if ((size_t)rv != header_size) {
+		free(header);
+		return 0;
+	}
+
+	map->data.cl.total_size = total;
+
+	free(header);
+	return header_size;
+}
+
 static CURL *
-get_handle(struct HsqsMapper *mapper) {
-	CURL *handle = mapper->data.cl.handle;
-	pthread_mutex_lock(&mapper->data.cl.handle_lock);
+get_handle(struct HsqsMap *map) {
+	CURL *handle = map->mapper->data.cl.handle;
+	pthread_mutex_lock(&map->mapper->data.cl.handle_lock);
 	curl_easy_reset(handle);
-	curl_easy_setopt(handle, CURLOPT_URL, mapper->data.cl.url);
+	curl_easy_setopt(handle, CURLOPT_URL, map->mapper->data.cl.url);
 	curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 1L);
 	curl_easy_setopt(handle, CURLOPT_TCP_KEEPALIVE, 1L);
 	curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1L);
 	curl_easy_setopt(handle, CURLOPT_FAILONERROR, 1L);
 	curl_easy_setopt(handle, CURLOPT_FILETIME, 1L);
+	curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, header_callback);
+	curl_easy_setopt(handle, CURLOPT_HEADERDATA, map);
 	return handle;
 }
 
@@ -90,11 +138,18 @@ hsqs_mapper_curl_init(
 		struct HsqsMapper *mapper, const void *input, size_t size) {
 	(void)size;
 	int rv = 0;
+	struct HsqsMap map = {0};
 	curl_global_init(CURL_GLOBAL_ALL);
-	CURL *handle = NULL;
 
 	mapper->data.cl.url = input;
 	mapper->data.cl.handle = curl_easy_init();
+	mapper->data.cl.expected_size = UINT64_MAX;
+	mapper->data.cl.expected_time = UINT64_MAX;
+
+	rv = hsqs_lru_hashmap_init(&mapper->data.cl.cache, 16);
+	if (rv < 0) {
+		goto out;
+	}
 
 	rv = pthread_mutex_init(&mapper->data.cl.handle_lock, NULL);
 	if (rv != 0) {
@@ -102,44 +157,54 @@ hsqs_mapper_curl_init(
 		goto out;
 	}
 
-	handle = get_handle(mapper);
-	curl_easy_setopt(handle, CURLOPT_NOBODY, 1L);
-	rv = curl_easy_perform(handle);
-	if (rv != CURLE_OK) {
-		rv = -HSQS_ERROR_MAPPER_INIT;
-		goto out;
-	}
-
-	curl_off_t content_length;
-	rv = curl_easy_getinfo(
-			handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &content_length);
-	if (rv != CURLE_OK) {
-		rv = -HSQS_ERROR_MAPPER_INIT;
-		goto out;
-	}
-	mapper->data.cl.content_length = content_length;
-
-	long file_time;
-	rv = curl_easy_getinfo(handle, CURLINFO_FILETIME, &file_time);
-	if (rv != CURLE_OK) {
-		rv = -HSQS_ERROR_MAPPER_INIT;
-		goto out;
-	}
-	mapper->data.cl.file_time = file_time;
-
-out:
-	release_handle(mapper, handle);
-	return rv;
-}
-static int
-hsqs_mapper_curl_map(struct HsqsMap *map, off_t offset, size_t size) {
-	int rv = 0;
-
-	map->data.cl.offset = offset;
-	rv = hsqs_buffer_init(&map->data.cl.buffer, HSQS_COMPRESSION_NONE, 8192);
+	rv = hsqs_mapper_map(&map, mapper, 0, SUPERBLOCK_REQUEST_SIZE);
 	if (rv < 0) {
 		goto out;
 	}
+	mapper->data.cl.expected_size = map.data.cl.total_size;
+	mapper->data.cl.expected_time = map.data.cl.file_time;
+	hsqs_map_unmap(&map);
+
+out:
+	return rv;
+}
+
+static int
+buffer_dtor(void *data) {
+	struct HsqsBuffer *buffer = data;
+	hsqs_buffer_cleanup(buffer);
+	return 0;
+}
+
+static int
+hsqs_mapper_curl_map(struct HsqsMap *map, off_t offset, size_t size) {
+	int rv = 0;
+	struct HsqsRefCount *buffer_ref;
+	struct HsqsBuffer *buffer;
+
+	map->data.cl.offset = offset;
+	buffer_ref = hsqs_lru_hashmap_get(&map->mapper->data.cl.cache, offset);
+	if (buffer_ref == NULL) {
+		rv = hsqs_ref_count_new(
+				&buffer_ref, sizeof(struct HsqsBuffer), buffer_dtor);
+		if (rv < 0) {
+			goto out;
+		}
+		rv = hsqs_lru_hashmap_put(
+				&map->mapper->data.cl.cache, offset, buffer_ref);
+		if (rv < 0) {
+			goto out;
+		}
+		buffer = hsqs_ref_count_retain(buffer_ref);
+		rv = hsqs_buffer_init(buffer, HSQS_COMPRESSION_NONE, 8192);
+		if (rv < 0) {
+			goto out;
+		}
+	} else {
+		buffer = hsqs_ref_count_retain(buffer_ref);
+	}
+	map->data.cl.buffer_ref = buffer_ref;
+	map->data.cl.buffer = buffer;
 
 	rv = hsqs_map_resize(map, size);
 	if (rv < 0) {
@@ -147,51 +212,58 @@ hsqs_mapper_curl_map(struct HsqsMap *map, off_t offset, size_t size) {
 	}
 
 out:
+	if (rv < 0) {
+		hsqs_map_unmap(map);
+	}
 	return rv;
 }
 static size_t
 hsqs_mapper_curl_size(const struct HsqsMapper *mapper) {
-	return mapper->data.cl.content_length;
+	return mapper->data.cl.expected_size;
 }
 static int
 hsqs_mapper_curl_cleanup(struct HsqsMapper *mapper) {
+	hsqs_lru_hashmap_cleanup(&mapper->data.cl.cache);
 	pthread_mutex_destroy(&mapper->data.cl.handle_lock);
 	curl_easy_cleanup(mapper->data.cl.handle);
 	return 0;
 }
 static int
 hsqs_map_curl_unmap(struct HsqsMap *map) {
-	hsqs_buffer_cleanup(&map->data.cl.buffer);
+	hsqs_ref_count_release(map->data.cl.buffer_ref);
+	map->data.cl.buffer_ref = NULL;
 	return 0;
 }
 static const uint8_t *
 hsqs_map_curl_data(const struct HsqsMap *map) {
-	return hsqs_buffer_data(&map->data.cl.buffer);
+	return hsqs_buffer_data(map->data.cl.buffer);
 }
 
 static int
 hsqs_map_curl_resize(struct HsqsMap *map, size_t new_size) {
 	int rv = 0;
 	char range_buffer[512] = {0};
-	CURL *handle = get_handle(map->mapper);
+	CURL *handle = get_handle(map);
 	new_size = HSQS_PADDING(new_size, 512);
 	size_t current_size = hsqs_map_size(map);
 	uint64_t new_offset = map->data.cl.offset + current_size;
 	uint64_t end_offset = new_offset + new_size - current_size - 1;
 	long http_code = 0;
+	uint64_t expected_size = map->mapper->data.cl.expected_size;
+	uint64_t expected_time = map->mapper->data.cl.expected_time;
 
 	if (new_size <= current_size) {
 		return 0;
 	}
 
-	if (end_offset > map->mapper->data.cl.content_length - 1) {
-		end_offset = map->mapper->data.cl.content_length - 1;
+	if (end_offset > map->mapper->data.cl.expected_size - 1) {
+		end_offset = map->mapper->data.cl.expected_size - 1;
 	}
 
 	// TODO: check for negative values of offset
 	rv = snprintf(
-			range_buffer, sizeof(range_buffer), "%lu-%lu", new_offset,
-			end_offset);
+			range_buffer, sizeof(range_buffer), "%" PRIu64 "-%" PRIu64,
+			new_offset, end_offset);
 	if (rv >= (int)sizeof(range_buffer)) {
 		rv = -HSQS_ERROR_MAPPER_MAP;
 		goto out;
@@ -213,18 +285,30 @@ hsqs_map_curl_resize(struct HsqsMap *map, size_t new_size) {
 		goto out;
 	}
 
-	long file_time;
+	uint64_t file_time;
 	rv = curl_easy_getinfo(handle, CURLINFO_FILETIME, &file_time);
 	if (rv != CURLE_OK) {
 		rv = -HSQS_ERROR_MAPPER_MAP;
 		goto out;
 	}
-	if (map->mapper->data.cl.file_time != file_time) {
+	rv = 0;
+	map->data.cl.file_time = file_time;
+
+	if (file_time == UINT64_MAX) {
 		rv = -HSQS_ERROR_MAPPER_MAP;
 		goto out;
 	}
 
-	rv = 0;
+	if (expected_time != UINT64_MAX && file_time != expected_time) {
+		rv = -HSQS_ERROR_MAPPER_MAP;
+		goto out;
+	}
+
+	if (expected_size != UINT64_MAX &&
+		map->data.cl.total_size != expected_size) {
+		rv = -HSQS_ERROR_MAPPER_MAP;
+		goto out;
+	}
 
 out:
 	release_handle(map->mapper, handle);
@@ -233,7 +317,7 @@ out:
 
 static size_t
 hsqs_map_curl_size(const struct HsqsMap *map) {
-	return hsqs_buffer_size(&map->data.cl.buffer);
+	return hsqs_buffer_size(map->data.cl.buffer);
 }
 
 struct HsqsMemoryMapperImpl hsqs_mapper_impl_curl = {

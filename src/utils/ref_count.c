@@ -10,6 +10,10 @@
 
 #include <stdlib.h>
 
+static void *
+get_data(struct HsqsRefCount *ref_count) {
+	return (void *)&ref_count[1];
+}
 int
 hsqs_ref_count_new(
 		struct HsqsRefCount **ref_count, size_t object_size,
@@ -33,14 +37,18 @@ hsqs_ref_count_new(
 void *
 hsqs_ref_count_retain(struct HsqsRefCount *ref_count) {
 	ref_count->references++;
-	return (void *)&ref_count[1];
+	return get_data(ref_count);
 }
 
 int
 hsqs_ref_count_release(struct HsqsRefCount *ref_count) {
+	if (ref_count == NULL) {
+		return 0;
+	}
+
 	ref_count->references--;
 	if (ref_count->references == 0) {
-		ref_count->dtor(hsqs_ref_count_retain(ref_count));
+		ref_count->dtor(get_data(ref_count));
 		free(ref_count);
 		return 0;
 	} else {
