@@ -48,12 +48,20 @@ hsqs_zlib_extract(
 		const union HsqsCompressionOptions *options, size_t options_size,
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
+	// Needed for 32-bit: *target_size is a size_t, but zlib wants a
+	// pointer to an unsigned long.
+	uLongf long_target_size = *target_size;
 	if (options != NULL &&
 		options_size != HSQS_SIZEOF_COMPRESSION_OPTIONS_GZIP) {
 		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
-	int rv = uncompress(target, target_size, compressed, compressed_size);
+	int rv = uncompress(target, &long_target_size, compressed, compressed_size);
+
+	// This casts to a smaller type. But it's safe, because long_target_size
+	// originates from a the content of *target_size and uncompress() only
+	// decreases it.
+	*target_size = long_target_size;
 
 	if (rv != Z_OK) {
 		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
