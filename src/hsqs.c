@@ -50,6 +50,7 @@ enum InitializedBitmap {
 	INITIALIZED_XATTR_TABLE = 1 << 3,
 	INITIALIZED_FRAGMENT_TABLE = 1 << 4,
 	INITIALIZED_COMPRESSION_OPTIONS = 1 << 5,
+	INITIALIZED_TRAILING_BYTES = 1 << 6,
 };
 
 static bool
@@ -215,6 +216,36 @@ hsqs_superblock(struct Hsqs *hsqs) {
 struct HsqsMapper *
 hsqs_mapper(struct Hsqs *hsqs) {
 	return &hsqs->mapper;
+}
+
+const uint8_t *
+hsqs_trailing_bytes(struct Hsqs *hsqs) {
+	if (!is_initialized(hsqs, INITIALIZED_TRAILING_BYTES)) {
+		struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
+		struct HsqsMapper *mapper = hsqs_mapper(hsqs);
+		uint64_t trailing_start = hsqs_superblock_bytes_used(superblock);
+		size_t archive_size = hsqs_mapper_size(mapper);
+		uint64_t trailing_size;
+
+		if (archive_size <= trailing_start) {
+			return NULL;
+		}
+
+		trailing_size = archive_size - trailing_start;
+
+		hsqs_mapper_map(
+				&hsqs->trailing_map, mapper, trailing_start, trailing_size);
+	}
+	return hsqs_map_data(&hsqs->trailing_map);
+}
+size_t
+hsqs_trailing_bytes_size(struct Hsqs *hsqs) {
+	if (!is_initialized(hsqs, INITIALIZED_TRAILING_BYTES)) {
+		if (hsqs_map_data(&hsqs->trailing_map) == NULL) {
+			return 0;
+		}
+	}
+	return hsqs_map_size(&hsqs->trailing_map);
 }
 
 int

@@ -57,6 +57,7 @@ struct Hsqs {
 	struct HsqsXattrTable xattr_table;
 	struct HsqsFragmentTable fragment_table;
 	struct HsqsCompressionOptionsContext compression_options;
+	struct HsqsMap trailing_map;
 	uint8_t initialized;
 };
 
@@ -77,7 +78,8 @@ int hsqs_xattr_table(struct Hsqs *hsqs, struct HsqsXattrTable **xattr_table);
 int hsqs_compression_options(
 		struct Hsqs *hsqs,
 		struct HsqsCompressionOptionsContext **compression_options);
-
+const uint8_t *hsqs_trailing_bytes(struct Hsqs *hsqs);
+size_t hsqs_trailing_bytes_size(struct Hsqs *hsqs);
 int hsqs_cleanup(struct Hsqs *hsqs);
 
 #endif /* end of include guard HSQS_H */
