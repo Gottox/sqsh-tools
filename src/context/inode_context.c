@@ -39,8 +39,8 @@
 
 #include "../error.h"
 #include "../hsqs.h"
+#include "../iterator/directory_iterator.h"
 #include "../utils.h"
-#include "directory_context.h"
 #include "superblock_context.h"
 #include <stdint.h>
 #include <string.h>

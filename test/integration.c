@@ -33,13 +33,13 @@
  */
 
 #include "../src/context/content_context.h"
-#include "../src/context/directory_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/context/superblock_context.h"
 #include "../src/context/xattr_context.h"
 #include "../src/data/superblock.h"
 #include "../src/error.h"
 #include "../src/hsqs.h"
+#include "../src/iterator/directory_iterator.h"
 #include "../src/table/xattr_table.h"
 #include "common.h"
 #include "test.h"

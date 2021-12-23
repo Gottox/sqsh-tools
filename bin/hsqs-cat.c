@@ -33,9 +33,9 @@
  */
 
 #include "../src/context/content_context.h"
-#include "../src/context/directory_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/hsqs.h"
+#include "../src/iterator/directory_iterator.h"
 
 #include <assert.h>
 #include <limits.h>

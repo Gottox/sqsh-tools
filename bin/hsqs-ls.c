@@ -32,9 +32,9 @@
  * @created     : Friday Sep 04, 2021 18:46:20 CEST
  */
 
-#include "../src/context/directory_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/hsqs.h"
+#include "../src/iterator/directory_iterator.h"
 
 #include <assert.h>
 #include <inttypes.h>

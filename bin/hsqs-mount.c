@@ -41,10 +41,10 @@
 #include <string.h>
 
 #include "../src/context/content_context.h"
-#include "../src/context/directory_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/context/xattr_context.h"
 #include "../src/hsqs.h"
+#include "../src/iterator/directory_iterator.h"
 
 static struct { struct Hsqs hsqs; } data = {0};
 
