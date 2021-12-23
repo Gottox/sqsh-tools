@@ -55,6 +55,22 @@ hsqs_empty() {
 }
 
 static void
+hsqs_get_nonexistant() {
+	int rv;
+	struct HsqsInodeContext inode = {0};
+	struct Hsqs hsqs = {0};
+
+	rv = hsqs_init(&hsqs, squash_image, sizeof(squash_image));
+	assert(rv == 0);
+
+	rv = hsqs_inode_load_by_path(&inode, &hsqs, "/nonexistant");
+	assert(rv < 0);
+
+	rv = hsqs_cleanup(&hsqs);
+	assert(rv == 0);
+}
+
+static void
 hsqs_ls() {
 	int rv;
 	char *name;
@@ -556,6 +572,7 @@ fuzz_crash_7() {
 DEFINE
 TEST(hsqs_empty);
 TEST(hsqs_ls);
+TEST(hsqs_get_nonexistant);
 TEST(hsqs_cat_fragment);
 TEST(hsqs_cat_datablock_and_fragment);
 TEST(hsqs_cat_size_overflow);
