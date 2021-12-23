@@ -29,4 +29,4 @@ $(BUILD_DIR): meson.build Makefile
 .PHONY: clean
 
 clean:
-	[ -d "builddir" ] && rm -r $(BUILD_DIR) || true
+	[ -d "$(BUILD_DIR)" ] && rm -r $(BUILD_DIR) || true
