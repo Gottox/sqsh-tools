@@ -144,6 +144,11 @@ if get_option('zstd')
 	build_args += '-DCONFIG_ZSTD'
 endif
 
+if get_option('trace')
+	build_args += ['-DENABLE_TRACE', '-finstrument-functions', '-no-pie', '-g', '-rdynamic']
+	hsqs_src += 'src/utils/trace.c'
+endif
+
 libhsqs = library(
   'hsqs',
   hsqs_src,
