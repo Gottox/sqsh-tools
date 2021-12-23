@@ -28,7 +28,7 @@ jobs:
         cc: [gcc, clang]
         all_features: [true, false]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v2.4.0
     - name: configure
       run: |
         CC=${{ matrix.cc }} meson setup /tmp/build \
