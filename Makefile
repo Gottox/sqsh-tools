@@ -5,18 +5,28 @@
 ######################################################################
 
 NINJA_TARGETS := test benchmark install dist scan-build clang-format uninstall \
-	all clean
+	all tidy
+
+ifeq ($(PODMAN), 1)
+	W = podman run --rm -ti -v .:/host gottox/hsqs-build
+	SANATIZE =
+	BUILD_DIR = ./build_dir-podman
+else
+	W =
+	SANATIZE = -Db_sanitize=address,undefined
+	BUILD_DIR = ./build_dir
+endif
 
 .PHONY: $(NINJA_TARGETS)
 
-$(NINJA_TARGETS): builddir
-	ninja -C $< $@
+$(NINJA_TARGETS): $(BUILD_DIR)
+	$W ninja -C $< $@
 
-builddir: meson.build
-	[ -d "builddir" ] && rm -r builddir || true
-	meson setup builddir -Dtest=true -Db_sanitize=address,undefined
+$(BUILD_DIR): meson.build Makefile
+	[ -d "$@" ] && rm -r "$@" || true
+	$W meson setup "$@" -Dtest=true $(SANATIZE)
 
-.PHONY: meson_clean
+.PHONY: clean
 
-meson_clean:
-	rm -r builddir
+clean:
+	[ -d "builddir" ] && rm -r $(BUILD_DIR) || true
