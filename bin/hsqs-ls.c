@@ -37,6 +37,7 @@
 #include "../src/hsqs.h"
 
 #include <assert.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -120,8 +121,9 @@ print_detail_inode(struct HsqsInodeContext *inode, const char *path) {
 #undef PRINT_MODE
 
 	time_t mtime = hsqs_inode_modified_time(inode);
-	printf(" %6u %6u %10lu %s %s", hsqs_inode_uid(inode), hsqs_inode_gid(inode),
-		   hsqs_inode_file_size(inode), strtok(ctime(&mtime), "\n"), path);
+	printf(" %6u %6u %10" PRIu64 " %s %s", hsqs_inode_uid(inode),
+		   hsqs_inode_gid(inode), hsqs_inode_file_size(inode),
+		   strtok(ctime(&mtime), "\n"), path);
 
 	if (hsqs_inode_type(inode) == HSQS_INODE_TYPE_SYMLINK) {
 		fputs(" -> ", stdout);
