@@ -14,7 +14,6 @@ struct HsqsInodeContext;
 
 struct HsqsInodeDirectoryIndexIterator {
 	struct HsqsInodeContext *inode;
-	const struct HsqsInodeDirectoryIndex *indices;
 	size_t remaining_entries;
 	hsqs_index_t current_offset;
 	hsqs_index_t next_offset;

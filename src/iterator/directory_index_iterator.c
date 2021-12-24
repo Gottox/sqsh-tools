@@ -45,7 +45,6 @@ hsqs_inode_directory_index_iterator_init(
 
 	const struct HsqsInodeDirectoryExt *xdir =
 			hsqs_data_inode_directory_ext(get_inode(iterator));
-	iterator->indices = hsqs_data_inode_directory_ext_index(xdir);
 	iterator->remaining_entries =
 			hsqs_data_inode_directory_ext_index_count(xdir);
 	return rv;
@@ -55,6 +54,8 @@ int
 hsqs_inode_directory_index_iterator_next(
 		struct HsqsInodeDirectoryIndexIterator *iterator) {
 	int rv = 0;
+	iterator->current_offset = iterator->next_offset;
+
 	// Make sure next entry is loaded:
 	iterator->next_offset += HSQS_SIZEOF_INODE_DIRECTORY_INDEX;
 	rv = directory_index_data_more(iterator, iterator->next_offset);
@@ -69,6 +70,8 @@ hsqs_inode_directory_index_iterator_next(
 	if (rv < 0) {
 		return rv;
 	}
+
+	iterator->current_offset = iterator->next_offset;
 
 	return rv;
 }
