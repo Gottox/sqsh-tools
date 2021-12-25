@@ -56,14 +56,12 @@ hsqs_xattr_table_init(struct HsqsXattrTable *context, struct Hsqs *hsqs) {
 	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
 	uint64_t xattr_address = hsqs_superblock_xattr_id_table_start(superblock);
 	uint64_t bytes_used = hsqs_superblock_bytes_used(superblock);
-	struct HsqsMapper *mapper = hsqs_mapper(hsqs);
 	if (xattr_address + HSQS_SIZEOF_XATTR_ID_TABLE >= bytes_used) {
 		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
 	context->hsqs = hsqs;
-	rv = hsqs_mapper_map(
-			&context->header, mapper, xattr_address,
-			HSQS_SIZEOF_XATTR_ID_TABLE);
+	rv = hsqs_request_map(
+			hsqs, &context->header, xattr_address, HSQS_SIZEOF_XATTR_ID_TABLE);
 	if (rv < 0) {
 		goto out;
 	}

@@ -48,6 +48,7 @@ hsqs_fragment_table_init(struct HsqsFragmentTable *table, struct Hsqs *hsqs) {
 	uint64_t start = hsqs_superblock_fragment_table_start(superblock);
 	uint32_t count = hsqs_superblock_fragment_entry_count(superblock);
 
+	table->hsqs = hsqs;
 	rv = hsqs_table_init(
 			&table->table, hsqs, start, HSQS_SIZEOF_FRAGMENT, count);
 	if (rv < 0) {
@@ -55,7 +56,6 @@ hsqs_fragment_table_init(struct HsqsFragmentTable *table, struct Hsqs *hsqs) {
 	}
 
 	table->superblock = superblock;
-	table->mapper = hsqs_mapper(hsqs);
 
 out:
 	return rv;
@@ -84,7 +84,7 @@ read_fragment_data(
 	size = hsqs_data_datablock_size(size_info);
 	is_compressed = hsqs_data_datablock_is_compressed(size_info);
 
-	rv = hsqs_mapper_map(&memory_map, table->mapper, start, size);
+	rv = hsqs_request_map(table->hsqs, &memory_map, start, size);
 	if (rv < 0) {
 		goto out;
 	}

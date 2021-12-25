@@ -53,15 +53,14 @@ hsqs_table_init(
 		size_t element_size, size_t element_count) {
 	int rv = 0;
 	size_t byte_size;
-	struct HsqsMapper *mapper = hsqs_mapper(hsqs);
 	// TODO: Overflow
 	size_t lookup_table_size =
 			HSQS_DEVIDE_CEIL(
 					element_size * element_count, HSQS_METABLOCK_BLOCK_SIZE) *
 			sizeof(uint64_t);
 
-	rv = hsqs_mapper_map(
-			&table->lookup_table, mapper, start_block, lookup_table_size);
+	rv = hsqs_request_map(
+			hsqs, &table->lookup_table, start_block, lookup_table_size);
 	if (rv < 0) {
 		return rv;
 	}

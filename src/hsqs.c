@@ -213,18 +213,21 @@ hsqs_superblock(struct Hsqs *hsqs) {
 	return &hsqs->superblock;
 }
 
-struct HsqsMapper *
-hsqs_mapper(struct Hsqs *hsqs) {
-	return &hsqs->mapper;
+int
+hsqs_request_map(
+		struct Hsqs *hsqs, struct HsqsMap *map, uint64_t offset,
+		uint64_t size) {
+	int rv = 0;
+	rv = hsqs_mapper_map(map, &hsqs->mapper, offset, size);
+	return rv;
 }
 
 const uint8_t *
 hsqs_trailing_bytes(struct Hsqs *hsqs) {
 	if (!is_initialized(hsqs, INITIALIZED_TRAILING_BYTES)) {
 		struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
-		struct HsqsMapper *mapper = hsqs_mapper(hsqs);
 		uint64_t trailing_start = hsqs_superblock_bytes_used(superblock);
-		size_t archive_size = hsqs_mapper_size(mapper);
+		size_t archive_size = hsqs_mapper_size(&hsqs->mapper);
 		uint64_t trailing_size;
 
 		if (archive_size <= trailing_start) {
@@ -233,8 +236,8 @@ hsqs_trailing_bytes(struct Hsqs *hsqs) {
 
 		trailing_size = archive_size - trailing_start;
 
-		hsqs_mapper_map(
-				&hsqs->trailing_map, mapper, trailing_start, trailing_size);
+		hsqs_request_map(
+				hsqs, &hsqs->trailing_map, trailing_start, trailing_size);
 	}
 	return hsqs_map_data(&hsqs->trailing_map);
 }

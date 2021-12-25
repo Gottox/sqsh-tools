@@ -66,7 +66,8 @@ hsqs_init(struct Hsqs *hsqs, const uint8_t *buffer, const size_t size);
 
 HSQS_NO_UNUSED int hsqs_open(struct Hsqs *hsqs, const char *path);
 
-struct HsqsMapper *hsqs_mapper(struct Hsqs *hsqs);
+int hsqs_request_map(
+		struct Hsqs *hsqs, struct HsqsMap *map, uint64_t offset, uint64_t size);
 
 struct HsqsSuperblockContext *hsqs_superblock(struct Hsqs *hsqs);
 

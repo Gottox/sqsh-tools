@@ -46,7 +46,7 @@ struct HsqsBuffer;
 struct HsqsFragmentTable {
 	const struct HsqsSuperblockContext *superblock;
 	struct HsqsTable table;
-	struct HsqsMapper *mapper;
+	struct Hsqs *hsqs;
 };
 
 HSQS_NO_UNUSED int

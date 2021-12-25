@@ -48,9 +48,8 @@ hsqs_metablock_init(
 		struct HsqsMetablockContext *context, struct Hsqs *hsqs,
 		uint64_t address) {
 	int rv = 0;
-	struct HsqsMapper *mapper = hsqs_mapper(hsqs);
 
-	rv = hsqs_mapper_map(&context->map, mapper, address, HSQS_SIZEOF_METABLOCK);
+	rv = hsqs_request_map(hsqs, &context->map, address, HSQS_SIZEOF_METABLOCK);
 	if (rv < 0) {
 		goto out;
 	}

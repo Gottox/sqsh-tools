@@ -84,7 +84,6 @@ hsqs_content_init(
 
 	context->inode = inode;
 	context->block_size = hsqs_superblock_block_size(superblock);
-	context->mapper = hsqs_mapper(hsqs);
 	context->hsqs = hsqs;
 
 	if (has_fragment(context)) {
@@ -133,9 +132,8 @@ hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
 	uint32_t outer_block_size;
 	uint64_t outer_offset = 0;
 
-	rv = hsqs_mapper_map(
-			&map, context->mapper, start_block + block_offset,
-			block_whole_size);
+	rv = hsqs_request_map(
+			context->hsqs, &map, start_block + block_offset, block_whole_size);
 
 	if (rv < 0) {
 		goto out;
