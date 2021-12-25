@@ -32,25 +32,19 @@
  * @created     : Friday Apr 30, 2021 11:09:40 CEST
  */
 
-#include <errno.h>
-#include <fcntl.h>
-#include <stdint.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
-#include "compression/compression.h"
 #include "hsqs.h"
+#include "compression/compression.h"
 
 static const uint64_t NO_SEGMENT = 0xFFFFFFFFFFFFFFFF;
 
 enum InitializedBitmap {
 	INITIALIZED_ID_TABLE = 1 << 0,
-	INITIALIZED_EXPORT_TABLE = 1 << 2,
-	INITIALIZED_XATTR_TABLE = 1 << 3,
-	INITIALIZED_FRAGMENT_TABLE = 1 << 4,
-	INITIALIZED_COMPRESSION_OPTIONS = 1 << 5,
-	INITIALIZED_TRAILING_BYTES = 1 << 6,
+	INITIALIZED_EXPORT_TABLE = 1 << 1,
+	INITIALIZED_XATTR_TABLE = 1 << 2,
+	INITIALIZED_FRAGMENT_TABLE = 1 << 3,
+	INITIALIZED_COMPRESSION_OPTIONS = 1 << 4,
+	INITIALIZED_TRAILING_BYTES = 1 << 5,
+	INITIALIZED_TABLE_MAPPER = 1 << 6,
 };
 
 static bool
@@ -213,12 +207,61 @@ hsqs_superblock(struct Hsqs *hsqs) {
 	return &hsqs->superblock;
 }
 
+static int
+get_table_mapper(struct Hsqs *hsqs, struct HsqsMapper **table_mapper) {
+	int rv = 0;
+	if (is_initialized(hsqs, INITIALIZED_TABLE_MAPPER)) {
+		*table_mapper = &hsqs->table_mapper;
+		goto out;
+	}
+	*table_mapper = NULL;
+	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
+	uint64_t inode_table_start = hsqs_superblock_inode_table_start(superblock);
+	uint64_t archive_size = hsqs_mapper_size(&hsqs->mapper);
+	if (archive_size == UINT64_MAX) {
+		archive_size = hsqs_superblock_bytes_used(superblock);
+	}
+
+	const uint64_t table_size = archive_size - inode_table_start;
+
+	rv = hsqs_mapper_map(
+			&hsqs->table_map, &hsqs->mapper, inode_table_start, table_size);
+	if (rv < 0) {
+		goto out;
+	}
+	const uint8_t *table_data = hsqs_map_data(&hsqs->table_map);
+	rv = hsqs_mapper_init_static(&hsqs->table_mapper, table_data, table_size);
+	if (rv < 0) {
+		goto out;
+	}
+	*table_mapper = &hsqs->table_mapper;
+	hsqs->initialized |= INITIALIZED_TABLE_MAPPER;
+
+out:
+	return rv;
+}
+
 int
 hsqs_request_map(
 		struct Hsqs *hsqs, struct HsqsMap *map, uint64_t offset,
 		uint64_t size) {
 	int rv = 0;
-	rv = hsqs_mapper_map(map, &hsqs->mapper, offset, size);
+	struct HsqsMapper *mapper;
+	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
+	uint64_t inode_table_start = hsqs_superblock_inode_table_start(superblock);
+
+	if (offset >= inode_table_start) {
+		rv = get_table_mapper(hsqs, &mapper);
+		if (rv < 0) {
+			goto out;
+		}
+		offset -= inode_table_start;
+	} else {
+		mapper = &hsqs->mapper;
+	}
+
+	rv = hsqs_mapper_map(map, mapper, offset, size);
+out:
 	return rv;
 }
 
@@ -269,6 +312,10 @@ hsqs_cleanup(struct Hsqs *hsqs) {
 	}
 	if (is_initialized(hsqs, INITIALIZED_COMPRESSION_OPTIONS)) {
 		hsqs_compression_options_cleanup(&hsqs->compression_options);
+	}
+	if (is_initialized(hsqs, INITIALIZED_TABLE_MAPPER)) {
+		hsqs_mapper_cleanup(&hsqs->table_mapper);
+		hsqs_map_unmap(&hsqs->table_map);
 	}
 	hsqs_superblock_cleanup(&hsqs->superblock);
 	hsqs_mapper_cleanup(&hsqs->mapper);

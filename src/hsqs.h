@@ -51,6 +51,8 @@
 struct Hsqs {
 	uint32_t error;
 	struct HsqsMapper mapper;
+	struct HsqsMapper table_mapper;
+	struct HsqsMap table_map;
 	struct HsqsSuperblockContext superblock;
 	struct HsqsTable id_table;
 	struct HsqsTable export_table;
