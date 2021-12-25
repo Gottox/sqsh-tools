@@ -39,7 +39,7 @@
 
 #define SUPERBLOCK_INTERNAL_H
 
-struct HSQS_UNALIGNED HsqsSuperblock {
+struct HsqsSuperblock {
 	uint32_t magic;
 	uint32_t inode_count;
 	uint32_t modification_time;
