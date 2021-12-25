@@ -39,10 +39,11 @@
 #include <stdint.h>
 #include <string.h>
 
+typedef const __attribute__((aligned(1))) uint64_t unaligned_uint64_t;
 static uint64_t
 lookup_table_get(const struct HsqsTable *table, off_t index) {
-	const uint64_t *lookup_table =
-			(const uint64_t *)hsqs_map_data(&table->lookup_table);
+	unaligned_uint64_t *lookup_table =
+			(unaligned_uint64_t *)hsqs_map_data(&table->lookup_table);
 
 	return lookup_table[index];
 }
