@@ -63,6 +63,8 @@ const char *hsqs_xattr_iterator_prefix(struct HsqsXattrIterator *iterator);
 uint16_t hsqs_xattr_iterator_prefix_size(struct HsqsXattrIterator *iterator);
 const char *hsqs_xattr_iterator_name(struct HsqsXattrIterator *iterator);
 uint16_t hsqs_xattr_iterator_name_size(struct HsqsXattrIterator *iterator);
+int hsqs_xattr_iterator_fullname_cmp(
+		struct HsqsXattrIterator *iterator, const char *name);
 int hsqs_xattr_iterator_fullname_dup(
 		struct HsqsXattrIterator *iterator, char **fullname_buffer);
 

@@ -147,7 +147,6 @@ static int
 hsqsfuse_getxattr(
 		const char *path, const char *name, char *value, size_t size) {
 	int rv = 0;
-	char *fullname;
 	const char *value_ptr = NULL;
 	size_t value_size;
 	struct HsqsInodeContext inode = {0};
@@ -161,22 +160,17 @@ hsqsfuse_getxattr(
 
 	rv = hsqs_inode_xattr_iterator(&inode, &iter);
 	if (rv < 0) {
-		rv = -EINVAL; // TODO: find correct error code for this.
+		// TODO: this means that the archive is corrupt, not that it has no
+		// xattrs. Handle the error accordingly.
+		rv = -ENODATA;
 		goto out;
 	}
 
 	while (value_ptr == NULL && (rv = hsqs_xattr_iterator_next(&iter)) > 0) {
-		rv = hsqs_xattr_iterator_fullname_dup(&iter, &fullname);
-		if (rv < 0) {
-			rv = -EINVAL; // TODO: find correct error code for this.
-			goto out;
-		}
-
-		if (strcmp(fullname, name) == 0) {
+		if (hsqs_xattr_iterator_fullname_cmp(&iter, name) == 0) {
 			value_ptr = hsqs_xattr_iterator_value(&iter);
 			value_size = hsqs_xattr_iterator_value_size(&iter);
 		}
-		free(fullname);
 	}
 	if (rv < 0) {
 		rv = -EINVAL;

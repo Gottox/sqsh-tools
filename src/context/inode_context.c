@@ -659,10 +659,10 @@ hsqs_inode_xattr_iterator(
 		const struct HsqsInodeContext *inode,
 		struct HsqsXattrIterator *iterator) {
 	int rv = 0;
-	struct HsqsXattrTable *table;
+	struct HsqsXattrTable *table = NULL;
 
 	rv = hsqs_xattr_table(inode->hsqs, &table);
-	if (rv < 0) {
+	if (rv < 0 && rv != -HSQS_ERROR_NO_XATTR_TABLE) {
 		return rv;
 	}
 	return hsqs_xattr_iterator_init(iterator, table, inode);

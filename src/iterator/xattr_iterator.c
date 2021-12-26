@@ -52,6 +52,9 @@ hsqs_xattr_iterator_init(
 		iterator->remaining_entries = 0;
 		return 0;
 	}
+	if (index != HSQS_INODE_NO_XATTR && xattr_table == NULL) {
+		return -HSQS_INODE_NO_XATTR;
+	}
 
 	rv = hsqs_table_get(&xattr_table->table, index, &ref);
 	if (rv < 0) {
@@ -240,6 +243,27 @@ hsqs_xattr_iterator_prefix(struct HsqsXattrIterator *iterator) {
 uint16_t
 hsqs_xattr_iterator_prefix_size(struct HsqsXattrIterator *iterator) {
 	return strlen(hsqs_xattr_iterator_prefix(iterator));
+}
+
+int
+hsqs_xattr_iterator_fullname_cmp(
+		struct HsqsXattrIterator *iterator, const char *name) {
+	int rv = 0;
+	const char *prefix = hsqs_xattr_iterator_prefix(iterator);
+	int prefix_len = strlen(prefix);
+	rv = strncmp(name, prefix, prefix_len);
+	if (rv != 0) {
+		return rv;
+	}
+	name += prefix_len;
+
+	const char *xattr_name = hsqs_xattr_iterator_name(iterator);
+	if (strlen(name) != hsqs_xattr_iterator_name_size(iterator)) {
+		return -1;
+	} else {
+		return strncmp(
+				name, xattr_name, hsqs_xattr_iterator_name_size(iterator));
+	}
 }
 
 int
