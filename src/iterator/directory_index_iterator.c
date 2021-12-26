@@ -15,8 +15,10 @@ get_inode(const struct HsqsInodeDirectoryIndexIterator *iterator) {
 			&iterator->inode->metablock);
 }
 
+// TODO: use hsqs_data_inode_directory_ext_index().
 static const struct HsqsInodeDirectoryIndex *
-current_directory_index(struct HsqsInodeDirectoryIndexIterator *iterator) {
+current_directory_index(
+		const struct HsqsInodeDirectoryIndexIterator *iterator) {
 	const uint8_t *tmp = (const uint8_t *)get_inode(iterator);
 	return (const struct HsqsInodeDirectoryIndex
 					*)&tmp[iterator->current_offset];
@@ -34,14 +36,15 @@ hsqs_inode_directory_index_iterator_init(
 		struct HsqsInodeContext *inode) {
 	int rv = 0;
 
-	if (hsqs_inode_type(inode) != HSQS_INODE_TYPE_DIRECTORY &&
-		hsqs_inode_is_extended(inode)) {
+	if (hsqs_inode_type(inode) != HSQS_INODE_TYPE_DIRECTORY ||
+		hsqs_inode_is_extended(inode) == false) {
 		return -HSQS_ERROR_NO_EXTENDED_DIRECTORY;
 	}
 
 	iterator->inode = inode;
 	iterator->current_offset = 0;
-	iterator->next_offset = HSQS_SIZEOF_INODE_DIRECTORY_EXT;
+	iterator->next_offset =
+			HSQS_SIZEOF_INODE_HEADER + HSQS_SIZEOF_INODE_DIRECTORY_EXT;
 
 	const struct HsqsInodeDirectoryExt *xdir =
 			hsqs_data_inode_directory_ext(get_inode(iterator));
@@ -56,6 +59,8 @@ hsqs_inode_directory_index_iterator_next(
 	int rv = 0;
 	iterator->current_offset = iterator->next_offset;
 
+	iterator->remaining_entries--;
+
 	// Make sure next entry is loaded:
 	iterator->next_offset += HSQS_SIZEOF_INODE_DIRECTORY_INDEX;
 	rv = directory_index_data_more(iterator, iterator->next_offset);
@@ -64,16 +69,14 @@ hsqs_inode_directory_index_iterator_next(
 	}
 
 	// Make sure current index has its name populated
-	iterator->next_offset += hsqs_data_inode_directory_index_name_size(
-			current_directory_index(iterator));
+	iterator->next_offset +=
+			hsqs_inode_directory_index_iterator_name_size(iterator);
 	rv = directory_index_data_more(iterator, iterator->next_offset);
 	if (rv < 0) {
 		return rv;
 	}
 
-	iterator->current_offset = iterator->next_offset;
-
-	return rv;
+	return iterator->remaining_entries;
 }
 
 uint32_t

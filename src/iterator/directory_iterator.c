@@ -48,20 +48,21 @@ directory_iterator_index_lookup(
 		struct HsqsDirectoryIterator *iterator, const char *name,
 		const size_t name_len) {
 	int rv = 0;
-	struct HsqsInodeDirectoryIndexIterator index_iterator;
+	struct HsqsInodeDirectoryIndexIterator index_iterator = {0};
 	struct HsqsInodeContext *inode = iterator->inode;
 
 	rv = hsqs_inode_directory_index_iterator_init(&index_iterator, inode);
 	if (rv < 0) {
 		return 0;
 	}
-	while (hsqs_inode_directory_index_iterator_next(&index_iterator)) {
+	while ((rv = hsqs_inode_directory_index_iterator_next(&index_iterator)) >
+		   0) {
 		const char *index_name =
 				hsqs_inode_directory_index_iterator_name(&index_iterator);
 		uint32_t index_name_size =
 				hsqs_inode_directory_index_iterator_name_size(&index_iterator);
 
-		if (strncmp(name, (char *)index_name, MIN(index_name_size, name_len)) >
+		if (strncmp(name, (char *)index_name, MIN(index_name_size, name_len)) <
 			0) {
 			break;
 		}

@@ -136,7 +136,7 @@ uint16_t hsqs_data_inode_directory_ext_block_offset(
 		const struct HsqsInodeDirectoryExt *directory_ext);
 uint32_t hsqs_data_inode_directory_ext_xattr_idx(
 		const struct HsqsInodeDirectoryExt *directory_ext);
-const struct HsqsInodeDirectoryIndex *hsqs_data_inode_directory_ext_index(
+const uint8_t *hsqs_data_inode_directory_ext_index(
 		const struct HsqsInodeDirectoryExt *directory_ext);
 
 uint32_t hsqs_data_inode_directory_index_index(

@@ -219,10 +219,10 @@ hsqs_data_inode_directory_ext_xattr_idx(
 		const struct HsqsInodeDirectoryExt *directory_ext) {
 	return htole32(directory_ext->xattr_idx);
 }
-const struct HsqsInodeDirectoryIndex *
+const uint8_t *
 hsqs_data_inode_directory_ext_index(
 		const struct HsqsInodeDirectoryExt *directory_ext) {
-	return (const struct HsqsInodeDirectoryIndex *)&directory_ext[1];
+	return (const uint8_t *)&directory_ext[1];
 }
 
 uint32_t
