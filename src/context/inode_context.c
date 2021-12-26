@@ -35,7 +35,7 @@
 #include "inode_context.h"
 #include "../data/datablock_internal.h"
 #include "../data/inode.h"
-#include "xattr_context.h"
+#include "../iterator/xattr_iterator.h"
 
 #include "../error.h"
 #include "../hsqs.h"
