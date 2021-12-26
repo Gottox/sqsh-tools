@@ -37,6 +37,9 @@
 #include "../data/inode.h"
 #include "../error.h"
 
+static const uint64_t INODE_HEADER_SIZE =
+		HSQS_SIZEOF_INODE_HEADER + HSQS_SIZEOF_INODE_DIRECTORY_EXT;
+
 static const struct HsqsInode *
 get_inode(const struct HsqsInodeDirectoryIndexIterator *iterator) {
 	return (const struct HsqsInode *)hsqs_metablock_stream_data(
@@ -71,8 +74,7 @@ hsqs_inode_directory_index_iterator_init(
 
 	iterator->inode = inode;
 	iterator->current_offset = 0;
-	iterator->next_offset =
-			HSQS_SIZEOF_INODE_HEADER + HSQS_SIZEOF_INODE_DIRECTORY_EXT;
+	iterator->next_offset = INODE_HEADER_SIZE;
 
 	const struct HsqsInodeDirectoryExt *xdir =
 			hsqs_data_inode_directory_ext(get_inode(iterator));
