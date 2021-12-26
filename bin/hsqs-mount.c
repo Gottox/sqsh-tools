@@ -361,7 +361,9 @@ hsqsfuse_read(
 		goto out;
 	}
 
-	memcpy(buf, hsqs_content_data(&file), size);
+	if (size != 0) {
+		memcpy(buf, hsqs_content_data(&file), size);
+	}
 
 	rv = size;
 out:
