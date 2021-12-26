@@ -62,6 +62,7 @@ directory_iterator_index_lookup(
 		uint32_t index_name_size =
 				hsqs_inode_directory_index_iterator_name_size(&index_iterator);
 
+		// BUG: the branch could be taken too early when the name is a prefix
 		if (strncmp(name, (char *)index_name,
 					MIN(index_name_size, name_len + 1)) < 0) {
 			break;
