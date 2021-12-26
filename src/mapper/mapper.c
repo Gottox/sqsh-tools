@@ -47,16 +47,16 @@ extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_curl;
 
 int
 hsqs_mapper_init_mmap(struct HsqsMapper *mapper, const char *path) {
-	mapper->impl = &hsqs_mapper_impl_mmap_full;
-	// mapper->impl = &hsqs_mapper_impl_curl;
+	// mapper->impl = &hsqs_mapper_impl_mmap;
+	mapper->impl = &hsqs_mapper_impl_curl;
 	return mapper->impl->init(mapper, path, strlen(path));
 }
 
 int
 hsqs_mapper_init_static(
 		struct HsqsMapper *mapper, const uint8_t *input, size_t size) {
-	mapper->impl = &hsqs_mapper_impl_canary;
-	// mapper->impl = &hsqs_mapper_impl_in_memory;
+	// mapper->impl = &hsqs_mapper_impl_canary;
+	mapper->impl = &hsqs_mapper_impl_static;
 	return mapper->impl->init(mapper, input, size);
 }
 

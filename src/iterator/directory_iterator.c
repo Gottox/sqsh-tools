@@ -62,8 +62,8 @@ directory_iterator_index_lookup(
 		uint32_t index_name_size =
 				hsqs_inode_directory_index_iterator_name_size(&index_iterator);
 
-		if (strncmp(name, (char *)index_name, MIN(index_name_size, name_len)) <
-			0) {
+		if (strncmp(name, (char *)index_name,
+					MIN(index_name_size, name_len + 1)) < 0) {
 			break;
 		}
 		iterator->next_offset =
