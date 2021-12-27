@@ -43,6 +43,40 @@ get_metablock(const struct HsqsMetablockContext *context) {
 	return (const struct HsqsMetablock *)hsqs_map_data(&context->map);
 }
 
+static int
+read_buffer(struct HsqsMetablockContext *context, struct HsqsBuffer *buffer) {
+	int rv = 0;
+	const struct HsqsMetablock *metablock = get_metablock(context);
+	uint32_t size = hsqs_data_metablock_size(metablock);
+	bool is_compressed = hsqs_data_metablock_is_compressed(metablock);
+	uint32_t map_size;
+
+	if (size > HSQS_METABLOCK_BLOCK_SIZE) {
+		return -HSQS_ERROR_METABLOCK_TOO_BIG;
+	}
+	if (ADD_OVERFLOW(size, HSQS_SIZEOF_METABLOCK, &map_size)) {
+		rv = -HSQS_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
+
+	rv = hsqs_map_resize(&context->map, map_size);
+	if (rv < 0) {
+		goto out;
+	}
+
+	// metablock may has moved after resize, so re-request it:
+	metablock = get_metablock(context);
+	const uint8_t *data = hsqs_data_metablock_data(metablock);
+
+	rv = hsqs_buffer_append_block(buffer, data, size, is_compressed);
+	if (rv < 0) {
+		goto out;
+	}
+
+out:
+	return rv;
+}
+
 int
 hsqs_metablock_init(
 		struct HsqsMetablockContext *context, struct Hsqs *hsqs,
@@ -105,7 +139,7 @@ hsqs_metablock_read(struct HsqsMetablockContext *context) {
 		if (rv < 0) {
 			goto out;
 		}
-		rv = hsqs_metablock_to_buffer(context, context->buffer);
+		rv = read_buffer(context, context->buffer);
 		if (rv < 0) {
 			goto out;
 		}
@@ -121,35 +155,16 @@ int
 hsqs_metablock_to_buffer(
 		struct HsqsMetablockContext *context, struct HsqsBuffer *buffer) {
 	int rv = 0;
-	const struct HsqsMetablock *metablock = get_metablock(context);
-	uint32_t size = hsqs_data_metablock_size(metablock);
-	bool is_compressed = hsqs_data_metablock_is_compressed(metablock);
-	uint32_t map_size;
-
-	if (size > HSQS_METABLOCK_BLOCK_SIZE) {
-		return -HSQS_ERROR_METABLOCK_TOO_BIG;
-	}
-	if (ADD_OVERFLOW(size, HSQS_SIZEOF_METABLOCK, &map_size)) {
-		rv = -HSQS_ERROR_INTEGER_OVERFLOW;
-		goto out;
-	}
-
-	rv = hsqs_map_resize(&context->map, map_size);
+	rv = hsqs_metablock_read(context);
 	if (rv < 0) {
-		goto out;
+		return rv;
 	}
+	const struct HsqsBuffer *source_buffer = context->buffer;
 
-	// metablock may has moved after resize, so re-request it:
-	metablock = get_metablock(context);
-	const uint8_t *data = hsqs_data_metablock_data(metablock);
+	const uint8_t *source_data = hsqs_buffer_data(source_buffer);
+	const uint64_t source_size = hsqs_buffer_size(source_buffer);
 
-	rv = hsqs_buffer_append_block(buffer, data, size, is_compressed);
-	if (rv < 0) {
-		goto out;
-	}
-
-out:
-	return rv;
+	return hsqs_buffer_append_block(buffer, source_data, source_size, false);
 }
 
 int

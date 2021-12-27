@@ -39,21 +39,37 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include <stdio.h>
+
 static off_t
 hash_to_start_index(struct HsqsLruHashmap *hashmap, uint64_t hash) {
-	return (hash * hash) % hashmap->size;
+	union {
+		uint64_t hash;
+		uint8_t bytes[8];
+	} hash_bytes = {.hash = hash}, target_bytes = {0};
+
+	for (size_t i = 0; i < 8; i++) {
+		target_bytes.bytes[0] = hash_bytes.bytes[i] ^ hash_bytes.bytes[7 - i];
+	}
+	return target_bytes.hash % hashmap->size;
 }
 
 static struct HsqsLruEntry *
 find_entry(struct HsqsLruHashmap *hashmap, uint64_t hash, bool find_free) {
 	int start_index = hash_to_start_index(hashmap, hash);
+	hsqs_index_t i = 0, index = 0;
+	struct HsqsLruEntry *candidate = NULL;
 
-	for (hsqs_index_t i = 0; i < hashmap->size; i++) {
-		hsqs_index_t index = (start_index + i) % hashmap->size;
-		struct HsqsLruEntry *candidate = &hashmap->entries[index];
+	for (i = 0; i < hashmap->size; i++) {
+		index = (start_index + i) % hashmap->size;
+		candidate = &hashmap->entries[index];
 
-		if (find_free && candidate->pointer == NULL) {
-			return candidate;
+		if (candidate->pointer == NULL) {
+			if (find_free) {
+				return candidate;
+			} else {
+				return NULL;
+			}
 		}
 		if (candidate->hash == hash && candidate->pointer != NULL) {
 			return candidate;
