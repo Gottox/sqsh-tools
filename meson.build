@@ -149,6 +149,10 @@ if get_option('trace')
 	hsqs_src += 'src/utils/trace.c'
 endif
 
+if get_option('debug')
+	build_args += ['-DDEBUG']
+endif
+
 libhsqs = library(
   'hsqs',
   hsqs_src,
