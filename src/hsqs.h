@@ -50,6 +50,7 @@
 
 struct Hsqs {
 	uint32_t error;
+	struct HsqsLruHashmap metablock_cache;
 	struct HsqsMapper mapper;
 	struct HsqsMapper table_mapper;
 	struct HsqsMap table_map;
@@ -81,6 +82,7 @@ int hsqs_xattr_table(struct Hsqs *hsqs, struct HsqsXattrTable **xattr_table);
 int hsqs_compression_options(
 		struct Hsqs *hsqs,
 		struct HsqsCompressionOptionsContext **compression_options);
+struct HsqsLruHashmap *hsqs_metablock_cache(struct Hsqs *hsqs);
 const uint8_t *hsqs_trailing_bytes(struct Hsqs *hsqs);
 size_t hsqs_trailing_bytes_size(struct Hsqs *hsqs);
 int hsqs_cleanup(struct Hsqs *hsqs);

@@ -53,6 +53,8 @@ hsqs_metablock_init(
 	if (rv < 0) {
 		goto out;
 	}
+	context->hsqs = hsqs;
+	context->address = address;
 
 out:
 	if (rv < 0) {
@@ -66,6 +68,53 @@ uint32_t
 hsqs_metablock_compressed_size(const struct HsqsMetablockContext *context) {
 	const struct HsqsMetablock *metablock = get_metablock(context);
 	return hsqs_data_metablock_size(metablock);
+}
+
+static int
+buffer_dtor(void *data) {
+	struct HsqsBuffer *buffer = data;
+	hsqs_buffer_cleanup(buffer);
+	return 0;
+}
+
+int
+hsqs_metablock_read(struct HsqsMetablockContext *context) {
+	int rv = 0;
+	struct HsqsSuperblockContext *superblock = hsqs_superblock(context->hsqs);
+	struct HsqsLruHashmap *cache = hsqs_metablock_cache(context->hsqs);
+
+	if (context->buffer != NULL) {
+		return 0;
+	}
+
+	context->ref = hsqs_lru_hashmap_get(cache, context->address);
+	if (context->ref == NULL) {
+		rv = hsqs_ref_count_new(
+				&context->ref, sizeof(struct HsqsBuffer), buffer_dtor);
+		if (rv < 0) {
+			goto out;
+		}
+		if (rv < 0) {
+			goto out;
+		}
+		context->buffer = hsqs_ref_count_retain(context->ref);
+		rv = hsqs_buffer_init(
+				context->buffer, hsqs_superblock_compression_id(superblock),
+				HSQS_METABLOCK_BLOCK_SIZE);
+		rv = hsqs_lru_hashmap_put(cache, context->address, context->ref);
+		if (rv < 0) {
+			goto out;
+		}
+		rv = hsqs_metablock_to_buffer(context, context->buffer);
+		if (rv < 0) {
+			goto out;
+		}
+	} else {
+		context->buffer = hsqs_ref_count_retain(context->ref);
+	}
+
+out:
+	return rv;
 }
 
 int
@@ -105,6 +154,7 @@ out:
 
 int
 hsqs_metablock_cleanup(struct HsqsMetablockContext *context) {
+	hsqs_ref_count_release(context->ref);
 	hsqs_map_unmap(&context->map);
 	return 0;
 }

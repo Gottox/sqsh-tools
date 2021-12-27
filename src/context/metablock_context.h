@@ -34,6 +34,7 @@
 
 #include "../mapper/mapper.h"
 #include "../utils.h"
+#include "../utils/lru_hashmap.h"
 #include <stdint.h>
 
 #ifndef METABLOCK_CONTEXT_H
@@ -48,6 +49,10 @@ struct HsqsSuperblockContext;
 struct HsqsBuffer;
 
 struct HsqsMetablockContext {
+	struct Hsqs *hsqs;
+	uint64_t address;
+	struct HsqsRefCount *ref;
+	struct HsqsBuffer *buffer;
 	struct HsqsMap map;
 };
 
@@ -57,6 +62,8 @@ int hsqs_metablock_init(
 
 uint32_t
 hsqs_metablock_compressed_size(const struct HsqsMetablockContext *context);
+
+int hsqs_metablock_read(struct HsqsMetablockContext *context);
 
 HSQS_NO_UNUSED int hsqs_metablock_to_buffer(
 		struct HsqsMetablockContext *context, struct HsqsBuffer *buffer);

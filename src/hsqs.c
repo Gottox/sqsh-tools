@@ -69,6 +69,8 @@ init(struct Hsqs *hsqs) {
 		}
 	}
 
+	rv = hsqs_lru_hashmap_init(&hsqs->metablock_cache, 1024);
+
 out:
 	if (rv < 0) {
 		hsqs_cleanup(hsqs);
@@ -265,6 +267,11 @@ out:
 	return rv;
 }
 
+struct HsqsLruHashmap *
+hsqs_metablock_cache(struct Hsqs *hsqs) {
+	return &hsqs->metablock_cache;
+}
+
 const uint8_t *
 hsqs_trailing_bytes(struct Hsqs *hsqs) {
 	if (!is_initialized(hsqs, INITIALIZED_TRAILING_BYTES)) {
@@ -317,6 +324,7 @@ hsqs_cleanup(struct Hsqs *hsqs) {
 		hsqs_mapper_cleanup(&hsqs->table_mapper);
 		hsqs_map_unmap(&hsqs->table_map);
 	}
+	hsqs_lru_hashmap_cleanup(&hsqs->metablock_cache);
 	hsqs_superblock_cleanup(&hsqs->superblock);
 	hsqs_mapper_cleanup(&hsqs->mapper);
 
