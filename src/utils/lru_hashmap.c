@@ -37,26 +37,28 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
-#include <stdio.h>
-
-static off_t
+static uint32_t
 hash_to_start_index(struct HsqsLruHashmap *hashmap, uint64_t hash) {
 	union {
 		uint64_t hash;
 		uint8_t bytes[8];
 	} hash_bytes = {.hash = hash}, target_bytes = {0};
 
-	for (size_t i = 0; i < 8; i++) {
-		target_bytes.bytes[0] = hash_bytes.bytes[i] ^ hash_bytes.bytes[7 - i];
+	for (size_t i = 0; i < sizeof(uint64_t); i++) {
+		target_bytes.bytes[i] = hash_bytes.bytes[i] ^
+				hash_bytes.bytes[sizeof(uint64_t) - i - 1];
 	}
+	// reserve the lower 2 bits for collisions.
+	target_bytes.hash <<= 2;
 	return target_bytes.hash % hashmap->size;
 }
 
 static struct HsqsLruEntry *
 find_entry(struct HsqsLruHashmap *hashmap, uint64_t hash, bool find_free) {
-	int start_index = hash_to_start_index(hashmap, hash);
+	uint32_t start_index = hash_to_start_index(hashmap, hash);
 	hsqs_index_t i = 0, index = 0;
 	struct HsqsLruEntry *candidate = NULL;
 
@@ -68,12 +70,21 @@ find_entry(struct HsqsLruHashmap *hashmap, uint64_t hash, bool find_free) {
 			if (find_free) {
 				return candidate;
 			} else {
+#ifdef DEBUG
+				hashmap->misses++;
+#endif
 				return NULL;
 			}
 		}
-		if (candidate->hash == hash && candidate->pointer != NULL) {
+		if (candidate->hash == hash) {
+#ifdef DEBUG
+			hashmap->hits++;
+#endif
 			return candidate;
 		}
+#ifdef DEBUG
+		hashmap->collisions++;
+#endif
 	}
 	return NULL;
 }
@@ -144,14 +155,26 @@ lru_attach(struct HsqsLruHashmap *hashmap, struct HsqsLruEntry *entry) {
 
 int
 hsqs_lru_hashmap_init(struct HsqsLruHashmap *hashmap, size_t size) {
+	int rv = 0;
 	hashmap->size = size;
 	hashmap->newest = NULL;
 	hashmap->oldest = NULL;
 	hashmap->entries = NULL;
 
+	rv = pthread_mutex_init(&hashmap->lock, NULL);
+	if (rv != 0) {
+		rv = -HSQS_ERROR_HASHMAP_INTERNAL_ERROR;
+		goto out;
+	}
+
 	hashmap->entries = calloc(size, sizeof(struct HsqsLruEntry));
 	if (hashmap->entries == NULL) {
-		return -HSQS_ERROR_MALLOC_FAILED;
+		rv = -HSQS_ERROR_MALLOC_FAILED;
+		goto out;
+	}
+out:
+	if (rv < 0) {
+		hsqs_lru_hashmap_cleanup(hashmap);
 	}
 	return 0;
 }
@@ -160,15 +183,22 @@ int
 hsqs_lru_hashmap_put(
 		struct HsqsLruHashmap *hashmap, uint64_t hash,
 		struct HsqsRefCount *pointer) {
+	pthread_mutex_lock(&hashmap->lock);
+	int rv = 0;
 	struct HsqsLruEntry *candidate = find_entry(hashmap, hash, true);
 	hsqs_ref_count_retain(pointer);
 
 	if (candidate == NULL) {
 		if (hashmap->oldest == NULL) {
+			//
 			// Should never happen:
-			return -HSQS_ERROR_HASHMAP_INTERNAL_ERROR;
+			rv = -HSQS_ERROR_HASHMAP_INTERNAL_ERROR;
+			goto out;
 		}
 
+#ifdef DEBUG
+		hashmap->overflows++;
+#endif
 		// TODO: This is potentional slow. Instead find the current first match
 		// and switch places with this one.
 		candidate = hashmap->oldest;
@@ -181,21 +211,25 @@ hsqs_lru_hashmap_put(
 	candidate->pointer = pointer;
 	candidate->hash = hash;
 	lru_attach(hashmap, candidate);
-
-	return 0;
+out:
+	pthread_mutex_unlock(&hashmap->lock);
+	return rv;
 }
 
 struct HsqsRefCount *
 hsqs_lru_hashmap_get(struct HsqsLruHashmap *hashmap, uint64_t hash) {
+	pthread_mutex_lock(&hashmap->lock);
+	struct HsqsRefCount *pointer = NULL;
 	struct HsqsLruEntry *candidate = find_entry(hashmap, hash, false);
 
-	if (candidate == NULL) {
-		return NULL;
+	if (candidate != NULL) {
+		lru_detach(hashmap, candidate);
+		lru_attach(hashmap, candidate);
+		pointer = candidate->pointer;
 	}
-	lru_detach(hashmap, candidate);
-	lru_attach(hashmap, candidate);
 
-	return candidate->pointer;
+	pthread_mutex_unlock(&hashmap->lock);
+	return pointer;
 }
 
 int
@@ -205,6 +239,16 @@ hsqs_lru_hashmap_cleanup(struct HsqsLruHashmap *hashmap) {
 			hsqs_ref_count_release(hashmap->entries[i].pointer);
 		}
 	}
+#ifdef DEBUG
+	fprintf(stderr, "Hashmap size:        %lu\n", hashmap->size);
+	fprintf(stderr, "Hashmap collisions:  %lu\n", hashmap->collisions);
+	fprintf(stderr, "Hashmap misses:      %lu\n", hashmap->misses);
+	fprintf(stderr, "Hashmap hits:        %lu\n", hashmap->hits);
+	fprintf(stderr, "Hashmap overflows:   %lu\n", hashmap->overflows);
+	fprintf(stderr, "Hashmap hitrate:     %f\n",
+			(float)hashmap->hits / (float)hashmap->misses);
+#endif
+	pthread_mutex_destroy(&hashmap->lock);
 	free(hashmap->entries);
 	return 0;
 }

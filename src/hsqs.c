@@ -61,11 +61,7 @@ init(struct Hsqs *hsqs) {
 		goto out;
 	}
 
-	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
-	uint64_t inode_table_start = hsqs_superblock_inode_table_start(superblock);
-	uint64_t archive_size = hsqs_superblock_bytes_used(superblock);
-	const uint64_t table_size = archive_size - inode_table_start;
-	rv = hsqs_lru_hashmap_init(&hsqs->metablock_cache, table_size);
+	rv = hsqs_lru_hashmap_init(&hsqs->metablock_cache, 16);
 	if (rv < 0) {
 		goto out;
 	}

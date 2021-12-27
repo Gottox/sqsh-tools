@@ -34,6 +34,7 @@
 
 #include "../utils.h"
 #include "ref_count.h"
+#include <pthread.h>
 #include <stdint.h>
 #include <sys/types.h>
 
@@ -55,6 +56,13 @@ struct HsqsLruHashmap {
 	struct HsqsLruEntry *oldest;
 	struct HsqsLruEntry *newest;
 	struct HsqsLruEntry *entries;
+	pthread_mutex_t lock;
+#ifdef DEBUG
+	size_t collisions;
+	size_t misses;
+	size_t hits;
+	size_t overflows;
+#endif
 };
 
 HSQS_NO_UNUSED int
