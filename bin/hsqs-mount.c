@@ -389,6 +389,12 @@ out:
 	return rv;
 }
 
+static void
+hsqsfuse_destroy(void *private_data) {
+	(void)private_data;
+	hsqs_cleanup(&data.hsqs);
+}
+
 static const struct fuse_operations hsqsfuse_operations = {
 		.init = hsqsfuse_init,
 		.getattr = hsqsfuse_getattr,
@@ -398,6 +404,7 @@ static const struct fuse_operations hsqsfuse_operations = {
 		.open = hsqsfuse_open,
 		.read = hsqsfuse_read,
 		.readlink = hsqsfuse_readlink,
+		.destroy = hsqsfuse_destroy,
 };
 
 static int
