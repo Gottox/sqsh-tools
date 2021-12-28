@@ -51,8 +51,8 @@ hsqs_hdr = [
 	'src/table/table.h',
 	'src/table/xattr_table.h',
 	'src/utils.h',
-	'src/utils/lru_hashmap.h',
-	'src/utils/ref_count.h',
+	'src/cache/lru_hashmap.h',
+	'src/cache/ref_count.h',
 ]
 
 hsqs_src = [
@@ -86,13 +86,13 @@ hsqs_src = [
 	'src/table/table.c',
 	'src/table/xattr_table.c',
 	'src/utils.c',
-	'src/utils/lru_hashmap.c',
-	'src/utils/ref_count.c',
+	'src/cache/lru_hashmap.c',
+	'src/cache/ref_count.c',
 ]
 
 hsqs_test = [
 	'test/integration.c',
-	'test/utils/lru_hashmap.c',
+	'test/cache/lru_hashmap.c',
 ]
 
 libhsqs_deps = [ ]

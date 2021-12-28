@@ -32,8 +32,8 @@
  * @created     : Monday Dec 06, 2021 17:49:46 CET
  */
 
+#include "../cache/lru_hashmap.h"
 #include "../compression/buffer.h"
-#include "../utils/lru_hashmap.h"
 #include <curl/curl.h>
 #include <stdint.h>
 
