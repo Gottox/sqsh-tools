@@ -21,7 +21,7 @@ WIP Status:
 * [x] export
 * [ ] frontend api
 * [x] better fragment support
-* [ ] caching system
+* [x] caching system
 
 # Resource
 
