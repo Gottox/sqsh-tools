@@ -94,6 +94,9 @@ bool hsqs_superblock_has_compression_options(
 uint32_t
 hsqs_superblock_block_size(const struct HsqsSuperblockContext *context);
 
+uint32_t
+hsqs_superblock_modification_time(const struct HsqsSuperblockContext *context);
+
 uint32_t hsqs_superblock_fragment_entry_count(
 		const struct HsqsSuperblockContext *context);
 

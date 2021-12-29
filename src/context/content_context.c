@@ -42,25 +42,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-static bool
-has_fragment(struct HsqsFileContext *context) {
-	return hsqs_inode_file_fragment_block_index(context->inode) !=
-			HSQS_INODE_NO_FRAGMENT;
-}
-
-uint32_t
-datablock_count(struct HsqsFileContext *context) {
-	struct HsqsSuperblockContext *superblock = hsqs_superblock(context->hsqs);
-	uint64_t file_size = hsqs_inode_file_size(context->inode);
-	uint32_t block_size = hsqs_superblock_block_size(superblock);
-
-	if (has_fragment(context)) {
-		return file_size / block_size;
-	} else {
-		return HSQS_DEVIDE_CEIL(file_size, block_size);
-	}
-}
-
 static uint64_t
 datablock_offset(struct HsqsFileContext *context, uint32_t block_index) {
 	uint64_t offset = 0;
@@ -86,7 +67,7 @@ hsqs_content_init(
 	context->block_size = hsqs_superblock_block_size(superblock);
 	context->hsqs = hsqs;
 
-	if (has_fragment(context)) {
+	if (hsqs_inode_has_fragment(inode)) {
 		rv = hsqs_fragment_table(context->hsqs, &context->fragment_table);
 		if (rv < 0) {
 			return rv;
@@ -125,7 +106,7 @@ hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
 	uint64_t start_block = hsqs_inode_file_blocks_start(context->inode);
 	bool is_compressed;
 	uint32_t block_index = context->seek_pos / context->block_size;
-	uint32_t block_count = datablock_count(context);
+	uint32_t block_count = hsqs_inode_file_block_count(context->inode);
 	uint64_t block_offset = datablock_offset(context, block_index);
 	uint64_t block_whole_size =
 			datablock_offset(context, block_count) - block_offset;
@@ -159,7 +140,7 @@ hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
 	}
 
 	if (hsqs_content_size(context) < size) {
-		if (!has_fragment(context)) {
+		if (!hsqs_inode_has_fragment(context->inode)) {
 			rv = -HSQS_ERROR_TODO;
 			goto out;
 		}

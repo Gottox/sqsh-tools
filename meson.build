@@ -167,7 +167,7 @@ if get_option('default_library') == 'both'
 	libhsqs = libhsqs.get_static_lib()
 endif
 
-foreach p : [ 'hsqs-cat', 'hsqs-ls' ]
+foreach p : [ 'hsqs-cat', 'hsqs-ls', 'hsqs-stat' ]
 	executable(p, 'bin/'+p+'.c',
 		install: not meson.is_subproject(),
 		c_args : build_args,

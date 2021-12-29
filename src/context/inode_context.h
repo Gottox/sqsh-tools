@@ -86,6 +86,8 @@ uint16_t hsqs_inode_permission(const struct HsqsInodeContext *context);
 uint32_t hsqs_inode_number(const struct HsqsInodeContext *context);
 uint32_t hsqs_inode_modified_time(const struct HsqsInodeContext *context);
 uint64_t hsqs_inode_file_blocks_start(const struct HsqsInodeContext *context);
+bool hsqs_inode_has_fragment(const struct HsqsInodeContext *context);
+uint32_t hsqs_inode_file_block_count(const struct HsqsInodeContext *context);
 uint32_t hsqs_inode_file_block_size(
 		const struct HsqsInodeContext *context, uint32_t index);
 bool hsqs_inode_file_block_is_compressed(
