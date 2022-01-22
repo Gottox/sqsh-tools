@@ -132,6 +132,10 @@ stat_file(struct Hsqs *hsqs, const char *path) {
 	(void)hsqs;
 	(void)path;
 	rv = hsqs_inode_load_by_path(&inode, hsqs, path);
+	if (rv < 0) {
+		hsqs_perror(rv, path);
+		return rv;
+	}
 
 	int inode_type = hsqs_inode_type(&inode);
 	printf("         inode type: %s\n", inode_type_name(inode_type));
