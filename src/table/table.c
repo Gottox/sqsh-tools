@@ -54,11 +54,21 @@ hsqs_table_init(
 		size_t element_size, size_t element_count) {
 	int rv = 0;
 	size_t byte_size;
-	// TODO: Overflow
-	size_t lookup_table_size =
-			HSQS_DEVIDE_CEIL(
-					element_size * element_count, HSQS_METABLOCK_BLOCK_SIZE) *
-			sizeof(uint64_t);
+	size_t table_size;
+	size_t lookup_table_size;
+	size_t lookup_table_count;
+
+	if (MULT_OVERFLOW(element_size, element_count, &table_size)) {
+		return -HSQS_ERROR_INTEGER_OVERFLOW;
+	}
+
+	lookup_table_count =
+			HSQS_DEVIDE_CEIL(table_size, HSQS_METABLOCK_BLOCK_SIZE);
+
+	if (MULT_OVERFLOW(
+				lookup_table_count, sizeof(uint64_t), &lookup_table_size)) {
+		return -HSQS_ERROR_INTEGER_OVERFLOW;
+	}
 
 	rv = hsqs_request_map(
 			hsqs, &table->lookup_table, start_block, lookup_table_size);
