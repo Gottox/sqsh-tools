@@ -67,7 +67,7 @@ hsqs_content_init(
 	context->block_size = hsqs_superblock_block_size(superblock);
 	context->hsqs = hsqs;
 
-	if (hsqs_inode_has_fragment(inode)) {
+	if (hsqs_inode_file_has_fragment(inode)) {
 		rv = hsqs_fragment_table(context->hsqs, &context->fragment_table);
 		if (rv < 0) {
 			return rv;
@@ -140,7 +140,7 @@ hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
 	}
 
 	if (hsqs_content_size(context) < size) {
-		if (!hsqs_inode_has_fragment(context->inode)) {
+		if (!hsqs_inode_file_has_fragment(context->inode)) {
 			rv = -HSQS_ERROR_TODO;
 			goto out;
 		}

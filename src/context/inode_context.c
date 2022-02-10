@@ -414,19 +414,13 @@ hsqs_inode_file_blocks_start(const struct HsqsInodeContext *context) {
 	return UINT64_MAX;
 }
 
-bool
-hsqs_inode_has_fragment(const struct HsqsInodeContext *context) {
-	return hsqs_inode_file_fragment_block_index(context) !=
-			HSQS_INODE_NO_FRAGMENT;
-}
-
 uint32_t
 hsqs_inode_file_block_count(const struct HsqsInodeContext *context) {
 	struct HsqsSuperblockContext *superblock = hsqs_superblock(context->hsqs);
 	uint64_t file_size = hsqs_inode_file_size(context);
 	uint32_t block_size = hsqs_superblock_block_size(superblock);
 
-	if (hsqs_inode_has_fragment(context)) {
+	if (hsqs_inode_file_has_fragment(context)) {
 		return file_size / block_size;
 	} else {
 		return HSQS_DEVIDE_CEIL(file_size, block_size);
