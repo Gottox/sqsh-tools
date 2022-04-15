@@ -48,9 +48,10 @@ hsqs_mapper_static_mem_init(
 	return 0;
 }
 static int
-hsqs_mapper_static_mem_map(struct HsqsMap *map, off_t offset, size_t size) {
-	map->data.sm.data = &map->mapper->data.sm.data[offset];
-	map->data.sm.size = size;
+hsqs_mapper_static_mem_map(
+		struct HsqsMapping *mapping, off_t offset, size_t size) {
+	mapping->data.sm.data = &mapping->mapper->data.sm.data[offset];
+	mapping->data.sm.size = size;
 	return 0;
 }
 static size_t
@@ -63,34 +64,34 @@ hsqs_mapper_static_mem_cleanup(struct HsqsMapper *mapper) {
 	return 0;
 }
 static int
-hsqs_map_static_mem_unmap(struct HsqsMap *map) {
-	map->data.sm.data = NULL;
-	map->data.sm.size = 0;
+hsqs_mapping_static_mem_unmap(struct HsqsMapping *mapping) {
+	mapping->data.sm.data = NULL;
+	mapping->data.sm.size = 0;
 	return 0;
 }
 static const uint8_t *
-hsqs_map_static_mem_data(const struct HsqsMap *map) {
-	return map->data.sm.data;
+hsqs_mapping_static_mem_data(const struct HsqsMapping *mapping) {
+	return mapping->data.sm.data;
 }
 
 static int
-hsqs_map_static_mem_resize(struct HsqsMap *map, size_t new_size) {
-	map->data.sm.size = new_size;
+hsqs_mapping_static_mem_resize(struct HsqsMapping *mapping, size_t new_size) {
+	mapping->data.sm.size = new_size;
 	return 0;
 }
 
 static size_t
-hsqs_map_static_mem_size(const struct HsqsMap *map) {
-	return map->data.sm.size;
+hsqs_mapping_static_mem_size(const struct HsqsMapping *mapping) {
+	return mapping->data.sm.size;
 }
 
 struct HsqsMemoryMapperImpl hsqs_mapper_impl_static = {
 		.init = hsqs_mapper_static_mem_init,
-		.map = hsqs_mapper_static_mem_map,
+		.mapping = hsqs_mapper_static_mem_map,
 		.size = hsqs_mapper_static_mem_size,
 		.cleanup = hsqs_mapper_static_mem_cleanup,
-		.map_data = hsqs_map_static_mem_data,
-		.map_resize = hsqs_map_static_mem_resize,
-		.map_size = hsqs_map_static_mem_size,
-		.unmap = hsqs_map_static_mem_unmap,
+		.map_data = hsqs_mapping_static_mem_data,
+		.map_resize = hsqs_mapping_static_mem_resize,
+		.map_size = hsqs_mapping_static_mem_size,
+		.unmap = hsqs_mapping_static_mem_unmap,
 };

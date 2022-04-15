@@ -72,12 +72,12 @@ hsqs_superblock_init(
 		goto out;
 	}
 
-	rv = hsqs_mapper_map(&context->map, mapper, 0, HSQS_SIZEOF_SUPERBLOCK);
+	rv = hsqs_mapper_map(&context->mapping, mapper, 0, HSQS_SIZEOF_SUPERBLOCK);
 	if (rv < 0) {
 		goto out;
 	}
 	const struct HsqsSuperblock *superblock =
-			(const struct HsqsSuperblock *)hsqs_map_data(&context->map);
+			(const struct HsqsSuperblock *)hsqs_mapping_data(&context->mapping);
 
 	if (hsqs_data_superblock_magic(superblock) != SUPERBLOCK_MAGIC) {
 		rv = -HSQS_ERROR_WRONG_MAGIC;
@@ -214,6 +214,6 @@ hsqs_superblock_bytes_used(const struct HsqsSuperblockContext *context) {
 
 int
 hsqs_superblock_cleanup(struct HsqsSuperblockContext *superblock) {
-	hsqs_map_unmap(&superblock->map);
+	hsqs_mapping_unmap(&superblock->mapping);
 	return 0;
 }

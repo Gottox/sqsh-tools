@@ -74,9 +74,10 @@ out:
 	return rv;
 }
 static int
-hsqs_mapper_mmap_complete_map(struct HsqsMap *map, off_t offset, size_t size) {
-	map->data.mc.data = &map->mapper->data.mc.data[offset];
-	map->data.mc.size = size;
+hsqs_mapper_mmap_complete_map(
+		struct HsqsMapping *mapping, off_t offset, size_t size) {
+	mapping->data.mc.data = &mapping->mapper->data.mc.data[offset];
+	mapping->data.mc.size = size;
 	return 0;
 }
 static int
@@ -92,33 +93,33 @@ hsqs_mapper_mmap_complete_size(const struct HsqsMapper *mapper) {
 	return mapper->data.mc.size;
 }
 static int
-hsqs_map_mmap_complete_unmap(struct HsqsMap *map) {
-	map->data.mc.data = NULL;
-	map->data.mc.size = 0;
+hsqs_mapping_mmap_complete_unmap(struct HsqsMapping *mapping) {
+	mapping->data.mc.data = NULL;
+	mapping->data.mc.size = 0;
 	return 0;
 }
 static const uint8_t *
-hsqs_map_mmap_complete_data(const struct HsqsMap *map) {
-	return map->data.mc.data;
+hsqs_mapping_mmap_complete_data(const struct HsqsMapping *mapping) {
+	return mapping->data.mc.data;
 }
 static int
-hsqs_map_mmap_complete_resize(
-		struct HsqsMap *mapper, size_t __attribute__((unused)) new_size) {
+hsqs_mapping_mmap_complete_resize(
+		struct HsqsMapping *mapper, size_t __attribute__((unused)) new_size) {
 	return mapper->data.mc.size;
 }
 
 static size_t
-hsqs_map_mmap_complete_size(const struct HsqsMap *map) {
-	return map->data.mc.size;
+hsqs_mapping_mmap_complete_size(const struct HsqsMapping *mapping) {
+	return mapping->data.mc.size;
 }
 
 struct HsqsMemoryMapperImpl hsqs_mapper_impl_mmap_full = {
 		.init = hsqs_mapper_mmap_complete_init,
-		.map = hsqs_mapper_mmap_complete_map,
+		.mapping = hsqs_mapper_mmap_complete_map,
 		.size = hsqs_mapper_mmap_complete_size,
 		.cleanup = hsqs_mapper_mmap_complete_cleanup,
-		.map_data = hsqs_map_mmap_complete_data,
-		.map_resize = hsqs_map_mmap_complete_resize,
-		.map_size = hsqs_map_mmap_complete_size,
-		.unmap = hsqs_map_mmap_complete_unmap,
+		.map_data = hsqs_mapping_mmap_complete_data,
+		.map_resize = hsqs_mapping_mmap_complete_resize,
+		.map_size = hsqs_mapping_mmap_complete_size,
+		.unmap = hsqs_mapping_mmap_complete_unmap,
 };

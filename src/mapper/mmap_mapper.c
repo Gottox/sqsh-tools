@@ -72,8 +72,8 @@ out:
 	return rv;
 }
 static int
-hsqs_mapper_mmap_map(struct HsqsMap *map, off_t offset, size_t size) {
-	struct HsqsMapper *mapper = map->mapper;
+hsqs_mapper_mmap_map(struct HsqsMapping *mapping, off_t offset, size_t size) {
+	struct HsqsMapper *mapper = mapping->mapper;
 	uint8_t *file_map = NULL;
 	size_t page_offset = offset % mapper->data.mm.page_size;
 
@@ -86,10 +86,10 @@ hsqs_mapper_mmap_map(struct HsqsMap *map, off_t offset, size_t size) {
 		}
 	}
 
-	map->data.mm.data = file_map;
-	map->data.mm.size = size;
-	map->data.mm.offset = offset;
-	map->data.mm.page_offset = page_offset;
+	mapping->data.mm.data = file_map;
+	mapping->data.mm.size = size;
+	mapping->data.mm.offset = offset;
+	mapping->data.mm.page_offset = page_offset;
 	return 0;
 }
 static int
@@ -103,28 +103,29 @@ hsqs_mapper_mmap_size(const struct HsqsMapper *mapper) {
 }
 
 static int
-hsqs_map_mmap_unmap(struct HsqsMap *map) {
+hsqs_mapping_mmap_unmap(struct HsqsMapping *mapping) {
 	int rv;
-	rv = munmap(
-			map->data.mm.data, map->data.mm.size + map->data.mm.page_offset);
+	rv =
+			munmap(mapping->data.mm.data,
+				   mapping->data.mm.size + mapping->data.mm.page_offset);
 
-	map->data.mm.data = NULL;
-	map->data.mm.size = 0;
-	map->data.mm.page_offset = 0;
-	map->data.mm.offset = 0;
+	mapping->data.mm.data = NULL;
+	mapping->data.mm.size = 0;
+	mapping->data.mm.page_offset = 0;
+	mapping->data.mm.offset = 0;
 	return rv;
 }
 static const uint8_t *
-hsqs_map_mmap_data(const struct HsqsMap *map) {
-	return &map->data.mm.data[map->data.mm.page_offset];
+hsqs_mapping_mmap_data(const struct HsqsMapping *mapping) {
+	return &mapping->data.mm.data[mapping->data.mm.page_offset];
 }
 
 int
-hsqs_map_mmap_resize(struct HsqsMap *map, size_t new_size) {
+hsqs_mapping_mmap_resize(struct HsqsMapping *mapping, size_t new_size) {
 #ifdef _GNU_SOURCE
-	uint8_t *data = map->data.mm.data;
-	size_t size = map->data.mm.size;
-	size_t page_offset = map->data.mm.page_offset;
+	uint8_t *data = mapping->data.mm.data;
+	size_t size = mapping->data.mm.size;
+	size_t page_offset = mapping->data.mm.page_offset;
 
 	data = mremap(
 			data, page_offset + size, page_offset + new_size, MREMAP_MAYMOVE);
@@ -133,34 +134,34 @@ hsqs_map_mmap_resize(struct HsqsMap *map, size_t new_size) {
 		return -errno;
 	}
 
-	map->data.mm.size = new_size;
-	map->data.mm.data = data;
+	mapping->data.mm.size = new_size;
+	mapping->data.mm.data = data;
 
 	return 0;
 #else
 	int rv;
-	uint64_t offset = map->data.mm.offset;
-	struct HsqsMemoryMapper *mapper = map->mapper;
+	uint64_t offset = mapping->data.mm.offset;
+	struct HsqsMemoryMapper *mapper = mapping->mapper;
 
-	rv = hsqs_map_unmap(map);
+	rv = hsqs_mapping_unmap(mapping);
 	if (rv < 0) {
 		return rv;
 	}
-	return hsqs_mapper_map(map, mapper, offset, new_size);
+	return hsqs_mapper_map(mapping, mapper, offset, new_size);
 #endif
 }
 static size_t
-hsqs_map_mmap_size(const struct HsqsMap *map) {
-	return map->data.mm.size;
+hsqs_mapping_mmap_size(const struct HsqsMapping *mapping) {
+	return mapping->data.mm.size;
 }
 
 struct HsqsMemoryMapperImpl hsqs_mapper_impl_mmap = {
 		.init = hsqs_mapper_mmap_init,
-		.map = hsqs_mapper_mmap_map,
+		.mapping = hsqs_mapper_mmap_map,
 		.size = hsqs_mapper_mmap_size,
 		.cleanup = hsqs_mapper_mmap_cleanup,
-		.map_data = hsqs_map_mmap_data,
-		.map_size = hsqs_map_mmap_size,
-		.map_resize = hsqs_map_mmap_resize,
-		.unmap = hsqs_map_mmap_unmap,
+		.map_data = hsqs_mapping_mmap_data,
+		.map_size = hsqs_mapping_mmap_size,
+		.map_resize = hsqs_mapping_mmap_resize,
+		.unmap = hsqs_mapping_mmap_unmap,
 };

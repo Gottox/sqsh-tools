@@ -48,7 +48,7 @@
 
 struct HsqsMapper;
 
-struct HsqsMap {
+struct HsqsMapping {
 	struct HsqsMapper *mapper;
 	union {
 		struct HsqsMmapFullMap mc;
@@ -61,13 +61,13 @@ struct HsqsMap {
 
 struct HsqsMemoryMapperImpl {
 	int (*init)(struct HsqsMapper *mapper, const void *input, size_t size);
-	int (*map)(struct HsqsMap *map, off_t offset, size_t size);
+	int (*mapping)(struct HsqsMapping *map, off_t offset, size_t size);
 	size_t (*size)(const struct HsqsMapper *mapper);
 	int (*cleanup)(struct HsqsMapper *mapper);
-	const uint8_t *(*map_data)(const struct HsqsMap *map);
-	int (*map_resize)(struct HsqsMap *map, size_t new_size);
-	size_t (*map_size)(const struct HsqsMap *map);
-	int (*unmap)(struct HsqsMap *map);
+	const uint8_t *(*map_data)(const struct HsqsMapping *mapping);
+	int (*map_resize)(struct HsqsMapping *mapping, size_t new_size);
+	size_t (*map_size)(const struct HsqsMapping *mapping);
+	int (*unmap)(struct HsqsMapping *mapping);
 };
 
 struct HsqsMapper {
@@ -85,13 +85,13 @@ int hsqs_mapper_init_mmap(struct HsqsMapper *mapper, const char *path);
 int hsqs_mapper_init_static(
 		struct HsqsMapper *mapper, const uint8_t *input, size_t size);
 int hsqs_mapper_map(
-		struct HsqsMap *map, struct HsqsMapper *mapper, hsqs_index_t offset,
-		size_t size);
+		struct HsqsMapping *mapping, struct HsqsMapper *mapper,
+		hsqs_index_t offset, size_t size);
 size_t hsqs_mapper_size(const struct HsqsMapper *mapper);
 int hsqs_mapper_cleanup(struct HsqsMapper *mapper);
-size_t hsqs_map_size(struct HsqsMap *map);
-int hsqs_map_resize(struct HsqsMap *map, size_t new_size);
-const uint8_t *hsqs_map_data(const struct HsqsMap *map);
-int hsqs_map_unmap(struct HsqsMap *map);
+size_t hsqs_mapping_size(struct HsqsMapping *mapping);
+int hsqs_mapping_resize(struct HsqsMapping *mapping, size_t new_size);
+const uint8_t *hsqs_mapping_data(const struct HsqsMapping *mapping);
+int hsqs_mapping_unmap(struct HsqsMapping *mapping);
 
 #endif /* end of include guard MEMORY_MAPPER_H */

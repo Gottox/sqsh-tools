@@ -49,7 +49,7 @@ struct HsqsInodeContext;
 
 struct HsqsXattrTable {
 	struct Hsqs *hsqs;
-	struct HsqsMap header;
+	struct HsqsMapping header;
 	struct HsqsTable table;
 };
 

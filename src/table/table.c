@@ -43,7 +43,7 @@ typedef const __attribute__((aligned(1))) uint64_t unaligned_uint64_t;
 static uint64_t
 lookup_table_get(const struct HsqsTable *table, off_t index) {
 	unaligned_uint64_t *lookup_table =
-			(unaligned_uint64_t *)hsqs_map_data(&table->lookup_table);
+			(unaligned_uint64_t *)hsqs_mapping_data(&table->lookup_table);
 
 	return lookup_table[index];
 }
@@ -129,6 +129,6 @@ out:
 
 int
 hsqs_table_cleanup(struct HsqsTable *table) {
-	hsqs_map_unmap(&table->lookup_table);
+	hsqs_mapping_unmap(&table->lookup_table);
 	return 0;
 }

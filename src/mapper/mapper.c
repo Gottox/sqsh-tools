@@ -60,8 +60,8 @@ hsqs_mapper_init_static(
 
 int
 hsqs_mapper_map(
-		struct HsqsMap *map, struct HsqsMapper *mapper, hsqs_index_t offset,
-		size_t size) {
+		struct HsqsMapping *mapping, struct HsqsMapper *mapper,
+		hsqs_index_t offset, size_t size) {
 	size_t end_offset;
 	size_t archive_size = hsqs_mapper_size(mapper);
 	if (offset > archive_size) {
@@ -73,8 +73,8 @@ hsqs_mapper_map(
 	if (end_offset > archive_size) {
 		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
-	map->mapper = mapper;
-	return mapper->impl->map(map, offset, size);
+	mapping->mapper = mapper;
+	return mapper->impl->mapping(mapping, offset, size);
 }
 
 size_t
@@ -93,30 +93,30 @@ hsqs_mapper_cleanup(struct HsqsMapper *mapper) {
 }
 
 int
-hsqs_map_resize(struct HsqsMap *map, size_t new_size) {
-	if (new_size <= hsqs_map_size(map)) {
+hsqs_mapping_resize(struct HsqsMapping *mapping, size_t new_size) {
+	if (new_size <= hsqs_mapping_size(mapping)) {
 		return 0;
 	} else {
-		return map->mapper->impl->map_resize(map, new_size);
+		return mapping->mapper->impl->map_resize(mapping, new_size);
 	}
 }
 
 size_t
-hsqs_map_size(struct HsqsMap *map) {
-	return map->mapper->impl->map_size(map);
+hsqs_mapping_size(struct HsqsMapping *mapping) {
+	return mapping->mapper->impl->map_size(mapping);
 }
 
 const uint8_t *
-hsqs_map_data(const struct HsqsMap *map) {
-	return map->mapper->impl->map_data(map);
+hsqs_mapping_data(const struct HsqsMapping *mapping) {
+	return mapping->mapper->impl->map_data(mapping);
 }
 
 int
-hsqs_map_unmap(struct HsqsMap *map) {
+hsqs_mapping_unmap(struct HsqsMapping *mapping) {
 	int rv = 0;
-	if (map->mapper) {
-		rv = map->mapper->impl->unmap(map);
+	if (mapping->mapper) {
+		rv = mapping->mapper->impl->unmap(mapping);
 	}
-	map->mapper = NULL;
+	mapping->mapper = NULL;
 	return rv;
 }

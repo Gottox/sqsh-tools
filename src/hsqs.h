@@ -53,14 +53,14 @@ struct Hsqs {
 	struct HsqsLruHashmap metablock_cache;
 	struct HsqsMapper mapper;
 	struct HsqsMapper table_mapper;
-	struct HsqsMap table_map;
+	struct HsqsMapping table_map;
 	struct HsqsSuperblockContext superblock;
 	struct HsqsTable id_table;
 	struct HsqsTable export_table;
 	struct HsqsXattrTable xattr_table;
 	struct HsqsFragmentTable fragment_table;
 	struct HsqsCompressionOptionsContext compression_options;
-	struct HsqsMap trailing_map;
+	struct HsqsMapping trailing_map;
 	uint8_t initialized;
 };
 
@@ -70,7 +70,8 @@ hsqs_init(struct Hsqs *hsqs, const uint8_t *buffer, const size_t size);
 HSQS_NO_UNUSED int hsqs_open(struct Hsqs *hsqs, const char *path);
 
 int hsqs_request_map(
-		struct Hsqs *hsqs, struct HsqsMap *map, uint64_t offset, uint64_t size);
+		struct Hsqs *hsqs, struct HsqsMapping *mapping, uint64_t offset,
+		uint64_t size);
 
 struct HsqsSuperblockContext *hsqs_superblock(struct Hsqs *hsqs);
 

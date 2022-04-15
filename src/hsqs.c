@@ -234,7 +234,7 @@ get_table_mapper(struct Hsqs *hsqs, struct HsqsMapper **table_mapper) {
 	if (rv < 0) {
 		goto out;
 	}
-	const uint8_t *table_data = hsqs_map_data(&hsqs->table_map);
+	const uint8_t *table_data = hsqs_mapping_data(&hsqs->table_map);
 	rv = hsqs_mapper_init_static(&hsqs->table_mapper, table_data, table_size);
 	if (rv < 0) {
 		goto out;
@@ -248,7 +248,7 @@ out:
 
 int
 hsqs_request_map(
-		struct Hsqs *hsqs, struct HsqsMap *map, uint64_t offset,
+		struct Hsqs *hsqs, struct HsqsMapping *mapping, uint64_t offset,
 		uint64_t size) {
 	int rv = 0;
 	struct HsqsMapper *mapper;
@@ -265,7 +265,7 @@ hsqs_request_map(
 		mapper = &hsqs->mapper;
 	}
 
-	rv = hsqs_mapper_map(map, mapper, offset, size);
+	rv = hsqs_mapper_map(mapping, mapper, offset, size);
 out:
 	return rv;
 }
@@ -292,16 +292,16 @@ hsqs_trailing_bytes(struct Hsqs *hsqs) {
 		hsqs_request_map(
 				hsqs, &hsqs->trailing_map, trailing_start, trailing_size);
 	}
-	return hsqs_map_data(&hsqs->trailing_map);
+	return hsqs_mapping_data(&hsqs->trailing_map);
 }
 size_t
 hsqs_trailing_bytes_size(struct Hsqs *hsqs) {
 	if (!is_initialized(hsqs, INITIALIZED_TRAILING_BYTES)) {
-		if (hsqs_map_data(&hsqs->trailing_map) == NULL) {
+		if (hsqs_mapping_data(&hsqs->trailing_map) == NULL) {
 			return 0;
 		}
 	}
-	return hsqs_map_size(&hsqs->trailing_map);
+	return hsqs_mapping_size(&hsqs->trailing_map);
 }
 
 int
@@ -325,7 +325,7 @@ hsqs_cleanup(struct Hsqs *hsqs) {
 	}
 	if (is_initialized(hsqs, INITIALIZED_TABLE_MAPPER)) {
 		hsqs_mapper_cleanup(&hsqs->table_mapper);
-		hsqs_map_unmap(&hsqs->table_map);
+		hsqs_mapping_unmap(&hsqs->table_map);
 	}
 	hsqs_lru_hashmap_cleanup(&hsqs->metablock_cache);
 	hsqs_superblock_cleanup(&hsqs->superblock);

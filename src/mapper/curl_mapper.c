@@ -57,13 +57,13 @@ static size_t
 write_data(void *ptr, size_t size, size_t nmemb, void *userdata) {
 	int rv = 0;
 	size_t byte_size;
-	struct HsqsMap *map = userdata;
+	struct HsqsMapping *mapping = userdata;
 
 	if (MULT_OVERFLOW(size, nmemb, &byte_size)) {
 		rv = -HSQS_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
-	rv = hsqs_buffer_append(map->data.cl.buffer, ptr, byte_size);
+	rv = hsqs_buffer_append(mapping->data.cl.buffer, ptr, byte_size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -83,7 +83,7 @@ header_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
 	uint64_t end = 0;
 	uint64_t total = 0;
 	size_t header_size = size * nitems;
-	struct HsqsMap *map = (struct HsqsMap *)userdata;
+	struct HsqsMapping *mapping = (struct HsqsMapping *)userdata;
 
 	if (header_size < CONTENT_RANGE_LENGTH) {
 		return header_size;
@@ -104,25 +104,25 @@ header_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
 		return 0;
 	}
 
-	map->data.cl.total_size = total;
+	mapping->data.cl.total_size = total;
 
 	free(header);
 	return header_size;
 }
 
 static CURL *
-get_handle(struct HsqsMap *map) {
-	CURL *handle = map->mapper->data.cl.handle;
-	pthread_mutex_lock(&map->mapper->data.cl.handle_lock);
+get_handle(struct HsqsMapping *mapping) {
+	CURL *handle = mapping->mapper->data.cl.handle;
+	pthread_mutex_lock(&mapping->mapper->data.cl.handle_lock);
 	curl_easy_reset(handle);
-	curl_easy_setopt(handle, CURLOPT_URL, map->mapper->data.cl.url);
+	curl_easy_setopt(handle, CURLOPT_URL, mapping->mapper->data.cl.url);
 	curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 1L);
 	curl_easy_setopt(handle, CURLOPT_TCP_KEEPALIVE, 1L);
 	curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1L);
 	curl_easy_setopt(handle, CURLOPT_FAILONERROR, 1L);
 	curl_easy_setopt(handle, CURLOPT_FILETIME, 1L);
 	curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, header_callback);
-	curl_easy_setopt(handle, CURLOPT_HEADERDATA, map);
+	curl_easy_setopt(handle, CURLOPT_HEADERDATA, mapping);
 	return handle;
 }
 
@@ -138,7 +138,7 @@ hsqs_mapper_curl_init(
 		struct HsqsMapper *mapper, const void *input, size_t size) {
 	(void)size;
 	int rv = 0;
-	struct HsqsMap map = {0};
+	struct HsqsMapping mapping = {0};
 	curl_global_init(CURL_GLOBAL_ALL);
 
 	mapper->data.cl.url = input;
@@ -157,13 +157,13 @@ hsqs_mapper_curl_init(
 		goto out;
 	}
 
-	rv = hsqs_mapper_map(&map, mapper, 0, SUPERBLOCK_REQUEST_SIZE);
+	rv = hsqs_mapper_map(&mapping, mapper, 0, SUPERBLOCK_REQUEST_SIZE);
 	if (rv < 0) {
 		goto out;
 	}
-	mapper->data.cl.expected_size = map.data.cl.total_size;
-	mapper->data.cl.expected_time = map.data.cl.file_time;
-	hsqs_map_unmap(&map);
+	mapper->data.cl.expected_size = mapping.data.cl.total_size;
+	mapper->data.cl.expected_time = mapping.data.cl.file_time;
+	hsqs_mapping_unmap(&mapping);
 
 out:
 	return rv;
@@ -177,13 +177,13 @@ buffer_dtor(void *data) {
 }
 
 static int
-hsqs_mapper_curl_map(struct HsqsMap *map, off_t offset, size_t size) {
+hsqs_mapper_curl_map(struct HsqsMapping *mapping, off_t offset, size_t size) {
 	int rv = 0;
 	struct HsqsRefCount *buffer_ref;
 	struct HsqsBuffer *buffer;
 
-	map->data.cl.offset = offset;
-	buffer_ref = hsqs_lru_hashmap_get(&map->mapper->data.cl.cache, offset);
+	mapping->data.cl.offset = offset;
+	buffer_ref = hsqs_lru_hashmap_get(&mapping->mapper->data.cl.cache, offset);
 	if (buffer_ref == NULL) {
 		rv = hsqs_ref_count_new(
 				&buffer_ref, sizeof(struct HsqsBuffer), buffer_dtor);
@@ -191,7 +191,7 @@ hsqs_mapper_curl_map(struct HsqsMap *map, off_t offset, size_t size) {
 			goto out;
 		}
 		rv = hsqs_lru_hashmap_put(
-				&map->mapper->data.cl.cache, offset, buffer_ref);
+				&mapping->mapper->data.cl.cache, offset, buffer_ref);
 		if (rv < 0) {
 			goto out;
 		}
@@ -203,17 +203,17 @@ hsqs_mapper_curl_map(struct HsqsMap *map, off_t offset, size_t size) {
 	} else {
 		buffer = hsqs_ref_count_retain(buffer_ref);
 	}
-	map->data.cl.buffer_ref = buffer_ref;
-	map->data.cl.buffer = buffer;
+	mapping->data.cl.buffer_ref = buffer_ref;
+	mapping->data.cl.buffer = buffer;
 
-	rv = hsqs_map_resize(map, size);
+	rv = hsqs_mapping_resize(mapping, size);
 	if (rv < 0) {
 		goto out;
 	}
 
 out:
 	if (rv < 0) {
-		hsqs_map_unmap(map);
+		hsqs_mapping_unmap(mapping);
 	}
 	return rv;
 }
@@ -229,35 +229,35 @@ hsqs_mapper_curl_cleanup(struct HsqsMapper *mapper) {
 	return 0;
 }
 static int
-hsqs_map_curl_unmap(struct HsqsMap *map) {
-	hsqs_ref_count_release(map->data.cl.buffer_ref);
-	map->data.cl.buffer_ref = NULL;
+hsqs_mapping_curl_unmap(struct HsqsMapping *mapping) {
+	hsqs_ref_count_release(mapping->data.cl.buffer_ref);
+	mapping->data.cl.buffer_ref = NULL;
 	return 0;
 }
 static const uint8_t *
-hsqs_map_curl_data(const struct HsqsMap *map) {
-	return hsqs_buffer_data(map->data.cl.buffer);
+hsqs_mapping_curl_data(const struct HsqsMapping *mapping) {
+	return hsqs_buffer_data(mapping->data.cl.buffer);
 }
 
 static int
-hsqs_map_curl_resize(struct HsqsMap *map, size_t new_size) {
+hsqs_mapping_curl_resize(struct HsqsMapping *mapping, size_t new_size) {
 	int rv = 0;
 	char range_buffer[512] = {0};
-	CURL *handle = get_handle(map);
+	CURL *handle = get_handle(mapping);
 	new_size = HSQS_PADDING(new_size, 512);
-	size_t current_size = hsqs_map_size(map);
-	uint64_t new_offset = map->data.cl.offset + current_size;
+	size_t current_size = hsqs_mapping_size(mapping);
+	uint64_t new_offset = mapping->data.cl.offset + current_size;
 	uint64_t end_offset = new_offset + new_size - current_size - 1;
 	long http_code = 0;
-	uint64_t expected_size = map->mapper->data.cl.expected_size;
-	uint64_t expected_time = map->mapper->data.cl.expected_time;
+	uint64_t expected_size = mapping->mapper->data.cl.expected_size;
+	uint64_t expected_time = mapping->mapper->data.cl.expected_time;
 
 	if (new_size <= current_size) {
 		return 0;
 	}
 
-	if (end_offset > map->mapper->data.cl.expected_size - 1) {
-		end_offset = map->mapper->data.cl.expected_size - 1;
+	if (end_offset > mapping->mapper->data.cl.expected_size - 1) {
+		end_offset = mapping->mapper->data.cl.expected_size - 1;
 	}
 
 	// TODO: check for negative values of offset
@@ -270,7 +270,7 @@ hsqs_map_curl_resize(struct HsqsMap *map, size_t new_size) {
 	}
 	curl_easy_setopt(handle, CURLOPT_RANGE, range_buffer);
 	curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_data);
-	curl_easy_setopt(handle, CURLOPT_WRITEDATA, map);
+	curl_easy_setopt(handle, CURLOPT_WRITEDATA, mapping);
 
 	rv = curl_easy_perform(handle);
 	if (rv != CURLE_OK) {
@@ -292,7 +292,7 @@ hsqs_map_curl_resize(struct HsqsMap *map, size_t new_size) {
 		goto out;
 	}
 	rv = 0;
-	map->data.cl.file_time = file_time;
+	mapping->data.cl.file_time = file_time;
 
 	if (file_time == UINT64_MAX) {
 		rv = -HSQS_ERROR_MAPPER_MAP;
@@ -305,28 +305,28 @@ hsqs_map_curl_resize(struct HsqsMap *map, size_t new_size) {
 	}
 
 	if (expected_size != UINT64_MAX &&
-		map->data.cl.total_size != expected_size) {
+		mapping->data.cl.total_size != expected_size) {
 		rv = -HSQS_ERROR_MAPPER_MAP;
 		goto out;
 	}
 
 out:
-	release_handle(map->mapper, handle);
+	release_handle(mapping->mapper, handle);
 	return rv;
 }
 
 static size_t
-hsqs_map_curl_size(const struct HsqsMap *map) {
-	return hsqs_buffer_size(map->data.cl.buffer);
+hsqs_mapping_curl_size(const struct HsqsMapping *mapping) {
+	return hsqs_buffer_size(mapping->data.cl.buffer);
 }
 
 struct HsqsMemoryMapperImpl hsqs_mapper_impl_curl = {
 		.init = hsqs_mapper_curl_init,
-		.map = hsqs_mapper_curl_map,
+		.mapping = hsqs_mapper_curl_map,
 		.size = hsqs_mapper_curl_size,
 		.cleanup = hsqs_mapper_curl_cleanup,
-		.map_data = hsqs_map_curl_data,
-		.map_resize = hsqs_map_curl_resize,
-		.map_size = hsqs_map_curl_size,
-		.unmap = hsqs_map_curl_unmap,
+		.map_data = hsqs_mapping_curl_data,
+		.map_resize = hsqs_mapping_curl_resize,
+		.map_size = hsqs_mapping_curl_size,
+		.unmap = hsqs_mapping_curl_unmap,
 };

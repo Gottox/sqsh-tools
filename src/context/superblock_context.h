@@ -45,7 +45,7 @@ struct HsqsSuperblock;
 
 struct HsqsSuperblockContext {
 	const struct HsqsSuperblock *superblock;
-	struct HsqsMap map;
+	struct HsqsMapping mapping;
 };
 
 HSQS_NO_UNUSED int hsqs_superblock_init(

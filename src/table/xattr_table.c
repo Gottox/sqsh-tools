@@ -47,7 +47,7 @@
 
 static const struct HsqsXattrIdTable *
 get_header(const struct HsqsXattrTable *context) {
-	return (struct HsqsXattrIdTable *)hsqs_map_data(&context->header);
+	return (struct HsqsXattrIdTable *)hsqs_mapping_data(&context->header);
 }
 
 int
@@ -91,6 +91,6 @@ hsqs_xattr_table_start(struct HsqsXattrTable *table) {
 int
 hsqs_xattr_table_cleanup(struct HsqsXattrTable *context) {
 	hsqs_table_cleanup(&context->table);
-	hsqs_map_unmap(&context->header);
+	hsqs_mapping_unmap(&context->header);
 	return 0;
 }

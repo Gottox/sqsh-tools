@@ -71,7 +71,7 @@ read_fragment_data(
 	const struct HsqsDatablockSize *size_info;
 	bool is_compressed;
 	struct HsqsFragment fragment = {0};
-	struct HsqsMap memory_map = {0};
+	struct HsqsMapping memory_map = {0};
 	const uint8_t *data;
 
 	rv = hsqs_table_get(&table->table, index, &fragment);
@@ -89,13 +89,13 @@ read_fragment_data(
 		goto out;
 	}
 
-	data = hsqs_map_data(&memory_map);
+	data = hsqs_mapping_data(&memory_map);
 	rv = hsqs_buffer_append_block(buffer, data, size, is_compressed);
 	if (rv < 0) {
 		goto out;
 	}
 out:
-	hsqs_map_unmap(&memory_map);
+	hsqs_mapping_unmap(&memory_map);
 	return rv;
 }
 

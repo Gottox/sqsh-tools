@@ -53,7 +53,7 @@ struct HsqsMetablockContext {
 	uint64_t address;
 	struct HsqsRefCount *ref;
 	struct HsqsBuffer *buffer;
-	struct HsqsMap map;
+	struct HsqsMapping mapping;
 };
 
 int hsqs_metablock_init(

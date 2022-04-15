@@ -100,7 +100,7 @@ hsqs_content_seek(struct HsqsFileContext *context, uint64_t seek_pos) {
 int
 hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
 	int rv = 0;
-	struct HsqsMap map = {0};
+	struct HsqsMapping mapping = {0};
 	struct HsqsFragmentTable *table = context->fragment_table;
 	struct HsqsBuffer *buffer = &context->buffer;
 	uint64_t start_block = hsqs_inode_file_blocks_start(context->inode);
@@ -114,7 +114,8 @@ hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
 	uint64_t outer_offset = 0;
 
 	rv = hsqs_request_map(
-			context->hsqs, &map, start_block + block_offset, block_whole_size);
+			context->hsqs, &mapping, start_block + block_offset,
+			block_whole_size);
 
 	if (rv < 0) {
 		goto out;
@@ -131,8 +132,8 @@ hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
 				hsqs_inode_file_block_size(context->inode, block_index);
 
 		rv = hsqs_buffer_append_block(
-				buffer, &hsqs_map_data(&map)[outer_offset], outer_block_size,
-				is_compressed);
+				buffer, &hsqs_mapping_data(&mapping)[outer_offset],
+				outer_block_size, is_compressed);
 		if (rv < 0) {
 			goto out;
 		}
@@ -157,7 +158,7 @@ hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
 	}
 
 out:
-	hsqs_map_unmap(&map);
+	hsqs_mapping_unmap(&mapping);
 	return rv;
 }
 

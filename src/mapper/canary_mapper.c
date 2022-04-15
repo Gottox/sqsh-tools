@@ -49,13 +49,13 @@ hsqs_mapper_canary_init(
 	return 0;
 }
 static int
-hsqs_mapper_canary_map(struct HsqsMap *map, off_t offset, size_t size) {
+hsqs_mapper_canary_map(struct HsqsMapping *mapping, off_t offset, size_t size) {
 	uint8_t *data = calloc(size, sizeof(uint8_t));
 
-	memcpy(data, &map->mapper->data.cn.data[offset], size);
-	map->data.cn.offset = offset;
-	map->data.cn.data = data;
-	map->data.cn.size = size;
+	memcpy(data, &mapping->mapper->data.cn.data[offset], size);
+	mapping->data.cn.offset = offset;
+	mapping->data.cn.data = data;
+	mapping->data.cn.size = size;
 	return 0;
 }
 static size_t
@@ -68,42 +68,42 @@ hsqs_mapper_canary_cleanup(struct HsqsMapper *mapper) {
 	return 0;
 }
 static int
-hsqs_map_canary_unmap(struct HsqsMap *map) {
-	free(map->data.cn.data);
-	map->data.cn.data = NULL;
-	map->data.cn.size = 0;
+hsqs_mapping_canary_unmap(struct HsqsMapping *mapping) {
+	free(mapping->data.cn.data);
+	mapping->data.cn.data = NULL;
+	mapping->data.cn.size = 0;
 	return 0;
 }
 static const uint8_t *
-hsqs_map_canary_data(const struct HsqsMap *map) {
-	return map->data.cn.data;
+hsqs_mapping_canary_data(const struct HsqsMapping *mapping) {
+	return mapping->data.cn.data;
 }
 
 static int
-hsqs_map_canary_resize(struct HsqsMap *map, size_t new_size) {
+hsqs_mapping_canary_resize(struct HsqsMapping *mapping, size_t new_size) {
 	int rv;
-	uint64_t offset = map->data.cn.offset;
-	struct HsqsMapper *mapper = map->mapper;
+	uint64_t offset = mapping->data.cn.offset;
+	struct HsqsMapper *mapper = mapping->mapper;
 
-	rv = hsqs_map_unmap(map);
+	rv = hsqs_mapping_unmap(mapping);
 	if (rv < 0) {
 		return rv;
 	}
-	return hsqs_mapper_map(map, mapper, offset, new_size);
+	return hsqs_mapper_map(mapping, mapper, offset, new_size);
 }
 
 static size_t
-hsqs_map_canary_size(const struct HsqsMap *map) {
-	return map->data.cn.size;
+hsqs_mapping_canary_size(const struct HsqsMapping *mapping) {
+	return mapping->data.cn.size;
 }
 
 struct HsqsMemoryMapperImpl hsqs_mapper_impl_canary = {
 		.init = hsqs_mapper_canary_init,
-		.map = hsqs_mapper_canary_map,
+		.mapping = hsqs_mapper_canary_map,
 		.size = hsqs_mapper_canary_size,
 		.cleanup = hsqs_mapper_canary_cleanup,
-		.map_data = hsqs_map_canary_data,
-		.map_resize = hsqs_map_canary_resize,
-		.map_size = hsqs_map_canary_size,
-		.unmap = hsqs_map_canary_unmap,
+		.map_data = hsqs_mapping_canary_data,
+		.map_resize = hsqs_mapping_canary_resize,
+		.map_size = hsqs_mapping_canary_size,
+		.unmap = hsqs_mapping_canary_unmap,
 };

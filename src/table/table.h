@@ -44,7 +44,7 @@ struct Hsqs;
 struct HsqsTable {
 	struct Hsqs *hsqs;
 	struct HsqsMapper *mapper;
-	struct HsqsMap lookup_table;
+	struct HsqsMapping lookup_table;
 	uint64_t start_block;
 	size_t element_size;
 	size_t element_count;

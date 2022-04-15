@@ -40,7 +40,7 @@
 
 static const struct HsqsMetablock *
 get_metablock(const struct HsqsMetablockContext *context) {
-	return (const struct HsqsMetablock *)hsqs_map_data(&context->map);
+	return (const struct HsqsMetablock *)hsqs_mapping_data(&context->mapping);
 }
 
 static int
@@ -59,7 +59,7 @@ read_buffer(struct HsqsMetablockContext *context, struct HsqsBuffer *buffer) {
 		goto out;
 	}
 
-	rv = hsqs_map_resize(&context->map, map_size);
+	rv = hsqs_mapping_resize(&context->mapping, map_size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -83,7 +83,8 @@ hsqs_metablock_init(
 		uint64_t address) {
 	int rv = 0;
 
-	rv = hsqs_request_map(hsqs, &context->map, address, HSQS_SIZEOF_METABLOCK);
+	rv = hsqs_request_map(
+			hsqs, &context->mapping, address, HSQS_SIZEOF_METABLOCK);
 	if (rv < 0) {
 		goto out;
 	}
@@ -170,6 +171,6 @@ hsqs_metablock_to_buffer(
 int
 hsqs_metablock_cleanup(struct HsqsMetablockContext *context) {
 	hsqs_ref_count_release(context->ref);
-	hsqs_map_unmap(&context->map);
+	hsqs_mapping_unmap(&context->mapping);
 	return 0;
 }
