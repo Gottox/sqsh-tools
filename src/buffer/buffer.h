@@ -28,7 +28,7 @@
 
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : compression
+ * @file        : buffer
  * @created     : Sunday Sep 05, 2021 10:50:12 CEST
  */
 
@@ -52,25 +52,20 @@ struct HsqsBuffer {
 	size_t size;
 };
 
-HSQS_NO_UNUSED int hsqs_buffer_new(
-		struct HsqsBuffer **context, int compression_id, int block_size);
-
 HSQS_NO_UNUSED int hsqs_buffer_init(
-		struct HsqsBuffer *compression, int compression_id, int block_size);
+		struct HsqsBuffer *context, int compression_id, int block_size);
 
 HSQS_NO_UNUSED int hsqs_buffer_append_block(
-		struct HsqsBuffer *compression, const uint8_t *source,
+		struct HsqsBuffer *context, const uint8_t *source,
 		const size_t source_size, bool is_compressed);
 
 HSQS_NO_UNUSED int hsqs_buffer_append(
-		struct HsqsBuffer *compression, const uint8_t *source,
+		struct HsqsBuffer *context, const uint8_t *source,
 		const size_t source_size);
 
 const uint8_t *hsqs_buffer_data(const struct HsqsBuffer *buffer);
 size_t hsqs_buffer_size(const struct HsqsBuffer *buffer);
 
-int hsqs_buffer_cleanup(struct HsqsBuffer *compression);
-
-int hsqs_buffer_free(struct HsqsBuffer *compression);
+int hsqs_buffer_cleanup(struct HsqsBuffer *context);
 
 #endif /* end of include guard HSQS_BUFFER_H */

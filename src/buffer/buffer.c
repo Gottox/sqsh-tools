@@ -97,23 +97,6 @@ compression_by_id(int id) {
 }
 
 int
-hsqs_buffer_new(
-		struct HsqsBuffer **context, int compression_id, int block_size) {
-	int rv = 0;
-
-	*context = calloc(1, sizeof(struct HsqsBuffer));
-	if (*context == NULL) {
-		rv = -HSQS_ERROR_MALLOC_FAILED;
-	} else {
-		rv = hsqs_buffer_init(*context, compression_id, block_size);
-		if (rv < 0) {
-			free(*context);
-		}
-	}
-	return rv;
-}
-
-int
 hsqs_buffer_init(
 		struct HsqsBuffer *buffer, int compression_id, int block_size) {
 	int rv = 0;
@@ -212,16 +195,6 @@ hsqs_buffer_data(const struct HsqsBuffer *buffer) {
 size_t
 hsqs_buffer_size(const struct HsqsBuffer *buffer) {
 	return buffer->size;
-}
-
-int
-hsqs_buffer_free(struct HsqsBuffer *buffer) {
-	int rv;
-
-	rv = hsqs_buffer_cleanup(buffer);
-	free(buffer);
-
-	return rv;
 }
 
 int
