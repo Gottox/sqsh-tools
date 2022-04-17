@@ -33,7 +33,7 @@
  */
 
 #include "content_context.h"
-#include "../compression/buffer.h"
+#include "../buffer/buffer.h"
 #include "../error.h"
 #include "../hsqs.h"
 #include "../mapper/mapper.h"

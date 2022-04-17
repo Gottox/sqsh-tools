@@ -32,7 +32,7 @@
  * @created     : Thursday Oct 07, 2021 09:23:05 CEST
  */
 
-#include "../compression/buffer.h"
+#include "../buffer/buffer.h"
 #include <stdint.h>
 
 #ifndef FILE_CONTEXT_H

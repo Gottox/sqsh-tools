@@ -32,7 +32,7 @@
  * @created     : Sunday Dec 05, 2021 10:09:54 CET
  */
 
-#include "../compression/buffer.h"
+#include "../buffer/buffer.h"
 #include <stdint.h>
 
 #ifndef METABLOCK_STREAM_CONTEXT_H

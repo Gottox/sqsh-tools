@@ -33,7 +33,7 @@
  */
 
 #include "metablock_stream_context.h"
-#include "../compression/buffer.h"
+#include "../buffer/buffer.h"
 #include "../data/metablock.h"
 #include "../error.h"
 #include "../hsqs.h"

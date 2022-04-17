@@ -32,12 +32,12 @@
  * @created     : Sunday Sep 05, 2021 12:16:28 CEST
  */
 
+#include "../compression/compression.h"
 #include "../context/superblock_context.h"
 #include "../data/metablock.h"
 #include "../data/superblock_internal.h"
 #include "../error.h"
 #include "../utils.h"
-#include "compression.h"
 
 #include <stdbool.h>
 #include <stdint.h>

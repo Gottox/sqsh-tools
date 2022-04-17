@@ -12,7 +12,7 @@ project(
 )
 
 hsqs_hdr = [
-	'src/compression/buffer.h',
+	'src/buffer/buffer.h',
 	'src/compression/compression.h',
 	'src/context/compression_options_context.h',
 	'src/context/content_context.h',
@@ -56,7 +56,7 @@ hsqs_hdr = [
 ]
 
 hsqs_src = [
-	'src/compression/buffer.c',
+	'src/buffer/buffer.c',
 	'src/compression/null.c',
 	'src/context/compression_options_context.c',
 	'src/context/content_context.c',
