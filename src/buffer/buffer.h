@@ -39,9 +39,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#ifndef EXTRACTOR_H
+#ifndef HSQS_BUFFER_H
 
-#define EXTRACTOR_H
+#define HSQS_BUFFER_H
 
 struct HsqsSuperblockContext;
 
@@ -73,4 +73,4 @@ int hsqs_buffer_cleanup(struct HsqsBuffer *compression);
 
 int hsqs_buffer_free(struct HsqsBuffer *compression);
 
-#endif /* end of include guard EXTRACTOR_H */
+#endif /* end of include guard HSQS_BUFFER_H */
