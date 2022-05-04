@@ -5,9 +5,11 @@
 ######################################################################
 
 NINJA_TARGETS := test benchmark install dist scan-build clang-format uninstall \
-	all tidy
+	all tidy doc
 
-MESON_FLAGS = -Dtest=true
+MESON_FLAGS = -Dtest=true -Ddoc=true
+
+SANATIZE = 1
 
 ifeq ($(PODMAN), 1)
 	W = podman run --rm -ti -v .:/host gottox/hsqs-build

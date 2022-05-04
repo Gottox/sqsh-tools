@@ -1,0 +1,37 @@
+# See LICENSE file for license and copyright information
+
+# General information
+PROJECT_NAME          = libhsqs
+OUTPUT_DIRECTORY      = @DOXYGEN_OUTPUT@
+OUTPUT_LANGUAGE       = English
+TAB_SIZE              = 4
+EXTRACT_ALL           = YES
+OPTIMIZE_OUTPUT_FOR_C = YES
+DOXYFILE_ENCODING     = UTF-8
+ALPHABETICAL_INDEX    = YES
+IGNORE_PREFIX         = hsqs_
+
+# Warning and progress messages
+QUIET                = YES
+WARNINGS             = YES
+WARN_IF_UNDOCUMENTED = YES
+
+# Input files
+INPUT         = @DOXYGEN_INPUT@
+EXCLUDE       = ../test squashfs_image.h
+FILE_PATTERNS = *.h README.md
+EXCLUDE_PATTERNS = *_internal.h
+RECURSIVE     = YES
+USE_MDFILE_AS_MAINPAGE = README.md
+
+
+# Output files
+GENERATE_HTML  = YES
+GENERATE_LATEX = NO
+GENERATE_RTF   = NO
+GENERATE_XML   = NO
+
+SOURCE_BROWSER = YES
+
+# HTML settings
+HTML_TIMESTAMP = NO

@@ -163,7 +163,8 @@ libhsqs = library(
   c_args : build_args,
   link_args : link_args,
   include_directories : 'src',
-  dependencies : libhsqs_deps
+  dependencies : [ libhsqs_deps ],
+  sources: hsqs_hdr
 )
 
 if get_option('default_library') == 'both'
@@ -220,3 +221,5 @@ if get_option('test')
 		test(p, t)
 	endforeach
 endif
+
+subdir('doc')
