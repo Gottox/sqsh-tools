@@ -113,6 +113,7 @@ hsqs_buffer_init(
 	buffer->impl = impl;
 	buffer->block_size = block_size;
 	buffer->data = NULL;
+	buffer->size = 0;
 
 	return rv;
 }
