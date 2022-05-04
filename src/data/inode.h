@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /*
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : inode
- * @created     : Wednesday Sep 08, 2021 12:59:19 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         inode.h
  */
 
 #include "datablock.h"

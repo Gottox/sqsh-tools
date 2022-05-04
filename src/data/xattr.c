@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : xattr
- * @created     : Sunday Oct 31, 2021 10:04:28 CET
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         xattr.c
  */
 
 #include "xattr_internal.h"

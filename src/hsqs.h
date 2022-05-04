@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : hsqs
- * @created     : Friday Apr 30, 2021 10:58:14 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         hsqs.h
  */
 
 #include "context/compression_options_context.h"

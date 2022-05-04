@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : superblock
- * @created     : Friday Apr 30, 2021 12:34:53 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         superblock.c
  */
 
 #include "superblock.h"

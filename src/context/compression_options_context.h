@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : compression_option_context
- * @created     : Tuesday Nov 30, 2021 15:21:20 CET
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         compression_options_context.h
  */
 
 #include "../buffer/buffer.h"

@@ -25,9 +25,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : cow
- * @created     : Sunday Apr 17, 2022 11:12:15 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         cow.c
  */
 
 #include "cow.h"

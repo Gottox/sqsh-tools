@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : hsqs-cat
- * @created     : Monday Sep 20, 2021 09:48:58 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         hsqs-cat.c
  */
 
 #include "../src/context/content_context.h"

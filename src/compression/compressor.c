@@ -1,7 +1,6 @@
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : compressor
- * @created     : Wednesday Dec 22, 2021 18:28:00 CET
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         compressor.c
  */
 
 #include "compressor.h"

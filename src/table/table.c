@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : table
- * @created     : Sunday Sep 26, 2021 19:11:49 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         table.c
  */
 
 #include "table.h"

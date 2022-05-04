@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : metablock
- * @created     : Friday Apr 30, 2021 21:39:44 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         metablock.c
  */
 
 #include "../hsqs.h"

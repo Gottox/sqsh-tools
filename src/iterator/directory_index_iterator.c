@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : directory_index_iterator
- * @created     : Monday Dec 20, 2021 12:41:47 CET
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         directory_index_iterator.c
  */
 
 #include "directory_index_iterator.h"

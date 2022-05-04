@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : xattr_table
- * @created     : Sunday Oct 31, 2021 11:54:43 CET
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         xattr_table.h
  */
 
 #include "../context/metablock_context.h"

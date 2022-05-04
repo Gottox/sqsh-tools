@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : superblock
- * @created     : Friday Apr 30, 2021 12:36:57 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         superblock.h
  */
 
 #ifndef HSQS_SUPERBLOCK_H

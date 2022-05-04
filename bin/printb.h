@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : printb
- * @created     : Monday May 03, 2021 09:47:06 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         printb.h
  */
 
 #ifndef PRINTB_H

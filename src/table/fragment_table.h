@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : fragment_table
- * @created     : Wednesday Dec 01, 2021 17:22:03 CET
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         fragment_table.h
  */
 
 #include "../utils.h"

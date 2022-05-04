@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : hsqs-ls
- * @created     : Friday Sep 04, 2021 18:46:20 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         hsqs-ls.c
  */
 
 #include "../src/context/inode_context.h"

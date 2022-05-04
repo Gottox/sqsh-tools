@@ -1,7 +1,6 @@
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : trace
- * @created     : Thursday Dec 23, 2021 15:26:56 CET
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         trace.c
  */
 
 #include <execinfo.h>

@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : metablock_internal
- * @created     : Wednesday Sep 08, 2021 16:38:40 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         metablock_internal.h
  */
 
 #include "metablock.h"

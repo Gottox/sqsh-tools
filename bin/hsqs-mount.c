@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : hsqs-mount
- * @created     : Wednesday Sep 08, 2021 09:06:25 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         hsqs-mount.c
  */
 
 #define FUSE_USE_VERSION 35

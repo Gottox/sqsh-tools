@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : directory
- * @created     : Monday Sep 06, 2021 14:46:06 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         directory.h
  */
 
 #include <stdint.h>

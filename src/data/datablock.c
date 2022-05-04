@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : datablock
- * @created     : Friday Sep 24, 2021 19:03:20 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         datablock.c
  */
 
 #include "datablock_internal.h"

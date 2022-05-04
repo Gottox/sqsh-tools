@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : refcount
- * @created     : Saturday Dec 18, 2021 22:49:36 CET
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         ref_count.c
  */
 
 #include "ref_count.h"

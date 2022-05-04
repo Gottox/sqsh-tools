@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : compression_options_internal
- * @created     : Friday Sep 17, 2021 11:02:51 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         compression_options_internal.h
  */
 
 #include "../utils.h"

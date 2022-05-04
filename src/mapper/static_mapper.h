@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : static_mapper
- * @created     : Sunday Nov 21, 2021 15:58:40 CET
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         static_mapper.h
  */
 
 #include <stddef.h>

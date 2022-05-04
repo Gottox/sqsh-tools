@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : curl_mapper
- * @created     : Monday Dec 06, 2021 17:49:46 CET
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         curl_mapper.h
  */
 
 #include "../buffer/buffer.h"

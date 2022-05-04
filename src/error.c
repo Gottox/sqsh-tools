@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : error
- * @created     : Saturday Sep 11, 2021 12:26:48 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         error.c
  */
 
 #include "error.h"

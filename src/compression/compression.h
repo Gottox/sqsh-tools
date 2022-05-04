@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : compression
- * @created     : Monday Sep 20, 2021 13:41:58 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         compression.h
  */
 
 #include <stddef.h>

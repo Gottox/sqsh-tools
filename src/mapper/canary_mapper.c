@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : canary_mapper
- * @created     : Sunday Nov 21, 2021 16:01:03 CET
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         canary_mapper.c
  */
 
 #include "mapper.h"

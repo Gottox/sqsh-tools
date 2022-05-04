@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : content_context
- * @created     : Thursday Oct 07, 2021 09:23:05 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         content_context.h
  */
 
 #include "../buffer/buffer.h"

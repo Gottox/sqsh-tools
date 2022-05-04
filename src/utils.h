@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : utils
- * @created     : Friday Apr 30, 2021 12:35:31 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         utils.h
  */
 
 #include <stddef.h>

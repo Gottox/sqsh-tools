@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : cow
- * @created     : Sunday Sep 05, 2021 10:50:12 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         cow.h
  */
 
 #include "../cache/ref_count.h"

@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : directory
- * @created     : Friday May 07, 2021 06:56:03 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         directory.h
  */
 
 #include "../context/inode_context.h"

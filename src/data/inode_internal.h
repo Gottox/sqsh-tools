@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : inode_internal
- * @created     : Wednesday Sep 08, 2021 13:30:05 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         inode_internal.h
  */
 
 #include "../utils.h"

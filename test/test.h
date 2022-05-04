@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : common
- * @created     : Friday Oct 08, 2021 20:24:58 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         common.h
  */
 
 #ifndef TEST_H

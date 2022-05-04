@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : directory_internal
- * @created     : Wednesday Sep 08, 2021 16:44:48 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         directory_internal.h
  */
 
 #include "../utils.h"

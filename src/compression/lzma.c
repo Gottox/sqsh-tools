@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : lzma
- * @created     : Sunday Sep 05, 2021 11:09:51 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         lzma.c
  */
 
 #include <lzma.h>

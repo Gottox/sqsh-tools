@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : superblock_context
- * @created     : Monday Oct 11, 2021 13:41:59 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         superblock_context.h
  */
 
 #include "../mapper/mapper.h"

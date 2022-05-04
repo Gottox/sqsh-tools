@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : lru_hashmap
- * @created     : Friday Oct 08, 2021 20:24:58 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         lru_hashmap.c
  */
 
 #include "lru_hashmap.h"

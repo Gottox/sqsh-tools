@@ -27,9 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : fragment
- * @created     : Friday Sep 17, 2021 09:23:55 CEST
+ * @author       Enno Boland (mail@eboland.de)
+ * @file         fragment.c
  */
 
 #include "fragment_internal.h"
