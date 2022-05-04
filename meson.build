@@ -13,6 +13,7 @@ project(
 
 hsqs_hdr = [
 	'src/buffer/buffer.h',
+	'src/buffer/cow.h',
 	'src/compression/compression.h',
 	'src/context/compression_options_context.h',
 	'src/context/content_context.h',
@@ -57,6 +58,7 @@ hsqs_hdr = [
 
 hsqs_src = [
 	'src/buffer/buffer.c',
+	'src/buffer/cow.c',
 	'src/compression/null.c',
 	'src/context/compression_options_context.c',
 	'src/context/content_context.c',
@@ -93,6 +95,7 @@ hsqs_src = [
 hsqs_test = [
 	'test/integration.c',
 	'test/cache/lru_hashmap.c',
+	'test/buffer/cow.c',
 ]
 
 libhsqs_deps = [ ]
