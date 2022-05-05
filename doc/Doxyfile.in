@@ -1,7 +1,6 @@
-# See LICENSE file for license and copyright information
-
 # General information
 PROJECT_NAME          = libhsqs
+PROJECT_NUMBER        = @DOXYGEN_PROJECT_NUMBER@
 OUTPUT_DIRECTORY      = @DOXYGEN_OUTPUT@
 OUTPUT_LANGUAGE       = English
 TAB_SIZE              = 4
