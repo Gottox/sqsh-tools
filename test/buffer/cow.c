@@ -103,6 +103,49 @@ add_to_cow_with_append() {
 }
 
 static void
+add_to_cow_with_cohesive_append() {
+	int rv = 0;
+
+	struct HsqsRefCount *ref = NULL;
+	struct HsqsCow cow = {0};
+	struct HsqsMapper mapper = {0};
+	struct HsqsMapping *mapping = NULL;
+	static const uint8_t data[] = "01234567890123456789";
+
+	rv = hsqs_mapper_init_static(&mapper, data, sizeof(data) - 1);
+
+	rv = hsqs_ref_count_new(&ref, sizeof(struct HsqsMapping), buffer_dtor);
+	assert(rv == 0);
+	mapping = hsqs_ref_count_retain(ref);
+
+	rv = hsqs_mapper_map(mapping, &mapper, 0, sizeof(data) - 1);
+	assert(rv == 0);
+
+	rv = hsqs_cow_init(&cow, compression_id, 1024);
+	assert(rv == 0);
+
+	assert(cow.state == HSQS_COW_EMPTY);
+
+	rv = hsqs_cow_append_block(&cow, ref, 0, 10, false);
+	assert(rv == 0);
+
+	assert(cow.state == HSQS_COW_PASS_THROUGH);
+	assert(hsqs_cow_data(&cow) == data);
+
+	rv = hsqs_cow_append_block(&cow, ref, 10, 10, false);
+	assert(rv == 0);
+
+	assert(cow.state == HSQS_COW_PASS_THROUGH);
+	assert(hsqs_cow_data(&cow) == data);
+
+	rv = hsqs_ref_count_release(ref);
+	assert(rv >= 0);
+
+	rv = hsqs_cow_cleanup(&cow);
+	assert(rv >= 0);
+}
+
+static void
 add_to_cow_with_offset() {
 	int rv = 0;
 
@@ -194,6 +237,7 @@ add_to_cow_with_compression() {
 DEFINE
 TEST(init_cow);
 TEST(add_to_cow_with_append);
+TEST_OFF(add_to_cow_with_cohesive_append);
 TEST(add_to_cow_with_offset);
 TEST(add_to_cow_with_compression);
 DEFINE_END
