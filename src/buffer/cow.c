@@ -47,27 +47,39 @@ hsqs_cow_init(struct HsqsCow *cow, int compression_id, int block_size) {
 }
 
 static int
-cow_copy(struct HsqsCow *cow) {
+cow_init_buffered(struct HsqsCow *cow) {
 	int rv = 0;
 
-	struct HsqsRefCount *rc = cow->content.mapping.rc;
+	struct HsqsRefCount *mapping_rc = cow->content.mapping.rc;
 	const uint8_t *source = hsqs_cow_data(cow);
 	const size_t source_size = hsqs_cow_size(cow);
+	struct HsqsBuffer *buffer = &cow->content.buffer;
 
-	rv = hsqs_buffer_init(
-			&cow->content.buffer, cow->compression_id, cow->block_size);
+	rv = hsqs_buffer_init(buffer, cow->compression_id, cow->block_size);
 	if (rv < 0) {
 		return rv;
 	}
 
 	if (cow->state != HSQS_COW_EMPTY) {
-		rv = hsqs_buffer_append(&cow->content.buffer, source, source_size);
+		rv = hsqs_buffer_append(buffer, source, source_size);
 	}
 
-	hsqs_ref_count_release(rc);
+	hsqs_ref_count_release(mapping_rc);
 	cow->state = HSQS_COW_BUFFERED;
 
 	return rv;
+}
+
+static int
+cow_init_pass_through(
+		struct HsqsCow *cow, struct HsqsRefCount *mapping_rc,
+		const size_t mapping_index, const size_t mapping_size) {
+	cow->state = HSQS_COW_PASS_THROUGH;
+	cow->content.mapping.rc = mapping_rc;
+	cow->content.mapping.mapping = hsqs_ref_count_retain(mapping_rc);
+	cow->content.mapping.offset = mapping_index;
+	cow->content.mapping.size = mapping_size;
+	return 0;
 }
 
 int
@@ -76,45 +88,28 @@ hsqs_cow_append_block(
 		const size_t mapping_index, const size_t mapping_size,
 		bool is_compressed) {
 	int rv = 0;
-	struct HsqsMapping *m = hsqs_ref_count_retain(mapping);
 
 	if (cow->state == HSQS_COW_EMPTY && !is_compressed) {
-		cow->state = HSQS_COW_PASS_THROUGH;
-		cow->content.mapping.rc = mapping;
-		cow->content.mapping.mapping = m;
-		cow->content.mapping.offset = mapping_index;
-		cow->content.mapping.size = mapping_size;
-		return 0;
+		return cow_init_pass_through(cow, mapping, mapping_index, mapping_size);
 	}
 
 	// TODO: check if mapping is cohesive
 
-	switch (cow->state) {
-	case HSQS_COW_PASS_THROUGH:
-		rv = cow_copy(cow);
-		break;
-	case HSQS_COW_EMPTY:
-		if (is_compressed) {
-			rv = cow_copy(cow);
+	if (cow->state != HSQS_COW_BUFFERED) {
+		rv = cow_init_buffered(cow);
+		if (rv < 0) {
+			return rv;
 		}
-		break;
-	default:
-		break;
 	}
 
-	if (rv < 0) {
-		goto out;
-	}
-
+	struct HsqsMapping *m = hsqs_ref_count_retain(mapping);
 	const uint8_t *data = hsqs_mapping_data(m);
 
 	rv = hsqs_buffer_append_block(
 			&cow->content.buffer, &data[mapping_index], mapping_size,
 			is_compressed);
 	hsqs_ref_count_release(mapping);
-	goto out;
 
-out:
 	return rv;
 }
 
