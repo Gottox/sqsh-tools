@@ -21,31 +21,6 @@ jobs:
     - name: test
       run: |
          ninja -C /tmp/build test
-  doxygen:
-    runs-on: ubuntu-latest
-    container: gottox/hsqs-build
-    steps:
-    - uses: actions/checkout@v3
-    - name: configure
-      run: |
-        CC=clang meson setup /tmp/build \
-          -Dcurl=false \
-          -Dzlib=true \
-          -Dlz4=false\
-          -Dlzma=false \
-          -Dlzo2=false \
-          -Dzstd=false \
-          -Dtest=false \
-          -Ddoc=true
-    - name: generate
-      run: |
-        cd /tmp/build
-        meson compile doc
-    - name: deploy
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: /tmp/build/doc/html
   build:
     runs-on: ubuntu-latest
     container: gottox/hsqs-build
@@ -67,3 +42,32 @@ jobs:
     - name: build
       run: |
          ninja -C /tmp/build
+  doxygen:
+    needs:
+    - build
+    - test
+    runs-on: ubuntu-latest
+    container: gottox/hsqs-build
+    steps:
+    - uses: actions/checkout@v3
+    - name: configure
+      run: |
+        git config --global --add safe.directory $PWD
+        CC=clang meson setup /tmp/build \
+          -Dcurl=false \
+          -Dzlib=true \
+          -Dlz4=false\
+          -Dlzma=false \
+          -Dlzo2=false \
+          -Dzstd=false \
+          -Dtest=false \
+          -Ddoc=true
+    - name: generate
+      run: |
+        cd /tmp/build
+        meson compile doc
+    - name: deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: /tmp/build/doc/html
