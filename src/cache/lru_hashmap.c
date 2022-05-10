@@ -233,10 +233,13 @@ hsqs_lru_hashmap_get(struct HsqsLruHashmap *hashmap, uint64_t hash) {
 
 int
 hsqs_lru_hashmap_cleanup(struct HsqsLruHashmap *hashmap) {
-	for (hsqs_index_t i = 0; i < hashmap->size; i++) {
-		if (hashmap->entries[i].pointer != NULL) {
-			hsqs_ref_count_release(hashmap->entries[i].pointer);
+	if (hashmap->entries) {
+		for (hsqs_index_t i = 0; i < hashmap->size; i++) {
+			if (hashmap->entries[i].pointer != NULL) {
+				hsqs_ref_count_release(hashmap->entries[i].pointer);
+			}
 		}
+		free(hashmap->entries);
 	}
 #ifdef DEBUG
 	fprintf(stderr, "Hashmap size:        %lu\n", hashmap->size);
@@ -248,6 +251,5 @@ hsqs_lru_hashmap_cleanup(struct HsqsLruHashmap *hashmap) {
 			(float)hashmap->hits / (float)hashmap->misses);
 #endif
 	pthread_mutex_destroy(&hashmap->lock);
-	free(hashmap->entries);
 	return 0;
 }
