@@ -9,6 +9,7 @@ OPTIMIZE_OUTPUT_FOR_C = YES
 DOXYFILE_ENCODING     = UTF-8
 ALPHABETICAL_INDEX    = YES
 IGNORE_PREFIX         = hsqs_
+HAVE_DOT              = YES
 
 # Warning and progress messages
 QUIET                = YES
