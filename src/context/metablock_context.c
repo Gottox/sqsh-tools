@@ -135,6 +135,9 @@ hsqs_metablock_read(struct HsqsMetablockContext *context) {
 		rv = hsqs_buffer_init(
 				context->buffer, hsqs_superblock_compression_id(superblock),
 				HSQS_METABLOCK_BLOCK_SIZE);
+		if (rv < 0) {
+			goto out;
+		}
 		rv = hsqs_lru_hashmap_put(cache, context->address, context->ref);
 		if (rv < 0) {
 			goto out;
