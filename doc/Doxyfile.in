@@ -10,6 +10,9 @@ DOXYFILE_ENCODING     = UTF-8
 ALPHABETICAL_INDEX    = YES
 IGNORE_PREFIX         = hsqs_
 HAVE_DOT              = YES
+DOT_IMAGE_FORMAT      = svg
+INTERACTIVE_SVG       = YES
+FULL_PATH_NAMES       = NO
 
 # Warning and progress messages
 QUIET                = YES
