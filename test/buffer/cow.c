@@ -70,6 +70,7 @@ add_to_cow_with_append() {
 	static const uint8_t datadata[] = "01234567890123456789";
 
 	rv = hsqs_mapper_init_static(&mapper, data, sizeof(data) - 1);
+	assert(rv == 0);
 
 	rv = hsqs_ref_count_new(&ref, sizeof(struct HsqsMapping), buffer_dtor);
 	assert(rv == 0);
@@ -113,6 +114,7 @@ add_to_cow_with_cohesive_append() {
 	static const uint8_t data[] = "01234567890123456789";
 
 	rv = hsqs_mapper_init_static(&mapper, data, sizeof(data) - 1);
+	assert(rv == 0);
 
 	rv = hsqs_ref_count_new(&ref, sizeof(struct HsqsMapping), buffer_dtor);
 	assert(rv == 0);
@@ -159,6 +161,7 @@ add_to_cow_with_offset() {
 	static int size = 10;
 
 	rv = hsqs_mapper_init_static(&mapper, data, sizeof(data) - 1);
+	assert(rv == 0);
 
 	rv = hsqs_ref_count_new(&ref, sizeof(struct HsqsMapping), buffer_dtor);
 	assert(rv == 0);
@@ -207,6 +210,7 @@ add_to_cow_with_compression() {
 
 	rv = hsqs_mapper_init_static(
 			&mapper, data_compressed, sizeof(data_compressed) - 1);
+	assert(rv == 0);
 
 	rv = hsqs_ref_count_new(&ref, sizeof(struct HsqsMapping), buffer_dtor);
 	assert(rv == 0);
