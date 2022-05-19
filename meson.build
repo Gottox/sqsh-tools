@@ -159,7 +159,9 @@ libhsqs = library(
   link_args : link_args,
   include_directories : 'src',
   dependencies : [ libhsqs_deps ],
-  sources: hsqs_hdr
+  sources: hsqs_hdr,
+  version : meson.project_version(),
+  soversion : meson.project_version().split('.')[0]
 )
 
 if get_option('default_library') == 'both'
