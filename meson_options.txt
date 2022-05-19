@@ -1,9 +1,18 @@
-option('curl',  type : 'boolean')
-option('zlib',  type : 'boolean')
-option('lz4',   type : 'boolean')
-option('lzma',  type : 'boolean')
-option('lzo2',  type : 'boolean', value : false)
-option('zstd',  type : 'boolean')
-option('fuse',  type : 'boolean')
-option('test',  type : 'boolean', value : false)
-option('doc',  type : 'boolean', value : false)
+option('curl',  type : 'boolean',
+	description: 'Support opening remote files with cURL.')
+option('zlib',  type : 'boolean',
+	description: 'Support zlib compression.')
+option('lz4',   type : 'boolean',
+	description: 'Support LZ4 compression.')
+option('lzma',  type : 'boolean',
+	description: 'Support LZMA compression.')
+option('lzo2',  type : 'boolean', value : false,
+	description: 'Support LZO2 compression. (WARNING: this will break the GPL license!)')
+option('zstd',  type : 'boolean',
+	description: 'Support ZSTD compression.')
+option('fuse',  type : 'boolean',
+	description: 'Support FUSE filesystem.')
+option('test',  type : 'boolean', value : false,
+	description: 'Run tests.')
+option('doc',   type : 'boolean', value : false,
+	description: 'Generate documentation.')
