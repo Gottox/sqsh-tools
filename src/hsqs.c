@@ -60,7 +60,7 @@ init(struct Hsqs *hsqs) {
 		goto out;
 	}
 
-	rv = hsqs_lru_hashmap_init(&hsqs->metablock_cache, 16);
+	rv = hsqs_lru_hashmap_init(&hsqs->metablock_cache, 17);
 	if (rv < 0) {
 		goto out;
 	}
