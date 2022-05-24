@@ -50,7 +50,7 @@ struct HsqsBuffer;
 struct HsqsMetablockContext {
 	struct Hsqs *hsqs;
 	uint64_t address;
-	struct HsqsRefCount *ref;
+	struct HsqsRefCount *buffer_ref;
 	struct HsqsBuffer *buffer;
 	struct HsqsMapping mapping;
 };

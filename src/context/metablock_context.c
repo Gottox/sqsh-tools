@@ -121,24 +121,24 @@ hsqs_metablock_read(struct HsqsMetablockContext *context) {
 		return 0;
 	}
 
-	context->ref = hsqs_lru_hashmap_get(cache, context->address);
-	if (context->ref == NULL) {
+	context->buffer_ref = hsqs_lru_hashmap_get(cache, context->address);
+	if (context->buffer_ref == NULL) {
 		rv = hsqs_ref_count_new(
-				&context->ref, sizeof(struct HsqsBuffer), buffer_dtor);
+				&context->buffer_ref, sizeof(struct HsqsBuffer), buffer_dtor);
 		if (rv < 0) {
 			goto out;
 		}
 		if (rv < 0) {
 			goto out;
 		}
-		context->buffer = hsqs_ref_count_retain(context->ref);
+		context->buffer = hsqs_ref_count_retain(context->buffer_ref);
 		rv = hsqs_buffer_init(
 				context->buffer, hsqs_superblock_compression_id(superblock),
 				HSQS_METABLOCK_BLOCK_SIZE);
 		if (rv < 0) {
 			goto out;
 		}
-		rv = hsqs_lru_hashmap_put(cache, context->address, context->ref);
+		rv = hsqs_lru_hashmap_put(cache, context->address, context->buffer_ref);
 		if (rv < 0) {
 			goto out;
 		}
@@ -147,7 +147,7 @@ hsqs_metablock_read(struct HsqsMetablockContext *context) {
 			goto out;
 		}
 	} else {
-		context->buffer = hsqs_ref_count_retain(context->ref);
+		context->buffer = hsqs_ref_count_retain(context->buffer_ref);
 	}
 
 out:
@@ -172,7 +172,7 @@ hsqs_metablock_to_buffer(
 
 int
 hsqs_metablock_cleanup(struct HsqsMetablockContext *context) {
-	hsqs_ref_count_release(context->ref);
+	hsqs_ref_count_release(context->buffer_ref);
 	hsqs_mapping_unmap(&context->mapping);
 	return 0;
 }
