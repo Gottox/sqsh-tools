@@ -31,8 +31,8 @@
  * @file         curl_mapper.h
  */
 
-#include "../buffer/buffer.h"
-#include "../cache/lru_hashmap.h"
+#include "../primitive/buffer.h"
+#include "../primitive/lru_hashmap.h"
 #include <curl/curl.h>
 #include <stdint.h>
 

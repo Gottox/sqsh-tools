@@ -31,7 +31,7 @@
  * @file         cow.h
  */
 
-#include "../cache/ref_count.h"
+#include "../primitive/ref_count.h"
 #include "buffer.h"
 
 #ifndef HSQS_COW_H

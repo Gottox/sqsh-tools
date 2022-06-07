@@ -32,7 +32,7 @@
  */
 
 #include "content_context.h"
-#include "../buffer/buffer.h"
+#include "../primitive/buffer.h"
 #include "../error.h"
 #include "../hsqs.h"
 #include "../mapper/mapper.h"

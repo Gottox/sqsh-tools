@@ -31,7 +31,7 @@
  * @file         metablock_context.h
  */
 
-#include "../cache/lru_hashmap.h"
+#include "../primitive/lru_hashmap.h"
 #include "../mapper/mapper.h"
 #include "../utils.h"
 #include <stdint.h>

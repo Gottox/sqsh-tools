@@ -35,8 +35,8 @@
 #include "../common.h"
 #include "../test.h"
 
-#include "../../src/buffer/buffer.h"
-#include "../../src/buffer/cow.h"
+#include "../../src/primitive/buffer.h"
+#include "../../src/primitive/cow.h"
 #include "../../src/mapper/mapper.h"
 
 static const int compression_id = HSQS_COMPRESSION_GZIP;

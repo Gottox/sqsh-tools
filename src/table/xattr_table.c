@@ -32,7 +32,7 @@
  */
 
 #include "xattr_table.h"
-#include "../buffer/buffer.h"
+#include "../primitive/buffer.h"
 #include "../context/inode_context.h"
 #include "../context/superblock_context.h"
 #include "../data/superblock.h"

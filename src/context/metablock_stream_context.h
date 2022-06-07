@@ -31,7 +31,7 @@
  * @file         metablock_stream_context.h
  */
 
-#include "../buffer/buffer.h"
+#include "../primitive/buffer.h"
 #include <stdint.h>
 
 #ifndef METABLOCK_STREAM_CONTEXT_H

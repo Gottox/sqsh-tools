@@ -12,8 +12,8 @@ project(
 )
 
 hsqs_hdr = [
-	'src/buffer/buffer.h',
-	'src/buffer/cow.h',
+	'src/primitive/buffer.h',
+	'src/primitive/cow.h',
 	'src/compression/compression.h',
 	'src/context/compression_options_context.h',
 	'src/context/content_context.h',
@@ -52,13 +52,13 @@ hsqs_hdr = [
 	'src/table/table.h',
 	'src/table/xattr_table.h',
 	'src/utils.h',
-	'src/cache/lru_hashmap.h',
-	'src/cache/ref_count.h',
+	'src/primitive/lru_hashmap.h',
+	'src/primitive/ref_count.h',
 ]
 
 hsqs_src = [
-	'src/buffer/buffer.c',
-	'src/buffer/cow.c',
+	'src/primitive/buffer.c',
+	'src/primitive/cow.c',
 	'src/compression/null.c',
 	'src/context/compression_options_context.c',
 	'src/context/content_context.c',
@@ -88,14 +88,14 @@ hsqs_src = [
 	'src/table/table.c',
 	'src/table/xattr_table.c',
 	'src/utils.c',
-	'src/cache/lru_hashmap.c',
-	'src/cache/ref_count.c',
+	'src/primitive/lru_hashmap.c',
+	'src/primitive/ref_count.c',
 ]
 
 hsqs_test = [
 	'test/integration.c',
-	'test/cache/lru_hashmap.c',
-	'test/buffer/cow.c',
+	'test/primitive/lru_hashmap.c',
+	'test/primitive/cow.c',
 ]
 
 libhsqs_deps = [ ]

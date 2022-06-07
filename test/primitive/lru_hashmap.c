@@ -35,7 +35,7 @@
 #include "../common.h"
 #include "../test.h"
 
-#include "../../src/cache/lru_hashmap.h"
+#include "../../src/primitive/lru_hashmap.h"
 
 static struct HsqsRefCount *last_free = NULL;
 

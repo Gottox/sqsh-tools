@@ -31,7 +31,7 @@
  * @file         compression_options_context.h
  */
 
-#include "../buffer/buffer.h"
+#include "../primitive/buffer.h"
 #include "../utils.h"
 
 #ifndef COMPRESSION_OPTIONS_CONTEXT_H

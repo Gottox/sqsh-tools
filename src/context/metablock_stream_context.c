@@ -32,7 +32,7 @@
  */
 
 #include "metablock_stream_context.h"
-#include "../buffer/buffer.h"
+#include "../primitive/buffer.h"
 #include "../data/metablock.h"
 #include "../error.h"
 #include "../hsqs.h"

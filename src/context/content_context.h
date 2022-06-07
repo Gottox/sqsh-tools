@@ -31,7 +31,7 @@
  * @file         content_context.h
  */
 
-#include "../buffer/buffer.h"
+#include "../primitive/buffer.h"
 #include <stdint.h>
 
 #ifndef FILE_CONTEXT_H
