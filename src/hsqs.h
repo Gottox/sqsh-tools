@@ -68,6 +68,10 @@ hsqs_init(struct Hsqs *hsqs, const uint8_t *buffer, const size_t size);
 
 HSQS_NO_UNUSED int hsqs_open(struct Hsqs *hsqs, const char *path);
 
+#ifdef CONFIG_CURL
+int hsqs_open_url(struct Hsqs *hsqs, const char *url);
+#endif
+
 int hsqs_request_map(
 		struct Hsqs *hsqs, struct HsqsMapping *mapping, uint64_t offset,
 		uint64_t size);

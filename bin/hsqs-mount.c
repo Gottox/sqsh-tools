@@ -44,6 +44,7 @@
 #include "../src/hsqs.h"
 #include "../src/iterator/directory_iterator.h"
 #include "../src/iterator/xattr_iterator.h"
+#include "common.h"
 
 static struct { struct Hsqs hsqs; } data = {0};
 
@@ -75,7 +76,7 @@ hsqsfuse_init(struct fuse_conn_info *conn, struct fuse_config *cfg) {
 	int rv = 0;
 	struct fuse_context *context = fuse_get_context();
 
-	rv = hsqs_open(&data.hsqs, options.image_path);
+	rv = open_archive(&data.hsqs, options.image_path);
 	if (rv < 0) {
 		hsqs_perror(rv, options.image_path);
 		fuse_unmount(context->fuse);

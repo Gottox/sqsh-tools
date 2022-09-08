@@ -34,6 +34,7 @@
 #include "../src/context/inode_context.h"
 #include "../src/hsqs.h"
 #include "../src/iterator/directory_iterator.h"
+#include "common.h"
 
 #include <assert.h>
 #include <inttypes.h>
@@ -283,7 +284,7 @@ main(int argc, char *argv[]) {
 	image_path = argv[optind];
 	optind++;
 
-	rv = hsqs_open(&hsqs, image_path);
+	rv = open_archive(&hsqs, image_path);
 	if (rv < 0) {
 		hsqs_perror(rv, image_path);
 		rv = EXIT_FAILURE;

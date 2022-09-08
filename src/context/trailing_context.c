@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Copyright (c) 2021, Enno Boland <g@s01.de>                                 *
+ * Copyright (c) 2022, Enno Boland <g@s01.de>                                 *
  *                                                                            *
  * Redistribution and use in source and binary forms, with or without         *
  * modification, are permitted provided that the following conditions are     *
@@ -27,104 +27,45 @@
  ******************************************************************************/
 
 /**
- * @author       Enno Boland (mail@eboland.de)
- * @file         hsqs-cat.c
+ * @author      : Enno Boland (mail@eboland.de)
+ * @file        : trailing_context.c
  */
 
-#include "../src/context/content_context.h"
-#include "../src/context/inode_context.h"
-#include "../src/hsqs.h"
-#include "../src/iterator/directory_iterator.h"
-#include "common.h"
+#include "trailing_context.h"
+#include "../hsqs.h"
+#include "../mapper/mapper.h"
+#include "../utils.h"
 
-#include <assert.h>
-#include <limits.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+int
+hsqs_trailing_init(struct HsqsTrailingContext *context, struct Hsqs *hsqs) {
+	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
+	uint64_t trailing_start = hsqs_superblock_bytes_used(superblock);
+	size_t archive_size = hsqs_mapper_size(&hsqs->mapper);
+	uint64_t trailing_size;
 
-static int
-usage(char *arg0) {
-	printf("usage: %s FILESYSTEM PATH [PATH ...]\n", arg0);
-	printf("       %s -v\n", arg0);
-	return EXIT_FAILURE;
+	if (archive_size <= trailing_start) {
+		return HSQS_ERROR_TODO;
+	}
+
+	if (SUB_OVERFLOW(archive_size, trailing_start, &trailing_size)) {
+		return HSQS_ERROR_TODO;
+	}
+
+	return hsqs_request_map(
+			hsqs, context->mapping, trailing_start, trailing_size);
 }
 
-static int
-cat_path(struct Hsqs *hsqs, char *path) {
-	struct HsqsInodeContext inode = {0};
-	struct HsqsFileContext file = {0};
+size_t
+hsqs_trailing_size(struct HsqsTrailingContext *context) {
+	return hsqs_mapping_size(context->mapping);
+}
 
-	int rv = 0;
-	rv = hsqs_inode_load_by_path(&inode, hsqs, path);
-	if (rv < 0) {
-		hsqs_perror(rv, path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-	rv = hsqs_content_init(&file, &inode);
-	if (rv < 0) {
-		hsqs_perror(rv, path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-	rv = hsqs_content_read(&file, hsqs_inode_file_size(&inode));
-	if (rv < 0) {
-		hsqs_perror(rv, path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-	fwrite(hsqs_content_data(&file), sizeof(uint8_t), hsqs_content_size(&file),
-		   stdout);
-out:
-	hsqs_content_cleanup(&file);
-	hsqs_inode_cleanup(&inode);
-	return rv;
+const uint8_t *
+hsqs_trailing_data(struct HsqsTrailingContext *context) {
+	return hsqs_mapping_data(context->mapping);
 }
 
 int
-main(int argc, char *argv[]) {
-	int rv = 0;
-	int opt = 0;
-	const char *image_path;
-	struct Hsqs hsqs = {0};
-
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
-		switch (opt) {
-		case 'v':
-			puts("hsqs-cat-" VERSION);
-			return 0;
-		default:
-			return usage(argv[0]);
-		}
-	}
-
-	if (optind + 1 >= argc) {
-		return usage(argv[0]);
-	}
-
-	image_path = argv[optind];
-	optind++;
-
-	rv = open_archive(&hsqs, image_path);
-	if (rv < 0) {
-		hsqs_perror(rv, image_path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-	for (; optind < argc; optind++) {
-		rv = cat_path(&hsqs, argv[optind]);
-		if (rv < 0) {
-			goto out;
-		}
-	}
-
-out:
-	hsqs_cleanup(&hsqs);
-	return rv;
+hsqs_trailing_cleanup(struct HsqsTrailingContext *context) {
+	return hsqs_mapping_unmap(context->mapping);
 }

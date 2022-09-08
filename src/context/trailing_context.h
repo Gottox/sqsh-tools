@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Copyright (c) 2021, Enno Boland <g@s01.de>                                 *
+ * Copyright (c) 2022, Enno Boland <g@s01.de>                                 *
  *                                                                            *
  * Redistribution and use in source and binary forms, with or without         *
  * modification, are permitted provided that the following conditions are     *
@@ -27,49 +27,30 @@
  ******************************************************************************/
 
 /**
- * @author       Enno Boland (mail@eboland.de)
- * @file         printb.h
+ * @author      : Enno Boland (mail@eboland.de)
+ * @file        : trailing_context.h
  */
 
-#ifndef PRINTB_H
+#ifndef TRAILING_CONTEXT_H
 
-#define PRINTB_H
+#define TRAILING_CONTEXT_H
 
-#include <limits.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define for_endian(size) for (int i = 0; i < size; ++i)
-#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define for_endian(size) for (int i = size - 1; i >= 0; --i)
-#else
-#error "Endianness not detected"
-#endif
+struct Hsqs;
+struct HsqsMapper;
 
-#define printb(value, out) \
-	{ __printb((const void *)&value, sizeof(value), out); }
+struct HsqsTrailingContext {
+	struct HsqsMapping *mapping;
+};
 
-#define MSB_MASK 1 << (CHAR_BIT - 1)
+int hsqs_trailing_init(struct HsqsTrailingContext *context, struct Hsqs *hsqs);
 
-static void
-__printb(const void *value, size_t size, FILE *out) {
-	unsigned char uc;
-	unsigned char bits[CHAR_BIT + 1];
+size_t hsqs_trailing_size(struct HsqsTrailingContext *context);
 
-	bits[CHAR_BIT] = '\0';
-	for_endian(size) {
-		uc = ((unsigned char *)value)[i];
-		memset(bits, '0', CHAR_BIT);
-		for (int j = 0; uc && j < CHAR_BIT; ++j) {
-			if (uc & MSB_MASK)
-				bits[j] = '1';
-			uc <<= 1;
-		}
-		fprintf(out, "%s ", bits);
-	}
-	fputs("\n", out);
-}
+const uint8_t *hsqs_trailing_data(struct HsqsTrailingContext *context);
 
-#endif /* end of include guard PRINTB_H */
+int hsqs_trailing_cleanup(struct HsqsTrailingContext *context);
+
+#endif /* end of include guard TRAILING_CONTEXT_H */

@@ -100,6 +100,21 @@ hsqs_open(struct Hsqs *hsqs, const char *path) {
 	return init(hsqs);
 }
 
+#ifdef CONFIG_CURL
+int
+hsqs_open_url(struct Hsqs *hsqs, const char *url) {
+	int rv = 0;
+
+	rv = hsqs_mapper_init(
+			&hsqs->mapper, &hsqs_mapper_impl_curl, url, strlen(url));
+	if (rv < 0) {
+		return rv;
+	}
+
+	return init(hsqs);
+}
+#endif
+
 int
 hsqs_id_table(struct Hsqs *hsqs, struct HsqsTable **id_table) {
 	int rv = 0;
