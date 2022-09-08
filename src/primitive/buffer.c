@@ -103,7 +103,7 @@ hsqs_buffer_init(
 
 	impl = compression_by_id(compression_id);
 	if (impl == NULL) {
-		return -HSQS_ERROR_COMPRESSION_UNKNOWN;
+		return -HSQS_ERROR_COMPRESSION_UNSUPPORTED;
 	}
 
 	if (rv < 0) {

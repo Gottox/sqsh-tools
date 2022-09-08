@@ -36,14 +36,24 @@
 #include <stdio.h>
 
 #include "canary_mapper.h"
-#include "curl_mapper.h"
 #include "mmap_full_mapper.h"
 #include "mmap_mapper.h"
 #include "static_mapper.h"
+#ifdef CONFIG_CURL
+#include "curl_mapper.h"
+#endif
 
 #ifndef MEMORY_MAPPER_H
 
 #define MEMORY_MAPPER_H
+
+extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_static;
+extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_mmap_full;
+extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_mmap;
+extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_canary;
+#ifdef CONFIG_CURL
+extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_curl;
+#endif
 
 struct HsqsMapper;
 
@@ -54,7 +64,9 @@ struct HsqsMapping {
 		struct HsqsMmapMap mm;
 		struct HsqsStaticMap sm;
 		struct HsqsCanaryMap cn;
+#ifdef CONFIG_CURL
 		struct HsqsCurlMap cl;
+#endif
 	} data;
 };
 
@@ -76,13 +88,15 @@ struct HsqsMapper {
 		struct HsqsMmapMapper mm;
 		struct HsqsStaticMapper sm;
 		struct HsqsCanaryMapper cn;
+#ifdef CONFIG_CURL
 		struct HsqsCurlMapper cl;
+#endif
 	} data;
 };
 
-int hsqs_mapper_init_mmap(struct HsqsMapper *mapper, const char *path);
-int hsqs_mapper_init_static(
-		struct HsqsMapper *mapper, const uint8_t *input, size_t size);
+int hsqs_mapper_init(
+		struct HsqsMapper *mapper, struct HsqsMemoryMapperImpl *impl,
+		const void *input, size_t size);
 int hsqs_mapper_map(
 		struct HsqsMapping *mapping, struct HsqsMapper *mapper,
 		hsqs_index_t offset, size_t size);

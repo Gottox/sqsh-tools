@@ -32,7 +32,6 @@
  */
 
 #include "../primitive/buffer.h"
-#include "../primitive/lru_hashmap.h"
 #include <curl/curl.h>
 #include <stdint.h>
 
@@ -44,14 +43,12 @@ struct HsqsCurlMapper {
 	const char *url;
 	uint64_t expected_time;
 	uint64_t expected_size;
-	struct HsqsLruHashmap cache;
 	CURL *handle;
 	pthread_mutex_t handle_lock;
 };
 
 struct HsqsCurlMap {
-	struct HsqsRefCount *buffer_ref;
-	struct HsqsBuffer *buffer;
+	struct HsqsBuffer buffer;
 	uint64_t offset;
 	uint64_t total_size;
 	uint64_t file_time;

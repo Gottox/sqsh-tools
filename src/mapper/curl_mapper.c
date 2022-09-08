@@ -62,7 +62,7 @@ write_data(void *ptr, size_t size, size_t nmemb, void *userdata) {
 		rv = -HSQS_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
-	rv = hsqs_buffer_append(mapping->data.cl.buffer, ptr, byte_size);
+	rv = hsqs_buffer_append(&mapping->data.cl.buffer, ptr, byte_size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -145,11 +145,6 @@ hsqs_mapper_curl_init(
 	mapper->data.cl.expected_size = UINT64_MAX;
 	mapper->data.cl.expected_time = UINT64_MAX;
 
-	rv = hsqs_lru_hashmap_init(&mapper->data.cl.cache, 16);
-	if (rv < 0) {
-		goto out;
-	}
-
 	rv = pthread_mutex_init(&mapper->data.cl.handle_lock, NULL);
 	if (rv != 0) {
 		rv = -HSQS_ERROR_MAPPER_INIT;
@@ -169,41 +164,15 @@ out:
 }
 
 static int
-buffer_dtor(void *data) {
-	struct HsqsBuffer *buffer = data;
-	hsqs_buffer_cleanup(buffer);
-	return 0;
-}
-
-static int
 hsqs_mapper_curl_map(struct HsqsMapping *mapping, off_t offset, size_t size) {
 	int rv = 0;
-	struct HsqsRefCount *buffer_ref;
-	struct HsqsBuffer *buffer;
 
 	mapping->data.cl.offset = offset;
-	buffer_ref = hsqs_lru_hashmap_get(&mapping->mapper->data.cl.cache, offset);
-	if (buffer_ref == NULL) {
-		rv = hsqs_ref_count_new(
-				&buffer_ref, sizeof(struct HsqsBuffer), buffer_dtor);
-		if (rv < 0) {
-			goto out;
-		}
-		rv = hsqs_lru_hashmap_put(
-				&mapping->mapper->data.cl.cache, offset, buffer_ref);
-		if (rv < 0) {
-			goto out;
-		}
-		buffer = hsqs_ref_count_retain(buffer_ref);
-		rv = hsqs_buffer_init(buffer, HSQS_COMPRESSION_NONE, 8192);
-		if (rv < 0) {
-			goto out;
-		}
-	} else {
-		buffer = hsqs_ref_count_retain(buffer_ref);
+	rv = hsqs_buffer_init(
+			&mapping->data.cl.buffer, HSQS_COMPRESSION_NONE, 8192);
+	if (rv < 0) {
+		goto out;
 	}
-	mapping->data.cl.buffer_ref = buffer_ref;
-	mapping->data.cl.buffer = buffer;
 
 	rv = hsqs_mapping_resize(mapping, size);
 	if (rv < 0) {
@@ -220,22 +189,22 @@ static size_t
 hsqs_mapper_curl_size(const struct HsqsMapper *mapper) {
 	return mapper->data.cl.expected_size;
 }
+
 static int
 hsqs_mapper_curl_cleanup(struct HsqsMapper *mapper) {
-	hsqs_lru_hashmap_cleanup(&mapper->data.cl.cache);
 	pthread_mutex_destroy(&mapper->data.cl.handle_lock);
 	curl_easy_cleanup(mapper->data.cl.handle);
 	return 0;
 }
+
 static int
 hsqs_mapping_curl_unmap(struct HsqsMapping *mapping) {
-	hsqs_ref_count_release(mapping->data.cl.buffer_ref);
-	mapping->data.cl.buffer_ref = NULL;
+	hsqs_buffer_cleanup(&mapping->data.cl.buffer);
 	return 0;
 }
 static const uint8_t *
 hsqs_mapping_curl_data(const struct HsqsMapping *mapping) {
-	return hsqs_buffer_data(mapping->data.cl.buffer);
+	return hsqs_buffer_data(&mapping->data.cl.buffer);
 }
 
 static int
@@ -316,7 +285,7 @@ out:
 
 static size_t
 hsqs_mapping_curl_size(const struct HsqsMapping *mapping) {
-	return hsqs_buffer_size(mapping->data.cl.buffer);
+	return hsqs_buffer_size(&mapping->data.cl.buffer);
 }
 
 struct HsqsMemoryMapperImpl hsqs_mapper_impl_curl = {

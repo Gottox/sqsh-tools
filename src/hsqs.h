@@ -47,9 +47,10 @@
 
 #define HSQS_H
 
+struct HsqsTrailingContext;
+
 struct Hsqs {
 	uint32_t error;
-	struct HsqsLruHashmap metablock_cache;
 	struct HsqsMapper mapper;
 	struct HsqsMapper table_mapper;
 	struct HsqsMapping table_map;
@@ -59,7 +60,6 @@ struct Hsqs {
 	struct HsqsXattrTable xattr_table;
 	struct HsqsFragmentTable fragment_table;
 	struct HsqsCompressionOptionsContext compression_options;
-	struct HsqsMapping trailing_map;
 	uint8_t initialized;
 };
 
@@ -83,8 +83,8 @@ int hsqs_compression_options(
 		struct Hsqs *hsqs,
 		struct HsqsCompressionOptionsContext **compression_options);
 struct HsqsLruHashmap *hsqs_metablock_cache(struct Hsqs *hsqs);
-const uint8_t *hsqs_trailing_bytes(struct Hsqs *hsqs);
-size_t hsqs_trailing_bytes_size(struct Hsqs *hsqs);
+HSQS_NO_UNUSED int hsqs_trailing_bytes(
+		struct Hsqs *hsqs, struct HsqsTrailingContext *trailing_bytes);
 int hsqs_cleanup(struct Hsqs *hsqs);
 
 #endif /* end of include guard HSQS_H */

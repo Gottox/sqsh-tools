@@ -33,6 +33,7 @@
 
 #include "hsqs.h"
 #include "compression/compression.h"
+#include <string.h>
 
 static const uint64_t NO_SEGMENT = 0xFFFFFFFFFFFFFFFF;
 
@@ -42,8 +43,6 @@ enum InitializedBitmap {
 	INITIALIZED_XATTR_TABLE = 1 << 2,
 	INITIALIZED_FRAGMENT_TABLE = 1 << 3,
 	INITIALIZED_COMPRESSION_OPTIONS = 1 << 4,
-	INITIALIZED_TRAILING_BYTES = 1 << 5,
-	INITIALIZED_TABLE_MAPPER = 1 << 6,
 };
 
 static bool
@@ -56,11 +55,6 @@ init(struct Hsqs *hsqs) {
 	int rv = 0;
 
 	rv = hsqs_superblock_init(&hsqs->superblock, &hsqs->mapper);
-	if (rv < 0) {
-		goto out;
-	}
-
-	rv = hsqs_lru_hashmap_init(&hsqs->metablock_cache, 17);
 	if (rv < 0) {
 		goto out;
 	}
@@ -84,7 +78,8 @@ int
 hsqs_init(struct Hsqs *hsqs, const uint8_t *buffer, const size_t size) {
 	int rv = 0;
 
-	rv = hsqs_mapper_init_static(&hsqs->mapper, buffer, size);
+	rv = hsqs_mapper_init(
+			&hsqs->mapper, &hsqs_mapper_impl_static, buffer, size);
 	if (rv < 0) {
 		return rv;
 	}
@@ -96,7 +91,8 @@ int
 hsqs_open(struct Hsqs *hsqs, const char *path) {
 	int rv = 0;
 
-	rv = hsqs_mapper_init_mmap(&hsqs->mapper, path);
+	rv = hsqs_mapper_init(
+			&hsqs->mapper, &hsqs_mapper_impl_mmap, path, strlen(path));
 	if (rv < 0) {
 		return rv;
 	}
@@ -211,96 +207,11 @@ hsqs_superblock(struct Hsqs *hsqs) {
 	return &hsqs->superblock;
 }
 
-static int
-get_table_mapper(struct Hsqs *hsqs, struct HsqsMapper **table_mapper) {
-	int rv = 0;
-	if (is_initialized(hsqs, INITIALIZED_TABLE_MAPPER)) {
-		*table_mapper = &hsqs->table_mapper;
-		goto out;
-	}
-	*table_mapper = NULL;
-	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
-	uint64_t inode_table_start = hsqs_superblock_inode_table_start(superblock);
-	uint64_t archive_size = hsqs_mapper_size(&hsqs->mapper);
-	if (archive_size == UINT64_MAX) {
-		archive_size = hsqs_superblock_bytes_used(superblock);
-	}
-
-	const uint64_t table_size = archive_size - inode_table_start;
-
-	rv = hsqs_mapper_map(
-			&hsqs->table_map, &hsqs->mapper, inode_table_start, table_size);
-	if (rv < 0) {
-		goto out;
-	}
-	const uint8_t *table_data = hsqs_mapping_data(&hsqs->table_map);
-	rv = hsqs_mapper_init_static(&hsqs->table_mapper, table_data, table_size);
-	if (rv < 0) {
-		goto out;
-	}
-	*table_mapper = &hsqs->table_mapper;
-	hsqs->initialized |= INITIALIZED_TABLE_MAPPER;
-
-out:
-	return rv;
-}
-
 int
 hsqs_request_map(
 		struct Hsqs *hsqs, struct HsqsMapping *mapping, uint64_t offset,
 		uint64_t size) {
-	int rv = 0;
-	struct HsqsMapper *mapper;
-	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
-	uint64_t inode_table_start = hsqs_superblock_inode_table_start(superblock);
-
-	if (offset >= inode_table_start) {
-		rv = get_table_mapper(hsqs, &mapper);
-		if (rv < 0) {
-			goto out;
-		}
-		offset -= inode_table_start;
-	} else {
-		mapper = &hsqs->mapper;
-	}
-
-	rv = hsqs_mapper_map(mapping, mapper, offset, size);
-out:
-	return rv;
-}
-
-struct HsqsLruHashmap *
-hsqs_metablock_cache(struct Hsqs *hsqs) {
-	return &hsqs->metablock_cache;
-}
-
-const uint8_t *
-hsqs_trailing_bytes(struct Hsqs *hsqs) {
-	if (!is_initialized(hsqs, INITIALIZED_TRAILING_BYTES)) {
-		struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
-		uint64_t trailing_start = hsqs_superblock_bytes_used(superblock);
-		size_t archive_size = hsqs_mapper_size(&hsqs->mapper);
-		uint64_t trailing_size;
-
-		if (archive_size <= trailing_start) {
-			return NULL;
-		}
-
-		trailing_size = archive_size - trailing_start;
-
-		hsqs_request_map(
-				hsqs, &hsqs->trailing_map, trailing_start, trailing_size);
-	}
-	return hsqs_mapping_data(&hsqs->trailing_map);
-}
-size_t
-hsqs_trailing_bytes_size(struct Hsqs *hsqs) {
-	if (!is_initialized(hsqs, INITIALIZED_TRAILING_BYTES)) {
-		if (hsqs_mapping_data(&hsqs->trailing_map) == NULL) {
-			return 0;
-		}
-	}
-	return hsqs_mapping_size(&hsqs->trailing_map);
+	return hsqs_mapper_map(mapping, &hsqs->mapper, offset, size);
 }
 
 int
@@ -322,11 +233,6 @@ hsqs_cleanup(struct Hsqs *hsqs) {
 	if (is_initialized(hsqs, INITIALIZED_COMPRESSION_OPTIONS)) {
 		hsqs_compression_options_cleanup(&hsqs->compression_options);
 	}
-	if (is_initialized(hsqs, INITIALIZED_TABLE_MAPPER)) {
-		hsqs_mapper_cleanup(&hsqs->table_mapper);
-		hsqs_mapping_unmap(&hsqs->table_map);
-	}
-	hsqs_lru_hashmap_cleanup(&hsqs->metablock_cache);
 	hsqs_superblock_cleanup(&hsqs->superblock);
 	hsqs_mapper_cleanup(&hsqs->mapper);
 

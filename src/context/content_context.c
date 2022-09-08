@@ -32,10 +32,10 @@
  */
 
 #include "content_context.h"
-#include "../primitive/buffer.h"
 #include "../error.h"
 #include "../hsqs.h"
 #include "../mapper/mapper.h"
+#include "../primitive/buffer.h"
 #include "inode_context.h"
 #include "superblock_context.h"
 #include <stdint.h>

@@ -568,6 +568,7 @@ fuzz_crash_7() {
 	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
 	hsqs_cleanup(&hsqs);
 }
+
 DEFINE
 TEST(hsqs_empty);
 TEST(hsqs_ls);

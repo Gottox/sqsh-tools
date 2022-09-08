@@ -36,25 +36,23 @@
 #include <stdint.h>
 #include <string.h>
 
-extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_static;
-extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_mmap_full;
-extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_mmap;
-extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_canary;
-#ifdef CONFIG_CURL
-extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_curl;
-#endif
+int
+hsqs_mapper_init(
+		struct HsqsMapper *mapper, struct HsqsMemoryMapperImpl *impl,
+		const void *input, size_t size) {
+	mapper->impl = impl;
+	return mapper->impl->init(mapper, input, size);
+}
 
 int
 hsqs_mapper_init_mmap(struct HsqsMapper *mapper, const char *path) {
-	mapper->impl = &hsqs_mapper_impl_mmap;
-	return mapper->impl->init(mapper, path, strlen(path));
+	return hsqs_mapper_init(mapper, &hsqs_mapper_impl_mmap, path, strlen(path));
 }
 
 int
 hsqs_mapper_init_static(
 		struct HsqsMapper *mapper, const uint8_t *input, size_t size) {
-	mapper->impl = &hsqs_mapper_impl_static;
-	return mapper->impl->init(mapper, input, size);
+	return hsqs_mapper_init(mapper, &hsqs_mapper_impl_static, input, size);
 }
 
 int

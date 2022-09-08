@@ -134,7 +134,7 @@ hsqs_error_str(int error_code) {
 		return "Mapper init error";
 	case HSQS_ERROR_MAPPER_MAP:
 		return "Mapper mapping error";
-	case HSQS_ERROR_COMPRESSION_UNKNOWN:
+	case HSQS_ERROR_COMPRESSION_UNSUPPORTED:
 		return "Compression unkown";
 	case HSQS_ERROR_TODO:
 		return "Todo";

@@ -32,13 +32,13 @@
  */
 
 #include "xattr_table.h"
-#include "../primitive/buffer.h"
 #include "../context/inode_context.h"
 #include "../context/superblock_context.h"
 #include "../data/superblock.h"
 #include "../data/xattr_internal.h"
 #include "../error.h"
 #include "../hsqs.h"
+#include "../primitive/buffer.h"
 
 #include <stdint.h>
 #include <stdlib.h>
