@@ -18,7 +18,7 @@ jobs:
           sha-${{ github.sha }} latest
           ${{ github.ref_name }}
         context: utils
-        containerfiles: Dockerfile
+        containerfiles: utils/Dockerfile
     - name: Push to Dockerhub
       uses: redhat-actions/push-to-registry@v2
       with:
