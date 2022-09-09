@@ -32,6 +32,7 @@
  */
 
 #include "../mapper/mapper.h"
+#include "../primitive/buffer.h"
 #include "../utils.h"
 #include <stdint.h>
 

@@ -35,6 +35,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "../utils.h"
 #include "canary_mapper.h"
 #include "mmap_full_mapper.h"
 #include "mmap_mapper.h"

@@ -31,14 +31,15 @@
  * @file         superblock_context.h
  */
 
+#ifndef SUPERBLOCK_CONTEXT_H
+
+#define SUPERBLOCK_CONTEXT_H
+
+#include "../data/superblock.h"
 #include "../mapper/mapper.h"
 #include "../utils.h"
 #include <stdbool.h>
 #include <stdint.h>
-
-#ifndef SUPERBLOCK_CONTEXT_H
-
-#define SUPERBLOCK_CONTEXT_H
 
 struct HsqsSuperblock;
 

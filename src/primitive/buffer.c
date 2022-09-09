@@ -31,6 +31,7 @@
  * @file         compression.c
  */
 
+#include "buffer.h"
 #include "../compression/compression.h"
 #include "../context/superblock_context.h"
 #include "../data/metablock.h"
