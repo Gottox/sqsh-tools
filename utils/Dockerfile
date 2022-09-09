@@ -1,6 +1,3 @@
-# podman build -t docker.io/gottox/hsqs-build .
-# podman push docker.io/gottox/hsqs-build
-
 FROM alpine:3.16
 
 RUN apk add --no-cache gcc clang clang-analyzer meson musl-dev git
