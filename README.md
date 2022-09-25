@@ -2,6 +2,30 @@
 
 squashfs implementation as library.
 
+## Features
+
+*libhsqs* supports all features of the squashfs format. Keep in mind that this
+library only supports reading archives. If you need to create archives take a
+look at [squashfs-tools-ng](https://github.com/AgentD/squashfs-tools-ng/).
+
+At this point development focuses on avoiding redundant decompressions and
+developing efficient cache tactics.
+
+* traverse directories
+* read file contents
+* open files by path (`hsqs_inode_load_by_path`)
+* read metadata from inodes
+* read xattr from inodes
+* read symlinks from inodes
+* read device ids from inodes
+* open remote file systems through http (needs *libcurl*)
+* ... much more
+
+## Design principles
+
+* Stack oriented structures
+* usable in multithreaded applications
+
 ## How to...?
 
 ### ... open an archive?
