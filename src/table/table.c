@@ -91,7 +91,6 @@ int
 hsqs_table_get(const struct HsqsTable *table, off_t index, void *target) {
 	int rv = 0;
 	struct Hsqs *hsqs = table->hsqs;
-	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
 	struct HsqsMetablockContext metablock = {0};
 	struct HsqsBuffer buffer = {0};
 	uint64_t lookup_index =
@@ -100,9 +99,6 @@ hsqs_table_get(const struct HsqsTable *table, off_t index, void *target) {
 	uint64_t element_index =
 			(index * table->element_size) % HSQS_METABLOCK_BLOCK_SIZE;
 
-	enum HsqsSuperblockCompressionId compression_id =
-			hsqs_superblock_compression_id(superblock);
-	rv = hsqs_buffer_init(&buffer, compression_id, HSQS_METABLOCK_BLOCK_SIZE);
 	if (rv < 0) {
 		goto out;
 	}

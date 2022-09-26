@@ -33,6 +33,7 @@
 
 #include "context/compression_options_context.h"
 #include "context/superblock_context.h"
+#include "compression/compression.h"
 #include "error.h"
 #include "mapper/mapper.h"
 #include "table/fragment_table.h"
@@ -52,6 +53,8 @@ struct HsqsTrailingContext;
 struct Hsqs {
 	uint32_t error;
 	struct HsqsMapper mapper;
+	struct HsqsCompression data_compression;
+	struct HsqsCompression metablock_compression;
 	struct HsqsMapper table_mapper;
 	struct HsqsMapping table_map;
 	struct HsqsSuperblockContext superblock;
@@ -77,6 +80,8 @@ int hsqs_request_map(
 		uint64_t size);
 
 struct HsqsSuperblockContext *hsqs_superblock(struct Hsqs *hsqs);
+struct HsqsCompression *hsqs_data_compression(struct Hsqs *hsqs);
+struct HsqsCompression *hsqs_metablock_compression(struct Hsqs *hsqs);
 
 int hsqs_id_table(struct Hsqs *hsqs, struct HsqsTable **id_table);
 int hsqs_export_table(struct Hsqs *hsqs, struct HsqsTable **export_table);

@@ -39,6 +39,8 @@
 #define COMPRESSION_H
 
 union HsqsCompressionOptions;
+struct HsqsSuperblockContext;
+struct HsqsBuffer;
 
 struct HsqsCompressionImplementation {
 	int (*extract)(
@@ -46,5 +48,20 @@ struct HsqsCompressionImplementation {
 			uint8_t *target, size_t *target_size, const uint8_t *compressed,
 			const size_t compressed_size);
 };
+
+struct HsqsCompression {
+	const struct HsqsCompressionImplementation *impl;
+	size_t block_size;
+};
+
+int hsqs_compression_init(
+		struct HsqsCompression *compression,
+		int compression_id, size_t block_size);
+
+int hsqs_compression_decompress_to_buffer(
+		const struct HsqsCompression *compression, struct HsqsBuffer *buffer,
+		const uint8_t *compressed, const size_t compressed_size);
+
+int hsqs_compression_cleanup(struct HsqsCompression *compression);
 
 #endif /* end of include guard COMPRESSION_H */

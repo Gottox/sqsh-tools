@@ -48,6 +48,7 @@ hsqs_fragment_table_init(struct HsqsFragmentTable *table, struct Hsqs *hsqs) {
 	uint32_t count = hsqs_superblock_fragment_entry_count(superblock);
 
 	table->hsqs = hsqs;
+	table->compression = hsqs_data_compression(hsqs);
 	rv = hsqs_table_init(
 			&table->table, hsqs, start, HSQS_SIZEOF_FRAGMENT, count);
 	if (rv < 0) {
@@ -89,7 +90,12 @@ read_fragment_data(
 	}
 
 	data = hsqs_mapping_data(&memory_map);
-	rv = hsqs_buffer_append_block(buffer, data, size, is_compressed);
+	if (is_compressed) {
+		rv = hsqs_compression_decompress_to_buffer(
+				table->compression, buffer, data, size);
+	} else {
+		rv = hsqs_buffer_append(buffer, data, size);
+	}
 	if (rv < 0) {
 		goto out;
 	}
@@ -113,9 +119,7 @@ hsqs_fragment_table_to_buffer(
 	if (ADD_OVERFLOW(offset, size, &end_offset)) {
 		return -HSQS_ERROR_INTEGER_OVERFLOW;
 	}
-	enum HsqsSuperblockCompressionId compression_id =
-			hsqs_superblock_compression_id(table->superblock);
-	rv = hsqs_buffer_init(&intermediate_buffer, compression_id, block_size);
+	rv = hsqs_buffer_init(&intermediate_buffer);
 	if (rv < 0) {
 		goto out;
 	}
@@ -131,7 +135,7 @@ hsqs_fragment_table_to_buffer(
 
 	data = hsqs_buffer_data(&intermediate_buffer);
 
-	rv = hsqs_buffer_append_block(buffer, &data[offset], size, false);
+	rv = hsqs_buffer_append(buffer, &data[offset], size);
 	if (rv < 0) {
 		goto out;
 	}

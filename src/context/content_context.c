@@ -65,6 +65,7 @@ hsqs_content_init(
 	context->inode = inode;
 	context->block_size = hsqs_superblock_block_size(superblock);
 	context->hsqs = hsqs;
+	context->compression = hsqs_data_compression(hsqs);
 
 	if (hsqs_inode_file_has_fragment(inode)) {
 		rv = hsqs_fragment_table(context->hsqs, &context->fragment_table);
@@ -75,10 +76,7 @@ hsqs_content_init(
 		context->fragment_table = NULL;
 	}
 
-	enum HsqsSuperblockCompressionId compression_id =
-			hsqs_superblock_compression_id(superblock);
-	rv = hsqs_buffer_init(
-			&context->buffer, compression_id, context->block_size);
+	rv = hsqs_buffer_init(&context->buffer);
 	if (rv < 0) {
 		return rv;
 	}
@@ -130,9 +128,14 @@ hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
 		outer_block_size =
 				hsqs_inode_file_block_size(context->inode, block_index);
 
-		rv = hsqs_buffer_append_block(
-				buffer, &hsqs_mapping_data(&mapping)[outer_offset],
-				outer_block_size, is_compressed);
+		const uint8_t *data = &hsqs_mapping_data(&mapping)[outer_offset];
+		const size_t size = outer_block_size;
+		if (is_compressed) {
+			rv = hsqs_compression_decompress_to_buffer(
+					context->compression, buffer, data, size);
+		} else {
+			rv = hsqs_buffer_append(buffer, data, size);
+		}
 		if (rv < 0) {
 			goto out;
 		}

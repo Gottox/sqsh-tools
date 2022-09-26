@@ -32,6 +32,7 @@
  */
 
 #include "metablock_context.h"
+#include "../compression/compression.h"
 #include "../data/metablock.h"
 #include "../error.h"
 #include "../hsqs.h"
@@ -53,7 +54,7 @@ hsqs_metablock_init(
 	if (rv < 0) {
 		goto out;
 	}
-	context->hsqs = hsqs;
+	context->compression = hsqs_metablock_compression(hsqs);
 
 out:
 	if (rv < 0) {
@@ -95,7 +96,12 @@ hsqs_metablock_to_buffer(
 	metablock = get_metablock(context);
 	const uint8_t *data = hsqs_data_metablock_data(metablock);
 
-	rv = hsqs_buffer_append_block(buffer, data, size, is_compressed);
+	if (is_compressed) {
+		rv = hsqs_compression_decompress_to_buffer(
+				context->compression, buffer, data, size);
+	} else {
+		rv = hsqs_buffer_append(buffer, data, size);
+	}
 	if (rv < 0) {
 		goto out;
 	}

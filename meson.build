@@ -54,6 +54,7 @@ hsqs_hdr = [
 ]
 
 hsqs_src = [
+	'src/compression/compression.c',
 	'src/compression/null.c',
 	'src/context/compression_options_context.c',
 	'src/context/content_context.c',

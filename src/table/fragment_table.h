@@ -46,6 +46,7 @@ struct HsqsFragmentTable {
 	const struct HsqsSuperblockContext *superblock;
 	struct HsqsTable table;
 	struct Hsqs *hsqs;
+	struct HsqsCompression *compression;
 };
 
 HSQS_NO_UNUSED int

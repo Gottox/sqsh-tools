@@ -45,18 +45,18 @@
 struct HsqsSuperblockContext;
 
 struct HsqsBuffer {
-	const struct HsqsCompressionImplementation *impl;
-	int block_size;
 	uint8_t *data;
 	size_t size;
 };
 
 HSQS_NO_UNUSED int
-hsqs_buffer_init(struct HsqsBuffer *buffer, int compression_id, int block_size);
+hsqs_buffer_init(struct HsqsBuffer *buffer);
 
-HSQS_NO_UNUSED int hsqs_buffer_append_block(
-		struct HsqsBuffer *buffer, const uint8_t *source,
-		const size_t source_size, bool is_compressed);
+HSQS_NO_UNUSED int
+hsqs_buffer_add_size(struct HsqsBuffer *buffer, size_t additional_size);
+HSQS_NO_UNUSED int hsqs_buffer_add_capacity(
+		struct HsqsBuffer *buffer, uint8_t **additional_buffer,
+		size_t additional_size);
 
 HSQS_NO_UNUSED int hsqs_buffer_append(
 		struct HsqsBuffer *buffer, const uint8_t *source,

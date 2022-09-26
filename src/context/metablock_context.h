@@ -48,9 +48,9 @@ struct HsqsSuperblockContext;
 struct HsqsBuffer;
 
 struct HsqsMetablockContext {
-	struct Hsqs *hsqs;
 	struct HsqsMapping mapping;
 	struct HsqsBuffer buffer;
+	struct HsqsCompression *compression;
 };
 
 int hsqs_metablock_init(

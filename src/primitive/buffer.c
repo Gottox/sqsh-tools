@@ -28,11 +28,10 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         compression.c
+ * @file         buffer.c
  */
 
 #include "buffer.h"
-#include "../compression/compression.h"
 #include "../context/superblock_context.h"
 #include "../data/metablock.h"
 #include "../data/superblock_internal.h"
@@ -44,74 +43,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef CONFIG_ZLIB
-extern const struct HsqsCompressionImplementation hsqs_compression_zlib;
-#endif
-#ifdef CONFIG_LZMA
-extern const struct HsqsCompressionImplementation hsqs_compression_lzma;
-extern const struct HsqsCompressionImplementation hsqs_compression_xz;
-#endif
-#ifdef CONFIG_LZO
-extern const struct HsqsCompressionImplementation hsqs_compression_lzo;
-#endif
-#ifdef CONFIG_LZ4
-extern const struct HsqsCompressionImplementation hsqs_compression_lz4;
-#endif
-#ifdef CONFIG_ZSTD
-extern const struct HsqsCompressionImplementation hsqs_compression_zstd;
-#endif
-extern const struct HsqsCompressionImplementation hsqs_compression_null;
-
-static const struct HsqsCompressionImplementation *
-compression_by_id(int id) {
-	switch ((enum HsqsSuperblockCompressionId)id) {
-	case HSQS_COMPRESSION_NONE:
-		return &hsqs_compression_null;
-#ifdef CONFIG_ZLIB
-	case HSQS_COMPRESSION_GZIP:
-		return &hsqs_compression_zlib;
-#endif
-#ifdef CONFIG_LZMA
-	case HSQS_COMPRESSION_LZMA:
-		return &hsqs_compression_lzma;
-#endif
-#ifdef CONFIG_XZ
-	case HSQS_COMPRESSION_XZ:
-		return &hsqs_compression_xz;
-#endif
-#ifdef CONFIG_LZO
-	case HSQS_COMPRESSION_LZO:
-		return &hsqs_compression_lzo;
-#endif
-#ifdef CONFIG_LZ4
-	case HSQS_COMPRESSION_LZ4:
-		return &hsqs_compression_lz4;
-#endif
-#ifdef CONFIG_ZSTD
-	case HSQS_COMPRESSION_ZSTD:
-		return &hsqs_compression_zstd;
-#endif
-	default:
-		return NULL;
-	}
-}
-
 int
 hsqs_buffer_init(
-		struct HsqsBuffer *buffer, int compression_id, int block_size) {
+		struct HsqsBuffer *buffer) {
 	int rv = 0;
-	const struct HsqsCompressionImplementation *impl;
 
-	impl = compression_by_id(compression_id);
-	if (impl == NULL) {
-		return -HSQS_ERROR_COMPRESSION_UNSUPPORTED;
-	}
-
-	if (rv < 0) {
-		return rv;
-	}
-	buffer->impl = impl;
-	buffer->block_size = block_size;
 	buffer->data = NULL;
 	buffer->size = 0;
 
@@ -119,73 +55,52 @@ hsqs_buffer_init(
 }
 
 int
+hsqs_buffer_add_capacity(
+		struct HsqsBuffer *buffer, uint8_t **additional_buffer,
+		size_t additional_size) {
+	const size_t buffer_size = buffer->size;
+	size_t new_capacity;
+
+	if (ADD_OVERFLOW(buffer_size, additional_size, &new_capacity)) {
+		return -HSQS_ERROR_INTEGER_OVERFLOW;
+	}
+
+	buffer->data = realloc(buffer->data, new_capacity);
+	if (buffer->data == NULL) {
+		return -HSQS_ERROR_MALLOC_FAILED;
+	}
+	if (additional_buffer != NULL) {
+		*additional_buffer = &buffer->data[buffer_size];
+	}
+	return new_capacity;
+}
+
+int
+hsqs_buffer_add_size(struct HsqsBuffer *buffer, size_t additional_size) {
+	const size_t buffer_size = buffer->size;
+	size_t new_size;
+	if (ADD_OVERFLOW(buffer_size, additional_size, &new_size)) {
+		return -HSQS_ERROR_INTEGER_OVERFLOW;
+	}
+
+	buffer->size = new_size;
+	return 0;
+}
+
+int
 hsqs_buffer_append(
 		struct HsqsBuffer *buffer, const uint8_t *source,
-		const size_t source_size) {
+		const size_t size) {
 	int rv = 0;
-	const size_t buffer_size = buffer->size;
-	size_t target_size;
-	size_t new_size;
+	uint8_t *additional_buffer;
 
-	if (ADD_OVERFLOW(buffer_size, source_size, &new_size)) {
-		return -HSQS_ERROR_INTEGER_OVERFLOW;
-	}
-
-	buffer->data = realloc(buffer->data, new_size);
-	if (buffer->data == NULL) {
-		return -HSQS_ERROR_MALLOC_FAILED;
-	}
-
-	target_size = source_size;
-	rv = hsqs_compression_null.extract(
-			NULL, 0, &buffer->data[buffer_size], &target_size, source,
-			source_size);
-	if (rv < 0)
+	rv = hsqs_buffer_add_capacity(buffer, &additional_buffer, size);
+	if (rv < 0) {
 		return rv;
-
-	buffer->size += target_size;
-
-	return rv;
-}
-int
-hsqs_buffer_append_block(
-		struct HsqsBuffer *buffer, const uint8_t *source,
-		const size_t source_size, bool is_compressed) {
-	const union HsqsCompressionOptions *options = NULL;
-	size_t options_size = 0;
-	// const struct HsqsCompressionOptionsContext *options_context;
-	const struct HsqsCompressionImplementation *impl =
-			is_compressed ? buffer->impl : &hsqs_compression_null;
-	int rv = 0;
-	size_t block_size = buffer->block_size;
-	const size_t buffer_size = buffer->size;
-	size_t new_size;
-
-	if (ADD_OVERFLOW(buffer_size, block_size, &new_size)) {
-		return -HSQS_ERROR_INTEGER_OVERFLOW;
 	}
 
-	buffer->data = realloc(buffer->data, new_size);
-	if (buffer->data == NULL) {
-		return -HSQS_ERROR_MALLOC_FAILED;
-	}
-	// if (is_compressed) {
-	//	options_context = NULL;
-	//			//hsqs_superblock_compression_options(buffer->superblock);
-	//	if (options_context) {
-	//		options = hsqs_compression_options(options_context);
-	//		options_size = hsqs_compression_options_size(options_context);
-	//	}
-	//}
-
-	rv = impl->extract(
-			options, options_size, &buffer->data[buffer_size], &block_size,
-			source, source_size);
-	if (rv < 0)
-		return rv;
-
-	buffer->size += block_size;
-
+	memcpy(additional_buffer, source, size);
+	rv = hsqs_buffer_add_size(buffer, size);
 	return rv;
 }
 

@@ -168,8 +168,7 @@ hsqs_mapper_curl_map(struct HsqsMapping *mapping, off_t offset, size_t size) {
 	int rv = 0;
 
 	mapping->data.cl.offset = offset;
-	rv = hsqs_buffer_init(
-			&mapping->data.cl.buffer, HSQS_COMPRESSION_NONE, 8192);
+	rv = hsqs_buffer_init(&mapping->data.cl.buffer);
 	if (rv < 0) {
 		goto out;
 	}

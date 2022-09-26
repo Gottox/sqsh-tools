@@ -49,11 +49,7 @@ hsqs_compression_options_init(
 		goto out;
 	}
 
-	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
-	enum HsqsSuperblockCompressionId compression_id =
-			hsqs_superblock_compression_id(superblock);
-	rv = hsqs_buffer_init(
-			&context->buffer, compression_id, HSQS_METABLOCK_BLOCK_SIZE);
+	rv = hsqs_buffer_init(&context->buffer);
 	if (rv < 0) {
 		goto out;
 	}

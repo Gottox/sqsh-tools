@@ -33,6 +33,8 @@
 
 #include "hsqs.h"
 #include "compression/compression.h"
+#include "context/metablock_context.h"
+#include "context/superblock_context.h"
 #include <string.h>
 
 static const uint64_t NO_SEGMENT = 0xFFFFFFFFFFFFFFFF;
@@ -65,6 +67,25 @@ init(struct Hsqs *hsqs) {
 		if (rv < 0) {
 			goto out;
 		}
+	}
+
+	enum HsqsSuperblockCompressionId compression_id =
+			hsqs_superblock_compression_id(&hsqs->superblock);
+	uint32_t data_block_size =
+			hsqs_superblock_block_size(&hsqs->superblock);
+
+	rv = hsqs_compression_init(
+			&hsqs->metablock_compression, compression_id,
+			HSQS_METABLOCK_BLOCK_SIZE);
+	if (rv < 0) {
+		hsqs_cleanup(hsqs);
+	}
+
+	rv = hsqs_compression_init(
+			&hsqs->data_compression, compression_id,
+			data_block_size);
+	if (rv < 0) {
+		hsqs_cleanup(hsqs);
 	}
 
 out:
@@ -217,6 +238,16 @@ hsqs_compression_options(
 	}
 }
 
+struct HsqsCompression *
+hsqs_data_compression(struct Hsqs *hsqs) {
+	return &hsqs->data_compression;
+}
+
+struct HsqsCompression *
+hsqs_metablock_compression(struct Hsqs *hsqs) {
+	return &hsqs->metablock_compression;
+}
+
 struct HsqsSuperblockContext *
 hsqs_superblock(struct Hsqs *hsqs) {
 	return &hsqs->superblock;
@@ -248,6 +279,8 @@ hsqs_cleanup(struct Hsqs *hsqs) {
 	if (is_initialized(hsqs, INITIALIZED_COMPRESSION_OPTIONS)) {
 		hsqs_compression_options_cleanup(&hsqs->compression_options);
 	}
+	hsqs_compression_cleanup(&hsqs->data_compression);
+	hsqs_compression_cleanup(&hsqs->metablock_compression);
 	hsqs_superblock_cleanup(&hsqs->superblock);
 	hsqs_mapper_cleanup(&hsqs->mapper);
 

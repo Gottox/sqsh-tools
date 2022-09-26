@@ -77,7 +77,6 @@ hsqs_metablock_stream_seek(
 		uint32_t buffer_offset) {
 	int rv = 0;
 	hsqs_buffer_cleanup(&context->buffer);
-	struct HsqsSuperblockContext *superblock = hsqs_superblock(context->hsqs);
 
 	if (ADD_OVERFLOW(
 				context->base_address, address_offset,
@@ -87,10 +86,7 @@ hsqs_metablock_stream_seek(
 	}
 	context->buffer_offset = buffer_offset;
 
-	enum HsqsSuperblockCompressionId compression_id =
-			hsqs_superblock_compression_id(superblock);
-	rv = hsqs_buffer_init(
-			&context->buffer, compression_id, HSQS_METABLOCK_BLOCK_SIZE);
+	rv = hsqs_buffer_init(&context->buffer);
 	if (rv < 0) {
 		goto out;
 	}

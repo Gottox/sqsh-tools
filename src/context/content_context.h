@@ -46,6 +46,7 @@ struct HsqsFileContext {
 	struct HsqsFragmentTable *fragment_table;
 	struct HsqsInodeContext *inode;
 	struct HsqsBuffer buffer;
+	struct HsqsCompression *compression;
 	uint64_t seek_pos;
 	uint32_t block_size;
 };
