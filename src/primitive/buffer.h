@@ -49,8 +49,7 @@ struct HsqsBuffer {
 	size_t size;
 };
 
-HSQS_NO_UNUSED int
-hsqs_buffer_init(struct HsqsBuffer *buffer);
+HSQS_NO_UNUSED int hsqs_buffer_init(struct HsqsBuffer *buffer);
 
 HSQS_NO_UNUSED int
 hsqs_buffer_add_size(struct HsqsBuffer *buffer, size_t additional_size);

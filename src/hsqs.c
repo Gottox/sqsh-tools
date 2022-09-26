@@ -71,8 +71,7 @@ init(struct Hsqs *hsqs) {
 
 	enum HsqsSuperblockCompressionId compression_id =
 			hsqs_superblock_compression_id(&hsqs->superblock);
-	uint32_t data_block_size =
-			hsqs_superblock_block_size(&hsqs->superblock);
+	uint32_t data_block_size = hsqs_superblock_block_size(&hsqs->superblock);
 
 	rv = hsqs_compression_init(
 			&hsqs->metablock_compression, compression_id,
@@ -82,8 +81,7 @@ init(struct Hsqs *hsqs) {
 	}
 
 	rv = hsqs_compression_init(
-			&hsqs->data_compression, compression_id,
-			data_block_size);
+			&hsqs->data_compression, compression_id, data_block_size);
 	if (rv < 0) {
 		hsqs_cleanup(hsqs);
 	}

@@ -55,8 +55,8 @@ struct HsqsCompression {
 };
 
 int hsqs_compression_init(
-		struct HsqsCompression *compression,
-		int compression_id, size_t block_size);
+		struct HsqsCompression *compression, int compression_id,
+		size_t block_size);
 
 int hsqs_compression_decompress_to_buffer(
 		const struct HsqsCompression *compression, struct HsqsBuffer *buffer,

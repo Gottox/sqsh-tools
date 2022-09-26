@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Copyright (c) 2022, Enno Boland <g@s01.de>                                 *
+ * Copyright (c) 2021, Enno Boland <g@s01.de>                                 *
  *                                                                            *
  * Redistribution and use in source and binary forms, with or without         *
  * modification, are permitted provided that the following conditions are     *
@@ -28,93 +28,109 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         buffer.c
+ * @file         hsqs-xattr.c
  */
 
-#include "buffer.h"
-#include "../context/superblock_context.h"
-#include "../data/metablock.h"
-#include "../data/superblock_internal.h"
-#include "../error.h"
-#include "../utils.h"
+#include "../src/context/inode_context.h"
+#include "../src/hsqs.h"
+#include "../src/iterator/directory_iterator.h"
+#include "../src/iterator/xattr_iterator.h"
+#include "common.h"
 
-#include <stdbool.h>
+#include <assert.h>
+#include <limits.h>
 #include <stdint.h>
-#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
-int
-hsqs_buffer_init(struct HsqsBuffer *buffer) {
+static int
+usage(char *arg0) {
+	printf("usage: %s FILESYSTEM PATH [PATH ...]\n", arg0);
+	printf("       %s -v\n", arg0);
+	return EXIT_FAILURE;
+}
+
+static int
+fattr_path(struct Hsqs *hsqs, char *path) {
+	struct HsqsInodeContext inode = {0};
+	struct HsqsXattrIterator iter = {0};
+
 	int rv = 0;
-
-	buffer->data = NULL;
-	buffer->size = 0;
-
-	return rv;
-}
-
-int
-hsqs_buffer_add_capacity(
-		struct HsqsBuffer *buffer, uint8_t **additional_buffer,
-		size_t additional_size) {
-	const size_t buffer_size = buffer->size;
-	size_t new_capacity;
-
-	if (ADD_OVERFLOW(buffer_size, additional_size, &new_capacity)) {
-		return -HSQS_ERROR_INTEGER_OVERFLOW;
-	}
-
-	buffer->data = realloc(buffer->data, new_capacity);
-	if (buffer->data == NULL) {
-		return -HSQS_ERROR_MALLOC_FAILED;
-	}
-	if (additional_buffer != NULL) {
-		*additional_buffer = &buffer->data[buffer_size];
-	}
-	return new_capacity;
-}
-
-int
-hsqs_buffer_add_size(struct HsqsBuffer *buffer, size_t additional_size) {
-	const size_t buffer_size = buffer->size;
-	size_t new_size;
-	if (ADD_OVERFLOW(buffer_size, additional_size, &new_size)) {
-		return -HSQS_ERROR_INTEGER_OVERFLOW;
-	}
-
-	buffer->size = new_size;
-	return 0;
-}
-
-int
-hsqs_buffer_append(
-		struct HsqsBuffer *buffer, const uint8_t *source, const size_t size) {
-	int rv = 0;
-	uint8_t *additional_buffer;
-
-	rv = hsqs_buffer_add_capacity(buffer, &additional_buffer, size);
+	rv = hsqs_inode_load_by_path(&inode, hsqs, path);
 	if (rv < 0) {
-		return rv;
+		hsqs_perror(rv, path);
+		rv = EXIT_FAILURE;
+		goto out;
 	}
 
-	memcpy(additional_buffer, source, size);
-	rv = hsqs_buffer_add_size(buffer, size);
+	rv = hsqs_inode_xattr_iterator(&inode, &iter);
+	if (rv < 0) {
+		hsqs_perror(rv, path);
+		rv = EXIT_FAILURE;
+		goto out;
+	}
+
+	while ((rv = hsqs_xattr_iterator_next(&iter)) > 0) {
+		const char *prefix = hsqs_xattr_iterator_prefix(&iter);
+		uint16_t prefix_len = hsqs_xattr_iterator_prefix_size(&iter);
+		const char *name = hsqs_xattr_iterator_name(&iter);
+		uint16_t name_len = hsqs_xattr_iterator_name_size(&iter);
+		const char *value = hsqs_xattr_iterator_value(&iter);
+		uint16_t value_len = hsqs_xattr_iterator_value_size(&iter);
+
+		fwrite(prefix, prefix_len, 1, stdout);
+		fwrite(name, name_len, 1, stdout);
+		fputs("=\"", stdout);
+		fwrite(value, value_len, 1, stdout);
+		fputs("\"\n", stdout);
+	}
+
+out:
+	hsqs_xattr_iterator_cleanup(&iter);
+	hsqs_inode_cleanup(&inode);
 	return rv;
 }
 
-const uint8_t *
-hsqs_buffer_data(const struct HsqsBuffer *buffer) {
-	return buffer->data;
-}
-size_t
-hsqs_buffer_size(const struct HsqsBuffer *buffer) {
-	return buffer->size;
-}
-
 int
-hsqs_buffer_cleanup(struct HsqsBuffer *buffer) {
-	free(buffer->data);
-	buffer->data = NULL;
-	buffer->size = 0;
-	return 0;
+main(int argc, char *argv[]) {
+	int rv = 0;
+	int opt = 0;
+	const char *image_path;
+	struct Hsqs hsqs = {0};
+
+	while ((opt = getopt(argc, argv, "vh")) != -1) {
+		switch (opt) {
+		case 'v':
+			puts("hsqs-xattr-" VERSION);
+			return 0;
+		default:
+			return usage(argv[0]);
+		}
+	}
+
+	if (optind + 1 >= argc) {
+		return usage(argv[0]);
+	}
+
+	image_path = argv[optind];
+	optind++;
+
+	rv = open_archive(&hsqs, image_path);
+	if (rv < 0) {
+		hsqs_perror(rv, image_path);
+		rv = EXIT_FAILURE;
+		goto out;
+	}
+
+	for (; optind < argc; optind++) {
+		rv = fattr_path(&hsqs, argv[optind]);
+		if (rv < 0) {
+			goto out;
+		}
+	}
+
+out:
+	hsqs_cleanup(&hsqs);
+	return rv;
 }

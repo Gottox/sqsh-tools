@@ -31,9 +31,9 @@
  * @file         hsqs.h
  */
 
+#include "compression/compression.h"
 #include "context/compression_options_context.h"
 #include "context/superblock_context.h"
-#include "compression/compression.h"
 #include "error.h"
 #include "mapper/mapper.h"
 #include "table/fragment_table.h"

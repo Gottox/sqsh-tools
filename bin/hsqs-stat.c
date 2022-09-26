@@ -128,7 +128,6 @@ static int
 stat_file(struct Hsqs *hsqs, const char *path) {
 	int rv = 0;
 	struct HsqsInodeContext inode = {0};
-	struct HsqsXattrIterator iter = {0};
 	(void)hsqs;
 	(void)path;
 	rv = hsqs_inode_load_by_path(&inode, hsqs, path);
@@ -172,20 +171,6 @@ stat_file(struct Hsqs *hsqs, const char *path) {
 		printf("       device minor: %i\n",
 			   hsqs_inode_device_id(&inode) & 0xFF);
 		break;
-	}
-
-	rv = hsqs_inode_xattr_iterator(&inode, &iter);
-	if (rv < 0) {
-		hsqs_perror(rv, "hsqs_inode_xattr_iterator");
-		return rv;
-	}
-	if ((rv = hsqs_xattr_iterator_next(&iter)) > 0) {
-		printf("xattrs:\n");
-		do {
-			const char *name = hsqs_xattr_iterator_name(&iter);
-			const char *value = hsqs_xattr_iterator_value(&iter);
-			printf("    %s = %s\n", name, value);
-		} while ((rv = hsqs_xattr_iterator_next(&iter)) > 0);
 	}
 
 	hsqs_inode_cleanup(&inode);
