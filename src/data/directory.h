@@ -41,27 +41,27 @@
 #define HSQS_SIZEOF_DIRECTORY_FRAGMENT 12
 #define HSQS_SIZEOF_DIRECTORY_ENTRY 8
 
-struct HsqsDirectoryEntry;
+struct SqshDirectoryEntry;
 
-struct HsqsDirectoryFragment;
+struct SqshDirectoryFragment;
 
 uint16_t
-hsqs_data_directory_entry_offset(const struct HsqsDirectoryEntry *entry);
+sqsh_data_directory_entry_offset(const struct SqshDirectoryEntry *entry);
 int16_t
-hsqs_data_directory_entry_inode_offset(const struct HsqsDirectoryEntry *entry);
-uint16_t hsqs_data_directory_entry_type(const struct HsqsDirectoryEntry *entry);
+sqsh_data_directory_entry_inode_offset(const struct SqshDirectoryEntry *entry);
+uint16_t sqsh_data_directory_entry_type(const struct SqshDirectoryEntry *entry);
 uint16_t
-hsqs_data_directory_entry_name_size(const struct HsqsDirectoryEntry *entry);
+sqsh_data_directory_entry_name_size(const struct SqshDirectoryEntry *entry);
 const uint8_t *
-hsqs_data_directory_entry_name(const struct HsqsDirectoryEntry *entry);
+sqsh_data_directory_entry_name(const struct SqshDirectoryEntry *entry);
 
-uint32_t hsqs_data_directory_fragment_count(
-		const struct HsqsDirectoryFragment *fragment);
-uint32_t hsqs_data_directory_fragment_start(
-		const struct HsqsDirectoryFragment *fragment);
-uint32_t hsqs_data_directory_fragment_inode_number(
-		const struct HsqsDirectoryFragment *fragment);
-const struct HsqsDirectoryEntry *hsqs_data_directory_fragment_entries(
-		const struct HsqsDirectoryFragment *fragment);
+uint32_t sqsh_data_directory_fragment_count(
+		const struct SqshDirectoryFragment *fragment);
+uint32_t sqsh_data_directory_fragment_start(
+		const struct SqshDirectoryFragment *fragment);
+uint32_t sqsh_data_directory_fragment_inode_number(
+		const struct SqshDirectoryFragment *fragment);
+const struct SqshDirectoryEntry *sqsh_data_directory_fragment_entries(
+		const struct SqshDirectoryFragment *fragment);
 
 #endif /* end of include guard HSQS__DIRECTORY_H */

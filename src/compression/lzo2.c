@@ -44,8 +44,8 @@
 #include "compression.h"
 
 static int
-hsqs_lzo2_extract(
-		const union HsqsCompressionOptions *options, size_t options_size,
+sqsh_lzo2_extract(
+		const union SqshCompressionOptions *options, size_t options_size,
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	if (options != NULL &&
@@ -62,6 +62,6 @@ hsqs_lzo2_extract(
 	return 0;
 }
 
-const struct HsqsCompressionImplementation hsqs_compression_lzo = {
-		.extract = hsqs_lzo2_extract,
+const struct SqshCompressionImplementation sqsh_compression_lzo = {
+		.extract = sqsh_lzo2_extract,
 };

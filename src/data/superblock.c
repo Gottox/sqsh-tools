@@ -37,7 +37,7 @@
 
 #include <endian.h>
 
-struct HsqsSuperblock {
+struct SqshSuperblock {
 	uint32_t magic;
 	uint32_t inode_count;
 	uint32_t modification_time;
@@ -60,103 +60,103 @@ struct HsqsSuperblock {
 };
 
 uint32_t
-hsqs_data_superblock_magic(const struct HsqsSuperblock *superblock) {
+sqsh_data_superblock_magic(const struct SqshSuperblock *superblock) {
 	return le32toh(superblock->magic);
 }
 
 uint32_t
-hsqs_data_superblock_inode_count(const struct HsqsSuperblock *superblock) {
+sqsh_data_superblock_inode_count(const struct SqshSuperblock *superblock) {
 	return le32toh(superblock->inode_count);
 }
 
 uint32_t
-hsqs_data_superblock_modification_time(
-		const struct HsqsSuperblock *superblock) {
+sqsh_data_superblock_modification_time(
+		const struct SqshSuperblock *superblock) {
 	return le32toh(superblock->modification_time);
 }
 
 uint32_t
-hsqs_data_superblock_block_size(const struct HsqsSuperblock *superblock) {
+sqsh_data_superblock_block_size(const struct SqshSuperblock *superblock) {
 	return le32toh(superblock->block_size);
 }
 
 uint32_t
-hsqs_data_superblock_fragment_entry_count(
-		const struct HsqsSuperblock *superblock) {
+sqsh_data_superblock_fragment_entry_count(
+		const struct SqshSuperblock *superblock) {
 	return le32toh(superblock->fragment_entry_count);
 }
 
 uint16_t
-hsqs_data_superblock_compression_id(const struct HsqsSuperblock *superblock) {
+sqsh_data_superblock_compression_id(const struct SqshSuperblock *superblock) {
 	return le16toh(superblock->compression_id);
 }
 
 uint16_t
-hsqs_data_superblock_block_log(const struct HsqsSuperblock *superblock) {
+sqsh_data_superblock_block_log(const struct SqshSuperblock *superblock) {
 	return le16toh(superblock->block_log);
 }
 
 uint16_t
-hsqs_data_superblock_flags(const struct HsqsSuperblock *superblock) {
+sqsh_data_superblock_flags(const struct SqshSuperblock *superblock) {
 	return le16toh(superblock->flags);
 }
 
 uint16_t
-hsqs_data_superblock_id_count(const struct HsqsSuperblock *superblock) {
+sqsh_data_superblock_id_count(const struct SqshSuperblock *superblock) {
 	return le16toh(superblock->id_count);
 }
 
 uint16_t
-hsqs_data_superblock_version_major(const struct HsqsSuperblock *superblock) {
+sqsh_data_superblock_version_major(const struct SqshSuperblock *superblock) {
 	return le16toh(superblock->version_major);
 }
 
 uint16_t
-hsqs_data_superblock_version_minor(const struct HsqsSuperblock *superblock) {
+sqsh_data_superblock_version_minor(const struct SqshSuperblock *superblock) {
 	return le16toh(superblock->version_minor);
 }
 
 uint64_t
-hsqs_data_superblock_root_inode_ref(const struct HsqsSuperblock *superblock) {
+sqsh_data_superblock_root_inode_ref(const struct SqshSuperblock *superblock) {
 	return le64toh(superblock->root_inode_ref);
 }
 
 uint64_t
-hsqs_data_superblock_bytes_used(const struct HsqsSuperblock *superblock) {
+sqsh_data_superblock_bytes_used(const struct SqshSuperblock *superblock) {
 	return le64toh(superblock->bytes_used);
 }
 
 uint64_t
-hsqs_data_superblock_id_table_start(const struct HsqsSuperblock *superblock) {
+sqsh_data_superblock_id_table_start(const struct SqshSuperblock *superblock) {
 	return le64toh(superblock->id_table_start);
 }
 
 uint64_t
-hsqs_data_superblock_xattr_id_table_start(
-		const struct HsqsSuperblock *superblock) {
+sqsh_data_superblock_xattr_id_table_start(
+		const struct SqshSuperblock *superblock) {
 	return le64toh(superblock->xattr_id_table_start);
 }
 
 uint64_t
-hsqs_data_superblock_inode_table_start(
-		const struct HsqsSuperblock *superblock) {
+sqsh_data_superblock_inode_table_start(
+		const struct SqshSuperblock *superblock) {
 	return le64toh(superblock->inode_table_start);
 }
 
 uint64_t
-hsqs_data_superblock_directory_table_start(
-		const struct HsqsSuperblock *superblock) {
+sqsh_data_superblock_directory_table_start(
+		const struct SqshSuperblock *superblock) {
 	return le64toh(superblock->directory_table_start);
 }
 
 uint64_t
-hsqs_data_superblock_fragment_table_start(
-		const struct HsqsSuperblock *superblock) {
+sqsh_data_superblock_fragment_table_start(
+		const struct SqshSuperblock *superblock) {
 	return le64toh(superblock->fragment_table_start);
 }
 
 uint64_t
-hsqs_data_superblock_export_table_start(
-		const struct HsqsSuperblock *superblock) {
+sqsh_data_superblock_export_table_start(
+		const struct SqshSuperblock *superblock) {
 	return le64toh(superblock->export_table_start);
 }

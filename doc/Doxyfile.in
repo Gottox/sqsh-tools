@@ -1,5 +1,5 @@
 # General information
-PROJECT_NAME          = libhsqs
+PROJECT_NAME          = libsqsh
 PROJECT_NUMBER        = @DOXYGEN_PROJECT_NUMBER@
 OUTPUT_DIRECTORY      = @DOXYGEN_OUTPUT@
 OUTPUT_LANGUAGE       = English
@@ -8,7 +8,7 @@ EXTRACT_ALL           = YES
 OPTIMIZE_OUTPUT_FOR_C = YES
 DOXYFILE_ENCODING     = UTF-8
 ALPHABETICAL_INDEX    = YES
-IGNORE_PREFIX         = hsqs_
+IGNORE_PREFIX         = sqsh_
 HAVE_DOT              = YES
 DOT_IMAGE_FORMAT      = svg
 INTERACTIVE_SVG       = YES

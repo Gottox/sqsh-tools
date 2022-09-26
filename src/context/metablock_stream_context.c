@@ -34,49 +34,49 @@
 #include "metablock_stream_context.h"
 #include "../data/metablock.h"
 #include "../error.h"
-#include "../hsqs.h"
 #include "../primitive/buffer.h"
+#include "../sqsh.h"
 #include "data/superblock.h"
 #include "metablock_context.h"
 #include "superblock_context.h"
 #include <stdint.h>
 
 HSQS_NO_UNUSED int
-hsqs_metablock_stream_init(
-		struct HsqsMetablockStreamContext *context, struct Hsqs *hsqs,
+sqsh_metablock_stream_init(
+		struct SqshMetablockStreamContext *context, struct Sqsh *sqsh,
 		uint64_t address, uint64_t max_address) {
 	// TODO check for max_address
 	(void)max_address;
 	int rv = 0;
 
-	context->hsqs = hsqs;
+	context->sqsh = sqsh;
 	context->base_address = address;
-	rv = hsqs_metablock_stream_seek(context, address, 0);
+	rv = sqsh_metablock_stream_seek(context, address, 0);
 	if (rv < 0) {
 		goto out;
 	}
 out:
 	if (rv < 0) {
-		hsqs_metablock_stream_cleanup(context);
+		sqsh_metablock_stream_cleanup(context);
 	}
 	return rv;
 }
 
 int
-hsqs_metablock_stream_seek_ref(
-		struct HsqsMetablockStreamContext *context, uint64_t ref) {
+sqsh_metablock_stream_seek_ref(
+		struct SqshMetablockStreamContext *context, uint64_t ref) {
 	uint64_t address_offset = ref >> 16;
 	uint16_t index = ref & 0xFFFF;
 
-	return hsqs_metablock_stream_seek(context, address_offset, index);
+	return sqsh_metablock_stream_seek(context, address_offset, index);
 }
 
 int
-hsqs_metablock_stream_seek(
-		struct HsqsMetablockStreamContext *context, uint64_t address_offset,
+sqsh_metablock_stream_seek(
+		struct SqshMetablockStreamContext *context, uint64_t address_offset,
 		uint32_t buffer_offset) {
 	int rv = 0;
-	hsqs_buffer_cleanup(&context->buffer);
+	sqsh_buffer_cleanup(&context->buffer);
 
 	if (ADD_OVERFLOW(
 				context->base_address, address_offset,
@@ -86,7 +86,7 @@ hsqs_metablock_stream_seek(
 	}
 	context->buffer_offset = buffer_offset;
 
-	rv = hsqs_buffer_init(&context->buffer);
+	rv = sqsh_buffer_init(&context->buffer);
 	if (rv < 0) {
 		goto out;
 	}
@@ -96,38 +96,38 @@ out:
 }
 
 static int
-add_block(struct HsqsMetablockStreamContext *context) {
+add_block(struct SqshMetablockStreamContext *context) {
 	int rv = 0;
-	struct HsqsMetablockContext metablock = {0};
+	struct SqshMetablockContext metablock = {0};
 	uint64_t address = context->current_address;
 	uint32_t metablock_size;
 
-	rv = hsqs_metablock_init(&metablock, context->hsqs, address);
+	rv = sqsh_metablock_init(&metablock, context->sqsh, address);
 	if (rv < 0) {
 		goto out;
 	}
 	metablock_size =
-			HSQS_SIZEOF_METABLOCK + hsqs_metablock_compressed_size(&metablock);
+			HSQS_SIZEOF_METABLOCK + sqsh_metablock_compressed_size(&metablock);
 	if (ADD_OVERFLOW(address, metablock_size, &context->current_address)) {
 		rv = -HSQS_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
 
-	rv = hsqs_metablock_to_buffer(&metablock, &context->buffer);
+	rv = sqsh_metablock_to_buffer(&metablock, &context->buffer);
 	if (rv < 0) {
 		goto out;
 	}
 
 out:
-	hsqs_metablock_cleanup(&metablock);
+	sqsh_metablock_cleanup(&metablock);
 	return rv;
 }
 
 HSQS_NO_UNUSED int
-hsqs_metablock_stream_more(
-		struct HsqsMetablockStreamContext *context, uint64_t size) {
+sqsh_metablock_stream_more(
+		struct SqshMetablockStreamContext *context, uint64_t size) {
 	int rv = 0;
-	while (hsqs_metablock_stream_size(context) < size) {
+	while (sqsh_metablock_stream_size(context) < size) {
 		rv = add_block(context);
 		if (rv < 0) {
 			return rv;
@@ -137,17 +137,17 @@ hsqs_metablock_stream_more(
 }
 
 const uint8_t *
-hsqs_metablock_stream_data(const struct HsqsMetablockStreamContext *context) {
-	if (hsqs_metablock_stream_size(context) > 0) {
-		return &hsqs_buffer_data(&context->buffer)[context->buffer_offset];
+sqsh_metablock_stream_data(const struct SqshMetablockStreamContext *context) {
+	if (sqsh_metablock_stream_size(context) > 0) {
+		return &sqsh_buffer_data(&context->buffer)[context->buffer_offset];
 	} else {
 		return NULL;
 	}
 }
 
 size_t
-hsqs_metablock_stream_size(const struct HsqsMetablockStreamContext *context) {
-	size_t buffer_size = hsqs_buffer_size(&context->buffer);
+sqsh_metablock_stream_size(const struct SqshMetablockStreamContext *context) {
+	size_t buffer_size = sqsh_buffer_size(&context->buffer);
 
 	if (buffer_size > context->buffer_offset) {
 		return buffer_size - context->buffer_offset;
@@ -157,7 +157,7 @@ hsqs_metablock_stream_size(const struct HsqsMetablockStreamContext *context) {
 }
 
 int
-hsqs_metablock_stream_cleanup(struct HsqsMetablockStreamContext *context) {
-	hsqs_buffer_cleanup(&context->buffer);
+sqsh_metablock_stream_cleanup(struct SqshMetablockStreamContext *context) {
+	sqsh_buffer_cleanup(&context->buffer);
 	return 0;
 }

@@ -52,7 +52,7 @@
 #define HSQS_SIZEOF_INODE_IPC_EXT 8
 #define HSQS_SIZEOF_INODE_HEADER 16
 
-enum HsqsInodeType {
+enum SqshInodeType {
 	HSQS_INODE_TYPE_BASIC_DIRECTORY = 1,
 	HSQS_INODE_TYPE_BASIC_FILE = 2,
 	HSQS_INODE_TYPE_BASIC_SYMLINK = 3,
@@ -69,139 +69,139 @@ enum HsqsInodeType {
 	HSQS_INODE_TYPE_EXTENDED_SOCKET = 14,
 };
 
-struct HsqsInodeDirectory;
-struct HsqsInodeDirectoryExt;
-struct HsqsInodeFile;
-struct HsqsInodeFileExt;
-struct HsqsInodeSymlink;
-struct HsqsInodeSymlinkExt;
-struct HsqsInodeSymlinkExtTail;
-struct HsqsInodeDevice;
-struct HsqsInodeDeviceExt;
-struct HsqsInodeIpc;
-struct HsqsInodeIpcExt;
-struct HsqsInode;
+struct SqshInodeDirectory;
+struct SqshInodeDirectoryExt;
+struct SqshInodeFile;
+struct SqshInodeFileExt;
+struct SqshInodeSymlink;
+struct SqshInodeSymlinkExt;
+struct SqshInodeSymlinkExtTail;
+struct SqshInodeDevice;
+struct SqshInodeDeviceExt;
+struct SqshInodeIpc;
+struct SqshInodeIpcExt;
+struct SqshInode;
 
-struct HsqsInodeDirectoryIndex;
+struct SqshInodeDirectoryIndex;
 
-uint16_t hsqs_data_inode_type(const struct HsqsInode *inode);
-uint16_t hsqs_data_inode_permissions(const struct HsqsInode *inode);
-uint16_t hsqs_data_inode_uid_idx(const struct HsqsInode *inode);
-uint16_t hsqs_data_inode_gid_idx(const struct HsqsInode *inode);
-uint32_t hsqs_data_inode_modified_time(const struct HsqsInode *inode);
-uint32_t hsqs_data_inode_number(const struct HsqsInode *inode);
+uint16_t sqsh_data_inode_type(const struct SqshInode *inode);
+uint16_t sqsh_data_inode_permissions(const struct SqshInode *inode);
+uint16_t sqsh_data_inode_uid_idx(const struct SqshInode *inode);
+uint16_t sqsh_data_inode_gid_idx(const struct SqshInode *inode);
+uint32_t sqsh_data_inode_modified_time(const struct SqshInode *inode);
+uint32_t sqsh_data_inode_number(const struct SqshInode *inode);
 
-const struct HsqsInodeDirectory *
-hsqs_data_inode_directory(const struct HsqsInode *inode);
-const struct HsqsInodeDirectoryExt *
-hsqs_data_inode_directory_ext(const struct HsqsInode *inode);
-const struct HsqsInodeFile *hsqs_data_inode_file(const struct HsqsInode *inode);
-const struct HsqsInodeFileExt *
-hsqs_data_inode_file_ext(const struct HsqsInode *inode);
-const struct HsqsInodeSymlink *
-hsqs_data_inode_symlink(const struct HsqsInode *inode);
-const struct HsqsInodeSymlinkExt *
-hsqs_data_inode_symlink_ext(const struct HsqsInode *inode);
-const struct HsqsInodeDevice *
-hsqs_data_inode_device(const struct HsqsInode *inode);
-const struct HsqsInodeDeviceExt *
-hsqs_data_inode_device_ext(const struct HsqsInode *inode);
-const struct HsqsInodeIpc *hsqs_data_inode_ipc(const struct HsqsInode *inode);
-const struct HsqsInodeIpcExt *
-hsqs_data_inode_ipc_ext(const struct HsqsInode *inode);
+const struct SqshInodeDirectory *
+sqsh_data_inode_directory(const struct SqshInode *inode);
+const struct SqshInodeDirectoryExt *
+sqsh_data_inode_directory_ext(const struct SqshInode *inode);
+const struct SqshInodeFile *sqsh_data_inode_file(const struct SqshInode *inode);
+const struct SqshInodeFileExt *
+sqsh_data_inode_file_ext(const struct SqshInode *inode);
+const struct SqshInodeSymlink *
+sqsh_data_inode_symlink(const struct SqshInode *inode);
+const struct SqshInodeSymlinkExt *
+sqsh_data_inode_symlink_ext(const struct SqshInode *inode);
+const struct SqshInodeDevice *
+sqsh_data_inode_device(const struct SqshInode *inode);
+const struct SqshInodeDeviceExt *
+sqsh_data_inode_device_ext(const struct SqshInode *inode);
+const struct SqshInodeIpc *sqsh_data_inode_ipc(const struct SqshInode *inode);
+const struct SqshInodeIpcExt *
+sqsh_data_inode_ipc_ext(const struct SqshInode *inode);
 
-uint32_t hsqs_data_inode_directory_block_start(
-		const struct HsqsInodeDirectory *directory);
-uint32_t hsqs_data_inode_directory_hard_link_count(
-		const struct HsqsInodeDirectory *directory);
+uint32_t sqsh_data_inode_directory_block_start(
+		const struct SqshInodeDirectory *directory);
+uint32_t sqsh_data_inode_directory_hard_link_count(
+		const struct SqshInodeDirectory *directory);
 uint16_t
-hsqs_data_inode_directory_file_size(const struct HsqsInodeDirectory *directory);
-uint16_t hsqs_data_inode_directory_block_offset(
-		const struct HsqsInodeDirectory *directory);
-uint32_t hsqs_data_inode_directory_parent_inode_number(
-		const struct HsqsInodeDirectory *directory);
+sqsh_data_inode_directory_file_size(const struct SqshInodeDirectory *directory);
+uint16_t sqsh_data_inode_directory_block_offset(
+		const struct SqshInodeDirectory *directory);
+uint32_t sqsh_data_inode_directory_parent_inode_number(
+		const struct SqshInodeDirectory *directory);
 
-uint32_t hsqs_data_inode_directory_ext_hard_link_count(
-		const struct HsqsInodeDirectoryExt *directory_ext);
-uint32_t hsqs_data_inode_directory_ext_file_size(
-		const struct HsqsInodeDirectoryExt *directory_ext);
-uint32_t hsqs_data_inode_directory_ext_block_start(
-		const struct HsqsInodeDirectoryExt *directory_ext);
-uint32_t hsqs_data_inode_directory_ext_parent_inode_number(
-		const struct HsqsInodeDirectoryExt *directory_ext);
-uint16_t hsqs_data_inode_directory_ext_index_count(
-		const struct HsqsInodeDirectoryExt *directory_ext);
-uint16_t hsqs_data_inode_directory_ext_block_offset(
-		const struct HsqsInodeDirectoryExt *directory_ext);
-uint32_t hsqs_data_inode_directory_ext_xattr_idx(
-		const struct HsqsInodeDirectoryExt *directory_ext);
-const uint8_t *hsqs_data_inode_directory_ext_index(
-		const struct HsqsInodeDirectoryExt *directory_ext);
+uint32_t sqsh_data_inode_directory_ext_hard_link_count(
+		const struct SqshInodeDirectoryExt *directory_ext);
+uint32_t sqsh_data_inode_directory_ext_file_size(
+		const struct SqshInodeDirectoryExt *directory_ext);
+uint32_t sqsh_data_inode_directory_ext_block_start(
+		const struct SqshInodeDirectoryExt *directory_ext);
+uint32_t sqsh_data_inode_directory_ext_parent_inode_number(
+		const struct SqshInodeDirectoryExt *directory_ext);
+uint16_t sqsh_data_inode_directory_ext_index_count(
+		const struct SqshInodeDirectoryExt *directory_ext);
+uint16_t sqsh_data_inode_directory_ext_block_offset(
+		const struct SqshInodeDirectoryExt *directory_ext);
+uint32_t sqsh_data_inode_directory_ext_xattr_idx(
+		const struct SqshInodeDirectoryExt *directory_ext);
+const uint8_t *sqsh_data_inode_directory_ext_index(
+		const struct SqshInodeDirectoryExt *directory_ext);
 
-uint32_t hsqs_data_inode_directory_index_index(
-		const struct HsqsInodeDirectoryIndex *directory_index);
-uint32_t hsqs_data_inode_directory_index_start(
-		const struct HsqsInodeDirectoryIndex *directory_index);
-uint32_t hsqs_data_inode_directory_index_name_size(
-		const struct HsqsInodeDirectoryIndex *directory_index);
-const uint8_t *hsqs_data_inode_directory_index_name(
-		const struct HsqsInodeDirectoryIndex *directory_index);
+uint32_t sqsh_data_inode_directory_index_index(
+		const struct SqshInodeDirectoryIndex *directory_index);
+uint32_t sqsh_data_inode_directory_index_start(
+		const struct SqshInodeDirectoryIndex *directory_index);
+uint32_t sqsh_data_inode_directory_index_name_size(
+		const struct SqshInodeDirectoryIndex *directory_index);
+const uint8_t *sqsh_data_inode_directory_index_name(
+		const struct SqshInodeDirectoryIndex *directory_index);
 
-uint32_t hsqs_data_inode_file_blocks_start(const struct HsqsInodeFile *file);
+uint32_t sqsh_data_inode_file_blocks_start(const struct SqshInodeFile *file);
 uint32_t
-hsqs_data_inode_file_fragment_block_index(const struct HsqsInodeFile *file);
-uint32_t hsqs_data_inode_file_block_offset(const struct HsqsInodeFile *file);
-uint32_t hsqs_data_inode_file_size(const struct HsqsInodeFile *file);
-const struct HsqsDatablockSize *
-hsqs_data_inode_file_block_sizes(const struct HsqsInodeFile *file);
+sqsh_data_inode_file_fragment_block_index(const struct SqshInodeFile *file);
+uint32_t sqsh_data_inode_file_block_offset(const struct SqshInodeFile *file);
+uint32_t sqsh_data_inode_file_size(const struct SqshInodeFile *file);
+const struct SqshDatablockSize *
+sqsh_data_inode_file_block_sizes(const struct SqshInodeFile *file);
 
 uint64_t
-hsqs_data_inode_file_ext_blocks_start(const struct HsqsInodeFileExt *file_ext);
-uint64_t hsqs_data_inode_file_ext_size(const struct HsqsInodeFileExt *file_ext);
+sqsh_data_inode_file_ext_blocks_start(const struct SqshInodeFileExt *file_ext);
+uint64_t sqsh_data_inode_file_ext_size(const struct SqshInodeFileExt *file_ext);
 uint64_t
-hsqs_data_inode_file_ext_sparse(const struct HsqsInodeFileExt *file_ext);
-uint32_t hsqs_data_inode_file_ext_hard_link_count(
-		const struct HsqsInodeFileExt *file_ext);
-uint32_t hsqs_data_inode_file_ext_fragment_block_index(
-		const struct HsqsInodeFileExt *file_ext);
+sqsh_data_inode_file_ext_sparse(const struct SqshInodeFileExt *file_ext);
+uint32_t sqsh_data_inode_file_ext_hard_link_count(
+		const struct SqshInodeFileExt *file_ext);
+uint32_t sqsh_data_inode_file_ext_fragment_block_index(
+		const struct SqshInodeFileExt *file_ext);
 uint32_t
-hsqs_data_inode_file_ext_block_offset(const struct HsqsInodeFileExt *file_ext);
+sqsh_data_inode_file_ext_block_offset(const struct SqshInodeFileExt *file_ext);
 uint32_t
-hsqs_data_inode_file_ext_xattr_idx(const struct HsqsInodeFileExt *file_ext);
-const struct HsqsDatablockSize *
-hsqs_data_inode_file_ext_block_sizes(const struct HsqsInodeFileExt *file_ext);
+sqsh_data_inode_file_ext_xattr_idx(const struct SqshInodeFileExt *file_ext);
+const struct SqshDatablockSize *
+sqsh_data_inode_file_ext_block_sizes(const struct SqshInodeFileExt *file_ext);
 
-uint32_t hsqs_data_inode_symlink_hard_link_count(
-		const struct HsqsInodeSymlink *directory);
+uint32_t sqsh_data_inode_symlink_hard_link_count(
+		const struct SqshInodeSymlink *directory);
 uint32_t
-hsqs_data_inode_symlink_target_size(const struct HsqsInodeSymlink *directory);
+sqsh_data_inode_symlink_target_size(const struct SqshInodeSymlink *directory);
 const uint8_t *
-hsqs_data_inode_symlink_target_path(const struct HsqsInodeSymlink *directory);
+sqsh_data_inode_symlink_target_path(const struct SqshInodeSymlink *directory);
 
-uint32_t hsqs_data_inode_symlink_ext_hard_link_count(
-		const struct HsqsInodeSymlinkExt *directory);
-uint32_t hsqs_data_inode_symlink_ext_target_size(
-		const struct HsqsInodeSymlinkExt *directory);
-const uint8_t *hsqs_data_inode_symlink_ext_target_path(
-		const struct HsqsInodeSymlinkExt *directory);
-uint32_t hsqs_data_inode_symlink_ext_xattr_idx(
-		const struct HsqsInodeSymlinkExt *directory);
-
-uint32_t
-hsqs_data_inode_device_hard_link_count(const struct HsqsInodeDevice *device);
-uint32_t hsqs_data_inode_device_device(const struct HsqsInodeDevice *device);
-
-uint32_t hsqs_data_inode_device_ext_hard_link_count(
-		const struct HsqsInodeDeviceExt *device);
-uint32_t
-hsqs_data_inode_device_ext_device(const struct HsqsInodeDeviceExt *device);
-uint32_t
-hsqs_data_inode_device_ext_xattr_idx(const struct HsqsInodeDeviceExt *device);
-
-uint32_t hsqs_data_inode_ipc_hard_link_count(const struct HsqsInodeIpc *ipc);
+uint32_t sqsh_data_inode_symlink_ext_hard_link_count(
+		const struct SqshInodeSymlinkExt *directory);
+uint32_t sqsh_data_inode_symlink_ext_target_size(
+		const struct SqshInodeSymlinkExt *directory);
+const uint8_t *sqsh_data_inode_symlink_ext_target_path(
+		const struct SqshInodeSymlinkExt *directory);
+uint32_t sqsh_data_inode_symlink_ext_xattr_idx(
+		const struct SqshInodeSymlinkExt *directory);
 
 uint32_t
-hsqs_data_inode_ipc_ext_hard_link_count(const struct HsqsInodeIpcExt *ipc);
-uint32_t hsqs_data_inode_ipc_ext_xattr_idx(const struct HsqsInodeIpcExt *ipc);
+sqsh_data_inode_device_hard_link_count(const struct SqshInodeDevice *device);
+uint32_t sqsh_data_inode_device_device(const struct SqshInodeDevice *device);
+
+uint32_t sqsh_data_inode_device_ext_hard_link_count(
+		const struct SqshInodeDeviceExt *device);
+uint32_t
+sqsh_data_inode_device_ext_device(const struct SqshInodeDeviceExt *device);
+uint32_t
+sqsh_data_inode_device_ext_xattr_idx(const struct SqshInodeDeviceExt *device);
+
+uint32_t sqsh_data_inode_ipc_hard_link_count(const struct SqshInodeIpc *ipc);
+
+uint32_t
+sqsh_data_inode_ipc_ext_hard_link_count(const struct SqshInodeIpcExt *ipc);
+uint32_t sqsh_data_inode_ipc_ext_xattr_idx(const struct SqshInodeIpcExt *ipc);
 
 #endif /* end of include guard INODE_H */

@@ -28,12 +28,12 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         hsqs-ls.c
+ * @file         sqsh-ls.c
  */
 
 #include "../src/context/inode_context.h"
-#include "../src/hsqs.h"
 #include "../src/iterator/directory_iterator.h"
+#include "../src/sqsh.h"
 #include "common.h"
 
 #include <assert.h>
@@ -47,14 +47,14 @@
 #include <unistd.h>
 
 static int
-print_simple(const struct HsqsDirectoryIterator *iter, const char *path);
+print_simple(const struct SqshDirectoryIterator *iter, const char *path);
 
 static bool recursive = false;
-static int (*print_item)(const struct HsqsDirectoryIterator *, const char *) =
+static int (*print_item)(const struct SqshDirectoryIterator *, const char *) =
 		print_simple;
 
 static int
-ls(struct Hsqs *hsqs, const char *path, struct HsqsInodeContext *inode);
+ls(struct Sqsh *sqsh, const char *path, struct SqshInodeContext *inode);
 
 static int
 usage(char *arg0) {
@@ -64,18 +64,18 @@ usage(char *arg0) {
 }
 
 static int
-print_simple(const struct HsqsDirectoryIterator *iter, const char *path) {
+print_simple(const struct SqshDirectoryIterator *iter, const char *path) {
 	(void)iter;
 	puts(path);
 	return 0;
 }
 
 void
-print_detail_inode(struct HsqsInodeContext *inode, const char *path) {
+print_detail_inode(struct SqshInodeContext *inode, const char *path) {
 	int mode;
 	char xchar, unxchar;
 
-	switch (hsqs_inode_type(inode)) {
+	switch (sqsh_inode_type(inode)) {
 	case HSQS_INODE_TYPE_UNKNOWN:
 		putchar('?');
 		break;
@@ -102,7 +102,7 @@ print_detail_inode(struct HsqsInodeContext *inode, const char *path) {
 		break;
 	}
 
-	mode = hsqs_inode_permission(inode);
+	mode = sqsh_inode_permission(inode);
 #define PRINT_MODE(t) \
 	{ \
 		putchar((S_IR##t & mode) ? 'r' : '-'); \
@@ -120,14 +120,14 @@ print_detail_inode(struct HsqsInodeContext *inode, const char *path) {
 	PRINT_MODE(OTH);
 #undef PRINT_MODE
 
-	time_t mtime = hsqs_inode_modified_time(inode);
-	printf(" %6u %6u %10" PRIu64 " %s %s", hsqs_inode_uid(inode),
-		   hsqs_inode_gid(inode), hsqs_inode_file_size(inode),
+	time_t mtime = sqsh_inode_modified_time(inode);
+	printf(" %6u %6u %10" PRIu64 " %s %s", sqsh_inode_uid(inode),
+		   sqsh_inode_gid(inode), sqsh_inode_file_size(inode),
 		   strtok(ctime(&mtime), "\n"), path);
 
-	if (hsqs_inode_type(inode) == HSQS_INODE_TYPE_SYMLINK) {
+	if (sqsh_inode_type(inode) == HSQS_INODE_TYPE_SYMLINK) {
 		fputs(" -> ", stdout);
-		fwrite(hsqs_inode_symlink(inode), hsqs_inode_symlink_size(inode),
+		fwrite(sqsh_inode_symlink(inode), sqsh_inode_symlink_size(inode),
 			   sizeof(char), stdout);
 	}
 
@@ -135,28 +135,28 @@ print_detail_inode(struct HsqsInodeContext *inode, const char *path) {
 }
 
 static int
-print_detail(const struct HsqsDirectoryIterator *iter, const char *path) {
+print_detail(const struct SqshDirectoryIterator *iter, const char *path) {
 	int rv = 0;
-	struct HsqsInodeContext inode = {0};
+	struct SqshInodeContext inode = {0};
 
-	rv = hsqs_directory_iterator_inode_load(iter, &inode);
+	rv = sqsh_directory_iterator_inode_load(iter, &inode);
 	if (rv < 0) {
 		goto out;
 	}
 	print_detail_inode(&inode, path);
 out:
-	hsqs_inode_cleanup(&inode);
+	sqsh_inode_cleanup(&inode);
 	return rv;
 }
 
 static int
-ls_item(struct Hsqs *hsqs, const char *path,
-		struct HsqsDirectoryIterator *iter) {
+ls_item(struct Sqsh *sqsh, const char *path,
+		struct SqshDirectoryIterator *iter) {
 	int rv = 0;
 	int len = 0;
-	struct HsqsInodeContext entry_inode = {0};
-	const char *name = hsqs_directory_iterator_name(iter);
-	const int name_size = hsqs_directory_iterator_name_size(iter);
+	struct SqshInodeContext entry_inode = {0};
+	const char *name = sqsh_directory_iterator_name(iter);
+	const int name_size = sqsh_directory_iterator_name_size(iter);
 	char *current_path =
 			calloc(name_size + strlen(path ? path : "") + 2, sizeof(char));
 
@@ -175,16 +175,16 @@ ls_item(struct Hsqs *hsqs, const char *path,
 	print_item(iter, current_path);
 
 	if (recursive &&
-		hsqs_directory_iterator_inode_type(iter) == HSQS_INODE_TYPE_DIRECTORY) {
-		rv = hsqs_directory_iterator_inode_load(iter, &entry_inode);
+		sqsh_directory_iterator_inode_type(iter) == HSQS_INODE_TYPE_DIRECTORY) {
+		rv = sqsh_directory_iterator_inode_load(iter, &entry_inode);
 		if (rv < 0) {
 			goto out;
 		}
-		rv = ls(hsqs, current_path, &entry_inode);
+		rv = ls(sqsh, current_path, &entry_inode);
 		if (rv < 0) {
 			goto out;
 		}
-		hsqs_inode_cleanup(&entry_inode);
+		sqsh_inode_cleanup(&entry_inode);
 	}
 
 out:
@@ -193,19 +193,19 @@ out:
 }
 
 static int
-ls(struct Hsqs *hsqs, const char *path, struct HsqsInodeContext *inode) {
+ls(struct Sqsh *sqsh, const char *path, struct SqshInodeContext *inode) {
 	int rv;
-	struct HsqsDirectoryIterator iter = {0};
+	struct SqshDirectoryIterator iter = {0};
 
-	rv = hsqs_directory_iterator_init(&iter, inode);
+	rv = sqsh_directory_iterator_init(&iter, inode);
 	if (rv < 0) {
-		hsqs_perror(rv, "hsqs_directory_iterator_init");
+		sqsh_perror(rv, "sqsh_directory_iterator_init");
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	while (hsqs_directory_iterator_next(&iter) > 0) {
-		rv = ls_item(hsqs, path, &iter);
+	while (sqsh_directory_iterator_next(&iter) > 0) {
+		rv = ls_item(sqsh, path, &iter);
 		if (rv < 0) {
 			rv = EXIT_FAILURE;
 			goto out;
@@ -213,31 +213,31 @@ ls(struct Hsqs *hsqs, const char *path, struct HsqsInodeContext *inode) {
 	}
 
 out:
-	hsqs_directory_iterator_cleanup(&iter);
+	sqsh_directory_iterator_cleanup(&iter);
 
 	return rv;
 }
 
 static int
-ls_path(struct Hsqs *hsqs, char *path) {
-	struct HsqsInodeContext inode = {0};
+ls_path(struct Sqsh *sqsh, char *path) {
+	struct SqshInodeContext inode = {0};
 	int rv = 0;
 
-	rv = hsqs_inode_load_by_path(&inode, hsqs, path);
+	rv = sqsh_inode_load_by_path(&inode, sqsh, path);
 	if (rv < 0) {
-		hsqs_perror(rv, path);
+		sqsh_perror(rv, path);
 		goto out;
 	}
-	if (hsqs_inode_type(&inode) == HSQS_INODE_TYPE_DIRECTORY) {
+	if (sqsh_inode_type(&inode) == HSQS_INODE_TYPE_DIRECTORY) {
 		if (rv < 0) {
-			hsqs_perror(rv, path);
+			sqsh_perror(rv, path);
 			rv = EXIT_FAILURE;
 			goto out;
 		}
 
-		rv = ls(hsqs, path, &inode);
+		rv = ls(sqsh, path, &inode);
 		if (rv < 0) {
-			hsqs_perror(rv, path);
+			sqsh_perror(rv, path);
 			rv = EXIT_FAILURE;
 			goto out;
 		}
@@ -249,7 +249,7 @@ ls_path(struct Hsqs *hsqs, char *path) {
 		}
 	}
 out:
-	hsqs_inode_cleanup(&inode);
+	sqsh_inode_cleanup(&inode);
 	return rv;
 }
 
@@ -259,12 +259,12 @@ main(int argc, char *argv[]) {
 	int rv = 0;
 	int opt = 0;
 	const char *image_path;
-	struct Hsqs hsqs = {0};
+	struct Sqsh sqsh = {0};
 
 	while ((opt = getopt(argc, argv, "vrhl")) != -1) {
 		switch (opt) {
 		case 'v':
-			puts("hsqs-ls-" VERSION);
+			puts("sqsh-ls-" VERSION);
 			return 0;
 		case 'r':
 			recursive = true;
@@ -284,29 +284,29 @@ main(int argc, char *argv[]) {
 	image_path = argv[optind];
 	optind++;
 
-	rv = open_archive(&hsqs, image_path);
+	rv = open_archive(&sqsh, image_path);
 	if (rv < 0) {
-		hsqs_perror(rv, image_path);
+		sqsh_perror(rv, image_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
 	for (; optind < argc; optind++) {
 		has_listed = true;
-		rv = ls_path(&hsqs, argv[optind]);
+		rv = ls_path(&sqsh, argv[optind]);
 		if (rv < 0) {
 			goto out;
 		}
 	}
 
 	if (has_listed == false) {
-		rv = ls_path(&hsqs, NULL);
+		rv = ls_path(&sqsh, NULL);
 		if (rv < 0) {
 			goto out;
 		}
 	}
 
 out:
-	hsqs_cleanup(&hsqs);
+	sqsh_cleanup(&sqsh);
 	return rv;
 }

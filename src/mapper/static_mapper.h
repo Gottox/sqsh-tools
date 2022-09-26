@@ -38,12 +38,12 @@
 
 #define STATIC_MAPPER_H
 
-struct HsqsStaticMapper {
+struct SqshStaticMapper {
 	const uint8_t *data;
 	size_t size;
 };
 
-struct HsqsStaticMap {
+struct SqshStaticMap {
 	const uint8_t *data;
 	size_t size;
 };

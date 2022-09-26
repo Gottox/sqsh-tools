@@ -38,13 +38,13 @@
 
 #define MMAP_MAPPER_H
 
-struct HsqsMmapMapper {
+struct SqshMmapMapper {
 	int fd;
 	long page_size;
 	size_t size;
 };
 
-struct HsqsMmapMap {
+struct SqshMmapMap {
 	uint8_t *data;
 	size_t offset;
 	size_t page_offset;

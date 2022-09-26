@@ -34,22 +34,22 @@
 #include "table.h"
 #include "../context/metablock_context.h"
 #include "../error.h"
-#include "../hsqs.h"
+#include "../sqsh.h"
 #include <stdint.h>
 #include <string.h>
 
 typedef const __attribute__((aligned(1))) uint64_t unaligned_uint64_t;
 static uint64_t
-lookup_table_get(const struct HsqsTable *table, off_t index) {
+lookup_table_get(const struct SqshTable *table, off_t index) {
 	unaligned_uint64_t *lookup_table =
-			(unaligned_uint64_t *)hsqs_mapping_data(&table->lookup_table);
+			(unaligned_uint64_t *)sqsh_mapping_data(&table->lookup_table);
 
 	return lookup_table[index];
 }
 
 int
-hsqs_table_init(
-		struct HsqsTable *table, struct Hsqs *hsqs, off_t start_block,
+sqsh_table_init(
+		struct SqshTable *table, struct Sqsh *sqsh, off_t start_block,
 		size_t element_size, size_t element_count) {
 	int rv = 0;
 	size_t byte_size;
@@ -69,13 +69,13 @@ hsqs_table_init(
 		return -HSQS_ERROR_INTEGER_OVERFLOW;
 	}
 
-	rv = hsqs_request_map(
-			hsqs, &table->lookup_table, start_block, lookup_table_size);
+	rv = sqsh_request_map(
+			sqsh, &table->lookup_table, start_block, lookup_table_size);
 	if (rv < 0) {
 		return rv;
 	}
 
-	table->hsqs = hsqs;
+	table->sqsh = sqsh;
 	table->element_size = element_size;
 	table->element_count = element_count;
 	if (MULT_OVERFLOW(element_size, element_count, &byte_size)) {
@@ -88,11 +88,11 @@ out:
 }
 
 int
-hsqs_table_get(const struct HsqsTable *table, off_t index, void *target) {
+sqsh_table_get(const struct SqshTable *table, off_t index, void *target) {
 	int rv = 0;
-	struct Hsqs *hsqs = table->hsqs;
-	struct HsqsMetablockContext metablock = {0};
-	struct HsqsBuffer buffer = {0};
+	struct Sqsh *sqsh = table->sqsh;
+	struct SqshMetablockContext metablock = {0};
+	struct SqshBuffer buffer = {0};
 	uint64_t lookup_index =
 			index * table->element_size / HSQS_METABLOCK_BLOCK_SIZE;
 	uint64_t metablock_address = lookup_table_get(table, lookup_index);
@@ -103,27 +103,27 @@ hsqs_table_get(const struct HsqsTable *table, off_t index, void *target) {
 		goto out;
 	}
 
-	rv = hsqs_metablock_init(&metablock, hsqs, metablock_address);
+	rv = sqsh_metablock_init(&metablock, sqsh, metablock_address);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = hsqs_metablock_to_buffer(&metablock, &buffer);
+	rv = sqsh_metablock_to_buffer(&metablock, &buffer);
 	if (rv < 0) {
 		goto out;
 	}
 
-	memcpy(target, &hsqs_buffer_data(&buffer)[element_index],
+	memcpy(target, &sqsh_buffer_data(&buffer)[element_index],
 		   table->element_size);
 
 out:
-	hsqs_metablock_cleanup(&metablock);
-	hsqs_buffer_cleanup(&buffer);
+	sqsh_metablock_cleanup(&metablock);
+	sqsh_buffer_cleanup(&buffer);
 	return rv;
 }
 
 int
-hsqs_table_cleanup(struct HsqsTable *table) {
-	hsqs_mapping_unmap(&table->lookup_table);
+sqsh_table_cleanup(struct SqshTable *table) {
+	sqsh_mapping_unmap(&table->lookup_table);
 	return 0;
 }

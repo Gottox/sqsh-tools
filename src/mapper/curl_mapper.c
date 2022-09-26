@@ -56,13 +56,13 @@ static size_t
 write_data(void *ptr, size_t size, size_t nmemb, void *userdata) {
 	int rv = 0;
 	size_t byte_size;
-	struct HsqsMapping *mapping = userdata;
+	struct SqshMapping *mapping = userdata;
 
 	if (MULT_OVERFLOW(size, nmemb, &byte_size)) {
 		rv = -HSQS_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
-	rv = hsqs_buffer_append(&mapping->data.cl.buffer, ptr, byte_size);
+	rv = sqsh_buffer_append(&mapping->data.cl.buffer, ptr, byte_size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -82,7 +82,7 @@ header_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
 	uint64_t end = 0;
 	uint64_t total = 0;
 	size_t header_size = size * nitems;
-	struct HsqsMapping *mapping = (struct HsqsMapping *)userdata;
+	struct SqshMapping *mapping = (struct SqshMapping *)userdata;
 
 	if (header_size < CONTENT_RANGE_LENGTH) {
 		return header_size;
@@ -91,7 +91,7 @@ header_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
 		return header_size;
 	}
 
-	char *header = hsqs_memdup(buffer, header_size);
+	char *header = sqsh_memdup(buffer, header_size);
 	if (header == NULL) {
 		return 0;
 	}
@@ -110,7 +110,7 @@ header_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
 }
 
 static CURL *
-get_handle(struct HsqsMapping *mapping) {
+get_handle(struct SqshMapping *mapping) {
 	CURL *handle = mapping->mapper->data.cl.handle;
 	pthread_mutex_lock(&mapping->mapper->data.cl.handle_lock);
 	curl_easy_reset(handle);
@@ -126,18 +126,18 @@ get_handle(struct HsqsMapping *mapping) {
 }
 
 static void
-release_handle(struct HsqsMapper *mapper, CURL *handle) {
+release_handle(struct SqshMapper *mapper, CURL *handle) {
 	if (handle == mapper->data.cl.handle) {
 		pthread_mutex_unlock(&mapper->data.cl.handle_lock);
 	}
 }
 
 static int
-hsqs_mapper_curl_init(
-		struct HsqsMapper *mapper, const void *input, size_t size) {
+sqsh_mapper_curl_init(
+		struct SqshMapper *mapper, const void *input, size_t size) {
 	(void)size;
 	int rv = 0;
-	struct HsqsMapping mapping = {0};
+	struct SqshMapping mapping = {0};
 	curl_global_init(CURL_GLOBAL_ALL);
 
 	mapper->data.cl.url = input;
@@ -151,68 +151,68 @@ hsqs_mapper_curl_init(
 		goto out;
 	}
 
-	rv = hsqs_mapper_map(&mapping, mapper, 0, SUPERBLOCK_REQUEST_SIZE);
+	rv = sqsh_mapper_map(&mapping, mapper, 0, SUPERBLOCK_REQUEST_SIZE);
 	if (rv < 0) {
 		goto out;
 	}
 	mapper->data.cl.expected_size = mapping.data.cl.total_size;
 	mapper->data.cl.expected_time = mapping.data.cl.file_time;
-	hsqs_mapping_unmap(&mapping);
+	sqsh_mapping_unmap(&mapping);
 
 out:
 	return rv;
 }
 
 static int
-hsqs_mapper_curl_map(struct HsqsMapping *mapping, off_t offset, size_t size) {
+sqsh_mapper_curl_map(struct SqshMapping *mapping, off_t offset, size_t size) {
 	int rv = 0;
 
 	mapping->data.cl.offset = offset;
-	rv = hsqs_buffer_init(&mapping->data.cl.buffer);
+	rv = sqsh_buffer_init(&mapping->data.cl.buffer);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = hsqs_mapping_resize(mapping, size);
+	rv = sqsh_mapping_resize(mapping, size);
 	if (rv < 0) {
 		goto out;
 	}
 
 out:
 	if (rv < 0) {
-		hsqs_mapping_unmap(mapping);
+		sqsh_mapping_unmap(mapping);
 	}
 	return rv;
 }
 static size_t
-hsqs_mapper_curl_size(const struct HsqsMapper *mapper) {
+sqsh_mapper_curl_size(const struct SqshMapper *mapper) {
 	return mapper->data.cl.expected_size;
 }
 
 static int
-hsqs_mapper_curl_cleanup(struct HsqsMapper *mapper) {
+sqsh_mapper_curl_cleanup(struct SqshMapper *mapper) {
 	pthread_mutex_destroy(&mapper->data.cl.handle_lock);
 	curl_easy_cleanup(mapper->data.cl.handle);
 	return 0;
 }
 
 static int
-hsqs_mapping_curl_unmap(struct HsqsMapping *mapping) {
-	hsqs_buffer_cleanup(&mapping->data.cl.buffer);
+sqsh_mapping_curl_unmap(struct SqshMapping *mapping) {
+	sqsh_buffer_cleanup(&mapping->data.cl.buffer);
 	return 0;
 }
 static const uint8_t *
-hsqs_mapping_curl_data(const struct HsqsMapping *mapping) {
-	return hsqs_buffer_data(&mapping->data.cl.buffer);
+sqsh_mapping_curl_data(const struct SqshMapping *mapping) {
+	return sqsh_buffer_data(&mapping->data.cl.buffer);
 }
 
 static int
-hsqs_mapping_curl_resize(struct HsqsMapping *mapping, size_t new_size) {
+sqsh_mapping_curl_resize(struct SqshMapping *mapping, size_t new_size) {
 	int rv = 0;
 	char range_buffer[512] = {0};
 	CURL *handle = get_handle(mapping);
 	new_size = HSQS_PADDING(new_size, 512);
-	size_t current_size = hsqs_mapping_size(mapping);
+	size_t current_size = sqsh_mapping_size(mapping);
 	uint64_t new_offset = mapping->data.cl.offset + current_size;
 	uint64_t end_offset = new_offset + new_size - current_size - 1;
 	long http_code = 0;
@@ -283,17 +283,17 @@ out:
 }
 
 static size_t
-hsqs_mapping_curl_size(const struct HsqsMapping *mapping) {
-	return hsqs_buffer_size(&mapping->data.cl.buffer);
+sqsh_mapping_curl_size(const struct SqshMapping *mapping) {
+	return sqsh_buffer_size(&mapping->data.cl.buffer);
 }
 
-struct HsqsMemoryMapperImpl hsqs_mapper_impl_curl = {
-		.init = hsqs_mapper_curl_init,
-		.mapping = hsqs_mapper_curl_map,
-		.size = hsqs_mapper_curl_size,
-		.cleanup = hsqs_mapper_curl_cleanup,
-		.map_data = hsqs_mapping_curl_data,
-		.map_resize = hsqs_mapping_curl_resize,
-		.map_size = hsqs_mapping_curl_size,
-		.unmap = hsqs_mapping_curl_unmap,
+struct SqshMemoryMapperImpl sqsh_mapper_impl_curl = {
+		.init = sqsh_mapper_curl_init,
+		.mapping = sqsh_mapper_curl_map,
+		.size = sqsh_mapper_curl_size,
+		.cleanup = sqsh_mapper_curl_cleanup,
+		.map_data = sqsh_mapping_curl_data,
+		.map_resize = sqsh_mapping_curl_resize,
+		.map_size = sqsh_mapping_curl_size,
+		.unmap = sqsh_mapping_curl_unmap,
 };

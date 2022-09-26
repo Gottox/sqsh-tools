@@ -41,8 +41,8 @@
 #include <sys/types.h>
 
 static int
-hsqs_null_extract(
-		const union HsqsCompressionOptions *options, size_t options_size,
+sqsh_null_extract(
+		const union SqshCompressionOptions *options, size_t options_size,
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	// the null decompressor has no compression options
@@ -60,6 +60,6 @@ hsqs_null_extract(
 	return 0;
 }
 
-const struct HsqsCompressionImplementation hsqs_compression_null = {
-		.extract = hsqs_null_extract,
+const struct SqshCompressionImplementation sqsh_compression_null = {
+		.extract = sqsh_null_extract,
 };

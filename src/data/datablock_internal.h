@@ -38,9 +38,9 @@
 
 #define DATABLOCK_INTERNAL_H
 
-struct HSQS_UNALIGNED HsqsDatablockSize {
+struct HSQS_UNALIGNED SqshDatablockSize {
 	uint32_t size;
 };
-STATIC_ASSERT(sizeof(struct HsqsDatablockSize) == HSQS_SIZEOF_DATABLOCK_SIZE);
+STATIC_ASSERT(sizeof(struct SqshDatablockSize) == HSQS_SIZEOF_DATABLOCK_SIZE);
 
 #endif /* end of include guard DATABLOCK_INTERNAL_H */

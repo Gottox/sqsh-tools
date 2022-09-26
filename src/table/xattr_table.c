@@ -37,59 +37,59 @@
 #include "../data/superblock.h"
 #include "../data/xattr_internal.h"
 #include "../error.h"
-#include "../hsqs.h"
 #include "../primitive/buffer.h"
+#include "../sqsh.h"
 
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
-static const struct HsqsXattrIdTable *
-get_header(const struct HsqsXattrTable *context) {
-	return (struct HsqsXattrIdTable *)hsqs_mapping_data(&context->header);
+static const struct SqshXattrIdTable *
+get_header(const struct SqshXattrTable *context) {
+	return (struct SqshXattrIdTable *)sqsh_mapping_data(&context->header);
 }
 
 int
-hsqs_xattr_table_init(struct HsqsXattrTable *context, struct Hsqs *hsqs) {
+sqsh_xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh) {
 	int rv = 0;
-	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
-	uint64_t xattr_address = hsqs_superblock_xattr_id_table_start(superblock);
-	uint64_t bytes_used = hsqs_superblock_bytes_used(superblock);
+	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
+	uint64_t xattr_address = sqsh_superblock_xattr_id_table_start(superblock);
+	uint64_t bytes_used = sqsh_superblock_bytes_used(superblock);
 	if (xattr_address + HSQS_SIZEOF_XATTR_ID_TABLE >= bytes_used) {
 		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
-	context->hsqs = hsqs;
-	rv = hsqs_request_map(
-			hsqs, &context->header, xattr_address, HSQS_SIZEOF_XATTR_ID_TABLE);
+	context->sqsh = sqsh;
+	rv = sqsh_request_map(
+			sqsh, &context->header, xattr_address, HSQS_SIZEOF_XATTR_ID_TABLE);
 	if (rv < 0) {
 		goto out;
 	}
 
-	const struct HsqsXattrIdTable *header = get_header(context);
+	const struct SqshXattrIdTable *header = get_header(context);
 
-	rv = hsqs_table_init(
-			&context->table, hsqs, xattr_address + HSQS_SIZEOF_XATTR_ID_TABLE,
+	rv = sqsh_table_init(
+			&context->table, sqsh, xattr_address + HSQS_SIZEOF_XATTR_ID_TABLE,
 			HSQS_SIZEOF_XATTR_LOOKUP_TABLE,
-			hsqs_data_xattr_id_table_xattr_ids(header));
+			sqsh_data_xattr_id_table_xattr_ids(header));
 	if (rv < 0) {
 		goto out;
 	}
 out:
 	if (rv < 0) {
-		hsqs_xattr_table_cleanup(context);
+		sqsh_xattr_table_cleanup(context);
 	}
 	return rv;
 }
 
 uint64_t
-hsqs_xattr_table_start(struct HsqsXattrTable *table) {
-	const struct HsqsXattrIdTable *header = get_header(table);
-	return hsqs_data_xattr_id_table_xattr_table_start(header);
+sqsh_xattr_table_start(struct SqshXattrTable *table) {
+	const struct SqshXattrIdTable *header = get_header(table);
+	return sqsh_data_xattr_id_table_xattr_table_start(header);
 }
 
 int
-hsqs_xattr_table_cleanup(struct HsqsXattrTable *context) {
-	hsqs_table_cleanup(&context->table);
-	hsqs_mapping_unmap(&context->header);
+sqsh_xattr_table_cleanup(struct SqshXattrTable *context) {
+	sqsh_table_cleanup(&context->table);
+	sqsh_mapping_unmap(&context->header);
 	return 0;
 }

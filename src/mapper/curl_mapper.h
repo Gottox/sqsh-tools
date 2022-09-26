@@ -39,7 +39,7 @@
 
 #define CURL_MAPPER_H
 
-struct HsqsCurlMapper {
+struct SqshCurlMapper {
 	const char *url;
 	uint64_t expected_time;
 	uint64_t expected_size;
@@ -47,8 +47,8 @@ struct HsqsCurlMapper {
 	pthread_mutex_t handle_lock;
 };
 
-struct HsqsCurlMap {
-	struct HsqsBuffer buffer;
+struct SqshCurlMap {
+	struct SqshBuffer buffer;
 	uint64_t offset;
 	uint64_t total_size;
 	uint64_t file_time;

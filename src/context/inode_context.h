@@ -43,15 +43,15 @@
 #define HSQS_INODE_NO_FRAGMENT 0xFFFFFFFF
 #define HSQS_INODE_NO_XATTR 0xFFFFFFFF
 
-struct Hsqs;
+struct Sqsh;
 
-struct HsqsSuperblockContext;
-struct HsqsInode;
-struct HsqsInodeTable;
-struct HsqsDirectoryIterator;
-struct HsqsXattrIterator;
+struct SqshSuperblockContext;
+struct SqshInode;
+struct SqshInodeTable;
+struct SqshDirectoryIterator;
+struct SqshXattrIterator;
 
-enum HsqsInodeContextType {
+enum SqshInodeContextType {
 	HSQS_INODE_TYPE_UNKNOWN = -1,
 	// avoid overlapping with the types in ../data/inode.h
 	HSQS_INODE_TYPE_DIRECTORY = 1 + (1 << 8),
@@ -63,63 +63,63 @@ enum HsqsInodeContextType {
 	HSQS_INODE_TYPE_SOCKET,
 };
 
-struct HsqsInodeContext {
-	struct HsqsMetablockStreamContext metablock;
-	struct Hsqs *hsqs;
+struct SqshInodeContext {
+	struct SqshMetablockStreamContext metablock;
+	struct Sqsh *sqsh;
 };
 
-HSQS_NO_UNUSED int hsqs_inode_load_by_ref(
-		struct HsqsInodeContext *context, struct Hsqs *hsqs,
+HSQS_NO_UNUSED int sqsh_inode_load_by_ref(
+		struct SqshInodeContext *context, struct Sqsh *sqsh,
 		uint64_t inode_ref);
-int hsqs_inode_load_root(struct HsqsInodeContext *context, struct Hsqs *hsqs);
-HSQS_NO_UNUSED int hsqs_inode_load_by_inode_number(
-		struct HsqsInodeContext *context, struct Hsqs *hsqs,
+int sqsh_inode_load_root(struct SqshInodeContext *context, struct Sqsh *sqsh);
+HSQS_NO_UNUSED int sqsh_inode_load_by_inode_number(
+		struct SqshInodeContext *context, struct Sqsh *sqsh,
 		uint64_t inode_number);
-HSQS_NO_UNUSED int hsqs_inode_load_by_path(
-		struct HsqsInodeContext *context, struct Hsqs *hsqs, const char *path);
+HSQS_NO_UNUSED int sqsh_inode_load_by_path(
+		struct SqshInodeContext *context, struct Sqsh *sqsh, const char *path);
 
-bool hsqs_inode_is_extended(const struct HsqsInodeContext *context);
-uint32_t hsqs_inode_hard_link_count(const struct HsqsInodeContext *context);
-uint64_t hsqs_inode_file_size(const struct HsqsInodeContext *context);
-uint16_t hsqs_inode_permission(const struct HsqsInodeContext *context);
-uint32_t hsqs_inode_number(const struct HsqsInodeContext *context);
-uint32_t hsqs_inode_modified_time(const struct HsqsInodeContext *context);
-uint64_t hsqs_inode_file_blocks_start(const struct HsqsInodeContext *context);
-uint32_t hsqs_inode_file_block_count(const struct HsqsInodeContext *context);
-uint32_t hsqs_inode_file_block_size(
-		const struct HsqsInodeContext *context, uint32_t index);
-bool hsqs_inode_file_block_is_compressed(
-		const struct HsqsInodeContext *context, int index);
+bool sqsh_inode_is_extended(const struct SqshInodeContext *context);
+uint32_t sqsh_inode_hard_link_count(const struct SqshInodeContext *context);
+uint64_t sqsh_inode_file_size(const struct SqshInodeContext *context);
+uint16_t sqsh_inode_permission(const struct SqshInodeContext *context);
+uint32_t sqsh_inode_number(const struct SqshInodeContext *context);
+uint32_t sqsh_inode_modified_time(const struct SqshInodeContext *context);
+uint64_t sqsh_inode_file_blocks_start(const struct SqshInodeContext *context);
+uint32_t sqsh_inode_file_block_count(const struct SqshInodeContext *context);
+uint32_t sqsh_inode_file_block_size(
+		const struct SqshInodeContext *context, uint32_t index);
+bool sqsh_inode_file_block_is_compressed(
+		const struct SqshInodeContext *context, int index);
 uint32_t
-hsqs_inode_file_fragment_block_index(const struct HsqsInodeContext *context);
+sqsh_inode_file_fragment_block_index(const struct SqshInodeContext *context);
 uint32_t
-hsqs_inode_file_fragment_block_offset(const struct HsqsInodeContext *context);
+sqsh_inode_file_fragment_block_offset(const struct SqshInodeContext *context);
 uint32_t
-hsqs_inode_directory_block_start(const struct HsqsInodeContext *context);
+sqsh_inode_directory_block_start(const struct SqshInodeContext *context);
 uint32_t
-hsqs_inode_directory_block_offset(const struct HsqsInodeContext *context);
-bool hsqs_inode_file_has_fragment(const struct HsqsInodeContext *context);
+sqsh_inode_directory_block_offset(const struct SqshInodeContext *context);
+bool sqsh_inode_file_has_fragment(const struct SqshInodeContext *context);
 
-enum HsqsInodeContextType
-hsqs_inode_type(const struct HsqsInodeContext *context);
+enum SqshInodeContextType
+sqsh_inode_type(const struct SqshInodeContext *context);
 
-const char *hsqs_inode_symlink(const struct HsqsInodeContext *context);
-HSQS_NO_UNUSED int hsqs_inode_symlink_dup(
-		const struct HsqsInodeContext *context, char **namebuffer);
-uint32_t hsqs_inode_symlink_size(const struct HsqsInodeContext *context);
+const char *sqsh_inode_symlink(const struct SqshInodeContext *context);
+HSQS_NO_UNUSED int sqsh_inode_symlink_dup(
+		const struct SqshInodeContext *context, char **namebuffer);
+uint32_t sqsh_inode_symlink_size(const struct SqshInodeContext *context);
 
-uint32_t hsqs_inode_device_id(const struct HsqsInodeContext *context);
+uint32_t sqsh_inode_device_id(const struct SqshInodeContext *context);
 
-uint32_t hsqs_inode_uid(const struct HsqsInodeContext *context);
-uint32_t hsqs_inode_gid(const struct HsqsInodeContext *context);
-uint32_t hsqs_inode_xattr_index(const struct HsqsInodeContext *context);
-HSQS_NO_UNUSED int hsqs_inode_xattr_iterator(
-		const struct HsqsInodeContext *context,
-		struct HsqsXattrIterator *iterator);
-int hsqs_inode_cleanup(struct HsqsInodeContext *context);
+uint32_t sqsh_inode_uid(const struct SqshInodeContext *context);
+uint32_t sqsh_inode_gid(const struct SqshInodeContext *context);
+uint32_t sqsh_inode_xattr_index(const struct SqshInodeContext *context);
+HSQS_NO_UNUSED int sqsh_inode_xattr_iterator(
+		const struct SqshInodeContext *context,
+		struct SqshXattrIterator *iterator);
+int sqsh_inode_cleanup(struct SqshInodeContext *context);
 void
-hsqs_inode_ref_to_block(uint64_t ref, uint32_t *block_index, uint16_t *offset);
+sqsh_inode_ref_to_block(uint64_t ref, uint32_t *block_index, uint16_t *offset);
 HSQS_NO_UNUSED uint64_t
-hsqs_inode_ref_from_block(uint32_t block_index, uint16_t offset);
+sqsh_inode_ref_from_block(uint32_t block_index, uint16_t offset);
 
 #endif /* end of include guard HSQS_INODE_CONTEXT_H */

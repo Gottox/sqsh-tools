@@ -38,21 +38,21 @@
 
 #define TABLE_H
 
-struct Hsqs;
+struct Sqsh;
 
-struct HsqsTable {
-	struct Hsqs *hsqs;
-	struct HsqsMapper *mapper;
-	struct HsqsMapping lookup_table;
+struct SqshTable {
+	struct Sqsh *sqsh;
+	struct SqshMapper *mapper;
+	struct SqshMapping lookup_table;
 	uint64_t start_block;
 	size_t element_size;
 	size_t element_count;
 };
 
-int hsqs_table_init(
-		struct HsqsTable *table, struct Hsqs *hsqs, off_t start_block,
+int sqsh_table_init(
+		struct SqshTable *table, struct Sqsh *sqsh, off_t start_block,
 		size_t element_size, size_t element_count);
-int hsqs_table_get(const struct HsqsTable *table, off_t index, void *target);
-int hsqs_table_cleanup(struct HsqsTable *table);
+int sqsh_table_get(const struct SqshTable *table, off_t index, void *target);
+int sqsh_table_cleanup(struct SqshTable *table);
 
 #endif /* end of include guard TABLE_H */

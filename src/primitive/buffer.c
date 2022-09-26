@@ -44,7 +44,7 @@
 #include <string.h>
 
 int
-hsqs_buffer_init(struct HsqsBuffer *buffer) {
+sqsh_buffer_init(struct SqshBuffer *buffer) {
 	int rv = 0;
 
 	buffer->data = NULL;
@@ -54,8 +54,8 @@ hsqs_buffer_init(struct HsqsBuffer *buffer) {
 }
 
 int
-hsqs_buffer_add_capacity(
-		struct HsqsBuffer *buffer, uint8_t **additional_buffer,
+sqsh_buffer_add_capacity(
+		struct SqshBuffer *buffer, uint8_t **additional_buffer,
 		size_t additional_size) {
 	const size_t buffer_size = buffer->size;
 	size_t new_capacity;
@@ -75,7 +75,7 @@ hsqs_buffer_add_capacity(
 }
 
 int
-hsqs_buffer_add_size(struct HsqsBuffer *buffer, size_t additional_size) {
+sqsh_buffer_add_size(struct SqshBuffer *buffer, size_t additional_size) {
 	const size_t buffer_size = buffer->size;
 	size_t new_size;
 	if (ADD_OVERFLOW(buffer_size, additional_size, &new_size)) {
@@ -87,32 +87,32 @@ hsqs_buffer_add_size(struct HsqsBuffer *buffer, size_t additional_size) {
 }
 
 int
-hsqs_buffer_append(
-		struct HsqsBuffer *buffer, const uint8_t *source, const size_t size) {
+sqsh_buffer_append(
+		struct SqshBuffer *buffer, const uint8_t *source, const size_t size) {
 	int rv = 0;
 	uint8_t *additional_buffer;
 
-	rv = hsqs_buffer_add_capacity(buffer, &additional_buffer, size);
+	rv = sqsh_buffer_add_capacity(buffer, &additional_buffer, size);
 	if (rv < 0) {
 		return rv;
 	}
 
 	memcpy(additional_buffer, source, size);
-	rv = hsqs_buffer_add_size(buffer, size);
+	rv = sqsh_buffer_add_size(buffer, size);
 	return rv;
 }
 
 const uint8_t *
-hsqs_buffer_data(const struct HsqsBuffer *buffer) {
+sqsh_buffer_data(const struct SqshBuffer *buffer) {
 	return buffer->data;
 }
 size_t
-hsqs_buffer_size(const struct HsqsBuffer *buffer) {
+sqsh_buffer_size(const struct SqshBuffer *buffer) {
 	return buffer->size;
 }
 
 int
-hsqs_buffer_cleanup(struct HsqsBuffer *buffer) {
+sqsh_buffer_cleanup(struct SqshBuffer *buffer) {
 	free(buffer->data);
 	buffer->data = NULL;
 	buffer->size = 0;

@@ -28,13 +28,13 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         hsqs-xattr.c
+ * @file         sqsh-xattr.c
  */
 
 #include "../src/context/inode_context.h"
-#include "../src/hsqs.h"
 #include "../src/iterator/directory_iterator.h"
 #include "../src/iterator/xattr_iterator.h"
+#include "../src/sqsh.h"
 #include "common.h"
 
 #include <assert.h>
@@ -52,32 +52,32 @@ usage(char *arg0) {
 }
 
 static int
-fattr_path(struct Hsqs *hsqs, char *path) {
-	struct HsqsInodeContext inode = {0};
-	struct HsqsXattrIterator iter = {0};
+fattr_path(struct Sqsh *sqsh, char *path) {
+	struct SqshInodeContext inode = {0};
+	struct SqshXattrIterator iter = {0};
 
 	int rv = 0;
-	rv = hsqs_inode_load_by_path(&inode, hsqs, path);
+	rv = sqsh_inode_load_by_path(&inode, sqsh, path);
 	if (rv < 0) {
-		hsqs_perror(rv, path);
+		sqsh_perror(rv, path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	rv = hsqs_inode_xattr_iterator(&inode, &iter);
+	rv = sqsh_inode_xattr_iterator(&inode, &iter);
 	if (rv < 0) {
-		hsqs_perror(rv, path);
+		sqsh_perror(rv, path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	while ((rv = hsqs_xattr_iterator_next(&iter)) > 0) {
-		const char *prefix = hsqs_xattr_iterator_prefix(&iter);
-		uint16_t prefix_len = hsqs_xattr_iterator_prefix_size(&iter);
-		const char *name = hsqs_xattr_iterator_name(&iter);
-		uint16_t name_len = hsqs_xattr_iterator_name_size(&iter);
-		const char *value = hsqs_xattr_iterator_value(&iter);
-		uint16_t value_len = hsqs_xattr_iterator_value_size(&iter);
+	while ((rv = sqsh_xattr_iterator_next(&iter)) > 0) {
+		const char *prefix = sqsh_xattr_iterator_prefix(&iter);
+		uint16_t prefix_len = sqsh_xattr_iterator_prefix_size(&iter);
+		const char *name = sqsh_xattr_iterator_name(&iter);
+		uint16_t name_len = sqsh_xattr_iterator_name_size(&iter);
+		const char *value = sqsh_xattr_iterator_value(&iter);
+		uint16_t value_len = sqsh_xattr_iterator_value_size(&iter);
 
 		fwrite(prefix, prefix_len, 1, stdout);
 		fwrite(name, name_len, 1, stdout);
@@ -87,8 +87,8 @@ fattr_path(struct Hsqs *hsqs, char *path) {
 	}
 
 out:
-	hsqs_xattr_iterator_cleanup(&iter);
-	hsqs_inode_cleanup(&inode);
+	sqsh_xattr_iterator_cleanup(&iter);
+	sqsh_inode_cleanup(&inode);
 	return rv;
 }
 
@@ -97,12 +97,12 @@ main(int argc, char *argv[]) {
 	int rv = 0;
 	int opt = 0;
 	const char *image_path;
-	struct Hsqs hsqs = {0};
+	struct Sqsh sqsh = {0};
 
 	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {
 		case 'v':
-			puts("hsqs-xattr-" VERSION);
+			puts("sqsh-xattr-" VERSION);
 			return 0;
 		default:
 			return usage(argv[0]);
@@ -116,21 +116,21 @@ main(int argc, char *argv[]) {
 	image_path = argv[optind];
 	optind++;
 
-	rv = open_archive(&hsqs, image_path);
+	rv = open_archive(&sqsh, image_path);
 	if (rv < 0) {
-		hsqs_perror(rv, image_path);
+		sqsh_perror(rv, image_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
 	for (; optind < argc; optind++) {
-		rv = fattr_path(&hsqs, argv[optind]);
+		rv = fattr_path(&sqsh, argv[optind]);
 		if (rv < 0) {
 			goto out;
 		}
 	}
 
 out:
-	hsqs_cleanup(&hsqs);
+	sqsh_cleanup(&sqsh);
 	return rv;
 }

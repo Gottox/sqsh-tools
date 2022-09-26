@@ -38,19 +38,19 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-struct Hsqs;
-struct HsqsMapper;
+struct Sqsh;
+struct SqshMapper;
 
-struct HsqsTrailingContext {
-	struct HsqsMapping *mapping;
+struct SqshTrailingContext {
+	struct SqshMapping *mapping;
 };
 
-int hsqs_trailing_init(struct HsqsTrailingContext *context, struct Hsqs *hsqs);
+int sqsh_trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh);
 
-size_t hsqs_trailing_size(struct HsqsTrailingContext *context);
+size_t sqsh_trailing_size(struct SqshTrailingContext *context);
 
-const uint8_t *hsqs_trailing_data(struct HsqsTrailingContext *context);
+const uint8_t *sqsh_trailing_data(struct SqshTrailingContext *context);
 
-int hsqs_trailing_cleanup(struct HsqsTrailingContext *context);
+int sqsh_trailing_cleanup(struct SqshTrailingContext *context);
 
 #endif /* end of include guard TRAILING_CONTEXT_H */

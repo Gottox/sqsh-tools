@@ -28,13 +28,13 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         hsqs-cat.c
+ * @file         sqsh-cat.c
  */
 
 #include "../src/context/content_context.h"
 #include "../src/context/inode_context.h"
-#include "../src/hsqs.h"
 #include "../src/iterator/directory_iterator.h"
+#include "../src/sqsh.h"
 #include "common.h"
 
 #include <assert.h>
@@ -52,37 +52,37 @@ usage(char *arg0) {
 }
 
 static int
-cat_path(struct Hsqs *hsqs, char *path) {
-	struct HsqsInodeContext inode = {0};
-	struct HsqsFileContext file = {0};
+cat_path(struct Sqsh *sqsh, char *path) {
+	struct SqshInodeContext inode = {0};
+	struct SqshFileContext file = {0};
 
 	int rv = 0;
-	rv = hsqs_inode_load_by_path(&inode, hsqs, path);
+	rv = sqsh_inode_load_by_path(&inode, sqsh, path);
 	if (rv < 0) {
-		hsqs_perror(rv, path);
+		sqsh_perror(rv, path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	rv = hsqs_content_init(&file, &inode);
+	rv = sqsh_content_init(&file, &inode);
 	if (rv < 0) {
-		hsqs_perror(rv, path);
+		sqsh_perror(rv, path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	rv = hsqs_content_read(&file, hsqs_inode_file_size(&inode));
+	rv = sqsh_content_read(&file, sqsh_inode_file_size(&inode));
 	if (rv < 0) {
-		hsqs_perror(rv, path);
+		sqsh_perror(rv, path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	fwrite(hsqs_content_data(&file), sizeof(uint8_t), hsqs_content_size(&file),
+	fwrite(sqsh_content_data(&file), sizeof(uint8_t), sqsh_content_size(&file),
 		   stdout);
 out:
-	hsqs_content_cleanup(&file);
-	hsqs_inode_cleanup(&inode);
+	sqsh_content_cleanup(&file);
+	sqsh_inode_cleanup(&inode);
 	return rv;
 }
 
@@ -91,12 +91,12 @@ main(int argc, char *argv[]) {
 	int rv = 0;
 	int opt = 0;
 	const char *image_path;
-	struct Hsqs hsqs = {0};
+	struct Sqsh sqsh = {0};
 
 	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {
 		case 'v':
-			puts("hsqs-cat-" VERSION);
+			puts("sqsh-cat-" VERSION);
 			return 0;
 		default:
 			return usage(argv[0]);
@@ -110,21 +110,21 @@ main(int argc, char *argv[]) {
 	image_path = argv[optind];
 	optind++;
 
-	rv = open_archive(&hsqs, image_path);
+	rv = open_archive(&sqsh, image_path);
 	if (rv < 0) {
-		hsqs_perror(rv, image_path);
+		sqsh_perror(rv, image_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
 	for (; optind < argc; optind++) {
-		rv = cat_path(&hsqs, argv[optind]);
+		rv = cat_path(&sqsh, argv[optind]);
 		if (rv < 0) {
 			goto out;
 		}
 	}
 
 out:
-	hsqs_cleanup(&hsqs);
+	sqsh_cleanup(&sqsh);
 	return rv;
 }

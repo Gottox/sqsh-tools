@@ -1,5 +1,5 @@
 project(
-	'libhsqs',
+	'libsqsh',
 	['c'],
 	default_options : [
 		'c_std=c18',
@@ -11,7 +11,7 @@ project(
 	meson_version: '>=0.57'
 )
 
-hsqs_hdr = [
+sqsh_hdr = [
 	'src/compression/compression.h',
 	'src/context/compression_options_context.h',
 	'src/context/content_context.h',
@@ -36,7 +36,7 @@ hsqs_hdr = [
 	'src/data/xattr.h',
 	'src/data/xattr_internal.h',
 	'src/error.h',
-	'src/hsqs.h',
+	'src/sqsh.h',
 	'src/iterator/directory_index_iterator.h',
 	'src/iterator/directory_iterator.h',
 	'src/iterator/xattr_iterator.h',
@@ -53,7 +53,7 @@ hsqs_hdr = [
 	'src/utils.h',
 ]
 
-hsqs_src = [
+sqsh_src = [
 	'src/compression/compression.c',
 	'src/compression/null.c',
 	'src/context/compression_options_context.c',
@@ -71,7 +71,7 @@ hsqs_src = [
 	'src/data/superblock.c',
 	'src/data/xattr.c',
 	'src/error.c',
-	'src/hsqs.c',
+	'src/sqsh.c',
 	'src/iterator/directory_index_iterator.c',
 	'src/iterator/directory_iterator.c',
 	'src/iterator/xattr_iterator.c',
@@ -87,11 +87,11 @@ hsqs_src = [
 	'src/utils.c',
 ]
 
-hsqs_test = [
+sqsh_test = [
 	'test/integration.c',
 ]
 
-libhsqs_deps = [ ]
+libsqsh_deps = [ ]
 
 build_args = [
 	'-DVERSION="' + meson.project_version() + '"',
@@ -104,39 +104,39 @@ link_args = [
 ]
 
 if get_option('curl')
-	libhsqs_deps += dependency('libcurl')
-	hsqs_src += 'src/mapper/curl_mapper.c'
+	libsqsh_deps += dependency('libcurl')
+	sqsh_src += 'src/mapper/curl_mapper.c'
 	build_args += '-DCONFIG_CURL'
 endif
 
 if get_option('zlib')
-	libhsqs_deps += dependency('zlib')
-	hsqs_src += 'src/compression/zlib.c'
+	libsqsh_deps += dependency('zlib')
+	sqsh_src += 'src/compression/zlib.c'
 	build_args += '-DCONFIG_ZLIB'
 endif
 
 if get_option('lz4')
-	libhsqs_deps += dependency('liblz4')
-	hsqs_src += 'src/compression/lz4.c'
+	libsqsh_deps += dependency('liblz4')
+	sqsh_src += 'src/compression/lz4.c'
 	build_args += '-DCONFIG_LZ4'
 endif
 
 if get_option('lzma')
-	libhsqs_deps += dependency('liblzma')
-	hsqs_src += 'src/compression/lzma.c'
-	hsqs_src += 'src/compression/xz.c'
+	libsqsh_deps += dependency('liblzma')
+	sqsh_src += 'src/compression/lzma.c'
+	sqsh_src += 'src/compression/xz.c'
 	build_args += '-DCONFIG_LZMA'
 endif
 
 if get_option('lzo2')
-	libhsqs_deps += dependency('lzo2')
-	hsqs_src += 'src/compression/lzo2.c'
+	libsqsh_deps += dependency('lzo2')
+	sqsh_src += 'src/compression/lzo2.c'
 	build_args += '-DCONFIG_LZO'
 endif
 
 if get_option('zstd')
-	libhsqs_deps += dependency('libzstd')
-	hsqs_src += 'src/compression/zstd.c'
+	libsqsh_deps += dependency('libzstd')
+	sqsh_src += 'src/compression/zstd.c'
 	build_args += '-DCONFIG_ZSTD'
 endif
 
@@ -144,38 +144,38 @@ if get_option('debug')
 	build_args += ['-DDEBUG']
 endif
 
-libhsqs = library(
-  'hsqs',
-  hsqs_src,
+libsqsh = library(
+  'sqsh',
+  sqsh_src,
   install: not meson.is_subproject(),
   c_args : build_args,
   link_args : link_args,
   include_directories : 'src',
-  dependencies : [ libhsqs_deps ],
-  sources: hsqs_hdr,
+  dependencies : [ libsqsh_deps ],
+  sources: sqsh_hdr,
   version : meson.project_version(),
   soversion : meson.project_version().split('.')[0]
 )
 
 if get_option('default_library') == 'both'
-	libhsqs = libhsqs.get_static_lib()
+	libsqsh = libsqsh.get_static_lib()
 endif
 
-foreach p : [ 'hsqs-cat', 'hsqs-ls', 'hsqs-stat', 'hsqs-xattr' ]
+foreach p : [ 'sqsh-cat', 'sqsh-ls', 'sqsh-stat', 'sqsh-xattr' ]
 	executable(p, 'bin/'+p+'.c',
 		install: not meson.is_subproject(),
 		c_args : build_args,
-		link_with : libhsqs
+		link_with : libsqsh
 	)
 endforeach
 
 if get_option('fuse')
-	executable('hsqs-mount',
-		'bin/hsqs-mount.c',
+	executable('sqsh-mount',
+		'bin/sqsh-mount.c',
 		install: not meson.is_subproject(),
 		c_args : build_args,
 		dependencies: dependency('fuse3'),
-		link_with : libhsqs
+		link_with : libsqsh
 	)
 endif
 
@@ -201,12 +201,12 @@ if get_option('test')
 		output : 'squashfs_image.h',
 		command : ['utils/header_from_bin.sh','@INPUT@', '@OUTPUT@', '@PRIVATE_DIR@'],
 	)
-	foreach p : hsqs_test
+	foreach p : sqsh_test
 		t = executable(p.underscorify(),
 			[ p, squashfs_h ],
 			install : false,
 			c_args : build_args,
-			link_with : libhsqs
+			link_with : libsqsh
 		)
 		test(p, t)
 	endforeach

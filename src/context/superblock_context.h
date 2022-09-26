@@ -41,68 +41,68 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-struct HsqsSuperblock;
+struct SqshSuperblock;
 
-struct HsqsSuperblockContext {
-	const struct HsqsSuperblock *superblock;
-	struct HsqsMapping mapping;
+struct SqshSuperblockContext {
+	const struct SqshSuperblock *superblock;
+	struct SqshMapping mapping;
 };
 
-HSQS_NO_UNUSED int hsqs_superblock_init(
-		struct HsqsSuperblockContext *context, struct HsqsMapper *mapper);
+HSQS_NO_UNUSED int sqsh_superblock_init(
+		struct SqshSuperblockContext *context, struct SqshMapper *mapper);
 
-const void *hsqs_superblock_data_from_offset(
-		const struct HsqsSuperblockContext *context, uint64_t offset);
+const void *sqsh_superblock_data_from_offset(
+		const struct SqshSuperblockContext *context, uint64_t offset);
 
-enum HsqsSuperblockCompressionId
-hsqs_superblock_compression_id(const struct HsqsSuperblockContext *context);
+enum SqshSuperblockCompressionId
+sqsh_superblock_compression_id(const struct SqshSuperblockContext *context);
 
-uint64_t hsqs_superblock_directory_table_start(
-		const struct HsqsSuperblockContext *context);
+uint64_t sqsh_superblock_directory_table_start(
+		const struct SqshSuperblockContext *context);
 
-uint64_t hsqs_superblock_fragment_table_start(
-		const struct HsqsSuperblockContext *context);
+uint64_t sqsh_superblock_fragment_table_start(
+		const struct SqshSuperblockContext *context);
 
 uint32_t
-hsqs_superblock_inode_count(const struct HsqsSuperblockContext *context);
+sqsh_superblock_inode_count(const struct SqshSuperblockContext *context);
 
 uint64_t
-hsqs_superblock_inode_table_start(const struct HsqsSuperblockContext *context);
+sqsh_superblock_inode_table_start(const struct SqshSuperblockContext *context);
 
 uint64_t
-hsqs_superblock_id_table_start(const struct HsqsSuperblockContext *context);
+sqsh_superblock_id_table_start(const struct SqshSuperblockContext *context);
 
-uint16_t hsqs_superblock_id_count(const struct HsqsSuperblockContext *context);
-
-uint64_t
-hsqs_superblock_export_table_start(const struct HsqsSuperblockContext *context);
-
-uint64_t hsqs_superblock_xattr_id_table_start(
-		const struct HsqsSuperblockContext *context);
+uint16_t sqsh_superblock_id_count(const struct SqshSuperblockContext *context);
 
 uint64_t
-hsqs_superblock_inode_root_ref(const struct HsqsSuperblockContext *context);
+sqsh_superblock_export_table_start(const struct SqshSuperblockContext *context);
 
-bool hsqs_superblock_has_fragments(const struct HsqsSuperblockContext *context);
+uint64_t sqsh_superblock_xattr_id_table_start(
+		const struct SqshSuperblockContext *context);
+
+uint64_t
+sqsh_superblock_inode_root_ref(const struct SqshSuperblockContext *context);
+
+bool sqsh_superblock_has_fragments(const struct SqshSuperblockContext *context);
 
 bool
-hsqs_superblock_has_export_table(const struct HsqsSuperblockContext *context);
+sqsh_superblock_has_export_table(const struct SqshSuperblockContext *context);
 
-bool hsqs_superblock_has_compression_options(
-		const struct HsqsSuperblockContext *context);
-
-uint32_t
-hsqs_superblock_block_size(const struct HsqsSuperblockContext *context);
+bool sqsh_superblock_has_compression_options(
+		const struct SqshSuperblockContext *context);
 
 uint32_t
-hsqs_superblock_modification_time(const struct HsqsSuperblockContext *context);
+sqsh_superblock_block_size(const struct SqshSuperblockContext *context);
 
-uint32_t hsqs_superblock_fragment_entry_count(
-		const struct HsqsSuperblockContext *context);
+uint32_t
+sqsh_superblock_modification_time(const struct SqshSuperblockContext *context);
+
+uint32_t sqsh_superblock_fragment_entry_count(
+		const struct SqshSuperblockContext *context);
 
 uint64_t
-hsqs_superblock_bytes_used(const struct HsqsSuperblockContext *context);
+sqsh_superblock_bytes_used(const struct SqshSuperblockContext *context);
 
-int hsqs_superblock_cleanup(struct HsqsSuperblockContext *superblock);
+int sqsh_superblock_cleanup(struct SqshSuperblockContext *superblock);
 
 #endif /* end of include guard SUPERBLOCK_CONTEXT_H */

@@ -40,7 +40,7 @@
 
 #define HSQS_SIZEOF_SUPERBLOCK 96
 
-enum HsqsSuperblockCompressionId {
+enum SqshSuperblockCompressionId {
 	HSQS_COMPRESSION_NONE = 0,
 	HSQS_COMPRESSION_GZIP = 1,
 	HSQS_COMPRESSION_LZMA = 2,
@@ -50,7 +50,7 @@ enum HsqsSuperblockCompressionId {
 	HSQS_COMPRESSION_ZSTD = 6,
 };
 
-enum HsqsSuperblockFlags {
+enum SqshSuperblockFlags {
 	HSQS_SUPERBLOCK_UNCOMPRESSED_INODES = 0x0001,
 	HSQS_SUPERBLOCK_UNCOMPRESSED_DATA = 0x0002,
 	HSQS_SUPERBLOCK_CHECK = 0x0004,
@@ -65,45 +65,45 @@ enum HsqsSuperblockFlags {
 	HSQS_SUPERBLOCK_UNCOMPRESSED_IDS = 0x0800,
 };
 
-struct HsqsSuperblock;
+struct SqshSuperblock;
 
 int
-hsqs_data_superblock_init(const struct HsqsSuperblock *superblock, size_t size);
+sqsh_data_superblock_init(const struct SqshSuperblock *superblock, size_t size);
 
-uint32_t hsqs_data_superblock_magic(const struct HsqsSuperblock *superblock);
+uint32_t sqsh_data_superblock_magic(const struct SqshSuperblock *superblock);
 uint32_t
-hsqs_data_superblock_inode_count(const struct HsqsSuperblock *superblock);
+sqsh_data_superblock_inode_count(const struct SqshSuperblock *superblock);
 uint32_t
-hsqs_data_superblock_modification_time(const struct HsqsSuperblock *superblock);
+sqsh_data_superblock_modification_time(const struct SqshSuperblock *superblock);
 uint32_t
-hsqs_data_superblock_block_size(const struct HsqsSuperblock *superblock);
-uint32_t hsqs_data_superblock_fragment_entry_count(
-		const struct HsqsSuperblock *superblock);
+sqsh_data_superblock_block_size(const struct SqshSuperblock *superblock);
+uint32_t sqsh_data_superblock_fragment_entry_count(
+		const struct SqshSuperblock *superblock);
 uint16_t
-hsqs_data_superblock_compression_id(const struct HsqsSuperblock *superblock);
+sqsh_data_superblock_compression_id(const struct SqshSuperblock *superblock);
 uint16_t
-hsqs_data_superblock_block_log(const struct HsqsSuperblock *superblock);
-uint16_t hsqs_data_superblock_flags(const struct HsqsSuperblock *superblock);
-uint16_t hsqs_data_superblock_id_count(const struct HsqsSuperblock *superblock);
+sqsh_data_superblock_block_log(const struct SqshSuperblock *superblock);
+uint16_t sqsh_data_superblock_flags(const struct SqshSuperblock *superblock);
+uint16_t sqsh_data_superblock_id_count(const struct SqshSuperblock *superblock);
 uint16_t
-hsqs_data_superblock_version_major(const struct HsqsSuperblock *superblock);
+sqsh_data_superblock_version_major(const struct SqshSuperblock *superblock);
 uint16_t
-hsqs_data_superblock_version_minor(const struct HsqsSuperblock *superblock);
+sqsh_data_superblock_version_minor(const struct SqshSuperblock *superblock);
 uint64_t
-hsqs_data_superblock_root_inode_ref(const struct HsqsSuperblock *superblock);
+sqsh_data_superblock_root_inode_ref(const struct SqshSuperblock *superblock);
 uint64_t
-hsqs_data_superblock_bytes_used(const struct HsqsSuperblock *superblock);
+sqsh_data_superblock_bytes_used(const struct SqshSuperblock *superblock);
 uint64_t
-hsqs_data_superblock_id_table_start(const struct HsqsSuperblock *superblock);
-uint64_t hsqs_data_superblock_xattr_id_table_start(
-		const struct HsqsSuperblock *superblock);
+sqsh_data_superblock_id_table_start(const struct SqshSuperblock *superblock);
+uint64_t sqsh_data_superblock_xattr_id_table_start(
+		const struct SqshSuperblock *superblock);
 uint64_t
-hsqs_data_superblock_inode_table_start(const struct HsqsSuperblock *superblock);
-uint64_t hsqs_data_superblock_directory_table_start(
-		const struct HsqsSuperblock *superblock);
-uint64_t hsqs_data_superblock_fragment_table_start(
-		const struct HsqsSuperblock *superblock);
-uint64_t hsqs_data_superblock_export_table_start(
-		const struct HsqsSuperblock *superblock);
+sqsh_data_superblock_inode_table_start(const struct SqshSuperblock *superblock);
+uint64_t sqsh_data_superblock_directory_table_start(
+		const struct SqshSuperblock *superblock);
+uint64_t sqsh_data_superblock_fragment_table_start(
+		const struct SqshSuperblock *superblock);
+uint64_t sqsh_data_superblock_export_table_start(
+		const struct SqshSuperblock *superblock);
 
 #endif /* end of include guard HSQS_SUPERBLOCK_H */

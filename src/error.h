@@ -38,7 +38,7 @@
 #define HSQS_ERROR_H
 
 #define HSQS_ERROR_SECTION (1 << 8)
-enum HsqsError {
+enum SqshError {
 	// Avoid collisions with errno
 	HSQS_ERROR_SUPERBLOCK_TOO_SMALL = HSQS_ERROR_SECTION + 1,
 	HSQS_ERROR_WRONG_MAGIC,
@@ -81,8 +81,8 @@ enum HsqsError {
 	HSQS_ERROR_TODO,
 };
 
-void hsqs_perror(int error_code, const char *msg);
+void sqsh_perror(int error_code, const char *msg);
 
-HSQS_NO_UNUSED const char *hsqs_error_str(int errorcode);
+HSQS_NO_UNUSED const char *sqsh_error_str(int errorcode);
 
 #endif /* end of include guard HSQS_ERROR_H */

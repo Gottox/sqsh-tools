@@ -43,8 +43,8 @@
 #include "compression.h"
 
 static int
-hsqs_lzma_extract(
-		const union HsqsCompressionOptions *options, size_t options_size,
+sqsh_lzma_extract(
+		const union SqshCompressionOptions *options, size_t options_size,
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	// LZMA has no compression options
@@ -82,6 +82,6 @@ hsqs_lzma_extract(
 	return rv;
 }
 
-const struct HsqsCompressionImplementation hsqs_compression_lzma = {
-		.extract = hsqs_lzma_extract,
+const struct SqshCompressionImplementation sqsh_compression_lzma = {
+		.extract = sqsh_lzma_extract,
 };

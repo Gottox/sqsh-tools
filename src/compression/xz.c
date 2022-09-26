@@ -43,8 +43,8 @@
 #include "compression.h"
 
 static int
-hsqs_xz_extract(
-		const union HsqsCompressionOptions *options, size_t options_size,
+sqsh_xz_extract(
+		const union SqshCompressionOptions *options, size_t options_size,
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	int rv = 0;
@@ -71,6 +71,6 @@ hsqs_xz_extract(
 	return rv;
 }
 
-const struct HsqsCompressionImplementation hsqs_compression_xz = {
-		.extract = hsqs_xz_extract,
+const struct SqshCompressionImplementation sqsh_compression_xz = {
+		.extract = sqsh_xz_extract,
 };

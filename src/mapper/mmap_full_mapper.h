@@ -38,12 +38,12 @@
 
 #define MMAP_COMPLETE_H
 
-struct HsqsMmapFullMapper {
+struct SqshMmapFullMapper {
 	uint8_t *data;
 	size_t size;
 };
 
-struct HsqsMmapFullMap {
+struct SqshMmapFullMap {
 	uint8_t *data;
 	size_t size;
 };

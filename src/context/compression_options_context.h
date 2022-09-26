@@ -38,22 +38,22 @@
 
 #define COMPRESSION_OPTIONS_CONTEXT_H
 
-struct Hsqs;
-union HsqsCompressionOptions;
+struct Sqsh;
+union SqshCompressionOptions;
 
-struct HsqsCompressionOptionsContext {
-	struct HsqsBuffer buffer;
+struct SqshCompressionOptionsContext {
+	struct SqshBuffer buffer;
 };
 
-HSQS_NO_UNUSED int hsqs_compression_options_init(
-		struct HsqsCompressionOptionsContext *context, struct Hsqs *hsqs);
+HSQS_NO_UNUSED int sqsh_compression_options_init(
+		struct SqshCompressionOptionsContext *context, struct Sqsh *sqsh);
 
-const union HsqsCompressionOptions *hsqs_compression_options_data(
-		const struct HsqsCompressionOptionsContext *context);
-size_t hsqs_compression_options_size(
-		const struct HsqsCompressionOptionsContext *context);
+const union SqshCompressionOptions *sqsh_compression_options_data(
+		const struct SqshCompressionOptionsContext *context);
+size_t sqsh_compression_options_size(
+		const struct SqshCompressionOptionsContext *context);
 
 int
-hsqs_compression_options_cleanup(struct HsqsCompressionOptionsContext *context);
+sqsh_compression_options_cleanup(struct SqshCompressionOptionsContext *context);
 
 #endif /* end of include guard COMPRESSION_OPTIONS_CONTEXT_H */

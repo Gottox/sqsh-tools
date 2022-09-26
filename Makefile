@@ -12,7 +12,7 @@ MESON_FLAGS = -Dtest=true -Ddoc=true
 SANATIZE = 1
 
 ifeq ($(PODMAN), 1)
-	W = podman run --rm -ti -v .:/host gottox/hsqs-build
+	W = podman run --rm -ti -v .:/host gottox/sqsh-build
 	BUILD_DIR = ./build_dir-podman
 else
 	W =

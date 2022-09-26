@@ -42,27 +42,27 @@
 
 #define HSQS_METABLOCK_BLOCK_SIZE 8192
 
-struct Hsqs;
+struct Sqsh;
 
-struct HsqsSuperblockContext;
-struct HsqsBuffer;
+struct SqshSuperblockContext;
+struct SqshBuffer;
 
-struct HsqsMetablockContext {
-	struct HsqsMapping mapping;
-	struct HsqsBuffer buffer;
-	struct HsqsCompression *compression;
+struct SqshMetablockContext {
+	struct SqshMapping mapping;
+	struct SqshBuffer buffer;
+	struct SqshCompression *compression;
 };
 
-int hsqs_metablock_init(
-		struct HsqsMetablockContext *context, struct Hsqs *hsqs,
+int sqsh_metablock_init(
+		struct SqshMetablockContext *context, struct Sqsh *sqsh,
 		uint64_t address);
 
 uint32_t
-hsqs_metablock_compressed_size(const struct HsqsMetablockContext *context);
+sqsh_metablock_compressed_size(const struct SqshMetablockContext *context);
 
-HSQS_NO_UNUSED int hsqs_metablock_to_buffer(
-		struct HsqsMetablockContext *context, struct HsqsBuffer *buffer);
+HSQS_NO_UNUSED int sqsh_metablock_to_buffer(
+		struct SqshMetablockContext *context, struct SqshBuffer *buffer);
 
-int hsqs_metablock_cleanup(struct HsqsMetablockContext *context);
+int sqsh_metablock_cleanup(struct SqshMetablockContext *context);
 
 #endif /* end of include guard METABLOCK_CONTEXT_H */

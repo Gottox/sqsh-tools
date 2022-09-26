@@ -31,23 +31,23 @@
  * @file         metablock.c
  */
 
-#include "../hsqs.h"
+#include "../sqsh.h"
 #include "../utils.h"
 #include "metablock_internal.h"
 #include "superblock.h"
 #include <endian.h>
 
 int
-hsqs_data_metablock_is_compressed(const struct HsqsMetablock *metablock) {
+sqsh_data_metablock_is_compressed(const struct SqshMetablock *metablock) {
 	return !(htole16(metablock->header) & 0x8000);
 }
 
 const uint8_t *
-hsqs_data_metablock_data(const struct HsqsMetablock *metablock) {
+sqsh_data_metablock_data(const struct SqshMetablock *metablock) {
 	return (uint8_t *)&metablock[1];
 }
 
 size_t
-hsqs_data_metablock_size(const struct HsqsMetablock *metablock) {
+sqsh_data_metablock_size(const struct SqshMetablock *metablock) {
 	return htole16(metablock->header) & 0x7FFF;
 }

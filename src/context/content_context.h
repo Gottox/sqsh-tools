@@ -38,31 +38,31 @@
 
 #define FILE_CONTEXT_H
 
-struct HsqsInodeContext;
-struct Hsqs;
+struct SqshInodeContext;
+struct Sqsh;
 
-struct HsqsFileContext {
-	struct Hsqs *hsqs;
-	struct HsqsFragmentTable *fragment_table;
-	struct HsqsInodeContext *inode;
-	struct HsqsBuffer buffer;
-	struct HsqsCompression *compression;
+struct SqshFileContext {
+	struct Sqsh *sqsh;
+	struct SqshFragmentTable *fragment_table;
+	struct SqshInodeContext *inode;
+	struct SqshBuffer buffer;
+	struct SqshCompression *compression;
 	uint64_t seek_pos;
 	uint32_t block_size;
 };
 
-HSQS_NO_UNUSED int hsqs_content_init(
-		struct HsqsFileContext *context, struct HsqsInodeContext *inode);
+HSQS_NO_UNUSED int sqsh_content_init(
+		struct SqshFileContext *context, struct SqshInodeContext *inode);
 
 HSQS_NO_UNUSED int
-hsqs_content_seek(struct HsqsFileContext *context, uint64_t seek_pos);
+sqsh_content_seek(struct SqshFileContext *context, uint64_t seek_pos);
 
-int hsqs_content_read(struct HsqsFileContext *context, uint64_t size);
+int sqsh_content_read(struct SqshFileContext *context, uint64_t size);
 
-const uint8_t *hsqs_content_data(struct HsqsFileContext *context);
+const uint8_t *sqsh_content_data(struct SqshFileContext *context);
 
-uint64_t hsqs_content_size(struct HsqsFileContext *context);
+uint64_t sqsh_content_size(struct SqshFileContext *context);
 
-int hsqs_content_cleanup(struct HsqsFileContext *context);
+int sqsh_content_cleanup(struct SqshFileContext *context);
 
 #endif /* end of include guard FILE_CONTEXT_H */

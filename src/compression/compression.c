@@ -31,7 +31,7 @@
  * @file         null.c
  */
 
-#include "../hsqs.h"
+#include "../sqsh.h"
 //#include "../data/compression_options.h"
 #include "../context/superblock_context.h"
 #include "../error.h"
@@ -44,51 +44,51 @@
 #include <sys/types.h>
 
 #ifdef CONFIG_ZLIB
-extern const struct HsqsCompressionImplementation hsqs_compression_zlib;
+extern const struct SqshCompressionImplementation sqsh_compression_zlib;
 #endif
 #ifdef CONFIG_LZMA
-extern const struct HsqsCompressionImplementation hsqs_compression_lzma;
-extern const struct HsqsCompressionImplementation hsqs_compression_xz;
+extern const struct SqshCompressionImplementation sqsh_compression_lzma;
+extern const struct SqshCompressionImplementation sqsh_compression_xz;
 #endif
 #ifdef CONFIG_LZO
-extern const struct HsqsCompressionImplementation hsqs_compression_lzo;
+extern const struct SqshCompressionImplementation sqsh_compression_lzo;
 #endif
 #ifdef CONFIG_LZ4
-extern const struct HsqsCompressionImplementation hsqs_compression_lz4;
+extern const struct SqshCompressionImplementation sqsh_compression_lz4;
 #endif
 #ifdef CONFIG_ZSTD
-extern const struct HsqsCompressionImplementation hsqs_compression_zstd;
+extern const struct SqshCompressionImplementation sqsh_compression_zstd;
 #endif
-extern const struct HsqsCompressionImplementation hsqs_compression_null;
+extern const struct SqshCompressionImplementation sqsh_compression_null;
 
-static const struct HsqsCompressionImplementation *
+static const struct SqshCompressionImplementation *
 compression_by_id(int id) {
-	switch ((enum HsqsSuperblockCompressionId)id) {
+	switch ((enum SqshSuperblockCompressionId)id) {
 	case HSQS_COMPRESSION_NONE:
-		return &hsqs_compression_null;
+		return &sqsh_compression_null;
 #ifdef CONFIG_ZLIB
 	case HSQS_COMPRESSION_GZIP:
-		return &hsqs_compression_zlib;
+		return &sqsh_compression_zlib;
 #endif
 #ifdef CONFIG_LZMA
 	case HSQS_COMPRESSION_LZMA:
-		return &hsqs_compression_lzma;
+		return &sqsh_compression_lzma;
 #endif
 #ifdef CONFIG_XZ
 	case HSQS_COMPRESSION_XZ:
-		return &hsqs_compression_xz;
+		return &sqsh_compression_xz;
 #endif
 #ifdef CONFIG_LZO
 	case HSQS_COMPRESSION_LZO:
-		return &hsqs_compression_lzo;
+		return &sqsh_compression_lzo;
 #endif
 #ifdef CONFIG_LZ4
 	case HSQS_COMPRESSION_LZ4:
-		return &hsqs_compression_lz4;
+		return &sqsh_compression_lz4;
 #endif
 #ifdef CONFIG_ZSTD
 	case HSQS_COMPRESSION_ZSTD:
-		return &hsqs_compression_zstd;
+		return &sqsh_compression_zstd;
 #endif
 	default:
 		return NULL;
@@ -96,10 +96,10 @@ compression_by_id(int id) {
 }
 
 int
-hsqs_compression_init(
-		struct HsqsCompression *compression, int compression_id,
+sqsh_compression_init(
+		struct SqshCompression *compression, int compression_id,
 		size_t block_size) {
-	const struct HsqsCompressionImplementation *impl =
+	const struct SqshCompressionImplementation *impl =
 			compression_by_id(compression_id);
 	compression->impl = impl;
 	compression->block_size = block_size;
@@ -107,18 +107,18 @@ hsqs_compression_init(
 }
 
 int
-hsqs_compression_decompress_to_buffer(
-		const struct HsqsCompression *compression, struct HsqsBuffer *buffer,
+sqsh_compression_decompress_to_buffer(
+		const struct SqshCompression *compression, struct SqshBuffer *buffer,
 		const uint8_t *compressed, const size_t compressed_size) {
 	int rv = 0;
-	const union HsqsCompressionOptions *options = NULL;
+	const union SqshCompressionOptions *options = NULL;
 	const size_t options_size = 0;
 	size_t max_size = compression->block_size;
 	size_t size = 0;
 	uint8_t *decompressed = NULL;
-	const struct HsqsCompressionImplementation *impl = compression->impl;
+	const struct SqshCompressionImplementation *impl = compression->impl;
 
-	rv = hsqs_buffer_add_capacity(buffer, &decompressed, max_size);
+	rv = sqsh_buffer_add_capacity(buffer, &decompressed, max_size);
 	if (rv < 0) {
 		return rv;
 	}
@@ -131,12 +131,12 @@ hsqs_compression_decompress_to_buffer(
 	}
 	size = max_size;
 
-	rv = hsqs_buffer_add_size(buffer, size);
+	rv = sqsh_buffer_add_size(buffer, size);
 	return rv;
 }
 
 int
-hsqs_compression_cleanup(struct HsqsCompression *compression) {
+sqsh_compression_cleanup(struct SqshCompression *compression) {
 	compression->impl = NULL;
 	compression->block_size = 0;
 	return 0;

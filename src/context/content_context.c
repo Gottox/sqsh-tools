@@ -33,42 +33,42 @@
 
 #include "content_context.h"
 #include "../error.h"
-#include "../hsqs.h"
 #include "../mapper/mapper.h"
 #include "../primitive/buffer.h"
+#include "../sqsh.h"
 #include "inode_context.h"
 #include "superblock_context.h"
 #include <stdint.h>
 #include <stdio.h>
 
 static uint64_t
-datablock_offset(struct HsqsFileContext *context, uint32_t block_index) {
+datablock_offset(struct SqshFileContext *context, uint32_t block_index) {
 	uint64_t offset = 0;
 
 	for (uint32_t i = 0; i < block_index; i++) {
-		offset += hsqs_inode_file_block_size(context->inode, i);
+		offset += sqsh_inode_file_block_size(context->inode, i);
 	}
 	return offset;
 }
 
 int
-hsqs_content_init(
-		struct HsqsFileContext *context, struct HsqsInodeContext *inode) {
+sqsh_content_init(
+		struct SqshFileContext *context, struct SqshInodeContext *inode) {
 	int rv = 0;
-	struct Hsqs *hsqs = inode->hsqs;
-	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
+	struct Sqsh *sqsh = inode->sqsh;
+	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 
-	if (hsqs_inode_type(inode) != HSQS_INODE_TYPE_FILE) {
+	if (sqsh_inode_type(inode) != HSQS_INODE_TYPE_FILE) {
 		return -HSQS_ERROR_NOT_A_FILE;
 	}
 
 	context->inode = inode;
-	context->block_size = hsqs_superblock_block_size(superblock);
-	context->hsqs = hsqs;
-	context->compression = hsqs_data_compression(hsqs);
+	context->block_size = sqsh_superblock_block_size(superblock);
+	context->sqsh = sqsh;
+	context->compression = sqsh_data_compression(sqsh);
 
-	if (hsqs_inode_file_has_fragment(inode)) {
-		rv = hsqs_fragment_table(context->hsqs, &context->fragment_table);
+	if (sqsh_inode_file_has_fragment(inode)) {
+		rv = sqsh_fragment_table(context->sqsh, &context->fragment_table);
 		if (rv < 0) {
 			return rv;
 		}
@@ -76,17 +76,17 @@ hsqs_content_init(
 		context->fragment_table = NULL;
 	}
 
-	rv = hsqs_buffer_init(&context->buffer);
+	rv = sqsh_buffer_init(&context->buffer);
 	if (rv < 0) {
 		return rv;
 	}
 
-	return hsqs_content_seek(context, 0);
+	return sqsh_content_seek(context, 0);
 }
 
 int
-hsqs_content_seek(struct HsqsFileContext *context, uint64_t seek_pos) {
-	if (seek_pos > hsqs_inode_file_size(context->inode)) {
+sqsh_content_seek(struct SqshFileContext *context, uint64_t seek_pos) {
+	if (seek_pos > sqsh_inode_file_size(context->inode)) {
 		return -HSQS_ERROR_SEEK_OUT_OF_RANGE;
 	}
 	context->seek_pos = seek_pos;
@@ -95,46 +95,46 @@ hsqs_content_seek(struct HsqsFileContext *context, uint64_t seek_pos) {
 }
 
 int
-hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
+sqsh_content_read(struct SqshFileContext *context, uint64_t size) {
 	int rv = 0;
-	struct HsqsMapping mapping = {0};
-	struct HsqsFragmentTable *table = context->fragment_table;
-	struct HsqsBuffer *buffer = &context->buffer;
-	uint64_t start_block = hsqs_inode_file_blocks_start(context->inode);
+	struct SqshMapping mapping = {0};
+	struct SqshFragmentTable *table = context->fragment_table;
+	struct SqshBuffer *buffer = &context->buffer;
+	uint64_t start_block = sqsh_inode_file_blocks_start(context->inode);
 	bool is_compressed;
 	uint32_t block_index = context->seek_pos / context->block_size;
-	uint32_t block_count = hsqs_inode_file_block_count(context->inode);
+	uint32_t block_count = sqsh_inode_file_block_count(context->inode);
 	uint64_t block_offset = datablock_offset(context, block_index);
 	uint64_t block_whole_size =
 			datablock_offset(context, block_count) - block_offset;
 	uint32_t outer_block_size;
 	uint64_t outer_offset = 0;
 
-	rv = hsqs_request_map(
-			context->hsqs, &mapping, start_block + block_offset,
+	rv = sqsh_request_map(
+			context->sqsh, &mapping, start_block + block_offset,
 			block_whole_size);
 
 	if (rv < 0) {
 		goto out;
 	}
-	if (hsqs_inode_file_size(context->inode) > size) {
+	if (sqsh_inode_file_size(context->inode) > size) {
 		rv = HSQS_ERROR_SIZE_MISSMATCH;
 	}
 
-	for (; block_index < block_count && hsqs_content_size(context) < size;
+	for (; block_index < block_count && sqsh_content_size(context) < size;
 		 block_index++) {
-		is_compressed = hsqs_inode_file_block_is_compressed(
+		is_compressed = sqsh_inode_file_block_is_compressed(
 				context->inode, block_index);
 		outer_block_size =
-				hsqs_inode_file_block_size(context->inode, block_index);
+				sqsh_inode_file_block_size(context->inode, block_index);
 
-		const uint8_t *data = &hsqs_mapping_data(&mapping)[outer_offset];
+		const uint8_t *data = &sqsh_mapping_data(&mapping)[outer_offset];
 		const size_t size = outer_block_size;
 		if (is_compressed) {
-			rv = hsqs_compression_decompress_to_buffer(
+			rv = sqsh_compression_decompress_to_buffer(
 					context->compression, buffer, data, size);
 		} else {
-			rv = hsqs_buffer_append(buffer, data, size);
+			rv = sqsh_buffer_append(buffer, data, size);
 		}
 		if (rv < 0) {
 			goto out;
@@ -142,47 +142,47 @@ hsqs_content_read(struct HsqsFileContext *context, uint64_t size) {
 		outer_offset += outer_block_size;
 	}
 
-	if (hsqs_content_size(context) < size) {
-		if (!hsqs_inode_file_has_fragment(context->inode)) {
+	if (sqsh_content_size(context) < size) {
+		if (!sqsh_inode_file_has_fragment(context->inode)) {
 			rv = -HSQS_ERROR_TODO;
 			goto out;
 		}
 
-		rv = hsqs_fragment_table_to_buffer(table, context->inode, buffer);
+		rv = sqsh_fragment_table_to_buffer(table, context->inode, buffer);
 		if (rv < 0) {
 			goto out;
 		}
 
-		if (hsqs_content_size(context) < size) {
+		if (sqsh_content_size(context) < size) {
 			rv = -HSQS_ERROR_TODO;
 			goto out;
 		}
 	}
 
 out:
-	hsqs_mapping_unmap(&mapping);
+	sqsh_mapping_unmap(&mapping);
 	return rv;
 }
 
 const uint8_t *
-hsqs_content_data(struct HsqsFileContext *context) {
-	struct HsqsSuperblockContext *superblock = hsqs_superblock(context->hsqs);
-	uint32_t block_size = hsqs_superblock_block_size(superblock);
+sqsh_content_data(struct SqshFileContext *context) {
+	struct SqshSuperblockContext *superblock = sqsh_superblock(context->sqsh);
+	uint32_t block_size = sqsh_superblock_block_size(superblock);
 	off_t offset = context->seek_pos % block_size;
 
-	if (hsqs_content_size(context) == 0) {
+	if (sqsh_content_size(context) == 0) {
 		return NULL;
 	} else {
-		return &hsqs_buffer_data(&context->buffer)[offset];
+		return &sqsh_buffer_data(&context->buffer)[offset];
 	}
 }
 
 uint64_t
-hsqs_content_size(struct HsqsFileContext *context) {
-	struct HsqsSuperblockContext *superblock = hsqs_superblock(context->hsqs);
-	uint32_t block_size = hsqs_superblock_block_size(superblock);
+sqsh_content_size(struct SqshFileContext *context) {
+	struct SqshSuperblockContext *superblock = sqsh_superblock(context->sqsh);
+	uint32_t block_size = sqsh_superblock_block_size(superblock);
 	size_t offset = context->seek_pos % block_size;
-	size_t buffer_size = hsqs_buffer_size(&context->buffer);
+	size_t buffer_size = sqsh_buffer_size(&context->buffer);
 
 	if (buffer_size < offset)
 		return 0;
@@ -191,8 +191,8 @@ hsqs_content_size(struct HsqsFileContext *context) {
 }
 
 int
-hsqs_content_cleanup(struct HsqsFileContext *context) {
-	hsqs_buffer_cleanup(&context->buffer);
+sqsh_content_cleanup(struct SqshFileContext *context) {
+	sqsh_buffer_cleanup(&context->buffer);
 
 	return 0;
 }

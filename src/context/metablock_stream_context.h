@@ -38,34 +38,34 @@
 
 #define METABLOCK_STREAM_CONTEXT_H
 
-struct HsqsMetablockStreamContext {
-	struct Hsqs *hsqs;
-	struct HsqsBuffer buffer;
+struct SqshMetablockStreamContext {
+	struct Sqsh *sqsh;
+	struct SqshBuffer buffer;
 	uint64_t base_address;
 	uint64_t current_address;
 	uint16_t buffer_offset;
 };
 
-HSQS_NO_UNUSED int hsqs_metablock_stream_init(
-		struct HsqsMetablockStreamContext *context, struct Hsqs *hsqs,
+HSQS_NO_UNUSED int sqsh_metablock_stream_init(
+		struct SqshMetablockStreamContext *context, struct Sqsh *sqsh,
 		uint64_t address, uint64_t max_address);
 
-HSQS_NO_UNUSED int hsqs_metablock_stream_seek_ref(
-		struct HsqsMetablockStreamContext *context, uint64_t ref);
+HSQS_NO_UNUSED int sqsh_metablock_stream_seek_ref(
+		struct SqshMetablockStreamContext *context, uint64_t ref);
 
-HSQS_NO_UNUSED int hsqs_metablock_stream_seek(
-		struct HsqsMetablockStreamContext *context, uint64_t address_offset,
+HSQS_NO_UNUSED int sqsh_metablock_stream_seek(
+		struct SqshMetablockStreamContext *context, uint64_t address_offset,
 		uint32_t buffer_offset);
 
-HSQS_NO_UNUSED int hsqs_metablock_stream_more(
-		struct HsqsMetablockStreamContext *context, uint64_t size);
+HSQS_NO_UNUSED int sqsh_metablock_stream_more(
+		struct SqshMetablockStreamContext *context, uint64_t size);
 
 const uint8_t *
-hsqs_metablock_stream_data(const struct HsqsMetablockStreamContext *context);
+sqsh_metablock_stream_data(const struct SqshMetablockStreamContext *context);
 
 size_t
-hsqs_metablock_stream_size(const struct HsqsMetablockStreamContext *context);
+sqsh_metablock_stream_size(const struct SqshMetablockStreamContext *context);
 
-int hsqs_metablock_stream_cleanup(struct HsqsMetablockStreamContext *context);
+int sqsh_metablock_stream_cleanup(struct SqshMetablockStreamContext *context);
 
 #endif /* end of include guard METABLOCK_STREAM_CONTEXT_H */

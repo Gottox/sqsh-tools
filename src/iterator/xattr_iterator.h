@@ -36,45 +36,45 @@
 
 #ifndef XATTR_CONTEXT_H
 
-struct HsqsInodeContext;
+struct SqshInodeContext;
 
-struct HsqsXattrIterator {
-	struct HsqsMetablockStreamContext metablock;
-	struct HsqsMetablockStreamContext out_of_line_value;
-	struct HsqsXattrTable *context;
+struct SqshXattrIterator {
+	struct SqshMetablockStreamContext metablock;
+	struct SqshMetablockStreamContext out_of_line_value;
+	struct SqshXattrTable *context;
 	int remaining_entries;
-	hsqs_index_t next_offset;
-	hsqs_index_t key_offset;
-	hsqs_index_t value_offset;
+	sqsh_index_t next_offset;
+	sqsh_index_t key_offset;
+	sqsh_index_t value_offset;
 };
 
-HSQS_NO_UNUSED int hsqs_xattr_iterator_init(
-		struct HsqsXattrIterator *iterator, struct HsqsXattrTable *xattr_table,
-		const struct HsqsInodeContext *inode);
+HSQS_NO_UNUSED int sqsh_xattr_iterator_init(
+		struct SqshXattrIterator *iterator, struct SqshXattrTable *xattr_table,
+		const struct SqshInodeContext *inode);
 
-int hsqs_xattr_iterator_next(struct HsqsXattrIterator *iterator);
+int sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator);
 
-uint16_t hsqs_xattr_iterator_type(struct HsqsXattrIterator *iterator);
+uint16_t sqsh_xattr_iterator_type(struct SqshXattrIterator *iterator);
 
-bool hsqs_xattr_iterator_is_indirect(struct HsqsXattrIterator *iterator);
+bool sqsh_xattr_iterator_is_indirect(struct SqshXattrIterator *iterator);
 
-const char *hsqs_xattr_iterator_prefix(struct HsqsXattrIterator *iterator);
-uint16_t hsqs_xattr_iterator_prefix_size(struct HsqsXattrIterator *iterator);
-const char *hsqs_xattr_iterator_name(struct HsqsXattrIterator *iterator);
-uint16_t hsqs_xattr_iterator_name_size(struct HsqsXattrIterator *iterator);
-int hsqs_xattr_iterator_fullname_cmp(
-		struct HsqsXattrIterator *iterator, const char *name);
-int hsqs_xattr_iterator_fullname_dup(
-		struct HsqsXattrIterator *iterator, char **fullname_buffer);
+const char *sqsh_xattr_iterator_prefix(struct SqshXattrIterator *iterator);
+uint16_t sqsh_xattr_iterator_prefix_size(struct SqshXattrIterator *iterator);
+const char *sqsh_xattr_iterator_name(struct SqshXattrIterator *iterator);
+uint16_t sqsh_xattr_iterator_name_size(struct SqshXattrIterator *iterator);
+int sqsh_xattr_iterator_fullname_cmp(
+		struct SqshXattrIterator *iterator, const char *name);
+int sqsh_xattr_iterator_fullname_dup(
+		struct SqshXattrIterator *iterator, char **fullname_buffer);
 
-int hsqs_xattr_iterator_value_dup(
-		struct HsqsXattrIterator *iterator, char **value_buffer);
+int sqsh_xattr_iterator_value_dup(
+		struct SqshXattrIterator *iterator, char **value_buffer);
 
-const char *hsqs_xattr_iterator_value(struct HsqsXattrIterator *iterator);
+const char *sqsh_xattr_iterator_value(struct SqshXattrIterator *iterator);
 
-uint16_t hsqs_xattr_iterator_value_size(struct HsqsXattrIterator *iterator);
+uint16_t sqsh_xattr_iterator_value_size(struct SqshXattrIterator *iterator);
 
-int hsqs_xattr_iterator_cleanup(struct HsqsXattrIterator *iterator);
+int sqsh_xattr_iterator_cleanup(struct SqshXattrIterator *iterator);
 
 #define XATTR_CONTEXT_H
 

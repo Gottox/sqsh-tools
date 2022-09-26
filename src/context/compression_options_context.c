@@ -34,56 +34,56 @@
 #include "compression_options_context.h"
 #include "../data/compression_options.h"
 #include "../data/superblock.h"
-#include "../hsqs.h"
+#include "../sqsh.h"
 #include "metablock_context.h"
 #include "superblock_context.h"
 
 int
-hsqs_compression_options_init(
-		struct HsqsCompressionOptionsContext *context, struct Hsqs *hsqs) {
+sqsh_compression_options_init(
+		struct SqshCompressionOptionsContext *context, struct Sqsh *sqsh) {
 	int rv = 0;
-	struct HsqsMetablockContext metablock = {0};
+	struct SqshMetablockContext metablock = {0};
 
-	rv = hsqs_metablock_init(&metablock, hsqs, HSQS_SIZEOF_SUPERBLOCK);
+	rv = sqsh_metablock_init(&metablock, sqsh, HSQS_SIZEOF_SUPERBLOCK);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = hsqs_buffer_init(&context->buffer);
+	rv = sqsh_buffer_init(&context->buffer);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = hsqs_metablock_to_buffer(&metablock, &context->buffer);
+	rv = sqsh_metablock_to_buffer(&metablock, &context->buffer);
 	if (rv < 0) {
 		goto out;
 	}
 
 out:
-	hsqs_metablock_cleanup(&metablock);
+	sqsh_metablock_cleanup(&metablock);
 	if (rv < 0) {
-		hsqs_compression_options_cleanup(context);
+		sqsh_compression_options_cleanup(context);
 	}
 	return rv;
 }
 
-const union HsqsCompressionOptions *
-hsqs_compression_options_data(
-		const struct HsqsCompressionOptionsContext *context) {
-	return (const union HsqsCompressionOptions *)hsqs_buffer_data(
+const union SqshCompressionOptions *
+sqsh_compression_options_data(
+		const struct SqshCompressionOptionsContext *context) {
+	return (const union SqshCompressionOptions *)sqsh_buffer_data(
 			&context->buffer);
 }
 
 size_t
-hsqs_compression_options_size(
-		const struct HsqsCompressionOptionsContext *context) {
-	return hsqs_buffer_size(&context->buffer);
+sqsh_compression_options_size(
+		const struct SqshCompressionOptionsContext *context) {
+	return sqsh_buffer_size(&context->buffer);
 }
 
 int
-hsqs_compression_options_cleanup(
-		struct HsqsCompressionOptionsContext *context) {
-	hsqs_buffer_cleanup(&context->buffer);
+sqsh_compression_options_cleanup(
+		struct SqshCompressionOptionsContext *context) {
+	sqsh_buffer_cleanup(&context->buffer);
 
 	return 0;
 }

@@ -38,30 +38,30 @@
 
 #define COMPRESSION_H
 
-union HsqsCompressionOptions;
-struct HsqsSuperblockContext;
-struct HsqsBuffer;
+union SqshCompressionOptions;
+struct SqshSuperblockContext;
+struct SqshBuffer;
 
-struct HsqsCompressionImplementation {
+struct SqshCompressionImplementation {
 	int (*extract)(
-			const union HsqsCompressionOptions *options, size_t options_size,
+			const union SqshCompressionOptions *options, size_t options_size,
 			uint8_t *target, size_t *target_size, const uint8_t *compressed,
 			const size_t compressed_size);
 };
 
-struct HsqsCompression {
-	const struct HsqsCompressionImplementation *impl;
+struct SqshCompression {
+	const struct SqshCompressionImplementation *impl;
 	size_t block_size;
 };
 
-int hsqs_compression_init(
-		struct HsqsCompression *compression, int compression_id,
+int sqsh_compression_init(
+		struct SqshCompression *compression, int compression_id,
 		size_t block_size);
 
-int hsqs_compression_decompress_to_buffer(
-		const struct HsqsCompression *compression, struct HsqsBuffer *buffer,
+int sqsh_compression_decompress_to_buffer(
+		const struct SqshCompression *compression, struct SqshBuffer *buffer,
 		const uint8_t *compressed, const size_t compressed_size);
 
-int hsqs_compression_cleanup(struct HsqsCompression *compression);
+int sqsh_compression_cleanup(struct SqshCompression *compression);
 
 #endif /* end of include guard COMPRESSION_H */

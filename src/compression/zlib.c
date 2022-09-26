@@ -43,8 +43,8 @@
 #include "compression.h"
 
 static int
-hsqs_zlib_extract(
-		const union HsqsCompressionOptions *options, size_t options_size,
+sqsh_zlib_extract(
+		const union SqshCompressionOptions *options, size_t options_size,
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	// Needed for 32-bit: *target_size is a size_t, but zlib wants a
@@ -68,6 +68,6 @@ hsqs_zlib_extract(
 	return rv;
 }
 
-const struct HsqsCompressionImplementation hsqs_compression_zlib = {
-		.extract = hsqs_zlib_extract,
+const struct SqshCompressionImplementation sqsh_compression_zlib = {
+		.extract = sqsh_zlib_extract,
 };

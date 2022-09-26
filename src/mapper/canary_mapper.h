@@ -38,12 +38,12 @@
 
 #define CANARY_MAPPER_H
 
-struct HsqsCanaryMapper {
+struct SqshCanaryMapper {
 	const uint8_t *data;
 	size_t size;
 };
 
-struct HsqsCanaryMap {
+struct SqshCanaryMap {
 	uint64_t offset;
 	uint8_t *data;
 	size_t size;

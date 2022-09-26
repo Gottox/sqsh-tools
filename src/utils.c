@@ -36,7 +36,7 @@
 #include <string.h>
 
 void *
-hsqs_memdup(const void *source, size_t size) {
+sqsh_memdup(const void *source, size_t size) {
 	void *target = calloc(size + 1, sizeof(char));
 	if (target == NULL) {
 		return NULL;

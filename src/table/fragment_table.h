@@ -38,24 +38,24 @@
 
 #define FRAGMENT_TABLE_H
 
-struct HsqsSuperblockContext;
-struct HsqsInodeContext;
-struct HsqsBuffer;
+struct SqshSuperblockContext;
+struct SqshInodeContext;
+struct SqshBuffer;
 
-struct HsqsFragmentTable {
-	const struct HsqsSuperblockContext *superblock;
-	struct HsqsTable table;
-	struct Hsqs *hsqs;
-	struct HsqsCompression *compression;
+struct SqshFragmentTable {
+	const struct SqshSuperblockContext *superblock;
+	struct SqshTable table;
+	struct Sqsh *sqsh;
+	struct SqshCompression *compression;
 };
 
 HSQS_NO_UNUSED int
-hsqs_fragment_table_init(struct HsqsFragmentTable *context, struct Hsqs *hsqs);
+sqsh_fragment_table_init(struct SqshFragmentTable *context, struct Sqsh *sqsh);
 
-HSQS_NO_UNUSED int hsqs_fragment_table_to_buffer(
-		const struct HsqsFragmentTable *context,
-		const struct HsqsInodeContext *inode, struct HsqsBuffer *buffer);
+HSQS_NO_UNUSED int sqsh_fragment_table_to_buffer(
+		const struct SqshFragmentTable *context,
+		const struct SqshInodeContext *inode, struct SqshBuffer *buffer);
 
-int hsqs_fragment_table_cleanup(struct HsqsFragmentTable *context);
+int sqsh_fragment_table_cleanup(struct SqshFragmentTable *context);
 
 #endif /* end of include guard FRAGMENT_TABLE_H */

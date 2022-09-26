@@ -40,57 +40,57 @@
 #include <unistd.h>
 
 static int
-hsqs_mapper_static_mem_init(
-		struct HsqsMapper *mapper, const void *input, size_t size) {
+sqsh_mapper_static_mem_init(
+		struct SqshMapper *mapper, const void *input, size_t size) {
 	mapper->data.sm.data = input;
 	mapper->data.sm.size = size;
 	return 0;
 }
 static int
-hsqs_mapper_static_mem_map(
-		struct HsqsMapping *mapping, off_t offset, size_t size) {
+sqsh_mapper_static_mem_map(
+		struct SqshMapping *mapping, off_t offset, size_t size) {
 	mapping->data.sm.data = &mapping->mapper->data.sm.data[offset];
 	mapping->data.sm.size = size;
 	return 0;
 }
 static size_t
-hsqs_mapper_static_mem_size(const struct HsqsMapper *mapper) {
+sqsh_mapper_static_mem_size(const struct SqshMapper *mapper) {
 	return mapper->data.sm.size;
 }
 static int
-hsqs_mapper_static_mem_cleanup(struct HsqsMapper *mapper) {
+sqsh_mapper_static_mem_cleanup(struct SqshMapper *mapper) {
 	(void)mapper;
 	return 0;
 }
 static int
-hsqs_mapping_static_mem_unmap(struct HsqsMapping *mapping) {
+sqsh_mapping_static_mem_unmap(struct SqshMapping *mapping) {
 	mapping->data.sm.data = NULL;
 	mapping->data.sm.size = 0;
 	return 0;
 }
 static const uint8_t *
-hsqs_mapping_static_mem_data(const struct HsqsMapping *mapping) {
+sqsh_mapping_static_mem_data(const struct SqshMapping *mapping) {
 	return mapping->data.sm.data;
 }
 
 static int
-hsqs_mapping_static_mem_resize(struct HsqsMapping *mapping, size_t new_size) {
+sqsh_mapping_static_mem_resize(struct SqshMapping *mapping, size_t new_size) {
 	mapping->data.sm.size = new_size;
 	return 0;
 }
 
 static size_t
-hsqs_mapping_static_mem_size(const struct HsqsMapping *mapping) {
+sqsh_mapping_static_mem_size(const struct SqshMapping *mapping) {
 	return mapping->data.sm.size;
 }
 
-struct HsqsMemoryMapperImpl hsqs_mapper_impl_static = {
-		.init = hsqs_mapper_static_mem_init,
-		.mapping = hsqs_mapper_static_mem_map,
-		.size = hsqs_mapper_static_mem_size,
-		.cleanup = hsqs_mapper_static_mem_cleanup,
-		.map_data = hsqs_mapping_static_mem_data,
-		.map_resize = hsqs_mapping_static_mem_resize,
-		.map_size = hsqs_mapping_static_mem_size,
-		.unmap = hsqs_mapping_static_mem_unmap,
+struct SqshMemoryMapperImpl sqsh_mapper_impl_static = {
+		.init = sqsh_mapper_static_mem_init,
+		.mapping = sqsh_mapper_static_mem_map,
+		.size = sqsh_mapper_static_mem_size,
+		.cleanup = sqsh_mapper_static_mem_cleanup,
+		.map_data = sqsh_mapping_static_mem_data,
+		.map_resize = sqsh_mapping_static_mem_resize,
+		.map_size = sqsh_mapping_static_mem_size,
+		.unmap = sqsh_mapping_static_mem_unmap,
 };

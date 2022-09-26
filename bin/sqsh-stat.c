@@ -28,14 +28,14 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         hsqs-cat.c
+ * @file         sqsh-cat.c
  */
 
 #include "../src/context/content_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/error.h"
-#include "../src/hsqs.h"
 #include "../src/iterator/xattr_iterator.h"
+#include "../src/sqsh.h"
 #include "common.h"
 
 #include <assert.h>
@@ -76,28 +76,28 @@ usage(char *arg0) {
 }
 
 static int
-stat_image(struct Hsqs *hsqs) {
-	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
-	int compression_id = hsqs_superblock_compression_id(superblock);
+stat_image(struct Sqsh *sqsh) {
+	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
+	int compression_id = sqsh_superblock_compression_id(superblock);
 	printf("compression:              %s (%i)\n",
 		   compression_id_name(compression_id), compression_id);
 	printf("inode count:              %i\n",
-		   hsqs_superblock_inode_count(superblock));
+		   sqsh_superblock_inode_count(superblock));
 	printf("uid/gid count:            %i\n",
-		   hsqs_superblock_id_count(superblock));
+		   sqsh_superblock_id_count(superblock));
 	printf("has fragments:            %s\n",
-		   hsqs_superblock_has_fragments(superblock) ? "yes" : "no");
+		   sqsh_superblock_has_fragments(superblock) ? "yes" : "no");
 	printf("has export table:         %s\n",
-		   hsqs_superblock_has_fragments(superblock) ? "yes" : "no");
+		   sqsh_superblock_has_fragments(superblock) ? "yes" : "no");
 	printf("has compression options:  %s\n",
-		   hsqs_superblock_has_fragments(superblock) ? "yes" : "no");
+		   sqsh_superblock_has_fragments(superblock) ? "yes" : "no");
 	printf("block size:               %i\n",
-		   hsqs_superblock_block_size(superblock));
+		   sqsh_superblock_block_size(superblock));
 	printf("fragment count:           %i\n",
-		   hsqs_superblock_fragment_entry_count(superblock));
+		   sqsh_superblock_fragment_entry_count(superblock));
 	printf("archive size:             %" PRIu64 "\n",
-		   hsqs_superblock_bytes_used(superblock));
-	time_t mtime = hsqs_superblock_modification_time(superblock);
+		   sqsh_superblock_bytes_used(superblock));
+	time_t mtime = sqsh_superblock_modification_time(superblock);
 	printf("modification time:        %s\n", ctime(&mtime));
 	return 0;
 }
@@ -125,55 +125,55 @@ inode_type_name(int type) {
 }
 
 static int
-stat_file(struct Hsqs *hsqs, const char *path) {
+stat_file(struct Sqsh *sqsh, const char *path) {
 	int rv = 0;
-	struct HsqsInodeContext inode = {0};
-	(void)hsqs;
+	struct SqshInodeContext inode = {0};
+	(void)sqsh;
 	(void)path;
-	rv = hsqs_inode_load_by_path(&inode, hsqs, path);
+	rv = sqsh_inode_load_by_path(&inode, sqsh, path);
 	if (rv < 0) {
-		hsqs_perror(rv, path);
+		sqsh_perror(rv, path);
 		return rv;
 	}
 
-	int inode_type = hsqs_inode_type(&inode);
+	int inode_type = sqsh_inode_type(&inode);
 	printf("         inode type: %s\n", inode_type_name(inode_type));
 	printf(" extended structure: %s\n",
-		   hsqs_inode_is_extended(&inode) ? "yes" : "no");
-	printf("       inode number: %i\n", hsqs_inode_number(&inode));
-	printf("        permissions: %04o\n", hsqs_inode_permission(&inode));
-	printf("                uid: %i\n", hsqs_inode_uid(&inode));
-	printf("                gid: %i\n", hsqs_inode_gid(&inode));
-	printf("    hard link count: %i\n", hsqs_inode_hard_link_count(&inode));
-	printf("          file size: %" PRIu64 "\n", hsqs_inode_file_size(&inode));
+		   sqsh_inode_is_extended(&inode) ? "yes" : "no");
+	printf("       inode number: %i\n", sqsh_inode_number(&inode));
+	printf("        permissions: %04o\n", sqsh_inode_permission(&inode));
+	printf("                uid: %i\n", sqsh_inode_uid(&inode));
+	printf("                gid: %i\n", sqsh_inode_gid(&inode));
+	printf("    hard link count: %i\n", sqsh_inode_hard_link_count(&inode));
+	printf("          file size: %" PRIu64 "\n", sqsh_inode_file_size(&inode));
 	switch (inode_type) {
 	case HSQS_INODE_TYPE_FILE:
 		printf("       has fragment: %s\n",
-			   hsqs_inode_file_has_fragment(&inode) ? "yes" : "no");
+			   sqsh_inode_file_has_fragment(&inode) ? "yes" : "no");
 		printf("   number of blocks: %i\n",
-			   hsqs_inode_file_block_count(&inode));
-		for (uint32_t i = 0; i < hsqs_inode_file_block_count(&inode); i++) {
-			bool is_compressed = hsqs_inode_file_block_is_compressed(&inode, i);
-			uint32_t size = hsqs_inode_file_block_size(&inode, i);
+			   sqsh_inode_file_block_count(&inode));
+		for (uint32_t i = 0; i < sqsh_inode_file_block_count(&inode); i++) {
+			bool is_compressed = sqsh_inode_file_block_is_compressed(&inode, i);
+			uint32_t size = sqsh_inode_file_block_size(&inode, i);
 
 			printf("                    - %i (compressed: %s)\n", size,
 				   is_compressed ? "yes" : "no");
 		}
 		break;
 	case HSQS_INODE_TYPE_SYMLINK:
-		printf("     symlink target: %.*s\n", hsqs_inode_symlink_size(&inode),
-			   hsqs_inode_symlink(&inode));
+		printf("     symlink target: %.*s\n", sqsh_inode_symlink_size(&inode),
+			   sqsh_inode_symlink(&inode));
 		break;
 	case HSQS_INODE_TYPE_BLOCK:
 	case HSQS_INODE_TYPE_CHAR:
 		printf("       device major: %i\n",
-			   (hsqs_inode_device_id(&inode) & 0xFFF00) >> 8);
+			   (sqsh_inode_device_id(&inode) & 0xFFF00) >> 8);
 		printf("       device minor: %i\n",
-			   hsqs_inode_device_id(&inode) & 0xFF);
+			   sqsh_inode_device_id(&inode) & 0xFF);
 		break;
 	}
 
-	hsqs_inode_cleanup(&inode);
+	sqsh_inode_cleanup(&inode);
 	return rv;
 }
 
@@ -182,12 +182,12 @@ main(int argc, char *argv[]) {
 	int rv = 0;
 	int opt = 0;
 	const char *image_path;
-	struct Hsqs hsqs = {0};
+	struct Sqsh sqsh = {0};
 
 	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {
 		case 'v':
-			puts("hsqs-stat-" VERSION);
+			puts("sqsh-stat-" VERSION);
 			return 0;
 		default:
 			return usage(argv[0]);
@@ -201,22 +201,22 @@ main(int argc, char *argv[]) {
 	image_path = argv[optind];
 	optind++;
 
-	rv = open_archive(&hsqs, image_path);
+	rv = open_archive(&sqsh, image_path);
 	if (rv < 0) {
-		hsqs_perror(rv, image_path);
+		sqsh_perror(rv, image_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
 	if (optind == argc) {
-		rv = stat_image(&hsqs);
+		rv = stat_image(&sqsh);
 	} else if (optind + 1 == argc) {
-		rv = stat_file(&hsqs, argv[optind]);
+		rv = stat_file(&sqsh, argv[optind]);
 	} else {
 		rv = usage(argv[0]);
 	}
 
 out:
-	hsqs_cleanup(&hsqs);
+	sqsh_cleanup(&sqsh);
 	return rv;
 }

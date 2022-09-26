@@ -40,8 +40,8 @@
 #include <unistd.h>
 
 static int
-hsqs_mapper_mmap_complete_init(
-		struct HsqsMapper *mapper, const void *input, size_t size) {
+sqsh_mapper_mmap_complete_init(
+		struct SqshMapper *mapper, const void *input, size_t size) {
 	(void)size;
 	int rv = 0;
 	int fd = -1;
@@ -73,52 +73,52 @@ out:
 	return rv;
 }
 static int
-hsqs_mapper_mmap_complete_map(
-		struct HsqsMapping *mapping, off_t offset, size_t size) {
+sqsh_mapper_mmap_complete_map(
+		struct SqshMapping *mapping, off_t offset, size_t size) {
 	mapping->data.mc.data = &mapping->mapper->data.mc.data[offset];
 	mapping->data.mc.size = size;
 	return 0;
 }
 static int
-hsqs_mapper_mmap_complete_cleanup(struct HsqsMapper *mapper) {
+sqsh_mapper_mmap_complete_cleanup(struct SqshMapper *mapper) {
 	int rv;
-	size_t size = hsqs_mapper_size(mapper);
+	size_t size = sqsh_mapper_size(mapper);
 
 	rv = munmap(mapper->data.mc.data, size);
 	return rv;
 }
 static size_t
-hsqs_mapper_mmap_complete_size(const struct HsqsMapper *mapper) {
+sqsh_mapper_mmap_complete_size(const struct SqshMapper *mapper) {
 	return mapper->data.mc.size;
 }
 static int
-hsqs_mapping_mmap_complete_unmap(struct HsqsMapping *mapping) {
+sqsh_mapping_mmap_complete_unmap(struct SqshMapping *mapping) {
 	mapping->data.mc.data = NULL;
 	mapping->data.mc.size = 0;
 	return 0;
 }
 static const uint8_t *
-hsqs_mapping_mmap_complete_data(const struct HsqsMapping *mapping) {
+sqsh_mapping_mmap_complete_data(const struct SqshMapping *mapping) {
 	return mapping->data.mc.data;
 }
 static int
-hsqs_mapping_mmap_complete_resize(
-		struct HsqsMapping *mapper, size_t __attribute__((unused)) new_size) {
+sqsh_mapping_mmap_complete_resize(
+		struct SqshMapping *mapper, size_t __attribute__((unused)) new_size) {
 	return mapper->data.mc.size;
 }
 
 static size_t
-hsqs_mapping_mmap_complete_size(const struct HsqsMapping *mapping) {
+sqsh_mapping_mmap_complete_size(const struct SqshMapping *mapping) {
 	return mapping->data.mc.size;
 }
 
-struct HsqsMemoryMapperImpl hsqs_mapper_impl_mmap_full = {
-		.init = hsqs_mapper_mmap_complete_init,
-		.mapping = hsqs_mapper_mmap_complete_map,
-		.size = hsqs_mapper_mmap_complete_size,
-		.cleanup = hsqs_mapper_mmap_complete_cleanup,
-		.map_data = hsqs_mapping_mmap_complete_data,
-		.map_resize = hsqs_mapping_mmap_complete_resize,
-		.map_size = hsqs_mapping_mmap_complete_size,
-		.unmap = hsqs_mapping_mmap_complete_unmap,
+struct SqshMemoryMapperImpl sqsh_mapper_impl_mmap_full = {
+		.init = sqsh_mapper_mmap_complete_init,
+		.mapping = sqsh_mapper_mmap_complete_map,
+		.size = sqsh_mapper_mmap_complete_size,
+		.cleanup = sqsh_mapper_mmap_complete_cleanup,
+		.map_data = sqsh_mapping_mmap_complete_data,
+		.map_resize = sqsh_mapping_mmap_complete_resize,
+		.map_size = sqsh_mapping_mmap_complete_size,
+		.unmap = sqsh_mapping_mmap_complete_unmap,
 };

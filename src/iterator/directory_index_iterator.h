@@ -37,30 +37,30 @@
 
 #define DIRECTORY_INDEX_ITERATOR_H
 
-struct HsqsInodeContext;
+struct SqshInodeContext;
 
-struct HsqsInodeDirectoryIndexIterator {
-	struct HsqsInodeContext *inode;
+struct SqshInodeDirectoryIndexIterator {
+	struct SqshInodeContext *inode;
 	size_t remaining_entries;
-	hsqs_index_t current_offset;
-	hsqs_index_t next_offset;
+	sqsh_index_t current_offset;
+	sqsh_index_t next_offset;
 };
 
-HSQS_NO_UNUSED int hsqs_inode_directory_index_iterator_init(
-		struct HsqsInodeDirectoryIndexIterator *iterator,
-		struct HsqsInodeContext *inode);
-HSQS_NO_UNUSED int hsqs_inode_directory_index_iterator_next(
-		struct HsqsInodeDirectoryIndexIterator *iterator);
-uint32_t hsqs_inode_directory_index_iterator_index(
-		struct HsqsInodeDirectoryIndexIterator *iterator);
-uint32_t hsqs_inode_directory_index_iterator_start(
-		struct HsqsInodeDirectoryIndexIterator *iterator);
-uint32_t hsqs_inode_directory_index_iterator_name_size(
-		struct HsqsInodeDirectoryIndexIterator *iterator);
-const char *hsqs_inode_directory_index_iterator_name(
-		struct HsqsInodeDirectoryIndexIterator *iterator);
+HSQS_NO_UNUSED int sqsh_inode_directory_index_iterator_init(
+		struct SqshInodeDirectoryIndexIterator *iterator,
+		struct SqshInodeContext *inode);
+HSQS_NO_UNUSED int sqsh_inode_directory_index_iterator_next(
+		struct SqshInodeDirectoryIndexIterator *iterator);
+uint32_t sqsh_inode_directory_index_iterator_index(
+		struct SqshInodeDirectoryIndexIterator *iterator);
+uint32_t sqsh_inode_directory_index_iterator_start(
+		struct SqshInodeDirectoryIndexIterator *iterator);
+uint32_t sqsh_inode_directory_index_iterator_name_size(
+		struct SqshInodeDirectoryIndexIterator *iterator);
+const char *sqsh_inode_directory_index_iterator_name(
+		struct SqshInodeDirectoryIndexIterator *iterator);
 
-HSQS_NO_UNUSED int hsqs_inode_directory_index_iterator_clean(
-		struct HsqsInodeDirectoryIndexIterator *iterator);
+HSQS_NO_UNUSED int sqsh_inode_directory_index_iterator_clean(
+		struct SqshInodeDirectoryIndexIterator *iterator);
 
 #endif /* end of include guard DIRECTORY_INDEX_ITERATOR_H */

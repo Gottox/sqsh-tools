@@ -41,22 +41,22 @@
 
 #define XATTR_TABLE_H
 
-struct HsqsSuperblockContext;
-struct HsqsXattrKey;
-struct HsqsXattrValue;
-struct HsqsInodeContext;
+struct SqshSuperblockContext;
+struct SqshXattrKey;
+struct SqshXattrValue;
+struct SqshInodeContext;
 
-struct HsqsXattrTable {
-	struct Hsqs *hsqs;
-	struct HsqsMapping header;
-	struct HsqsTable table;
+struct SqshXattrTable {
+	struct Sqsh *sqsh;
+	struct SqshMapping header;
+	struct SqshTable table;
 };
 
 HSQS_NO_UNUSED int
-hsqs_xattr_table_init(struct HsqsXattrTable *context, struct Hsqs *hsqs);
+sqsh_xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh);
 
-uint64_t hsqs_xattr_table_start(struct HsqsXattrTable *table);
+uint64_t sqsh_xattr_table_start(struct SqshXattrTable *table);
 
-int hsqs_xattr_table_cleanup(struct HsqsXattrTable *context);
+int sqsh_xattr_table_cleanup(struct SqshXattrTable *context);
 
 #endif /* end of include guard XATTR_TABLE_H */

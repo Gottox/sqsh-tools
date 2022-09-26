@@ -43,23 +43,23 @@ static __thread char
 		err_str[sizeof(UNKOWN_ERROR_FORMAT "18446744073709551615")] = {0};
 
 void
-hsqs_perror(int error_code, const char *msg) {
+sqsh_perror(int error_code, const char *msg) {
 	if (msg) {
 		fputs(msg, stderr);
 		fputs(": ", stderr);
 	}
-	fputs(hsqs_error_str(error_code), stderr);
+	fputs(sqsh_error_str(error_code), stderr);
 	fputc('\n', stderr);
 }
 
 const char *
-hsqs_error_str(int error_code) {
+sqsh_error_str(int error_code) {
 	error_code = abs(error_code);
 
 	if (error_code < HSQS_ERROR_SECTION) {
 		return strerror(error_code);
 	}
-	switch ((enum HsqsError)error_code) {
+	switch ((enum SqshError)error_code) {
 	case HSQS_ERROR_NO_COMPRESSION_OPTIONS:
 		return "No compression options";
 	case HSQS_ERROR_SUPERBLOCK_TOO_SMALL:

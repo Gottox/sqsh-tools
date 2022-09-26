@@ -20,7 +20,7 @@ if get_option('doc')
   custom_target('doc',
     build_by_default: true,
     command: [doxygen, doxyfile],
-    depends: libhsqs,
+    depends: libsqsh,
     output: ['html']
   )
 endif

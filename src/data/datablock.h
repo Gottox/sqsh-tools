@@ -40,11 +40,11 @@
 
 #define HSQS_SIZEOF_DATABLOCK_SIZE 4
 
-struct HsqsDatablockSize;
+struct SqshDatablockSize;
 
 uint32_t
-hsqs_data_datablock_size(const struct HsqsDatablockSize *datablock_size);
-bool hsqs_data_datablock_is_compressed(
-		const struct HsqsDatablockSize *datablock_size);
+sqsh_data_datablock_size(const struct SqshDatablockSize *datablock_size);
+bool sqsh_data_datablock_is_compressed(
+		const struct SqshDatablockSize *datablock_size);
 
 #endif /* end of include guard DATABLOCK_H */

@@ -48,64 +48,64 @@
 
 #define MEMORY_MAPPER_H
 
-extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_static;
-extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_mmap_full;
-extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_mmap;
-extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_canary;
+extern struct SqshMemoryMapperImpl sqsh_mapper_impl_static;
+extern struct SqshMemoryMapperImpl sqsh_mapper_impl_mmap_full;
+extern struct SqshMemoryMapperImpl sqsh_mapper_impl_mmap;
+extern struct SqshMemoryMapperImpl sqsh_mapper_impl_canary;
 #ifdef CONFIG_CURL
-extern struct HsqsMemoryMapperImpl hsqs_mapper_impl_curl;
+extern struct SqshMemoryMapperImpl sqsh_mapper_impl_curl;
 #endif
 
-struct HsqsMapper;
+struct SqshMapper;
 
-struct HsqsMapping {
-	struct HsqsMapper *mapper;
+struct SqshMapping {
+	struct SqshMapper *mapper;
 	union {
-		struct HsqsMmapFullMap mc;
-		struct HsqsMmapMap mm;
-		struct HsqsStaticMap sm;
-		struct HsqsCanaryMap cn;
+		struct SqshMmapFullMap mc;
+		struct SqshMmapMap mm;
+		struct SqshStaticMap sm;
+		struct SqshCanaryMap cn;
 #ifdef CONFIG_CURL
-		struct HsqsCurlMap cl;
+		struct SqshCurlMap cl;
 #endif
 	} data;
 };
 
-struct HsqsMemoryMapperImpl {
-	int (*init)(struct HsqsMapper *mapper, const void *input, size_t size);
-	int (*mapping)(struct HsqsMapping *map, off_t offset, size_t size);
-	size_t (*size)(const struct HsqsMapper *mapper);
-	int (*cleanup)(struct HsqsMapper *mapper);
-	const uint8_t *(*map_data)(const struct HsqsMapping *mapping);
-	int (*map_resize)(struct HsqsMapping *mapping, size_t new_size);
-	size_t (*map_size)(const struct HsqsMapping *mapping);
-	int (*unmap)(struct HsqsMapping *mapping);
+struct SqshMemoryMapperImpl {
+	int (*init)(struct SqshMapper *mapper, const void *input, size_t size);
+	int (*mapping)(struct SqshMapping *map, off_t offset, size_t size);
+	size_t (*size)(const struct SqshMapper *mapper);
+	int (*cleanup)(struct SqshMapper *mapper);
+	const uint8_t *(*map_data)(const struct SqshMapping *mapping);
+	int (*map_resize)(struct SqshMapping *mapping, size_t new_size);
+	size_t (*map_size)(const struct SqshMapping *mapping);
+	int (*unmap)(struct SqshMapping *mapping);
 };
 
-struct HsqsMapper {
-	struct HsqsMemoryMapperImpl *impl;
+struct SqshMapper {
+	struct SqshMemoryMapperImpl *impl;
 	union {
-		struct HsqsMmapFullMapper mc;
-		struct HsqsMmapMapper mm;
-		struct HsqsStaticMapper sm;
-		struct HsqsCanaryMapper cn;
+		struct SqshMmapFullMapper mc;
+		struct SqshMmapMapper mm;
+		struct SqshStaticMapper sm;
+		struct SqshCanaryMapper cn;
 #ifdef CONFIG_CURL
-		struct HsqsCurlMapper cl;
+		struct SqshCurlMapper cl;
 #endif
 	} data;
 };
 
-int hsqs_mapper_init(
-		struct HsqsMapper *mapper, struct HsqsMemoryMapperImpl *impl,
+int sqsh_mapper_init(
+		struct SqshMapper *mapper, struct SqshMemoryMapperImpl *impl,
 		const void *input, size_t size);
-int hsqs_mapper_map(
-		struct HsqsMapping *mapping, struct HsqsMapper *mapper,
-		hsqs_index_t offset, size_t size);
-size_t hsqs_mapper_size(const struct HsqsMapper *mapper);
-int hsqs_mapper_cleanup(struct HsqsMapper *mapper);
-size_t hsqs_mapping_size(struct HsqsMapping *mapping);
-int hsqs_mapping_resize(struct HsqsMapping *mapping, size_t new_size);
-const uint8_t *hsqs_mapping_data(const struct HsqsMapping *mapping);
-int hsqs_mapping_unmap(struct HsqsMapping *mapping);
+int sqsh_mapper_map(
+		struct SqshMapping *mapping, struct SqshMapper *mapper,
+		sqsh_index_t offset, size_t size);
+size_t sqsh_mapper_size(const struct SqshMapper *mapper);
+int sqsh_mapper_cleanup(struct SqshMapper *mapper);
+size_t sqsh_mapping_size(struct SqshMapping *mapping);
+int sqsh_mapping_resize(struct SqshMapping *mapping, size_t new_size);
+const uint8_t *sqsh_mapping_data(const struct SqshMapping *mapping);
+int sqsh_mapping_unmap(struct SqshMapping *mapping);
 
 #endif /* end of include guard MEMORY_MAPPER_H */

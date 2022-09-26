@@ -35,12 +35,12 @@
 #include <endian.h>
 
 uint32_t
-hsqs_data_datablock_size(const struct HsqsDatablockSize *datablock_size) {
+sqsh_data_datablock_size(const struct SqshDatablockSize *datablock_size) {
 	return le32toh(datablock_size->size) & ~(1 << 24);
 }
 
 bool
-hsqs_data_datablock_is_compressed(
-		const struct HsqsDatablockSize *datablock_size) {
+sqsh_data_datablock_is_compressed(
+		const struct SqshDatablockSize *datablock_size) {
 	return !(le32toh(datablock_size->size) & (1 << 24));
 }

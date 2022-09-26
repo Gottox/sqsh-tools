@@ -38,55 +38,55 @@
 
 #define COMPRESSION_OPTIONS_INTERNAL_H
 
-struct HSQS_UNALIGNED HsqsCompressionOptionsGzip {
+struct HSQS_UNALIGNED SqshCompressionOptionsGzip {
 	uint32_t compression_level;
 	uint16_t window_size;
 	uint16_t strategies;
 };
 STATIC_ASSERT(
-		sizeof(struct HsqsCompressionOptionsGzip) ==
+		sizeof(struct SqshCompressionOptionsGzip) ==
 		HSQS_SIZEOF_COMPRESSION_OPTIONS_GZIP);
 
-struct HSQS_UNALIGNED HsqsCompressionOptionsXz {
+struct HSQS_UNALIGNED SqshCompressionOptionsXz {
 	uint32_t dictionary_size;
 	uint32_t filters;
 };
 STATIC_ASSERT(
-		sizeof(struct HsqsCompressionOptionsXz) ==
+		sizeof(struct SqshCompressionOptionsXz) ==
 		HSQS_SIZEOF_COMPRESSION_OPTIONS_XZ);
 
-struct HSQS_UNALIGNED HsqsCompressionOptionsLz4 {
+struct HSQS_UNALIGNED SqshCompressionOptionsLz4 {
 	uint32_t version;
 	uint32_t flags;
 };
 STATIC_ASSERT(
-		sizeof(struct HsqsCompressionOptionsLz4) ==
+		sizeof(struct SqshCompressionOptionsLz4) ==
 		HSQS_SIZEOF_COMPRESSION_OPTIONS_LZ4);
 
-struct HSQS_UNALIGNED HsqsCompressionOptionsZstd {
+struct HSQS_UNALIGNED SqshCompressionOptionsZstd {
 	uint32_t compression_level;
 };
 STATIC_ASSERT(
-		sizeof(struct HsqsCompressionOptionsZstd) ==
+		sizeof(struct SqshCompressionOptionsZstd) ==
 		HSQS_SIZEOF_COMPRESSION_OPTIONS_ZSTD);
 
-struct HSQS_UNALIGNED HsqsCompressionOptionsLzo {
+struct HSQS_UNALIGNED SqshCompressionOptionsLzo {
 	uint32_t algorithm;
 	uint32_t compression_level;
 };
 STATIC_ASSERT(
-		sizeof(struct HsqsCompressionOptionsLzo) ==
+		sizeof(struct SqshCompressionOptionsLzo) ==
 		HSQS_SIZEOF_COMPRESSION_OPTIONS_LZO);
 
-union HsqsCompressionOptions {
-	struct HsqsCompressionOptionsGzip gzip;
-	struct HsqsCompressionOptionsXz xz;
-	struct HsqsCompressionOptionsLz4 lz4;
-	struct HsqsCompressionOptionsZstd zstd;
-	struct HsqsCompressionOptionsLzo lzo;
+union SqshCompressionOptions {
+	struct SqshCompressionOptionsGzip gzip;
+	struct SqshCompressionOptionsXz xz;
+	struct SqshCompressionOptionsLz4 lz4;
+	struct SqshCompressionOptionsZstd zstd;
+	struct SqshCompressionOptionsLzo lzo;
 };
 STATIC_ASSERT(
-		sizeof(union HsqsCompressionOptions) ==
+		sizeof(union SqshCompressionOptions) ==
 		HSQS_SIZEOF_COMPRESSION_OPTIONS);
 
 #endif /* end of include guard COMPRESSION_OPTIONS_INTERNAL_H */

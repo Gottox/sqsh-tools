@@ -41,14 +41,14 @@
 #include <unistd.h>
 
 static int
-hsqs_mapper_canary_init(
-		struct HsqsMapper *mapper, const void *input, size_t size) {
+sqsh_mapper_canary_init(
+		struct SqshMapper *mapper, const void *input, size_t size) {
 	mapper->data.cn.data = input;
 	mapper->data.cn.size = size;
 	return 0;
 }
 static int
-hsqs_mapper_canary_map(struct HsqsMapping *mapping, off_t offset, size_t size) {
+sqsh_mapper_canary_map(struct SqshMapping *mapping, off_t offset, size_t size) {
 	uint8_t *data = calloc(size, sizeof(uint8_t));
 
 	memcpy(data, &mapping->mapper->data.cn.data[offset], size);
@@ -58,51 +58,51 @@ hsqs_mapper_canary_map(struct HsqsMapping *mapping, off_t offset, size_t size) {
 	return 0;
 }
 static size_t
-hsqs_mapper_canary_size(const struct HsqsMapper *mapper) {
+sqsh_mapper_canary_size(const struct SqshMapper *mapper) {
 	return mapper->data.cn.size;
 }
 static int
-hsqs_mapper_canary_cleanup(struct HsqsMapper *mapper) {
+sqsh_mapper_canary_cleanup(struct SqshMapper *mapper) {
 	(void)mapper;
 	return 0;
 }
 static int
-hsqs_mapping_canary_unmap(struct HsqsMapping *mapping) {
+sqsh_mapping_canary_unmap(struct SqshMapping *mapping) {
 	free(mapping->data.cn.data);
 	mapping->data.cn.data = NULL;
 	mapping->data.cn.size = 0;
 	return 0;
 }
 static const uint8_t *
-hsqs_mapping_canary_data(const struct HsqsMapping *mapping) {
+sqsh_mapping_canary_data(const struct SqshMapping *mapping) {
 	return mapping->data.cn.data;
 }
 
 static int
-hsqs_mapping_canary_resize(struct HsqsMapping *mapping, size_t new_size) {
+sqsh_mapping_canary_resize(struct SqshMapping *mapping, size_t new_size) {
 	int rv;
 	uint64_t offset = mapping->data.cn.offset;
-	struct HsqsMapper *mapper = mapping->mapper;
+	struct SqshMapper *mapper = mapping->mapper;
 
-	rv = hsqs_mapping_unmap(mapping);
+	rv = sqsh_mapping_unmap(mapping);
 	if (rv < 0) {
 		return rv;
 	}
-	return hsqs_mapper_map(mapping, mapper, offset, new_size);
+	return sqsh_mapper_map(mapping, mapper, offset, new_size);
 }
 
 static size_t
-hsqs_mapping_canary_size(const struct HsqsMapping *mapping) {
+sqsh_mapping_canary_size(const struct SqshMapping *mapping) {
 	return mapping->data.cn.size;
 }
 
-struct HsqsMemoryMapperImpl hsqs_mapper_impl_canary = {
-		.init = hsqs_mapper_canary_init,
-		.mapping = hsqs_mapper_canary_map,
-		.size = hsqs_mapper_canary_size,
-		.cleanup = hsqs_mapper_canary_cleanup,
-		.map_data = hsqs_mapping_canary_data,
-		.map_resize = hsqs_mapping_canary_resize,
-		.map_size = hsqs_mapping_canary_size,
-		.unmap = hsqs_mapping_canary_unmap,
+struct SqshMemoryMapperImpl sqsh_mapper_impl_canary = {
+		.init = sqsh_mapper_canary_init,
+		.mapping = sqsh_mapper_canary_map,
+		.size = sqsh_mapper_canary_size,
+		.cleanup = sqsh_mapper_canary_cleanup,
+		.map_data = sqsh_mapping_canary_data,
+		.map_resize = sqsh_mapping_canary_resize,
+		.map_size = sqsh_mapping_canary_size,
+		.unmap = sqsh_mapping_canary_unmap,
 };

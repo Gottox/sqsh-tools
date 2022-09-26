@@ -39,35 +39,35 @@
 static const uint64_t INODE_HEADER_SIZE =
 		HSQS_SIZEOF_INODE_HEADER + HSQS_SIZEOF_INODE_DIRECTORY_EXT;
 
-static const struct HsqsInode *
-get_inode(const struct HsqsInodeDirectoryIndexIterator *iterator) {
-	return (const struct HsqsInode *)hsqs_metablock_stream_data(
+static const struct SqshInode *
+get_inode(const struct SqshInodeDirectoryIndexIterator *iterator) {
+	return (const struct SqshInode *)sqsh_metablock_stream_data(
 			&iterator->inode->metablock);
 }
 
-// TODO: use hsqs_data_inode_directory_ext_index().
-static const struct HsqsInodeDirectoryIndex *
+// TODO: use sqsh_data_inode_directory_ext_index().
+static const struct SqshInodeDirectoryIndex *
 current_directory_index(
-		const struct HsqsInodeDirectoryIndexIterator *iterator) {
+		const struct SqshInodeDirectoryIndexIterator *iterator) {
 	const uint8_t *tmp = (const uint8_t *)get_inode(iterator);
-	return (const struct HsqsInodeDirectoryIndex
+	return (const struct SqshInodeDirectoryIndex
 					*)&tmp[iterator->current_offset];
 }
 
 static int
 directory_index_data_more(
-		struct HsqsInodeDirectoryIndexIterator *iterator, size_t size) {
-	return hsqs_metablock_stream_more(&iterator->inode->metablock, size);
+		struct SqshInodeDirectoryIndexIterator *iterator, size_t size) {
+	return sqsh_metablock_stream_more(&iterator->inode->metablock, size);
 }
 
 int
-hsqs_inode_directory_index_iterator_init(
-		struct HsqsInodeDirectoryIndexIterator *iterator,
-		struct HsqsInodeContext *inode) {
+sqsh_inode_directory_index_iterator_init(
+		struct SqshInodeDirectoryIndexIterator *iterator,
+		struct SqshInodeContext *inode) {
 	int rv = 0;
 
-	if (hsqs_inode_type(inode) != HSQS_INODE_TYPE_DIRECTORY ||
-		hsqs_inode_is_extended(inode) == false) {
+	if (sqsh_inode_type(inode) != HSQS_INODE_TYPE_DIRECTORY ||
+		sqsh_inode_is_extended(inode) == false) {
 		return -HSQS_ERROR_NO_EXTENDED_DIRECTORY;
 	}
 
@@ -75,16 +75,16 @@ hsqs_inode_directory_index_iterator_init(
 	iterator->current_offset = 0;
 	iterator->next_offset = INODE_HEADER_SIZE;
 
-	const struct HsqsInodeDirectoryExt *xdir =
-			hsqs_data_inode_directory_ext(get_inode(iterator));
+	const struct SqshInodeDirectoryExt *xdir =
+			sqsh_data_inode_directory_ext(get_inode(iterator));
 	iterator->remaining_entries =
-			hsqs_data_inode_directory_ext_index_count(xdir);
+			sqsh_data_inode_directory_ext_index_count(xdir);
 	return rv;
 }
 
 int
-hsqs_inode_directory_index_iterator_next(
-		struct HsqsInodeDirectoryIndexIterator *iterator) {
+sqsh_inode_directory_index_iterator_next(
+		struct SqshInodeDirectoryIndexIterator *iterator) {
 	int rv = 0;
 	iterator->current_offset = iterator->next_offset;
 
@@ -99,7 +99,7 @@ hsqs_inode_directory_index_iterator_next(
 
 	// Make sure current index has its name populated
 	iterator->next_offset +=
-			hsqs_inode_directory_index_iterator_name_size(iterator);
+			sqsh_inode_directory_index_iterator_name_size(iterator);
 	rv = directory_index_data_more(iterator, iterator->next_offset);
 	if (rv < 0) {
 		return rv;
@@ -109,37 +109,37 @@ hsqs_inode_directory_index_iterator_next(
 }
 
 uint32_t
-hsqs_inode_directory_index_iterator_index(
-		struct HsqsInodeDirectoryIndexIterator *iterator) {
-	const struct HsqsInodeDirectoryIndex *current =
+sqsh_inode_directory_index_iterator_index(
+		struct SqshInodeDirectoryIndexIterator *iterator) {
+	const struct SqshInodeDirectoryIndex *current =
 			current_directory_index(iterator);
-	return hsqs_data_inode_directory_index_index(current);
+	return sqsh_data_inode_directory_index_index(current);
 }
 uint32_t
-hsqs_inode_directory_index_iterator_start(
-		struct HsqsInodeDirectoryIndexIterator *iterator) {
-	const struct HsqsInodeDirectoryIndex *current =
+sqsh_inode_directory_index_iterator_start(
+		struct SqshInodeDirectoryIndexIterator *iterator) {
+	const struct SqshInodeDirectoryIndex *current =
 			current_directory_index(iterator);
-	return hsqs_data_inode_directory_index_start(current);
+	return sqsh_data_inode_directory_index_start(current);
 }
 uint32_t
-hsqs_inode_directory_index_iterator_name_size(
-		struct HsqsInodeDirectoryIndexIterator *iterator) {
-	const struct HsqsInodeDirectoryIndex *current =
+sqsh_inode_directory_index_iterator_name_size(
+		struct SqshInodeDirectoryIndexIterator *iterator) {
+	const struct SqshInodeDirectoryIndex *current =
 			current_directory_index(iterator);
-	return hsqs_data_inode_directory_index_name_size(current) + 1;
+	return sqsh_data_inode_directory_index_name_size(current) + 1;
 }
 const char *
-hsqs_inode_directory_index_iterator_name(
-		struct HsqsInodeDirectoryIndexIterator *iterator) {
-	const struct HsqsInodeDirectoryIndex *current =
+sqsh_inode_directory_index_iterator_name(
+		struct SqshInodeDirectoryIndexIterator *iterator) {
+	const struct SqshInodeDirectoryIndex *current =
 			current_directory_index(iterator);
-	return (const char *)hsqs_data_inode_directory_index_name(current);
+	return (const char *)sqsh_data_inode_directory_index_name(current);
 }
 
 int
-hsqs_inode_directory_index_iterator_clean(
-		struct HsqsInodeDirectoryIndexIterator __attribute__((unused)) *
+sqsh_inode_directory_index_iterator_clean(
+		struct SqshInodeDirectoryIndexIterator __attribute__((unused)) *
 		iterator) {
 	return 0;
 }

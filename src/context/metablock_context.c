@@ -35,48 +35,48 @@
 #include "../compression/compression.h"
 #include "../data/metablock.h"
 #include "../error.h"
-#include "../hsqs.h"
+#include "../sqsh.h"
 #include <stdint.h>
 
-static const struct HsqsMetablock *
-get_metablock(const struct HsqsMetablockContext *context) {
-	return (const struct HsqsMetablock *)hsqs_mapping_data(&context->mapping);
+static const struct SqshMetablock *
+get_metablock(const struct SqshMetablockContext *context) {
+	return (const struct SqshMetablock *)sqsh_mapping_data(&context->mapping);
 }
 
 int
-hsqs_metablock_init(
-		struct HsqsMetablockContext *context, struct Hsqs *hsqs,
+sqsh_metablock_init(
+		struct SqshMetablockContext *context, struct Sqsh *sqsh,
 		uint64_t address) {
 	int rv = 0;
 
-	rv = hsqs_mapper_map(
-			&context->mapping, &hsqs->mapper, address, HSQS_SIZEOF_METABLOCK);
+	rv = sqsh_mapper_map(
+			&context->mapping, &sqsh->mapper, address, HSQS_SIZEOF_METABLOCK);
 	if (rv < 0) {
 		goto out;
 	}
-	context->compression = hsqs_metablock_compression(hsqs);
+	context->compression = sqsh_metablock_compression(sqsh);
 
 out:
 	if (rv < 0) {
-		hsqs_metablock_cleanup(context);
+		sqsh_metablock_cleanup(context);
 	}
 
 	return rv;
 }
 
 uint32_t
-hsqs_metablock_compressed_size(const struct HsqsMetablockContext *context) {
-	const struct HsqsMetablock *metablock = get_metablock(context);
-	return hsqs_data_metablock_size(metablock);
+sqsh_metablock_compressed_size(const struct SqshMetablockContext *context) {
+	const struct SqshMetablock *metablock = get_metablock(context);
+	return sqsh_data_metablock_size(metablock);
 }
 
 int
-hsqs_metablock_to_buffer(
-		struct HsqsMetablockContext *context, struct HsqsBuffer *buffer) {
+sqsh_metablock_to_buffer(
+		struct SqshMetablockContext *context, struct SqshBuffer *buffer) {
 	int rv = 0;
-	const struct HsqsMetablock *metablock = get_metablock(context);
-	uint32_t size = hsqs_data_metablock_size(metablock);
-	bool is_compressed = hsqs_data_metablock_is_compressed(metablock);
+	const struct SqshMetablock *metablock = get_metablock(context);
+	uint32_t size = sqsh_data_metablock_size(metablock);
+	bool is_compressed = sqsh_data_metablock_is_compressed(metablock);
 	uint32_t map_size;
 
 	if (size > HSQS_METABLOCK_BLOCK_SIZE) {
@@ -87,20 +87,20 @@ hsqs_metablock_to_buffer(
 		goto out;
 	}
 
-	rv = hsqs_mapping_resize(&context->mapping, map_size);
+	rv = sqsh_mapping_resize(&context->mapping, map_size);
 	if (rv < 0) {
 		goto out;
 	}
 
 	// metablock may has moved after resize, so re-request it:
 	metablock = get_metablock(context);
-	const uint8_t *data = hsqs_data_metablock_data(metablock);
+	const uint8_t *data = sqsh_data_metablock_data(metablock);
 
 	if (is_compressed) {
-		rv = hsqs_compression_decompress_to_buffer(
+		rv = sqsh_compression_decompress_to_buffer(
 				context->compression, buffer, data, size);
 	} else {
-		rv = hsqs_buffer_append(buffer, data, size);
+		rv = sqsh_buffer_append(buffer, data, size);
 	}
 	if (rv < 0) {
 		goto out;
@@ -111,7 +111,7 @@ out:
 }
 
 int
-hsqs_metablock_cleanup(struct HsqsMetablockContext *context) {
-	hsqs_mapping_unmap(&context->mapping);
+sqsh_metablock_cleanup(struct SqshMetablockContext *context) {
+	sqsh_mapping_unmap(&context->mapping);
 	return 0;
 }

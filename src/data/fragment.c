@@ -36,11 +36,11 @@
 #include <endian.h>
 
 uint64_t
-hsqs_data_fragment_start(const struct HsqsFragment *fragment) {
+sqsh_data_fragment_start(const struct SqshFragment *fragment) {
 	return le64toh(fragment->start);
 }
 
-const struct HsqsDatablockSize *
-hsqs_data_fragment_size_info(const struct HsqsFragment *fragment) {
+const struct SqshDatablockSize *
+sqsh_data_fragment_size_info(const struct SqshFragment *fragment) {
 	return &fragment->size;
 }

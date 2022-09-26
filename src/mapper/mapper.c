@@ -37,30 +37,30 @@
 #include <string.h>
 
 int
-hsqs_mapper_init(
-		struct HsqsMapper *mapper, struct HsqsMemoryMapperImpl *impl,
+sqsh_mapper_init(
+		struct SqshMapper *mapper, struct SqshMemoryMapperImpl *impl,
 		const void *input, size_t size) {
 	mapper->impl = impl;
 	return mapper->impl->init(mapper, input, size);
 }
 
 int
-hsqs_mapper_init_mmap(struct HsqsMapper *mapper, const char *path) {
-	return hsqs_mapper_init(mapper, &hsqs_mapper_impl_mmap, path, strlen(path));
+sqsh_mapper_init_mmap(struct SqshMapper *mapper, const char *path) {
+	return sqsh_mapper_init(mapper, &sqsh_mapper_impl_mmap, path, strlen(path));
 }
 
 int
-hsqs_mapper_init_static(
-		struct HsqsMapper *mapper, const uint8_t *input, size_t size) {
-	return hsqs_mapper_init(mapper, &hsqs_mapper_impl_static, input, size);
+sqsh_mapper_init_static(
+		struct SqshMapper *mapper, const uint8_t *input, size_t size) {
+	return sqsh_mapper_init(mapper, &sqsh_mapper_impl_static, input, size);
 }
 
 int
-hsqs_mapper_map(
-		struct HsqsMapping *mapping, struct HsqsMapper *mapper,
-		hsqs_index_t offset, size_t size) {
+sqsh_mapper_map(
+		struct SqshMapping *mapping, struct SqshMapper *mapper,
+		sqsh_index_t offset, size_t size) {
 	size_t end_offset;
-	size_t archive_size = hsqs_mapper_size(mapper);
+	size_t archive_size = sqsh_mapper_size(mapper);
 	if (offset > archive_size) {
 		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
@@ -75,12 +75,12 @@ hsqs_mapper_map(
 }
 
 size_t
-hsqs_mapper_size(const struct HsqsMapper *mapper) {
+sqsh_mapper_size(const struct SqshMapper *mapper) {
 	return mapper->impl->size(mapper);
 }
 
 int
-hsqs_mapper_cleanup(struct HsqsMapper *mapper) {
+sqsh_mapper_cleanup(struct SqshMapper *mapper) {
 	int rv = 0;
 	if (mapper->impl != NULL) {
 		rv = mapper->impl->cleanup(mapper);
@@ -90,8 +90,8 @@ hsqs_mapper_cleanup(struct HsqsMapper *mapper) {
 }
 
 int
-hsqs_mapping_resize(struct HsqsMapping *mapping, size_t new_size) {
-	if (new_size <= hsqs_mapping_size(mapping)) {
+sqsh_mapping_resize(struct SqshMapping *mapping, size_t new_size) {
+	if (new_size <= sqsh_mapping_size(mapping)) {
 		return 0;
 	} else {
 		return mapping->mapper->impl->map_resize(mapping, new_size);
@@ -99,17 +99,17 @@ hsqs_mapping_resize(struct HsqsMapping *mapping, size_t new_size) {
 }
 
 size_t
-hsqs_mapping_size(struct HsqsMapping *mapping) {
+sqsh_mapping_size(struct SqshMapping *mapping) {
 	return mapping->mapper->impl->map_size(mapping);
 }
 
 const uint8_t *
-hsqs_mapping_data(const struct HsqsMapping *mapping) {
+sqsh_mapping_data(const struct SqshMapping *mapping) {
 	return mapping->mapper->impl->map_data(mapping);
 }
 
 int
-hsqs_mapping_unmap(struct HsqsMapping *mapping) {
+sqsh_mapping_unmap(struct SqshMapping *mapping) {
 	int rv = 0;
 	if (mapping->mapper) {
 		rv = mapping->mapper->impl->unmap(mapping);

@@ -36,9 +36,9 @@
 #include "../src/context/superblock_context.h"
 #include "../src/data/superblock.h"
 #include "../src/error.h"
-#include "../src/hsqs.h"
 #include "../src/iterator/directory_iterator.h"
 #include "../src/iterator/xattr_iterator.h"
+#include "../src/sqsh.h"
 #include "../src/table/xattr_table.h"
 #include "common.h"
 #include "test.h"
@@ -46,304 +46,304 @@
 #include <stdint.h>
 
 static void
-hsqs_empty() {
+sqsh_empty() {
 	int rv;
-	struct Hsqs hsqs = {0};
-	rv = hsqs_init(&hsqs, NULL, 0);
+	struct Sqsh sqsh = {0};
+	rv = sqsh_init(&sqsh, NULL, 0);
 	assert(rv == -HSQS_ERROR_SUPERBLOCK_TOO_SMALL);
 }
 
 static void
-hsqs_get_nonexistant() {
+sqsh_get_nonexistant() {
 	int rv;
-	struct HsqsInodeContext inode = {0};
-	struct Hsqs hsqs = {0};
+	struct SqshInodeContext inode = {0};
+	struct Sqsh sqsh = {0};
 
-	rv = hsqs_init(&hsqs, squash_image, sizeof(squash_image));
+	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = hsqs_inode_load_by_path(&inode, &hsqs, "/nonexistant");
+	rv = sqsh_inode_load_by_path(&inode, &sqsh, "/nonexistant");
 	assert(rv < 0);
 
-	rv = hsqs_cleanup(&hsqs);
+	rv = sqsh_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
 static void
-hsqs_ls() {
+sqsh_ls() {
 	int rv;
 	char *name;
-	struct HsqsInodeContext inode = {0};
-	struct HsqsDirectoryIterator iter = {0};
-	struct Hsqs hsqs = {0};
-	rv = hsqs_init(&hsqs, squash_image, sizeof(squash_image));
+	struct SqshInodeContext inode = {0};
+	struct SqshDirectoryIterator iter = {0};
+	struct Sqsh sqsh = {0};
+	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = hsqs_inode_load_root(&inode, &hsqs);
+	rv = sqsh_inode_load_root(&inode, &sqsh);
 	assert(rv == 0);
 
-	rv = hsqs_directory_iterator_init(&iter, &inode);
+	rv = sqsh_directory_iterator_init(&iter, &inode);
 	assert(rv == 0);
 
-	rv = hsqs_directory_iterator_next(&iter);
+	rv = sqsh_directory_iterator_next(&iter);
 	assert(rv > 0);
-	rv = hsqs_directory_iterator_name_dup(&iter, &name);
+	rv = sqsh_directory_iterator_name_dup(&iter, &name);
 	assert(rv == 1);
 	assert(strcmp("a", name) == 0);
 	free(name);
 
-	rv = hsqs_directory_iterator_next(&iter);
+	rv = sqsh_directory_iterator_next(&iter);
 	assert(rv >= 0);
-	rv = hsqs_directory_iterator_name_dup(&iter, &name);
+	rv = sqsh_directory_iterator_name_dup(&iter, &name);
 	assert(rv == 1);
 	assert(strcmp("b", name) == 0);
 	free(name);
 
-	rv = hsqs_directory_iterator_next(&iter);
+	rv = sqsh_directory_iterator_next(&iter);
 	// End of file list
 	assert(rv == 0);
 
-	rv = hsqs_directory_iterator_cleanup(&iter);
+	rv = sqsh_directory_iterator_cleanup(&iter);
 	assert(rv == 0);
 
-	rv = hsqs_inode_cleanup(&inode);
+	rv = sqsh_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = hsqs_cleanup(&hsqs);
+	rv = sqsh_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
 static void
-hsqs_cat_fragment() {
+sqsh_cat_fragment() {
 	int rv;
 	const uint8_t *data;
 	size_t size;
-	struct HsqsInodeContext inode = {0};
-	struct HsqsFileContext file = {0};
-	struct Hsqs hsqs = {0};
-	rv = hsqs_init(&hsqs, squash_image, sizeof(squash_image));
+	struct SqshInodeContext inode = {0};
+	struct SqshFileContext file = {0};
+	struct Sqsh sqsh = {0};
+	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = hsqs_inode_load_by_path(&inode, &hsqs, "a");
+	rv = sqsh_inode_load_by_path(&inode, &sqsh, "a");
 	assert(rv == 0);
 
-	rv = hsqs_content_init(&file, &inode);
+	rv = sqsh_content_init(&file, &inode);
 	assert(rv == 0);
 
-	size = hsqs_inode_file_size(&inode);
+	size = sqsh_inode_file_size(&inode);
 	assert(size == 2);
 
-	rv = hsqs_content_read(&file, size);
+	rv = sqsh_content_read(&file, size);
 	assert(rv == 0);
 
-	data = hsqs_content_data(&file);
+	data = sqsh_content_data(&file);
 	assert(memcmp(data, "a\n", size) == 0);
 
-	rv = hsqs_content_cleanup(&file);
+	rv = sqsh_content_cleanup(&file);
 	assert(rv == 0);
 
-	rv = hsqs_inode_cleanup(&inode);
+	rv = sqsh_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = hsqs_cleanup(&hsqs);
+	rv = sqsh_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
 static void
-hsqs_cat_datablock_and_fragment() {
+sqsh_cat_datablock_and_fragment() {
 	int rv;
 	const uint8_t *data;
 	size_t size;
-	struct HsqsInodeContext inode = {0};
-	struct HsqsFileContext file = {0};
-	struct Hsqs hsqs = {0};
-	rv = hsqs_init(&hsqs, squash_image, sizeof(squash_image));
+	struct SqshInodeContext inode = {0};
+	struct SqshFileContext file = {0};
+	struct Sqsh sqsh = {0};
+	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = hsqs_inode_load_by_path(&inode, &hsqs, "b");
+	rv = sqsh_inode_load_by_path(&inode, &sqsh, "b");
 	assert(rv == 0);
 
-	rv = hsqs_content_init(&file, &inode);
+	rv = sqsh_content_init(&file, &inode);
 	assert(rv == 0);
 
-	size = hsqs_inode_file_size(&inode);
+	size = sqsh_inode_file_size(&inode);
 	assert(size == 1050000);
 
-	rv = hsqs_content_read(&file, size);
+	rv = sqsh_content_read(&file, size);
 	assert(rv == 0);
-	assert(size == hsqs_content_size(&file));
+	assert(size == sqsh_content_size(&file));
 
-	data = hsqs_content_data(&file);
-	for (hsqs_index_t i = 0; i < size; i++) {
+	data = sqsh_content_data(&file);
+	for (sqsh_index_t i = 0; i < size; i++) {
 		assert(data[i] == 'b');
 	}
 
-	rv = hsqs_content_cleanup(&file);
+	rv = sqsh_content_cleanup(&file);
 	assert(rv == 0);
 
-	rv = hsqs_inode_cleanup(&inode);
+	rv = sqsh_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = hsqs_cleanup(&hsqs);
+	rv = sqsh_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
 static void
-hsqs_cat_size_overflow() {
+sqsh_cat_size_overflow() {
 	int rv;
 	const uint8_t *data;
 	size_t size;
-	struct HsqsInodeContext inode = {0};
-	struct HsqsFileContext file = {0};
-	struct Hsqs hsqs = {0};
-	rv = hsqs_init(&hsqs, squash_image, sizeof(squash_image));
+	struct SqshInodeContext inode = {0};
+	struct SqshFileContext file = {0};
+	struct Sqsh sqsh = {0};
+	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = hsqs_inode_load_by_path(&inode, &hsqs, "b");
+	rv = sqsh_inode_load_by_path(&inode, &sqsh, "b");
 	assert(rv == 0);
 
-	rv = hsqs_content_init(&file, &inode);
+	rv = sqsh_content_init(&file, &inode);
 	assert(rv == 0);
-	size = hsqs_inode_file_size(&inode);
+	size = sqsh_inode_file_size(&inode);
 	assert(size == 1050000);
 
-	rv = hsqs_content_read(&file, size + 4096);
+	rv = sqsh_content_read(&file, size + 4096);
 	assert(rv != 0); // TODO: check for correct error code
 
-	assert(hsqs_content_size(&file) == size);
+	assert(sqsh_content_size(&file) == size);
 
-	data = hsqs_content_data(&file);
-	for (hsqs_index_t i = 0; i < size; i++) {
+	data = sqsh_content_data(&file);
+	for (sqsh_index_t i = 0; i < size; i++) {
 		assert(data[i] == 'b');
 	}
 
-	rv = hsqs_content_cleanup(&file);
+	rv = sqsh_content_cleanup(&file);
 	assert(rv == 0);
 
-	rv = hsqs_inode_cleanup(&inode);
+	rv = sqsh_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = hsqs_cleanup(&hsqs);
+	rv = sqsh_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
 static void
-hsqs_test_uid_and_gid() {
+sqsh_test_uid_and_gid() {
 	int rv;
 	uint32_t uid, gid;
-	struct HsqsInodeContext inode = {0};
-	struct Hsqs hsqs = {0};
-	rv = hsqs_init(&hsqs, squash_image, sizeof(squash_image));
+	struct SqshInodeContext inode = {0};
+	struct Sqsh sqsh = {0};
+	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = hsqs_inode_load_root(&inode, &hsqs);
+	rv = sqsh_inode_load_root(&inode, &sqsh);
 	assert(rv == 0);
 
-	uid = hsqs_inode_uid(&inode);
+	uid = sqsh_inode_uid(&inode);
 	assert(uid == 2020);
-	gid = hsqs_inode_gid(&inode);
+	gid = sqsh_inode_gid(&inode);
 	assert(gid == 202020);
 
-	rv = hsqs_inode_cleanup(&inode);
+	rv = sqsh_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = hsqs_cleanup(&hsqs);
+	rv = sqsh_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
 static void
-hsqs_test_xattr() {
+sqsh_test_xattr() {
 	const char *expected_value = "1234567891234567891234567890001234567890";
 	int rv;
 	char *name, *value;
-	struct HsqsInodeContext inode = {0};
-	struct HsqsInodeContext entry_inode = {0};
-	struct HsqsDirectoryIterator dir_iter = {0};
-	struct HsqsXattrIterator xattr_iter = {0};
-	struct Hsqs hsqs = {0};
-	rv = hsqs_init(&hsqs, squash_image, sizeof(squash_image));
+	struct SqshInodeContext inode = {0};
+	struct SqshInodeContext entry_inode = {0};
+	struct SqshDirectoryIterator dir_iter = {0};
+	struct SqshXattrIterator xattr_iter = {0};
+	struct Sqsh sqsh = {0};
+	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = hsqs_inode_load_root(&inode, &hsqs);
+	rv = sqsh_inode_load_root(&inode, &sqsh);
 	assert(rv == 0);
 
-	rv = hsqs_inode_xattr_iterator(&inode, &xattr_iter);
+	rv = sqsh_inode_xattr_iterator(&inode, &xattr_iter);
 	assert(rv == 0);
-	rv = hsqs_xattr_iterator_next(&xattr_iter);
+	rv = sqsh_xattr_iterator_next(&xattr_iter);
 	assert(rv == 0);
-	rv = hsqs_xattr_iterator_cleanup(&xattr_iter);
-	assert(rv == 0);
-
-	rv = hsqs_directory_iterator_init(&dir_iter, &inode);
+	rv = sqsh_xattr_iterator_cleanup(&xattr_iter);
 	assert(rv == 0);
 
-	rv = hsqs_directory_iterator_next(&dir_iter);
+	rv = sqsh_directory_iterator_init(&dir_iter, &inode);
+	assert(rv == 0);
+
+	rv = sqsh_directory_iterator_next(&dir_iter);
 	assert(rv > 0);
-	rv = hsqs_directory_iterator_name_dup(&dir_iter, &name);
+	rv = sqsh_directory_iterator_name_dup(&dir_iter, &name);
 	assert(rv == 1);
 	assert(strcmp("a", name) == 0);
 	free(name);
-	rv = hsqs_directory_iterator_inode_load(&dir_iter, &entry_inode);
+	rv = sqsh_directory_iterator_inode_load(&dir_iter, &entry_inode);
 	assert(rv == 0);
-	rv = hsqs_inode_xattr_iterator(&entry_inode, &xattr_iter);
+	rv = sqsh_inode_xattr_iterator(&entry_inode, &xattr_iter);
 	assert(rv == 0);
-	rv = hsqs_xattr_iterator_next(&xattr_iter);
+	rv = sqsh_xattr_iterator_next(&xattr_iter);
 	assert(rv > 0);
-	assert(hsqs_xattr_iterator_is_indirect(&xattr_iter) == false);
-	rv = hsqs_xattr_iterator_fullname_dup(&xattr_iter, &name);
+	assert(sqsh_xattr_iterator_is_indirect(&xattr_iter) == false);
+	rv = sqsh_xattr_iterator_fullname_dup(&xattr_iter, &name);
 	assert(rv == 8);
 	assert(strcmp("user.foo", name) == 0);
 	free(name);
-	rv = hsqs_xattr_iterator_value_dup(&xattr_iter, &value);
+	rv = sqsh_xattr_iterator_value_dup(&xattr_iter, &value);
 	assert(rv == (int)strlen(expected_value));
 	assert(strcmp(expected_value, value) == 0);
 	free(value);
-	rv = hsqs_xattr_iterator_next(&xattr_iter);
+	rv = sqsh_xattr_iterator_next(&xattr_iter);
 	assert(rv == 0);
-	rv = hsqs_xattr_iterator_cleanup(&xattr_iter);
+	rv = sqsh_xattr_iterator_cleanup(&xattr_iter);
 	assert(rv == 0);
-	rv = hsqs_inode_cleanup(&entry_inode);
+	rv = sqsh_inode_cleanup(&entry_inode);
 	assert(rv == 0);
 
-	rv = hsqs_directory_iterator_next(&dir_iter);
+	rv = sqsh_directory_iterator_next(&dir_iter);
 	assert(rv >= 0);
-	rv = hsqs_directory_iterator_name_dup(&dir_iter, &name);
+	rv = sqsh_directory_iterator_name_dup(&dir_iter, &name);
 	assert(rv == 1);
 	assert(strcmp("b", name) == 0);
 	free(name);
-	rv = hsqs_directory_iterator_inode_load(&dir_iter, &entry_inode);
+	rv = sqsh_directory_iterator_inode_load(&dir_iter, &entry_inode);
 	assert(rv == 0);
-	rv = hsqs_inode_xattr_iterator(&entry_inode, &xattr_iter);
+	rv = sqsh_inode_xattr_iterator(&entry_inode, &xattr_iter);
 	assert(rv == 0);
-	rv = hsqs_xattr_iterator_next(&xattr_iter);
+	rv = sqsh_xattr_iterator_next(&xattr_iter);
 	assert(rv > 0);
-	assert(hsqs_xattr_iterator_is_indirect(&xattr_iter) == true);
-	rv = hsqs_xattr_iterator_fullname_dup(&xattr_iter, &name);
+	assert(sqsh_xattr_iterator_is_indirect(&xattr_iter) == true);
+	rv = sqsh_xattr_iterator_fullname_dup(&xattr_iter, &name);
 	assert(rv == 8);
 	assert(strcmp("user.bar", name) == 0);
 	free(name);
-	rv = hsqs_xattr_iterator_value_dup(&xattr_iter, &value);
+	rv = sqsh_xattr_iterator_value_dup(&xattr_iter, &value);
 	assert(rv == (int)strlen(expected_value));
 	assert(strcmp(expected_value, value) == 0);
 	free(value);
-	rv = hsqs_xattr_iterator_next(&xattr_iter);
+	rv = sqsh_xattr_iterator_next(&xattr_iter);
 	assert(rv == 0);
-	rv = hsqs_xattr_iterator_cleanup(&xattr_iter);
+	rv = sqsh_xattr_iterator_cleanup(&xattr_iter);
 	assert(rv == 0);
-	rv = hsqs_inode_cleanup(&entry_inode);
+	rv = sqsh_inode_cleanup(&entry_inode);
 	assert(rv == 0);
 
-	rv = hsqs_directory_iterator_next(&dir_iter);
+	rv = sqsh_directory_iterator_next(&dir_iter);
 	// End of file list
 	assert(rv == 0);
 
-	rv = hsqs_directory_iterator_cleanup(&dir_iter);
+	rv = sqsh_directory_iterator_cleanup(&dir_iter);
 	assert(rv == 0);
 
-	rv = hsqs_inode_cleanup(&inode);
+	rv = sqsh_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = hsqs_cleanup(&hsqs);
+	rv = sqsh_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -370,18 +370,18 @@ fuzz_crash_1() {
 			0xff, 0xff, 0xff, 0xff, 0xff, 0x36, 0x62, 0x62, 0x62, 0x62, 0x62,
 			0x62, 0x62, 0x29, 0x62, 0x62, 0x62, 0x62, 0xff, 0xff, 0x62, 0x62};
 
-	struct HsqsInodeContext inode = {0};
-	struct Hsqs hsqs = {0};
-	rv = hsqs_init(&hsqs, input, sizeof(input));
+	struct SqshInodeContext inode = {0};
+	struct Sqsh sqsh = {0};
+	rv = sqsh_init(&sqsh, input, sizeof(input));
 	assert(rv == 0);
 
-	rv = hsqs_inode_load_by_path(&inode, &hsqs, "");
+	rv = sqsh_inode_load_by_path(&inode, &sqsh, "");
 	assert(rv < 0);
 
-	rv = hsqs_inode_cleanup(&inode);
+	rv = sqsh_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = hsqs_cleanup(&hsqs);
+	rv = sqsh_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -401,18 +401,18 @@ fuzz_crash_2() {
 			0x62, 0x62, 0x0,  0x2,
 	};
 
-	struct HsqsInodeContext inode = {0};
-	struct Hsqs hsqs = {0};
-	rv = hsqs_init(&hsqs, input, sizeof(input));
+	struct SqshInodeContext inode = {0};
+	struct Sqsh sqsh = {0};
+	rv = sqsh_init(&sqsh, input, sizeof(input));
 	assert(rv == 0);
 
-	rv = hsqs_inode_load_by_path(&inode, &hsqs, "");
+	rv = sqsh_inode_load_by_path(&inode, &sqsh, "");
 	assert(rv < 0);
 
-	rv = hsqs_inode_cleanup(&inode);
+	rv = sqsh_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = hsqs_cleanup(&hsqs);
+	rv = sqsh_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -433,18 +433,18 @@ fuzz_crash_3() {
 			0x61, 0x1,  0x0,  0x0,  0x2,  0x2,
 	};
 
-	struct HsqsInodeContext inode = {0};
-	struct Hsqs hsqs = {0};
-	rv = hsqs_init(&hsqs, input, sizeof(input));
+	struct SqshInodeContext inode = {0};
+	struct Sqsh sqsh = {0};
+	rv = sqsh_init(&sqsh, input, sizeof(input));
 	assert(rv == 0);
 
-	rv = hsqs_inode_load_by_path(&inode, &hsqs, "");
+	rv = sqsh_inode_load_by_path(&inode, &sqsh, "");
 	assert(rv < 0);
 
-	rv = hsqs_inode_cleanup(&inode);
+	rv = sqsh_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = hsqs_cleanup(&hsqs);
+	rv = sqsh_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -476,13 +476,13 @@ fuzz_crash_4() {
 			0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,
 	};
 
-	struct HsqsTable *id_table = NULL;
-	struct Hsqs hsqs = {0};
-	rv = hsqs_init(&hsqs, input, sizeof(input));
+	struct SqshTable *id_table = NULL;
+	struct Sqsh sqsh = {0};
+	rv = sqsh_init(&sqsh, input, sizeof(input));
 	assert(rv == 0);
-	rv = hsqs_id_table(&hsqs, &id_table);
+	rv = sqsh_id_table(&sqsh, &id_table);
 	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
-	hsqs_cleanup(&hsqs);
+	sqsh_cleanup(&sqsh);
 }
 
 static void
@@ -513,13 +513,13 @@ fuzz_crash_5() {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4f, 0x00, 0x00, 0x00,
 	};
 
-	struct HsqsTable *id_table = NULL;
-	struct Hsqs hsqs = {0};
-	rv = hsqs_init(&hsqs, input, sizeof(input));
+	struct SqshTable *id_table = NULL;
+	struct Sqsh sqsh = {0};
+	rv = sqsh_init(&sqsh, input, sizeof(input));
 	assert(rv == 0);
-	rv = hsqs_id_table(&hsqs, &id_table);
+	rv = sqsh_id_table(&sqsh, &id_table);
 	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
-	hsqs_cleanup(&hsqs);
+	sqsh_cleanup(&sqsh);
 }
 
 static void
@@ -536,13 +536,13 @@ fuzz_crash_6() {
 			0x0,  0x0,  0x0,  0x0,  0x0,  0x0, 0x0, 0x0, 0x0,  0x0,  0x0, 0xa,
 	};
 
-	struct HsqsTable *id_table = NULL;
-	struct Hsqs hsqs = {0};
-	rv = hsqs_init(&hsqs, input, sizeof(input));
+	struct SqshTable *id_table = NULL;
+	struct Sqsh sqsh = {0};
+	rv = sqsh_init(&sqsh, input, sizeof(input));
 	assert(rv == 0);
-	rv = hsqs_id_table(&hsqs, &id_table);
+	rv = sqsh_id_table(&sqsh, &id_table);
 	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
-	hsqs_cleanup(&hsqs);
+	sqsh_cleanup(&sqsh);
 }
 
 static void
@@ -560,24 +560,24 @@ fuzz_crash_7() {
 			0x0,  0x97, 0x97, 0x97, 0x97, 0x74, 0x97, 0x97,
 	};
 
-	struct HsqsTable *id_table = NULL;
-	struct Hsqs hsqs = {0};
-	rv = hsqs_init(&hsqs, input, sizeof(input));
+	struct SqshTable *id_table = NULL;
+	struct Sqsh sqsh = {0};
+	rv = sqsh_init(&sqsh, input, sizeof(input));
 	assert(rv == 0);
-	rv = hsqs_id_table(&hsqs, &id_table);
+	rv = sqsh_id_table(&sqsh, &id_table);
 	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
-	hsqs_cleanup(&hsqs);
+	sqsh_cleanup(&sqsh);
 }
 
 DEFINE
-TEST(hsqs_empty);
-TEST(hsqs_ls);
-TEST(hsqs_get_nonexistant);
-TEST(hsqs_cat_fragment);
-TEST(hsqs_cat_datablock_and_fragment);
-TEST(hsqs_cat_size_overflow);
-TEST(hsqs_test_uid_and_gid);
-TEST(hsqs_test_xattr);
+TEST(sqsh_empty);
+TEST(sqsh_ls);
+TEST(sqsh_get_nonexistant);
+TEST(sqsh_cat_fragment);
+TEST(sqsh_cat_datablock_and_fragment);
+TEST(sqsh_cat_size_overflow);
+TEST(sqsh_test_uid_and_gid);
+TEST(sqsh_test_xattr);
 TEST_OFF(fuzz_crash_1); // Fails since the library sets up tables
 TEST_OFF(fuzz_crash_2); // Fails since the library sets up tables
 TEST_OFF(fuzz_crash_3); // Fails since the library sets up tables

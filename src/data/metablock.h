@@ -40,12 +40,12 @@
 
 #define HSQS_SIZEOF_METABLOCK 2
 
-struct HsqsMetablock;
+struct SqshMetablock;
 
-int hsqs_data_metablock_is_compressed(const struct HsqsMetablock *metablock);
+int sqsh_data_metablock_is_compressed(const struct SqshMetablock *metablock);
 
-const uint8_t *hsqs_data_metablock_data(const struct HsqsMetablock *metablock);
+const uint8_t *sqsh_data_metablock_data(const struct SqshMetablock *metablock);
 
-size_t hsqs_data_metablock_size(const struct HsqsMetablock *metablock);
+size_t sqsh_data_metablock_size(const struct SqshMetablock *metablock);
 
 #endif /* end of include guard METABLOCK_H */

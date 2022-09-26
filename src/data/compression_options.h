@@ -44,41 +44,41 @@
 #define HSQS_SIZEOF_COMPRESSION_OPTIONS_LZO 8
 #define HSQS_SIZEOF_COMPRESSION_OPTIONS 8
 
-struct HsqsCompressionOptionsGzip;
+struct SqshCompressionOptionsGzip;
 
-struct HsqsCompressionOptionsXz;
+struct SqshCompressionOptionsXz;
 
-struct HsqsCompressionOptionsLz4;
+struct SqshCompressionOptionsLz4;
 
-struct HsqsCompressionOptionsZstd;
+struct SqshCompressionOptionsZstd;
 
-struct HsqsCompressionOptionsLzo;
+struct SqshCompressionOptionsLzo;
 
-union HsqsCompressionOptions;
+union SqshCompressionOptions;
 
-uint32_t hsqs_compression_options_gzip_compression_level(
-		const union HsqsCompressionOptions *options);
-uint16_t hsqs_compression_options_gzip_window_size(
-		const union HsqsCompressionOptions *options);
-uint16_t hsqs_compression_options_gzip_strategies(
-		const union HsqsCompressionOptions *options);
+uint32_t sqsh_compression_options_gzip_compression_level(
+		const union SqshCompressionOptions *options);
+uint16_t sqsh_compression_options_gzip_window_size(
+		const union SqshCompressionOptions *options);
+uint16_t sqsh_compression_options_gzip_strategies(
+		const union SqshCompressionOptions *options);
 
-uint32_t hsqs_compression_options_xz_dictionary_size(
-		const union HsqsCompressionOptions *options);
-uint32_t hsqs_compression_options_xz_filters(
-		const union HsqsCompressionOptions *options);
+uint32_t sqsh_compression_options_xz_dictionary_size(
+		const union SqshCompressionOptions *options);
+uint32_t sqsh_compression_options_xz_filters(
+		const union SqshCompressionOptions *options);
 
-uint32_t hsqs_compression_options_lz4_version(
-		const union HsqsCompressionOptions *options);
+uint32_t sqsh_compression_options_lz4_version(
+		const union SqshCompressionOptions *options);
 uint32_t
-hsqs_compression_options_lz4_flags(const union HsqsCompressionOptions *options);
+sqsh_compression_options_lz4_flags(const union SqshCompressionOptions *options);
 
-uint32_t hsqs_compression_options_zstd_compression_level(
-		const union HsqsCompressionOptions *options);
+uint32_t sqsh_compression_options_zstd_compression_level(
+		const union SqshCompressionOptions *options);
 
-uint32_t hsqs_compression_options_lzo_algorithm(
-		const union HsqsCompressionOptions *options);
-uint32_t hsqs_compression_options_lzo_compression_level(
-		const union HsqsCompressionOptions *options);
+uint32_t sqsh_compression_options_lzo_algorithm(
+		const union SqshCompressionOptions *options);
+uint32_t sqsh_compression_options_lzo_compression_level(
+		const union SqshCompressionOptions *options);
 
 #endif /* end of include guard HSQS__COMPRESSION_OPTIONS_H */

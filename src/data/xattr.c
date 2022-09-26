@@ -37,64 +37,64 @@
 #include <string.h>
 
 uint16_t
-hsqs_data_xattr_key_type(const struct HsqsXattrKey *xattr_key) {
+sqsh_data_xattr_key_type(const struct SqshXattrKey *xattr_key) {
 	return le16toh(xattr_key->type);
 }
 
 uint16_t
-hsqs_data_xattr_key_name_size(const struct HsqsXattrKey *xattr_key) {
+sqsh_data_xattr_key_name_size(const struct SqshXattrKey *xattr_key) {
 	return le16toh(xattr_key->name_size);
 }
 const uint8_t *
-hsqs_data_xattr_key_name(const struct HsqsXattrKey *xattr_key) {
+sqsh_data_xattr_key_name(const struct SqshXattrKey *xattr_key) {
 	return (const uint8_t *)&xattr_key[1];
 }
 
 uint32_t
-hsqs_data_xattr_value_size(const struct HsqsXattrValue *xattr_value) {
+sqsh_data_xattr_value_size(const struct SqshXattrValue *xattr_value) {
 	return le32toh(xattr_value->value_size);
 }
 const uint8_t *
-hsqs_data_xattr_value(const struct HsqsXattrValue *xattr_value) {
+sqsh_data_xattr_value(const struct SqshXattrValue *xattr_value) {
 	return (const uint8_t *)&xattr_value[1];
 }
 uint64_t
-hsqs_data_xattr_value_ref(const struct HsqsXattrValue *xattr_value) {
+sqsh_data_xattr_value_ref(const struct SqshXattrValue *xattr_value) {
 	uint64_t ref = 0;
 
-	memcpy(&ref, hsqs_data_xattr_value(xattr_value), sizeof(uint64_t));
+	memcpy(&ref, sqsh_data_xattr_value(xattr_value), sizeof(uint64_t));
 	return le64toh(ref);
 }
 
 uint64_t
-hsqs_data_xattr_lookup_table_xattr_ref(
-		const struct HsqsXattrLookupTable *lookup_table) {
+sqsh_data_xattr_lookup_table_xattr_ref(
+		const struct SqshXattrLookupTable *lookup_table) {
 	return le64toh(lookup_table->xattr_ref);
 }
 uint32_t
-hsqs_data_xattr_lookup_table_count(
-		const struct HsqsXattrLookupTable *lookup_table) {
+sqsh_data_xattr_lookup_table_count(
+		const struct SqshXattrLookupTable *lookup_table) {
 	return le32toh(lookup_table->count);
 }
 uint32_t
-hsqs_data_xattr_lookup_table_size(
-		const struct HsqsXattrLookupTable *lookup_table) {
+sqsh_data_xattr_lookup_table_size(
+		const struct SqshXattrLookupTable *lookup_table) {
 	return le32toh(lookup_table->size);
 }
 
 uint64_t
-hsqs_data_xattr_id_table_xattr_table_start(
-		const struct HsqsXattrIdTable *xattr_id_table) {
+sqsh_data_xattr_id_table_xattr_table_start(
+		const struct SqshXattrIdTable *xattr_id_table) {
 	return le64toh(xattr_id_table->xattr_table_start);
 }
 uint32_t
-hsqs_data_xattr_id_table_xattr_ids(
-		const struct HsqsXattrIdTable *xattr_id_table) {
+sqsh_data_xattr_id_table_xattr_ids(
+		const struct SqshXattrIdTable *xattr_id_table) {
 	return le32toh(xattr_id_table->xattr_ids);
 }
 uint64_t
-hsqs_data_xattr_id_table_ref(
-		const struct HsqsXattrIdTable *xattr_id_table, uint64_t index) {
+sqsh_data_xattr_id_table_ref(
+		const struct SqshXattrIdTable *xattr_id_table, uint64_t index) {
 	const uint64_t *table = (const uint64_t *)&xattr_id_table[1];
 
 	return le64toh(table[index]);

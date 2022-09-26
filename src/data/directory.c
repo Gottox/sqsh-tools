@@ -35,47 +35,47 @@
 #include <endian.h>
 
 uint16_t
-hsqs_data_directory_entry_offset(const struct HsqsDirectoryEntry *entry) {
+sqsh_data_directory_entry_offset(const struct SqshDirectoryEntry *entry) {
 	return le16toh(entry->offset);
 }
 
 int16_t
-hsqs_data_directory_entry_inode_offset(const struct HsqsDirectoryEntry *entry) {
+sqsh_data_directory_entry_inode_offset(const struct SqshDirectoryEntry *entry) {
 	return le16toh(entry->inode_offset);
 }
 
 uint16_t
-hsqs_data_directory_entry_type(const struct HsqsDirectoryEntry *entry) {
+sqsh_data_directory_entry_type(const struct SqshDirectoryEntry *entry) {
 	return le16toh(entry->type);
 }
 
 uint16_t
-hsqs_data_directory_entry_name_size(const struct HsqsDirectoryEntry *entry) {
+sqsh_data_directory_entry_name_size(const struct SqshDirectoryEntry *entry) {
 	return le16toh(entry->name_size);
 }
 
 const uint8_t *
-hsqs_data_directory_entry_name(const struct HsqsDirectoryEntry *entry) {
+sqsh_data_directory_entry_name(const struct SqshDirectoryEntry *entry) {
 	return (const uint8_t *)&entry[1];
 }
 
 uint32_t
-hsqs_data_directory_fragment_count(
-		const struct HsqsDirectoryFragment *fragment) {
+sqsh_data_directory_fragment_count(
+		const struct SqshDirectoryFragment *fragment) {
 	return le32toh(fragment->count);
 }
 uint32_t
-hsqs_data_directory_fragment_start(
-		const struct HsqsDirectoryFragment *fragment) {
+sqsh_data_directory_fragment_start(
+		const struct SqshDirectoryFragment *fragment) {
 	return le32toh(fragment->start);
 }
 uint32_t
-hsqs_data_directory_fragment_inode_number(
-		const struct HsqsDirectoryFragment *fragment) {
+sqsh_data_directory_fragment_inode_number(
+		const struct SqshDirectoryFragment *fragment) {
 	return le32toh(fragment->inode_number);
 }
-const struct HsqsDirectoryEntry *
-hsqs_data_directory_fragment_entries(
-		const struct HsqsDirectoryFragment *fragment) {
-	return (const struct HsqsDirectoryEntry *)&fragment[1];
+const struct SqshDirectoryEntry *
+sqsh_data_directory_fragment_entries(
+		const struct SqshDirectoryFragment *fragment) {
+	return (const struct SqshDirectoryEntry *)&fragment[1];
 }

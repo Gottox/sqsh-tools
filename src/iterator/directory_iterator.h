@@ -40,43 +40,43 @@
 
 #define HSQS_DIRECTORY_CONTEXT_H
 
-struct HsqsInodeContext;
-struct Hsqs;
+struct SqshInodeContext;
+struct Sqsh;
 
-struct HsqsDirectoryIterator {
-	struct HsqsInodeContext *inode;
+struct SqshDirectoryIterator {
+	struct SqshInodeContext *inode;
 	uint32_t block_start;
 	uint32_t block_offset;
 	uint32_t size;
 
-	const struct HsqsDirectoryFragment *fragments;
-	struct HsqsDirectoryContext *directory;
-	struct HsqsMetablockStreamContext metablock;
+	const struct SqshDirectoryFragment *fragments;
+	struct SqshDirectoryContext *directory;
+	struct SqshMetablockStreamContext metablock;
 	size_t remaining_entries;
-	hsqs_index_t current_fragment_offset;
-	hsqs_index_t next_offset;
-	hsqs_index_t current_offset;
+	sqsh_index_t current_fragment_offset;
+	sqsh_index_t next_offset;
+	sqsh_index_t current_offset;
 };
 
-HSQS_NO_UNUSED int hsqs_directory_iterator_init(
-		struct HsqsDirectoryIterator *iterator, struct HsqsInodeContext *inode);
+HSQS_NO_UNUSED int sqsh_directory_iterator_init(
+		struct SqshDirectoryIterator *iterator, struct SqshInodeContext *inode);
 HSQS_NO_UNUSED int
-hsqs_directory_iterator_next(struct HsqsDirectoryIterator *iterator);
-HSQS_NO_UNUSED int hsqs_directory_iterator_lookup(
-		struct HsqsDirectoryIterator *iterator, const char *name,
+sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator);
+HSQS_NO_UNUSED int sqsh_directory_iterator_lookup(
+		struct SqshDirectoryIterator *iterator, const char *name,
 		const size_t name_len);
 int
-hsqs_directory_iterator_name_size(const struct HsqsDirectoryIterator *iterator);
+sqsh_directory_iterator_name_size(const struct SqshDirectoryIterator *iterator);
 uint64_t
-hsqs_directory_iterator_inode_ref(const struct HsqsDirectoryIterator *iterator);
-enum HsqsInodeContextType hsqs_directory_iterator_inode_type(
-		const struct HsqsDirectoryIterator *iterator);
-HSQS_NO_UNUSED int hsqs_directory_iterator_inode_load(
-		const struct HsqsDirectoryIterator *iterator,
-		struct HsqsInodeContext *inode);
+sqsh_directory_iterator_inode_ref(const struct SqshDirectoryIterator *iterator);
+enum SqshInodeContextType sqsh_directory_iterator_inode_type(
+		const struct SqshDirectoryIterator *iterator);
+HSQS_NO_UNUSED int sqsh_directory_iterator_inode_load(
+		const struct SqshDirectoryIterator *iterator,
+		struct SqshInodeContext *inode);
 const char *
-hsqs_directory_iterator_name(const struct HsqsDirectoryIterator *iterator);
-HSQS_NO_UNUSED int hsqs_directory_iterator_name_dup(
-		const struct HsqsDirectoryIterator *iterator, char **name_buffer);
-int hsqs_directory_iterator_cleanup(struct HsqsDirectoryIterator *iterator);
+sqsh_directory_iterator_name(const struct SqshDirectoryIterator *iterator);
+HSQS_NO_UNUSED int sqsh_directory_iterator_name_dup(
+		const struct SqshDirectoryIterator *iterator, char **name_buffer);
+int sqsh_directory_iterator_cleanup(struct SqshDirectoryIterator *iterator);
 #endif /* end of include guard HSQS_DIRECTORY_CONTEXT_H */

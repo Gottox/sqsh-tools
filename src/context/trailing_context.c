@@ -32,15 +32,15 @@
  */
 
 #include "trailing_context.h"
-#include "../hsqs.h"
 #include "../mapper/mapper.h"
+#include "../sqsh.h"
 #include "../utils.h"
 
 int
-hsqs_trailing_init(struct HsqsTrailingContext *context, struct Hsqs *hsqs) {
-	struct HsqsSuperblockContext *superblock = hsqs_superblock(hsqs);
-	uint64_t trailing_start = hsqs_superblock_bytes_used(superblock);
-	size_t archive_size = hsqs_mapper_size(&hsqs->mapper);
+sqsh_trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh) {
+	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
+	uint64_t trailing_start = sqsh_superblock_bytes_used(superblock);
+	size_t archive_size = sqsh_mapper_size(&sqsh->mapper);
 	uint64_t trailing_size;
 
 	if (archive_size <= trailing_start) {
@@ -51,21 +51,21 @@ hsqs_trailing_init(struct HsqsTrailingContext *context, struct Hsqs *hsqs) {
 		return HSQS_ERROR_TODO;
 	}
 
-	return hsqs_request_map(
-			hsqs, context->mapping, trailing_start, trailing_size);
+	return sqsh_request_map(
+			sqsh, context->mapping, trailing_start, trailing_size);
 }
 
 size_t
-hsqs_trailing_size(struct HsqsTrailingContext *context) {
-	return hsqs_mapping_size(context->mapping);
+sqsh_trailing_size(struct SqshTrailingContext *context) {
+	return sqsh_mapping_size(context->mapping);
 }
 
 const uint8_t *
-hsqs_trailing_data(struct HsqsTrailingContext *context) {
-	return hsqs_mapping_data(context->mapping);
+sqsh_trailing_data(struct SqshTrailingContext *context) {
+	return sqsh_mapping_data(context->mapping);
 }
 
 int
-hsqs_trailing_cleanup(struct HsqsTrailingContext *context) {
-	return hsqs_mapping_unmap(context->mapping);
+sqsh_trailing_cleanup(struct SqshTrailingContext *context) {
+	return sqsh_mapping_unmap(context->mapping);
 }

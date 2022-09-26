@@ -1,10 +1,10 @@
-# libhsqs
+# libsqsh
 
 squashfs implementation as library.
 
 ## Features
 
-*libhsqs* supports all features of the squashfs format. Keep in mind that this
+*libsqsh* supports all features of the squashfs format. Keep in mind that this
 library only supports reading archives. If you need to create archives take a
 look at [squashfs-tools-ng](https://github.com/AgentD/squashfs-tools-ng/).
 
@@ -13,7 +13,7 @@ developing efficient cache tactics.
 
 * traverse directories
 * read file contents
-* open files by path (`hsqs_inode_load_by_path`)
+* open files by path (`sqsh_inode_load_by_path`)
 * read metadata from inodes
 * read xattr from inodes
 * read symlinks from inodes
@@ -31,26 +31,26 @@ developing efficient cache tactics.
 ### ... open an archive?
 
 ```c
-struct Hsqs archive = { 0 };
-int rv = hsqs_open(&archive, "/path/to/archive.squashfs");
+struct Sqsh archive = { 0 };
+int rv = sqsh_open(&archive, "/path/to/archive.squashfs");
 if (rv < 0)
 	abort();
 // Do something with the archive!
-hsqs_cleanup(&archive);
+sqsh_cleanup(&archive);
 ```
 
 ### ... get metainformations about a file?
 
 ```c
-struct HsqsInodeContext inode = { 0 };
-int rv = hsqs_inode_load_by_path(&inode, &archive, "/path/to/file");
+struct SqshInodeContext inode = { 0 };
+int rv = sqsh_inode_load_by_path(&inode, &archive, "/path/to/file");
 if (rv < 0)
 	abort();
 // inode contains metainformations about '/path/to/file'.
-// They can be queried with the hsqs_inode_* functions.
+// They can be queried with the sqsh_inode_* functions.
 // This for example gives you the file size of a file:
-int file_size = hsqs_inode_file_size(&inode);
-hsqs_inode_cleanup(&inode);
+int file_size = sqsh_inode_file_size(&inode);
+sqsh_inode_cleanup(&inode);
 ```
 
 ## Resource

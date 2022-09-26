@@ -42,28 +42,28 @@
 
 #define HSQS_BUFFER_H
 
-struct HsqsSuperblockContext;
+struct SqshSuperblockContext;
 
-struct HsqsBuffer {
+struct SqshBuffer {
 	uint8_t *data;
 	size_t size;
 };
 
-HSQS_NO_UNUSED int hsqs_buffer_init(struct HsqsBuffer *buffer);
+HSQS_NO_UNUSED int sqsh_buffer_init(struct SqshBuffer *buffer);
 
 HSQS_NO_UNUSED int
-hsqs_buffer_add_size(struct HsqsBuffer *buffer, size_t additional_size);
-HSQS_NO_UNUSED int hsqs_buffer_add_capacity(
-		struct HsqsBuffer *buffer, uint8_t **additional_buffer,
+sqsh_buffer_add_size(struct SqshBuffer *buffer, size_t additional_size);
+HSQS_NO_UNUSED int sqsh_buffer_add_capacity(
+		struct SqshBuffer *buffer, uint8_t **additional_buffer,
 		size_t additional_size);
 
-HSQS_NO_UNUSED int hsqs_buffer_append(
-		struct HsqsBuffer *buffer, const uint8_t *source,
+HSQS_NO_UNUSED int sqsh_buffer_append(
+		struct SqshBuffer *buffer, const uint8_t *source,
 		const size_t source_size);
 
-const uint8_t *hsqs_buffer_data(const struct HsqsBuffer *buffer);
-size_t hsqs_buffer_size(const struct HsqsBuffer *buffer);
+const uint8_t *sqsh_buffer_data(const struct SqshBuffer *buffer);
+size_t sqsh_buffer_size(const struct SqshBuffer *buffer);
 
-int hsqs_buffer_cleanup(struct HsqsBuffer *buffer);
+int sqsh_buffer_cleanup(struct SqshBuffer *buffer);
 
 #endif /* end of include guard HSQS_BUFFER_H */

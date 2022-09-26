@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         hsqs.h
+ * @file         sqsh.h
  */
 
 #include "compression/compression.h"
@@ -48,52 +48,52 @@
 
 #define HSQS_H
 
-struct HsqsTrailingContext;
+struct SqshTrailingContext;
 
-struct Hsqs {
+struct Sqsh {
 	uint32_t error;
-	struct HsqsMapper mapper;
-	struct HsqsCompression data_compression;
-	struct HsqsCompression metablock_compression;
-	struct HsqsMapper table_mapper;
-	struct HsqsMapping table_map;
-	struct HsqsSuperblockContext superblock;
-	struct HsqsTable id_table;
-	struct HsqsTable export_table;
-	struct HsqsXattrTable xattr_table;
-	struct HsqsFragmentTable fragment_table;
-	struct HsqsCompressionOptionsContext compression_options;
+	struct SqshMapper mapper;
+	struct SqshCompression data_compression;
+	struct SqshCompression metablock_compression;
+	struct SqshMapper table_mapper;
+	struct SqshMapping table_map;
+	struct SqshSuperblockContext superblock;
+	struct SqshTable id_table;
+	struct SqshTable export_table;
+	struct SqshXattrTable xattr_table;
+	struct SqshFragmentTable fragment_table;
+	struct SqshCompressionOptionsContext compression_options;
 	uint8_t initialized;
 };
 
 HSQS_NO_UNUSED int
-hsqs_init(struct Hsqs *hsqs, const uint8_t *buffer, const size_t size);
+sqsh_init(struct Sqsh *sqsh, const uint8_t *buffer, const size_t size);
 
-HSQS_NO_UNUSED int hsqs_open(struct Hsqs *hsqs, const char *path);
+HSQS_NO_UNUSED int sqsh_open(struct Sqsh *sqsh, const char *path);
 
 #ifdef CONFIG_CURL
-int hsqs_open_url(struct Hsqs *hsqs, const char *url);
+int sqsh_open_url(struct Sqsh *sqsh, const char *url);
 #endif
 
-int hsqs_request_map(
-		struct Hsqs *hsqs, struct HsqsMapping *mapping, uint64_t offset,
+int sqsh_request_map(
+		struct Sqsh *sqsh, struct SqshMapping *mapping, uint64_t offset,
 		uint64_t size);
 
-struct HsqsSuperblockContext *hsqs_superblock(struct Hsqs *hsqs);
-struct HsqsCompression *hsqs_data_compression(struct Hsqs *hsqs);
-struct HsqsCompression *hsqs_metablock_compression(struct Hsqs *hsqs);
+struct SqshSuperblockContext *sqsh_superblock(struct Sqsh *sqsh);
+struct SqshCompression *sqsh_data_compression(struct Sqsh *sqsh);
+struct SqshCompression *sqsh_metablock_compression(struct Sqsh *sqsh);
 
-int hsqs_id_table(struct Hsqs *hsqs, struct HsqsTable **id_table);
-int hsqs_export_table(struct Hsqs *hsqs, struct HsqsTable **export_table);
-int hsqs_fragment_table(
-		struct Hsqs *hsqs, struct HsqsFragmentTable **fragment_table);
-int hsqs_xattr_table(struct Hsqs *hsqs, struct HsqsXattrTable **xattr_table);
-int hsqs_compression_options(
-		struct Hsqs *hsqs,
-		struct HsqsCompressionOptionsContext **compression_options);
-struct HsqsLruHashmap *hsqs_metablock_cache(struct Hsqs *hsqs);
-HSQS_NO_UNUSED int hsqs_trailing_bytes(
-		struct Hsqs *hsqs, struct HsqsTrailingContext *trailing_bytes);
-int hsqs_cleanup(struct Hsqs *hsqs);
+int sqsh_id_table(struct Sqsh *sqsh, struct SqshTable **id_table);
+int sqsh_export_table(struct Sqsh *sqsh, struct SqshTable **export_table);
+int sqsh_fragment_table(
+		struct Sqsh *sqsh, struct SqshFragmentTable **fragment_table);
+int sqsh_xattr_table(struct Sqsh *sqsh, struct SqshXattrTable **xattr_table);
+int sqsh_compression_options(
+		struct Sqsh *sqsh,
+		struct SqshCompressionOptionsContext **compression_options);
+struct SqshLruHashmap *sqsh_metablock_cache(struct Sqsh *sqsh);
+HSQS_NO_UNUSED int sqsh_trailing_bytes(
+		struct Sqsh *sqsh, struct SqshTrailingContext *trailing_bytes);
+int sqsh_cleanup(struct Sqsh *sqsh);
 
 #endif /* end of include guard HSQS_H */

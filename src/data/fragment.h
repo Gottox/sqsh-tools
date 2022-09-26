@@ -40,11 +40,11 @@
 
 #define HSQS_SIZEOF_FRAGMENT 16
 
-struct HsqsFragment;
+struct SqshFragment;
 
-uint64_t hsqs_data_fragment_start(const struct HsqsFragment *fragment);
-const struct HsqsDatablockSize *
-hsqs_data_fragment_size_info(const struct HsqsFragment *fragment);
-uint32_t hsqs_data_fragment_is_compressed(const struct HsqsFragment *fragment);
+uint64_t sqsh_data_fragment_start(const struct SqshFragment *fragment);
+const struct SqshDatablockSize *
+sqsh_data_fragment_size_info(const struct SqshFragment *fragment);
+uint32_t sqsh_data_fragment_is_compressed(const struct SqshFragment *fragment);
 
 #endif /* end of include guard HSQS__FRAGMENT_H */
