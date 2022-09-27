@@ -50,6 +50,10 @@
 
 struct SqshTrailingContext;
 
+/**
+ * @brief The SqshContext struct contains all information about the current
+ * sqsh session.
+ */
 struct Sqsh {
 	uint32_t error;
 	struct SqshMapper mapper;
@@ -66,14 +70,32 @@ struct Sqsh {
 	uint8_t initialized;
 };
 
+/**
+ * @brief sqsh_init initializes the Sqsh structure.
+ * @param sqsh the Sqsh structure to initialize.
+ * @return 0 on success, less than 0 on error.
+ */
 HSQS_NO_UNUSED int
 sqsh_init(struct Sqsh *sqsh, const uint8_t *buffer, const size_t size);
 
+/**
+ * @brief sqsh_open opens the sqsh file at the given path.
+ * @param sqsh the Sqsh structure to initialize.
+ * @param path the path to the sqsh file.
+ * @return 0 on success, less than 0 on error.
+ */
 HSQS_NO_UNUSED int sqsh_open(struct Sqsh *sqsh, const char *path);
 
 #ifdef CONFIG_CURL
+/**
+ * @brief sqsh_open_url opens the sqsh file at the given url.
+ * @param sqsh the Sqsh structure to initialize.
+ * @param url the url to the sqsh file.
+ * @return 0 on success, less than 0 on error.
+ */
 int sqsh_open_url(struct Sqsh *sqsh, const char *url);
 #endif
+
 
 struct SqshSuperblockContext *sqsh_superblock(struct Sqsh *sqsh);
 struct SqshMapper *sqsh_mapper(struct Sqsh *sqsh);
@@ -88,9 +110,12 @@ int sqsh_xattr_table(struct Sqsh *sqsh, struct SqshXattrTable **xattr_table);
 int sqsh_compression_options(
 		struct Sqsh *sqsh,
 		struct SqshCompressionOptionsContext **compression_options);
-struct SqshLruHashmap *sqsh_metablock_cache(struct Sqsh *sqsh);
-HSQS_NO_UNUSED int sqsh_trailing_bytes(
-		struct Sqsh *sqsh, struct SqshTrailingContext *trailing_bytes);
+/**
+ * @brief sqsh_cleanup frees all resources allocated by the Sqsh structure and
+ * cleans up the structure.
+ * @param sqsh the Sqsh structure to cleanup.
+ * @return 0 on success, less than 0 on error.
+ */
 int sqsh_cleanup(struct Sqsh *sqsh);
 
 #endif /* end of include guard HSQS_H */
