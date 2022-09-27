@@ -15,7 +15,7 @@ INTERACTIVE_SVG       = YES
 FULL_PATH_NAMES       = NO
 
 # Warning and progress messages
-QUIET                = YES
+QUIET                = NO
 WARNINGS             = YES
 WARN_IF_UNDOCUMENTED = YES
 

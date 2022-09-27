@@ -68,6 +68,10 @@ directory_iterator_index_lookup(
 				sqsh_inode_directory_index_iterator_index(&index_iterator);
 	}
 	iterator->remaining_entries = 0;
+	if (rv < 0) {
+		return rv;
+	}
+	rv = sqsh_inode_directory_index_iterator_clean(&index_iterator);
 	return rv;
 }
 

@@ -138,9 +138,6 @@ int
 sqsh_id_table(struct Sqsh *sqsh, struct SqshTable **id_table) {
 	int rv = 0;
 	uint64_t table_start = sqsh_superblock_id_table_start(&sqsh->superblock);
-	if (table_start == NO_SEGMENT) {
-		return -HSQS_ERROR_NO_XATTR_TABLE;
-	}
 
 	if (!is_initialized(sqsh, INITIALIZED_ID_TABLE)) {
 		rv = sqsh_table_init(
@@ -162,7 +159,7 @@ sqsh_export_table(struct Sqsh *sqsh, struct SqshTable **export_table) {
 	uint64_t table_start =
 			sqsh_superblock_export_table_start(&sqsh->superblock);
 	if (table_start == NO_SEGMENT) {
-		return -HSQS_ERROR_NO_XATTR_TABLE;
+		return -HSQS_ERROR_NO_EXPORT_TABLE;
 	}
 
 	if (!(sqsh->initialized & INITIALIZED_EXPORT_TABLE)) {
@@ -186,7 +183,7 @@ sqsh_fragment_table(
 	uint64_t table_start =
 			sqsh_superblock_fragment_table_start(&sqsh->superblock);
 	if (table_start == NO_SEGMENT) {
-		return -HSQS_ERROR_NO_XATTR_TABLE;
+		return -HSQS_ERROR_NO_FRAGMENT_TABLE;
 	}
 
 	if (!is_initialized(sqsh, INITIALIZED_FRAGMENT_TABLE)) {
@@ -207,7 +204,6 @@ sqsh_xattr_table(struct Sqsh *sqsh, struct SqshXattrTable **xattr_table) {
 	int rv = 0;
 	uint64_t table_start =
 			sqsh_superblock_xattr_id_table_start(&sqsh->superblock);
-
 	if (table_start == NO_SEGMENT) {
 		return -HSQS_ERROR_NO_XATTR_TABLE;
 	}

@@ -64,9 +64,9 @@ sqsh_xattr_iterator_init(
 
 	uint64_t start_block = sqsh_xattr_table_start(xattr_table);
 
-	// TODO upper bounds should not be ~0.
+	// TODO upper bounds should not be SIZE_MAX.
 	rv = sqsh_metablock_stream_init(
-			&iterator->metablock, xattr_table->sqsh, start_block, ~0);
+			&iterator->metablock, xattr_table->sqsh, start_block, SIZE_MAX);
 	if (rv < 0) {
 		goto out;
 	}

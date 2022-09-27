@@ -100,6 +100,13 @@ sqsh_ls() {
 	free(name);
 
 	rv = sqsh_directory_iterator_next(&iter);
+	assert(rv >= 0);
+	rv = sqsh_directory_iterator_name_dup(&iter, &name);
+	assert(rv == 9);
+	assert(strcmp("large_dir", name) == 0);
+	free(name);
+
+	rv = sqsh_directory_iterator_next(&iter);
 	// End of file list
 	assert(rv == 0);
 
@@ -252,6 +259,24 @@ sqsh_test_uid_and_gid() {
 }
 
 static void
+sqsh_test_extended_dir() {
+	int rv;
+	struct SqshInodeContext inode = {0};
+	struct Sqsh sqsh = {0};
+	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
+	assert(rv == 0);
+
+	rv = sqsh_inode_load_by_path(&inode, &sqsh, "/large_dir/999");
+	assert(rv == 0);
+
+	rv = sqsh_inode_cleanup(&inode);
+	assert(rv == 0);
+
+	rv = sqsh_cleanup(&sqsh);
+	assert(rv == 0);
+}
+
+static void
 sqsh_test_xattr() {
 	const char *expected_value = "1234567891234567891234567890001234567890";
 	int rv;
@@ -331,10 +356,6 @@ sqsh_test_xattr() {
 	rv = sqsh_xattr_iterator_cleanup(&xattr_iter);
 	assert(rv == 0);
 	rv = sqsh_inode_cleanup(&entry_inode);
-	assert(rv == 0);
-
-	rv = sqsh_directory_iterator_next(&dir_iter);
-	// End of file list
 	assert(rv == 0);
 
 	rv = sqsh_directory_iterator_cleanup(&dir_iter);
@@ -577,6 +598,7 @@ TEST(sqsh_cat_fragment);
 TEST(sqsh_cat_datablock_and_fragment);
 TEST(sqsh_cat_size_overflow);
 TEST(sqsh_test_uid_and_gid);
+TEST(sqsh_test_extended_dir);
 TEST(sqsh_test_xattr);
 TEST_OFF(fuzz_crash_1); // Fails since the library sets up tables
 TEST_OFF(fuzz_crash_2); // Fails since the library sets up tables

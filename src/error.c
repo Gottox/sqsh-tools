@@ -124,6 +124,8 @@ sqsh_error_str(int error_code) {
 		return "Hashmap internal error";
 	case HSQS_ERROR_NO_EXTENDED_DIRECTORY:
 		return "No extended directory";
+	case HSQS_ERROR_NO_FRAGMENT_TABLE:
+		return "No fragment table";
 	case HSQS_ERROR_NO_EXPORT_TABLE:
 		return "No export table";
 	case HSQS_ERROR_NO_XATTR_TABLE:
