@@ -76,30 +76,176 @@ usage(char *arg0) {
 }
 
 static int
+stat_gzip_options(
+		const struct SqshCompressionOptionsContext *compression_options) {
+	printf("       compression level: %i\n",
+		   sqsh_compression_options_gzip_compression_level(
+				   compression_options));
+	printf("             window size: %i\n",
+		   sqsh_compression_options_gzip_window_size(compression_options));
+	const enum SqshGzipStrategies strategies =
+			sqsh_compression_options_gzip_strategies(compression_options);
+	printf("              strategies: %04x\n", strategies);
+	if (strategies & SQSH_GZIP_STRATEGY_DEFAULT) {
+		puts("                          default");
+	}
+	if (strategies & SQSH_GZIP_STRATEGY_FILTERED) {
+		puts("                          filtered");
+	}
+	if (strategies & SQSH_GZIP_STRATEGY_HUFFMAN_ONLY) {
+		puts("                          huffman only");
+	}
+	if (strategies & SQSH_GZIP_STRATEGY_RLE) {
+		puts("                          rle");
+	}
+	if (strategies & SQSH_GZIP_STRATEGY_FIXED) {
+		puts("                          fixed");
+	}
+
+	return 0;
+}
+
+static int
+stat_xz_options(
+		const struct SqshCompressionOptionsContext *compression_options) {
+	printf("         dictionary size: %i\n",
+		   sqsh_compression_options_xz_dictionary_size(compression_options));
+	const enum SqshXzFilters filters =
+			sqsh_compression_options_xz_filters(compression_options);
+	printf("                 filters: %04x\n", filters);
+	if (filters & SQSH_XZ_FILTER_X86) {
+		puts("                          x86");
+	}
+	if (filters & SQSH_XZ_FILTER_POWERPC) {
+		puts("                          powerpc");
+	}
+	if (filters & SQSH_XZ_FILTER_IA64) {
+		puts("                          ia64");
+	}
+	if (filters & SQSH_XZ_FILTER_ARM) {
+		puts("                          arm");
+	}
+	if (filters & SQSH_XZ_FILTER_ARMTHUMB) {
+		puts("                          armthumb");
+	}
+
+	return 0;
+}
+
+static int
+stat_lz4_options(
+		const struct SqshCompressionOptionsContext *compression_options) {
+	printf("                 version: %i\n",
+		   sqsh_compression_options_lz4_version(compression_options));
+	const enum SqshLz4Flags flags =
+			sqsh_compression_options_lz4_flags(compression_options);
+	printf("                   flags: %x\n", flags);
+	if (flags & SQSH_LZ4_HIGH_COMPRESSION) {
+		puts("                         high compression");
+	}
+
+	return 0;
+}
+
+static int
+stat_zstd_options(
+		const struct SqshCompressionOptionsContext *compression_options) {
+	printf("       compression level: %i\n",
+		   sqsh_compression_options_zstd_compression_level(
+				   compression_options));
+
+	return 0;
+}
+
+static int
+stat_lzo_options(
+		const struct SqshCompressionOptionsContext *compression_options) {
+	const enum SqshLzoAlgorithm algorithm =
+			sqsh_compression_options_lzo_algorithm(compression_options);
+	const char *algorithm_str;
+	switch (algorithm) {
+	case SQSH_LZO_ALGORITHM_LZO1X_1:
+		algorithm_str = "lzo1x_1";
+		break;
+	case SQSH_LZO_ALGORITHM_LZO1X_1_11:
+		algorithm_str = "lzo1x_1_11";
+		break;
+	case SQSH_LZO_ALGORITHM_LZO1X_1_12:
+		algorithm_str = "lzo1x_1_12";
+		break;
+	case SQSH_LZO_ALGORITHM_LZO1X_1_15:
+		algorithm_str = "lzo1x_1_15";
+		break;
+	case SQSH_LZO_ALGORITHM_LZO1X_999:
+		algorithm_str = "lzo1x_999";
+		break;
+	default:
+		algorithm_str = "unknown";
+		break;
+	}
+	printf("               algorithm: %s (%x)\n", algorithm_str, algorithm);
+	printf("       compression level: %i\n",
+		   sqsh_compression_options_lzo_compression_level(compression_options));
+
+	return 0;
+}
+
+static int
 stat_image(struct Sqsh *sqsh) {
 	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
+	struct SqshCompressionOptionsContext *compression_options;
 	int compression_id = sqsh_superblock_compression_id(superblock);
-	printf("compression:              %s (%i)\n",
+	int rv = 0;
+	printf("             compression: %s (%i)\n",
 		   compression_id_name(compression_id), compression_id);
-	printf("inode count:              %i\n",
+	printf("             inode count: %i\n",
 		   sqsh_superblock_inode_count(superblock));
-	printf("uid/gid count:            %i\n",
+	printf("           uid/gid count: %i\n",
 		   sqsh_superblock_id_count(superblock));
-	printf("has fragments:            %s\n",
+	printf("           has fragments: %s\n",
 		   sqsh_superblock_has_fragments(superblock) ? "yes" : "no");
-	printf("has export table:         %s\n",
+	printf("        has export table: %s\n",
 		   sqsh_superblock_has_fragments(superblock) ? "yes" : "no");
-	printf("has compression options:  %s\n",
+	printf(" has compression options: %s\n",
 		   sqsh_superblock_has_fragments(superblock) ? "yes" : "no");
-	printf("block size:               %i\n",
+	printf("              block size: %i\n",
 		   sqsh_superblock_block_size(superblock));
-	printf("fragment count:           %i\n",
+	printf("          fragment count: %i\n",
 		   sqsh_superblock_fragment_entry_count(superblock));
-	printf("archive size:             %" PRIu64 "\n",
+	printf("            archive size: %" PRIu64 "\n",
 		   sqsh_superblock_bytes_used(superblock));
 	time_t mtime = sqsh_superblock_modification_time(superblock);
-	printf("modification time:        %s\n", ctime(&mtime));
-	return 0;
+	printf("       modification time: %s\n", ctime(&mtime));
+
+	rv = sqsh_compression_options(sqsh, &compression_options);
+	if (rv == -HSQS_ERROR_NO_COMPRESSION_OPTIONS) {
+		rv = 0;
+	} else if (rv == 0) {
+		puts("=== compression options ===");
+		switch (compression_id) {
+		case HSQS_COMPRESSION_GZIP:
+			stat_gzip_options(compression_options);
+			break;
+		case HSQS_COMPRESSION_XZ:
+			stat_xz_options(compression_options);
+			break;
+		case HSQS_COMPRESSION_LZ4:
+			stat_lz4_options(compression_options);
+			break;
+		case HSQS_COMPRESSION_ZSTD:
+			stat_zstd_options(compression_options);
+			break;
+		case HSQS_COMPRESSION_LZO:
+			stat_lzo_options(compression_options);
+			break;
+		default:
+		case HSQS_COMPRESSION_LZMA:
+		case HSQS_COMPRESSION_NONE:
+			puts("  WARNING: compression options are present, but "
+				 "not supported by the compression algorithm");
+		}
+	}
+	return rv;
 }
 
 static char *
