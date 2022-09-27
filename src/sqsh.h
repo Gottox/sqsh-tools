@@ -73,6 +73,8 @@ struct Sqsh {
 /**
  * @brief sqsh_init initializes the Sqsh structure.
  * @param sqsh the Sqsh structure to initialize.
+ * @param buffer the buffer to use for the Sqsh structure.
+ * @param buffer_size the size of the buffer.
  * @return 0 on success, less than 0 on error.
  */
 HSQS_NO_UNUSED int
@@ -95,7 +97,6 @@ HSQS_NO_UNUSED int sqsh_open(struct Sqsh *sqsh, const char *path);
  */
 int sqsh_open_url(struct Sqsh *sqsh, const char *url);
 #endif
-
 
 struct SqshSuperblockContext *sqsh_superblock(struct Sqsh *sqsh);
 struct SqshMapper *sqsh_mapper(struct Sqsh *sqsh);
