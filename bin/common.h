@@ -1,7 +1,6 @@
 /**
  * @author      : Enno Boland (mail@eboland.de)
- * @file        : common.c
- * @created     : Thursday Sep 08, 2022 11:00:02 CEST
+ * @file        : common.h
  */
 
 #ifndef BIN_COMMON_H
