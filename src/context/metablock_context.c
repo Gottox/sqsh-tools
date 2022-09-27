@@ -48,9 +48,10 @@ sqsh_metablock_init(
 		struct SqshMetablockContext *context, struct Sqsh *sqsh,
 		uint64_t address) {
 	int rv = 0;
+	struct SqshMapper *mapper = sqsh_mapper(sqsh);
 
 	rv = sqsh_mapper_map(
-			&context->mapping, &sqsh->mapper, address, HSQS_SIZEOF_METABLOCK);
+			&context->mapping, mapper, address, HSQS_SIZEOF_METABLOCK);
 	if (rv < 0) {
 		goto out;
 	}

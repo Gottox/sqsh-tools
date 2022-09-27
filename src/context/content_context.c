@@ -64,11 +64,11 @@ sqsh_content_init(
 
 	context->inode = inode;
 	context->block_size = sqsh_superblock_block_size(superblock);
-	context->sqsh = sqsh;
+	context->mapper = sqsh_mapper(sqsh);
 	context->compression = sqsh_data_compression(sqsh);
 
 	if (sqsh_inode_file_has_fragment(inode)) {
-		rv = sqsh_fragment_table(context->sqsh, &context->fragment_table);
+		rv = sqsh_fragment_table(sqsh, &context->fragment_table);
 		if (rv < 0) {
 			return rv;
 		}
@@ -110,8 +110,8 @@ sqsh_content_read(struct SqshFileContext *context, uint64_t size) {
 	uint32_t outer_block_size;
 	uint64_t outer_offset = 0;
 
-	rv = sqsh_request_map(
-			context->sqsh, &mapping, start_block + block_offset,
+	rv = sqsh_mapper_map(
+			&mapping, context->mapper, start_block + block_offset,
 			block_whole_size);
 
 	if (rv < 0) {
@@ -166,8 +166,7 @@ out:
 
 const uint8_t *
 sqsh_content_data(struct SqshFileContext *context) {
-	struct SqshSuperblockContext *superblock = sqsh_superblock(context->sqsh);
-	uint32_t block_size = sqsh_superblock_block_size(superblock);
+	uint32_t block_size = context->block_size;
 	off_t offset = context->seek_pos % block_size;
 
 	if (sqsh_content_size(context) == 0) {
@@ -179,8 +178,7 @@ sqsh_content_data(struct SqshFileContext *context) {
 
 uint64_t
 sqsh_content_size(struct SqshFileContext *context) {
-	struct SqshSuperblockContext *superblock = sqsh_superblock(context->sqsh);
-	uint32_t block_size = sqsh_superblock_block_size(superblock);
+	uint32_t block_size = context->block_size;
 	size_t offset = context->seek_pos % block_size;
 	size_t buffer_size = sqsh_buffer_size(&context->buffer);
 

@@ -42,7 +42,7 @@ struct SqshInodeContext;
 struct Sqsh;
 
 struct SqshFileContext {
-	struct Sqsh *sqsh;
+	struct SqshMapper *mapper;
 	struct SqshFragmentTable *fragment_table;
 	struct SqshInodeContext *inode;
 	struct SqshBuffer buffer;

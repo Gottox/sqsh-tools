@@ -251,11 +251,9 @@ sqsh_superblock(struct Sqsh *sqsh) {
 	return &sqsh->superblock;
 }
 
-int
-sqsh_request_map(
-		struct Sqsh *sqsh, struct SqshMapping *mapping, uint64_t offset,
-		uint64_t size) {
-	return sqsh_mapper_map(mapping, &sqsh->mapper, offset, size);
+struct SqshMapper *
+sqsh_mapper(struct Sqsh *sqsh) {
+	return &sqsh->mapper;
 }
 
 int

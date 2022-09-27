@@ -53,14 +53,16 @@ int
 sqsh_xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh) {
 	int rv = 0;
 	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
+	struct SqshMapper *mapper = sqsh_mapper(sqsh);
 	uint64_t xattr_address = sqsh_superblock_xattr_id_table_start(superblock);
 	uint64_t bytes_used = sqsh_superblock_bytes_used(superblock);
 	if (xattr_address + HSQS_SIZEOF_XATTR_ID_TABLE >= bytes_used) {
 		return -HSQS_ERROR_SIZE_MISSMATCH;
 	}
 	context->sqsh = sqsh;
-	rv = sqsh_request_map(
-			sqsh, &context->header, xattr_address, HSQS_SIZEOF_XATTR_ID_TABLE);
+	rv = sqsh_mapper_map(
+			&context->header, mapper, xattr_address,
+			HSQS_SIZEOF_XATTR_ID_TABLE);
 	if (rv < 0) {
 		goto out;
 	}

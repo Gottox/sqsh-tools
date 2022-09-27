@@ -45,7 +45,7 @@ struct SqshBuffer;
 struct SqshFragmentTable {
 	const struct SqshSuperblockContext *superblock;
 	struct SqshTable table;
-	struct Sqsh *sqsh;
+	struct SqshMapper *mapper;
 	struct SqshCompression *compression;
 };
 

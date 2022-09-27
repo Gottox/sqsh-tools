@@ -75,11 +75,8 @@ HSQS_NO_UNUSED int sqsh_open(struct Sqsh *sqsh, const char *path);
 int sqsh_open_url(struct Sqsh *sqsh, const char *url);
 #endif
 
-int sqsh_request_map(
-		struct Sqsh *sqsh, struct SqshMapping *mapping, uint64_t offset,
-		uint64_t size);
-
 struct SqshSuperblockContext *sqsh_superblock(struct Sqsh *sqsh);
+struct SqshMapper *sqsh_mapper(struct Sqsh *sqsh);
 struct SqshCompression *sqsh_data_compression(struct Sqsh *sqsh);
 struct SqshCompression *sqsh_metablock_compression(struct Sqsh *sqsh);
 

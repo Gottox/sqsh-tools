@@ -56,6 +56,7 @@ sqsh_table_init(
 	size_t table_size;
 	size_t lookup_table_size;
 	size_t lookup_table_count;
+	struct SqshMapper *mapper = sqsh_mapper(sqsh);
 
 	if (MULT_OVERFLOW(element_size, element_count, &table_size)) {
 		return -HSQS_ERROR_INTEGER_OVERFLOW;
@@ -69,8 +70,8 @@ sqsh_table_init(
 		return -HSQS_ERROR_INTEGER_OVERFLOW;
 	}
 
-	rv = sqsh_request_map(
-			sqsh, &table->lookup_table, start_block, lookup_table_size);
+	rv = sqsh_mapper_map(
+			&table->lookup_table, mapper, start_block, lookup_table_size);
 	if (rv < 0) {
 		return rv;
 	}

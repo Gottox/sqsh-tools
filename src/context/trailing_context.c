@@ -40,7 +40,8 @@ int
 sqsh_trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh) {
 	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 	uint64_t trailing_start = sqsh_superblock_bytes_used(superblock);
-	size_t archive_size = sqsh_mapper_size(&sqsh->mapper);
+	struct SqshMapper *mapper = sqsh_mapper(sqsh);
+	size_t archive_size = sqsh_mapper_size(mapper);
 	uint64_t trailing_size;
 
 	if (archive_size <= trailing_start) {
@@ -51,8 +52,8 @@ sqsh_trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh) {
 		return HSQS_ERROR_TODO;
 	}
 
-	return sqsh_request_map(
-			sqsh, context->mapping, trailing_start, trailing_size);
+	return sqsh_mapper_map(
+			context->mapping, mapper, trailing_start, trailing_size);
 }
 
 size_t
