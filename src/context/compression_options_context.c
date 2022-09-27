@@ -32,17 +32,24 @@
  */
 
 #include "compression_options_context.h"
-#include "../data/compression_options.h"
+#include "../data/compression_options_internal.h"
 #include "../data/superblock.h"
 #include "../sqsh.h"
 #include "metablock_context.h"
 #include "superblock_context.h"
+#include <stdint.h>
+
+static const union SqshCompressionOptions *
+compression_options(const struct SqshCompressionOptionsContext *context) {
+	return (union SqshCompressionOptions *)sqsh_buffer_data(&context->buffer);
+}
 
 int
 sqsh_compression_options_init(
 		struct SqshCompressionOptionsContext *context, struct Sqsh *sqsh) {
 	int rv = 0;
 	struct SqshMetablockContext metablock = {0};
+	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 
 	rv = sqsh_metablock_init(&metablock, sqsh, HSQS_SIZEOF_SUPERBLOCK);
 	if (rv < 0) {
@@ -58,6 +65,7 @@ sqsh_compression_options_init(
 	if (rv < 0) {
 		goto out;
 	}
+	context->compression_id = sqsh_superblock_compression_id(superblock);
 
 out:
 	sqsh_metablock_cleanup(&metablock);
@@ -67,11 +75,99 @@ out:
 	return rv;
 }
 
-const union SqshCompressionOptions *
-sqsh_compression_options_data(
+uint32_t
+sqsh_compression_options_gzip_compression_level(
 		const struct SqshCompressionOptionsContext *context) {
-	return (const union SqshCompressionOptions *)sqsh_buffer_data(
-			&context->buffer);
+	if (context->compression_id != HSQS_COMPRESSION_GZIP) {
+		return UINT32_MAX;
+	}
+	return sqsh_data_compression_options_gzip_compression_level(
+			compression_options(context));
+}
+uint16_t
+sqsh_compression_options_gzip_window_size(
+		const struct SqshCompressionOptionsContext *context) {
+	if (context->compression_id != HSQS_COMPRESSION_GZIP) {
+		return UINT16_MAX;
+	}
+	return sqsh_data_compression_options_gzip_window_size(
+			compression_options(context));
+}
+enum SqshGzipStrategies
+sqsh_compression_options_gzip_strategies(
+		const struct SqshCompressionOptionsContext *context) {
+	if (context->compression_id != HSQS_COMPRESSION_GZIP) {
+		return UINT16_MAX;
+	}
+	return sqsh_data_compression_options_gzip_strategies(
+			compression_options(context));
+}
+
+uint32_t
+sqsh_compression_options_xz_dictionary_size(
+		const struct SqshCompressionOptionsContext *context) {
+	if (context->compression_id != HSQS_COMPRESSION_XZ) {
+		return UINT32_MAX;
+	}
+	return sqsh_data_compression_options_xz_dictionary_size(
+			compression_options(context));
+}
+uint32_t
+sqsh_compression_options_xz_filters(
+		const struct SqshCompressionOptionsContext *context) {
+	if (context->compression_id != HSQS_COMPRESSION_XZ) {
+		return UINT32_MAX;
+	}
+	return sqsh_data_compression_options_xz_filters(
+			compression_options(context));
+}
+
+uint32_t
+sqsh_compression_options_lz4_version(
+		const struct SqshCompressionOptionsContext *context) {
+	if (context->compression_id != HSQS_COMPRESSION_LZ4) {
+		return UINT32_MAX;
+	}
+	return sqsh_data_compression_options_lz4_version(
+			compression_options(context));
+}
+uint32_t
+sqsh_compression_options_lz4_flags(
+		const struct SqshCompressionOptionsContext *context) {
+	if (context->compression_id != HSQS_COMPRESSION_LZ4) {
+		return UINT32_MAX;
+	}
+	return sqsh_data_compression_options_lz4_flags(
+			compression_options(context));
+}
+
+uint32_t
+sqsh_compression_options_zstd_compression_level(
+		const struct SqshCompressionOptionsContext *context) {
+	if (context->compression_id != HSQS_COMPRESSION_ZSTD) {
+		return UINT32_MAX;
+	}
+	return sqsh_data_compression_options_zstd_compression_level(
+			compression_options(context));
+}
+
+enum SqshLzoAlgorithm
+sqsh_compression_options_lzo_algorithm(
+		const struct SqshCompressionOptionsContext *context) {
+	if (context->compression_id != HSQS_COMPRESSION_LZO) {
+		return UINT32_MAX;
+	}
+	return sqsh_data_compression_options_lzo_algorithm(
+			compression_options(context));
+}
+uint32_t
+sqsh_compression_options_lzo_compression_level(
+		const struct SqshCompressionOptionsContext *context) {
+	if (context->compression_id != HSQS_COMPRESSION_LZO) {
+		return UINT32_MAX;
+	}
+	return sqsh_data_compression_options_lzo_compression_level(
+			compression_options(context));
 }
 
 size_t

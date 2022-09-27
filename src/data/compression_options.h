@@ -56,29 +56,29 @@ struct SqshCompressionOptionsLzo;
 
 union SqshCompressionOptions;
 
-uint32_t sqsh_compression_options_gzip_compression_level(
+uint32_t sqsh_data_compression_options_gzip_compression_level(
 		const union SqshCompressionOptions *options);
-uint16_t sqsh_compression_options_gzip_window_size(
+uint16_t sqsh_data_compression_options_gzip_window_size(
 		const union SqshCompressionOptions *options);
-uint16_t sqsh_compression_options_gzip_strategies(
-		const union SqshCompressionOptions *options);
-
-uint32_t sqsh_compression_options_xz_dictionary_size(
-		const union SqshCompressionOptions *options);
-uint32_t sqsh_compression_options_xz_filters(
+uint16_t sqsh_data_compression_options_gzip_strategies(
 		const union SqshCompressionOptions *options);
 
-uint32_t sqsh_compression_options_lz4_version(
+uint32_t sqsh_data_compression_options_xz_dictionary_size(
 		const union SqshCompressionOptions *options);
-uint32_t
-sqsh_compression_options_lz4_flags(const union SqshCompressionOptions *options);
-
-uint32_t sqsh_compression_options_zstd_compression_level(
+uint32_t sqsh_data_compression_options_xz_filters(
 		const union SqshCompressionOptions *options);
 
-uint32_t sqsh_compression_options_lzo_algorithm(
+uint32_t sqsh_data_compression_options_lz4_version(
 		const union SqshCompressionOptions *options);
-uint32_t sqsh_compression_options_lzo_compression_level(
+uint32_t sqsh_data_compression_options_lz4_flags(
+		const union SqshCompressionOptions *options);
+
+uint32_t sqsh_data_compression_options_zstd_compression_level(
+		const union SqshCompressionOptions *options);
+
+uint32_t sqsh_data_compression_options_lzo_algorithm(
+		const union SqshCompressionOptions *options);
+uint32_t sqsh_data_compression_options_lzo_compression_level(
 		const union SqshCompressionOptions *options);
 
 #endif /* end of include guard HSQS__COMPRESSION_OPTIONS_H */
