@@ -46,6 +46,12 @@ struct SqshXattrKey;
 struct SqshXattrValue;
 struct SqshInodeContext;
 
+enum SqshXattrType {
+	HSQS_XATTR_USER = 0,
+	HSQS_XATTR_TRUSTED = 1,
+	HSQS_XATTR_SECURITY = 2,
+};
+
 struct SqshXattrTable {
 	struct Sqsh *sqsh;
 	struct SqshMapping header;

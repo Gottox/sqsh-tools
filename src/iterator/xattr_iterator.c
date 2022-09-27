@@ -33,6 +33,7 @@
 
 #include "xattr_iterator.h"
 #include "../context/inode_context.h"
+// TODO: this should be replaced with the non-internal version
 #include "../data/xattr_internal.h"
 #include "../error.h"
 #include "../table/xattr_table.h"

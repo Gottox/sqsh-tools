@@ -34,8 +34,6 @@
 #include "directory_iterator.h"
 #include "../context/inode_context.h"
 #include "../data/directory.h"
-#include "../data/inode.h"
-#include "../data/metablock.h"
 #include "../error.h"
 #include "../sqsh.h"
 #include "directory_index_iterator.h"

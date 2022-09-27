@@ -32,7 +32,7 @@
  */
 
 #include "compression_options_context.h"
-#include "../data/compression_options_internal.h"
+#include "../data/compression_options.h"
 #include "../data/superblock.h"
 #include "../sqsh.h"
 #include "metablock_context.h"

@@ -32,11 +32,7 @@
  */
 
 #include "buffer.h"
-#include "../context/superblock_context.h"
-#include "../data/metablock.h"
-#include "../data/superblock_internal.h"
 #include "../error.h"
-#include "../utils.h"
 
 #include <stdbool.h>
 #include <stdint.h>

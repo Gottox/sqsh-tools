@@ -42,12 +42,6 @@
 #define HSQS_SIZEOF_XATTR_LOOKUP_TABLE 16
 #define HSQS_SIZEOF_XATTR_ID_TABLE 16
 
-enum SqshXattrType {
-	HSQS_XATTR_USER = 0,
-	HSQS_XATTR_TRUSTED = 1,
-	HSQS_XATTR_SECURITY = 2,
-};
-
 struct SqshXattrKey;
 
 struct SqshXattrValue;
