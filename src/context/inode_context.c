@@ -419,7 +419,9 @@ sqsh_inode_file_block_count(const struct SqshInodeContext *context) {
 	uint64_t file_size = sqsh_inode_file_size(context);
 	uint32_t block_size = sqsh_superblock_block_size(superblock);
 
-	if (sqsh_inode_file_has_fragment(context)) {
+	if (file_size == UINT64_MAX) {
+		return UINT32_MAX;
+	} else if (sqsh_inode_file_has_fragment(context)) {
 		return file_size / block_size;
 	} else {
 		return HSQS_DEVIDE_CEIL(file_size, block_size);
