@@ -85,57 +85,231 @@ struct SqshInodeContext {
 	struct Sqsh *sqsh;
 };
 
+/**
+ * @brief Initialize the inode context from a inode reference. inode references
+ * are descriptors of the physical location of an inode inside the inode table.
+ * They are diffrent from the inode number. In doubt use the inode number.
+ *
+ * @param context The inode context to initialize.
+ * @param sqsh The sqsh context.
+ * @param inode_ref The inode reference.
+ * @return int 0 on success, less than 0 on error.
+ */
 HSQS_NO_UNUSED int sqsh_inode_load_by_ref(
 		struct SqshInodeContext *context, struct Sqsh *sqsh,
 		uint64_t inode_ref);
-int sqsh_inode_load_root(struct SqshInodeContext *context, struct Sqsh *sqsh);
+/**
+ * @brief Initialize the inode context of the root directory.
+ * @param context The inode context to initialize.
+ * @param sqsh The sqsh context.
+ * @return int 0 on success, less than 0 on error.
+ */
+HSQS_NO_UNUSED int
+sqsh_inode_load_root(struct SqshInodeContext *context, struct Sqsh *sqsh);
+/**
+ * @brief Initialize the inode context from an inode number.
+ * @param context The inode context to initialize.
+ * @param sqsh The sqsh context.
+ * @param inode_number The inode number.
+ * @return int 0 on success, less than 0 on error.
+ */
 HSQS_NO_UNUSED int sqsh_inode_load_by_inode_number(
 		struct SqshInodeContext *context, struct Sqsh *sqsh,
 		uint64_t inode_number);
+/**
+ * @brief Initialize the inode context from a path.
+ * @param context The inode context to initialize.
+ * @param sqsh The sqsh context.
+ * @param path The path the file or directory.
+ * @return int 0 on success, less than 0 on error.
+ */
 HSQS_NO_UNUSED int sqsh_inode_load_by_path(
 		struct SqshInodeContext *context, struct Sqsh *sqsh, const char *path);
 
+/**
+ * @brief returns whether the inode is an extended structure.
+ * @param context The inode context.
+ * @return true if the inode is an extended structure.
+ */
 bool sqsh_inode_is_extended(const struct SqshInodeContext *context);
+/**
+ * @brief Getter for the inode hard link count.
+ * @param context The inode context.
+ * @return the amount of hard links to the inode.
+ */
 uint32_t sqsh_inode_hard_link_count(const struct SqshInodeContext *context);
+/**
+ * @brief Getter for the file size. 0 if the file has no size.
+ * @param context The inode context.
+ * @return the inode type.
+ */
 uint64_t sqsh_inode_file_size(const struct SqshInodeContext *context);
+/**
+ * @brief Getter for the permissions of the inode.
+ * @param context The inode context.
+ * @return the permissions of the inode.
+ */
 uint16_t sqsh_inode_permission(const struct SqshInodeContext *context);
+/**
+ * @brief Getter for the inode number.
+ * @param context The inode context.
+ * @return the inode number.
+ */
 uint32_t sqsh_inode_number(const struct SqshInodeContext *context);
+/**
+ * @brief Getter for the inode modification time.
+ * @param context The inode context.
+ * @return the inode modification time.
+ */
 uint32_t sqsh_inode_modified_time(const struct SqshInodeContext *context);
+/**
+ * @brief Getter for the start block of the file content. This is only
+ * internally used and will be used while retrieving the file content.
+ * @param context The inode context.
+ * @return the start block of the file content or UINT64_MAX if the inode
+ * is not a file.
+ */
 uint64_t sqsh_inode_file_blocks_start(const struct SqshInodeContext *context);
+/**
+ * @brief Getter for the amount of blocks of the file content. This is only
+ * internally used and will be used while retrieving the file content.
+ * @param context The inode context.
+ * @return the amount of blocks of the file content. If the inode is not a
+ * file 0, UINT32_MAX will be returned.
+ */
 uint32_t sqsh_inode_file_block_count(const struct SqshInodeContext *context);
+/**
+ * @brief Getter the size of a block of the file content. This is only
+ * internally used and will be used while retrieving the file content.
+ * @param context The inode context.
+ * @param block The index of the block.
+ * @return the size of the block with the index.
+ */
 uint32_t sqsh_inode_file_block_size(
 		const struct SqshInodeContext *context, uint32_t index);
+/**
+ * @brief Checks whether a certain block is compressed.
+ * @param context The inode context.
+ * @param block The index of the block.
+ * @return true if the block is compressed, false otherwise.
+ */
 bool sqsh_inode_file_block_is_compressed(
 		const struct SqshInodeContext *context, int index);
+/**
+ * @brief retrieve the fragment block index. This is only internally used
+ * and will be used while retrieving the file content.
+ * @param context The inode context.
+ * @return the fragment block index.
+ */
 uint32_t
 sqsh_inode_file_fragment_block_index(const struct SqshInodeContext *context);
+/**
+ * @brief retrieve the fragment block offset. This is only internally used
+ * and will be used while retrieving the file content.
+ * @param context The inode context.
+ * @return the offset inside of the fragment block.
+ */
 uint32_t
 sqsh_inode_file_fragment_block_offset(const struct SqshInodeContext *context);
+/**
+ * @brief retrieve the directory block start. This is only internally used
+ * and will be used while iterating over the directory entries.
+ * @param context The inode context.
+ * @return the directory block start.
+ */
 uint32_t
 sqsh_inode_directory_block_start(const struct SqshInodeContext *context);
+/**
+ * @brief retrieve the directory block offset. This is only internally used
+ * and will be used while iterating over the directory entries.
+ * @param context The inode context.
+ * @return the directory block offset.
+ */
 uint32_t
 sqsh_inode_directory_block_offset(const struct SqshInodeContext *context);
+/**
+ * @brief returns true if the inode has a fragment block.
+ * @param context The inode context.
+ * @return true if the inode has a fragment block, false otherwise.
+ */
 bool sqsh_inode_file_has_fragment(const struct SqshInodeContext *context);
 
+/**
+ * @brief returns the type of the inode.
+ * @param context The inode context.
+ * @return the type of the inode.
+ */
 enum SqshInodeContextType
 sqsh_inode_type(const struct SqshInodeContext *context);
 
+/**
+ * @brief returns the target of a symbolic link. Be aware that the returned
+ * value is not zero terminated. If you need a zero terminated string use
+ * sqsh_inode_symlink_dup().
+ * @param context The inode context.
+ * @return the name of the inode or NULL if the inode is not a symbolic link.
+ */
 const char *sqsh_inode_symlink(const struct SqshInodeContext *context);
+/**
+ * @brief sets a heap allocated, zero terminated string of the target of a
+ * symbolic link.
+ * @param context The inode context.
+ * @param symlink The target of the symbolic link.
+ * @return int 0 on success, less than 0 on error.
+ */
 HSQS_NO_UNUSED int sqsh_inode_symlink_dup(
 		const struct SqshInodeContext *context, char **namebuffer);
+/**
+ * @brief returns the length of the target of a symbolic link in bytes.
+ * @param context The inode context.
+ * @return the length of the target of a symbolic link in bytes or 0 if the
+ * inode is not a symbolic link.
+ */
 uint32_t sqsh_inode_symlink_size(const struct SqshInodeContext *context);
 
+/**
+ * @brie returns the device id of the device inode.
+ * @param context The inode context.
+ * @return the name of the inode or 0 if the inode is not a device.
+ */
 uint32_t sqsh_inode_device_id(const struct SqshInodeContext *context);
 
+/**
+ * @brief returns the uid of the inode.
+ * @param context The inode context.
+ * @return the uid of the inode.
+ */
 uint32_t sqsh_inode_uid(const struct SqshInodeContext *context);
+/**
+ * @brief returns the gid of the inode.
+ * @param context The inode context.
+ * @return the gid of the inode.
+ */
 uint32_t sqsh_inode_gid(const struct SqshInodeContext *context);
+/**
+ * @brief returns index of the extended attribute inside of the xattr table.
+ * @param context The inode context.
+ * @return the index of the extended attribute inside of the xattr table.
+ */
 uint32_t sqsh_inode_xattr_index(const struct SqshInodeContext *context);
 HSQS_NO_UNUSED int sqsh_inode_xattr_iterator(
 		const struct SqshInodeContext *context,
 		struct SqshXattrIterator *iterator);
 int sqsh_inode_cleanup(struct SqshInodeContext *context);
+/**
+ * @brief converts an inode reference into a block index and a block offset
+ * @param ref The inode reference.
+ * @param block_index a pointer where the block index will be stored.
+ * @param block_offset a pointer where the block offset will be stored.
+ */
 void
 sqsh_inode_ref_to_block(uint64_t ref, uint32_t *block_index, uint16_t *offset);
+/**
+ * @brief converts a block index and a block offset into an inode reference.
+ * @param block_index The block index.
+ * @param block_offset The block offset.
+ * @return the inode reference.
+ */
 HSQS_NO_UNUSED uint64_t
 sqsh_inode_ref_from_block(uint32_t block_index, uint16_t offset);
 
