@@ -72,8 +72,6 @@ compression_by_id(int id) {
 #ifdef CONFIG_LZMA
 	case HSQS_COMPRESSION_LZMA:
 		return &sqsh_compression_lzma;
-#endif
-#ifdef CONFIG_XZ
 	case HSQS_COMPRESSION_XZ:
 		return &sqsh_compression_xz;
 #endif
@@ -100,6 +98,9 @@ sqsh_compression_init(
 		size_t block_size) {
 	const struct SqshCompressionImplementation *impl =
 			compression_by_id(compression_id);
+	if (impl == NULL) {
+		return HSQS_ERROR_COMPRESSION_UNSUPPORTED;
+	}
 	compression->impl = impl;
 	compression->block_size = block_size;
 	return 0;
