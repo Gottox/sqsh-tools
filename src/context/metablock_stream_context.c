@@ -123,7 +123,7 @@ out:
 	return rv;
 }
 
-HSQS_NO_UNUSED int
+int
 sqsh_metablock_stream_more(
 		struct SqshMetablockStreamContext *context, uint64_t size) {
 	int rv = 0;
