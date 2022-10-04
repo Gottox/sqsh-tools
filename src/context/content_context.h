@@ -42,7 +42,7 @@ struct SqshInodeContext;
 struct Sqsh;
 
 /**
- * @brief The SqshContentContext struct
+ * @brief The SqshFileContext struct
  *
  * This struct is used to assemble file contents.
  */
@@ -58,6 +58,7 @@ struct SqshFileContext {
 
 /**
  * @brief Initializes a SqshContentContext struct.
+ * @memberof SqshContentContext
  * @param context The content context to initialize.
  * @param inode The inode context to retrieve the file contents from.
  * @return 0 on success, less than 0 on error.
@@ -67,6 +68,7 @@ HSQS_NO_UNUSED int sqsh_content_init(
 
 /**
  * @brief Seek to a position in the file content.
+ * @memberof SqshContentContext
  * @param context The content context to seek in. If the context buffer
  * already contains data, it will be cleared.
  * @param offset The offset to seek to.
@@ -78,6 +80,7 @@ sqsh_content_seek(struct SqshFileContext *context, uint64_t seek_pos);
 /**
  * @brief Reads data from the current seek position
  * and writes it to the content buffer.
+ * @memberof SqshContentContext
  * @param context The content context to read from.
  * @param size The size of the buffer.
  * @return The number of bytes read on success, less than 0 on error.
@@ -86,6 +89,7 @@ int sqsh_content_read(struct SqshFileContext *context, uint64_t size);
 
 /**
  * @brief Gets a pointer to read file content.
+ * @memberof SqshContentContext
  * @param context The content context to get the data from.
  * @return A pointer to the data in the file content buffer.
  */
@@ -93,6 +97,7 @@ const uint8_t *sqsh_content_data(struct SqshFileContext *context);
 
 /**
  * @brief Gets the size of the file content buffer.
+ * @memberof SqshContentContext
  * @param context The content context to get the size from.
  * @return The size of the file content buffer.
  */
@@ -100,6 +105,7 @@ uint64_t sqsh_content_size(struct SqshFileContext *context);
 
 /**
  * @brief Frees the resources used by the content context.
+ * @memberof SqshContentContext
  * @param context The content context to clean up.
  */
 int sqsh_content_cleanup(struct SqshFileContext *context);
