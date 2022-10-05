@@ -52,6 +52,21 @@ usage(char *arg0) {
 }
 
 static int
+print_value(const char *value, size_t size) {
+	size_t i = 0;
+
+	for (i = 0; i < size; i++) {
+		if (isprint(value[i])) {
+			putchar(value[i]);
+		} else if (strchr("\"\\", value[i])) {
+			printf("\\%c", value[i]);
+		} else {
+			printf("\\x%02x", value[i]);
+		}
+	}
+	return 0;
+}
+static int
 fattr_path(struct Sqsh *sqsh, char *path) {
 	struct SqshInodeContext inode = {0};
 	struct SqshXattrIterator iter = {0};
@@ -82,7 +97,7 @@ fattr_path(struct Sqsh *sqsh, char *path) {
 		fwrite(prefix, prefix_len, 1, stdout);
 		fwrite(name, name_len, 1, stdout);
 		fputs("=\"", stdout);
-		fwrite(value, value_len, 1, stdout);
+		print_value(value, value_len);
 		fputs("\"\n", stdout);
 	}
 
