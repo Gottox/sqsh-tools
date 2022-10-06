@@ -32,7 +32,6 @@
  */
 
 #include "../mapper/mapper.h"
-#include <stdint.h>
 
 #ifndef TABLE_H
 

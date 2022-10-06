@@ -34,8 +34,6 @@
 #include "../utils.h"
 
 #include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
 
 #ifndef HSQS_BUFFER_H
 

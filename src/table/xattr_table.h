@@ -35,7 +35,6 @@
 #include "../context/metablock_stream_context.h"
 #include "../utils.h"
 #include "table.h"
-#include <stdint.h>
 
 #ifndef XATTR_TABLE_H
 

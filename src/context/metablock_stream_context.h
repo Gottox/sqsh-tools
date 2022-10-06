@@ -32,7 +32,6 @@
  */
 
 #include "../primitive/buffer.h"
-#include <stdint.h>
 
 #ifndef METABLOCK_STREAM_CONTEXT_H
 

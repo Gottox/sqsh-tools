@@ -39,7 +39,6 @@
 #include "data/superblock.h"
 #include "metablock_context.h"
 #include "superblock_context.h"
-#include <stdint.h>
 
 HSQS_NO_UNUSED int
 sqsh_metablock_stream_init(
