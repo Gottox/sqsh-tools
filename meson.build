@@ -47,6 +47,7 @@ sqsh_hdr = [
 	'src/mapper/mmap_mapper.h',
 	'src/mapper/static_mapper.h',
 	'src/primitive/buffer.h',
+	'src/primitive/ref_count.h',
 	'src/table/fragment_table.h',
 	'src/table/table.h',
 	'src/table/xattr_table.h',
@@ -81,6 +82,7 @@ sqsh_src = [
 	'src/mapper/mmap_mapper.c',
 	'src/mapper/static_mapper.c',
 	'src/primitive/buffer.c',
+	'src/primitive/ref_count.c',
 	'src/table/fragment_table.c',
 	'src/table/table.c',
 	'src/table/xattr_table.c',
@@ -89,6 +91,7 @@ sqsh_src = [
 
 sqsh_test = [
 	'test/integration.c',
+	'test/primitive/ref_count.c',
 ]
 
 libsqsh_deps = [ ]
