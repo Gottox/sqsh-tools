@@ -13,16 +13,19 @@
 
 static int
 open_archive(struct Sqsh *sqsh, const char *image_path) {
+	struct SqshConfig config = {
+			.source_type = SQSH_SOURCE_TYPE_PATH,
+	};
 #ifdef CONFIG_CURL
 	int i;
 	for (i = 0; isalnum(image_path[i]); i++) {
 	}
 	if (strncmp(&image_path[i], "://", 3) == 0) {
-		return sqsh_open_url(sqsh, image_path);
+		config.source_type = SQSH_SOURCE_TYPE_CURL;
 	}
 #endif
 
-	return sqsh_open(sqsh, image_path);
+	return sqsh_open2(sqsh, image_path, &config);
 }
 
 #endif /* end of include guard COMMON_H */
