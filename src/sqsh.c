@@ -35,6 +35,7 @@
 #include "compression/compression.h"
 #include "context/metablock_context.h"
 #include "context/superblock_context.h"
+#include "error.h"
 #include <string.h>
 
 static const uint64_t NO_SEGMENT = 0xFFFFFFFFFFFFFFFF;
@@ -95,42 +96,81 @@ out:
 
 int
 sqsh_init(struct Sqsh *sqsh, const uint8_t *buffer, const size_t size) {
+	const struct SqshConfig config = {
+			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_size = size,
+	};
+	return sqsh_open2(sqsh, (const char *)buffer, &config);
+}
+
+int
+sqsh_open2(
+		struct Sqsh *sqsh, const char *source,
+		const struct SqshConfig *config) {
 	int rv = 0;
 
-	rv = sqsh_mapper_init(
-			&sqsh->mapper, &sqsh_mapper_impl_static, buffer, size);
-	if (rv < 0) {
-		return rv;
+	// Initialize struct to 0, so in an error case we have a clean state that
+	// we can call sqsh_mapper_cleanup on.
+	memset(&sqsh->mapper, 0, sizeof(struct SqshMapper));
+
+	if (config == NULL) {
+		config = memset(&sqsh->config, 0, sizeof(struct SqshConfig));
+	} else {
+		config = memcpy(&sqsh->config, config, sizeof(struct SqshConfig));
 	}
 
-	return init(sqsh);
+	switch (config->source_type) {
+	case SQSH_SOURCE_TYPE_PATH:
+		rv = sqsh_mapper_init(
+				&sqsh->mapper, &sqsh_mapper_impl_mmap, source, strlen(source));
+		break;
+	case SQSH_SOURCE_TYPE_FD:
+		rv = -SQSH_ERROR_TODO;
+		break;
+	case SQSH_SOURCE_TYPE_MEMORY:
+		if (config->source_size == 0) {
+			rv = -SQSH_ERROR_SUPERBLOCK_TOO_SMALL;
+			goto out;
+		}
+		rv = sqsh_mapper_init(
+				&sqsh->mapper, &sqsh_mapper_impl_static, source,
+				config->source_size);
+		break;
+#ifdef CONFIG_CURL
+	case SQSH_SOURCE_TYPE_CURL:
+		rv = sqsh_mapper_init(
+				&sqsh->mapper, &sqsh_mapper_impl_curl, source, strlen(source));
+		break;
+#endif
+	default:
+		rv = -SQSH_ERROR_TODO;
+	}
+
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = init(sqsh);
+
+out:
+	if (rv < 0) {
+		sqsh_mapper_cleanup(&sqsh->mapper);
+	}
+	return rv;
 }
 
 int
 sqsh_open(struct Sqsh *sqsh, const char *path) {
-	int rv = 0;
-
-	rv = sqsh_mapper_init(
-			&sqsh->mapper, &sqsh_mapper_impl_mmap, path, strlen(path));
-	if (rv < 0) {
-		return rv;
-	}
-
-	return init(sqsh);
+	return sqsh_open2(sqsh, path, NULL);
 }
 
 #ifdef CONFIG_CURL
 int
 sqsh_open_url(struct Sqsh *sqsh, const char *url) {
-	int rv = 0;
-
-	rv = sqsh_mapper_init(
-			&sqsh->mapper, &sqsh_mapper_impl_curl, url, strlen(url));
-	if (rv < 0) {
-		return rv;
-	}
-
-	return init(sqsh);
+	const struct SqshConfig config = {
+			.source_type = SQSH_SOURCE_TYPE_CURL,
+	};
+	return sqsh_open2(sqsh, url, &config);
 }
 #endif
 

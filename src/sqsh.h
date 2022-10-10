@@ -50,6 +50,23 @@
 
 struct SqshTrailingContext;
 
+enum SqshSourceType {
+	SQSH_SOURCE_TYPE_PATH,
+	SQSH_SOURCE_TYPE_FD,
+	SQSH_SOURCE_TYPE_MEMORY,
+#ifdef CONFIG_CURL
+	SQSH_SOURCE_TYPE_CURL,
+#endif
+};
+/**
+ * @brief The SqshConfig struct contains all the configuration options for
+ * a sqsh session.
+ */
+struct SqshConfig {
+	enum SqshSourceType source_type;
+	size_t source_size;
+};
+
 /**
  * @brief The SqshContext struct contains all information about the current
  * sqsh session.
@@ -68,6 +85,7 @@ struct Sqsh {
 	struct SqshFragmentTable fragment_table;
 	struct SqshCompressionOptionsContext compression_options;
 	uint8_t initialized;
+	struct SqshConfig config;
 };
 
 /**
@@ -78,6 +96,18 @@ struct Sqsh {
  * @param size the size of the buffer.
  * @return 0 on success, less than 0 on error.
  */
+SQSH_NO_UNUSED int sqsh_open2(
+		struct Sqsh *sqsh, const char *source, const struct SqshConfig *config);
+
+/**
+ * @brief sqsh_init initializes the Sqsh structure.
+ * @memberof Sqsh
+ * @param sqsh the Sqsh structure to initialize.
+ * @param buffer the buffer to use for the Sqsh structure.
+ * @param size the size of the buffer.
+ * @return 0 on success, less than 0 on error.
+ */
+
 SQSH_NO_UNUSED int
 sqsh_init(struct Sqsh *sqsh, const uint8_t *buffer, const size_t size);
 
