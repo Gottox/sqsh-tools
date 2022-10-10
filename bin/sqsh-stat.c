@@ -274,8 +274,7 @@ static int
 stat_file(struct Sqsh *sqsh, const char *path) {
 	int rv = 0;
 	struct SqshInodeContext inode = {0};
-	(void)sqsh;
-	(void)path;
+	bool has_fragment = false;
 	rv = sqsh_inode_load_by_path(&inode, sqsh, path);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
@@ -294,8 +293,14 @@ stat_file(struct Sqsh *sqsh, const char *path) {
 	printf("          file size: %" PRIu64 "\n", sqsh_inode_file_size(&inode));
 	switch (inode_type) {
 	case HSQS_INODE_TYPE_FILE:
-		printf("       has fragment: %s\n",
-			   sqsh_inode_file_has_fragment(&inode) ? "yes" : "no");
+		has_fragment = sqsh_inode_file_has_fragment(&inode);
+		printf("       has fragment: %s\n", has_fragment ? "yes" : "no");
+		if (has_fragment) {
+			printf("     fragment index: %i\n",
+				   sqsh_inode_file_fragment_block_index(&inode));
+			printf("    fragment offset: %i\n",
+				   sqsh_inode_file_fragment_block_offset(&inode));
+		}
 		printf("   number of blocks: %i\n",
 			   sqsh_inode_file_block_count(&inode));
 		for (uint32_t i = 0; i < sqsh_inode_file_block_count(&inode); i++) {
