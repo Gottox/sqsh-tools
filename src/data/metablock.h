@@ -34,11 +34,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#ifndef HSQS_METABLOCK_H
+#ifndef SQSH_METABLOCK_H
 
-#define HSQS_METABLOCK_H
+#define SQSH_METABLOCK_H
 
-#define HSQS_SIZEOF_METABLOCK 2
+#define SQSH_SIZEOF_METABLOCK 2
 
 struct SqshMetablock;
 

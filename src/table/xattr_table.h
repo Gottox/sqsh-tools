@@ -46,9 +46,9 @@ struct SqshXattrValue;
 struct SqshInodeContext;
 
 enum SqshXattrType {
-	HSQS_XATTR_USER = 0,
-	HSQS_XATTR_TRUSTED = 1,
-	HSQS_XATTR_SECURITY = 2,
+	SQSH_XATTR_USER = 0,
+	SQSH_XATTR_TRUSTED = 1,
+	SQSH_XATTR_SECURITY = 2,
 };
 
 struct SqshXattrTable {
@@ -57,7 +57,7 @@ struct SqshXattrTable {
 	struct SqshTable table;
 };
 
-HSQS_NO_UNUSED int
+SQSH_NO_UNUSED int
 sqsh_xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh);
 
 uint64_t sqsh_xattr_table_start(struct SqshXattrTable *table);

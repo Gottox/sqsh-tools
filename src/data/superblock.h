@@ -31,14 +31,14 @@
  * @file         superblock.h
  */
 
-#ifndef HSQS_SUPERBLOCK_H
+#ifndef SQSH_SUPERBLOCK_H
 
-#define HSQS_SUPERBLOCK_H
+#define SQSH_SUPERBLOCK_H
 
 #include <stddef.h>
 #include <stdint.h>
 
-#define HSQS_SIZEOF_SUPERBLOCK 96
+#define SQSH_SIZEOF_SUPERBLOCK 96
 
 struct SqshSuperblock;
 
@@ -81,4 +81,4 @@ uint64_t sqsh_data_superblock_fragment_table_start(
 uint64_t sqsh_data_superblock_export_table_start(
 		const struct SqshSuperblock *superblock);
 
-#endif /* end of include guard HSQS_SUPERBLOCK_H */
+#endif /* end of include guard SQSH_SUPERBLOCK_H */

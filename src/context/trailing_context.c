@@ -45,11 +45,11 @@ sqsh_trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh) {
 	uint64_t trailing_size;
 
 	if (archive_size <= trailing_start) {
-		return HSQS_ERROR_TODO;
+		return SQSH_ERROR_TODO;
 	}
 
 	if (SUB_OVERFLOW(archive_size, trailing_start, &trailing_size)) {
-		return HSQS_ERROR_TODO;
+		return SQSH_ERROR_TODO;
 	}
 
 	return sqsh_mapper_map(

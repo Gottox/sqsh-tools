@@ -35,37 +35,37 @@
 #include "xattr.h"
 #include <stdint.h>
 
-#ifndef HSQS_XATTR_INTERNAL_H
+#ifndef SQSH_XATTR_INTERNAL_H
 
-#define HSQS_XATTR_INTERNAL_H
+#define SQSH_XATTR_INTERNAL_H
 
-struct HSQS_UNALIGNED SqshXattrKey {
+struct SQSH_UNALIGNED SqshXattrKey {
 	uint16_t type;
 	uint16_t name_size;
 	// uint8_t name[0]; // [name_size - strlen(prefix)];
 };
-STATIC_ASSERT(sizeof(struct SqshXattrKey) == HSQS_SIZEOF_XATTR_KEY);
+STATIC_ASSERT(sizeof(struct SqshXattrKey) == SQSH_SIZEOF_XATTR_KEY);
 
-struct HSQS_UNALIGNED SqshXattrValue {
+struct SQSH_UNALIGNED SqshXattrValue {
 	uint32_t value_size;
 	// uint8_t value[0]; // [value_size]
 };
-STATIC_ASSERT(sizeof(struct SqshXattrValue) == HSQS_SIZEOF_XATTR_VALUE);
+STATIC_ASSERT(sizeof(struct SqshXattrValue) == SQSH_SIZEOF_XATTR_VALUE);
 
-struct HSQS_UNALIGNED SqshXattrLookupTable {
+struct SQSH_UNALIGNED SqshXattrLookupTable {
 	uint64_t xattr_ref;
 	uint32_t count;
 	uint32_t size;
 };
 STATIC_ASSERT(
-		sizeof(struct SqshXattrLookupTable) == HSQS_SIZEOF_XATTR_LOOKUP_TABLE);
+		sizeof(struct SqshXattrLookupTable) == SQSH_SIZEOF_XATTR_LOOKUP_TABLE);
 
-struct HSQS_UNALIGNED SqshXattrIdTable {
+struct SQSH_UNALIGNED SqshXattrIdTable {
 	uint64_t xattr_table_start;
 	uint32_t xattr_ids;
 	uint32_t _unused;
 	// uint64_t table[0]; // [ceil(xattr_ids / 512.0)]
 };
-STATIC_ASSERT(sizeof(struct SqshXattrIdTable) == HSQS_SIZEOF_XATTR_ID_TABLE);
+STATIC_ASSERT(sizeof(struct SqshXattrIdTable) == SQSH_SIZEOF_XATTR_ID_TABLE);
 
-#endif /* end of include guard HSQS_XATTR_INTERNAL_H */
+#endif /* end of include guard SQSH_XATTR_INTERNAL_H */

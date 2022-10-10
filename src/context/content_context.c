@@ -58,8 +58,8 @@ sqsh_content_init(
 	struct Sqsh *sqsh = inode->sqsh;
 	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 
-	if (sqsh_inode_type(inode) != HSQS_INODE_TYPE_FILE) {
-		return -HSQS_ERROR_NOT_A_FILE;
+	if (sqsh_inode_type(inode) != SQSH_INODE_TYPE_FILE) {
+		return -SQSH_ERROR_NOT_A_FILE;
 	}
 
 	context->inode = inode;
@@ -87,7 +87,7 @@ sqsh_content_init(
 int
 sqsh_content_seek(struct SqshFileContext *context, uint64_t seek_pos) {
 	if (seek_pos > sqsh_inode_file_size(context->inode)) {
-		return -HSQS_ERROR_SEEK_OUT_OF_RANGE;
+		return -SQSH_ERROR_SEEK_OUT_OF_RANGE;
 	}
 	context->seek_pos = seek_pos;
 
@@ -118,7 +118,7 @@ sqsh_content_read(struct SqshFileContext *context, uint64_t size) {
 		goto out;
 	}
 	if (sqsh_inode_file_size(context->inode) > size) {
-		rv = HSQS_ERROR_SIZE_MISSMATCH;
+		rv = SQSH_ERROR_SIZE_MISSMATCH;
 	}
 
 	for (; block_index < block_count && sqsh_content_size(context) < size;
@@ -144,7 +144,7 @@ sqsh_content_read(struct SqshFileContext *context, uint64_t size) {
 
 	if (sqsh_content_size(context) < size) {
 		if (!sqsh_inode_file_has_fragment(context->inode)) {
-			rv = -HSQS_ERROR_TODO;
+			rv = -SQSH_ERROR_TODO;
 			goto out;
 		}
 
@@ -154,7 +154,7 @@ sqsh_content_read(struct SqshFileContext *context, uint64_t size) {
 		}
 
 		if (sqsh_content_size(context) < size) {
-			rv = -HSQS_ERROR_TODO;
+			rv = -SQSH_ERROR_TODO;
 			goto out;
 		}
 	}

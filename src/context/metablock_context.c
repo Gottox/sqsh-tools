@@ -51,7 +51,7 @@ sqsh_metablock_init(
 	struct SqshMapper *mapper = sqsh_mapper(sqsh);
 
 	rv = sqsh_mapper_map(
-			&context->mapping, mapper, address, HSQS_SIZEOF_METABLOCK);
+			&context->mapping, mapper, address, SQSH_SIZEOF_METABLOCK);
 	if (rv < 0) {
 		goto out;
 	}
@@ -80,11 +80,11 @@ sqsh_metablock_to_buffer(
 	bool is_compressed = sqsh_data_metablock_is_compressed(metablock);
 	uint32_t map_size;
 
-	if (size > HSQS_METABLOCK_BLOCK_SIZE) {
-		return -HSQS_ERROR_METABLOCK_TOO_BIG;
+	if (size > SQSH_METABLOCK_BLOCK_SIZE) {
+		return -SQSH_ERROR_METABLOCK_TOO_BIG;
 	}
-	if (ADD_OVERFLOW(size, HSQS_SIZEOF_METABLOCK, &map_size)) {
-		rv = -HSQS_ERROR_INTEGER_OVERFLOW;
+	if (ADD_OVERFLOW(size, SQSH_SIZEOF_METABLOCK, &map_size)) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
 

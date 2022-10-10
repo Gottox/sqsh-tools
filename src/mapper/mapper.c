@@ -62,13 +62,13 @@ sqsh_mapper_map(
 	size_t end_offset;
 	size_t archive_size = sqsh_mapper_size(mapper);
 	if (offset > archive_size) {
-		return -HSQS_ERROR_SIZE_MISSMATCH;
+		return -SQSH_ERROR_SIZE_MISSMATCH;
 	}
 	if (ADD_OVERFLOW(offset, size, &end_offset)) {
-		return -HSQS_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	if (end_offset > archive_size) {
-		return -HSQS_ERROR_SIZE_MISSMATCH;
+		return -SQSH_ERROR_SIZE_MISSMATCH;
 	}
 	mapping->mapper = mapper;
 	return mapper->impl->mapping(mapping, offset, size);

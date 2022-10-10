@@ -48,14 +48,14 @@ sqsh_zstd_extract(
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	if (options != NULL &&
-		options_size != HSQS_SIZEOF_COMPRESSION_OPTIONS_ZSTD) {
-		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
+		options_size != SQSH_SIZEOF_COMPRESSION_OPTIONS_ZSTD) {
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
 	int rv = ZSTD_decompress(target, *target_size, compressed, compressed_size);
 
 	if (ZSTD_isError(rv)) {
-		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 	return rv;
 }

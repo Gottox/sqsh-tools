@@ -76,28 +76,28 @@ print_detail_inode(struct SqshInodeContext *inode, const char *path) {
 	char xchar, unxchar;
 
 	switch (sqsh_inode_type(inode)) {
-	case HSQS_INODE_TYPE_UNKNOWN:
+	case SQSH_INODE_TYPE_UNKNOWN:
 		putchar('?');
 		break;
-	case HSQS_INODE_TYPE_DIRECTORY:
+	case SQSH_INODE_TYPE_DIRECTORY:
 		putchar('d');
 		break;
-	case HSQS_INODE_TYPE_FILE:
+	case SQSH_INODE_TYPE_FILE:
 		putchar('-');
 		break;
-	case HSQS_INODE_TYPE_SYMLINK:
+	case SQSH_INODE_TYPE_SYMLINK:
 		putchar('l');
 		break;
-	case HSQS_INODE_TYPE_BLOCK:
+	case SQSH_INODE_TYPE_BLOCK:
 		putchar('b');
 		break;
-	case HSQS_INODE_TYPE_CHAR:
+	case SQSH_INODE_TYPE_CHAR:
 		putchar('c');
 		break;
-	case HSQS_INODE_TYPE_FIFO:
+	case SQSH_INODE_TYPE_FIFO:
 		putchar('p');
 		break;
-	case HSQS_INODE_TYPE_SOCKET:
+	case SQSH_INODE_TYPE_SOCKET:
 		putchar('s');
 		break;
 	}
@@ -125,7 +125,7 @@ print_detail_inode(struct SqshInodeContext *inode, const char *path) {
 		   sqsh_inode_gid(inode), sqsh_inode_file_size(inode),
 		   strtok(ctime(&mtime), "\n"), path);
 
-	if (sqsh_inode_type(inode) == HSQS_INODE_TYPE_SYMLINK) {
+	if (sqsh_inode_type(inode) == SQSH_INODE_TYPE_SYMLINK) {
 		fputs(" -> ", stdout);
 		fwrite(sqsh_inode_symlink(inode), sqsh_inode_symlink_size(inode),
 			   sizeof(char), stdout);
@@ -161,7 +161,7 @@ ls_item(struct Sqsh *sqsh, const char *path,
 			calloc(name_size + strlen(path ? path : "") + 2, sizeof(char));
 
 	if (current_path == NULL) {
-		rv = -HSQS_ERROR_MALLOC_FAILED;
+		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
 	if (path != NULL) {
@@ -175,7 +175,7 @@ ls_item(struct Sqsh *sqsh, const char *path,
 	print_item(iter, current_path);
 
 	if (recursive &&
-		sqsh_directory_iterator_inode_type(iter) == HSQS_INODE_TYPE_DIRECTORY) {
+		sqsh_directory_iterator_inode_type(iter) == SQSH_INODE_TYPE_DIRECTORY) {
 		rv = sqsh_directory_iterator_inode_load(iter, &entry_inode);
 		if (rv < 0) {
 			goto out;
@@ -228,7 +228,7 @@ ls_path(struct Sqsh *sqsh, char *path) {
 		sqsh_perror(rv, path);
 		goto out;
 	}
-	if (sqsh_inode_type(&inode) == HSQS_INODE_TYPE_DIRECTORY) {
+	if (sqsh_inode_type(&inode) == SQSH_INODE_TYPE_DIRECTORY) {
 		if (rv < 0) {
 			sqsh_perror(rv, path);
 			rv = EXIT_FAILURE;

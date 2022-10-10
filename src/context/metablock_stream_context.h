@@ -45,18 +45,18 @@ struct SqshMetablockStreamContext {
 	uint16_t buffer_offset;
 };
 
-HSQS_NO_UNUSED int sqsh_metablock_stream_init(
+SQSH_NO_UNUSED int sqsh_metablock_stream_init(
 		struct SqshMetablockStreamContext *context, struct Sqsh *sqsh,
 		uint64_t address, uint64_t max_address);
 
-HSQS_NO_UNUSED int sqsh_metablock_stream_seek_ref(
+SQSH_NO_UNUSED int sqsh_metablock_stream_seek_ref(
 		struct SqshMetablockStreamContext *context, uint64_t ref);
 
-HSQS_NO_UNUSED int sqsh_metablock_stream_seek(
+SQSH_NO_UNUSED int sqsh_metablock_stream_seek(
 		struct SqshMetablockStreamContext *context, uint64_t address_offset,
 		uint32_t buffer_offset);
 
-HSQS_NO_UNUSED int sqsh_metablock_stream_more(
+SQSH_NO_UNUSED int sqsh_metablock_stream_more(
 		struct SqshMetablockStreamContext *context, uint64_t size);
 
 const uint8_t *

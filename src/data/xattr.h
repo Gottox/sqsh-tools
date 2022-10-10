@@ -33,14 +33,14 @@
 
 #include <stdint.h>
 
-#ifndef HSQS_XATTR_H
+#ifndef SQSH_XATTR_H
 
-#define HSQS_XATTR_H
+#define SQSH_XATTR_H
 
-#define HSQS_SIZEOF_XATTR_KEY 4
-#define HSQS_SIZEOF_XATTR_VALUE 4
-#define HSQS_SIZEOF_XATTR_LOOKUP_TABLE 16
-#define HSQS_SIZEOF_XATTR_ID_TABLE 16
+#define SQSH_SIZEOF_XATTR_KEY 4
+#define SQSH_SIZEOF_XATTR_VALUE 4
+#define SQSH_SIZEOF_XATTR_LOOKUP_TABLE 16
+#define SQSH_SIZEOF_XATTR_ID_TABLE 16
 
 struct SqshXattrKey;
 
@@ -72,4 +72,4 @@ uint32_t sqsh_data_xattr_id_table_xattr_ids(
 const uint64_t *
 sqsh_data_xattr_id_table(const struct SqshXattrIdTable *xattr_id_table);
 
-#endif /* end of include guard HSQS_XATTR_H */
+#endif /* end of include guard SQSH_XATTR_H */

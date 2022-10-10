@@ -49,10 +49,10 @@ struct SqshFragmentTable {
 	struct SqshCompression *compression;
 };
 
-HSQS_NO_UNUSED int
+SQSH_NO_UNUSED int
 sqsh_fragment_table_init(struct SqshFragmentTable *context, struct Sqsh *sqsh);
 
-HSQS_NO_UNUSED int sqsh_fragment_table_to_buffer(
+SQSH_NO_UNUSED int sqsh_fragment_table_to_buffer(
 		const struct SqshFragmentTable *context,
 		const struct SqshInodeContext *inode, struct SqshBuffer *buffer);
 

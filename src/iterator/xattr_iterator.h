@@ -48,7 +48,7 @@ struct SqshXattrIterator {
 	sqsh_index_t value_offset;
 };
 
-HSQS_NO_UNUSED int sqsh_xattr_iterator_init(
+SQSH_NO_UNUSED int sqsh_xattr_iterator_init(
 		struct SqshXattrIterator *iterator, struct SqshXattrTable *xattr_table,
 		const struct SqshInodeContext *inode);
 

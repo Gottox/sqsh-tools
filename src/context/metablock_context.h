@@ -40,7 +40,7 @@
 
 #define METABLOCK_CONTEXT_H
 
-#define HSQS_METABLOCK_BLOCK_SIZE 8192
+#define SQSH_METABLOCK_BLOCK_SIZE 8192
 
 struct Sqsh;
 
@@ -60,7 +60,7 @@ int sqsh_metablock_init(
 uint32_t
 sqsh_metablock_compressed_size(const struct SqshMetablockContext *context);
 
-HSQS_NO_UNUSED int sqsh_metablock_to_buffer(
+SQSH_NO_UNUSED int sqsh_metablock_to_buffer(
 		struct SqshMetablockContext *context, struct SqshBuffer *buffer);
 
 int sqsh_metablock_cleanup(struct SqshMetablockContext *context);

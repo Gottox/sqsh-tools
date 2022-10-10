@@ -36,12 +36,12 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#ifndef HSQS_INODE_CONTEXT_H
+#ifndef SQSH_INODE_CONTEXT_H
 
-#define HSQS_INODE_CONTEXT_H
+#define SQSH_INODE_CONTEXT_H
 
-#define HSQS_INODE_NO_FRAGMENT 0xFFFFFFFF
-#define HSQS_INODE_NO_XATTR 0xFFFFFFFF
+#define SQSH_INODE_NO_FRAGMENT 0xFFFFFFFF
+#define SQSH_INODE_NO_XATTR 0xFFFFFFFF
 
 struct Sqsh;
 
@@ -52,32 +52,32 @@ struct SqshDirectoryIterator;
 struct SqshXattrIterator;
 
 enum SqshInodeType {
-	HSQS_INODE_TYPE_BASIC_DIRECTORY = 1,
-	HSQS_INODE_TYPE_BASIC_FILE = 2,
-	HSQS_INODE_TYPE_BASIC_SYMLINK = 3,
-	HSQS_INODE_TYPE_BASIC_BLOCK = 4,
-	HSQS_INODE_TYPE_BASIC_CHAR = 5,
-	HSQS_INODE_TYPE_BASIC_FIFO = 6,
-	HSQS_INODE_TYPE_BASIC_SOCKET = 7,
-	HSQS_INODE_TYPE_EXTENDED_DIRECTORY = 8,
-	HSQS_INODE_TYPE_EXTENDED_FILE = 9,
-	HSQS_INODE_TYPE_EXTENDED_SYMLINK = 10,
-	HSQS_INODE_TYPE_EXTENDED_BLOCK = 11,
-	HSQS_INODE_TYPE_EXTENDED_CHAR = 12,
-	HSQS_INODE_TYPE_EXTENDED_FIFO = 13,
-	HSQS_INODE_TYPE_EXTENDED_SOCKET = 14,
+	SQSH_INODE_TYPE_BASIC_DIRECTORY = 1,
+	SQSH_INODE_TYPE_BASIC_FILE = 2,
+	SQSH_INODE_TYPE_BASIC_SYMLINK = 3,
+	SQSH_INODE_TYPE_BASIC_BLOCK = 4,
+	SQSH_INODE_TYPE_BASIC_CHAR = 5,
+	SQSH_INODE_TYPE_BASIC_FIFO = 6,
+	SQSH_INODE_TYPE_BASIC_SOCKET = 7,
+	SQSH_INODE_TYPE_EXTENDED_DIRECTORY = 8,
+	SQSH_INODE_TYPE_EXTENDED_FILE = 9,
+	SQSH_INODE_TYPE_EXTENDED_SYMLINK = 10,
+	SQSH_INODE_TYPE_EXTENDED_BLOCK = 11,
+	SQSH_INODE_TYPE_EXTENDED_CHAR = 12,
+	SQSH_INODE_TYPE_EXTENDED_FIFO = 13,
+	SQSH_INODE_TYPE_EXTENDED_SOCKET = 14,
 };
 
 enum SqshInodeContextType {
-	HSQS_INODE_TYPE_UNKNOWN = -1,
+	SQSH_INODE_TYPE_UNKNOWN = -1,
 	// avoid overlapping with the types in ../data/inode.h
-	HSQS_INODE_TYPE_DIRECTORY = 1 + (1 << 8),
-	HSQS_INODE_TYPE_FILE,
-	HSQS_INODE_TYPE_SYMLINK,
-	HSQS_INODE_TYPE_BLOCK,
-	HSQS_INODE_TYPE_CHAR,
-	HSQS_INODE_TYPE_FIFO,
-	HSQS_INODE_TYPE_SOCKET,
+	SQSH_INODE_TYPE_DIRECTORY = 1 + (1 << 8),
+	SQSH_INODE_TYPE_FILE,
+	SQSH_INODE_TYPE_SYMLINK,
+	SQSH_INODE_TYPE_BLOCK,
+	SQSH_INODE_TYPE_CHAR,
+	SQSH_INODE_TYPE_FIFO,
+	SQSH_INODE_TYPE_SOCKET,
 };
 
 struct SqshInodeContext {
@@ -95,7 +95,7 @@ struct SqshInodeContext {
  * @param inode_ref The inode reference.
  * @return int 0 on success, less than 0 on error.
  */
-HSQS_NO_UNUSED int sqsh_inode_load_by_ref(
+SQSH_NO_UNUSED int sqsh_inode_load_by_ref(
 		struct SqshInodeContext *context, struct Sqsh *sqsh,
 		uint64_t inode_ref);
 /**
@@ -104,7 +104,7 @@ HSQS_NO_UNUSED int sqsh_inode_load_by_ref(
  * @param sqsh The sqsh context.
  * @return int 0 on success, less than 0 on error.
  */
-HSQS_NO_UNUSED int
+SQSH_NO_UNUSED int
 sqsh_inode_load_root(struct SqshInodeContext *context, struct Sqsh *sqsh);
 /**
  * @brief Initialize the inode context from an inode number.
@@ -113,7 +113,7 @@ sqsh_inode_load_root(struct SqshInodeContext *context, struct Sqsh *sqsh);
  * @param inode_number The inode number.
  * @return int 0 on success, less than 0 on error.
  */
-HSQS_NO_UNUSED int sqsh_inode_load_by_inode_number(
+SQSH_NO_UNUSED int sqsh_inode_load_by_inode_number(
 		struct SqshInodeContext *context, struct Sqsh *sqsh,
 		uint64_t inode_number);
 /**
@@ -123,7 +123,7 @@ HSQS_NO_UNUSED int sqsh_inode_load_by_inode_number(
  * @param path The path the file or directory.
  * @return int 0 on success, less than 0 on error.
  */
-HSQS_NO_UNUSED int sqsh_inode_load_by_path(
+SQSH_NO_UNUSED int sqsh_inode_load_by_path(
 		struct SqshInodeContext *context, struct Sqsh *sqsh, const char *path);
 
 /**
@@ -257,7 +257,7 @@ const char *sqsh_inode_symlink(const struct SqshInodeContext *context);
  * @param symlink The target of the symbolic link.
  * @return int 0 on success, less than 0 on error.
  */
-HSQS_NO_UNUSED int sqsh_inode_symlink_dup(
+SQSH_NO_UNUSED int sqsh_inode_symlink_dup(
 		const struct SqshInodeContext *context, char **namebuffer);
 /**
  * @brief returns the length of the target of a symbolic link in bytes.
@@ -292,7 +292,7 @@ uint32_t sqsh_inode_gid(const struct SqshInodeContext *context);
  * @return the index of the extended attribute inside of the xattr table.
  */
 uint32_t sqsh_inode_xattr_index(const struct SqshInodeContext *context);
-HSQS_NO_UNUSED int sqsh_inode_xattr_iterator(
+SQSH_NO_UNUSED int sqsh_inode_xattr_iterator(
 		const struct SqshInodeContext *context,
 		struct SqshXattrIterator *iterator);
 int sqsh_inode_cleanup(struct SqshInodeContext *context);
@@ -310,7 +310,7 @@ sqsh_inode_ref_to_block(uint64_t ref, uint32_t *block_index, uint16_t *offset);
  * @param block_offset The block offset.
  * @return the inode reference.
  */
-HSQS_NO_UNUSED uint64_t
+SQSH_NO_UNUSED uint64_t
 sqsh_inode_ref_from_block(uint32_t block_index, uint16_t offset);
 
-#endif /* end of include guard HSQS_INODE_CONTEXT_H */
+#endif /* end of include guard SQSH_INODE_CONTEXT_H */

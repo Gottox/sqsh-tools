@@ -74,7 +74,7 @@ enum SqshLzoAlgorithm {
 	SQSH_LZO_ALGORITHM_LZO1X_999 = 0x0004,
 };
 
-HSQS_NO_UNUSED int sqsh_compression_options_init(
+SQSH_NO_UNUSED int sqsh_compression_options_init(
 		struct SqshCompressionOptionsContext *context, struct Sqsh *sqsh);
 
 const union SqshCompressionOptions *sqsh_compression_options_data(

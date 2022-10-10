@@ -53,12 +53,12 @@ static struct SqshfuseOptions {
 	const char *image_path;
 } options = {0};
 
-#define HSQS_OPT_KEY(t, p) \
+#define SQSH_OPT_KEY(t, p) \
 	{ t, offsetof(struct SqshfuseOptions, p), 1 }
 // clang-format off
 static const struct fuse_opt option_spec[] = {
-	HSQS_OPT_KEY("-h", show_help),
-	HSQS_OPT_KEY("--help", show_help),
+	SQSH_OPT_KEY("-h", show_help),
+	SQSH_OPT_KEY("--help", show_help),
 	FUSE_OPT_END
 };
 // clang-format on
@@ -113,28 +113,28 @@ sqshfuse_getattr(
 	stbuf->st_mtime = stbuf->st_ctime = stbuf->st_atime =
 			sqsh_inode_modified_time(&inode);
 	switch (sqsh_inode_type(&inode)) {
-	case HSQS_INODE_TYPE_DIRECTORY:
+	case SQSH_INODE_TYPE_DIRECTORY:
 		stbuf->st_mode |= S_IFDIR;
 		break;
-	case HSQS_INODE_TYPE_FILE:
+	case SQSH_INODE_TYPE_FILE:
 		stbuf->st_mode |= S_IFREG;
 		break;
-	case HSQS_INODE_TYPE_SYMLINK:
+	case SQSH_INODE_TYPE_SYMLINK:
 		stbuf->st_mode |= S_IFLNK;
 		break;
-	case HSQS_INODE_TYPE_BLOCK:
+	case SQSH_INODE_TYPE_BLOCK:
 		stbuf->st_mode |= S_IFBLK;
 		break;
-	case HSQS_INODE_TYPE_CHAR:
+	case SQSH_INODE_TYPE_CHAR:
 		stbuf->st_mode |= S_IFCHR;
 		break;
-	case HSQS_INODE_TYPE_FIFO:
+	case SQSH_INODE_TYPE_FIFO:
 		stbuf->st_mode |= S_IFIFO;
 		break;
-	case HSQS_INODE_TYPE_SOCKET:
+	case SQSH_INODE_TYPE_SOCKET:
 		stbuf->st_mode |= S_IFSOCK;
 		break;
-	case HSQS_INODE_TYPE_UNKNOWN:
+	case SQSH_INODE_TYPE_UNKNOWN:
 		rv = -EIO;
 		goto out;
 	}

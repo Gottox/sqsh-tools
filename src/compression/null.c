@@ -48,11 +48,11 @@ sqsh_null_extract(
 	// the null decompressor has no compression options
 	if (options != NULL || options_size != 0) {
 		// TODO: More specific error code
-		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
 	if (compressed_size > *target_size) {
-		return -HSQS_ERROR_SIZE_MISSMATCH;
+		return -SQSH_ERROR_SIZE_MISSMATCH;
 	}
 	*target_size = compressed_size;
 	memcpy(target, compressed, compressed_size);

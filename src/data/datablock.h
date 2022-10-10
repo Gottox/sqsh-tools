@@ -38,7 +38,7 @@
 
 #define DATABLOCK_H
 
-#define HSQS_SIZEOF_DATABLOCK_SIZE 4
+#define SQSH_SIZEOF_DATABLOCK_SIZE 4
 
 struct SqshDatablockSize;
 

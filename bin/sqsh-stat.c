@@ -50,19 +50,19 @@
 static char *
 compression_id_name(int id) {
 	switch (id) {
-	case HSQS_COMPRESSION_NONE:
+	case SQSH_COMPRESSION_NONE:
 		return "none";
-	case HSQS_COMPRESSION_GZIP:
+	case SQSH_COMPRESSION_GZIP:
 		return "gzip";
-	case HSQS_COMPRESSION_XZ:
+	case SQSH_COMPRESSION_XZ:
 		return "xz";
-	case HSQS_COMPRESSION_LZMA:
+	case SQSH_COMPRESSION_LZMA:
 		return "lzma";
-	case HSQS_COMPRESSION_LZO:
+	case SQSH_COMPRESSION_LZO:
 		return "lzo";
-	case HSQS_COMPRESSION_LZ4:
+	case SQSH_COMPRESSION_LZ4:
 		return "lz4";
-	case HSQS_COMPRESSION_ZSTD:
+	case SQSH_COMPRESSION_ZSTD:
 		return "zstd";
 	default:
 		return "unknown";
@@ -218,29 +218,29 @@ stat_image(struct Sqsh *sqsh) {
 	printf("       modification time: %s\n", ctime(&mtime));
 
 	rv = sqsh_compression_options(sqsh, &compression_options);
-	if (rv == -HSQS_ERROR_NO_COMPRESSION_OPTIONS) {
+	if (rv == -SQSH_ERROR_NO_COMPRESSION_OPTIONS) {
 		rv = 0;
 	} else if (rv == 0) {
 		puts("=== compression options ===");
 		switch (compression_id) {
-		case HSQS_COMPRESSION_GZIP:
+		case SQSH_COMPRESSION_GZIP:
 			stat_gzip_options(compression_options);
 			break;
-		case HSQS_COMPRESSION_XZ:
+		case SQSH_COMPRESSION_XZ:
 			stat_xz_options(compression_options);
 			break;
-		case HSQS_COMPRESSION_LZ4:
+		case SQSH_COMPRESSION_LZ4:
 			stat_lz4_options(compression_options);
 			break;
-		case HSQS_COMPRESSION_ZSTD:
+		case SQSH_COMPRESSION_ZSTD:
 			stat_zstd_options(compression_options);
 			break;
-		case HSQS_COMPRESSION_LZO:
+		case SQSH_COMPRESSION_LZO:
 			stat_lzo_options(compression_options);
 			break;
 		default:
-		case HSQS_COMPRESSION_LZMA:
-		case HSQS_COMPRESSION_NONE:
+		case SQSH_COMPRESSION_LZMA:
+		case SQSH_COMPRESSION_NONE:
 			puts("  WARNING: compression options are present, but "
 				 "not supported by the compression algorithm");
 		}
@@ -251,19 +251,19 @@ stat_image(struct Sqsh *sqsh) {
 static char *
 inode_type_name(int type) {
 	switch (type) {
-	case HSQS_INODE_TYPE_FILE:
+	case SQSH_INODE_TYPE_FILE:
 		return "file";
-	case HSQS_INODE_TYPE_DIRECTORY:
+	case SQSH_INODE_TYPE_DIRECTORY:
 		return "directory";
-	case HSQS_INODE_TYPE_SYMLINK:
+	case SQSH_INODE_TYPE_SYMLINK:
 		return "symlink";
-	case HSQS_INODE_TYPE_FIFO:
+	case SQSH_INODE_TYPE_FIFO:
 		return "fifo";
-	case HSQS_INODE_TYPE_SOCKET:
+	case SQSH_INODE_TYPE_SOCKET:
 		return "socket";
-	case HSQS_INODE_TYPE_BLOCK:
+	case SQSH_INODE_TYPE_BLOCK:
 		return "block device";
-	case HSQS_INODE_TYPE_CHAR:
+	case SQSH_INODE_TYPE_CHAR:
 		return "character device";
 	default:
 		return "unknown";
@@ -292,7 +292,7 @@ stat_file(struct Sqsh *sqsh, const char *path) {
 	printf("    hard link count: %i\n", sqsh_inode_hard_link_count(&inode));
 	printf("          file size: %" PRIu64 "\n", sqsh_inode_file_size(&inode));
 	switch (inode_type) {
-	case HSQS_INODE_TYPE_FILE:
+	case SQSH_INODE_TYPE_FILE:
 		has_fragment = sqsh_inode_file_has_fragment(&inode);
 		printf("       has fragment: %s\n", has_fragment ? "yes" : "no");
 		if (has_fragment) {
@@ -311,12 +311,12 @@ stat_file(struct Sqsh *sqsh, const char *path) {
 				   is_compressed ? "yes" : "no");
 		}
 		break;
-	case HSQS_INODE_TYPE_SYMLINK:
+	case SQSH_INODE_TYPE_SYMLINK:
 		printf("     symlink target: %.*s\n", sqsh_inode_symlink_size(&inode),
 			   sqsh_inode_symlink(&inode));
 		break;
-	case HSQS_INODE_TYPE_BLOCK:
-	case HSQS_INODE_TYPE_CHAR:
+	case SQSH_INODE_TYPE_BLOCK:
+	case SQSH_INODE_TYPE_CHAR:
 		printf("       device major: %i\n",
 			   (sqsh_inode_device_id(&inode) & 0xFFF00) >> 8);
 		printf("       device minor: %i\n",

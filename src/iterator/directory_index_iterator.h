@@ -46,10 +46,10 @@ struct SqshInodeDirectoryIndexIterator {
 	sqsh_index_t next_offset;
 };
 
-HSQS_NO_UNUSED int sqsh_inode_directory_index_iterator_init(
+SQSH_NO_UNUSED int sqsh_inode_directory_index_iterator_init(
 		struct SqshInodeDirectoryIndexIterator *iterator,
 		struct SqshInodeContext *inode);
-HSQS_NO_UNUSED int sqsh_inode_directory_index_iterator_next(
+SQSH_NO_UNUSED int sqsh_inode_directory_index_iterator_next(
 		struct SqshInodeDirectoryIndexIterator *iterator);
 uint32_t sqsh_inode_directory_index_iterator_index(
 		struct SqshInodeDirectoryIndexIterator *iterator);
@@ -60,7 +60,7 @@ uint32_t sqsh_inode_directory_index_iterator_name_size(
 const char *sqsh_inode_directory_index_iterator_name(
 		struct SqshInodeDirectoryIndexIterator *iterator);
 
-HSQS_NO_UNUSED int sqsh_inode_directory_index_iterator_clean(
+SQSH_NO_UNUSED int sqsh_inode_directory_index_iterator_clean(
 		struct SqshInodeDirectoryIndexIterator *iterator);
 
 #endif /* end of include guard DIRECTORY_INDEX_ITERATOR_H */

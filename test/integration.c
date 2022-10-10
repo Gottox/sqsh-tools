@@ -50,7 +50,7 @@ sqsh_empty() {
 	int rv;
 	struct Sqsh sqsh = {0};
 	rv = sqsh_init(&sqsh, NULL, 0);
-	assert(rv == -HSQS_ERROR_SUPERBLOCK_TOO_SMALL);
+	assert(rv == -SQSH_ERROR_SUPERBLOCK_TOO_SMALL);
 }
 
 static void
@@ -502,7 +502,7 @@ fuzz_crash_4() {
 	rv = sqsh_init(&sqsh, input, sizeof(input));
 	assert(rv == 0);
 	rv = sqsh_id_table(&sqsh, &id_table);
-	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
+	assert(rv == -SQSH_ERROR_SIZE_MISSMATCH);
 	sqsh_cleanup(&sqsh);
 }
 
@@ -539,7 +539,7 @@ fuzz_crash_5() {
 	rv = sqsh_init(&sqsh, input, sizeof(input));
 	assert(rv == 0);
 	rv = sqsh_id_table(&sqsh, &id_table);
-	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
+	assert(rv == -SQSH_ERROR_SIZE_MISSMATCH);
 	sqsh_cleanup(&sqsh);
 }
 
@@ -562,7 +562,7 @@ fuzz_crash_6() {
 	rv = sqsh_init(&sqsh, input, sizeof(input));
 	assert(rv == 0);
 	rv = sqsh_id_table(&sqsh, &id_table);
-	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
+	assert(rv == -SQSH_ERROR_SIZE_MISSMATCH);
 	sqsh_cleanup(&sqsh);
 }
 
@@ -586,7 +586,7 @@ fuzz_crash_7() {
 	rv = sqsh_init(&sqsh, input, sizeof(input));
 	assert(rv == 0);
 	rv = sqsh_id_table(&sqsh, &id_table);
-	assert(rv == -HSQS_ERROR_SIZE_MISSMATCH);
+	assert(rv == -SQSH_ERROR_SIZE_MISSMATCH);
 	sqsh_cleanup(&sqsh);
 }
 

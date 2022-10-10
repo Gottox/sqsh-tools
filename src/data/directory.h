@@ -34,12 +34,12 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#ifndef HSQS__DIRECTORY_H
+#ifndef SQSH__DIRECTORY_H
 
-#define HSQS__DIRECTORY_H
+#define SQSH__DIRECTORY_H
 
-#define HSQS_SIZEOF_DIRECTORY_FRAGMENT 12
-#define HSQS_SIZEOF_DIRECTORY_ENTRY 8
+#define SQSH_SIZEOF_DIRECTORY_FRAGMENT 12
+#define SQSH_SIZEOF_DIRECTORY_ENTRY 8
 
 struct SqshDirectoryEntry;
 
@@ -64,4 +64,4 @@ uint32_t sqsh_data_directory_fragment_inode_number(
 const struct SqshDirectoryEntry *sqsh_data_directory_fragment_entries(
 		const struct SqshDirectoryFragment *fragment);
 
-#endif /* end of include guard HSQS__DIRECTORY_H */
+#endif /* end of include guard SQSH__DIRECTORY_H */

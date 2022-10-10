@@ -37,11 +37,11 @@
 
 #define METABLOCK_INTERNAL_H
 
-struct HSQS_UNALIGNED SqshMetablock {
+struct SQSH_UNALIGNED SqshMetablock {
 	uint16_t header;
 	// uint8_t data[0];
 };
 
-STATIC_ASSERT(sizeof(struct SqshMetablock) == HSQS_SIZEOF_METABLOCK);
+STATIC_ASSERT(sizeof(struct SqshMetablock) == SQSH_SIZEOF_METABLOCK);
 
 #endif /* end of include guard METABLOCK_INTERNAL_H */

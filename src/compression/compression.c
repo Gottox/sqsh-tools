@@ -63,28 +63,28 @@ extern const struct SqshCompressionImplementation sqsh_compression_null;
 static const struct SqshCompressionImplementation *
 compression_by_id(int id) {
 	switch ((enum SqshSuperblockCompressionId)id) {
-	case HSQS_COMPRESSION_NONE:
+	case SQSH_COMPRESSION_NONE:
 		return &sqsh_compression_null;
 #ifdef CONFIG_ZLIB
-	case HSQS_COMPRESSION_GZIP:
+	case SQSH_COMPRESSION_GZIP:
 		return &sqsh_compression_zlib;
 #endif
 #ifdef CONFIG_LZMA
-	case HSQS_COMPRESSION_LZMA:
+	case SQSH_COMPRESSION_LZMA:
 		return &sqsh_compression_lzma;
-	case HSQS_COMPRESSION_XZ:
+	case SQSH_COMPRESSION_XZ:
 		return &sqsh_compression_xz;
 #endif
 #ifdef CONFIG_LZO
-	case HSQS_COMPRESSION_LZO:
+	case SQSH_COMPRESSION_LZO:
 		return &sqsh_compression_lzo;
 #endif
 #ifdef CONFIG_LZ4
-	case HSQS_COMPRESSION_LZ4:
+	case SQSH_COMPRESSION_LZ4:
 		return &sqsh_compression_lz4;
 #endif
 #ifdef CONFIG_ZSTD
-	case HSQS_COMPRESSION_ZSTD:
+	case SQSH_COMPRESSION_ZSTD:
 		return &sqsh_compression_zstd;
 #endif
 	default:
@@ -99,7 +99,7 @@ sqsh_compression_init(
 	const struct SqshCompressionImplementation *impl =
 			compression_by_id(compression_id);
 	if (impl == NULL) {
-		return HSQS_ERROR_COMPRESSION_UNSUPPORTED;
+		return SQSH_ERROR_COMPRESSION_UNSUPPORTED;
 	}
 	compression->impl = impl;
 	compression->block_size = block_size;

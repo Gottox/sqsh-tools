@@ -57,12 +57,12 @@ sqsh_buffer_add_capacity(
 	size_t new_capacity;
 
 	if (ADD_OVERFLOW(buffer_size, additional_size, &new_capacity)) {
-		return -HSQS_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
 	buffer->data = realloc(buffer->data, new_capacity);
 	if (buffer->data == NULL) {
-		return -HSQS_ERROR_MALLOC_FAILED;
+		return -SQSH_ERROR_MALLOC_FAILED;
 	}
 	if (additional_buffer != NULL) {
 		*additional_buffer = &buffer->data[buffer_size];
@@ -75,7 +75,7 @@ sqsh_buffer_add_size(struct SqshBuffer *buffer, size_t additional_size) {
 	const size_t buffer_size = buffer->size;
 	size_t new_size;
 	if (ADD_OVERFLOW(buffer_size, additional_size, &new_size)) {
-		return -HSQS_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
 	buffer->size = new_size;

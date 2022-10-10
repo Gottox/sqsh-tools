@@ -56,89 +56,89 @@ const char *
 sqsh_error_str(int error_code) {
 	error_code = abs(error_code);
 
-	if (error_code < HSQS_ERROR_SECTION) {
+	if (error_code < SQSH_ERROR_SECTION) {
 		return strerror(error_code);
 	}
 	switch ((enum SqshError)error_code) {
-	case HSQS_ERROR_NO_COMPRESSION_OPTIONS:
+	case SQSH_ERROR_NO_COMPRESSION_OPTIONS:
 		return "No compression options";
-	case HSQS_ERROR_SUPERBLOCK_TOO_SMALL:
+	case SQSH_ERROR_SUPERBLOCK_TOO_SMALL:
 		return "Superblock too small";
-	case HSQS_ERROR_WRONG_MAGIC:
+	case SQSH_ERROR_WRONG_MAGIC:
 		return "Wrong magig";
-	case HSQS_ERROR_BLOCKSIZE_MISSMATCH:
+	case SQSH_ERROR_BLOCKSIZE_MISSMATCH:
 		return "Blocksize missmatch";
-	case HSQS_ERROR_SIZE_MISSMATCH:
+	case SQSH_ERROR_SIZE_MISSMATCH:
 		return "Size missmatch";
-	case HSQS_ERROR_CHECKFLAG_SET:
+	case SQSH_ERROR_CHECKFLAG_SET:
 		return "Checkflag set";
-	case HSQS_ERROR_METABLOCK_UNSUPPORTED_COMPRESSION:
+	case SQSH_ERROR_METABLOCK_UNSUPPORTED_COMPRESSION:
 		return "Metablock unsupported compression";
-	case HSQS_ERROR_METABLOCK_INFO_IS_COMPRESSED:
+	case SQSH_ERROR_METABLOCK_INFO_IS_COMPRESSED:
 		return "Metablock info is compressed";
-	case HSQS_ERROR_METABLOCK_INIT:
+	case SQSH_ERROR_METABLOCK_INIT:
 		return "Metablock init";
-	case HSQS_ERROR_COMPRESSION_INIT:
+	case SQSH_ERROR_COMPRESSION_INIT:
 		return "Compression init";
-	case HSQS_ERROR_COMPRESSION_DECOMPRESS:
+	case SQSH_ERROR_COMPRESSION_DECOMPRESS:
 		return "Compression decompress";
-	case HSQS_ERROR_UNKOWN_INODE_TYPE:
+	case SQSH_ERROR_UNKOWN_INODE_TYPE:
 		return "Unkown inode type";
-	case HSQS_ERROR_COMPRESSION_STREAM_INIT:
+	case SQSH_ERROR_COMPRESSION_STREAM_INIT:
 		return "Compression stream init";
-	case HSQS_ERROR_COMPRESSION_STREAM_CLEANUP:
+	case SQSH_ERROR_COMPRESSION_STREAM_CLEANUP:
 		return "Compression stream cleanup";
-	case HSQS_ERROR_STREAM_NOT_ENOUGH_BYTES:
+	case SQSH_ERROR_STREAM_NOT_ENOUGH_BYTES:
 		return "Stream not enough bytes";
-	case HSQS_ERROR_GZIP_HEADER_TOO_SMALL:
+	case SQSH_ERROR_GZIP_HEADER_TOO_SMALL:
 		return "Gzip header too small";
-	case HSQS_ERROR_GZIP_HEADER_READ:
+	case SQSH_ERROR_GZIP_HEADER_READ:
 		return "Gzip header read";
-	case HSQS_ERROR_GZIP_READ_AFTER_END:
+	case SQSH_ERROR_GZIP_READ_AFTER_END:
 		return "Gzip read after end";
-	case HSQS_ERROR_NOT_A_DIRECTORY:
+	case SQSH_ERROR_NOT_A_DIRECTORY:
 		return "Not a directory";
-	case HSQS_ERROR_NOT_A_FILE:
+	case SQSH_ERROR_NOT_A_FILE:
 		return "Not a file";
-	case HSQS_ERROR_MALLOC_FAILED:
+	case SQSH_ERROR_MALLOC_FAILED:
 		return "Malloc Failed";
-	case HSQS_ERROR_DIRECTORY_INIT:
+	case SQSH_ERROR_DIRECTORY_INIT:
 		return "Directory Init";
-	case HSQS_ERROR_INODE_INIT:
+	case SQSH_ERROR_INODE_INIT:
 		return "Inode init";
-	case HSQS_ERROR_INTEGER_OVERFLOW:
+	case SQSH_ERROR_INTEGER_OVERFLOW:
 		return "Integer overflow";
-	case HSQS_ERROR_NO_SUCH_FILE:
+	case SQSH_ERROR_NO_SUCH_FILE:
 		return "No such file or directory";
-	case HSQS_ERROR_METABLOCK_ZERO_SIZE:
+	case SQSH_ERROR_METABLOCK_ZERO_SIZE:
 		return "Metablock with size zero";
-	case HSQS_ERROR_SEEK_OUT_OF_RANGE:
+	case SQSH_ERROR_SEEK_OUT_OF_RANGE:
 		return "Seek out of range";
-	case HSQS_ERROR_SEEK_IN_FRAGMENT:
+	case SQSH_ERROR_SEEK_IN_FRAGMENT:
 		return "Seek in fragment";
-	case HSQS_ERROR_NO_FRAGMENT:
+	case SQSH_ERROR_NO_FRAGMENT:
 		return "No fragment";
-	case HSQS_ERROR_NO_DATABLOCKS:
+	case SQSH_ERROR_NO_DATABLOCKS:
 		return "No datablocks";
-	case HSQS_ERROR_HASHMAP_INTERNAL_ERROR:
+	case SQSH_ERROR_HASHMAP_INTERNAL_ERROR:
 		return "Hashmap internal error";
-	case HSQS_ERROR_NO_EXTENDED_DIRECTORY:
+	case SQSH_ERROR_NO_EXTENDED_DIRECTORY:
 		return "No extended directory";
-	case HSQS_ERROR_NO_FRAGMENT_TABLE:
+	case SQSH_ERROR_NO_FRAGMENT_TABLE:
 		return "No fragment table";
-	case HSQS_ERROR_NO_EXPORT_TABLE:
+	case SQSH_ERROR_NO_EXPORT_TABLE:
 		return "No export table";
-	case HSQS_ERROR_NO_XATTR_TABLE:
+	case SQSH_ERROR_NO_XATTR_TABLE:
 		return "No xattr table";
-	case HSQS_ERROR_METABLOCK_TOO_BIG:
+	case SQSH_ERROR_METABLOCK_TOO_BIG:
 		return "Metablock too big";
-	case HSQS_ERROR_MAPPER_INIT:
+	case SQSH_ERROR_MAPPER_INIT:
 		return "Mapper init error";
-	case HSQS_ERROR_MAPPER_MAP:
+	case SQSH_ERROR_MAPPER_MAP:
 		return "Mapper mapping error";
-	case HSQS_ERROR_COMPRESSION_UNSUPPORTED:
+	case SQSH_ERROR_COMPRESSION_UNSUPPORTED:
 		return "Compression unkown";
-	case HSQS_ERROR_TODO:
+	case SQSH_ERROR_TODO:
 		return "Todo";
 	}
 	snprintf(err_str, sizeof(err_str), UNKOWN_ERROR_FORMAT, abs(error_code));

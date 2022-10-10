@@ -50,7 +50,7 @@ sqsh_lzma_extract(
 	// LZMA has no compression options
 	if (options != NULL || options_size != 0) {
 		// TODO: More specific error code
-		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 	lzma_ret rv = LZMA_OK;
 
@@ -59,7 +59,7 @@ sqsh_lzma_extract(
 	rv = lzma_alone_decoder(&strm, UINT64_MAX);
 	if (rv != LZMA_OK) {
 		lzma_end(&strm);
-		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
 	lzma_action action = LZMA_RUN;
@@ -73,7 +73,7 @@ sqsh_lzma_extract(
 	action = LZMA_FINISH;
 
 	if (lzma_code(&strm, action) != LZMA_OK) {
-		rv = -HSQS_ERROR_COMPRESSION_DECOMPRESS;
+		rv = -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
 	*target_size = strm.avail_out;

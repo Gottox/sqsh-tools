@@ -123,7 +123,7 @@ sqsh_directory_iterator_lookup(
 		}
 	}
 
-	return -HSQS_ERROR_NO_SUCH_FILE;
+	return -SQSH_ERROR_NO_SUCH_FILE;
 }
 
 int
@@ -134,8 +134,8 @@ sqsh_directory_iterator_init(
 	struct Sqsh *sqsh = inode->sqsh;
 	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 
-	if (sqsh_inode_type(inode) != HSQS_INODE_TYPE_DIRECTORY) {
-		return -HSQS_ERROR_NOT_A_DIRECTORY;
+	if (sqsh_inode_type(inode) != SQSH_INODE_TYPE_DIRECTORY) {
+		return -SQSH_ERROR_NOT_A_DIRECTORY;
 	}
 	iterator->block_start = sqsh_inode_directory_block_start(inode);
 	iterator->block_offset = sqsh_inode_directory_block_offset(inode);
@@ -186,22 +186,22 @@ enum SqshInodeContextType
 sqsh_directory_iterator_inode_type(
 		const struct SqshDirectoryIterator *iterator) {
 	switch (sqsh_data_directory_entry_type(current_entry(iterator))) {
-	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
-		return HSQS_INODE_TYPE_DIRECTORY;
-	case HSQS_INODE_TYPE_BASIC_FILE:
-		return HSQS_INODE_TYPE_FILE;
-	case HSQS_INODE_TYPE_BASIC_SYMLINK:
-		return HSQS_INODE_TYPE_SYMLINK;
-	case HSQS_INODE_TYPE_BASIC_BLOCK:
-		return HSQS_INODE_TYPE_BLOCK;
-	case HSQS_INODE_TYPE_BASIC_CHAR:
-		return HSQS_INODE_TYPE_CHAR;
-	case HSQS_INODE_TYPE_BASIC_FIFO:
-		return HSQS_INODE_TYPE_FIFO;
-	case HSQS_INODE_TYPE_BASIC_SOCKET:
-		return HSQS_INODE_TYPE_SOCKET;
+	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
+		return SQSH_INODE_TYPE_DIRECTORY;
+	case SQSH_INODE_TYPE_BASIC_FILE:
+		return SQSH_INODE_TYPE_FILE;
+	case SQSH_INODE_TYPE_BASIC_SYMLINK:
+		return SQSH_INODE_TYPE_SYMLINK;
+	case SQSH_INODE_TYPE_BASIC_BLOCK:
+		return SQSH_INODE_TYPE_BLOCK;
+	case SQSH_INODE_TYPE_BASIC_CHAR:
+		return SQSH_INODE_TYPE_CHAR;
+	case SQSH_INODE_TYPE_BASIC_FIFO:
+		return SQSH_INODE_TYPE_FIFO;
+	case SQSH_INODE_TYPE_BASIC_SOCKET:
+		return SQSH_INODE_TYPE_SOCKET;
 	}
-	return HSQS_INODE_TYPE_UNKNOWN;
+	return SQSH_INODE_TYPE_UNKNOWN;
 }
 
 int
@@ -224,7 +224,7 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator) {
 		return 0;
 	} else if (iterator->remaining_entries == 0) {
 		// New fragment begins
-		iterator->next_offset += HSQS_SIZEOF_DIRECTORY_FRAGMENT;
+		iterator->next_offset += SQSH_SIZEOF_DIRECTORY_FRAGMENT;
 
 		rv = directory_data_more(iterator, iterator->next_offset);
 		if (rv < 0) {
@@ -242,7 +242,7 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator) {
 	iterator->remaining_entries--;
 
 	// Make sure next entry is loaded:
-	iterator->next_offset += HSQS_SIZEOF_DIRECTORY_ENTRY;
+	iterator->next_offset += SQSH_SIZEOF_DIRECTORY_ENTRY;
 	rv = directory_data_more(iterator, iterator->next_offset);
 	if (rv < 0) {
 		return rv;
@@ -283,6 +283,6 @@ sqsh_directory_iterator_name_dup(
 	if (*name_buffer) {
 		return size;
 	} else {
-		return -HSQS_ERROR_MALLOC_FAILED;
+		return -SQSH_ERROR_MALLOC_FAILED;
 	}
 }

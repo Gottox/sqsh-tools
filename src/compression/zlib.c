@@ -51,8 +51,8 @@ sqsh_zlib_extract(
 	// pointer to an unsigned long.
 	uLongf long_target_size = *target_size;
 	if (options != NULL &&
-		options_size != HSQS_SIZEOF_COMPRESSION_OPTIONS_GZIP) {
-		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
+		options_size != SQSH_SIZEOF_COMPRESSION_OPTIONS_GZIP) {
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
 	int rv = uncompress(target, &long_target_size, compressed, compressed_size);
@@ -63,7 +63,7 @@ sqsh_zlib_extract(
 	*target_size = long_target_size;
 
 	if (rv != Z_OK) {
-		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 	return rv;
 }

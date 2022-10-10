@@ -60,6 +60,6 @@ struct SqshSuperblock {
 	uint64_t export_table_start;
 };
 
-STATIC_ASSERT(sizeof(struct SqshSuperblock) == HSQS_SIZEOF_SUPERBLOCK);
+STATIC_ASSERT(sizeof(struct SqshSuperblock) == SQSH_SIZEOF_SUPERBLOCK);
 
 #endif /* end of include guard SUPERBLOCK_INTERNAL_H */

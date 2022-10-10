@@ -63,7 +63,7 @@ struct SqshFileContext {
  * @param inode The inode context to retrieve the file contents from.
  * @return 0 on success, less than 0 on error.
  */
-HSQS_NO_UNUSED int sqsh_content_init(
+SQSH_NO_UNUSED int sqsh_content_init(
 		struct SqshFileContext *context, struct SqshInodeContext *inode);
 
 /**
@@ -74,7 +74,7 @@ HSQS_NO_UNUSED int sqsh_content_init(
  * @param offset The offset to seek to.
  * @return 0 on success, less than 0 on error.
  */
-HSQS_NO_UNUSED int
+SQSH_NO_UNUSED int
 sqsh_content_seek(struct SqshFileContext *context, uint64_t seek_pos);
 
 /**

@@ -121,43 +121,43 @@ inode_data_more(struct SqshInodeContext *inode, size_t size) {
 static int
 inode_load(struct SqshInodeContext *context) {
 	int rv = 0;
-	size_t size = HSQS_SIZEOF_INODE_HEADER;
+	size_t size = SQSH_SIZEOF_INODE_HEADER;
 
 	const struct SqshInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
-	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
-		size += HSQS_SIZEOF_INODE_DIRECTORY;
+	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
+		size += SQSH_SIZEOF_INODE_DIRECTORY;
 		break;
-	case HSQS_INODE_TYPE_BASIC_FILE:
-		size += HSQS_SIZEOF_INODE_FILE_EXT;
+	case SQSH_INODE_TYPE_BASIC_FILE:
+		size += SQSH_SIZEOF_INODE_FILE_EXT;
 		break;
-	case HSQS_INODE_TYPE_BASIC_SYMLINK:
-		size += HSQS_SIZEOF_INODE_SYMLINK;
+	case SQSH_INODE_TYPE_BASIC_SYMLINK:
+		size += SQSH_SIZEOF_INODE_SYMLINK;
 		break;
-	case HSQS_INODE_TYPE_BASIC_BLOCK:
-	case HSQS_INODE_TYPE_BASIC_CHAR:
-		size += HSQS_SIZEOF_INODE_DEVICE;
+	case SQSH_INODE_TYPE_BASIC_BLOCK:
+	case SQSH_INODE_TYPE_BASIC_CHAR:
+		size += SQSH_SIZEOF_INODE_DEVICE;
 		break;
-	case HSQS_INODE_TYPE_BASIC_FIFO:
-	case HSQS_INODE_TYPE_BASIC_SOCKET:
-		size += HSQS_SIZEOF_INODE_IPC;
+	case SQSH_INODE_TYPE_BASIC_FIFO:
+	case SQSH_INODE_TYPE_BASIC_SOCKET:
+		size += SQSH_SIZEOF_INODE_IPC;
 		break;
-	case HSQS_INODE_TYPE_EXTENDED_DIRECTORY:
-		size += HSQS_SIZEOF_INODE_DIRECTORY_EXT;
+	case SQSH_INODE_TYPE_EXTENDED_DIRECTORY:
+		size += SQSH_SIZEOF_INODE_DIRECTORY_EXT;
 		break;
-	case HSQS_INODE_TYPE_EXTENDED_FILE:
-		size += HSQS_SIZEOF_INODE_FILE_EXT;
+	case SQSH_INODE_TYPE_EXTENDED_FILE:
+		size += SQSH_SIZEOF_INODE_FILE_EXT;
 		break;
-	case HSQS_INODE_TYPE_EXTENDED_SYMLINK:
-		size += HSQS_SIZEOF_INODE_SYMLINK_EXT;
+	case SQSH_INODE_TYPE_EXTENDED_SYMLINK:
+		size += SQSH_SIZEOF_INODE_SYMLINK_EXT;
 		break;
-	case HSQS_INODE_TYPE_EXTENDED_BLOCK:
-	case HSQS_INODE_TYPE_EXTENDED_CHAR:
-		size += HSQS_SIZEOF_INODE_DEVICE_EXT;
+	case SQSH_INODE_TYPE_EXTENDED_BLOCK:
+	case SQSH_INODE_TYPE_EXTENDED_CHAR:
+		size += SQSH_SIZEOF_INODE_DEVICE_EXT;
 		break;
-	case HSQS_INODE_TYPE_EXTENDED_FIFO:
-	case HSQS_INODE_TYPE_EXTENDED_SOCKET:
-		size += HSQS_SIZEOF_INODE_IPC_EXT;
+	case SQSH_INODE_TYPE_EXTENDED_FIFO:
+	case SQSH_INODE_TYPE_EXTENDED_SOCKET:
+		size += SQSH_SIZEOF_INODE_IPC_EXT;
 		break;
 	}
 	rv = inode_data_more(context, size);
@@ -171,10 +171,10 @@ get_size_info(const struct SqshInodeContext *context, int index) {
 
 	const struct SqshInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
-	case HSQS_INODE_TYPE_BASIC_FILE:
+	case SQSH_INODE_TYPE_BASIC_FILE:
 		basic_file = sqsh_data_inode_file(inode);
 		return &sqsh_data_inode_file_block_sizes(basic_file)[index];
-	case HSQS_INODE_TYPE_EXTENDED_FILE:
+	case SQSH_INODE_TYPE_EXTENDED_FILE:
 		extended_file = sqsh_data_inode_file_ext(inode);
 		return &sqsh_data_inode_file_ext_block_sizes(extended_file)[index];
 	}
@@ -206,7 +206,7 @@ sqsh_inode_load_by_ref(
 	}
 
 	// loading enough data to identify the inode
-	rv = inode_data_more(inode, HSQS_SIZEOF_INODE_HEADER);
+	rv = inode_data_more(inode, SQSH_SIZEOF_INODE_HEADER);
 	if (rv < 0) {
 		return rv;
 	}
@@ -259,7 +259,7 @@ sqsh_inode_load_by_path(
 	const char *segment = path;
 	uint64_t *inode_refs = calloc(segment_count, sizeof(uint64_t));
 	if (inode_refs == NULL) {
-		rv = HSQS_ERROR_MALLOC_FAILED;
+		rv = SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
 	inode_refs[0] = sqsh_superblock_inode_root_ref(superblock);
@@ -295,21 +295,21 @@ bool
 sqsh_inode_is_extended(const struct SqshInodeContext *context) {
 	const struct SqshInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
-	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
-	case HSQS_INODE_TYPE_BASIC_FILE:
-	case HSQS_INODE_TYPE_BASIC_SYMLINK:
-	case HSQS_INODE_TYPE_BASIC_BLOCK:
-	case HSQS_INODE_TYPE_BASIC_CHAR:
-	case HSQS_INODE_TYPE_BASIC_FIFO:
-	case HSQS_INODE_TYPE_BASIC_SOCKET:
+	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
+	case SQSH_INODE_TYPE_BASIC_FILE:
+	case SQSH_INODE_TYPE_BASIC_SYMLINK:
+	case SQSH_INODE_TYPE_BASIC_BLOCK:
+	case SQSH_INODE_TYPE_BASIC_CHAR:
+	case SQSH_INODE_TYPE_BASIC_FIFO:
+	case SQSH_INODE_TYPE_BASIC_SOCKET:
 		return false;
-	case HSQS_INODE_TYPE_EXTENDED_DIRECTORY:
-	case HSQS_INODE_TYPE_EXTENDED_FILE:
-	case HSQS_INODE_TYPE_EXTENDED_SYMLINK:
-	case HSQS_INODE_TYPE_EXTENDED_BLOCK:
-	case HSQS_INODE_TYPE_EXTENDED_CHAR:
-	case HSQS_INODE_TYPE_EXTENDED_FIFO:
-	case HSQS_INODE_TYPE_EXTENDED_SOCKET:
+	case SQSH_INODE_TYPE_EXTENDED_DIRECTORY:
+	case SQSH_INODE_TYPE_EXTENDED_FILE:
+	case SQSH_INODE_TYPE_EXTENDED_SYMLINK:
+	case SQSH_INODE_TYPE_EXTENDED_BLOCK:
+	case SQSH_INODE_TYPE_EXTENDED_CHAR:
+	case SQSH_INODE_TYPE_EXTENDED_FIFO:
+	case SQSH_INODE_TYPE_EXTENDED_SOCKET:
 		return true;
 	}
 	return false;
@@ -319,41 +319,41 @@ uint32_t
 sqsh_inode_hard_link_count(const struct SqshInodeContext *context) {
 	const struct SqshInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
-	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
+	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
 		return sqsh_data_inode_directory_hard_link_count(
 				sqsh_data_inode_directory(inode));
-	case HSQS_INODE_TYPE_BASIC_FILE:
+	case SQSH_INODE_TYPE_BASIC_FILE:
 		return 1;
-	case HSQS_INODE_TYPE_BASIC_SYMLINK:
+	case SQSH_INODE_TYPE_BASIC_SYMLINK:
 		return sqsh_data_inode_symlink_hard_link_count(
 				sqsh_data_inode_symlink(inode));
-	case HSQS_INODE_TYPE_BASIC_BLOCK:
-	case HSQS_INODE_TYPE_BASIC_CHAR:
+	case SQSH_INODE_TYPE_BASIC_BLOCK:
+	case SQSH_INODE_TYPE_BASIC_CHAR:
 		return sqsh_data_inode_device_hard_link_count(
 				sqsh_data_inode_device(inode));
-	case HSQS_INODE_TYPE_BASIC_FIFO:
-	case HSQS_INODE_TYPE_BASIC_SOCKET:
+	case SQSH_INODE_TYPE_BASIC_FIFO:
+	case SQSH_INODE_TYPE_BASIC_SOCKET:
 		return sqsh_data_inode_ipc_hard_link_count(sqsh_data_inode_ipc(inode));
 
-	case HSQS_INODE_TYPE_EXTENDED_DIRECTORY:
+	case SQSH_INODE_TYPE_EXTENDED_DIRECTORY:
 		return sqsh_data_inode_directory_ext_hard_link_count(
 				sqsh_data_inode_directory_ext(inode));
-	case HSQS_INODE_TYPE_EXTENDED_FILE:
+	case SQSH_INODE_TYPE_EXTENDED_FILE:
 		return sqsh_data_inode_file_ext_hard_link_count(
 				sqsh_data_inode_file_ext(inode));
-	case HSQS_INODE_TYPE_EXTENDED_SYMLINK:
+	case SQSH_INODE_TYPE_EXTENDED_SYMLINK:
 		return sqsh_data_inode_symlink_ext_hard_link_count(
 				sqsh_data_inode_symlink_ext(inode));
-	case HSQS_INODE_TYPE_EXTENDED_BLOCK:
-	case HSQS_INODE_TYPE_EXTENDED_CHAR:
+	case SQSH_INODE_TYPE_EXTENDED_BLOCK:
+	case SQSH_INODE_TYPE_EXTENDED_CHAR:
 		return sqsh_data_inode_device_ext_hard_link_count(
 				sqsh_data_inode_device_ext(inode));
-	case HSQS_INODE_TYPE_EXTENDED_FIFO:
-	case HSQS_INODE_TYPE_EXTENDED_SOCKET:
+	case SQSH_INODE_TYPE_EXTENDED_FIFO:
+	case SQSH_INODE_TYPE_EXTENDED_SOCKET:
 		return sqsh_data_inode_ipc_ext_hard_link_count(
 				sqsh_data_inode_ipc_ext(inode));
 	}
-	return -HSQS_ERROR_UNKOWN_INODE_TYPE;
+	return -SQSH_ERROR_UNKOWN_INODE_TYPE;
 }
 
 uint64_t
@@ -365,16 +365,16 @@ sqsh_inode_file_size(const struct SqshInodeContext *context) {
 
 	const struct SqshInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
-	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
+	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
 		basic_dir = sqsh_data_inode_directory(inode);
 		return sqsh_data_inode_directory_file_size(basic_dir);
-	case HSQS_INODE_TYPE_EXTENDED_DIRECTORY:
+	case SQSH_INODE_TYPE_EXTENDED_DIRECTORY:
 		extended_dir = sqsh_data_inode_directory_ext(inode);
 		return sqsh_data_inode_directory_ext_file_size(extended_dir);
-	case HSQS_INODE_TYPE_BASIC_FILE:
+	case SQSH_INODE_TYPE_BASIC_FILE:
 		basic_file = sqsh_data_inode_file(inode);
 		return sqsh_data_inode_file_size(basic_file);
-	case HSQS_INODE_TYPE_EXTENDED_FILE:
+	case SQSH_INODE_TYPE_EXTENDED_FILE:
 		extended_file = sqsh_data_inode_file_ext(inode);
 		return sqsh_data_inode_file_ext_size(extended_file);
 	}
@@ -403,10 +403,10 @@ sqsh_inode_file_blocks_start(const struct SqshInodeContext *context) {
 
 	const struct SqshInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
-	case HSQS_INODE_TYPE_BASIC_FILE:
+	case SQSH_INODE_TYPE_BASIC_FILE:
 		basic_file = sqsh_data_inode_file(inode);
 		return sqsh_data_inode_file_blocks_start(basic_file);
-	case HSQS_INODE_TYPE_EXTENDED_FILE:
+	case SQSH_INODE_TYPE_EXTENDED_FILE:
 		extended_file = sqsh_data_inode_file_ext(inode);
 		return sqsh_data_inode_file_ext_blocks_start(extended_file);
 	}
@@ -424,7 +424,7 @@ sqsh_inode_file_block_count(const struct SqshInodeContext *context) {
 	} else if (sqsh_inode_file_has_fragment(context)) {
 		return file_size / block_size;
 	} else {
-		return HSQS_DEVIDE_CEIL(file_size, block_size);
+		return SQSH_DEVIDE_CEIL(file_size, block_size);
 	}
 }
 
@@ -451,14 +451,14 @@ sqsh_inode_file_fragment_block_index(const struct SqshInodeContext *context) {
 
 	const struct SqshInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
-	case HSQS_INODE_TYPE_BASIC_FILE:
+	case SQSH_INODE_TYPE_BASIC_FILE:
 		basic_file = sqsh_data_inode_file(inode);
 		return sqsh_data_inode_file_fragment_block_index(basic_file);
-	case HSQS_INODE_TYPE_EXTENDED_FILE:
+	case SQSH_INODE_TYPE_EXTENDED_FILE:
 		extended_file = sqsh_data_inode_file_ext(inode);
 		return sqsh_data_inode_file_ext_fragment_block_index(extended_file);
 	}
-	return HSQS_INODE_NO_FRAGMENT;
+	return SQSH_INODE_NO_FRAGMENT;
 }
 
 uint32_t
@@ -468,10 +468,10 @@ sqsh_inode_directory_block_start(const struct SqshInodeContext *context) {
 	const struct SqshInode *inode = get_inode(context);
 
 	switch (sqsh_data_inode_type(inode)) {
-	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
+	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
 		basic_file = sqsh_data_inode_directory(inode);
 		return sqsh_data_inode_directory_block_start(basic_file);
-	case HSQS_INODE_TYPE_EXTENDED_DIRECTORY:
+	case SQSH_INODE_TYPE_EXTENDED_DIRECTORY:
 		extended_file = sqsh_data_inode_directory_ext(inode);
 		return sqsh_data_inode_directory_ext_block_start(extended_file);
 	}
@@ -485,10 +485,10 @@ sqsh_inode_directory_block_offset(const struct SqshInodeContext *context) {
 	const struct SqshInode *inode = get_inode(context);
 
 	switch (sqsh_data_inode_type(inode)) {
-	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
+	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
 		basic_directory = sqsh_data_inode_directory(inode);
 		return sqsh_data_inode_directory_block_offset(basic_directory);
-	case HSQS_INODE_TYPE_EXTENDED_DIRECTORY:
+	case SQSH_INODE_TYPE_EXTENDED_DIRECTORY:
 		extended_directory = sqsh_data_inode_directory_ext(inode);
 		return sqsh_data_inode_directory_ext_block_offset(extended_directory);
 	}
@@ -502,20 +502,20 @@ sqsh_inode_file_fragment_block_offset(const struct SqshInodeContext *context) {
 	const struct SqshInode *inode = get_inode(context);
 
 	switch (sqsh_data_inode_type(inode)) {
-	case HSQS_INODE_TYPE_BASIC_FILE:
+	case SQSH_INODE_TYPE_BASIC_FILE:
 		basic_file = sqsh_data_inode_file(inode);
 		return sqsh_data_inode_file_block_offset(basic_file);
-	case HSQS_INODE_TYPE_EXTENDED_FILE:
+	case SQSH_INODE_TYPE_EXTENDED_FILE:
 		extended_file = sqsh_data_inode_file_ext(inode);
 		return sqsh_data_inode_file_ext_block_offset(extended_file);
 	}
-	return HSQS_INODE_NO_FRAGMENT;
+	return SQSH_INODE_NO_FRAGMENT;
 }
 
 bool
 sqsh_inode_file_has_fragment(const struct SqshInodeContext *inode) {
 	return sqsh_inode_file_fragment_block_index(inode) !=
-			HSQS_INODE_NO_FRAGMENT;
+			SQSH_INODE_NO_FRAGMENT;
 }
 
 enum SqshInodeContextType
@@ -523,29 +523,29 @@ sqsh_inode_type(const struct SqshInodeContext *context) {
 	const struct SqshInode *inode = get_inode(context);
 
 	switch (sqsh_data_inode_type(inode)) {
-	case HSQS_INODE_TYPE_BASIC_DIRECTORY:
-	case HSQS_INODE_TYPE_EXTENDED_DIRECTORY:
-		return HSQS_INODE_TYPE_DIRECTORY;
-	case HSQS_INODE_TYPE_BASIC_FILE:
-	case HSQS_INODE_TYPE_EXTENDED_FILE:
-		return HSQS_INODE_TYPE_FILE;
-	case HSQS_INODE_TYPE_BASIC_SYMLINK:
-	case HSQS_INODE_TYPE_EXTENDED_SYMLINK:
-		return HSQS_INODE_TYPE_SYMLINK;
-	case HSQS_INODE_TYPE_BASIC_BLOCK:
-	case HSQS_INODE_TYPE_EXTENDED_BLOCK:
-		return HSQS_INODE_TYPE_BLOCK;
-	case HSQS_INODE_TYPE_BASIC_CHAR:
-	case HSQS_INODE_TYPE_EXTENDED_CHAR:
-		return HSQS_INODE_TYPE_CHAR;
-	case HSQS_INODE_TYPE_BASIC_FIFO:
-	case HSQS_INODE_TYPE_EXTENDED_FIFO:
-		return HSQS_INODE_TYPE_FIFO;
-	case HSQS_INODE_TYPE_BASIC_SOCKET:
-	case HSQS_INODE_TYPE_EXTENDED_SOCKET:
-		return HSQS_INODE_TYPE_SOCKET;
+	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
+	case SQSH_INODE_TYPE_EXTENDED_DIRECTORY:
+		return SQSH_INODE_TYPE_DIRECTORY;
+	case SQSH_INODE_TYPE_BASIC_FILE:
+	case SQSH_INODE_TYPE_EXTENDED_FILE:
+		return SQSH_INODE_TYPE_FILE;
+	case SQSH_INODE_TYPE_BASIC_SYMLINK:
+	case SQSH_INODE_TYPE_EXTENDED_SYMLINK:
+		return SQSH_INODE_TYPE_SYMLINK;
+	case SQSH_INODE_TYPE_BASIC_BLOCK:
+	case SQSH_INODE_TYPE_EXTENDED_BLOCK:
+		return SQSH_INODE_TYPE_BLOCK;
+	case SQSH_INODE_TYPE_BASIC_CHAR:
+	case SQSH_INODE_TYPE_EXTENDED_CHAR:
+		return SQSH_INODE_TYPE_CHAR;
+	case SQSH_INODE_TYPE_BASIC_FIFO:
+	case SQSH_INODE_TYPE_EXTENDED_FIFO:
+		return SQSH_INODE_TYPE_FIFO;
+	case SQSH_INODE_TYPE_BASIC_SOCKET:
+	case SQSH_INODE_TYPE_EXTENDED_SOCKET:
+		return SQSH_INODE_TYPE_SOCKET;
 	}
-	return HSQS_INODE_TYPE_UNKNOWN;
+	return SQSH_INODE_TYPE_UNKNOWN;
 }
 
 const char *
@@ -555,10 +555,10 @@ sqsh_inode_symlink(const struct SqshInodeContext *context) {
 
 	const struct SqshInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
-	case HSQS_INODE_TYPE_BASIC_SYMLINK:
+	case SQSH_INODE_TYPE_BASIC_SYMLINK:
 		basic = sqsh_data_inode_symlink(inode);
 		return (const char *)sqsh_data_inode_symlink_target_path(basic);
-	case HSQS_INODE_TYPE_EXTENDED_SYMLINK:
+	case SQSH_INODE_TYPE_EXTENDED_SYMLINK:
 		extended = sqsh_data_inode_symlink_ext(inode);
 		return (const char *)sqsh_data_inode_symlink_ext_target_path(extended);
 	}
@@ -575,7 +575,7 @@ sqsh_inode_symlink_dup(
 	if (*namebuffer) {
 		return size;
 	} else {
-		return -HSQS_ERROR_MALLOC_FAILED;
+		return -SQSH_ERROR_MALLOC_FAILED;
 	}
 }
 
@@ -586,10 +586,10 @@ sqsh_inode_symlink_size(const struct SqshInodeContext *context) {
 
 	const struct SqshInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
-	case HSQS_INODE_TYPE_BASIC_SYMLINK:
+	case SQSH_INODE_TYPE_BASIC_SYMLINK:
 		basic = sqsh_data_inode_symlink(inode);
 		return sqsh_data_inode_symlink_target_size(basic);
-	case HSQS_INODE_TYPE_EXTENDED_SYMLINK:
+	case SQSH_INODE_TYPE_EXTENDED_SYMLINK:
 		extended = sqsh_data_inode_symlink_ext(inode);
 		return sqsh_data_inode_symlink_ext_target_size(extended);
 	}
@@ -603,12 +603,12 @@ sqsh_inode_device_id(const struct SqshInodeContext *context) {
 
 	const struct SqshInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
-	case HSQS_INODE_TYPE_BASIC_BLOCK:
-	case HSQS_INODE_TYPE_BASIC_CHAR:
+	case SQSH_INODE_TYPE_BASIC_BLOCK:
+	case SQSH_INODE_TYPE_BASIC_CHAR:
 		basic = sqsh_data_inode_device(inode);
 		return sqsh_data_inode_device_device(basic);
-	case HSQS_INODE_TYPE_EXTENDED_BLOCK:
-	case HSQS_INODE_TYPE_EXTENDED_CHAR:
+	case SQSH_INODE_TYPE_EXTENDED_BLOCK:
+	case SQSH_INODE_TYPE_EXTENDED_CHAR:
 		extended = sqsh_data_inode_device_ext(inode);
 		return sqsh_data_inode_device_ext_device(extended);
 	}
@@ -647,25 +647,25 @@ uint32_t
 sqsh_inode_xattr_index(const struct SqshInodeContext *context) {
 	const struct SqshInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
-	case HSQS_INODE_TYPE_EXTENDED_DIRECTORY:
+	case SQSH_INODE_TYPE_EXTENDED_DIRECTORY:
 		return sqsh_data_inode_directory_ext_xattr_idx(
 				sqsh_data_inode_directory_ext(inode));
-	case HSQS_INODE_TYPE_EXTENDED_FILE:
+	case SQSH_INODE_TYPE_EXTENDED_FILE:
 		return sqsh_data_inode_file_ext_xattr_idx(
 				sqsh_data_inode_file_ext(inode));
-	case HSQS_INODE_TYPE_EXTENDED_SYMLINK:
+	case SQSH_INODE_TYPE_EXTENDED_SYMLINK:
 		return sqsh_data_inode_symlink_ext_xattr_idx(
 				sqsh_data_inode_symlink_ext(inode));
-	case HSQS_INODE_TYPE_EXTENDED_BLOCK:
-	case HSQS_INODE_TYPE_EXTENDED_CHAR:
+	case SQSH_INODE_TYPE_EXTENDED_BLOCK:
+	case SQSH_INODE_TYPE_EXTENDED_CHAR:
 		return sqsh_data_inode_device_ext_xattr_idx(
 				sqsh_data_inode_device_ext(inode));
-	case HSQS_INODE_TYPE_EXTENDED_FIFO:
-	case HSQS_INODE_TYPE_EXTENDED_SOCKET:
+	case SQSH_INODE_TYPE_EXTENDED_FIFO:
+	case SQSH_INODE_TYPE_EXTENDED_SOCKET:
 		return sqsh_data_inode_ipc_ext_xattr_idx(
 				sqsh_data_inode_ipc_ext(inode));
 	}
-	return HSQS_INODE_NO_XATTR;
+	return SQSH_INODE_NO_XATTR;
 }
 
 int
@@ -676,7 +676,7 @@ sqsh_inode_xattr_iterator(
 	struct SqshXattrTable *table = NULL;
 
 	rv = sqsh_xattr_table(inode->sqsh, &table);
-	if (rv < 0 && rv != -HSQS_ERROR_NO_XATTR_TABLE) {
+	if (rv < 0 && rv != -SQSH_ERROR_NO_XATTR_TABLE) {
 		return rv;
 	}
 	return sqsh_xattr_iterator_init(iterator, table, inode);

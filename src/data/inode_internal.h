@@ -38,7 +38,7 @@
 
 #define FORMAT_INODE_INTERNAL_H
 
-struct HSQS_UNALIGNED SqshInodeDirectoryIndex {
+struct SQSH_UNALIGNED SqshInodeDirectoryIndex {
 	uint32_t index;
 	uint32_t start;
 	uint32_t name_size;
@@ -46,18 +46,18 @@ struct HSQS_UNALIGNED SqshInodeDirectoryIndex {
 };
 STATIC_ASSERT(
 		sizeof(struct SqshInodeDirectoryIndex) ==
-		HSQS_SIZEOF_INODE_DIRECTORY_INDEX);
+		SQSH_SIZEOF_INODE_DIRECTORY_INDEX);
 
-struct HSQS_UNALIGNED SqshInodeDirectory {
+struct SQSH_UNALIGNED SqshInodeDirectory {
 	uint32_t block_start;
 	uint32_t hard_link_count;
 	uint16_t file_size;
 	uint16_t block_offset;
 	uint32_t parent_inode_number;
 };
-STATIC_ASSERT(sizeof(struct SqshInodeDirectory) == HSQS_SIZEOF_INODE_DIRECTORY);
+STATIC_ASSERT(sizeof(struct SqshInodeDirectory) == SQSH_SIZEOF_INODE_DIRECTORY);
 
-struct HSQS_UNALIGNED SqshInodeDirectoryExt {
+struct SQSH_UNALIGNED SqshInodeDirectoryExt {
 	uint32_t hard_link_count;
 	uint32_t file_size;
 	uint32_t block_start;
@@ -69,18 +69,18 @@ struct HSQS_UNALIGNED SqshInodeDirectoryExt {
 };
 STATIC_ASSERT(
 		sizeof(struct SqshInodeDirectoryExt) ==
-		HSQS_SIZEOF_INODE_DIRECTORY_EXT);
+		SQSH_SIZEOF_INODE_DIRECTORY_EXT);
 
-struct HSQS_UNALIGNED SqshInodeFile {
+struct SQSH_UNALIGNED SqshInodeFile {
 	uint32_t blocks_start;
 	uint32_t fragment_block_index;
 	uint32_t block_offset;
 	uint32_t file_size;
 	// uint32_t block_sizes[0];
 };
-STATIC_ASSERT(sizeof(struct SqshInodeFile) == HSQS_SIZEOF_INODE_FILE);
+STATIC_ASSERT(sizeof(struct SqshInodeFile) == SQSH_SIZEOF_INODE_FILE);
 
-struct HSQS_UNALIGNED SqshInodeFileExt {
+struct SQSH_UNALIGNED SqshInodeFileExt {
 	uint64_t blocks_start;
 	uint64_t file_size;
 	uint64_t sparse;
@@ -90,56 +90,56 @@ struct HSQS_UNALIGNED SqshInodeFileExt {
 	uint32_t xattr_idx;
 	// uint32_t block_sizes[0];
 };
-STATIC_ASSERT(sizeof(struct SqshInodeFileExt) == HSQS_SIZEOF_INODE_FILE_EXT);
+STATIC_ASSERT(sizeof(struct SqshInodeFileExt) == SQSH_SIZEOF_INODE_FILE_EXT);
 
-struct HSQS_UNALIGNED SqshInodeSymlink {
+struct SQSH_UNALIGNED SqshInodeSymlink {
 	uint32_t hard_link_count;
 	uint32_t target_size;
 	// uint8_t target_path[0]; // [target_size]
 };
-STATIC_ASSERT(sizeof(struct SqshInodeSymlink) == HSQS_SIZEOF_INODE_SYMLINK);
+STATIC_ASSERT(sizeof(struct SqshInodeSymlink) == SQSH_SIZEOF_INODE_SYMLINK);
 
-struct HSQS_UNALIGNED SqshInodeSymlinkExt {
+struct SQSH_UNALIGNED SqshInodeSymlinkExt {
 	uint32_t hard_link_count;
 	uint32_t target_size;
 	// uint8_t target_path[0]; // [target_size]
 };
 STATIC_ASSERT(
-		sizeof(struct SqshInodeSymlinkExt) == HSQS_SIZEOF_INODE_SYMLINK_EXT);
+		sizeof(struct SqshInodeSymlinkExt) == SQSH_SIZEOF_INODE_SYMLINK_EXT);
 
-struct HSQS_UNALIGNED SqshInodeSymlinkExtTail {
+struct SQSH_UNALIGNED SqshInodeSymlinkExtTail {
 	uint32_t xattr_idx;
 };
 STATIC_ASSERT(
 		sizeof(struct SqshInodeSymlinkExtTail) ==
-		HSQS_SIZEOF_INODE_SYMLINK_EXT_TAIL);
+		SQSH_SIZEOF_INODE_SYMLINK_EXT_TAIL);
 
-struct HSQS_UNALIGNED SqshInodeDevice {
+struct SQSH_UNALIGNED SqshInodeDevice {
 	uint32_t hard_link_count;
 	uint32_t device;
 };
-STATIC_ASSERT(sizeof(struct SqshInodeDevice) == HSQS_SIZEOF_INODE_DEVICE);
+STATIC_ASSERT(sizeof(struct SqshInodeDevice) == SQSH_SIZEOF_INODE_DEVICE);
 
-struct HSQS_UNALIGNED SqshInodeDeviceExt {
+struct SQSH_UNALIGNED SqshInodeDeviceExt {
 	uint32_t hard_link_count;
 	uint32_t device;
 	uint32_t xattr_idx;
 };
 STATIC_ASSERT(
-		sizeof(struct SqshInodeDeviceExt) == HSQS_SIZEOF_INODE_DEVICE_EXT);
+		sizeof(struct SqshInodeDeviceExt) == SQSH_SIZEOF_INODE_DEVICE_EXT);
 
-struct HSQS_UNALIGNED SqshInodeIpc {
+struct SQSH_UNALIGNED SqshInodeIpc {
 	uint32_t hard_link_count;
 };
-STATIC_ASSERT(sizeof(struct SqshInodeIpc) == HSQS_SIZEOF_INODE_IPC);
+STATIC_ASSERT(sizeof(struct SqshInodeIpc) == SQSH_SIZEOF_INODE_IPC);
 
-struct HSQS_UNALIGNED SqshInodeIpcExt {
+struct SQSH_UNALIGNED SqshInodeIpcExt {
 	uint32_t hard_link_count;
 	uint32_t xattr_idx;
 };
-STATIC_ASSERT(sizeof(struct SqshInodeIpcExt) == HSQS_SIZEOF_INODE_IPC_EXT);
+STATIC_ASSERT(sizeof(struct SqshInodeIpcExt) == SQSH_SIZEOF_INODE_IPC_EXT);
 
-struct HSQS_UNALIGNED SqshInodeHeader {
+struct SQSH_UNALIGNED SqshInodeHeader {
 	uint16_t type;
 	uint16_t permissions;
 	uint16_t uid_idx;
@@ -147,9 +147,9 @@ struct HSQS_UNALIGNED SqshInodeHeader {
 	uint32_t modified_time;
 	uint32_t inode_number;
 };
-STATIC_ASSERT(sizeof(struct SqshInodeHeader) == HSQS_SIZEOF_INODE_HEADER);
+STATIC_ASSERT(sizeof(struct SqshInodeHeader) == SQSH_SIZEOF_INODE_HEADER);
 
-struct HSQS_UNALIGNED SqshInode {
+struct SQSH_UNALIGNED SqshInode {
 	struct SqshInodeHeader header;
 	union {
 		struct SqshInodeDirectory directory;

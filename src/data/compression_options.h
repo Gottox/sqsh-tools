@@ -33,16 +33,16 @@
 
 #include <stdint.h>
 
-#ifndef HSQS__COMPRESSION_OPTIONS_H
+#ifndef SQSH__COMPRESSION_OPTIONS_H
 
-#define HSQS__COMPRESSION_OPTIONS_H
+#define SQSH__COMPRESSION_OPTIONS_H
 
-#define HSQS_SIZEOF_COMPRESSION_OPTIONS_GZIP 8
-#define HSQS_SIZEOF_COMPRESSION_OPTIONS_XZ 8
-#define HSQS_SIZEOF_COMPRESSION_OPTIONS_LZ4 8
-#define HSQS_SIZEOF_COMPRESSION_OPTIONS_ZSTD 4
-#define HSQS_SIZEOF_COMPRESSION_OPTIONS_LZO 8
-#define HSQS_SIZEOF_COMPRESSION_OPTIONS 8
+#define SQSH_SIZEOF_COMPRESSION_OPTIONS_GZIP 8
+#define SQSH_SIZEOF_COMPRESSION_OPTIONS_XZ 8
+#define SQSH_SIZEOF_COMPRESSION_OPTIONS_LZ4 8
+#define SQSH_SIZEOF_COMPRESSION_OPTIONS_ZSTD 4
+#define SQSH_SIZEOF_COMPRESSION_OPTIONS_LZO 8
+#define SQSH_SIZEOF_COMPRESSION_OPTIONS 8
 
 struct SqshCompressionOptionsGzip;
 
@@ -81,4 +81,4 @@ uint32_t sqsh_data_compression_options_lzo_algorithm(
 uint32_t sqsh_data_compression_options_lzo_compression_level(
 		const union SqshCompressionOptions *options);
 
-#endif /* end of include guard HSQS__COMPRESSION_OPTIONS_H */
+#endif /* end of include guard SQSH__COMPRESSION_OPTIONS_H */

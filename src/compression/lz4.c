@@ -47,14 +47,14 @@ sqsh_lz4_extract(
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	if (options != NULL &&
-		options_size != HSQS_SIZEOF_COMPRESSION_OPTIONS_LZ4) {
-		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
+		options_size != SQSH_SIZEOF_COMPRESSION_OPTIONS_LZ4) {
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
 	int rv = LZ4_decompress_safe(
 			(char *)compressed, (char *)target, compressed_size, *target_size);
 	if (rv < 0) {
-		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 	*target_size = rv;
 

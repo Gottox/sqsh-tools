@@ -50,7 +50,7 @@ sqsh_fragment_table_init(struct SqshFragmentTable *table, struct Sqsh *sqsh) {
 	table->compression = sqsh_data_compression(sqsh);
 	table->mapper = sqsh_mapper(sqsh);
 	rv = sqsh_table_init(
-			&table->table, sqsh, start, HSQS_SIZEOF_FRAGMENT, count);
+			&table->table, sqsh, start, SQSH_SIZEOF_FRAGMENT, count);
 	if (rv < 0) {
 		goto out;
 	}
@@ -117,7 +117,7 @@ sqsh_fragment_table_to_buffer(
 	uint32_t size = sqsh_inode_file_size(inode) % block_size;
 	uint32_t end_offset;
 	if (ADD_OVERFLOW(offset, size, &end_offset)) {
-		return -HSQS_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	rv = sqsh_buffer_init(&intermediate_buffer);
 	if (rv < 0) {
@@ -130,7 +130,7 @@ sqsh_fragment_table_to_buffer(
 	}
 
 	if (end_offset > sqsh_buffer_size(&intermediate_buffer)) {
-		return -HSQS_ERROR_SIZE_MISSMATCH;
+		return -SQSH_ERROR_SIZE_MISSMATCH;
 	}
 
 	data = sqsh_buffer_data(&intermediate_buffer);

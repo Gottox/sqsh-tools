@@ -44,9 +44,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#ifndef HSQS_H
+#ifndef SQSH_H
 
-#define HSQS_H
+#define SQSH_H
 
 struct SqshTrailingContext;
 
@@ -78,7 +78,7 @@ struct Sqsh {
  * @param size the size of the buffer.
  * @return 0 on success, less than 0 on error.
  */
-HSQS_NO_UNUSED int
+SQSH_NO_UNUSED int
 sqsh_init(struct Sqsh *sqsh, const uint8_t *buffer, const size_t size);
 
 /**
@@ -88,7 +88,7 @@ sqsh_init(struct Sqsh *sqsh, const uint8_t *buffer, const size_t size);
  * @param path the path to the sqsh file.
  * @return 0 on success, less than 0 on error.
  */
-HSQS_NO_UNUSED int sqsh_open(struct Sqsh *sqsh, const char *path);
+SQSH_NO_UNUSED int sqsh_open(struct Sqsh *sqsh, const char *path);
 
 #ifdef CONFIG_CURL
 /**
@@ -146,7 +146,7 @@ int sqsh_id_table(struct Sqsh *sqsh, struct SqshTable **id_table);
 /**
  * @brief sqsh_export_table returns the export table context. If the archive
  * does not contain an export table, the function returns
- * `-HSQS_ERROR_NO_EXPORT_TABLE`
+ * `-SQSH_ERROR_NO_EXPORT_TABLE`
  * @memberof Sqsh
  * @param sqsh the Sqsh structure.
  * @param export_table double pointer that will be set to the export table.
@@ -157,7 +157,7 @@ int sqsh_export_table(struct Sqsh *sqsh, struct SqshTable **export_table);
 /**
  * @brief sqsh_fragment_table returns the fragment table context. If the archive
  * does not contain a fragment table, the function returns
- * `-HSQS_ERROR_NO_FRAGMENT_TABLE`.
+ * `-SQSH_ERROR_NO_FRAGMENT_TABLE`.
  * @memberof Sqsh
  * @param sqsh the Sqsh structure.
  * @param fragment_table double pointer that will be set to the fragment table.
@@ -169,7 +169,7 @@ int sqsh_fragment_table(
 /**
  * @brief sqsh_xattr_table returns the xattr table context. If the archive
  * does not contain an xattr table, the function returns
- * `-HSQS_ERROR_NO_XATTR_TABLE`.
+ * `-SQSH_ERROR_NO_XATTR_TABLE`.
  * @memberof Sqsh
  * @param sqsh the Sqsh structure.
  * @param xattr_table double pointer that will be set to the xattr table.
@@ -198,4 +198,4 @@ int sqsh_compression_options(
  */
 int sqsh_cleanup(struct Sqsh *sqsh);
 
-#endif /* end of include guard HSQS_H */
+#endif /* end of include guard SQSH_H */

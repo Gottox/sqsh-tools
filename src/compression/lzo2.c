@@ -49,15 +49,15 @@ sqsh_lzo2_extract(
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	if (options != NULL &&
-		options_size != HSQS_SIZEOF_COMPRESSION_OPTIONS_LZO) {
-		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
+		options_size != SQSH_SIZEOF_COMPRESSION_OPTIONS_LZO) {
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
 	int rv = lzo1x_decompress_safe(
 			compressed, compressed_size, target, target_size, NULL);
 
 	if (rv != LZO_E_OK) {
-		return -HSQS_ERROR_COMPRESSION_DECOMPRESS;
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 	return 0;
 }

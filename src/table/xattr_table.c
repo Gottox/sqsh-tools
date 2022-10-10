@@ -55,13 +55,13 @@ sqsh_xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh) {
 	struct SqshMapper *mapper = sqsh_mapper(sqsh);
 	uint64_t xattr_address = sqsh_superblock_xattr_id_table_start(superblock);
 	uint64_t bytes_used = sqsh_superblock_bytes_used(superblock);
-	if (xattr_address + HSQS_SIZEOF_XATTR_ID_TABLE >= bytes_used) {
-		return -HSQS_ERROR_SIZE_MISSMATCH;
+	if (xattr_address + SQSH_SIZEOF_XATTR_ID_TABLE >= bytes_used) {
+		return -SQSH_ERROR_SIZE_MISSMATCH;
 	}
 	context->sqsh = sqsh;
 	rv = sqsh_mapper_map(
 			&context->header, mapper, xattr_address,
-			HSQS_SIZEOF_XATTR_ID_TABLE);
+			SQSH_SIZEOF_XATTR_ID_TABLE);
 	if (rv < 0) {
 		goto out;
 	}
@@ -69,8 +69,8 @@ sqsh_xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh) {
 	const struct SqshXattrIdTable *header = get_header(context);
 
 	rv = sqsh_table_init(
-			&context->table, sqsh, xattr_address + HSQS_SIZEOF_XATTR_ID_TABLE,
-			HSQS_SIZEOF_XATTR_LOOKUP_TABLE,
+			&context->table, sqsh, xattr_address + SQSH_SIZEOF_XATTR_ID_TABLE,
+			SQSH_SIZEOF_XATTR_LOOKUP_TABLE,
 			sqsh_data_xattr_id_table_xattr_ids(header));
 	if (rv < 0) {
 		goto out;

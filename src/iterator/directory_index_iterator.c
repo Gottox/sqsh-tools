@@ -37,7 +37,7 @@
 #include "../error.h"
 
 static const uint64_t INODE_HEADER_SIZE =
-		HSQS_SIZEOF_INODE_HEADER + HSQS_SIZEOF_INODE_DIRECTORY_EXT;
+		SQSH_SIZEOF_INODE_HEADER + SQSH_SIZEOF_INODE_DIRECTORY_EXT;
 
 static const struct SqshInode *
 get_inode(const struct SqshInodeDirectoryIndexIterator *iterator) {
@@ -66,9 +66,9 @@ sqsh_inode_directory_index_iterator_init(
 		struct SqshInodeContext *inode) {
 	int rv = 0;
 
-	if (sqsh_inode_type(inode) != HSQS_INODE_TYPE_DIRECTORY ||
+	if (sqsh_inode_type(inode) != SQSH_INODE_TYPE_DIRECTORY ||
 		sqsh_inode_is_extended(inode) == false) {
-		return -HSQS_ERROR_NO_EXTENDED_DIRECTORY;
+		return -SQSH_ERROR_NO_EXTENDED_DIRECTORY;
 	}
 
 	iterator->inode = inode;
@@ -91,7 +91,7 @@ sqsh_inode_directory_index_iterator_next(
 	iterator->remaining_entries--;
 
 	// Make sure next entry is loaded:
-	iterator->next_offset += HSQS_SIZEOF_INODE_DIRECTORY_INDEX;
+	iterator->next_offset += SQSH_SIZEOF_INODE_DIRECTORY_INDEX;
 	rv = directory_index_data_more(iterator, iterator->next_offset);
 	if (rv < 0) {
 		return rv;

@@ -35,9 +35,9 @@
 
 #include <stdbool.h>
 
-#ifndef HSQS_BUFFER_H
+#ifndef SQSH_BUFFER_H
 
-#define HSQS_BUFFER_H
+#define SQSH_BUFFER_H
 
 struct SqshSuperblockContext;
 
@@ -46,15 +46,15 @@ struct SqshBuffer {
 	size_t size;
 };
 
-HSQS_NO_UNUSED int sqsh_buffer_init(struct SqshBuffer *buffer);
+SQSH_NO_UNUSED int sqsh_buffer_init(struct SqshBuffer *buffer);
 
-HSQS_NO_UNUSED int
+SQSH_NO_UNUSED int
 sqsh_buffer_add_size(struct SqshBuffer *buffer, size_t additional_size);
-HSQS_NO_UNUSED int sqsh_buffer_add_capacity(
+SQSH_NO_UNUSED int sqsh_buffer_add_capacity(
 		struct SqshBuffer *buffer, uint8_t **additional_buffer,
 		size_t additional_size);
 
-HSQS_NO_UNUSED int sqsh_buffer_append(
+SQSH_NO_UNUSED int sqsh_buffer_append(
 		struct SqshBuffer *buffer, const uint8_t *source,
 		const size_t source_size);
 
@@ -63,4 +63,4 @@ size_t sqsh_buffer_size(const struct SqshBuffer *buffer);
 
 int sqsh_buffer_cleanup(struct SqshBuffer *buffer);
 
-#endif /* end of include guard HSQS_BUFFER_H */
+#endif /* end of include guard SQSH_BUFFER_H */

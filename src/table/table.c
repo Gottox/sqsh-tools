@@ -59,15 +59,15 @@ sqsh_table_init(
 	struct SqshMapper *mapper = sqsh_mapper(sqsh);
 
 	if (MULT_OVERFLOW(element_size, element_count, &table_size)) {
-		return -HSQS_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
 	lookup_table_count =
-			HSQS_DEVIDE_CEIL(table_size, HSQS_METABLOCK_BLOCK_SIZE);
+			SQSH_DEVIDE_CEIL(table_size, SQSH_METABLOCK_BLOCK_SIZE);
 
 	if (MULT_OVERFLOW(
 				lookup_table_count, sizeof(uint64_t), &lookup_table_size)) {
-		return -HSQS_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
 	rv = sqsh_mapper_map(
@@ -80,7 +80,7 @@ sqsh_table_init(
 	table->element_size = element_size;
 	table->element_count = element_count;
 	if (MULT_OVERFLOW(element_size, element_count, &byte_size)) {
-		rv = -HSQS_ERROR_INTEGER_OVERFLOW;
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
 
@@ -95,10 +95,10 @@ sqsh_table_get(const struct SqshTable *table, off_t index, void *target) {
 	struct SqshMetablockContext metablock = {0};
 	struct SqshBuffer buffer = {0};
 	uint64_t lookup_index =
-			index * table->element_size / HSQS_METABLOCK_BLOCK_SIZE;
+			index * table->element_size / SQSH_METABLOCK_BLOCK_SIZE;
 	uint64_t metablock_address = lookup_table_get(table, lookup_index);
 	uint64_t element_index =
-			(index * table->element_size) % HSQS_METABLOCK_BLOCK_SIZE;
+			(index * table->element_size) % SQSH_METABLOCK_BLOCK_SIZE;
 
 	if (rv < 0) {
 		goto out;

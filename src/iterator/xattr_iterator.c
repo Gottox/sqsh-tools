@@ -48,12 +48,12 @@ sqsh_xattr_iterator_init(
 	struct SqshXattrLookupTable ref = {0};
 	uint32_t index = sqsh_inode_xattr_index(inode);
 
-	if (index == HSQS_INODE_NO_XATTR) {
+	if (index == SQSH_INODE_NO_XATTR) {
 		iterator->remaining_entries = 0;
 		return 0;
 	}
-	if (index != HSQS_INODE_NO_XATTR && xattr_table == NULL) {
-		return -HSQS_INODE_NO_XATTR;
+	if (index != SQSH_INODE_NO_XATTR && xattr_table == NULL) {
+		return -SQSH_INODE_NO_XATTR;
 	}
 
 	rv = sqsh_table_get(&xattr_table->table, index, &ref);
@@ -118,7 +118,7 @@ xattr_value_indirect_load(struct SqshXattrIterator *iterator) {
 	const struct SqshXattrValue *value = get_value(iterator);
 	int rv = 0;
 	if (sqsh_data_xattr_value_size(value) != 8) {
-		return -HSQS_ERROR_SIZE_MISSMATCH;
+		return -SQSH_ERROR_SIZE_MISSMATCH;
 	}
 	uint64_t ref = sqsh_data_xattr_value_ref(value);
 
@@ -133,7 +133,7 @@ xattr_value_indirect_load(struct SqshXattrIterator *iterator) {
 	if (rv < 0) {
 		goto out;
 	}
-	size_t size = HSQS_SIZEOF_XATTR_VALUE;
+	size_t size = SQSH_SIZEOF_XATTR_VALUE;
 	rv = sqsh_metablock_stream_more(&iterator->out_of_line_value, size);
 	if (rv < 0) {
 		goto out;
@@ -165,7 +165,7 @@ sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator) {
 	}
 
 	// Load Key Header
-	size += HSQS_SIZEOF_XATTR_KEY;
+	size += SQSH_SIZEOF_XATTR_KEY;
 	rv = sqsh_metablock_stream_more(&iterator->metablock, size);
 	if (rv < 0) {
 		goto out;
@@ -181,7 +181,7 @@ sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator) {
 
 	// Load Value Header
 	offset = size;
-	size += HSQS_SIZEOF_XATTR_VALUE;
+	size += SQSH_SIZEOF_XATTR_VALUE;
 	rv = sqsh_metablock_stream_more(&iterator->metablock, size);
 	if (rv < 0) {
 		goto out;
@@ -230,11 +230,11 @@ sqsh_xattr_iterator_name(struct SqshXattrIterator *iterator) {
 const char *
 sqsh_xattr_iterator_prefix(struct SqshXattrIterator *iterator) {
 	switch (sqsh_xattr_iterator_type(iterator)) {
-	case HSQS_XATTR_USER:
+	case SQSH_XATTR_USER:
 		return "user.";
-	case HSQS_XATTR_TRUSTED:
+	case SQSH_XATTR_TRUSTED:
 		return "trusted.";
-	case HSQS_XATTR_SECURITY:
+	case SQSH_XATTR_SECURITY:
 		return "security.";
 	}
 	return NULL;
@@ -280,7 +280,7 @@ sqsh_xattr_iterator_fullname_dup(
 				name_size);
 		return size;
 	} else {
-		return -HSQS_ERROR_MALLOC_FAILED;
+		return -SQSH_ERROR_MALLOC_FAILED;
 	}
 }
 
@@ -299,7 +299,7 @@ sqsh_xattr_iterator_value_dup(
 	if (*value_buffer) {
 		return size;
 	} else {
-		return -HSQS_ERROR_MALLOC_FAILED;
+		return -SQSH_ERROR_MALLOC_FAILED;
 	}
 }
 

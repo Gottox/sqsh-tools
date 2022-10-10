@@ -38,45 +38,45 @@
 
 #define COMPRESSION_OPTIONS_INTERNAL_H
 
-struct HSQS_UNALIGNED SqshCompressionOptionsGzip {
+struct SQSH_UNALIGNED SqshCompressionOptionsGzip {
 	uint32_t compression_level;
 	uint16_t window_size;
 	uint16_t strategies;
 };
 STATIC_ASSERT(
 		sizeof(struct SqshCompressionOptionsGzip) ==
-		HSQS_SIZEOF_COMPRESSION_OPTIONS_GZIP);
+		SQSH_SIZEOF_COMPRESSION_OPTIONS_GZIP);
 
-struct HSQS_UNALIGNED SqshCompressionOptionsXz {
+struct SQSH_UNALIGNED SqshCompressionOptionsXz {
 	uint32_t dictionary_size;
 	uint32_t filters;
 };
 STATIC_ASSERT(
 		sizeof(struct SqshCompressionOptionsXz) ==
-		HSQS_SIZEOF_COMPRESSION_OPTIONS_XZ);
+		SQSH_SIZEOF_COMPRESSION_OPTIONS_XZ);
 
-struct HSQS_UNALIGNED SqshCompressionOptionsLz4 {
+struct SQSH_UNALIGNED SqshCompressionOptionsLz4 {
 	uint32_t version;
 	uint32_t flags;
 };
 STATIC_ASSERT(
 		sizeof(struct SqshCompressionOptionsLz4) ==
-		HSQS_SIZEOF_COMPRESSION_OPTIONS_LZ4);
+		SQSH_SIZEOF_COMPRESSION_OPTIONS_LZ4);
 
-struct HSQS_UNALIGNED SqshCompressionOptionsZstd {
+struct SQSH_UNALIGNED SqshCompressionOptionsZstd {
 	uint32_t compression_level;
 };
 STATIC_ASSERT(
 		sizeof(struct SqshCompressionOptionsZstd) ==
-		HSQS_SIZEOF_COMPRESSION_OPTIONS_ZSTD);
+		SQSH_SIZEOF_COMPRESSION_OPTIONS_ZSTD);
 
-struct HSQS_UNALIGNED SqshCompressionOptionsLzo {
+struct SQSH_UNALIGNED SqshCompressionOptionsLzo {
 	uint32_t algorithm;
 	uint32_t compression_level;
 };
 STATIC_ASSERT(
 		sizeof(struct SqshCompressionOptionsLzo) ==
-		HSQS_SIZEOF_COMPRESSION_OPTIONS_LZO);
+		SQSH_SIZEOF_COMPRESSION_OPTIONS_LZO);
 
 union SqshCompressionOptions {
 	struct SqshCompressionOptionsGzip gzip;
@@ -87,6 +87,6 @@ union SqshCompressionOptions {
 };
 STATIC_ASSERT(
 		sizeof(union SqshCompressionOptions) ==
-		HSQS_SIZEOF_COMPRESSION_OPTIONS);
+		SQSH_SIZEOF_COMPRESSION_OPTIONS);
 
 #endif /* end of include guard COMPRESSION_OPTIONS_INTERNAL_H */

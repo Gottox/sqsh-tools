@@ -49,11 +49,11 @@ sqsh_ref_count_new(
 	struct SqshRefCount *ptr;
 	size_t outer_size = 0;
 	if (ADD_OVERFLOW(sizeof(struct SqshRefCount), object_size, &outer_size)) {
-		return -HSQS_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	ptr = calloc(1, outer_size);
 	if (ptr == NULL) {
-		return -HSQS_ERROR_MALLOC_FAILED;
+		return -SQSH_ERROR_MALLOC_FAILED;
 	}
 
 	ptr->dtor = dtor;

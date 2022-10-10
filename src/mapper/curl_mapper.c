@@ -48,7 +48,7 @@
 #include <unistd.h>
 
 #define SUPERBLOCK_REQUEST_SIZE \
-	(HSQS_SIZEOF_SUPERBLOCK + HSQS_SIZEOF_COMPRESSION_OPTIONS)
+	(SQSH_SIZEOF_SUPERBLOCK + SQSH_SIZEOF_COMPRESSION_OPTIONS)
 #define CONTENT_RANGE "Content-Range: "
 #define CONTENT_RANGE_LENGTH (sizeof(CONTENT_RANGE) - 1)
 
@@ -59,7 +59,7 @@ write_data(void *ptr, size_t size, size_t nmemb, void *userdata) {
 	struct SqshMapping *mapping = userdata;
 
 	if (MULT_OVERFLOW(size, nmemb, &byte_size)) {
-		rv = -HSQS_ERROR_INTEGER_OVERFLOW;
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
 	rv = sqsh_buffer_append(&mapping->data.cl.buffer, ptr, byte_size);
@@ -147,7 +147,7 @@ sqsh_mapper_curl_init(
 
 	rv = pthread_mutex_init(&mapper->data.cl.handle_lock, NULL);
 	if (rv != 0) {
-		rv = -HSQS_ERROR_MAPPER_INIT;
+		rv = -SQSH_ERROR_MAPPER_INIT;
 		goto out;
 	}
 
@@ -211,7 +211,7 @@ sqsh_mapping_curl_resize(struct SqshMapping *mapping, size_t new_size) {
 	int rv = 0;
 	char range_buffer[512] = {0};
 	CURL *handle = get_handle(mapping);
-	new_size = HSQS_PADDING(new_size, 512);
+	new_size = SQSH_PADDING(new_size, 512);
 	size_t current_size = sqsh_mapping_size(mapping);
 	uint64_t new_offset = mapping->data.cl.offset + current_size;
 	uint64_t end_offset = new_offset + new_size - current_size - 1;
@@ -232,7 +232,7 @@ sqsh_mapping_curl_resize(struct SqshMapping *mapping, size_t new_size) {
 			range_buffer, sizeof(range_buffer), "%" PRIu64 "-%" PRIu64,
 			new_offset, end_offset);
 	if (rv >= (int)sizeof(range_buffer)) {
-		rv = -HSQS_ERROR_MAPPER_MAP;
+		rv = -SQSH_ERROR_MAPPER_MAP;
 		goto out;
 	}
 	curl_easy_setopt(handle, CURLOPT_RANGE, range_buffer);
@@ -241,39 +241,39 @@ sqsh_mapping_curl_resize(struct SqshMapping *mapping, size_t new_size) {
 
 	rv = curl_easy_perform(handle);
 	if (rv != CURLE_OK) {
-		rv = -HSQS_ERROR_MAPPER_MAP;
+		rv = -SQSH_ERROR_MAPPER_MAP;
 		goto out;
 	}
 
 	rv = curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &http_code);
 
 	if (http_code != 206 || rv != CURLE_OK) {
-		rv = -HSQS_ERROR_MAPPER_MAP;
+		rv = -SQSH_ERROR_MAPPER_MAP;
 		goto out;
 	}
 
 	uint64_t file_time;
 	rv = curl_easy_getinfo(handle, CURLINFO_FILETIME, &file_time);
 	if (rv != CURLE_OK) {
-		rv = -HSQS_ERROR_MAPPER_MAP;
+		rv = -SQSH_ERROR_MAPPER_MAP;
 		goto out;
 	}
 	rv = 0;
 	mapping->data.cl.file_time = file_time;
 
 	if (file_time == UINT64_MAX) {
-		rv = -HSQS_ERROR_MAPPER_MAP;
+		rv = -SQSH_ERROR_MAPPER_MAP;
 		goto out;
 	}
 
 	if (expected_time != UINT64_MAX && file_time != expected_time) {
-		rv = -HSQS_ERROR_MAPPER_MAP;
+		rv = -SQSH_ERROR_MAPPER_MAP;
 		goto out;
 	}
 
 	if (expected_size != UINT64_MAX &&
 		mapping->data.cl.total_size != expected_size) {
-		rv = -HSQS_ERROR_MAPPER_MAP;
+		rv = -SQSH_ERROR_MAPPER_MAP;
 		goto out;
 	}
 

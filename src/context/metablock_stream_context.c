@@ -40,7 +40,7 @@
 #include "metablock_context.h"
 #include "superblock_context.h"
 
-HSQS_NO_UNUSED int
+SQSH_NO_UNUSED int
 sqsh_metablock_stream_init(
 		struct SqshMetablockStreamContext *context, struct Sqsh *sqsh,
 		uint64_t address, uint64_t max_address) {
@@ -80,7 +80,7 @@ sqsh_metablock_stream_seek(
 	if (ADD_OVERFLOW(
 				context->base_address, address_offset,
 				&context->current_address)) {
-		rv = -HSQS_ERROR_INTEGER_OVERFLOW;
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
 	context->buffer_offset = buffer_offset;
@@ -106,9 +106,9 @@ add_block(struct SqshMetablockStreamContext *context) {
 		goto out;
 	}
 	metablock_size =
-			HSQS_SIZEOF_METABLOCK + sqsh_metablock_compressed_size(&metablock);
+			SQSH_SIZEOF_METABLOCK + sqsh_metablock_compressed_size(&metablock);
 	if (ADD_OVERFLOW(address, metablock_size, &context->current_address)) {
-		rv = -HSQS_ERROR_INTEGER_OVERFLOW;
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
 

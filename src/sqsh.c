@@ -75,7 +75,7 @@ init(struct Sqsh *sqsh) {
 
 	rv = sqsh_compression_init(
 			&sqsh->metablock_compression, compression_id,
-			HSQS_METABLOCK_BLOCK_SIZE);
+			SQSH_METABLOCK_BLOCK_SIZE);
 	if (rv < 0) {
 		sqsh_cleanup(sqsh);
 	}
@@ -159,7 +159,7 @@ sqsh_export_table(struct Sqsh *sqsh, struct SqshTable **export_table) {
 	uint64_t table_start =
 			sqsh_superblock_export_table_start(&sqsh->superblock);
 	if (table_start == NO_SEGMENT) {
-		return -HSQS_ERROR_NO_EXPORT_TABLE;
+		return -SQSH_ERROR_NO_EXPORT_TABLE;
 	}
 
 	if (!(sqsh->initialized & INITIALIZED_EXPORT_TABLE)) {
@@ -183,7 +183,7 @@ sqsh_fragment_table(
 	uint64_t table_start =
 			sqsh_superblock_fragment_table_start(&sqsh->superblock);
 	if (table_start == NO_SEGMENT) {
-		return -HSQS_ERROR_NO_FRAGMENT_TABLE;
+		return -SQSH_ERROR_NO_FRAGMENT_TABLE;
 	}
 
 	if (!is_initialized(sqsh, INITIALIZED_FRAGMENT_TABLE)) {
@@ -205,7 +205,7 @@ sqsh_xattr_table(struct Sqsh *sqsh, struct SqshXattrTable **xattr_table) {
 	uint64_t table_start =
 			sqsh_superblock_xattr_id_table_start(&sqsh->superblock);
 	if (table_start == NO_SEGMENT) {
-		return -HSQS_ERROR_NO_XATTR_TABLE;
+		return -SQSH_ERROR_NO_XATTR_TABLE;
 	}
 
 	if (!(sqsh->initialized & INITIALIZED_XATTR_TABLE)) {
@@ -228,7 +228,7 @@ sqsh_compression_options(
 		*compression_options = &sqsh->compression_options;
 		return 0;
 	} else {
-		return -HSQS_ERROR_NO_COMPRESSION_OPTIONS;
+		return -SQSH_ERROR_NO_COMPRESSION_OPTIONS;
 	}
 }
 

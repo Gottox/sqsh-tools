@@ -34,11 +34,11 @@
 #include "datablock.h"
 #include <stdint.h>
 
-#ifndef HSQS__FRAGMENT_H
+#ifndef SQSH__FRAGMENT_H
 
-#define HSQS__FRAGMENT_H
+#define SQSH__FRAGMENT_H
 
-#define HSQS_SIZEOF_FRAGMENT 16
+#define SQSH_SIZEOF_FRAGMENT 16
 
 struct SqshFragment;
 
@@ -47,4 +47,4 @@ const struct SqshDatablockSize *
 sqsh_data_fragment_size_info(const struct SqshFragment *fragment);
 uint32_t sqsh_data_fragment_is_compressed(const struct SqshFragment *fragment);
 
-#endif /* end of include guard HSQS__FRAGMENT_H */
+#endif /* end of include guard SQSH__FRAGMENT_H */
