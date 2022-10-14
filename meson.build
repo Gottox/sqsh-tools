@@ -164,7 +164,7 @@ if get_option('default_library') == 'both'
 	libsqsh = libsqsh.get_static_lib()
 endif
 
-foreach p : [ 'sqsh-cat', 'sqsh-ls', 'sqsh-stat', 'sqsh-xattr' ]
+foreach p : [ 'sqsh-cat', 'sqsh-ls', 'sqsh-stat', 'sqsh-xattr', 'sqsh-unpack' ]
 	executable(p, 'bin/'+p+'.c',
 		install: not meson.is_subproject(),
 		c_args : build_args,
