@@ -31,7 +31,7 @@
  * @file         sqsh-unpack.c
  */
 
-#include "../src/context/content_context.h"
+#include "../src/context/file_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/iterator/directory_iterator.h"
 #include "../src/sqsh.h"
@@ -167,15 +167,15 @@ extract_file(
 	struct SqshFileContext content = {0};
 	uint16_t mode = sqsh_inode_permission(inode);
 
-	rv = sqsh_content_init(&content, inode);
+	rv = sqsh_file_init(&content, inode);
 	if (rv < 0) {
-		print_err(rv, "sqsh_content_init", path_stack);
+		print_err(rv, "sqsh_file_init", path_stack);
 		goto out;
 	}
 
-	rv = sqsh_content_read(&content, sqsh_inode_file_size(inode));
+	rv = sqsh_file_read(&content, sqsh_inode_file_size(inode));
 	if (rv < 0) {
-		print_err(rv, "sqsh_content_read", path_stack);
+		print_err(rv, "sqsh_file_read", path_stack);
 		goto out;
 	}
 
@@ -184,8 +184,8 @@ extract_file(
 		print_err(rv = -errno, "fopen", path_stack);
 		goto out;
 	}
-	fwrite(sqsh_content_data(&content), sizeof(uint8_t),
-		   sqsh_content_size(&content), file);
+	fwrite(sqsh_file_data(&content), sizeof(uint8_t), sqsh_file_size(&content),
+		   file);
 	fclose(file);
 	rv = chmod(filename, mode);
 	if (rv < 0) {
@@ -193,7 +193,7 @@ extract_file(
 		goto out;
 	}
 out:
-	sqsh_content_cleanup(&content);
+	sqsh_file_cleanup(&content);
 	return rv;
 }
 

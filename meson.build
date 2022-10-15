@@ -14,7 +14,7 @@ project(
 sqsh_hdr = [
 	'src/compression/compression.h',
 	'src/context/compression_options_context.h',
-	'src/context/content_context.h',
+	'src/context/file_context.h',
 	'src/context/inode_context.h',
 	'src/context/metablock_context.h',
 	'src/context/metablock_stream_context.h',
@@ -58,7 +58,7 @@ sqsh_src = [
 	'src/compression/compression.c',
 	'src/compression/null.c',
 	'src/context/compression_options_context.c',
-	'src/context/content_context.c',
+	'src/context/file_context.c',
 	'src/context/inode_context.c',
 	'src/context/metablock_context.c',
 	'src/context/metablock_stream_context.c',

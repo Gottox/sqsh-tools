@@ -31,7 +31,7 @@
  * @file         integration.c
  */
 
-#include "../src/context/content_context.h"
+#include "../src/context/file_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/context/superblock_context.h"
 #include "../src/data/superblock.h"
@@ -134,19 +134,19 @@ sqsh_cat_fragment() {
 	rv = sqsh_inode_load_by_path(&inode, &sqsh, "a");
 	assert(rv == 0);
 
-	rv = sqsh_content_init(&file, &inode);
+	rv = sqsh_file_init(&file, &inode);
 	assert(rv == 0);
 
 	size = sqsh_inode_file_size(&inode);
 	assert(size == 2);
 
-	rv = sqsh_content_read(&file, size);
+	rv = sqsh_file_read(&file, size);
 	assert(rv == 0);
 
-	data = sqsh_content_data(&file);
+	data = sqsh_file_data(&file);
 	assert(memcmp(data, "a\n", size) == 0);
 
-	rv = sqsh_content_cleanup(&file);
+	rv = sqsh_file_cleanup(&file);
 	assert(rv == 0);
 
 	rv = sqsh_inode_cleanup(&inode);
@@ -170,22 +170,22 @@ sqsh_cat_datablock_and_fragment() {
 	rv = sqsh_inode_load_by_path(&inode, &sqsh, "b");
 	assert(rv == 0);
 
-	rv = sqsh_content_init(&file, &inode);
+	rv = sqsh_file_init(&file, &inode);
 	assert(rv == 0);
 
 	size = sqsh_inode_file_size(&inode);
 	assert(size == 1050000);
 
-	rv = sqsh_content_read(&file, size);
+	rv = sqsh_file_read(&file, size);
 	assert(rv == 0);
-	assert(size == sqsh_content_size(&file));
+	assert(size == sqsh_file_size(&file));
 
-	data = sqsh_content_data(&file);
+	data = sqsh_file_data(&file);
 	for (sqsh_index_t i = 0; i < size; i++) {
 		assert(data[i] == 'b');
 	}
 
-	rv = sqsh_content_cleanup(&file);
+	rv = sqsh_file_cleanup(&file);
 	assert(rv == 0);
 
 	rv = sqsh_inode_cleanup(&inode);
@@ -209,22 +209,22 @@ sqsh_cat_size_overflow() {
 	rv = sqsh_inode_load_by_path(&inode, &sqsh, "b");
 	assert(rv == 0);
 
-	rv = sqsh_content_init(&file, &inode);
+	rv = sqsh_file_init(&file, &inode);
 	assert(rv == 0);
 	size = sqsh_inode_file_size(&inode);
 	assert(size == 1050000);
 
-	rv = sqsh_content_read(&file, size + 4096);
+	rv = sqsh_file_read(&file, size + 4096);
 	assert(rv != 0); // TODO: check for correct error code
 
-	assert(sqsh_content_size(&file) == size);
+	assert(sqsh_file_size(&file) == size);
 
-	data = sqsh_content_data(&file);
+	data = sqsh_file_data(&file);
 	for (sqsh_index_t i = 0; i < size; i++) {
 		assert(data[i] == 'b');
 	}
 
-	rv = sqsh_content_cleanup(&file);
+	rv = sqsh_file_cleanup(&file);
 	assert(rv == 0);
 
 	rv = sqsh_inode_cleanup(&inode);

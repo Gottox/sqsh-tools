@@ -28,10 +28,10 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         content_context.c
+ * @file         file_context.c
  */
 
-#include "content_context.h"
+#include "file_context.h"
 #include "../error.h"
 #include "../mapper/mapper.h"
 #include "../primitive/buffer.h"
@@ -56,7 +56,7 @@ datablock_offset(struct SqshFileContext *context, uint32_t block_index) {
 }
 
 int
-sqsh_content_init(
+sqsh_file_init(
 		struct SqshFileContext *context, struct SqshInodeContext *inode) {
 	int rv = 0;
 	struct Sqsh *sqsh = inode->sqsh;
@@ -85,11 +85,11 @@ sqsh_content_init(
 		return rv;
 	}
 
-	return sqsh_content_seek(context, 0);
+	return sqsh_file_seek(context, 0);
 }
 
 int
-sqsh_content_seek(struct SqshFileContext *context, uint64_t seek_pos) {
+sqsh_file_seek(struct SqshFileContext *context, uint64_t seek_pos) {
 	if (seek_pos > sqsh_inode_file_size(context->inode)) {
 		return -SQSH_ERROR_SEEK_OUT_OF_RANGE;
 	}
@@ -99,7 +99,7 @@ sqsh_content_seek(struct SqshFileContext *context, uint64_t seek_pos) {
 }
 
 int
-sqsh_content_read(struct SqshFileContext *context, uint64_t size) {
+sqsh_file_read(struct SqshFileContext *context, uint64_t size) {
 	int rv = 0;
 	struct SqshMapping mapping = {0};
 	struct SqshFragmentTable *table = context->fragment_table;
@@ -131,7 +131,7 @@ sqsh_content_read(struct SqshFileContext *context, uint64_t size) {
 		rv = SQSH_ERROR_SIZE_MISSMATCH;
 	}
 
-	for (; block_index < block_count && sqsh_content_size(context) < size;
+	for (; block_index < block_count && sqsh_file_size(context) < size;
 		 block_index++) {
 		is_compressed = sqsh_inode_file_block_is_compressed(
 				context->inode, block_index);
@@ -154,7 +154,7 @@ sqsh_content_read(struct SqshFileContext *context, uint64_t size) {
 		outer_offset += outer_block_size;
 	}
 
-	if (sqsh_content_size(context) < size) {
+	if (sqsh_file_size(context) < size) {
 		if (!sqsh_inode_file_has_fragment(context->inode)) {
 			rv = -SQSH_ERROR_TODO;
 			goto out;
@@ -165,7 +165,7 @@ sqsh_content_read(struct SqshFileContext *context, uint64_t size) {
 			goto out;
 		}
 
-		if (sqsh_content_size(context) < size) {
+		if (sqsh_file_size(context) < size) {
 			rv = -SQSH_ERROR_TODO;
 			goto out;
 		}
@@ -177,11 +177,11 @@ out:
 }
 
 const uint8_t *
-sqsh_content_data(struct SqshFileContext *context) {
+sqsh_file_data(struct SqshFileContext *context) {
 	uint32_t block_size = context->block_size;
 	off_t offset = context->seek_pos % block_size;
 
-	if (sqsh_content_size(context) == 0) {
+	if (sqsh_file_size(context) == 0) {
 		return NULL;
 	} else {
 		return &sqsh_buffer_data(&context->buffer)[offset];
@@ -189,7 +189,7 @@ sqsh_content_data(struct SqshFileContext *context) {
 }
 
 uint64_t
-sqsh_content_size(struct SqshFileContext *context) {
+sqsh_file_size(struct SqshFileContext *context) {
 	uint32_t block_size = context->block_size;
 	size_t offset = context->seek_pos % block_size;
 	size_t buffer_size = sqsh_buffer_size(&context->buffer);
@@ -201,7 +201,7 @@ sqsh_content_size(struct SqshFileContext *context) {
 }
 
 int
-sqsh_content_cleanup(struct SqshFileContext *context) {
+sqsh_file_cleanup(struct SqshFileContext *context) {
 	sqsh_buffer_cleanup(&context->buffer);
 
 	return 0;

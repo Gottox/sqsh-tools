@@ -31,7 +31,6 @@
  * @file         sqsh-cat.c
  */
 
-#include "../src/context/content_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/error.h"
 #include "../src/iterator/xattr_iterator.h"

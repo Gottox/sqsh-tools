@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         content_context.h
+ * @file         file_context.h
  */
 
 #include "../primitive/buffer.h"
@@ -59,55 +59,55 @@ struct SqshFileContext {
 /**
  * @brief Initializes a SqshContentContext struct.
  * @memberof SqshContentContext
- * @param context The content context to initialize.
+ * @param context The file context to initialize.
  * @param inode The inode context to retrieve the file contents from.
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh_content_init(
-		struct SqshFileContext *context, struct SqshInodeContext *inode);
+SQSH_NO_UNUSED int
+sqsh_file_init(struct SqshFileContext *context, struct SqshInodeContext *inode);
 
 /**
  * @brief Seek to a position in the file content.
  * @memberof SqshContentContext
- * @param context The content context to seek in. If the context buffer
+ * @param context The file context to seek in. If the context buffer
  * already contains data, it will be cleared.
  * @param offset The offset to seek to.
  * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int
-sqsh_content_seek(struct SqshFileContext *context, uint64_t seek_pos);
+sqsh_file_seek(struct SqshFileContext *context, uint64_t seek_pos);
 
 /**
  * @brief Reads data from the current seek position
  * and writes it to the content buffer.
  * @memberof SqshContentContext
- * @param context The content context to read from.
+ * @param context The file context to read from.
  * @param size The size of the buffer.
  * @return The number of bytes read on success, less than 0 on error.
  */
-int sqsh_content_read(struct SqshFileContext *context, uint64_t size);
+int sqsh_file_read(struct SqshFileContext *context, uint64_t size);
 
 /**
  * @brief Gets a pointer to read file content.
  * @memberof SqshContentContext
- * @param context The content context to get the data from.
+ * @param context The file context to get the data from.
  * @return A pointer to the data in the file content buffer.
  */
-const uint8_t *sqsh_content_data(struct SqshFileContext *context);
+const uint8_t *sqsh_file_data(struct SqshFileContext *context);
 
 /**
  * @brief Gets the size of the file content buffer.
  * @memberof SqshContentContext
- * @param context The content context to get the size from.
+ * @param context The file context to get the size from.
  * @return The size of the file content buffer.
  */
-uint64_t sqsh_content_size(struct SqshFileContext *context);
+uint64_t sqsh_file_size(struct SqshFileContext *context);
 
 /**
- * @brief Frees the resources used by the content context.
+ * @brief Frees the resources used by the file context.
  * @memberof SqshContentContext
- * @param context The content context to clean up.
+ * @param context The file context to clean up.
  */
-int sqsh_content_cleanup(struct SqshFileContext *context);
+int sqsh_file_cleanup(struct SqshFileContext *context);
 
 #endif /* end of include guard FILE_CONTEXT_H */

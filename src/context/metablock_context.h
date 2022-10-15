@@ -47,12 +47,25 @@ struct Sqsh;
 struct SqshSuperblockContext;
 struct SqshBuffer;
 
+/**
+ * @brief The SqshMetablockContext struct
+ *
+ * The SqshMetablockContext struct contains all information about a
+ * metablock.
+ */
 struct SqshMetablockContext {
 	struct SqshMapping mapping;
 	struct SqshBuffer buffer;
 	struct SqshCompression *compression;
 };
 
+/**
+ * @brief sqsh_metablock_context_init
+ * @param context The SqshMetablockContext to initialize.
+ * @param superblock_context The SqshSuperblockContext to use.
+ * @param offset The offset of the metablock.
+ * @return 0 on success, less than 0 on error.
+ */
 int sqsh_metablock_init(
 		struct SqshMetablockContext *context, struct Sqsh *sqsh,
 		uint64_t address);

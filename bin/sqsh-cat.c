@@ -31,7 +31,7 @@
  * @file         sqsh-cat.c
  */
 
-#include "../src/context/content_context.h"
+#include "../src/context/file_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/iterator/directory_iterator.h"
 #include "../src/sqsh.h"
@@ -64,24 +64,24 @@ cat_path(struct Sqsh *sqsh, char *path) {
 		goto out;
 	}
 
-	rv = sqsh_content_init(&file, &inode);
+	rv = sqsh_file_init(&file, &inode);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	rv = sqsh_content_read(&file, sqsh_inode_file_size(&inode));
+	rv = sqsh_file_read(&file, sqsh_inode_file_size(&inode));
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	fwrite(sqsh_content_data(&file), sizeof(uint8_t), sqsh_content_size(&file),
+	fwrite(sqsh_file_data(&file), sizeof(uint8_t), sqsh_file_size(&file),
 		   stdout);
 out:
-	sqsh_content_cleanup(&file);
+	sqsh_file_cleanup(&file);
 	sqsh_inode_cleanup(&inode);
 	return rv;
 }

@@ -39,7 +39,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../src/context/content_context.h"
+#include "../src/context/file_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/iterator/directory_iterator.h"
 #include "../src/iterator/xattr_iterator.h"
@@ -334,7 +334,7 @@ sqshfuse_read(
 		rv = -EINVAL;
 		goto out;
 	}
-	rv = sqsh_content_init(&file, &inode);
+	rv = sqsh_file_init(&file, &inode);
 	if (rv < 0) {
 		// TODO: Better return type
 		rv = -EINVAL;
@@ -342,13 +342,13 @@ sqshfuse_read(
 	}
 
 	size = MIN(size, sqsh_inode_file_size(&inode));
-	rv = sqsh_content_seek(&file, offset);
+	rv = sqsh_file_seek(&file, offset);
 	if (rv < 0) {
 		// TODO: Better return type
 		rv = -EINVAL;
 		goto out;
 	}
-	rv = sqsh_content_read(&file, size);
+	rv = sqsh_file_read(&file, size);
 	if (rv < 0) {
 		// TODO: Better return type
 		rv = -EINVAL;
@@ -356,12 +356,12 @@ sqshfuse_read(
 	}
 
 	if (size != 0) {
-		memcpy(buf, sqsh_content_data(&file), size);
+		memcpy(buf, sqsh_file_data(&file), size);
 	}
 
 	rv = size;
 out:
-	sqsh_content_cleanup(&file);
+	sqsh_file_cleanup(&file);
 	sqsh_inode_cleanup(&inode);
 	return rv;
 }
