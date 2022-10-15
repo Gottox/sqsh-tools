@@ -365,18 +365,29 @@ main(int argc, char *argv[]) {
 
 	if (target_path == NULL) {
 		target_path = basename(src_path);
+		if (strcmp(target_path, "/") == 0) {
+			target_path = ".";
+		}
 	} else if (sqsh_inode_type(&inode) != SQSH_INODE_TYPE_DIRECTORY) {
-		rv = chdir(target_path);
-		if (rv < 0 && errno != ENOENT && errno != ENOTDIR) {
-			print_err(rv = -errno, "chdir", NULL);
+		struct stat st = {0};
+		rv = stat(target_path, &st);
+		if (rv < 0) {
+			perror(target_path);
 			rv = EXIT_FAILURE;
 			goto out;
-		} else if (rv == 0) {
-			target_path = basename(src_path);
 		}
-	}
-	if (strcmp(target_path, "/") == 0) {
-		target_path = ".";
+		if (S_ISDIR(st.st_mode)) {
+			rv = chdir(target_path);
+			if (rv < 0) {
+				perror(target_path);
+				rv = EXIT_FAILURE;
+				goto out;
+			}
+			target_path = basename(src_path);
+			if (strcmp(target_path, "/") == 0) {
+				target_path = ".";
+			}
+		}
 	}
 
 	rv = extract(target_path, &inode, NULL);
