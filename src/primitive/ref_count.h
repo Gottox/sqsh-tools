@@ -51,6 +51,7 @@ struct SqshRefCount {
  * @brief Initialize a SqshRefCount struct.
  * @memberof SqshRefCount
  * @param ref_count A pointer to the SqshRefCount struct.
+ * @param object_size The size of the object to be reference counted.
  * @param dtor A pointer to a function that is called when the reference count
  * reaches 0.
  * @return 0 on success, less than 0 on error.

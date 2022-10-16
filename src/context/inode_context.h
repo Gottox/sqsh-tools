@@ -198,7 +198,7 @@ uint32_t sqsh_inode_file_block_count(const struct SqshInodeContext *context);
  * @memberof SqshInodeContext
  * internally used and will be used while retrieving the file content.
  * @param context The inode context.
- * @param block The index of the block.
+ * @param index The index of the block.
  * @return the size of the block with the index.
  */
 uint32_t sqsh_inode_file_block_size(
@@ -207,7 +207,7 @@ uint32_t sqsh_inode_file_block_size(
  * @brief Checks whether a certain block is compressed.
  * @memberof SqshInodeContext
  * @param context The inode context.
- * @param block The index of the block.
+ * @param index The index of the block.
  * @return true if the block is compressed, false otherwise.
  */
 bool sqsh_inode_file_block_is_compressed(
@@ -279,7 +279,7 @@ const char *sqsh_inode_symlink(const struct SqshInodeContext *context);
  * @memberof SqshInodeContext
  * symbolic link.
  * @param context The inode context.
- * @param symlink The target of the symbolic link.
+ * @param namebuffer a pointer that will be set to the allocated string.
  * @return int 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int sqsh_inode_symlink_dup(
@@ -294,7 +294,7 @@ SQSH_NO_UNUSED int sqsh_inode_symlink_dup(
 uint32_t sqsh_inode_symlink_size(const struct SqshInodeContext *context);
 
 /**
- * @brie returns the device id of the device inode.
+ * @brief returns the device id of the device inode.
  * @param context The inode context.
  * @return the name of the inode or 0 if the inode is not a device.
  */
@@ -330,7 +330,7 @@ int sqsh_inode_cleanup(struct SqshInodeContext *context);
  * @memberof SqshInodeContext
  * @param ref The inode reference.
  * @param block_index a pointer where the block index will be stored.
- * @param block_offset a pointer where the block offset will be stored.
+ * @param offset a pointer where the block offset will be stored.
  */
 void
 sqsh_inode_ref_to_block(uint64_t ref, uint32_t *block_index, uint16_t *offset);
@@ -338,7 +338,7 @@ sqsh_inode_ref_to_block(uint64_t ref, uint32_t *block_index, uint16_t *offset);
  * @brief converts a block index and a block offset into an inode reference.
  * @memberof SqshInodeContext
  * @param block_index The block index.
- * @param block_offset The block offset.
+ * @param offset The block offset.
  * @return the inode reference.
  */
 SQSH_NO_UNUSED uint64_t

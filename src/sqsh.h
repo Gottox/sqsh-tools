@@ -92,8 +92,8 @@ struct Sqsh {
  * @brief sqsh_init initializes the Sqsh structure.
  * @memberof Sqsh
  * @param sqsh the Sqsh structure to initialize.
- * @param buffer the buffer to use for the Sqsh structure.
- * @param size the size of the buffer.
+ * @param source the source to retrieve the archive from
+ * @param config the configuration for the Sqsh session.
  * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int sqsh_open2(

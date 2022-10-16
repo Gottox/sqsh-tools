@@ -122,21 +122,21 @@ size_t sqsh_compression_options_size(
  * @param context the compression options context
  */
 uint32_t sqsh_compression_options_gzip_compression_level(
-		const struct SqshCompressionOptionsContext *options);
+		const struct SqshCompressionOptionsContext *context);
 /**
  * @brief returns the compression window size of gzip
  * @memberof SqshCompressionOptionsContext
  * @param context the compression options context
  */
 uint16_t sqsh_compression_options_gzip_window_size(
-		const struct SqshCompressionOptionsContext *options);
+		const struct SqshCompressionOptionsContext *context);
 /**
  * @brief returns the compression strategy of gzip
  * @memberof SqshCompressionOptionsContext
  * @param context the compression options context
  */
 enum SqshGzipStrategies sqsh_compression_options_gzip_strategies(
-		const struct SqshCompressionOptionsContext *options);
+		const struct SqshCompressionOptionsContext *context);
 
 /**
  * @brief returns the dictionary size of xz
@@ -144,14 +144,14 @@ enum SqshGzipStrategies sqsh_compression_options_gzip_strategies(
  * @param context the compression options context
  */
 uint32_t sqsh_compression_options_xz_dictionary_size(
-		const struct SqshCompressionOptionsContext *options);
+		const struct SqshCompressionOptionsContext *context);
 /**
  * @brief returns the compression options of xz
  * @memberof SqshCompressionOptionsContext
  * @param context the compression options context
  */
 enum SqshXzFilters sqsh_compression_options_xz_filters(
-		const struct SqshCompressionOptionsContext *options);
+		const struct SqshCompressionOptionsContext *context);
 
 /**
  * @brief returns the version of lz4 used
@@ -159,14 +159,14 @@ enum SqshXzFilters sqsh_compression_options_xz_filters(
  * @param context the compression options context
  */
 uint32_t sqsh_compression_options_lz4_version(
-		const struct SqshCompressionOptionsContext *options);
+		const struct SqshCompressionOptionsContext *context);
 /**
  * @brief returns the flags of lz4
  * @memberof SqshCompressionOptionsContext
  * @param context the compression options context
  */
 uint32_t sqsh_compression_options_lz4_flags(
-		const struct SqshCompressionOptionsContext *options);
+		const struct SqshCompressionOptionsContext *context);
 
 /**
  * @brief returns the compression level of zstd
@@ -174,7 +174,7 @@ uint32_t sqsh_compression_options_lz4_flags(
  * @param context the compression options context
  */
 uint32_t sqsh_compression_options_zstd_compression_level(
-		const struct SqshCompressionOptionsContext *options);
+		const struct SqshCompressionOptionsContext *context);
 
 /**
  * @brief returns the algorithm of lzo
@@ -182,9 +182,9 @@ uint32_t sqsh_compression_options_zstd_compression_level(
  * @param context the compression options context
  */
 enum SqshLzoAlgorithm sqsh_compression_options_lzo_algorithm(
-		const struct SqshCompressionOptionsContext *options);
+		const struct SqshCompressionOptionsContext *context);
 uint32_t sqsh_compression_options_lzo_compression_level(
-		const struct SqshCompressionOptionsContext *options);
+		const struct SqshCompressionOptionsContext *context);
 
 /**
  * @brief Frees the resources used by the compression options context.

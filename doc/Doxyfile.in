@@ -18,6 +18,10 @@ FULL_PATH_NAMES       = NO
 QUIET                = NO
 WARNINGS             = YES
 WARN_IF_UNDOCUMENTED = YES
+WARN_IF_DOC_ERROR    = YES
+WARN_NO_PARAMDOC     = YES
+WARN_AS_ERROR        = YES
+
 
 # Input files
 INPUT         = @DOXYGEN_INPUT@

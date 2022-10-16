@@ -81,6 +81,8 @@ sqsh_buffer_add_size(struct SqshBuffer *buffer, size_t additional_size);
  * @memberof SqshBuffer
  *
  * @param buffer The SqshBuffer to free.
+ * @param additional_buffer The pointer to the additional memory.
+ * @param additional_size The size of the additional memory.
  */
 SQSH_NO_UNUSED int sqsh_buffer_add_capacity(
 		struct SqshBuffer *buffer, uint8_t **additional_buffer,
@@ -89,9 +91,10 @@ SQSH_NO_UNUSED int sqsh_buffer_add_capacity(
 /**
  * @brief sqsh_buffer_append
  * @memberof SqshBuffer
+ *
  * @param buffer The SqshBuffer to append to.
- * @param data The data to append.
- * @param size The size of the data to append.
+ * @param source The data to append.
+ * @param source_size The size of the data to append.
  */
 SQSH_NO_UNUSED int sqsh_buffer_append(
 		struct SqshBuffer *buffer, const uint8_t *source,

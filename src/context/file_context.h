@@ -57,8 +57,8 @@ struct SqshFileContext {
 };
 
 /**
- * @brief Initializes a SqshContentContext struct.
- * @memberof SqshContentContext
+ * @brief Initializes a SqshFileContext struct.
+ * @memberof SqshFileContext
  * @param context The file context to initialize.
  * @param inode The inode context to retrieve the file contents from.
  * @return 0 on success, less than 0 on error.
@@ -68,10 +68,10 @@ sqsh_file_init(struct SqshFileContext *context, struct SqshInodeContext *inode);
 
 /**
  * @brief Seek to a position in the file content.
- * @memberof SqshContentContext
+ * @memberof SqshFileContext
  * @param context The file context to seek in. If the context buffer
  * already contains data, it will be cleared.
- * @param offset The offset to seek to.
+ * @param seek_pos The offset to seek to.
  * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int
@@ -80,7 +80,7 @@ sqsh_file_seek(struct SqshFileContext *context, uint64_t seek_pos);
 /**
  * @brief Reads data from the current seek position
  * and writes it to the content buffer.
- * @memberof SqshContentContext
+ * @memberof SqshFileContext
  * @param context The file context to read from.
  * @param size The size of the buffer.
  * @return The number of bytes read on success, less than 0 on error.
@@ -89,7 +89,7 @@ int sqsh_file_read(struct SqshFileContext *context, uint64_t size);
 
 /**
  * @brief Gets a pointer to read file content.
- * @memberof SqshContentContext
+ * @memberof SqshFileContext
  * @param context The file context to get the data from.
  * @return A pointer to the data in the file content buffer.
  */
@@ -97,7 +97,7 @@ const uint8_t *sqsh_file_data(struct SqshFileContext *context);
 
 /**
  * @brief Gets the size of the file content buffer.
- * @memberof SqshContentContext
+ * @memberof SqshFileContext
  * @param context The file context to get the size from.
  * @return The size of the file content buffer.
  */
@@ -105,7 +105,7 @@ uint64_t sqsh_file_size(struct SqshFileContext *context);
 
 /**
  * @brief Frees the resources used by the file context.
- * @memberof SqshContentContext
+ * @memberof SqshFileContext
  * @param context The file context to clean up.
  */
 int sqsh_file_cleanup(struct SqshFileContext *context);

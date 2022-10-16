@@ -62,8 +62,8 @@ struct SqshMetablockContext {
 /**
  * @brief sqsh_metablock_context_init
  * @param context The SqshMetablockContext to initialize.
- * @param superblock_context The SqshSuperblockContext to use.
- * @param offset The offset of the metablock.
+ * @param sqsh The Sqsh struct.
+ * @param address The address of the metablock.
  * @return 0 on success, less than 0 on error.
  */
 int sqsh_metablock_init(
