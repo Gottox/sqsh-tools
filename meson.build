@@ -91,6 +91,7 @@ sqsh_src = [
 
 sqsh_test = [
 	'test/integration.c',
+	'test/primitive/buffer.c',
 	'test/primitive/ref_count.c',
 ]
 
