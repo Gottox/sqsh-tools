@@ -31,6 +31,7 @@
  * @file         fragment.h
  */
 
+#include "../utils.h"
 #include "datablock.h"
 #include <stdint.h>
 
@@ -40,7 +41,7 @@
 
 #define SQSH_SIZEOF_FRAGMENT 16
 
-struct SqshFragment;
+struct SQSH_UNALIGNED SqshFragment;
 
 uint64_t sqsh_data_fragment_start(const struct SqshFragment *fragment);
 const struct SqshDatablockSize *

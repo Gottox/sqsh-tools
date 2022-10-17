@@ -31,6 +31,7 @@
  * @file         directory.h
  */
 
+#include "../utils.h"
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -41,9 +42,9 @@
 #define SQSH_SIZEOF_DIRECTORY_FRAGMENT 12
 #define SQSH_SIZEOF_DIRECTORY_ENTRY 8
 
-struct SqshDirectoryEntry;
+struct SQSH_UNALIGNED SqshDirectoryEntry;
 
-struct SqshDirectoryFragment;
+struct SQSH_UNALIGNED SqshDirectoryFragment;
 
 uint16_t
 sqsh_data_directory_entry_offset(const struct SqshDirectoryEntry *entry);

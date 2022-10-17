@@ -31,6 +31,7 @@
  * @file         datablock.h
  */
 
+#include "../utils.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -40,7 +41,7 @@
 
 #define SQSH_SIZEOF_DATABLOCK_SIZE 4
 
-struct SqshDatablockSize;
+struct SQSH_UNALIGNED SqshDatablockSize;
 
 uint32_t
 sqsh_data_datablock_size(const struct SqshDatablockSize *datablock_size);

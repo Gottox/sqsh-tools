@@ -31,14 +31,13 @@
  * @file         superblock_internal.h
  */
 
-#include "../utils.h"
 #include "superblock.h"
 
 #ifndef SUPERBLOCK_INTERNAL_H
 
 #define SUPERBLOCK_INTERNAL_H
 
-struct SqshSuperblock {
+struct SQSH_UNALIGNED SqshSuperblock {
 	uint32_t magic;
 	uint32_t inode_count;
 	uint32_t modification_time;

@@ -31,7 +31,6 @@
  * @file         compression_options_internal.h
  */
 
-#include "../utils.h"
 #include "compression_options.h"
 
 #ifndef COMPRESSION_OPTIONS_INTERNAL_H

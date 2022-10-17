@@ -31,16 +31,17 @@
  * @file         superblock.h
  */
 
+#include "../utils.h"
+#include <stddef.h>
+#include <stdint.h>
+
 #ifndef SQSH_SUPERBLOCK_H
 
 #define SQSH_SUPERBLOCK_H
 
-#include <stddef.h>
-#include <stdint.h>
-
 #define SQSH_SIZEOF_SUPERBLOCK 96
 
-struct SqshSuperblock;
+struct SQSH_UNALIGNED SqshSuperblock;
 
 int
 sqsh_data_superblock_init(const struct SqshSuperblock *superblock, size_t size);

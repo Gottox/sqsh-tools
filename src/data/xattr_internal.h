@@ -31,7 +31,6 @@
  * @file         xattr_internal.h
  */
 
-#include "../utils.h"
 #include "xattr.h"
 #include <stdint.h>
 

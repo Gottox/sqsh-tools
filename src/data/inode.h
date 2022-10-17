@@ -31,6 +31,7 @@
  * @file         inode.h
  */
 
+#include "../utils.h"
 #include "datablock.h"
 #include <stdint.h>
 
@@ -52,20 +53,20 @@
 #define SQSH_SIZEOF_INODE_IPC_EXT 8
 #define SQSH_SIZEOF_INODE_HEADER 16
 
-struct SqshInodeDirectory;
-struct SqshInodeDirectoryExt;
-struct SqshInodeFile;
-struct SqshInodeFileExt;
-struct SqshInodeSymlink;
-struct SqshInodeSymlinkExt;
-struct SqshInodeSymlinkExtTail;
-struct SqshInodeDevice;
-struct SqshInodeDeviceExt;
-struct SqshInodeIpc;
-struct SqshInodeIpcExt;
-struct SqshInode;
+struct SQSH_UNALIGNED SqshInodeDirectory;
+struct SQSH_UNALIGNED SqshInodeDirectoryExt;
+struct SQSH_UNALIGNED SqshInodeFile;
+struct SQSH_UNALIGNED SqshInodeFileExt;
+struct SQSH_UNALIGNED SqshInodeSymlink;
+struct SQSH_UNALIGNED SqshInodeSymlinkExt;
+struct SQSH_UNALIGNED SqshInodeSymlinkExtTail;
+struct SQSH_UNALIGNED SqshInodeDevice;
+struct SQSH_UNALIGNED SqshInodeDeviceExt;
+struct SQSH_UNALIGNED SqshInodeIpc;
+struct SQSH_UNALIGNED SqshInodeIpcExt;
+struct SQSH_UNALIGNED SqshInode;
 
-struct SqshInodeDirectoryIndex;
+struct SQSH_UNALIGNED SqshInodeDirectoryIndex;
 
 uint16_t sqsh_data_inode_type(const struct SqshInode *inode);
 uint16_t sqsh_data_inode_permissions(const struct SqshInode *inode);

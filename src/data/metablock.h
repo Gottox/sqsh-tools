@@ -31,6 +31,7 @@
  * @file         metablock.h
  */
 
+#include "../utils.h"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -40,7 +41,7 @@
 
 #define SQSH_SIZEOF_METABLOCK 2
 
-struct SqshMetablock;
+struct SQSH_UNALIGNED SqshMetablock;
 
 int sqsh_data_metablock_is_compressed(const struct SqshMetablock *metablock);
 

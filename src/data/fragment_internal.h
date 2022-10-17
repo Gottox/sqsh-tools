@@ -31,7 +31,6 @@
  * @file         fragment_internal.h
  */
 
-#include "../utils.h"
 #include "datablock_internal.h"
 #include "fragment.h"
 

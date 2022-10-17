@@ -37,7 +37,7 @@
 
 #include <endian.h>
 
-struct SqshSuperblock {
+struct SQSH_UNALIGNED SqshSuperblock {
 	uint32_t magic;
 	uint32_t inode_count;
 	uint32_t modification_time;

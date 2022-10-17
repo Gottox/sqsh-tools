@@ -31,6 +31,7 @@
  * @file         xattr.h
  */
 
+#include "../utils.h"
 #include <stdint.h>
 
 #ifndef SQSH_XATTR_H
@@ -42,13 +43,13 @@
 #define SQSH_SIZEOF_XATTR_LOOKUP_TABLE 16
 #define SQSH_SIZEOF_XATTR_ID_TABLE 16
 
-struct SqshXattrKey;
+struct SQSH_UNALIGNED SqshXattrKey;
 
-struct SqshXattrValue;
+struct SQSH_UNALIGNED SqshXattrValue;
 
-struct SqshXattrLookupTable;
+struct SQSH_UNALIGNED SqshXattrLookupTable;
 
-struct SqshXattrIdTable;
+struct SQSH_UNALIGNED SqshXattrIdTable;
 
 uint16_t sqsh_data_xattr_key_type(const struct SqshXattrKey *xattr_key);
 uint16_t sqsh_data_xattr_key_name_size(const struct SqshXattrKey *xattr_key);

@@ -31,6 +31,7 @@
  * @file         compression_options.h
  */
 
+#include "../utils.h"
 #include <stdint.h>
 
 #ifndef SQSH__COMPRESSION_OPTIONS_H
@@ -44,15 +45,15 @@
 #define SQSH_SIZEOF_COMPRESSION_OPTIONS_LZO 8
 #define SQSH_SIZEOF_COMPRESSION_OPTIONS 8
 
-struct SqshCompressionOptionsGzip;
+struct SQSH_UNALIGNED SqshCompressionOptionsGzip;
 
-struct SqshCompressionOptionsXz;
+struct SQSH_UNALIGNED SqshCompressionOptionsXz;
 
-struct SqshCompressionOptionsLz4;
+struct SQSH_UNALIGNED SqshCompressionOptionsLz4;
 
-struct SqshCompressionOptionsZstd;
+struct SQSH_UNALIGNED SqshCompressionOptionsZstd;
 
-struct SqshCompressionOptionsLzo;
+struct SQSH_UNALIGNED SqshCompressionOptionsLzo;
 
 union SqshCompressionOptions;
 
