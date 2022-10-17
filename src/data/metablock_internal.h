@@ -31,7 +31,7 @@
  * @file         metablock_internal.h
  */
 
-#include "metablock.h"
+#include "metablock_data.h"
 
 #ifndef METABLOCK_INTERNAL_H
 

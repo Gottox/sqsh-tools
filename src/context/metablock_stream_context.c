@@ -32,11 +32,11 @@
  */
 
 #include "metablock_stream_context.h"
-#include "../data/metablock.h"
+#include "../data/metablock_data.h"
 #include "../error.h"
 #include "../primitive/buffer.h"
 #include "../sqsh.h"
-#include "data/superblock.h"
+#include "data/superblock_data.h"
 #include "metablock_context.h"
 #include "superblock_context.h"
 

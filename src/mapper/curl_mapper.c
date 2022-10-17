@@ -31,8 +31,8 @@
  * @file         curl_mapper.c
  */
 
-#include "../data/compression_options.h"
-#include "../data/superblock.h"
+#include "../data/compression_options_data.h"
+#include "../data/superblock_data.h"
 #include "../error.h"
 #include "inttypes.h"
 #include "mapper.h"

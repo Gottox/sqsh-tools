@@ -32,7 +32,7 @@
  */
 
 #include "superblock_context.h"
-#include "../data/superblock.h"
+#include "../data/superblock_data.h"
 #include "../error.h"
 #include <stdint.h>
 

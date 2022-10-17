@@ -39,7 +39,7 @@
 #include <sys/types.h>
 #include <zconf.h>
 
-#include "../data/compression_options.h"
+#include "../data/compression_options_data.h"
 #include "../error.h"
 #include "compression.h"
 

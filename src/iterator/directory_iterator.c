@@ -33,7 +33,7 @@
 
 #include "directory_iterator.h"
 #include "../context/inode_context.h"
-#include "../data/directory.h"
+#include "../data/directory_data.h"
 #include "../error.h"
 #include "../sqsh.h"
 #include "directory_index_iterator.h"

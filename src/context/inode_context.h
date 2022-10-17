@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         inode.h
+ * @file         inode_context.h
  */
 
 #include "../utils.h"
@@ -70,7 +70,7 @@ enum SqshInodeType {
 
 enum SqshInodeContextType {
 	SQSH_INODE_TYPE_UNKNOWN = -1,
-	// avoid overlapping with the types in ../data/inode.h
+	// avoid overlapping with the types in ../data/inode_data.h
 	SQSH_INODE_TYPE_DIRECTORY = 1 + (1 << 8),
 	SQSH_INODE_TYPE_FILE,
 	SQSH_INODE_TYPE_SYMLINK,

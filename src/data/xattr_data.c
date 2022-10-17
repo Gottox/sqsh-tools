@@ -28,25 +28,74 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         metablock.h
+ * @file         xattr_data.c
  */
 
-#include "../utils.h"
-#include <stddef.h>
+#include "xattr_internal.h"
+#include <endian.h>
 #include <stdint.h>
+#include <string.h>
 
-#ifndef SQSH_METABLOCK_H
+uint16_t
+sqsh_data_xattr_key_type(const struct SqshXattrKey *xattr_key) {
+	return le16toh(xattr_key->type);
+}
 
-#define SQSH_METABLOCK_H
+uint16_t
+sqsh_data_xattr_key_name_size(const struct SqshXattrKey *xattr_key) {
+	return le16toh(xattr_key->name_size);
+}
+const uint8_t *
+sqsh_data_xattr_key_name(const struct SqshXattrKey *xattr_key) {
+	return (const uint8_t *)&xattr_key[1];
+}
 
-#define SQSH_SIZEOF_METABLOCK 2
+uint32_t
+sqsh_data_xattr_value_size(const struct SqshXattrValue *xattr_value) {
+	return le32toh(xattr_value->value_size);
+}
+const uint8_t *
+sqsh_data_xattr_value(const struct SqshXattrValue *xattr_value) {
+	return (const uint8_t *)&xattr_value[1];
+}
+uint64_t
+sqsh_data_xattr_value_ref(const struct SqshXattrValue *xattr_value) {
+	uint64_t ref = 0;
 
-struct SQSH_UNALIGNED SqshMetablock;
+	memcpy(&ref, sqsh_data_xattr_value(xattr_value), sizeof(uint64_t));
+	return le64toh(ref);
+}
 
-int sqsh_data_metablock_is_compressed(const struct SqshMetablock *metablock);
+uint64_t
+sqsh_data_xattr_lookup_table_xattr_ref(
+		const struct SqshXattrLookupTable *lookup_table) {
+	return le64toh(lookup_table->xattr_ref);
+}
+uint32_t
+sqsh_data_xattr_lookup_table_count(
+		const struct SqshXattrLookupTable *lookup_table) {
+	return le32toh(lookup_table->count);
+}
+uint32_t
+sqsh_data_xattr_lookup_table_size(
+		const struct SqshXattrLookupTable *lookup_table) {
+	return le32toh(lookup_table->size);
+}
 
-const uint8_t *sqsh_data_metablock_data(const struct SqshMetablock *metablock);
+uint64_t
+sqsh_data_xattr_id_table_xattr_table_start(
+		const struct SqshXattrIdTable *xattr_id_table) {
+	return le64toh(xattr_id_table->xattr_table_start);
+}
+uint32_t
+sqsh_data_xattr_id_table_xattr_ids(
+		const struct SqshXattrIdTable *xattr_id_table) {
+	return le32toh(xattr_id_table->xattr_ids);
+}
+uint64_t
+sqsh_data_xattr_id_table_ref(
+		const struct SqshXattrIdTable *xattr_id_table, uint64_t index) {
+	const uint64_t *table = (const uint64_t *)&xattr_id_table[1];
 
-size_t sqsh_data_metablock_size(const struct SqshMetablock *metablock);
-
-#endif /* end of include guard METABLOCK_H */
+	return le64toh(table[index]);
+}

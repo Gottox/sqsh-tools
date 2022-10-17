@@ -31,7 +31,7 @@
  * @file         inode_internal.h
  */
 
-#include "inode.h"
+#include "inode_data.h"
 
 #ifndef FORMAT_INODE_INTERNAL_H
 

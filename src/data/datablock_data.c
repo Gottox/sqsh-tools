@@ -28,58 +28,19 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         compression_options.h
+ * @file         datablock_data.c
  */
 
-#include "../utils.h"
-#include <stdint.h>
+#include "datablock_internal.h"
+#include <endian.h>
 
-#ifndef SQSH__COMPRESSION_OPTIONS_H
+uint32_t
+sqsh_data_datablock_size(const struct SqshDatablockSize *datablock_size) {
+	return le32toh(datablock_size->size) & ~(1 << 24);
+}
 
-#define SQSH__COMPRESSION_OPTIONS_H
-
-#define SQSH_SIZEOF_COMPRESSION_OPTIONS_GZIP 8
-#define SQSH_SIZEOF_COMPRESSION_OPTIONS_XZ 8
-#define SQSH_SIZEOF_COMPRESSION_OPTIONS_LZ4 8
-#define SQSH_SIZEOF_COMPRESSION_OPTIONS_ZSTD 4
-#define SQSH_SIZEOF_COMPRESSION_OPTIONS_LZO 8
-#define SQSH_SIZEOF_COMPRESSION_OPTIONS 8
-
-struct SQSH_UNALIGNED SqshCompressionOptionsGzip;
-
-struct SQSH_UNALIGNED SqshCompressionOptionsXz;
-
-struct SQSH_UNALIGNED SqshCompressionOptionsLz4;
-
-struct SQSH_UNALIGNED SqshCompressionOptionsZstd;
-
-struct SQSH_UNALIGNED SqshCompressionOptionsLzo;
-
-union SqshCompressionOptions;
-
-uint32_t sqsh_data_compression_options_gzip_compression_level(
-		const union SqshCompressionOptions *options);
-uint16_t sqsh_data_compression_options_gzip_window_size(
-		const union SqshCompressionOptions *options);
-uint16_t sqsh_data_compression_options_gzip_strategies(
-		const union SqshCompressionOptions *options);
-
-uint32_t sqsh_data_compression_options_xz_dictionary_size(
-		const union SqshCompressionOptions *options);
-uint32_t sqsh_data_compression_options_xz_filters(
-		const union SqshCompressionOptions *options);
-
-uint32_t sqsh_data_compression_options_lz4_version(
-		const union SqshCompressionOptions *options);
-uint32_t sqsh_data_compression_options_lz4_flags(
-		const union SqshCompressionOptions *options);
-
-uint32_t sqsh_data_compression_options_zstd_compression_level(
-		const union SqshCompressionOptions *options);
-
-uint32_t sqsh_data_compression_options_lzo_algorithm(
-		const union SqshCompressionOptions *options);
-uint32_t sqsh_data_compression_options_lzo_compression_level(
-		const union SqshCompressionOptions *options);
-
-#endif /* end of include guard SQSH__COMPRESSION_OPTIONS_H */
+bool
+sqsh_data_datablock_is_compressed(
+		const struct SqshDatablockSize *datablock_size) {
+	return !(le32toh(datablock_size->size) & (1 << 24));
+}

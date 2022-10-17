@@ -28,26 +28,24 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         metablock.c
+ * @file         fragment_data.h
  */
 
-#include "../sqsh.h"
 #include "../utils.h"
-#include "metablock_internal.h"
-#include "superblock.h"
-#include <endian.h>
+#include "datablock_data.h"
+#include <stdint.h>
 
-int
-sqsh_data_metablock_is_compressed(const struct SqshMetablock *metablock) {
-	return !(htole16(metablock->header) & 0x8000);
-}
+#ifndef SQSH_FRAGMENT_DATA_H
 
-const uint8_t *
-sqsh_data_metablock_data(const struct SqshMetablock *metablock) {
-	return (uint8_t *)&metablock[1];
-}
+#define SQSH_FRAGMENT_DATA_H
 
-size_t
-sqsh_data_metablock_size(const struct SqshMetablock *metablock) {
-	return htole16(metablock->header) & 0x7FFF;
-}
+#define SQSH_SIZEOF_FRAGMENT 16
+
+struct SQSH_UNALIGNED SqshFragment;
+
+uint64_t sqsh_data_fragment_start(const struct SqshFragment *fragment);
+const struct SqshDatablockSize *
+sqsh_data_fragment_size_info(const struct SqshFragment *fragment);
+uint32_t sqsh_data_fragment_is_compressed(const struct SqshFragment *fragment);
+
+#endif /* end of include guard SQSH_FRAGMENT_DATA_H */

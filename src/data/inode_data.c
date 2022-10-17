@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         inode.c
+ * @file         inode_data.c
  */
 
 #include "inode_internal.h"

@@ -34,7 +34,6 @@
 #include "../src/context/file_context.h"
 #include "../src/context/inode_context.h"
 #include "../src/context/superblock_context.h"
-#include "../src/data/superblock.h"
 #include "../src/error.h"
 #include "../src/iterator/directory_iterator.h"
 #include "../src/iterator/xattr_iterator.h"

@@ -28,58 +28,24 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         superblock.h
+ * @file         datablock_data.h
  */
 
 #include "../utils.h"
-#include <stddef.h>
+#include <stdbool.h>
 #include <stdint.h>
 
-#ifndef SQSH_SUPERBLOCK_H
+#ifndef DATABLOCK_DATA_H
 
-#define SQSH_SUPERBLOCK_H
+#define DATABLOCK_DATA_H
 
-#define SQSH_SIZEOF_SUPERBLOCK 96
+#define SQSH_SIZEOF_DATABLOCK_SIZE 4
 
-struct SQSH_UNALIGNED SqshSuperblock;
+struct SQSH_UNALIGNED SqshDatablockSize;
 
-int
-sqsh_data_superblock_init(const struct SqshSuperblock *superblock, size_t size);
-
-uint32_t sqsh_data_superblock_magic(const struct SqshSuperblock *superblock);
 uint32_t
-sqsh_data_superblock_inode_count(const struct SqshSuperblock *superblock);
-uint32_t
-sqsh_data_superblock_modification_time(const struct SqshSuperblock *superblock);
-uint32_t
-sqsh_data_superblock_block_size(const struct SqshSuperblock *superblock);
-uint32_t sqsh_data_superblock_fragment_entry_count(
-		const struct SqshSuperblock *superblock);
-uint16_t
-sqsh_data_superblock_compression_id(const struct SqshSuperblock *superblock);
-uint16_t
-sqsh_data_superblock_block_log(const struct SqshSuperblock *superblock);
-uint16_t sqsh_data_superblock_flags(const struct SqshSuperblock *superblock);
-uint16_t sqsh_data_superblock_id_count(const struct SqshSuperblock *superblock);
-uint16_t
-sqsh_data_superblock_version_major(const struct SqshSuperblock *superblock);
-uint16_t
-sqsh_data_superblock_version_minor(const struct SqshSuperblock *superblock);
-uint64_t
-sqsh_data_superblock_root_inode_ref(const struct SqshSuperblock *superblock);
-uint64_t
-sqsh_data_superblock_bytes_used(const struct SqshSuperblock *superblock);
-uint64_t
-sqsh_data_superblock_id_table_start(const struct SqshSuperblock *superblock);
-uint64_t sqsh_data_superblock_xattr_id_table_start(
-		const struct SqshSuperblock *superblock);
-uint64_t
-sqsh_data_superblock_inode_table_start(const struct SqshSuperblock *superblock);
-uint64_t sqsh_data_superblock_directory_table_start(
-		const struct SqshSuperblock *superblock);
-uint64_t sqsh_data_superblock_fragment_table_start(
-		const struct SqshSuperblock *superblock);
-uint64_t sqsh_data_superblock_export_table_start(
-		const struct SqshSuperblock *superblock);
+sqsh_data_datablock_size(const struct SqshDatablockSize *datablock_size);
+bool sqsh_data_datablock_is_compressed(
+		const struct SqshDatablockSize *datablock_size);
 
-#endif /* end of include guard SQSH_SUPERBLOCK_H */
+#endif /* end of include guard DATABLOCK_DATA_H */

@@ -28,74 +28,54 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         xattr.c
+ * @file         directory_data.c
  */
 
-#include "xattr_internal.h"
+#include "directory_internal.h"
 #include <endian.h>
-#include <stdint.h>
-#include <string.h>
 
 uint16_t
-sqsh_data_xattr_key_type(const struct SqshXattrKey *xattr_key) {
-	return le16toh(xattr_key->type);
+sqsh_data_directory_entry_offset(const struct SqshDirectoryEntry *entry) {
+	return le16toh(entry->offset);
+}
+
+int16_t
+sqsh_data_directory_entry_inode_offset(const struct SqshDirectoryEntry *entry) {
+	return le16toh(entry->inode_offset);
 }
 
 uint16_t
-sqsh_data_xattr_key_name_size(const struct SqshXattrKey *xattr_key) {
-	return le16toh(xattr_key->name_size);
+sqsh_data_directory_entry_type(const struct SqshDirectoryEntry *entry) {
+	return le16toh(entry->type);
 }
+
+uint16_t
+sqsh_data_directory_entry_name_size(const struct SqshDirectoryEntry *entry) {
+	return le16toh(entry->name_size);
+}
+
 const uint8_t *
-sqsh_data_xattr_key_name(const struct SqshXattrKey *xattr_key) {
-	return (const uint8_t *)&xattr_key[1];
+sqsh_data_directory_entry_name(const struct SqshDirectoryEntry *entry) {
+	return (const uint8_t *)&entry[1];
 }
 
 uint32_t
-sqsh_data_xattr_value_size(const struct SqshXattrValue *xattr_value) {
-	return le32toh(xattr_value->value_size);
-}
-const uint8_t *
-sqsh_data_xattr_value(const struct SqshXattrValue *xattr_value) {
-	return (const uint8_t *)&xattr_value[1];
-}
-uint64_t
-sqsh_data_xattr_value_ref(const struct SqshXattrValue *xattr_value) {
-	uint64_t ref = 0;
-
-	memcpy(&ref, sqsh_data_xattr_value(xattr_value), sizeof(uint64_t));
-	return le64toh(ref);
-}
-
-uint64_t
-sqsh_data_xattr_lookup_table_xattr_ref(
-		const struct SqshXattrLookupTable *lookup_table) {
-	return le64toh(lookup_table->xattr_ref);
+sqsh_data_directory_fragment_count(
+		const struct SqshDirectoryFragment *fragment) {
+	return le32toh(fragment->count);
 }
 uint32_t
-sqsh_data_xattr_lookup_table_count(
-		const struct SqshXattrLookupTable *lookup_table) {
-	return le32toh(lookup_table->count);
+sqsh_data_directory_fragment_start(
+		const struct SqshDirectoryFragment *fragment) {
+	return le32toh(fragment->start);
 }
 uint32_t
-sqsh_data_xattr_lookup_table_size(
-		const struct SqshXattrLookupTable *lookup_table) {
-	return le32toh(lookup_table->size);
+sqsh_data_directory_fragment_inode_number(
+		const struct SqshDirectoryFragment *fragment) {
+	return le32toh(fragment->inode_number);
 }
-
-uint64_t
-sqsh_data_xattr_id_table_xattr_table_start(
-		const struct SqshXattrIdTable *xattr_id_table) {
-	return le64toh(xattr_id_table->xattr_table_start);
-}
-uint32_t
-sqsh_data_xattr_id_table_xattr_ids(
-		const struct SqshXattrIdTable *xattr_id_table) {
-	return le32toh(xattr_id_table->xattr_ids);
-}
-uint64_t
-sqsh_data_xattr_id_table_ref(
-		const struct SqshXattrIdTable *xattr_id_table, uint64_t index) {
-	const uint64_t *table = (const uint64_t *)&xattr_id_table[1];
-
-	return le64toh(table[index]);
+const struct SqshDirectoryEntry *
+sqsh_data_directory_fragment_entries(
+		const struct SqshDirectoryFragment *fragment) {
+	return (const struct SqshDirectoryEntry *)&fragment[1];
 }

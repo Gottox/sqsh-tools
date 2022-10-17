@@ -28,63 +28,25 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         compression_options.c
+ * @file         metablock_data.c
  */
 
-#include "compression_options_internal.h"
+#include "../sqsh.h"
+#include "../utils.h"
+#include "metablock_internal.h"
 #include <endian.h>
 
-uint32_t
-sqsh_data_compression_options_gzip_compression_level(
-		const union SqshCompressionOptions *options) {
-	return le32toh(options->gzip.compression_level);
-}
-uint16_t
-sqsh_data_compression_options_gzip_window_size(
-		const union SqshCompressionOptions *options) {
-	return le16toh(options->gzip.window_size);
-}
-uint16_t
-sqsh_data_compression_options_gzip_strategies(
-		const union SqshCompressionOptions *options) {
-	return le16toh(options->gzip.strategies);
+int
+sqsh_data_metablock_is_compressed(const struct SqshMetablock *metablock) {
+	return !(htole16(metablock->header) & 0x8000);
 }
 
-uint32_t
-sqsh_data_compression_options_xz_dictionary_size(
-		const union SqshCompressionOptions *options) {
-	return le32toh(options->xz.dictionary_size);
-}
-uint32_t
-sqsh_data_compression_options_xz_filters(
-		const union SqshCompressionOptions *options) {
-	return le32toh(options->xz.filters);
+const uint8_t *
+sqsh_data_metablock_data(const struct SqshMetablock *metablock) {
+	return (uint8_t *)&metablock[1];
 }
 
-uint32_t
-sqsh_data_compression_options_lz4_version(
-		const union SqshCompressionOptions *options) {
-	return le32toh(options->lz4.version);
-}
-uint32_t
-sqsh_data_compression_options_lz4_flags(
-		const union SqshCompressionOptions *options) {
-	return le32toh(options->lz4.flags);
-}
-
-uint32_t
-sqsh_data_compression_options_zstd_compression_level(
-		const union SqshCompressionOptions *options) {
-	return le32toh(options->zstd.compression_level);
-}
-
-uint32_t
-sqsh_data_compression_options_lzo_algorithm(
-		const union SqshCompressionOptions *options) {
-	return le32toh(options->lzo.algorithm);
-}
-uint32_t
-sqsh_data_compression_options_lzo_compression_level(
-		const union SqshCompressionOptions *options) {
-	return le32toh(options->lzo.compression_level);
+size_t
+sqsh_data_metablock_size(const struct SqshMetablock *metablock) {
+	return htole16(metablock->header) & 0x7FFF;
 }

@@ -33,7 +33,7 @@
 
 #include "metablock_context.h"
 #include "../compression/compression.h"
-#include "../data/metablock.h"
+#include "../data/metablock_data.h"
 #include "../error.h"
 #include "../sqsh.h"
 #include <stdint.h>

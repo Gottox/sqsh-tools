@@ -34,7 +34,7 @@
 #include "xattr_table.h"
 #include "../context/inode_context.h"
 #include "../context/superblock_context.h"
-#include "../data/xattr.h"
+#include "../data/xattr_data.h"
 #include "../error.h"
 #include "../primitive/buffer.h"
 #include "../sqsh.h"

@@ -28,41 +28,19 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         directory.h
+ * @file         fragment_data.c
  */
 
-#include "../utils.h"
-#include <stdint.h>
-#include <stdlib.h>
+#include "fragment_internal.h"
 
-#ifndef SQSH__DIRECTORY_H
+#include <endian.h>
 
-#define SQSH__DIRECTORY_H
+uint64_t
+sqsh_data_fragment_start(const struct SqshFragment *fragment) {
+	return le64toh(fragment->start);
+}
 
-#define SQSH_SIZEOF_DIRECTORY_FRAGMENT 12
-#define SQSH_SIZEOF_DIRECTORY_ENTRY 8
-
-struct SQSH_UNALIGNED SqshDirectoryEntry;
-
-struct SQSH_UNALIGNED SqshDirectoryFragment;
-
-uint16_t
-sqsh_data_directory_entry_offset(const struct SqshDirectoryEntry *entry);
-int16_t
-sqsh_data_directory_entry_inode_offset(const struct SqshDirectoryEntry *entry);
-uint16_t sqsh_data_directory_entry_type(const struct SqshDirectoryEntry *entry);
-uint16_t
-sqsh_data_directory_entry_name_size(const struct SqshDirectoryEntry *entry);
-const uint8_t *
-sqsh_data_directory_entry_name(const struct SqshDirectoryEntry *entry);
-
-uint32_t sqsh_data_directory_fragment_count(
-		const struct SqshDirectoryFragment *fragment);
-uint32_t sqsh_data_directory_fragment_start(
-		const struct SqshDirectoryFragment *fragment);
-uint32_t sqsh_data_directory_fragment_inode_number(
-		const struct SqshDirectoryFragment *fragment);
-const struct SqshDirectoryEntry *sqsh_data_directory_fragment_entries(
-		const struct SqshDirectoryFragment *fragment);
-
-#endif /* end of include guard SQSH__DIRECTORY_H */
+const struct SqshDatablockSize *
+sqsh_data_fragment_size_info(const struct SqshFragment *fragment) {
+	return &fragment->size;
+}

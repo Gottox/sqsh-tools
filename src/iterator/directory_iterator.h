@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         directory.h
+ * @file         directory_iterator.h
  */
 
 #include "../context/inode_context.h"

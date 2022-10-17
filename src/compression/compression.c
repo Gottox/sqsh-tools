@@ -35,7 +35,7 @@
 #include "../context/superblock_context.h"
 #include "../error.h"
 #include "../sqsh.h"
-#include "data/superblock.h"
+#include "data/superblock_data.h"
 
 #include <stdint.h>
 #include <stdlib.h>

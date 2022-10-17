@@ -33,7 +33,7 @@
 
 #include "directory_index_iterator.h"
 #include "../context/inode_context.h"
-#include "../data/inode.h"
+#include "../data/inode_data.h"
 #include "../error.h"
 
 static const uint64_t INODE_HEADER_SIZE =

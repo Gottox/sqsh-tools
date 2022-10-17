@@ -31,7 +31,7 @@
  * @file         xattr_internal.h
  */
 
-#include "xattr.h"
+#include "xattr_data.h"
 #include <stdint.h>
 
 #ifndef SQSH_XATTR_INTERNAL_H

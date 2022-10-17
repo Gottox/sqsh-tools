@@ -32,8 +32,8 @@
  */
 
 #include "compression_options_context.h"
-#include "../data/compression_options.h"
-#include "../data/superblock.h"
+#include "../data/compression_options_data.h"
+#include "../data/superblock_data.h"
 #include "../sqsh.h"
 #include "metablock_context.h"
 #include "superblock_context.h"

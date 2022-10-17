@@ -28,49 +28,25 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         xattr.h
+ * @file         metablock_data.h
  */
 
 #include "../utils.h"
+#include <stddef.h>
 #include <stdint.h>
 
-#ifndef SQSH_XATTR_H
+#ifndef SQSH_METABLOCK_DATA_H
 
-#define SQSH_XATTR_H
+#define SQSH_METABLOCK_DATA_H
 
-#define SQSH_SIZEOF_XATTR_KEY 4
-#define SQSH_SIZEOF_XATTR_VALUE 4
-#define SQSH_SIZEOF_XATTR_LOOKUP_TABLE 16
-#define SQSH_SIZEOF_XATTR_ID_TABLE 16
+#define SQSH_SIZEOF_METABLOCK 2
 
-struct SQSH_UNALIGNED SqshXattrKey;
+struct SQSH_UNALIGNED SqshMetablock;
 
-struct SQSH_UNALIGNED SqshXattrValue;
+int sqsh_data_metablock_is_compressed(const struct SqshMetablock *metablock);
 
-struct SQSH_UNALIGNED SqshXattrLookupTable;
+const uint8_t *sqsh_data_metablock_data(const struct SqshMetablock *metablock);
 
-struct SQSH_UNALIGNED SqshXattrIdTable;
+size_t sqsh_data_metablock_size(const struct SqshMetablock *metablock);
 
-uint16_t sqsh_data_xattr_key_type(const struct SqshXattrKey *xattr_key);
-uint16_t sqsh_data_xattr_key_name_size(const struct SqshXattrKey *xattr_key);
-const uint8_t *sqsh_data_xattr_key_name(const struct SqshXattrKey *xattr_key);
-
-uint32_t sqsh_data_xattr_value_size(const struct SqshXattrValue *xattr_value);
-uint64_t sqsh_data_xattr_value_ref(const struct SqshXattrValue *xattr_value);
-const uint8_t *sqsh_data_xattr_value(const struct SqshXattrValue *xattr_value);
-
-uint64_t sqsh_data_xattr_lookup_table_xattr_ref(
-		const struct SqshXattrLookupTable *lookup_table);
-uint32_t sqsh_data_xattr_lookup_table_count(
-		const struct SqshXattrLookupTable *lookup_table);
-uint32_t sqsh_data_xattr_lookup_table_size(
-		const struct SqshXattrLookupTable *lookup_table);
-
-uint64_t sqsh_data_xattr_id_table_xattr_table_start(
-		const struct SqshXattrIdTable *xattr_id_table);
-uint32_t sqsh_data_xattr_id_table_xattr_ids(
-		const struct SqshXattrIdTable *xattr_id_table);
-const uint64_t *
-sqsh_data_xattr_id_table(const struct SqshXattrIdTable *xattr_id_table);
-
-#endif /* end of include guard SQSH_XATTR_H */
+#endif /* end of include guard METABLOCK_DATA_H */

@@ -28,24 +28,49 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         fragment.h
+ * @file         xattr_data.h
  */
 
 #include "../utils.h"
-#include "datablock.h"
 #include <stdint.h>
 
-#ifndef SQSH__FRAGMENT_H
+#ifndef SQSH_XATTR_DATA_H
 
-#define SQSH__FRAGMENT_H
+#define SQSH_XATTR_DATA_H
 
-#define SQSH_SIZEOF_FRAGMENT 16
+#define SQSH_SIZEOF_XATTR_KEY 4
+#define SQSH_SIZEOF_XATTR_VALUE 4
+#define SQSH_SIZEOF_XATTR_LOOKUP_TABLE 16
+#define SQSH_SIZEOF_XATTR_ID_TABLE 16
 
-struct SQSH_UNALIGNED SqshFragment;
+struct SQSH_UNALIGNED SqshXattrKey;
 
-uint64_t sqsh_data_fragment_start(const struct SqshFragment *fragment);
-const struct SqshDatablockSize *
-sqsh_data_fragment_size_info(const struct SqshFragment *fragment);
-uint32_t sqsh_data_fragment_is_compressed(const struct SqshFragment *fragment);
+struct SQSH_UNALIGNED SqshXattrValue;
 
-#endif /* end of include guard SQSH__FRAGMENT_H */
+struct SQSH_UNALIGNED SqshXattrLookupTable;
+
+struct SQSH_UNALIGNED SqshXattrIdTable;
+
+uint16_t sqsh_data_xattr_key_type(const struct SqshXattrKey *xattr_key);
+uint16_t sqsh_data_xattr_key_name_size(const struct SqshXattrKey *xattr_key);
+const uint8_t *sqsh_data_xattr_key_name(const struct SqshXattrKey *xattr_key);
+
+uint32_t sqsh_data_xattr_value_size(const struct SqshXattrValue *xattr_value);
+uint64_t sqsh_data_xattr_value_ref(const struct SqshXattrValue *xattr_value);
+const uint8_t *sqsh_data_xattr_value(const struct SqshXattrValue *xattr_value);
+
+uint64_t sqsh_data_xattr_lookup_table_xattr_ref(
+		const struct SqshXattrLookupTable *lookup_table);
+uint32_t sqsh_data_xattr_lookup_table_count(
+		const struct SqshXattrLookupTable *lookup_table);
+uint32_t sqsh_data_xattr_lookup_table_size(
+		const struct SqshXattrLookupTable *lookup_table);
+
+uint64_t sqsh_data_xattr_id_table_xattr_table_start(
+		const struct SqshXattrIdTable *xattr_id_table);
+uint32_t sqsh_data_xattr_id_table_xattr_ids(
+		const struct SqshXattrIdTable *xattr_id_table);
+const uint64_t *
+sqsh_data_xattr_id_table(const struct SqshXattrIdTable *xattr_id_table);
+
+#endif /* end of include guard SQSH_XATTR_DATA_H */

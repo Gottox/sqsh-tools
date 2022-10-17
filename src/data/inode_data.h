@@ -28,16 +28,15 @@
 
 /*
  * @author       Enno Boland (mail@eboland.de)
- * @file         inode.h
+ * @file         inode_data.h
  */
 
 #include "../utils.h"
-#include "datablock.h"
 #include <stdint.h>
 
-#ifndef INODE_H
+#ifndef INODE_DATA_H
 
-#define INODE_H
+#define INODE_DATA_H
 
 #define SQSH_SIZEOF_INODE_DIRECTORY_INDEX 12
 #define SQSH_SIZEOF_INODE_DIRECTORY 16
@@ -188,4 +187,4 @@ uint32_t
 sqsh_data_inode_ipc_ext_hard_link_count(const struct SqshInodeIpcExt *ipc);
 uint32_t sqsh_data_inode_ipc_ext_xattr_idx(const struct SqshInodeIpcExt *ipc);
 
-#endif /* end of include guard INODE_H */
+#endif /* end of include guard INODE_DATA_H */

@@ -31,7 +31,7 @@
  * @file         datablock_internal.h
  */
 
-#include "datablock.h"
+#include "datablock_data.h"
 
 #ifndef DATABLOCK_INTERNAL_H
 

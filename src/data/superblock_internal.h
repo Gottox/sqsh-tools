@@ -31,7 +31,7 @@
  * @file         superblock_internal.h
  */
 
-#include "superblock.h"
+#include "superblock_data.h"
 
 #ifndef SUPERBLOCK_INTERNAL_H
 

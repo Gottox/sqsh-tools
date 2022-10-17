@@ -31,7 +31,7 @@
  * @file         directory_internal.h
  */
 
-#include "directory.h"
+#include "directory_data.h"
 
 #ifndef DIRECTORY_INTERNAL_H
 

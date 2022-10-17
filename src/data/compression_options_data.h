@@ -28,54 +28,58 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         directory.c
+ * @file         compression_options_data.h
  */
 
-#include "directory_internal.h"
-#include <endian.h>
+#include "../utils.h"
+#include <stdint.h>
 
-uint16_t
-sqsh_data_directory_entry_offset(const struct SqshDirectoryEntry *entry) {
-	return le16toh(entry->offset);
-}
+#ifndef SQSH_COMPRESSION_OPTIONS_DATA_H
 
-int16_t
-sqsh_data_directory_entry_inode_offset(const struct SqshDirectoryEntry *entry) {
-	return le16toh(entry->inode_offset);
-}
+#define SQSH_COMPRESSION_OPTIONS_DATA_H
 
-uint16_t
-sqsh_data_directory_entry_type(const struct SqshDirectoryEntry *entry) {
-	return le16toh(entry->type);
-}
+#define SQSH_SIZEOF_COMPRESSION_OPTIONS_GZIP 8
+#define SQSH_SIZEOF_COMPRESSION_OPTIONS_XZ 8
+#define SQSH_SIZEOF_COMPRESSION_OPTIONS_LZ4 8
+#define SQSH_SIZEOF_COMPRESSION_OPTIONS_ZSTD 4
+#define SQSH_SIZEOF_COMPRESSION_OPTIONS_LZO 8
+#define SQSH_SIZEOF_COMPRESSION_OPTIONS 8
 
-uint16_t
-sqsh_data_directory_entry_name_size(const struct SqshDirectoryEntry *entry) {
-	return le16toh(entry->name_size);
-}
+struct SQSH_UNALIGNED SqshCompressionOptionsGzip;
 
-const uint8_t *
-sqsh_data_directory_entry_name(const struct SqshDirectoryEntry *entry) {
-	return (const uint8_t *)&entry[1];
-}
+struct SQSH_UNALIGNED SqshCompressionOptionsXz;
 
-uint32_t
-sqsh_data_directory_fragment_count(
-		const struct SqshDirectoryFragment *fragment) {
-	return le32toh(fragment->count);
-}
-uint32_t
-sqsh_data_directory_fragment_start(
-		const struct SqshDirectoryFragment *fragment) {
-	return le32toh(fragment->start);
-}
-uint32_t
-sqsh_data_directory_fragment_inode_number(
-		const struct SqshDirectoryFragment *fragment) {
-	return le32toh(fragment->inode_number);
-}
-const struct SqshDirectoryEntry *
-sqsh_data_directory_fragment_entries(
-		const struct SqshDirectoryFragment *fragment) {
-	return (const struct SqshDirectoryEntry *)&fragment[1];
-}
+struct SQSH_UNALIGNED SqshCompressionOptionsLz4;
+
+struct SQSH_UNALIGNED SqshCompressionOptionsZstd;
+
+struct SQSH_UNALIGNED SqshCompressionOptionsLzo;
+
+union SqshCompressionOptions;
+
+uint32_t sqsh_data_compression_options_gzip_compression_level(
+		const union SqshCompressionOptions *options);
+uint16_t sqsh_data_compression_options_gzip_window_size(
+		const union SqshCompressionOptions *options);
+uint16_t sqsh_data_compression_options_gzip_strategies(
+		const union SqshCompressionOptions *options);
+
+uint32_t sqsh_data_compression_options_xz_dictionary_size(
+		const union SqshCompressionOptions *options);
+uint32_t sqsh_data_compression_options_xz_filters(
+		const union SqshCompressionOptions *options);
+
+uint32_t sqsh_data_compression_options_lz4_version(
+		const union SqshCompressionOptions *options);
+uint32_t sqsh_data_compression_options_lz4_flags(
+		const union SqshCompressionOptions *options);
+
+uint32_t sqsh_data_compression_options_zstd_compression_level(
+		const union SqshCompressionOptions *options);
+
+uint32_t sqsh_data_compression_options_lzo_algorithm(
+		const union SqshCompressionOptions *options);
+uint32_t sqsh_data_compression_options_lzo_compression_level(
+		const union SqshCompressionOptions *options);
+
+#endif /* end of include guard SQSH_COMPRESSION_OPTIONS_DATA_H */
