@@ -48,9 +48,9 @@ init_refcount() {
 	struct SqshRefCount *ref = NULL;
 	int *my_int;
 
-	sqsh_ref_count_new(&ref, sizeof(int), dummy_dtor);
+	sqsh_ref_count_new(&ref, sizeof(int));
 	my_int = sqsh_ref_count_retain(ref);
-	sqsh_ref_count_release(ref);
+	sqsh_ref_count_release(ref, dummy_dtor);
 	(void)my_int;
 }
 

@@ -44,7 +44,6 @@ typedef int (*sqshRefCountDtor)(void *);
  */
 struct SqshRefCount {
 	size_t references;
-	sqshRefCountDtor dtor;
 };
 
 /**
@@ -56,9 +55,7 @@ struct SqshRefCount {
  * reaches 0.
  * @return 0 on success, less than 0 on error.
  */
-int sqsh_ref_count_new(
-		struct SqshRefCount **ref_count, size_t object_size,
-		sqshRefCountDtor dtor);
+int sqsh_ref_count_new(struct SqshRefCount **ref_count, size_t object_size);
 
 /**
  * @brief Increment the reference count of a SqshRefCount struct.
@@ -75,6 +72,7 @@ void *sqsh_ref_count_retain(struct SqshRefCount *ref_count);
  * @param ref_count A pointer to the SqshRefCount struct.
  * @return amount of references left.
  */
-int sqsh_ref_count_release(struct SqshRefCount *ref_count);
+int
+sqsh_ref_count_release(struct SqshRefCount *ref_count, sqshRefCountDtor dtor);
 
 #endif /* end of include guard REFCOUNT_H */

@@ -43,9 +43,7 @@ get_data(struct SqshRefCount *ref_count) {
 }
 
 int
-sqsh_ref_count_new(
-		struct SqshRefCount **ref_count, size_t object_size,
-		sqshRefCountDtor dtor) {
+sqsh_ref_count_new(struct SqshRefCount **ref_count, size_t object_size) {
 	struct SqshRefCount *ptr;
 	size_t outer_size = 0;
 	if (ADD_OVERFLOW(sizeof(struct SqshRefCount), object_size, &outer_size)) {
@@ -56,7 +54,6 @@ sqsh_ref_count_new(
 		return -SQSH_ERROR_MALLOC_FAILED;
 	}
 
-	ptr->dtor = dtor;
 	ptr->references = 0;
 	*ref_count = ptr;
 	return 0;
@@ -69,14 +66,14 @@ sqsh_ref_count_retain(struct SqshRefCount *ref_count) {
 }
 
 int
-sqsh_ref_count_release(struct SqshRefCount *ref_count) {
+sqsh_ref_count_release(struct SqshRefCount *ref_count, sqshRefCountDtor dtor) {
 	if (ref_count == NULL) {
 		return 0;
 	}
 
 	ref_count->references--;
 	if (ref_count->references == 0) {
-		ref_count->dtor(get_data(ref_count));
+		dtor(get_data(ref_count));
 		free(ref_count);
 		return 0;
 	} else {
