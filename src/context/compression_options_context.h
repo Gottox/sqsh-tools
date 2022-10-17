@@ -39,7 +39,6 @@
 #define COMPRESSION_OPTIONS_CONTEXT_H
 
 struct Sqsh;
-union SqshCompressionOptions;
 
 /**
  * @brief The compression options context is used to store the
@@ -99,22 +98,6 @@ enum SqshLzoAlgorithm {
  */
 SQSH_NO_UNUSED int sqsh_compression_options_init(
 		struct SqshCompressionOptionsContext *context, struct Sqsh *sqsh);
-
-/**
- * @brief returns a pointer to the compression options data
- * @memberof SqshCompressionOptionsContext
- * @param context the compression options context
- */
-const union SqshCompressionOptions *sqsh_compression_options_data(
-		const struct SqshCompressionOptionsContext *context);
-/**
- * @brief returns the size of the compression options data as returned by
- * @memberof SqshCompressionOptionsContext
- * sqsh_compression_options_data()
- * @param context the compression options context
- */
-size_t sqsh_compression_options_size(
-		const struct SqshCompressionOptionsContext *context);
 
 /**
  * @brief returns the compression level of gzip
