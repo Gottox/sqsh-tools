@@ -51,7 +51,6 @@ struct SqshRefCount {
  * @memberof SqshRefCount
  * @param ref_count A pointer to the SqshRefCount struct.
  * @param object_size The size of the object to be reference counted.
- * @param dtor A pointer to a function that is called when the reference count
  * reaches 0.
  * @return 0 on success, less than 0 on error.
  */
@@ -70,6 +69,7 @@ void *sqsh_ref_count_retain(struct SqshRefCount *ref_count);
  * reference count reaches 0, the destructor function is called.
  * @memberof SqshRefCount
  * @param ref_count A pointer to the SqshRefCount struct.
+ * @param dtor A pointer to a function that is called when the reference count
  * @return amount of references left.
  */
 int
