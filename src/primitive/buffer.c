@@ -44,7 +44,7 @@ sqsh_buffer_init(struct SqshBuffer *buffer) {
 	int rv = 0;
 
 	buffer->data = NULL;
-	buffer->size = 0;
+	buffer->capacity = buffer->size = 0;
 
 	return rv;
 }
@@ -54,15 +54,20 @@ sqsh_buffer_add_capacity(
 		struct SqshBuffer *buffer, uint8_t **additional_buffer,
 		size_t additional_size) {
 	const size_t buffer_size = buffer->size;
+	uint8_t *new_data;
 	size_t new_capacity;
 
 	if (ADD_OVERFLOW(buffer_size, additional_size, &new_capacity)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
-	buffer->data = realloc(buffer->data, new_capacity);
-	if (buffer->data == NULL) {
-		return -SQSH_ERROR_MALLOC_FAILED;
+	if (new_capacity > buffer->capacity) {
+		new_data = realloc(buffer->data, new_capacity);
+		if (new_data == NULL) {
+			return -SQSH_ERROR_MALLOC_FAILED;
+		}
+		buffer->data = new_data;
+		buffer->capacity = new_capacity;
 	}
 	if (additional_buffer != NULL) {
 		*additional_buffer = &buffer->data[buffer_size];
@@ -98,6 +103,13 @@ sqsh_buffer_append(
 	return rv;
 }
 
+void
+sqsh_buffer_drain(struct SqshBuffer *buffer) {
+	buffer->size = 0;
+	// TODO: cleaning the buffer is only for debug purposes. Remove it later.
+	memset(buffer->data, 0, buffer->capacity);
+}
+
 const uint8_t *
 sqsh_buffer_data(const struct SqshBuffer *buffer) {
 	return buffer->data;
@@ -111,6 +123,6 @@ int
 sqsh_buffer_cleanup(struct SqshBuffer *buffer) {
 	free(buffer->data);
 	buffer->data = NULL;
-	buffer->size = 0;
+	buffer->size = buffer->capacity = 0;
 	return 0;
 }

@@ -50,6 +50,7 @@ struct SqshSuperblockContext;
 struct SqshBuffer {
 	uint8_t *data;
 	size_t size;
+	size_t capacity;
 };
 
 /**
@@ -99,6 +100,18 @@ SQSH_NO_UNUSED int sqsh_buffer_add_capacity(
 SQSH_NO_UNUSED int sqsh_buffer_append(
 		struct SqshBuffer *buffer, const uint8_t *source,
 		const size_t source_size);
+
+/**
+ * @brief sqsh_buffer_drain resets the buffer size to 0.
+ * @memberof SqshBuffer
+ *
+ * This does not free the memory allocated by the buffer so that
+ * the buffer can be reused.
+ *
+ * @param buffer The SqshBuffer to drain.
+ */
+
+void sqsh_buffer_drain(struct SqshBuffer *buffer);
 
 /**
  * @brief sqsh_buffer_data returns the data of the SqshBuffer.

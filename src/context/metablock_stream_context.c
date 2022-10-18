@@ -74,24 +74,15 @@ int
 sqsh_metablock_stream_seek(
 		struct SqshMetablockStreamContext *context, uint64_t address_offset,
 		uint32_t buffer_offset) {
-	int rv = 0;
-	sqsh_buffer_cleanup(&context->buffer);
+	sqsh_buffer_drain(&context->buffer);
 
 	if (ADD_OVERFLOW(
 				context->base_address, address_offset,
 				&context->current_address)) {
-		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
-		goto out;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	context->buffer_offset = buffer_offset;
-
-	rv = sqsh_buffer_init(&context->buffer);
-	if (rv < 0) {
-		goto out;
-	}
-
-out:
-	return rv;
+	return 0;
 }
 
 static int
