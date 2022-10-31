@@ -50,36 +50,29 @@ sqsh_buffer_init(struct SqshBuffer *buffer) {
 }
 
 int
-sqsh_buffer_mut_slice(
-		struct SqshBuffer *buffer, size_t offset, size_t size, uint8_t **data) {
-	size_t end_offset;
+sqsh_buffer_add_capacity(
+		struct SqshBuffer *buffer, uint8_t **additional_buffer,
+		size_t additional_size) {
+	const size_t buffer_size = buffer->size;
 	uint8_t *new_data;
-	if (ADD_OVERFLOW(offset, size, &end_offset)) {
+	size_t new_capacity;
+
+	if (ADD_OVERFLOW(buffer_size, additional_size, &new_capacity)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
-	if (end_offset > buffer->capacity) {
-		new_data = realloc(buffer->data, end_offset);
+
+	if (new_capacity > buffer->capacity) {
+		new_data = realloc(buffer->data, new_capacity);
 		if (new_data == NULL) {
 			return -SQSH_ERROR_MALLOC_FAILED;
 		}
 		buffer->data = new_data;
-		buffer->capacity = end_offset;
+		buffer->capacity = new_capacity;
 	}
-
-	if (data != NULL) {
-		*data = &buffer->data[offset];
+	if (additional_buffer != NULL) {
+		*additional_buffer = &buffer->data[buffer_size];
 	}
-	return end_offset;
-}
-
-int
-sqsh_buffer_add_capacity(
-		struct SqshBuffer *buffer, uint8_t **additional_data,
-		size_t additional_size) {
-	const size_t buffer_size = buffer->size;
-
-	return sqsh_buffer_mut_slice(
-			buffer, buffer_size, additional_size, additional_data);
+	return new_capacity;
 }
 
 int

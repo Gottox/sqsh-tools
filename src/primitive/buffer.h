@@ -77,29 +77,16 @@ SQSH_NO_UNUSED int
 sqsh_buffer_add_size(struct SqshBuffer *buffer, size_t additional_size);
 
 /**
- * @brief sqsh_buffer_mut_slice sets data pointer to a mutable slice
- * of the buffer.
- * @memberof SqshBuffer
- *
- * @param buffer The SqshBuffer
- * @param offset The offset of the slice.
- * @param size The size of the slice.
- * @param data The pointer to the slice.
- * @return 0 on success, less then 0 on error.
- */
-SQSH_NO_UNUSED int sqsh_buffer_mut_slice(
-		struct SqshBuffer *buffer, size_t offset, size_t size, uint8_t **data);
-/**
  * @brief sqsh_buffer_add_size allocates additional memory for the SqshBuffer
  * and sets additional_buffer to the beginning of the additional memory.
  * @memberof SqshBuffer
  *
  * @param buffer The SqshBuffer to free.
- * @param additional_data The pointer to the additional memory.
+ * @param additional_buffer The pointer to the additional memory.
  * @param additional_size The size of the additional memory.
  */
 SQSH_NO_UNUSED int sqsh_buffer_add_capacity(
-		struct SqshBuffer *buffer, uint8_t **additional_data,
+		struct SqshBuffer *buffer, uint8_t **additional_buffer,
 		size_t additional_size);
 
 /**
@@ -123,6 +110,7 @@ SQSH_NO_UNUSED int sqsh_buffer_append(
  *
  * @param buffer The SqshBuffer to drain.
  */
+
 void sqsh_buffer_drain(struct SqshBuffer *buffer);
 
 /**
@@ -132,7 +120,6 @@ void sqsh_buffer_drain(struct SqshBuffer *buffer);
  * @return a pointer to the data of the SqshBuffer.
  */
 const uint8_t *sqsh_buffer_data(const struct SqshBuffer *buffer);
-
 /**
  * @brief sqsh_buffer_size returns the size of the SqshBuffer.
  * @memberof SqshBuffer
