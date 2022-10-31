@@ -14,6 +14,7 @@ developing efficient cache tactics.
 * traverse directories
 * read file contents
 * open files by path (`sqsh_inode_load_by_path`)
+* fast filename lookup
 * read metadata from inodes
 * read xattr from inodes
 * read symlinks from inodes
