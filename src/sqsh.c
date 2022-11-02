@@ -53,59 +53,9 @@ is_initialized(const struct Sqsh *sqsh, enum InitializedBitmap mask) {
 	return sqsh->initialized & mask;
 }
 
-static int
-init(struct Sqsh *sqsh) {
-	int rv = 0;
-
-	rv = sqsh_superblock_init(&sqsh->superblock, &sqsh->mapper);
-	if (rv < 0) {
-		goto out;
-	}
-
-	if (sqsh_superblock_has_compression_options(&sqsh->superblock)) {
-		sqsh->initialized |= INITIALIZED_COMPRESSION_OPTIONS;
-		rv = sqsh_compression_options_init(&sqsh->compression_options, sqsh);
-		if (rv < 0) {
-			goto out;
-		}
-	}
-
-	enum SqshSuperblockCompressionId compression_id =
-			sqsh_superblock_compression_id(&sqsh->superblock);
-	uint32_t data_block_size = sqsh_superblock_block_size(&sqsh->superblock);
-
-	rv = sqsh_compression_init(
-			&sqsh->metablock_compression, compression_id,
-			SQSH_METABLOCK_BLOCK_SIZE);
-	if (rv < 0) {
-		sqsh_cleanup(sqsh);
-	}
-
-	rv = sqsh_compression_init(
-			&sqsh->data_compression, compression_id, data_block_size);
-	if (rv < 0) {
-		sqsh_cleanup(sqsh);
-	}
-
-out:
-	if (rv < 0) {
-		sqsh_cleanup(sqsh);
-	}
-	return rv;
-}
-
 int
-sqsh_init(struct Sqsh *sqsh, const uint8_t *buffer, const size_t size) {
-	const struct SqshConfig config = {
-			.source_type = SQSH_SOURCE_TYPE_MEMORY,
-			.source_size = size,
-	};
-	return sqsh_open2(sqsh, (const char *)buffer, &config);
-}
-
-int
-sqsh_open2(
-		struct Sqsh *sqsh, const char *source,
+sqsh_init(
+		struct Sqsh *sqsh, const void *source,
 		const struct SqshConfig *config) {
 	int rv = 0;
 
@@ -150,29 +100,43 @@ sqsh_open2(
 		goto out;
 	}
 
-	rv = init(sqsh);
+	rv = sqsh_superblock_init(&sqsh->superblock, &sqsh->mapper);
+	if (rv < 0) {
+		goto out;
+	}
+
+	if (sqsh_superblock_has_compression_options(&sqsh->superblock)) {
+		sqsh->initialized |= INITIALIZED_COMPRESSION_OPTIONS;
+		rv = sqsh_compression_options_init(&sqsh->compression_options, sqsh);
+		if (rv < 0) {
+			goto out;
+		}
+	}
+
+	enum SqshSuperblockCompressionId compression_id =
+			sqsh_superblock_compression_id(&sqsh->superblock);
+	uint32_t data_block_size = sqsh_superblock_block_size(&sqsh->superblock);
+
+	rv = sqsh_compression_init(
+			&sqsh->metablock_compression, compression_id,
+			SQSH_METABLOCK_BLOCK_SIZE);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = sqsh_compression_init(
+			&sqsh->data_compression, compression_id, data_block_size);
+	if (rv < 0) {
+		goto out;
+	}
 
 out:
 	if (rv < 0) {
 		sqsh_mapper_cleanup(&sqsh->mapper);
+		sqsh_cleanup(sqsh);
 	}
 	return rv;
 }
-
-int
-sqsh_open(struct Sqsh *sqsh, const char *path) {
-	return sqsh_open2(sqsh, path, NULL);
-}
-
-#ifdef CONFIG_CURL
-int
-sqsh_open_url(struct Sqsh *sqsh, const char *url) {
-	const struct SqshConfig config = {
-			.source_type = SQSH_SOURCE_TYPE_CURL,
-	};
-	return sqsh_open2(sqsh, url, &config);
-}
-#endif
 
 int
 sqsh_id_table(struct Sqsh *sqsh, struct SqshTable **id_table) {

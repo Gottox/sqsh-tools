@@ -25,7 +25,7 @@ open_archive(struct Sqsh *sqsh, const char *image_path) {
 	}
 #endif
 
-	return sqsh_open2(sqsh, image_path, &config);
+	return sqsh_init(sqsh, image_path, &config);
 }
 
 #endif /* end of include guard COMMON_H */

@@ -96,41 +96,8 @@ struct Sqsh {
  * @param config the configuration for the Sqsh session.
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh_open2(
-		struct Sqsh *sqsh, const char *source, const struct SqshConfig *config);
-
-/**
- * @brief sqsh_init initializes the Sqsh structure.
- * @memberof Sqsh
- * @param sqsh the Sqsh structure to initialize.
- * @param buffer the buffer to use for the Sqsh structure.
- * @param size the size of the buffer.
- * @return 0 on success, less than 0 on error.
- */
-
-SQSH_NO_UNUSED int
-sqsh_init(struct Sqsh *sqsh, const uint8_t *buffer, const size_t size);
-
-/**
- * @brief sqsh_open opens the sqsh file at the given path.
- * @memberof Sqsh
- * @param sqsh the Sqsh structure to initialize.
- * @param path the path to the sqsh file.
- * @return 0 on success, less than 0 on error.
- */
-SQSH_NO_UNUSED int sqsh_open(struct Sqsh *sqsh, const char *path);
-
-#ifdef CONFIG_CURL
-/**
- * @brief sqsh_open_url opens the sqsh file at the given url. Only available if
- * `curl` is enabled.
- * @memberof Sqsh
- * @param sqsh the Sqsh structure to initialize.
- * @param url the url to the sqsh file.
- * @return 0 on success, less than 0 on error.
- */
-int sqsh_open_url(struct Sqsh *sqsh, const char *url);
-#endif
+SQSH_NO_UNUSED int sqsh_init(
+		struct Sqsh *sqsh, const void *source, const struct SqshConfig *config);
 
 /**
  * @brief sqsh_superblock returns the superblock context.

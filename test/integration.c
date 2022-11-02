@@ -48,7 +48,11 @@ static void
 sqsh_empty() {
 	int rv;
 	struct Sqsh sqsh = {0};
-	rv = sqsh_init(&sqsh, NULL, 0);
+	const struct SqshConfig config = {
+			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_size = 0,
+	};
+	rv = sqsh_init(&sqsh, NULL, &config);
 	assert(rv == -SQSH_ERROR_SUPERBLOCK_TOO_SMALL);
 }
 
@@ -58,7 +62,11 @@ sqsh_get_nonexistant() {
 	struct SqshInodeContext inode = {0};
 	struct Sqsh sqsh = {0};
 
-	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
+	const struct SqshConfig config = {
+			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_size = sizeof(squash_image),
+	};
+	rv = sqsh_init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_by_path(&inode, &sqsh, "/nonexistant");
@@ -75,7 +83,11 @@ sqsh_ls() {
 	struct SqshInodeContext inode = {0};
 	struct SqshDirectoryIterator iter = {0};
 	struct Sqsh sqsh = {0};
-	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
+	const struct SqshConfig config = {
+			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_size = sizeof(squash_image),
+	};
+	rv = sqsh_init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_root(&inode, &sqsh);
@@ -127,7 +139,11 @@ sqsh_cat_fragment() {
 	struct SqshInodeContext inode = {0};
 	struct SqshFileContext file = {0};
 	struct Sqsh sqsh = {0};
-	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
+	const struct SqshConfig config = {
+			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_size = sizeof(squash_image),
+	};
+	rv = sqsh_init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_by_path(&inode, &sqsh, "a");
@@ -163,7 +179,11 @@ sqsh_cat_datablock_and_fragment() {
 	struct SqshInodeContext inode = {0};
 	struct SqshFileContext file = {0};
 	struct Sqsh sqsh = {0};
-	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
+	const struct SqshConfig config = {
+			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_size = sizeof(squash_image),
+	};
+	rv = sqsh_init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_by_path(&inode, &sqsh, "b");
@@ -202,7 +222,11 @@ sqsh_cat_size_overflow() {
 	struct SqshInodeContext inode = {0};
 	struct SqshFileContext file = {0};
 	struct Sqsh sqsh = {0};
-	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
+	const struct SqshConfig config = {
+			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_size = sizeof(squash_image),
+	};
+	rv = sqsh_init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_by_path(&inode, &sqsh, "b");
@@ -239,7 +263,11 @@ sqsh_test_uid_and_gid() {
 	uint32_t uid, gid;
 	struct SqshInodeContext inode = {0};
 	struct Sqsh sqsh = {0};
-	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
+	const struct SqshConfig config = {
+			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_size = sizeof(squash_image),
+	};
+	rv = sqsh_init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_root(&inode, &sqsh);
@@ -262,7 +290,11 @@ sqsh_test_extended_dir() {
 	int rv;
 	struct SqshInodeContext inode = {0};
 	struct Sqsh sqsh = {0};
-	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
+	const struct SqshConfig config = {
+			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_size = sizeof(squash_image),
+	};
+	rv = sqsh_init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_by_path(&inode, &sqsh, "/large_dir/999");
@@ -285,7 +317,11 @@ sqsh_test_xattr() {
 	struct SqshDirectoryIterator dir_iter = {0};
 	struct SqshXattrIterator xattr_iter = {0};
 	struct Sqsh sqsh = {0};
-	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
+	const struct SqshConfig config = {
+			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_size = sizeof(squash_image),
+	};
+	rv = sqsh_init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_root(&inode, &sqsh);
@@ -392,7 +428,11 @@ fuzz_crash_1() {
 
 	struct SqshInodeContext inode = {0};
 	struct Sqsh sqsh = {0};
-	rv = sqsh_init(&sqsh, input, sizeof(input));
+	const struct SqshConfig config = {
+			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_size = sizeof(input),
+	};
+	rv = sqsh_init(&sqsh, input, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_by_path(&inode, &sqsh, "");
@@ -423,7 +463,11 @@ fuzz_crash_2() {
 
 	struct SqshInodeContext inode = {0};
 	struct Sqsh sqsh = {0};
-	rv = sqsh_init(&sqsh, input, sizeof(input));
+	const struct SqshConfig config = {
+			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_size = sizeof(input),
+	};
+	rv = sqsh_init(&sqsh, input, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_by_path(&inode, &sqsh, "");
@@ -455,7 +499,11 @@ fuzz_crash_3() {
 
 	struct SqshInodeContext inode = {0};
 	struct Sqsh sqsh = {0};
-	rv = sqsh_init(&sqsh, input, sizeof(input));
+	const struct SqshConfig config = {
+			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_size = sizeof(input),
+	};
+	rv = sqsh_init(&sqsh, input, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_by_path(&inode, &sqsh, "");
@@ -498,7 +546,11 @@ fuzz_crash_4() {
 
 	struct SqshTable *id_table = NULL;
 	struct Sqsh sqsh = {0};
-	rv = sqsh_init(&sqsh, input, sizeof(input));
+	const struct SqshConfig config = {
+			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_size = sizeof(input),
+	};
+	rv = sqsh_init(&sqsh, input, &config);
 	assert(rv == 0);
 	rv = sqsh_id_table(&sqsh, &id_table);
 	assert(rv == -SQSH_ERROR_SIZE_MISSMATCH);
@@ -535,7 +587,11 @@ fuzz_crash_5() {
 
 	struct SqshTable *id_table = NULL;
 	struct Sqsh sqsh = {0};
-	rv = sqsh_init(&sqsh, input, sizeof(input));
+	const struct SqshConfig config = {
+			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_size = sizeof(input),
+	};
+	rv = sqsh_init(&sqsh, input, &config);
 	assert(rv == 0);
 	rv = sqsh_id_table(&sqsh, &id_table);
 	assert(rv == -SQSH_ERROR_SIZE_MISSMATCH);
@@ -558,7 +614,11 @@ fuzz_crash_6() {
 
 	struct SqshTable *id_table = NULL;
 	struct Sqsh sqsh = {0};
-	rv = sqsh_init(&sqsh, input, sizeof(input));
+	const struct SqshConfig config = {
+			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_size = sizeof(input),
+	};
+	rv = sqsh_init(&sqsh, input, &config);
 	assert(rv == 0);
 	rv = sqsh_id_table(&sqsh, &id_table);
 	assert(rv == -SQSH_ERROR_SIZE_MISSMATCH);
@@ -582,7 +642,11 @@ fuzz_crash_7() {
 
 	struct SqshTable *id_table = NULL;
 	struct Sqsh sqsh = {0};
-	rv = sqsh_init(&sqsh, input, sizeof(input));
+	const struct SqshConfig config = {
+			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_size = sizeof(input),
+	};
+	rv = sqsh_init(&sqsh, input, &config);
 	assert(rv == 0);
 	rv = sqsh_id_table(&sqsh, &id_table);
 	assert(rv == -SQSH_ERROR_SIZE_MISSMATCH);
