@@ -11,8 +11,8 @@
 #include <ctype.h>
 #include <string.h>
 
-static int
-open_archive(struct Sqsh *sqsh, const char *image_path) {
+static struct Sqsh *
+open_archive(const char *image_path, int *err) {
 	struct SqshConfig config = {
 			.source_type = SQSH_SOURCE_TYPE_PATH,
 	};
@@ -25,7 +25,7 @@ open_archive(struct Sqsh *sqsh, const char *image_path) {
 	}
 #endif
 
-	return sqsh_init(sqsh, image_path, &config);
+	return sqsh_new(image_path, &config, err);
 }
 
 #endif /* end of include guard COMMON_H */

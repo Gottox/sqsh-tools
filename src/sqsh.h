@@ -89,6 +89,16 @@ struct Sqsh {
 };
 
 /**
+ * @brief sqsh_new initializes a sqsh context in heap.
+ * @param source the source to retrieve the archive from
+ * @param config the configuration for the sqsh context.
+ * @param err the error pointer.
+ * @return a pointer to the sqsh context or NULL if an error occurred.
+ */
+SQSH_NO_UNUSED struct Sqsh *
+sqsh_new(const void *source, const struct SqshConfig *config, int *err);
+
+/**
  * @brief sqsh_init initializes the Sqsh structure.
  * @memberof Sqsh
  * @param sqsh the Sqsh structure to initialize.
@@ -194,5 +204,13 @@ int sqsh_compression_options(
  * @return 0 on success, less than 0 on error.
  */
 int sqsh_cleanup(struct Sqsh *sqsh);
+
+/**
+ * @brief sqsh_free frees up a heap allocated Sqsh structure.
+ * @memberof Sqsh
+ * @param sqsh the Sqsh structure to free.
+ * @return 0 on success, less than 0 on error.
+ */
+int sqsh_free(struct Sqsh *sqsh);
 
 #endif /* end of include guard SQSH_H */

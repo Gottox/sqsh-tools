@@ -53,6 +53,20 @@ is_initialized(const struct Sqsh *sqsh, enum InitializedBitmap mask) {
 	return sqsh->initialized & mask;
 }
 
+struct Sqsh *
+sqsh_new(const void *source, const struct SqshConfig *config, int *err) {
+	struct Sqsh *sqsh = calloc(1, sizeof(struct Sqsh));
+	if (sqsh == NULL) {
+		return NULL;
+	}
+	*err = sqsh_init(sqsh, source, config);
+	if (*err < 0) {
+		free(sqsh);
+		return NULL;
+	}
+	return sqsh;
+}
+
 int
 sqsh_init(
 		struct Sqsh *sqsh, const void *source,
@@ -280,5 +294,12 @@ sqsh_cleanup(struct Sqsh *sqsh) {
 	sqsh_superblock_cleanup(&sqsh->superblock);
 	sqsh_mapper_cleanup(&sqsh->mapper);
 
+	return rv;
+}
+
+int
+sqsh_free(struct Sqsh *sqsh) {
+	int rv = sqsh_cleanup(sqsh);
+	free(sqsh);
 	return rv;
 }

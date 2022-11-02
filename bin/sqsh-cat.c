@@ -91,7 +91,7 @@ main(int argc, char *argv[]) {
 	int rv = 0;
 	int opt = 0;
 	const char *image_path;
-	struct Sqsh sqsh = {0};
+	struct Sqsh *sqsh;
 
 	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {
@@ -110,7 +110,7 @@ main(int argc, char *argv[]) {
 	image_path = argv[optind];
 	optind++;
 
-	rv = open_archive(&sqsh, image_path);
+	sqsh = open_archive(image_path, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, image_path);
 		rv = EXIT_FAILURE;
@@ -118,13 +118,13 @@ main(int argc, char *argv[]) {
 	}
 
 	for (; optind < argc; optind++) {
-		rv = cat_path(&sqsh, argv[optind]);
+		rv = cat_path(sqsh, argv[optind]);
 		if (rv < 0) {
 			goto out;
 		}
 	}
 
 out:
-	sqsh_cleanup(&sqsh);
+	sqsh_free(sqsh);
 	return rv;
 }

@@ -46,7 +46,7 @@
 #include "../src/sqsh.h"
 #include "common.h"
 
-static struct { struct Sqsh sqsh; } data = {0};
+static struct { struct Sqsh *sqsh; } data = {0};
 
 static struct SqshfuseOptions {
 	int show_help;
@@ -76,7 +76,7 @@ sqshfuse_init(struct fuse_conn_info *conn, struct fuse_config *cfg) {
 	int rv = 0;
 	struct fuse_context *context = fuse_get_context();
 
-	rv = open_archive(&data.sqsh, options.image_path);
+	data.sqsh = open_archive(options.image_path, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, options.image_path);
 		fuse_unmount(context->fuse);
@@ -94,9 +94,9 @@ sqshfuse_getattr(
 	memset(stbuf, 0, sizeof(struct stat));
 
 	struct SqshInodeContext inode = {0};
-	struct SqshSuperblockContext *superblock = sqsh_superblock(&data.sqsh);
+	struct SqshSuperblockContext *superblock = sqsh_superblock(data.sqsh);
 
-	rv = sqsh_inode_init_by_path(&inode, &data.sqsh, path);
+	rv = sqsh_inode_init_by_path(&inode, data.sqsh, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -152,7 +152,7 @@ sqshfuse_getxattr(
 	struct SqshInodeContext inode = {0};
 	struct SqshXattrIterator iter = {0};
 
-	rv = sqsh_inode_init_by_path(&inode, &data.sqsh, path);
+	rv = sqsh_inode_init_by_path(&inode, data.sqsh, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -200,7 +200,7 @@ sqshfuse_listxattr(const char *path, char *list, size_t size) {
 	char *p;
 	struct SqshInodeContext inode = {0};
 	struct SqshXattrIterator iter = {0};
-	rv = sqsh_inode_init_by_path(&inode, &data.sqsh, path);
+	rv = sqsh_inode_init_by_path(&inode, data.sqsh, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -264,7 +264,7 @@ sqshfuse_readdir(
 	int rv = 0;
 	struct SqshInodeContext inode = {0};
 	struct SqshDirectoryIterator iter = {0};
-	rv = sqsh_inode_init_by_path(&inode, &data.sqsh, path);
+	rv = sqsh_inode_init_by_path(&inode, data.sqsh, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -304,7 +304,7 @@ sqshfuse_open(const char *path, struct fuse_file_info *fi) {
 	int rv = 0;
 	struct SqshInodeContext inode = {0};
 
-	rv = sqsh_inode_init_by_path(&inode, &data.sqsh, path);
+	rv = sqsh_inode_init_by_path(&inode, data.sqsh, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -328,7 +328,7 @@ sqshfuse_read(
 	struct SqshInodeContext inode = {0};
 	struct SqshFileContext file = {0};
 
-	rv = sqsh_inode_init_by_path(&inode, &data.sqsh, path);
+	rv = sqsh_inode_init_by_path(&inode, data.sqsh, path);
 	if (rv < 0) {
 		// TODO: Better return type
 		rv = -EINVAL;
@@ -371,7 +371,7 @@ sqshfuse_readlink(const char *path, char *buf, size_t size) {
 	int rv = 0;
 	struct SqshInodeContext inode = {0};
 
-	rv = sqsh_inode_init_by_path(&inode, &data.sqsh, path);
+	rv = sqsh_inode_init_by_path(&inode, data.sqsh, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -392,7 +392,7 @@ out:
 static void
 sqshfuse_destroy(void *private_data) {
 	(void)private_data;
-	sqsh_cleanup(&data.sqsh);
+	sqsh_free(data.sqsh);
 }
 
 static const struct fuse_operations sqshfuse_operations = {

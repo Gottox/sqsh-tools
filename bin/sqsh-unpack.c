@@ -317,7 +317,7 @@ main(int argc, char *argv[]) {
 	const char *image_path;
 	char *src_path = "/";
 	char *target_path = NULL;
-	struct Sqsh sqsh = {0};
+	struct Sqsh *sqsh;
 	struct SqshInodeContext inode = {0};
 
 	while ((opt = getopt(argc, argv, "cvVh")) != -1) {
@@ -349,14 +349,14 @@ main(int argc, char *argv[]) {
 		target_path = argv[optind + 2];
 	}
 
-	rv = open_archive(&sqsh, image_path);
+	sqsh = open_archive(image_path, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, image_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	rv = sqsh_inode_init_by_path(&inode, &sqsh, src_path);
+	rv = sqsh_inode_init_by_path(&inode, sqsh, src_path);
 	if (rv < 0) {
 		sqsh_perror(rv, src_path);
 		rv = EXIT_FAILURE;
@@ -397,6 +397,6 @@ main(int argc, char *argv[]) {
 	}
 out:
 	sqsh_inode_cleanup(&inode);
-	sqsh_cleanup(&sqsh);
+	sqsh_free(sqsh);
 	return rv;
 }
