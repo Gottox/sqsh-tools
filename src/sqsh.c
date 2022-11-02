@@ -113,10 +113,10 @@ sqsh_open2(
 	// we can call sqsh_mapper_cleanup on.
 	memset(&sqsh->mapper, 0, sizeof(struct SqshMapper));
 
-	if (config == NULL) {
-		config = memset(&sqsh->config, 0, sizeof(struct SqshConfig));
-	} else {
+	if (config != NULL) {
 		config = memcpy(&sqsh->config, config, sizeof(struct SqshConfig));
+	} else {
+		config = memset(&sqsh->config, 0, sizeof(struct SqshConfig));
 	}
 
 	switch (config->source_type) {
