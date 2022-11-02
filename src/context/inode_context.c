@@ -81,7 +81,7 @@ path_find_inode_ref(
 	struct SqshInodeContext inode = {0};
 	struct SqshDirectoryIterator iter = {0};
 	int rv = 0;
-	rv = sqsh_inode_load_by_ref(&inode, sqsh, dir_ref);
+	rv = sqsh_inode_init_by_ref(&inode, sqsh, dir_ref);
 	if (rv < 0) {
 		goto out;
 	}
@@ -183,7 +183,7 @@ get_size_info(const struct SqshInodeContext *context, int index) {
 }
 
 int
-sqsh_inode_load_by_ref(
+sqsh_inode_init_by_ref(
 		struct SqshInodeContext *inode, struct Sqsh *sqsh, uint64_t inode_ref) {
 	uint32_t inode_block;
 	uint16_t inode_offset;
@@ -222,15 +222,15 @@ sqsh_inode_load_by_ref(
 }
 
 int
-sqsh_inode_load_root(struct SqshInodeContext *inode, struct Sqsh *sqsh) {
+sqsh_inode_init_root(struct SqshInodeContext *inode, struct Sqsh *sqsh) {
 	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 	uint64_t inode_ref = sqsh_superblock_inode_root_ref(superblock);
 
-	return sqsh_inode_load_by_ref(inode, sqsh, inode_ref);
+	return sqsh_inode_init_by_ref(inode, sqsh, inode_ref);
 }
 
 int
-sqsh_inode_load_by_inode_number(
+sqsh_inode_init_by_inode_number(
 		struct SqshInodeContext *inode, struct Sqsh *sqsh,
 		uint64_t inode_number) {
 	int rv = 0;
@@ -246,11 +246,11 @@ sqsh_inode_load_by_inode_number(
 	if (rv < 0) {
 		return rv;
 	}
-	return sqsh_inode_load_by_ref(inode, sqsh, inode_ref);
+	return sqsh_inode_init_by_ref(inode, sqsh, inode_ref);
 }
 
 int
-sqsh_inode_load_by_path(
+sqsh_inode_init_by_path(
 		struct SqshInodeContext *inode, struct Sqsh *sqsh, const char *path) {
 	int i;
 	int rv = 0;
@@ -284,7 +284,7 @@ sqsh_inode_load_by_path(
 		}
 	}
 
-	rv = sqsh_inode_load_by_ref(inode, sqsh, inode_refs[i]);
+	rv = sqsh_inode_init_by_ref(inode, sqsh, inode_refs[i]);
 
 out:
 	free(inode_refs);

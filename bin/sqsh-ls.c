@@ -223,7 +223,7 @@ ls_path(struct Sqsh *sqsh, char *path) {
 	struct SqshInodeContext inode = {0};
 	int rv = 0;
 
-	rv = sqsh_inode_load_by_path(&inode, sqsh, path);
+	rv = sqsh_inode_init_by_path(&inode, sqsh, path);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		goto out;

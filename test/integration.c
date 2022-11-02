@@ -61,7 +61,7 @@ sqsh_get_nonexistant() {
 	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = sqsh_inode_load_by_path(&inode, &sqsh, "/nonexistant");
+	rv = sqsh_inode_init_by_path(&inode, &sqsh, "/nonexistant");
 	assert(rv < 0);
 
 	rv = sqsh_cleanup(&sqsh);
@@ -78,7 +78,7 @@ sqsh_ls() {
 	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = sqsh_inode_load_root(&inode, &sqsh);
+	rv = sqsh_inode_init_root(&inode, &sqsh);
 	assert(rv == 0);
 
 	rv = sqsh_directory_iterator_init(&iter, &inode);
@@ -130,7 +130,7 @@ sqsh_cat_fragment() {
 	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = sqsh_inode_load_by_path(&inode, &sqsh, "a");
+	rv = sqsh_inode_init_by_path(&inode, &sqsh, "a");
 	assert(rv == 0);
 
 	rv = sqsh_file_init(&file, &inode);
@@ -166,7 +166,7 @@ sqsh_cat_datablock_and_fragment() {
 	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = sqsh_inode_load_by_path(&inode, &sqsh, "b");
+	rv = sqsh_inode_init_by_path(&inode, &sqsh, "b");
 	assert(rv == 0);
 
 	rv = sqsh_file_init(&file, &inode);
@@ -205,7 +205,7 @@ sqsh_cat_size_overflow() {
 	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = sqsh_inode_load_by_path(&inode, &sqsh, "b");
+	rv = sqsh_inode_init_by_path(&inode, &sqsh, "b");
 	assert(rv == 0);
 
 	rv = sqsh_file_init(&file, &inode);
@@ -242,7 +242,7 @@ sqsh_test_uid_and_gid() {
 	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = sqsh_inode_load_root(&inode, &sqsh);
+	rv = sqsh_inode_init_root(&inode, &sqsh);
 	assert(rv == 0);
 
 	uid = sqsh_inode_uid(&inode);
@@ -265,7 +265,7 @@ sqsh_test_extended_dir() {
 	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = sqsh_inode_load_by_path(&inode, &sqsh, "/large_dir/999");
+	rv = sqsh_inode_init_by_path(&inode, &sqsh, "/large_dir/999");
 	assert(rv == 0);
 
 	rv = sqsh_inode_cleanup(&inode);
@@ -288,7 +288,7 @@ sqsh_test_xattr() {
 	rv = sqsh_init(&sqsh, squash_image, sizeof(squash_image));
 	assert(rv == 0);
 
-	rv = sqsh_inode_load_root(&inode, &sqsh);
+	rv = sqsh_inode_init_root(&inode, &sqsh);
 	assert(rv == 0);
 
 	rv = sqsh_inode_xattr_iterator(&inode, &xattr_iter);
@@ -395,7 +395,7 @@ fuzz_crash_1() {
 	rv = sqsh_init(&sqsh, input, sizeof(input));
 	assert(rv == 0);
 
-	rv = sqsh_inode_load_by_path(&inode, &sqsh, "");
+	rv = sqsh_inode_init_by_path(&inode, &sqsh, "");
 	assert(rv < 0);
 
 	rv = sqsh_inode_cleanup(&inode);
@@ -426,7 +426,7 @@ fuzz_crash_2() {
 	rv = sqsh_init(&sqsh, input, sizeof(input));
 	assert(rv == 0);
 
-	rv = sqsh_inode_load_by_path(&inode, &sqsh, "");
+	rv = sqsh_inode_init_by_path(&inode, &sqsh, "");
 	assert(rv < 0);
 
 	rv = sqsh_inode_cleanup(&inode);
@@ -458,7 +458,7 @@ fuzz_crash_3() {
 	rv = sqsh_init(&sqsh, input, sizeof(input));
 	assert(rv == 0);
 
-	rv = sqsh_inode_load_by_path(&inode, &sqsh, "");
+	rv = sqsh_inode_init_by_path(&inode, &sqsh, "");
 	assert(rv < 0);
 
 	rv = sqsh_inode_cleanup(&inode);

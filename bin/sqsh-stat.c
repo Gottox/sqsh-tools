@@ -274,7 +274,7 @@ stat_file(struct Sqsh *sqsh, const char *path) {
 	int rv = 0;
 	struct SqshInodeContext inode = {0};
 	bool has_fragment = false;
-	rv = sqsh_inode_load_by_path(&inode, sqsh, path);
+	rv = sqsh_inode_init_by_path(&inode, sqsh, path);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		return rv;

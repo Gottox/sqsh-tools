@@ -99,7 +99,7 @@ struct SqshInodeContext {
  * @param inode_ref The inode reference.
  * @return int 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh_inode_load_by_ref(
+SQSH_NO_UNUSED int sqsh_inode_init_by_ref(
 		struct SqshInodeContext *context, struct Sqsh *sqsh,
 		uint64_t inode_ref);
 /**
@@ -110,7 +110,7 @@ SQSH_NO_UNUSED int sqsh_inode_load_by_ref(
  * @return int 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int
-sqsh_inode_load_root(struct SqshInodeContext *context, struct Sqsh *sqsh);
+sqsh_inode_init_root(struct SqshInodeContext *context, struct Sqsh *sqsh);
 /**
  * @brief Initialize the inode context from an inode number.
  * @memberof SqshInodeContext
@@ -119,7 +119,7 @@ sqsh_inode_load_root(struct SqshInodeContext *context, struct Sqsh *sqsh);
  * @param inode_number The inode number.
  * @return int 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh_inode_load_by_inode_number(
+SQSH_NO_UNUSED int sqsh_inode_init_by_inode_number(
 		struct SqshInodeContext *context, struct Sqsh *sqsh,
 		uint64_t inode_number);
 /**
@@ -130,7 +130,7 @@ SQSH_NO_UNUSED int sqsh_inode_load_by_inode_number(
  * @param path The path the file or directory.
  * @return int 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh_inode_load_by_path(
+SQSH_NO_UNUSED int sqsh_inode_init_by_path(
 		struct SqshInodeContext *context, struct Sqsh *sqsh, const char *path);
 
 /**

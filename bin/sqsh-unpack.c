@@ -356,7 +356,7 @@ main(int argc, char *argv[]) {
 		goto out;
 	}
 
-	rv = sqsh_inode_load_by_path(&inode, &sqsh, src_path);
+	rv = sqsh_inode_init_by_path(&inode, &sqsh, src_path);
 	if (rv < 0) {
 		sqsh_perror(rv, src_path);
 		rv = EXIT_FAILURE;

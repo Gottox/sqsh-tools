@@ -96,7 +96,7 @@ sqshfuse_getattr(
 	struct SqshInodeContext inode = {0};
 	struct SqshSuperblockContext *superblock = sqsh_superblock(&data.sqsh);
 
-	rv = sqsh_inode_load_by_path(&inode, &data.sqsh, path);
+	rv = sqsh_inode_init_by_path(&inode, &data.sqsh, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -152,7 +152,7 @@ sqshfuse_getxattr(
 	struct SqshInodeContext inode = {0};
 	struct SqshXattrIterator iter = {0};
 
-	rv = sqsh_inode_load_by_path(&inode, &data.sqsh, path);
+	rv = sqsh_inode_init_by_path(&inode, &data.sqsh, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -200,7 +200,7 @@ sqshfuse_listxattr(const char *path, char *list, size_t size) {
 	char *p;
 	struct SqshInodeContext inode = {0};
 	struct SqshXattrIterator iter = {0};
-	rv = sqsh_inode_load_by_path(&inode, &data.sqsh, path);
+	rv = sqsh_inode_init_by_path(&inode, &data.sqsh, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -264,7 +264,7 @@ sqshfuse_readdir(
 	int rv = 0;
 	struct SqshInodeContext inode = {0};
 	struct SqshDirectoryIterator iter = {0};
-	rv = sqsh_inode_load_by_path(&inode, &data.sqsh, path);
+	rv = sqsh_inode_init_by_path(&inode, &data.sqsh, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -304,7 +304,7 @@ sqshfuse_open(const char *path, struct fuse_file_info *fi) {
 	int rv = 0;
 	struct SqshInodeContext inode = {0};
 
-	rv = sqsh_inode_load_by_path(&inode, &data.sqsh, path);
+	rv = sqsh_inode_init_by_path(&inode, &data.sqsh, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -328,7 +328,7 @@ sqshfuse_read(
 	struct SqshInodeContext inode = {0};
 	struct SqshFileContext file = {0};
 
-	rv = sqsh_inode_load_by_path(&inode, &data.sqsh, path);
+	rv = sqsh_inode_init_by_path(&inode, &data.sqsh, path);
 	if (rv < 0) {
 		// TODO: Better return type
 		rv = -EINVAL;
@@ -371,7 +371,7 @@ sqshfuse_readlink(const char *path, char *buf, size_t size) {
 	int rv = 0;
 	struct SqshInodeContext inode = {0};
 
-	rv = sqsh_inode_load_by_path(&inode, &data.sqsh, path);
+	rv = sqsh_inode_init_by_path(&inode, &data.sqsh, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;

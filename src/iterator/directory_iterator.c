@@ -211,7 +211,7 @@ sqsh_directory_iterator_inode_load(
 	uint64_t inode_ref = sqsh_directory_iterator_inode_ref(iterator);
 	struct Sqsh *sqsh = iterator->inode->sqsh;
 
-	return sqsh_inode_load_by_ref(inode, sqsh, inode_ref);
+	return sqsh_inode_init_by_ref(inode, sqsh, inode_ref);
 }
 
 int
