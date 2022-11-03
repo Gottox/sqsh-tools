@@ -32,6 +32,7 @@
  */
 
 #include <sqsh_compression.h>
+#include <sqsh_data.h>
 #include <sqsh_error.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -45,8 +46,11 @@ sqsh_zlib_extract(
 		const union SqshCompressionOptions *options, size_t options_size,
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
-	(void)options;
-	(void)options_size;
+	if (options != NULL &&
+		options_size != SQSH_SIZEOF_COMPRESSION_OPTIONS_GZIP) {
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+	}
+
 	// Needed for 32-bit: *target_size is a size_t, but zlib wants a
 	// pointer to an unsigned long.
 	uLongf long_target_size = *target_size;

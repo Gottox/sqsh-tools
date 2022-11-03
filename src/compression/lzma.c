@@ -50,8 +50,8 @@ sqsh_lzma_extract(
 		// TODO: More specific error code
 		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
-	lzma_ret rv = LZMA_OK;
 
+	lzma_ret rv = LZMA_OK;
 	lzma_stream strm = LZMA_STREAM_INIT;
 
 	rv = lzma_alone_decoder(&strm, UINT64_MAX);
