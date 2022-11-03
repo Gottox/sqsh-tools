@@ -45,8 +45,6 @@
 
 #define SQSH_H
 
-struct SqshTrailingContext;
-
 enum SqshSourceType {
 	SQSH_SOURCE_TYPE_PATH,
 	SQSH_SOURCE_TYPE_FD,
@@ -68,22 +66,7 @@ struct SqshConfig {
  * @brief The SqshContext struct contains all information about the current
  * sqsh session.
  */
-struct Sqsh {
-	uint32_t error;
-	struct SqshMapper mapper;
-	struct SqshCompression data_compression;
-	struct SqshCompression metablock_compression;
-	struct SqshMapper table_mapper;
-	struct SqshMapping table_map;
-	struct SqshSuperblockContext superblock;
-	struct SqshTable id_table;
-	struct SqshTable export_table;
-	struct SqshXattrTable xattr_table;
-	struct SqshFragmentTable fragment_table;
-	struct SqshCompressionOptionsContext compression_options;
-	uint8_t initialized;
-	struct SqshConfig config;
-};
+struct Sqsh;
 
 /**
  * @brief sqsh_new initializes a sqsh context in heap.

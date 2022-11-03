@@ -31,7 +31,7 @@
  * @file         sqsh.c
  */
 
-#include <sqsh.h>
+#include <sqsh_private.h>
 #include <string.h>
 
 static const uint64_t NO_SEGMENT = 0xFFFFFFFFFFFFFFFF;
