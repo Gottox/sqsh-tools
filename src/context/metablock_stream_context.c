@@ -31,14 +31,9 @@
  * @file         metablock_stream_context.c
  */
 
-#include "metablock_stream_context.h"
-#include "../data/metablock_data.h"
-#include "../data/superblock_data.h"
-#include "../error.h"
-#include "../primitive/buffer.h"
-#include "../sqsh.h"
-#include "metablock_context.h"
-#include "superblock_context.h"
+#include <sqsh_context.h>
+#include <sqsh_data.h>
+#include <sqsh_error.h>
 
 SQSH_NO_UNUSED int
 sqsh_metablock_stream_init(

@@ -12,46 +12,17 @@ project(
 )
 
 sqsh_hdr = [
-	'src/compression/compression.h',
-	'src/context/compression_options_context.h',
-	'src/context/file_context.h',
-	'src/context/inode_context.h',
-	'src/context/metablock_context.h',
-	'src/context/metablock_stream_context.h',
-	'src/context/superblock_context.h',
-	'src/data/compression_options_data.h',
-	'src/data/compression_options_internal.h',
-	'src/data/datablock_data.h',
-	'src/data/datablock_internal.h',
-	'src/data/directory_data.h',
-	'src/data/directory_internal.h',
-	'src/data/fragment_data.h',
-	'src/data/fragment_internal.h',
-	'src/data/inode_data.h',
-	'src/data/inode_internal.h',
-	'src/data/metablock_data.h',
-	'src/data/metablock_internal.h',
-	'src/data/superblock_data.h',
-	'src/data/superblock_internal.h',
-	'src/data/xattr_data.h',
-	'src/data/xattr_internal.h',
-	'src/error.h',
-	'src/sqsh.h',
-	'src/iterator/directory_index_iterator.h',
-	'src/iterator/directory_iterator.h',
-	'src/iterator/xattr_iterator.h',
-	'src/mapper/canary_mapper.h',
-	'src/mapper/curl_mapper.h',
-	'src/mapper/mapper.h',
-	'src/mapper/mmap_full_mapper.h',
-	'src/mapper/mmap_mapper.h',
-	'src/mapper/static_mapper.h',
-	'src/primitive/buffer.h',
-	'src/primitive/ref_count.h',
-	'src/table/fragment_table.h',
-	'src/table/table.h',
-	'src/table/xattr_table.h',
-	'src/utils.h',
+	'include/sqsh.h',
+	'include/sqsh_common.h',
+	'include/sqsh_compression.h',
+	'include/sqsh_context.h',
+	'include/sqsh_data.h',
+	'include/sqsh_data_private.h',
+	'include/sqsh_error.h',
+	'include/sqsh_iterator.h',
+	'include/sqsh_mapper.h',
+	'include/sqsh_primitive.h',
+	'include/sqsh_table.h',
 ]
 
 sqsh_src = [
@@ -154,7 +125,7 @@ libsqsh = library(
   install: not meson.is_subproject(),
   c_args : build_args,
   link_args : link_args,
-  include_directories : 'src',
+  include_directories : 'include',
   dependencies : [ libsqsh_deps ],
   sources: sqsh_hdr,
   version : meson.project_version(),
@@ -169,6 +140,7 @@ foreach p : [ 'sqsh-cat', 'sqsh-ls', 'sqsh-stat', 'sqsh-xattr', 'sqsh-unpack' ]
 	executable(p, 'bin/'+p+'.c',
 		install: not meson.is_subproject(),
 		c_args : build_args,
+		include_directories : 'include',
 		link_with : libsqsh
 	)
 endforeach
@@ -179,6 +151,7 @@ if get_option('fuse')
 		install: not meson.is_subproject(),
 		c_args : build_args,
 		dependencies: dependency('fuse3'),
+		include_directories : 'include',
 		link_with : libsqsh
 	)
 endif
@@ -210,6 +183,7 @@ if get_option('test')
 			[ p, squashfs_h ],
 			install : false,
 			c_args : build_args,
+			include_directories : 'include',
 			link_with : libsqsh
 		)
 		test(p, t)

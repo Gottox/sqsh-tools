@@ -31,12 +31,12 @@
  * @file         xattr_iterator.c
  */
 
-#include "xattr_iterator.h"
-#include "../context/inode_context.h"
-// TODO: this should be replaced with the non-internal version
-#include "../data/xattr_internal.h"
-#include "../error.h"
-#include "../table/xattr_table.h"
+#include <sqsh_context.h>
+#include <sqsh_iterator.h>
+// TODO: this should be replaced with the non-private version
+#include <sqsh_data_private.h>
+#include <sqsh_error.h>
+#include <sqsh_table.h>
 #include <stdlib.h>
 #include <string.h>
 

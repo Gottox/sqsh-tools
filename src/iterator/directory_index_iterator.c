@@ -31,10 +31,9 @@
  * @file         directory_index_iterator.c
  */
 
-#include "directory_index_iterator.h"
-#include "../context/inode_context.h"
-#include "../data/inode_data.h"
-#include "../error.h"
+#include <sqsh.h>
+#include <sqsh_data.h>
+#include <sqsh_iterator.h>
 
 static const uint64_t INODE_HEADER_SIZE =
 		SQSH_SIZEOF_INODE_HEADER + SQSH_SIZEOF_INODE_DIRECTORY_EXT;

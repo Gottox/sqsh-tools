@@ -31,9 +31,9 @@
  * @file         canary_mapper.c
  */
 
-#include "mapper.h"
 #include <errno.h>
 #include <fcntl.h>
+#include <sqsh_mapper.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -48,7 +48,8 @@ sqsh_mapper_canary_init(
 	return 0;
 }
 static int
-sqsh_mapper_canary_map(struct SqshMapping *mapping, off_t offset, size_t size) {
+sqsh_mapper_canary_map(
+		struct SqshMapping *mapping, sqsh_index_t offset, size_t size) {
 	uint8_t *data = calloc(size, sizeof(uint8_t));
 
 	memcpy(data, &mapping->mapper->data.cn.data[offset], size);

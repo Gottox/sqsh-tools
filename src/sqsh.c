@@ -31,11 +31,7 @@
  * @file         sqsh.c
  */
 
-#include "sqsh.h"
-#include "compression/compression.h"
-#include "context/metablock_context.h"
-#include "context/superblock_context.h"
-#include "error.h"
+#include <sqsh.h>
 #include <string.h>
 
 static const uint64_t NO_SEGMENT = 0xFFFFFFFFFFFFFFFF;

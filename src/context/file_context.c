@@ -31,13 +31,11 @@
  * @file         file_context.c
  */
 
-#include "file_context.h"
-#include "../error.h"
-#include "../mapper/mapper.h"
-#include "../primitive/buffer.h"
-#include "../sqsh.h"
-#include "inode_context.h"
-#include "superblock_context.h"
+#include <sqsh.h>
+#include <sqsh_compression.h>
+#include <sqsh_context.h>
+#include <sqsh_error.h>
+#include <sqsh_table.h>
 #include <stdint.h>
 #include <stdio.h>
 

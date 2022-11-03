@@ -31,14 +31,14 @@
  * @file         curl_mapper.c
  */
 
-#include "../data/compression_options_data.h"
-#include "../data/superblock_data.h"
-#include "../error.h"
-#include "inttypes.h"
-#include "mapper.h"
+#include <curl/curl.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <inttypes.h>
 #include <pthread.h>
+#include <sqsh_data.h>
+#include <sqsh_error.h>
+#include <sqsh_mapper.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -164,7 +164,8 @@ out:
 }
 
 static int
-sqsh_mapper_curl_map(struct SqshMapping *mapping, off_t offset, size_t size) {
+sqsh_mapper_curl_map(
+		struct SqshMapping *mapping, sqsh_index_t offset, size_t size) {
 	int rv = 0;
 
 	mapping->data.cl.offset = offset;

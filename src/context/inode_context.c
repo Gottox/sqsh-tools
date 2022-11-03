@@ -31,16 +31,13 @@
  * @file         inode.c
  */
 
-#include "inode_context.h"
-#include "../data/datablock_internal.h"
-#include "../data/inode_data.h"
-#include "../iterator/xattr_iterator.h"
+#include <sqsh.h>
+#include <sqsh_context.h>
+#include <sqsh_data_private.h>
+#include <sqsh_error.h>
+#include <sqsh_iterator.h>
+#include <sqsh_table.h>
 
-#include "../error.h"
-#include "../iterator/directory_iterator.h"
-#include "../sqsh.h"
-#include "../utils.h"
-#include "superblock_context.h"
 #include <stdint.h>
 #include <string.h>
 

@@ -28,37 +28,72 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         superblock_internal.h
+ * @file         sqsh_table.h
  */
 
-#include "superblock_data.h"
+#ifndef SQSH_TABLE_H
 
-#ifndef SUPERBLOCK_INTERNAL_H
+#define SQSH_TABLE_H
 
-#define SUPERBLOCK_INTERNAL_H
+#include "sqsh_mapper.h"
 
-struct SQSH_UNALIGNED SqshSuperblock {
-	uint32_t magic;
-	uint32_t inode_count;
-	uint32_t modification_time;
-	uint32_t block_size;
-	uint32_t fragment_entry_count;
-	uint16_t compression_id;
-	uint16_t block_log;
-	uint16_t flags;
-	uint16_t id_count;
-	uint16_t version_major;
-	uint16_t version_minor;
-	uint64_t root_inode_ref;
-	uint64_t bytes_used;
-	uint64_t id_table_start;
-	uint64_t xattr_id_table_start;
-	uint64_t inode_table_start;
-	uint64_t directory_table_start;
-	uint64_t fragment_table_start;
-	uint64_t export_table_start;
+struct SqshInodeContext;
+
+// table/table.c
+
+struct SqshTable {
+	struct Sqsh *sqsh;
+	struct SqshMapper *mapper;
+	struct SqshMapping lookup_table;
+	uint64_t start_block;
+	size_t element_size;
+	size_t element_count;
 };
 
-STATIC_ASSERT(sizeof(struct SqshSuperblock) == SQSH_SIZEOF_SUPERBLOCK);
+int sqsh_table_init(
+		struct SqshTable *table, struct Sqsh *sqsh, sqsh_index_t start_block,
+		size_t element_size, size_t element_count);
+int
+sqsh_table_get(const struct SqshTable *table, sqsh_index_t index, void *target);
+int sqsh_table_cleanup(struct SqshTable *table);
 
-#endif /* end of include guard SUPERBLOCK_INTERNAL_H */
+struct SqshFragmentTable {
+	const struct SqshSuperblockContext *superblock;
+	struct SqshTable table;
+	struct SqshMapper *mapper;
+	struct SqshCompression *compression;
+};
+
+// table/fragment_table.c
+
+SQSH_NO_UNUSED int
+sqsh_fragment_table_init(struct SqshFragmentTable *context, struct Sqsh *sqsh);
+
+SQSH_NO_UNUSED int sqsh_fragment_table_to_buffer(
+		const struct SqshFragmentTable *context,
+		const struct SqshInodeContext *inode, struct SqshBuffer *buffer);
+
+int sqsh_fragment_table_cleanup(struct SqshFragmentTable *context);
+
+// table/xattr_table.c
+
+enum SqshXattrType {
+	SQSH_XATTR_USER = 0,
+	SQSH_XATTR_TRUSTED = 1,
+	SQSH_XATTR_SECURITY = 2,
+};
+
+struct SqshXattrTable {
+	struct Sqsh *sqsh;
+	struct SqshMapping header;
+	struct SqshTable table;
+};
+
+SQSH_NO_UNUSED int
+sqsh_xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh);
+
+uint64_t sqsh_xattr_table_start(struct SqshXattrTable *table);
+
+int sqsh_xattr_table_cleanup(struct SqshXattrTable *context);
+
+#endif /* end of include guard SQSH_TABLE_H */

@@ -31,8 +31,8 @@
  * @file         compression_options_data.c
  */
 
-#include "compression_options_internal.h"
 #include <endian.h>
+#include <sqsh_data_private.h>
 
 uint32_t
 sqsh_data_compression_options_gzip_compression_level(

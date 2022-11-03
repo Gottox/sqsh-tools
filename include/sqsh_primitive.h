@@ -28,14 +28,114 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         ref_count.h
+ * @file         sqsh_primitive.h
  */
 
-#include "../utils.h"
+#ifndef SQSH_PRIMITIVE_H
 
-#ifndef REFCOUNT_H
+#define SQSH_PRIMITIVE_H
 
-#define REFCOUNT_H
+#include "sqsh_common.h"
+
+#include <stdbool.h>
+
+// primitive/buffer.c
+
+/**
+ * @brief The SqshBuffer struct is a buffer for arbitrary data.
+ *
+ * The buffer takes care about resizing and freeing the memory managed by The
+ * buffer.
+ */
+struct SqshBuffer {
+	uint8_t *data;
+	size_t size;
+	size_t capacity;
+};
+
+/**
+ * @brief sqsh_buffer_init initializes a SqshBuffer.
+ * @memberof SqshBuffer
+ *
+ * @param buffer The SqshBuffer to initialize.
+ */
+SQSH_NO_UNUSED int sqsh_buffer_init(struct SqshBuffer *buffer);
+
+/**
+ * @brief sqsh_buffer_add_size tells SqshBuffer to increase the buffer by
+ * additional_size
+ * @memberof SqshBuffer
+ *
+ * Please be aware, that the buffer needs to be allocated by
+ * sqsh_buffer_add_capacity before. Otherwise the function behavior is
+ * undefined.
+ *
+ * @param buffer The SqshBuffer to increase.
+ * @param additional_size The additional size to increase the buffer.
+ */
+SQSH_NO_UNUSED int
+sqsh_buffer_add_size(struct SqshBuffer *buffer, size_t additional_size);
+
+/**
+ * @brief sqsh_buffer_add_size allocates additional memory for the SqshBuffer
+ * and sets additional_buffer to the beginning of the additional memory.
+ * @memberof SqshBuffer
+ *
+ * @param buffer The SqshBuffer to free.
+ * @param additional_buffer The pointer to the additional memory.
+ * @param additional_size The size of the additional memory.
+ */
+SQSH_NO_UNUSED int sqsh_buffer_add_capacity(
+		struct SqshBuffer *buffer, uint8_t **additional_buffer,
+		size_t additional_size);
+
+/**
+ * @brief sqsh_buffer_append
+ * @memberof SqshBuffer
+ *
+ * @param buffer The SqshBuffer to append to.
+ * @param source The data to append.
+ * @param source_size The size of the data to append.
+ */
+SQSH_NO_UNUSED int sqsh_buffer_append(
+		struct SqshBuffer *buffer, const uint8_t *source,
+		const size_t source_size);
+
+/**
+ * @brief sqsh_buffer_drain resets the buffer size to 0.
+ * @memberof SqshBuffer
+ *
+ * This does not free the memory allocated by the buffer so that
+ * the buffer can be reused.
+ *
+ * @param buffer The SqshBuffer to drain.
+ */
+
+void sqsh_buffer_drain(struct SqshBuffer *buffer);
+
+/**
+ * @brief sqsh_buffer_data returns the data of the SqshBuffer.
+ * @memberof SqshBuffer
+ * @param buffer The SqshBuffer to get the data from.
+ * @return a pointer to the data of the SqshBuffer.
+ */
+const uint8_t *sqsh_buffer_data(const struct SqshBuffer *buffer);
+/**
+ * @brief sqsh_buffer_size returns the size of the SqshBuffer.
+ * @memberof SqshBuffer
+ * @param buffer The SqshBuffer to get the size from.
+ * @return the size of the SqshBuffer.
+ */
+size_t sqsh_buffer_size(const struct SqshBuffer *buffer);
+
+/**
+ * @brief sqsh_buffer_cleanup frees the memory managed by the SqshBuffer.
+ * @memberof SqshBuffer
+ * @param buffer The SqshBuffer to cleanup.
+ */
+int sqsh_buffer_cleanup(struct SqshBuffer *buffer);
+
+// primitive/ref_count.c
 
 typedef int (*sqshRefCountDtor)(void *);
 
@@ -75,4 +175,4 @@ void *sqsh_ref_count_retain(struct SqshRefCount *ref_count);
 int
 sqsh_ref_count_release(struct SqshRefCount *ref_count, sqshRefCountDtor dtor);
 
-#endif /* end of include guard REFCOUNT_H */
+#endif /* end of include guard SQSH_PRIMITIVE_H */

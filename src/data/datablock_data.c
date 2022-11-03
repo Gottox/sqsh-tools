@@ -31,8 +31,8 @@
  * @file         datablock_data.c
  */
 
-#include "datablock_internal.h"
 #include <endian.h>
+#include <sqsh_data_private.h>
 
 uint32_t
 sqsh_data_datablock_size(const struct SqshDatablockSize *datablock_size) {

@@ -28,14 +28,108 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         inode_internal.h
+ * @file         sqsh_data_private.h
  */
 
-#include "inode_data.h"
+#ifndef SQSH_DATA_PRIVATE_H
 
-#ifndef FORMAT_INODE_INTERNAL_H
+#define SQSH_DATA_PRIVATE_H
 
-#define FORMAT_INODE_INTERNAL_H
+#include "sqsh_data.h"
+
+// data/compression_options_internal.c
+
+struct SQSH_UNALIGNED SqshCompressionOptionsGzip {
+	uint32_t compression_level;
+	uint16_t window_size;
+	uint16_t strategies;
+};
+STATIC_ASSERT(
+		sizeof(struct SqshCompressionOptionsGzip) ==
+		SQSH_SIZEOF_COMPRESSION_OPTIONS_GZIP);
+
+struct SQSH_UNALIGNED SqshCompressionOptionsXz {
+	uint32_t dictionary_size;
+	uint32_t filters;
+};
+STATIC_ASSERT(
+		sizeof(struct SqshCompressionOptionsXz) ==
+		SQSH_SIZEOF_COMPRESSION_OPTIONS_XZ);
+
+struct SQSH_UNALIGNED SqshCompressionOptionsLz4 {
+	uint32_t version;
+	uint32_t flags;
+};
+STATIC_ASSERT(
+		sizeof(struct SqshCompressionOptionsLz4) ==
+		SQSH_SIZEOF_COMPRESSION_OPTIONS_LZ4);
+
+struct SQSH_UNALIGNED SqshCompressionOptionsZstd {
+	uint32_t compression_level;
+};
+STATIC_ASSERT(
+		sizeof(struct SqshCompressionOptionsZstd) ==
+		SQSH_SIZEOF_COMPRESSION_OPTIONS_ZSTD);
+
+struct SQSH_UNALIGNED SqshCompressionOptionsLzo {
+	uint32_t algorithm;
+	uint32_t compression_level;
+};
+STATIC_ASSERT(
+		sizeof(struct SqshCompressionOptionsLzo) ==
+		SQSH_SIZEOF_COMPRESSION_OPTIONS_LZO);
+
+union SqshCompressionOptions {
+	struct SqshCompressionOptionsGzip gzip;
+	struct SqshCompressionOptionsXz xz;
+	struct SqshCompressionOptionsLz4 lz4;
+	struct SqshCompressionOptionsZstd zstd;
+	struct SqshCompressionOptionsLzo lzo;
+};
+STATIC_ASSERT(
+		sizeof(union SqshCompressionOptions) ==
+		SQSH_SIZEOF_COMPRESSION_OPTIONS);
+
+// data/datablock_internal.c
+
+struct SQSH_UNALIGNED SqshDatablockSize {
+	uint32_t size;
+};
+STATIC_ASSERT(sizeof(struct SqshDatablockSize) == SQSH_SIZEOF_DATABLOCK_SIZE);
+
+// data/directory_internal.c
+
+struct SQSH_UNALIGNED SqshDirectoryEntry {
+	uint16_t offset;
+	int16_t inode_offset;
+	uint16_t type;
+	uint16_t name_size;
+	// uint8_t name[0]; // [name_size + 1]
+};
+
+STATIC_ASSERT(sizeof(struct SqshDirectoryEntry) == SQSH_SIZEOF_DIRECTORY_ENTRY);
+
+struct SQSH_UNALIGNED SqshDirectoryFragment {
+	uint32_t count;
+	uint32_t start;
+	uint32_t inode_number;
+	// struct SqshDirectoryEntry entries[0]; // [count + 1]
+};
+
+STATIC_ASSERT(
+		sizeof(struct SqshDirectoryFragment) == SQSH_SIZEOF_DIRECTORY_FRAGMENT);
+
+// data/fragment_internal.c
+
+struct SQSH_UNALIGNED SqshFragment {
+	uint64_t start;
+	struct SqshDatablockSize size;
+	uint32_t unused;
+};
+
+STATIC_ASSERT(sizeof(struct SqshFragment) == SQSH_SIZEOF_FRAGMENT);
+
+// data/inode_internal.c
 
 struct SQSH_UNALIGNED SqshInodeDirectoryIndex {
 	uint32_t index;
@@ -164,4 +258,70 @@ struct SQSH_UNALIGNED SqshInode {
 	} data;
 };
 
-#endif /* end of include guard FORMAT_INODE_INTERNAL_H */
+// data/metablock_internal.c
+
+struct SQSH_UNALIGNED SqshMetablock {
+	uint16_t header;
+	// uint8_t data[0];
+};
+
+STATIC_ASSERT(sizeof(struct SqshMetablock) == SQSH_SIZEOF_METABLOCK);
+
+// data/superblock_internal.c
+
+struct SQSH_UNALIGNED SqshSuperblock {
+	uint32_t magic;
+	uint32_t inode_count;
+	uint32_t modification_time;
+	uint32_t block_size;
+	uint32_t fragment_entry_count;
+	uint16_t compression_id;
+	uint16_t block_log;
+	uint16_t flags;
+	uint16_t id_count;
+	uint16_t version_major;
+	uint16_t version_minor;
+	uint64_t root_inode_ref;
+	uint64_t bytes_used;
+	uint64_t id_table_start;
+	uint64_t xattr_id_table_start;
+	uint64_t inode_table_start;
+	uint64_t directory_table_start;
+	uint64_t fragment_table_start;
+	uint64_t export_table_start;
+};
+
+STATIC_ASSERT(sizeof(struct SqshSuperblock) == SQSH_SIZEOF_SUPERBLOCK);
+
+// data/xattr_internal.c
+
+struct SQSH_UNALIGNED SqshXattrKey {
+	uint16_t type;
+	uint16_t name_size;
+	// uint8_t name[0]; // [name_size - strlen(prefix)];
+};
+STATIC_ASSERT(sizeof(struct SqshXattrKey) == SQSH_SIZEOF_XATTR_KEY);
+
+struct SQSH_UNALIGNED SqshXattrValue {
+	uint32_t value_size;
+	// uint8_t value[0]; // [value_size]
+};
+STATIC_ASSERT(sizeof(struct SqshXattrValue) == SQSH_SIZEOF_XATTR_VALUE);
+
+struct SQSH_UNALIGNED SqshXattrLookupTable {
+	uint64_t xattr_ref;
+	uint32_t count;
+	uint32_t size;
+};
+STATIC_ASSERT(
+		sizeof(struct SqshXattrLookupTable) == SQSH_SIZEOF_XATTR_LOOKUP_TABLE);
+
+struct SQSH_UNALIGNED SqshXattrIdTable {
+	uint64_t xattr_table_start;
+	uint32_t xattr_ids;
+	uint32_t _unused;
+	// uint64_t table[0]; // [ceil(xattr_ids / 512.0)]
+};
+STATIC_ASSERT(sizeof(struct SqshXattrIdTable) == SQSH_SIZEOF_XATTR_ID_TABLE);
+
+#endif /* end of include guard SQSH_DATA_PRIVATE */

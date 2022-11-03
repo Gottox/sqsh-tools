@@ -31,11 +31,8 @@
  * @file         sqsh-cat.c
  */
 
-#include "../src/context/file_context.h"
-#include "../src/context/inode_context.h"
-#include "../src/iterator/directory_iterator.h"
-#include "../src/sqsh.h"
 #include "common.h"
+#include <sqsh_context.h>
 
 #include <assert.h>
 #include <limits.h>

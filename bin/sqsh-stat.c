@@ -31,11 +31,9 @@
  * @file         sqsh-cat.c
  */
 
-#include "../src/context/inode_context.h"
-#include "../src/error.h"
-#include "../src/iterator/xattr_iterator.h"
-#include "../src/sqsh.h"
 #include "common.h"
+#include <sqsh_context.h>
+#include <sqsh_iterator.h>
 
 #include <assert.h>
 #include <inttypes.h>

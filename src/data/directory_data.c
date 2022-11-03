@@ -31,8 +31,8 @@
  * @file         directory_data.c
  */
 
-#include "directory_internal.h"
 #include <endian.h>
+#include <sqsh_data_private.h>
 
 uint16_t
 sqsh_data_directory_entry_offset(const struct SqshDirectoryEntry *entry) {

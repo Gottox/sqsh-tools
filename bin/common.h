@@ -7,8 +7,8 @@
 
 #define BIN_COMMON_H
 
-#include "../src/sqsh.h"
 #include <ctype.h>
+#include <sqsh.h>
 #include <string.h>
 
 static struct Sqsh *

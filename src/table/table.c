@@ -31,10 +31,10 @@
  * @file         table.c
  */
 
-#include "table.h"
-#include "../context/metablock_context.h"
-#include "../error.h"
-#include "../sqsh.h"
+#include <sqsh.h>
+#include <sqsh_context.h>
+#include <sqsh_error.h>
+#include <sqsh_table.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -49,7 +49,7 @@ lookup_table_get(const struct SqshTable *table, off_t index) {
 
 int
 sqsh_table_init(
-		struct SqshTable *table, struct Sqsh *sqsh, off_t start_block,
+		struct SqshTable *table, struct Sqsh *sqsh, sqsh_index_t start_block,
 		size_t element_size, size_t element_count) {
 	int rv = 0;
 	size_t byte_size;
@@ -89,7 +89,8 @@ out:
 }
 
 int
-sqsh_table_get(const struct SqshTable *table, off_t index, void *target) {
+sqsh_table_get(
+		const struct SqshTable *table, sqsh_index_t index, void *target) {
 	int rv = 0;
 	struct Sqsh *sqsh = table->sqsh;
 	struct SqshMetablockContext metablock = {0};

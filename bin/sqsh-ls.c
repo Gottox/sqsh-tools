@@ -31,10 +31,9 @@
  * @file         sqsh-ls.c
  */
 
-#include "../src/context/inode_context.h"
-#include "../src/iterator/directory_iterator.h"
-#include "../src/sqsh.h"
 #include "common.h"
+#include <sqsh_context.h>
+#include <sqsh_iterator.h>
 
 #include <assert.h>
 #include <inttypes.h>

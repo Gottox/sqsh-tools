@@ -31,7 +31,7 @@
  * @file         utils.c
  */
 
-#include "utils.h"
+#include <sqsh_common.h>
 #include <stdlib.h>
 #include <string.h>
 

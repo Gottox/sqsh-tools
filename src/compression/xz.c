@@ -32,28 +32,25 @@
  */
 
 #include <lzma.h>
+#include <sqsh_compression.h>
+#include <sqsh_error.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <zconf.h>
 
-#include "../data/compression_options_data.h"
-#include "../error.h"
-#include "compression.h"
-
 static int
 sqsh_xz_extract(
 		const union SqshCompressionOptions *options, size_t options_size,
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
+	(void)options;
+	(void)options_size;
 	int rv = 0;
 	size_t compressed_pos = 0;
 	size_t target_pos = 0;
 	uint64_t memlimit = UINT64_MAX;
-	if (options != NULL && options_size != SQSH_SIZEOF_COMPRESSION_OPTIONS_XZ) {
-		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
-	}
 
 	rv = lzma_stream_buffer_decode(
 			&memlimit, 0, NULL, compressed, &compressed_pos, compressed_size,

@@ -31,13 +31,11 @@
  * @file         xattr_table.c
  */
 
-#include "xattr_table.h"
-#include "../context/inode_context.h"
-#include "../context/superblock_context.h"
-#include "../data/xattr_data.h"
-#include "../error.h"
-#include "../primitive/buffer.h"
-#include "../sqsh.h"
+#include <sqsh.h>
+#include <sqsh_context.h>
+#include <sqsh_data.h>
+#include <sqsh_error.h>
+#include <sqsh_table.h>
 
 #include <stdint.h>
 #include <stdlib.h>

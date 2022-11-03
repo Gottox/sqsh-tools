@@ -28,13 +28,84 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         xattr_iterator.h
+ * @file         sqsh_iterator.h
  */
 
-#include "../context/metablock_stream_context.h"
-#include "../utils.h"
+#include "sqsh_context.h"
 
-#ifndef XATTR_CONTEXT_H
+#ifndef SQSH_ITERATOR_H
+
+#define SQSH_ITERATOR_H
+
+// iterator/directory_index_iterator.c
+
+struct SqshInodeDirectoryIndexIterator {
+	struct SqshInodeContext *inode;
+	size_t remaining_entries;
+	sqsh_index_t current_offset;
+	sqsh_index_t next_offset;
+};
+
+SQSH_NO_UNUSED int sqsh_inode_directory_index_iterator_init(
+		struct SqshInodeDirectoryIndexIterator *iterator,
+		struct SqshInodeContext *inode);
+SQSH_NO_UNUSED int sqsh_inode_directory_index_iterator_next(
+		struct SqshInodeDirectoryIndexIterator *iterator);
+uint32_t sqsh_inode_directory_index_iterator_index(
+		struct SqshInodeDirectoryIndexIterator *iterator);
+uint32_t sqsh_inode_directory_index_iterator_start(
+		struct SqshInodeDirectoryIndexIterator *iterator);
+uint32_t sqsh_inode_directory_index_iterator_name_size(
+		struct SqshInodeDirectoryIndexIterator *iterator);
+const char *sqsh_inode_directory_index_iterator_name(
+		struct SqshInodeDirectoryIndexIterator *iterator);
+
+SQSH_NO_UNUSED int sqsh_inode_directory_index_iterator_clean(
+		struct SqshInodeDirectoryIndexIterator *iterator);
+
+// iterator/directory_iterator.c
+
+struct SqshInodeContext;
+struct Sqsh;
+
+struct SqshDirectoryIterator {
+	struct SqshInodeContext *inode;
+	uint32_t block_start;
+	uint32_t block_offset;
+	uint32_t size;
+
+	const struct SqshDirectoryFragment *fragments;
+	struct SqshDirectoryContext *directory;
+	struct SqshMetablockStreamContext metablock;
+	size_t remaining_entries;
+	sqsh_index_t current_fragment_offset;
+	sqsh_index_t next_offset;
+	sqsh_index_t current_offset;
+};
+
+SQSH_NO_UNUSED int sqsh_directory_iterator_init(
+		struct SqshDirectoryIterator *iterator, struct SqshInodeContext *inode);
+SQSH_NO_UNUSED int
+sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator);
+SQSH_NO_UNUSED int sqsh_directory_iterator_lookup(
+		struct SqshDirectoryIterator *iterator, const char *name,
+		const size_t name_len);
+int
+sqsh_directory_iterator_name_size(const struct SqshDirectoryIterator *iterator);
+uint64_t
+sqsh_directory_iterator_inode_ref(const struct SqshDirectoryIterator *iterator);
+enum SqshInodeContextType sqsh_directory_iterator_inode_type(
+		const struct SqshDirectoryIterator *iterator);
+SQSH_NO_UNUSED int sqsh_directory_iterator_inode_load(
+		const struct SqshDirectoryIterator *iterator,
+		struct SqshInodeContext *inode);
+const char *
+sqsh_directory_iterator_name(const struct SqshDirectoryIterator *iterator);
+SQSH_NO_UNUSED int sqsh_directory_iterator_name_dup(
+		const struct SqshDirectoryIterator *iterator, char **name_buffer);
+int sqsh_directory_iterator_cleanup(struct SqshDirectoryIterator *iterator);
+
+// iterator/xattr_iterator.c
 
 struct SqshInodeContext;
 
@@ -76,6 +147,4 @@ uint16_t sqsh_xattr_iterator_value_size(struct SqshXattrIterator *iterator);
 
 int sqsh_xattr_iterator_cleanup(struct SqshXattrIterator *iterator);
 
-#define XATTR_CONTEXT_H
-
-#endif /* end of include guard XATTR_CONTEXT_H */
+#endif /* end of include guard SQSH_ITERATOR_H */

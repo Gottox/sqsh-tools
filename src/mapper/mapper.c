@@ -31,8 +31,8 @@
  * @file         mapper.c
  */
 
-#include "mapper.h"
-#include "../error.h"
+#include <sqsh_error.h>
+#include <sqsh_mapper.h>
 #include <stdint.h>
 #include <string.h>
 

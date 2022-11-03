@@ -32,15 +32,13 @@
  */
 
 #include <lzma.h>
+#include <sqsh_compression.h>
+#include <sqsh_error.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <zconf.h>
-
-#include "../data/compression_options_data.h"
-#include "../error.h"
-#include "compression.h"
 
 static int
 sqsh_lzma_extract(

@@ -31,9 +31,9 @@
  * @file         mmap_full_mapper.c
  */
 
-#include "mapper.h"
 #include <errno.h>
 #include <fcntl.h>
+#include <sqsh_mapper.h>
 #include <stdint.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -74,7 +74,7 @@ out:
 }
 static int
 sqsh_mapper_mmap_complete_map(
-		struct SqshMapping *mapping, off_t offset, size_t size) {
+		struct SqshMapping *mapping, sqsh_index_t offset, size_t size) {
 	mapping->data.mc.data = &mapping->mapper->data.mc.data[offset];
 	mapping->data.mc.size = size;
 	return 0;

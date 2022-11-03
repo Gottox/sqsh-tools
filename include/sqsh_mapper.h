@@ -28,33 +28,100 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         mapper.h
+ * @file         sqsh_mapper.h
  */
 
+#ifndef SQSH_MAPPER_H
+
+#define SQSH_MAPPER_H
+
+#include "sqsh_primitive.h"
+#include <pthread.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
 
-#include "../utils.h"
-#include "canary_mapper.h"
-#include "mmap_full_mapper.h"
-#include "mmap_mapper.h"
-#include "static_mapper.h"
-#ifdef CONFIG_CURL
-#include "curl_mapper.h"
-#endif
+// mapper/canary_mapper.c
 
-#ifndef MEMORY_MAPPER_H
+struct SqshCanaryMapper {
+	const uint8_t *data;
+	size_t size;
+};
 
-#define MEMORY_MAPPER_H
+struct SqshCanaryMap {
+	uint64_t offset;
+	uint8_t *data;
+	size_t size;
+};
 
-extern struct SqshMemoryMapperImpl sqsh_mapper_impl_static;
-extern struct SqshMemoryMapperImpl sqsh_mapper_impl_mmap_full;
-extern struct SqshMemoryMapperImpl sqsh_mapper_impl_mmap;
 extern struct SqshMemoryMapperImpl sqsh_mapper_impl_canary;
+
+// mapper/curl_mapper.c
+
+struct SqshCurlMapper {
+	const char *url;
+	uint64_t expected_time;
+	uint64_t expected_size;
+	void *handle;
+	pthread_mutex_t handle_lock;
+};
+
+struct SqshCurlMap {
+	struct SqshBuffer buffer;
+	uint64_t offset;
+	uint64_t total_size;
+	uint64_t file_time;
+};
+
 #ifdef CONFIG_CURL
 extern struct SqshMemoryMapperImpl sqsh_mapper_impl_curl;
 #endif
+
+// mapper/mmap_full_mapper.c
+
+struct SqshMmapFullMapper {
+	uint8_t *data;
+	size_t size;
+};
+
+struct SqshMmapFullMap {
+	uint8_t *data;
+	size_t size;
+};
+
+extern struct SqshMemoryMapperImpl sqsh_mapper_impl_mmap_full;
+
+// mapper/mmap_mapper.c
+
+struct SqshMmapMapper {
+	int fd;
+	long page_size;
+	size_t size;
+};
+
+struct SqshMmapMap {
+	uint8_t *data;
+	size_t offset;
+	size_t page_offset;
+	size_t size;
+};
+
+extern struct SqshMemoryMapperImpl sqsh_mapper_impl_mmap;
+
+// mapper/static_mapper.c
+
+struct SqshStaticMapper {
+	const uint8_t *data;
+	size_t size;
+};
+
+struct SqshStaticMap {
+	const uint8_t *data;
+	size_t size;
+};
+
+extern struct SqshMemoryMapperImpl sqsh_mapper_impl_static;
+
+// mapper/mapper.c
 
 struct SqshMapper;
 
@@ -65,15 +132,13 @@ struct SqshMapping {
 		struct SqshMmapMap mm;
 		struct SqshStaticMap sm;
 		struct SqshCanaryMap cn;
-#ifdef CONFIG_CURL
 		struct SqshCurlMap cl;
-#endif
 	} data;
 };
 
 struct SqshMemoryMapperImpl {
 	int (*init)(struct SqshMapper *mapper, const void *input, size_t size);
-	int (*mapping)(struct SqshMapping *map, off_t offset, size_t size);
+	int (*mapping)(struct SqshMapping *map, sqsh_index_t offset, size_t size);
 	size_t (*size)(const struct SqshMapper *mapper);
 	int (*cleanup)(struct SqshMapper *mapper);
 	const uint8_t *(*map_data)(const struct SqshMapping *mapping);
@@ -89,9 +154,7 @@ struct SqshMapper {
 		struct SqshMmapMapper mm;
 		struct SqshStaticMapper sm;
 		struct SqshCanaryMapper cn;
-#ifdef CONFIG_CURL
 		struct SqshCurlMapper cl;
-#endif
 	} data;
 };
 
@@ -108,4 +171,4 @@ int sqsh_mapping_resize(struct SqshMapping *mapping, size_t new_size);
 const uint8_t *sqsh_mapping_data(const struct SqshMapping *mapping);
 int sqsh_mapping_unmap(struct SqshMapping *mapping);
 
-#endif /* end of include guard MEMORY_MAPPER_H */
+#endif /* end of include guard SQSH_MAPPER_H */

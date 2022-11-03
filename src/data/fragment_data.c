@@ -31,9 +31,8 @@
  * @file         fragment_data.c
  */
 
-#include "fragment_internal.h"
-
 #include <endian.h>
+#include <sqsh_data_private.h>
 
 uint64_t
 sqsh_data_fragment_start(const struct SqshFragment *fragment) {

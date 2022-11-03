@@ -1,3 +1,4 @@
+// error.c
 /******************************************************************************
  *                                                                            *
  * Copyright (c) 2022, Enno Boland <g@s01.de>                                 *
@@ -28,24 +29,62 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         canary_mapper.h
+ * @file         sqsh_error.h
  */
 
-#include <stddef.h>
-#include <stdint.h>
+#ifndef SQSH_ERROR_H
 
-#ifndef CANARY_MAPPER_H
+#define SQSH_ERROR_H
 
-#define CANARY_MAPPER_H
+#include "sqsh_common.h"
 
-struct SqshCanaryMapper {
-	const uint8_t *data;
-	size_t size;
+#define SQSH_ERROR_SECTION (1 << 8)
+enum SqshError {
+	// Avoid collisions with errno
+	SQSH_ERROR_SUPERBLOCK_TOO_SMALL = SQSH_ERROR_SECTION + 1,
+	SQSH_ERROR_WRONG_MAGIC,
+	SQSH_ERROR_BLOCKSIZE_MISSMATCH,
+	SQSH_ERROR_SIZE_MISSMATCH,
+	SQSH_ERROR_CHECKFLAG_SET,
+	SQSH_ERROR_METABLOCK_UNSUPPORTED_COMPRESSION,
+	SQSH_ERROR_METABLOCK_INFO_IS_COMPRESSED,
+	SQSH_ERROR_METABLOCK_ZERO_SIZE,
+	SQSH_ERROR_METABLOCK_INIT,
+	SQSH_ERROR_COMPRESSION_INIT,
+	SQSH_ERROR_COMPRESSION_UNSUPPORTED,
+	SQSH_ERROR_COMPRESSION_DECOMPRESS,
+	SQSH_ERROR_UNKOWN_INODE_TYPE,
+	SQSH_ERROR_COMPRESSION_STREAM_INIT,
+	SQSH_ERROR_COMPRESSION_STREAM_CLEANUP,
+	SQSH_ERROR_STREAM_NOT_ENOUGH_BYTES,
+	SQSH_ERROR_GZIP_HEADER_TOO_SMALL,
+	SQSH_ERROR_GZIP_HEADER_READ,
+	SQSH_ERROR_GZIP_READ_AFTER_END,
+	SQSH_ERROR_NOT_A_DIRECTORY,
+	SQSH_ERROR_NOT_A_FILE,
+	SQSH_ERROR_MALLOC_FAILED,
+	SQSH_ERROR_DIRECTORY_INIT,
+	SQSH_ERROR_INODE_INIT,
+	SQSH_ERROR_INTEGER_OVERFLOW,
+	SQSH_ERROR_NO_SUCH_FILE,
+	SQSH_ERROR_NO_FRAGMENT,
+	SQSH_ERROR_NO_FRAGMENT_TABLE,
+	SQSH_ERROR_NO_DATABLOCKS,
+	SQSH_ERROR_SEEK_OUT_OF_RANGE,
+	SQSH_ERROR_SEEK_IN_FRAGMENT,
+	SQSH_ERROR_HASHMAP_INTERNAL_ERROR,
+	SQSH_ERROR_NO_EXTENDED_DIRECTORY,
+	SQSH_ERROR_NO_EXPORT_TABLE,
+	SQSH_ERROR_NO_XATTR_TABLE,
+	SQSH_ERROR_NO_COMPRESSION_OPTIONS,
+	SQSH_ERROR_METABLOCK_TOO_BIG,
+	SQSH_ERROR_MAPPER_INIT,
+	SQSH_ERROR_MAPPER_MAP,
+	SQSH_ERROR_TODO,
 };
 
-struct SqshCanaryMap {
-	uint64_t offset;
-	uint8_t *data;
-	size_t size;
-};
-#endif /* end of include guard CANARY_MAPPER_H */
+void sqsh_perror(int error_code, const char *msg);
+
+SQSH_NO_UNUSED const char *sqsh_error_str(int errorcode);
+
+#endif /* end of include guard SQSH_ERROR_H */

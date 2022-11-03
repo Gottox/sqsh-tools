@@ -31,9 +31,8 @@
  * @file         xattr_data.c
  */
 
-#include "xattr_internal.h"
 #include <endian.h>
-#include <stdint.h>
+#include <sqsh_data_private.h>
 #include <string.h>
 
 uint16_t

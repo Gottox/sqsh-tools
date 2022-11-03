@@ -31,10 +31,8 @@
  * @file         metablock_data.c
  */
 
-#include "../sqsh.h"
-#include "../utils.h"
-#include "metablock_internal.h"
 #include <endian.h>
+#include <sqsh_data_private.h>
 
 int
 sqsh_data_metablock_is_compressed(const struct SqshMetablock *metablock) {

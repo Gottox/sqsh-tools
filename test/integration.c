@@ -31,16 +31,11 @@
  * @file         integration.c
  */
 
-#include "../src/context/file_context.h"
-#include "../src/context/inode_context.h"
-#include "../src/context/superblock_context.h"
-#include "../src/error.h"
-#include "../src/iterator/directory_iterator.h"
-#include "../src/iterator/xattr_iterator.h"
-#include "../src/sqsh.h"
-#include "../src/table/xattr_table.h"
 #include "common.h"
 #include "test.h"
+#include <sqsh.h>
+#include <sqsh_context.h>
+#include <sqsh_iterator.h>
 #include <squashfs_image.h>
 #include <stdint.h>
 

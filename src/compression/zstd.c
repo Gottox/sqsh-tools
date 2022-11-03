@@ -31,6 +31,8 @@
  * @file         zstd.c
  */
 
+#include <sqsh_compression.h>
+#include <sqsh_error.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,20 +40,13 @@
 #include <zconf.h>
 #include <zstd.h>
 
-#include "../data/compression_options_data.h"
-#include "../error.h"
-#include "compression.h"
-
 static int
 sqsh_zstd_extract(
 		const union SqshCompressionOptions *options, size_t options_size,
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
-	if (options != NULL &&
-		options_size != SQSH_SIZEOF_COMPRESSION_OPTIONS_ZSTD) {
-		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
-	}
-
+	(void)options;
+	(void)options_size;
 	int rv = ZSTD_decompress(target, *target_size, compressed, compressed_size);
 
 	if (ZSTD_isError(rv)) {

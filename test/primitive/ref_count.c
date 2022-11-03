@@ -35,7 +35,7 @@
 #include "../common.h"
 #include "../test.h"
 
-#include "../../src/primitive/ref_count.h"
+#include <sqsh_primitive.h>
 
 static int
 dummy_dtor(void *pointer) {

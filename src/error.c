@@ -31,7 +31,7 @@
  * @file         error.c
  */
 
-#include "error.h"
+#include <sqsh_error.h>
 
 #include <stdio.h>
 #include <stdlib.h>

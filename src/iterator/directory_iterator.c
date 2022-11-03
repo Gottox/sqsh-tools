@@ -31,13 +31,11 @@
  * @file         directory.c
  */
 
-#include "directory_iterator.h"
-#include "../context/inode_context.h"
-#include "../data/directory_data.h"
-#include "../error.h"
-#include "../sqsh.h"
-#include "directory_index_iterator.h"
-
+#include <sqsh.h>
+#include <sqsh_context.h>
+#include <sqsh_data.h>
+#include <sqsh_error.h>
+#include <sqsh_iterator.h>
 #include <string.h>
 
 static int

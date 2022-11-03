@@ -31,11 +31,11 @@
  * @file         metablock_context.c
  */
 
-#include "metablock_context.h"
-#include "../compression/compression.h"
-#include "../data/metablock_data.h"
-#include "../error.h"
-#include "../sqsh.h"
+#include <sqsh.h>
+#include <sqsh_compression.h>
+#include <sqsh_context.h>
+#include <sqsh_data.h>
+#include <sqsh_error.h>
 #include <stdint.h>
 
 static const struct SqshMetablock *

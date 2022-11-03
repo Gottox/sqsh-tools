@@ -31,11 +31,10 @@
  * @file         null.c
  */
 
-#include "compression.h"
-#include "../context/superblock_context.h"
-#include "../error.h"
-#include "../sqsh.h"
-#include "data/superblock_data.h"
+#include <sqsh_compression.h>
+#include <sqsh_context.h>
+#include <sqsh_data.h>
+#include <sqsh_error.h>
 
 #include <stdint.h>
 #include <stdlib.h>

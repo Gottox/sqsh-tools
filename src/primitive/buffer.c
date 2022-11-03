@@ -31,8 +31,8 @@
  * @file         buffer.c
  */
 
-#include "buffer.h"
-#include "../error.h"
+#include <sqsh_error.h>
+#include <sqsh_primitive.h>
 
 #include <stdbool.h>
 #include <stdint.h>

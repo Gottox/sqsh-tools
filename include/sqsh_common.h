@@ -1,3 +1,4 @@
+// utils.c
 /******************************************************************************
  *                                                                            *
  * Copyright (c) 2022, Enno Boland <g@s01.de>                                 *
@@ -28,33 +29,34 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         directory_internal.h
+ * @file         sqsh_common.h
  */
 
-#include "directory_data.h"
+#ifndef SQSH_COMMON_H
 
-#ifndef DIRECTORY_INTERNAL_H
+#define SQSH_COMMON_H
 
-#define DIRECTORY_INTERNAL_H
+#include <stddef.h>
+#include <stdint.h>
 
-struct SQSH_UNALIGNED SqshDirectoryEntry {
-	uint16_t offset;
-	int16_t inode_offset;
-	uint16_t type;
-	uint16_t name_size;
-	// uint8_t name[0]; // [name_size + 1]
-};
+#define MIN(a, b) (a < b ? a : b)
+#define MAX(a, b) (a > b ? a : b)
 
-STATIC_ASSERT(sizeof(struct SqshDirectoryEntry) == SQSH_SIZEOF_DIRECTORY_ENTRY);
+#define ADD_OVERFLOW(a, b, res) __builtin_add_overflow(a, b, res)
+#define SUB_OVERFLOW(a, b, res) __builtin_sub_overflow(a, b, res)
+#define MULT_OVERFLOW(a, b, res) __builtin_mul_overflow(a, b, res)
 
-struct SQSH_UNALIGNED SqshDirectoryFragment {
-	uint32_t count;
-	uint32_t start;
-	uint32_t inode_number;
-	// struct SqshDirectoryEntry entries[0]; // [count + 1]
-};
+#define SQSH_NO_UNUSED __attribute__((warn_unused_result))
+#define SQSH_UNALIGNED __attribute__((packed, aligned(1)))
 
-STATIC_ASSERT(
-		sizeof(struct SqshDirectoryFragment) == SQSH_SIZEOF_DIRECTORY_FRAGMENT);
+#define STATIC_ASSERT(cond) _Static_assert(cond, #cond)
 
-#endif /* end of include guard DIRECTORY_INTERNAL_H */
+#define SQSH_DEVIDE_CEIL(x, y) (((x - 1) / y) + 1)
+
+#define SQSH_PADDING(x, p) SQSH_DEVIDE_CEIL(x, p) * p
+
+typedef size_t sqsh_index_t;
+
+SQSH_NO_UNUSED void *sqsh_memdup(const void *source, size_t size);
+
+#endif /* end of include guard SQSH_COMMON_H */

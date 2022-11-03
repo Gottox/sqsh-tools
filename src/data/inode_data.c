@@ -31,9 +31,8 @@
  * @file         inode_data.c
  */
 
-#include "inode_internal.h"
 #include <endian.h>
-#include <stdint.h>
+#include <sqsh_data_private.h>
 
 uint16_t
 sqsh_data_inode_type(const struct SqshInode *inode) {

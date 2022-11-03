@@ -28,34 +28,40 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         utils.h
+ * @file         sqsh_compression.h
  */
+
+#ifndef SQSH_COMPRESSION_H
+
+#define SQSH_COMPRESSION_H
 
 #include <stddef.h>
 #include <stdint.h>
 
-#ifndef SQSH_UTILS_H
+union SqshCompressionOptions;
+struct SqshSuperblockContext;
+struct SqshBuffer;
 
-#define SQSH_UTILS_H
+struct SqshCompressionImplementation {
+	int (*extract)(
+			const union SqshCompressionOptions *options, size_t options_size,
+			uint8_t *target, size_t *target_size, const uint8_t *compressed,
+			const size_t compressed_size);
+};
 
-#define MIN(a, b) (a < b ? a : b)
-#define MAX(a, b) (a > b ? a : b)
+struct SqshCompression {
+	const struct SqshCompressionImplementation *impl;
+	size_t block_size;
+};
 
-#define ADD_OVERFLOW(a, b, res) __builtin_add_overflow(a, b, res)
-#define SUB_OVERFLOW(a, b, res) __builtin_sub_overflow(a, b, res)
-#define MULT_OVERFLOW(a, b, res) __builtin_mul_overflow(a, b, res)
+int sqsh_compression_init(
+		struct SqshCompression *compression, int compression_id,
+		size_t block_size);
 
-#define SQSH_NO_UNUSED __attribute__((warn_unused_result))
-#define SQSH_UNALIGNED __attribute__((packed, aligned(1)))
+int sqsh_compression_decompress_to_buffer(
+		const struct SqshCompression *compression, struct SqshBuffer *buffer,
+		const uint8_t *compressed, const size_t compressed_size);
 
-#define STATIC_ASSERT(cond) _Static_assert(cond, #cond)
+int sqsh_compression_cleanup(struct SqshCompression *compression);
 
-#define SQSH_DEVIDE_CEIL(x, y) (((x - 1) / y) + 1)
-
-#define SQSH_PADDING(x, p) SQSH_DEVIDE_CEIL(x, p) * p
-
-typedef size_t sqsh_index_t;
-
-SQSH_NO_UNUSED void *sqsh_memdup(const void *source, size_t size);
-
-#endif /* end of include guard SQSH_UTILS_H */
+#endif /* end of include guard SQSH_COMPRESSION_H */

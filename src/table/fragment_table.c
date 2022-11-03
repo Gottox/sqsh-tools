@@ -31,13 +31,13 @@
  * @file         fragment_table.c
  */
 
-#include "fragment_table.h"
-#include "../context/inode_context.h"
-#include "../context/superblock_context.h"
-#include "../data/fragment_internal.h"
-#include "../error.h"
-#include "../mapper/mapper.h"
-#include "../sqsh.h"
+#include <sqsh.h>
+// TODO: remove private header
+#include <sqsh_compression.h>
+#include <sqsh_context.h>
+#include <sqsh_data_private.h>
+#include <sqsh_error.h>
+#include <sqsh_table.h>
 #include <stdint.h>
 
 int

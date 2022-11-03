@@ -32,10 +32,9 @@
  */
 
 #define _GNU_SOURCE
-#include "../utils.h"
-#include "mapper.h"
 #include <errno.h>
 #include <fcntl.h>
+#include <sqsh_mapper.h>
 #include <stdint.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -71,7 +70,8 @@ out:
 	return rv;
 }
 static int
-sqsh_mapper_mmap_map(struct SqshMapping *mapping, off_t offset, size_t size) {
+sqsh_mapper_mmap_map(
+		struct SqshMapping *mapping, sqsh_index_t offset, size_t size) {
 	struct SqshMapper *mapper = mapping->mapper;
 	uint8_t *file_map = NULL;
 	size_t page_offset = offset % mapper->data.mm.page_size;

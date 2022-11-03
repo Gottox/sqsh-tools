@@ -31,15 +31,12 @@
  * @file         sqsh.h
  */
 
-#include "compression/compression.h"
-#include "context/compression_options_context.h"
-#include "context/superblock_context.h"
-#include "error.h"
-#include "mapper/mapper.h"
-#include "table/fragment_table.h"
-#include "table/table.h"
-#include "table/xattr_table.h"
-#include "utils.h"
+#include "sqsh_common.h"
+#include "sqsh_compression.h"
+#include "sqsh_context.h"
+#include "sqsh_error.h"
+#include "sqsh_mapper.h"
+#include "sqsh_table.h"
 
 #include <stdint.h>
 #include <stdlib.h>

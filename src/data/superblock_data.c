@@ -31,11 +31,8 @@
  * @file         superblock_data.c
  */
 
-#include "../error.h"
-#include "../utils.h"
-#include "superblock_internal.h"
-
 #include <endian.h>
+#include <sqsh_data_private.h>
 
 uint32_t
 sqsh_data_superblock_magic(const struct SqshSuperblock *superblock) {
