@@ -40,7 +40,7 @@
 
 typedef const __attribute__((aligned(1))) uint64_t unaligned_uint64_t;
 static uint64_t
-lookup_table_get(const struct SqshTable *table, off_t index) {
+lookup_table_get(const struct SqshTable *table, sqsh_index_t index) {
 	unaligned_uint64_t *lookup_table =
 			(unaligned_uint64_t *)sqsh_mapping_data(&table->lookup_table);
 

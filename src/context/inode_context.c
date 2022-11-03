@@ -613,7 +613,7 @@ sqsh_inode_device_id(const struct SqshInodeContext *context) {
 }
 
 static uint32_t
-inode_get_id(const struct SqshInodeContext *context, off_t idx) {
+inode_get_id(const struct SqshInodeContext *context, sqsh_index_t idx) {
 	int rv = 0;
 	struct SqshTable *id_table;
 	uint32_t id;

@@ -155,7 +155,7 @@ out:
 int
 sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator) {
 	int rv = 0;
-	off_t offset = iterator->next_offset;
+	sqsh_index_t offset = iterator->next_offset;
 	size_t size = offset;
 
 	sqsh_metablock_stream_cleanup(&iterator->out_of_line_value);
