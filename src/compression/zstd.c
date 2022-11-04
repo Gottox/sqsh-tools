@@ -41,8 +41,8 @@
 #include <zconf.h>
 #include <zstd.h>
 
-static int
-sqsh_zstd_extract(
+int
+sqsh_extract_zstd(
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	int rv = ZSTD_decompress(target, *target_size, compressed, compressed_size);
@@ -52,7 +52,3 @@ sqsh_zstd_extract(
 	}
 	return rv;
 }
-
-const struct SqshCompressionImplementation sqsh_compression_zstd = {
-		.extract = sqsh_zstd_extract,
-};

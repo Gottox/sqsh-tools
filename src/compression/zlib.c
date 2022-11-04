@@ -41,8 +41,8 @@
 #include <zconf.h>
 #include <zlib.h>
 
-static int
-sqsh_zlib_extract(
+int
+sqsh_extract_zlib(
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	// Needed for 32-bit: *target_size is a size_t, but zlib wants a
@@ -61,7 +61,3 @@ sqsh_zlib_extract(
 	}
 	return rv;
 }
-
-const struct SqshCompressionImplementation sqsh_compression_zlib = {
-		.extract = sqsh_zlib_extract,
-};

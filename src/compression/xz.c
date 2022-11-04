@@ -41,8 +41,8 @@
 #include <sys/types.h>
 #include <zconf.h>
 
-static int
-sqsh_xz_extract(
+int
+sqsh_extract_xz(
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	int rv = 0;
@@ -65,7 +65,3 @@ sqsh_xz_extract(
 	}
 	return rv;
 }
-
-const struct SqshCompressionImplementation sqsh_compression_xz = {
-		.extract = sqsh_xz_extract,
-};

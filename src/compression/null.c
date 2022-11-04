@@ -38,8 +38,8 @@
 #include <string.h>
 #include <sys/types.h>
 
-static int
-sqsh_null_extract(
+int
+sqsh_extract_null(
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	if (compressed_size > *target_size) {
@@ -50,7 +50,3 @@ sqsh_null_extract(
 
 	return 0;
 }
-
-const struct SqshCompressionImplementation sqsh_compression_null = {
-		.extract = sqsh_null_extract,
-};

@@ -42,8 +42,8 @@
 #include <sys/types.h>
 #include <zconf.h>
 
-static int
-sqsh_lzo2_extract(
+int
+sqsh_extract_lzo2(
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	int rv = lzo1x_decompress_safe(
@@ -54,7 +54,3 @@ sqsh_lzo2_extract(
 	}
 	return 0;
 }
-
-const struct SqshCompressionImplementation sqsh_compression_lzo = {
-		.extract = sqsh_lzo2_extract,
-};

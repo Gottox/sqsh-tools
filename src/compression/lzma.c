@@ -40,8 +40,8 @@
 #include <sys/types.h>
 #include <zconf.h>
 
-static int
-sqsh_lzma_extract(
+int
+sqsh_extract_lzma(
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	lzma_ret rv = LZMA_OK;
@@ -72,7 +72,3 @@ sqsh_lzma_extract(
 
 	return rv;
 }
-
-const struct SqshCompressionImplementation sqsh_compression_lzma = {
-		.extract = sqsh_lzma_extract,
-};

@@ -42,14 +42,12 @@ union SqshCompressionOptions;
 struct SqshSuperblockContext;
 struct SqshBuffer;
 
-struct SqshCompressionImplementation {
-	int (*extract)(
-			uint8_t *target, size_t *target_size, const uint8_t *compressed,
-			const size_t compressed_size);
-};
+typedef int (*sqsh_extract_func_t)(
+		uint8_t *target, size_t *target_size, const uint8_t *compressed,
+		const size_t compressed_size);
 
 struct SqshCompression {
-	const struct SqshCompressionImplementation *impl;
+	sqsh_extract_func_t impl;
 	size_t block_size;
 };
 

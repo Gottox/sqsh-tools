@@ -41,8 +41,8 @@
 #include <string.h>
 #include <sys/types.h>
 
-static int
-sqsh_lz4_extract(
+int
+sqsh_extract_lz4(
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
 	int rv = LZ4_decompress_safe(
@@ -54,6 +54,3 @@ sqsh_lz4_extract(
 
 	return 0;
 }
-const struct SqshCompressionImplementation sqsh_compression_lz4 = {
-		.extract = sqsh_lz4_extract,
-};

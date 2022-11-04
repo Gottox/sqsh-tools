@@ -41,51 +41,79 @@
 #include <string.h>
 #include <sys/types.h>
 
-#ifdef CONFIG_ZLIB
-extern const struct SqshCompressionImplementation sqsh_compression_zlib;
-#endif
-#ifdef CONFIG_LZMA
-extern const struct SqshCompressionImplementation sqsh_compression_lzma;
-extern const struct SqshCompressionImplementation sqsh_compression_xz;
-#endif
-#ifdef CONFIG_LZO
-extern const struct SqshCompressionImplementation sqsh_compression_lzo;
-#endif
 #ifdef CONFIG_LZ4
-extern const struct SqshCompressionImplementation sqsh_compression_lz4;
+int sqsh_lz4_extract(
+		uint8_t *target, size_t *target_size, const uint8_t *compressed,
+		const size_t compressed_size);
+#else
+const sqsh_extract_func_t sqsh_extract_lz4 = NULL;
 #endif
-#ifdef CONFIG_ZSTD
-extern const struct SqshCompressionImplementation sqsh_compression_zstd;
-#endif
-extern const struct SqshCompressionImplementation sqsh_compression_null;
 
-static const struct SqshCompressionImplementation *
+#ifdef CONFIG_LZMA
+int sqsh_extract_lzma(
+		uint8_t *target, size_t *target_size, const uint8_t *compressed,
+		const size_t compressed_size);
+int sqsh_extract_xz(
+		uint8_t *target, size_t *target_size, const uint8_t *compressed,
+		const size_t compressed_size);
+#else
+const sqsh_extract_func_t sqsh_extract_lzma = NULL;
+const sqsh_extract_func_t sqsh_extract_xz = NULL;
+#endif
+
+#ifdef CONFIG_LZ4
+int sqsh_extract_lz4(
+		uint8_t *target, size_t *target_size, const uint8_t *compressed,
+		const size_t compressed_size);
+#else
+const sqsh_extract_func_t sqsh_extract_lz4 = NULL;
+#endif
+
+#ifdef CONFIG_LZO
+int sqsh_extract_lzo2(
+		uint8_t *target, size_t *target_size, const uint8_t *compressed,
+		const size_t compressed_size);
+#else
+const sqsh_extract_func_t sqsh_extract_lzo2 = NULL;
+#endif
+
+#ifdef CONFIG_ZLIB
+int sqsh_extract_zlib(
+		uint8_t *target, size_t *target_size, const uint8_t *compressed,
+		const size_t compressed_size);
+#else
+const sqsh_extract_func_t sqsh_extract_zlib = NULL;
+#endif
+
+#ifdef CONFIG_ZSTD
+int sqsh_extract_zstd(
+		uint8_t *target, size_t *target_size, const uint8_t *compressed,
+		const size_t compressed_size);
+#else
+const sqsh_extract_func_t sqsh_extract_zstd = NULL;
+#endif
+
+int sqsh_extract_null(
+		uint8_t *target, size_t *target_size, const uint8_t *compressed,
+		const size_t compressed_size);
+
+sqsh_extract_func_t
 compression_by_id(int id) {
 	switch ((enum SqshSuperblockCompressionId)id) {
 	case SQSH_COMPRESSION_NONE:
-		return &sqsh_compression_null;
-#ifdef CONFIG_ZLIB
+		return sqsh_extract_null;
 	case SQSH_COMPRESSION_GZIP:
-		return &sqsh_compression_zlib;
-#endif
-#ifdef CONFIG_LZMA
+		return sqsh_extract_zlib;
 	case SQSH_COMPRESSION_LZMA:
-		return &sqsh_compression_lzma;
+		return sqsh_extract_lzma;
 	case SQSH_COMPRESSION_XZ:
-		return &sqsh_compression_xz;
-#endif
-#ifdef CONFIG_LZO
+		return sqsh_extract_xz;
 	case SQSH_COMPRESSION_LZO:
-		return &sqsh_compression_lzo;
-#endif
-#ifdef CONFIG_LZ4
+		return sqsh_extract_lzo2;
 	case SQSH_COMPRESSION_LZ4:
-		return &sqsh_compression_lz4;
-#endif
-#ifdef CONFIG_ZSTD
+		return sqsh_extract_lz4;
 	case SQSH_COMPRESSION_ZSTD:
-		return &sqsh_compression_zstd;
-#endif
+		return sqsh_extract_zstd;
 	default:
 		return NULL;
 	}
@@ -95,8 +123,7 @@ int
 sqsh_compression_init(
 		struct SqshCompression *compression, int compression_id,
 		size_t block_size) {
-	const struct SqshCompressionImplementation *impl =
-			compression_by_id(compression_id);
+	sqsh_extract_func_t impl = compression_by_id(compression_id);
 	if (impl == NULL) {
 		return SQSH_ERROR_COMPRESSION_UNSUPPORTED;
 	}
@@ -113,14 +140,14 @@ sqsh_compression_decompress_to_buffer(
 	size_t max_size = compression->block_size;
 	size_t size = 0;
 	uint8_t *decompressed = NULL;
-	const struct SqshCompressionImplementation *impl = compression->impl;
+	sqsh_extract_func_t extract = compression->impl;
 
 	rv = sqsh_buffer_add_capacity(buffer, &decompressed, max_size);
 	if (rv < 0) {
 		return rv;
 	}
 
-	rv = impl->extract(decompressed, &max_size, compressed, compressed_size);
+	rv = extract(decompressed, &max_size, compressed, compressed_size);
 	if (rv < 0) {
 		return rv;
 	}
