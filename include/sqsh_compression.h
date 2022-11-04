@@ -43,8 +43,10 @@ struct SqshSuperblockContext;
 struct SqshBuffer;
 
 struct SqshCompressionImplementation {
+	int (*init)(
+			const union SqshCompressionOptions *options,
+			const size_t options_size);
 	int (*extract)(
-			const union SqshCompressionOptions *options, size_t options_size,
 			uint8_t *target, size_t *target_size, const uint8_t *compressed,
 			const size_t compressed_size);
 };

@@ -43,15 +43,19 @@
 #include <zconf.h>
 
 static int
-sqsh_lzo2_extract(
-		const union SqshCompressionOptions *options, size_t options_size,
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size) {
+sqsh_lzo2_init(
+		const union SqshCompressionOptions *options, size_t options_size) {
 	if (options != NULL &&
 		options_size != SQSH_SIZEOF_COMPRESSION_OPTIONS_LZO) {
 		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
+	return 0;
+}
+static int
+sqsh_lzo2_extract(
+		uint8_t *target, size_t *target_size, const uint8_t *compressed,
+		const size_t compressed_size) {
 	int rv = lzo1x_decompress_safe(
 			compressed, compressed_size, target, target_size, NULL);
 
@@ -62,5 +66,6 @@ sqsh_lzo2_extract(
 }
 
 const struct SqshCompressionImplementation sqsh_compression_lzo = {
+		.init = sqsh_lzo2_init,
 		.extract = sqsh_lzo2_extract,
 };

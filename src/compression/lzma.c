@@ -41,16 +41,21 @@
 #include <zconf.h>
 
 static int
-sqsh_lzma_extract(
-		const union SqshCompressionOptions *options, size_t options_size,
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size) {
+sqsh_lzma_init(
+		const union SqshCompressionOptions *options, size_t options_size) {
 	// LZMA has no compression options
 	if (options != NULL || options_size != 0) {
 		// TODO: More specific error code
 		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
+	return 0;
+}
+
+static int
+sqsh_lzma_extract(
+		uint8_t *target, size_t *target_size, const uint8_t *compressed,
+		const size_t compressed_size) {
 	lzma_ret rv = LZMA_OK;
 	lzma_stream strm = LZMA_STREAM_INIT;
 
@@ -81,5 +86,6 @@ sqsh_lzma_extract(
 }
 
 const struct SqshCompressionImplementation sqsh_compression_lzma = {
+		.init = sqsh_lzma_init,
 		.extract = sqsh_lzma_extract,
 };

@@ -102,7 +102,8 @@ sqsh_compression_init(
 	}
 	compression->impl = impl;
 	compression->block_size = block_size;
-	return 0;
+	// TODO: call with actual compression options
+	return impl->init(NULL, 0);
 }
 
 int
@@ -110,8 +111,6 @@ sqsh_compression_decompress_to_buffer(
 		const struct SqshCompression *compression, struct SqshBuffer *buffer,
 		const uint8_t *compressed, const size_t compressed_size) {
 	int rv = 0;
-	const union SqshCompressionOptions *options = NULL;
-	const size_t options_size = 0;
 	size_t max_size = compression->block_size;
 	size_t size = 0;
 	uint8_t *decompressed = NULL;
@@ -122,9 +121,7 @@ sqsh_compression_decompress_to_buffer(
 		return rv;
 	}
 
-	rv = impl->extract(
-			options, options_size, decompressed, &max_size, compressed,
-			compressed_size);
+	rv = impl->extract(decompressed, &max_size, compressed, compressed_size);
 	if (rv < 0) {
 		return rv;
 	}

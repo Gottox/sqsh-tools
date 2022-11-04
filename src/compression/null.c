@@ -39,16 +39,21 @@
 #include <sys/types.h>
 
 static int
-sqsh_null_extract(
-		const union SqshCompressionOptions *options, size_t options_size,
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size) {
+sqsh_null_init(
+		const union SqshCompressionOptions *options, size_t options_size) {
 	// the null decompressor has no compression options
 	if (options != NULL || options_size != 0) {
 		// TODO: More specific error code
 		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
+	return 0;
+}
+
+static int
+sqsh_null_extract(
+		uint8_t *target, size_t *target_size, const uint8_t *compressed,
+		const size_t compressed_size) {
 	if (compressed_size > *target_size) {
 		return -SQSH_ERROR_SIZE_MISSMATCH;
 	}
@@ -59,5 +64,6 @@ sqsh_null_extract(
 }
 
 const struct SqshCompressionImplementation sqsh_compression_null = {
+		.init = sqsh_null_init,
 		.extract = sqsh_null_extract,
 };
