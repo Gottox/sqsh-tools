@@ -41,14 +41,6 @@
 #include <string.h>
 #include <sys/types.h>
 
-#ifdef CONFIG_LZ4
-int sqsh_lz4_extract(
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size);
-#else
-const sqsh_extract_func_t sqsh_extract_lz4 = NULL;
-#endif
-
 #ifdef CONFIG_LZMA
 int sqsh_extract_lzma(
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
