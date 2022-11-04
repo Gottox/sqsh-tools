@@ -42,15 +42,6 @@
 #include <zconf.h>
 
 static int
-sqsh_xz_init(const union SqshCompressionOptions *options, size_t options_size) {
-	if (options != NULL && options_size != SQSH_SIZEOF_COMPRESSION_OPTIONS_XZ) {
-		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
-	}
-
-	return 0;
-}
-
-static int
 sqsh_xz_extract(
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
@@ -76,6 +67,5 @@ sqsh_xz_extract(
 }
 
 const struct SqshCompressionImplementation sqsh_compression_xz = {
-		.init = sqsh_xz_init,
 		.extract = sqsh_xz_extract,
 };

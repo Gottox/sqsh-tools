@@ -102,8 +102,7 @@ sqsh_compression_init(
 	}
 	compression->impl = impl;
 	compression->block_size = block_size;
-	// TODO: call with actual compression options
-	return impl->init(NULL, 0);
+	return 0;
 }
 
 int

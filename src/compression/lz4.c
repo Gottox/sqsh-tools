@@ -42,17 +42,6 @@
 #include <sys/types.h>
 
 static int
-sqsh_lz4_init(
-		const union SqshCompressionOptions *options, size_t options_size) {
-	if (options != NULL &&
-		options_size != SQSH_SIZEOF_COMPRESSION_OPTIONS_LZ4) {
-		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
-	}
-
-	return 0;
-}
-
-static int
 sqsh_lz4_extract(
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
@@ -67,5 +56,4 @@ sqsh_lz4_extract(
 }
 const struct SqshCompressionImplementation sqsh_compression_lz4 = {
 		.extract = sqsh_lz4_extract,
-		.init = sqsh_lz4_init,
 };

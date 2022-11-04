@@ -42,17 +42,6 @@
 #include <zstd.h>
 
 static int
-sqsh_zstd_init(
-		const union SqshCompressionOptions *options, size_t options_size) {
-	if (options != NULL &&
-		options_size != SQSH_SIZEOF_COMPRESSION_OPTIONS_ZSTD) {
-		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
-	}
-
-	return 0;
-}
-
-static int
 sqsh_zstd_extract(
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
@@ -65,6 +54,5 @@ sqsh_zstd_extract(
 }
 
 const struct SqshCompressionImplementation sqsh_compression_zstd = {
-		.init = sqsh_zstd_init,
 		.extract = sqsh_zstd_extract,
 };
