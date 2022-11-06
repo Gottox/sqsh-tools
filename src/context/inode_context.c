@@ -418,6 +418,8 @@ sqsh_inode_file_block_count(const struct SqshInodeContext *context) {
 
 	if (file_size == UINT64_MAX) {
 		return UINT32_MAX;
+	} else if (file_size == 0) {
+		return 0;
 	} else if (sqsh_inode_file_has_fragment(context)) {
 		return file_size / block_size;
 	} else {
