@@ -71,7 +71,7 @@ sqsh_metablock_stream_seek(
 		uint32_t buffer_offset) {
 	sqsh_buffer_drain(&context->buffer);
 
-	if (ADD_OVERFLOW(
+	if (SQSH_ADD_OVERFLOW(
 				context->base_address, address_offset,
 				&context->current_address)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
@@ -93,7 +93,7 @@ add_block(struct SqshMetablockStreamContext *context) {
 	}
 	metablock_size =
 			SQSH_SIZEOF_METABLOCK + sqsh_metablock_compressed_size(&metablock);
-	if (ADD_OVERFLOW(address, metablock_size, &context->current_address)) {
+	if (SQSH_ADD_OVERFLOW(address, metablock_size, &context->current_address)) {
 		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}

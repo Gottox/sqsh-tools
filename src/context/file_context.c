@@ -44,7 +44,7 @@ datablock_offset(struct SqshFileContext *context, uint32_t block_index) {
 	uint64_t offset = 0;
 
 	for (uint32_t i = 0; i < block_index; i++) {
-		if (ADD_OVERFLOW(
+		if (SQSH_ADD_OVERFLOW(
 					offset, sqsh_inode_file_block_size(context->inode, i),
 					&offset)) {
 			return UINT64_MAX;
@@ -112,7 +112,7 @@ sqsh_file_read(struct SqshFileContext *context, uint64_t size) {
 	uint32_t outer_block_size;
 	uint64_t outer_offset = 0;
 
-	if (SUB_OVERFLOW(
+	if (SQSH_SUB_OVERFLOW(
 				datablock_offset(context, block_count), block_offset,
 				&block_whole_size)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;

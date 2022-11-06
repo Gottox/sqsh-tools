@@ -48,7 +48,7 @@ sqsh_trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh) {
 		return SQSH_ERROR_TODO;
 	}
 
-	if (SUB_OVERFLOW(archive_size, trailing_start, &trailing_size)) {
+	if (SQSH_SUB_OVERFLOW(archive_size, trailing_start, &trailing_size)) {
 		return SQSH_ERROR_TODO;
 	}
 

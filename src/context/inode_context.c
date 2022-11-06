@@ -267,7 +267,7 @@ sqsh_inode_init_by_path(
 		if (segment_len == 0 || (segment_len == 1 && segment[0] == '.')) {
 			continue;
 		} else if (segment_len == 2 && strncmp(segment, "..", 2) == 0) {
-			i = MAX(0, i - 1);
+			i = SQSH_MAX(0, i - 1);
 			continue;
 		} else {
 			uint64_t parent_inode_ref = inode_refs[i];

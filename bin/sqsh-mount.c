@@ -338,7 +338,7 @@ sqshfuse_read(
 		goto out;
 	}
 
-	size = MIN(size, sqsh_inode_file_size(&inode));
+	size = SQSH_MIN(size, sqsh_inode_file_size(&inode));
 	rv = sqsh_file_seek(&file, offset);
 	if (rv < 0) {
 		// TODO: Better return type
@@ -376,7 +376,7 @@ sqshfuse_readlink(const char *path, char *buf, size_t size) {
 
 	const char *symlink = sqsh_inode_symlink(&inode);
 	size_t symlink_size = sqsh_inode_symlink_size(&inode);
-	size_t cpy_size = MIN(symlink_size, size - 1);
+	size_t cpy_size = SQSH_MIN(symlink_size, size - 1);
 
 	memcpy(buf, symlink, cpy_size);
 	buf[cpy_size] = 0;

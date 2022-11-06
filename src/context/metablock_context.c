@@ -83,7 +83,7 @@ sqsh_metablock_to_buffer(
 	if (size > SQSH_METABLOCK_BLOCK_SIZE) {
 		return -SQSH_ERROR_METABLOCK_TOO_BIG;
 	}
-	if (ADD_OVERFLOW(size, SQSH_SIZEOF_METABLOCK, &map_size)) {
+	if (SQSH_ADD_OVERFLOW(size, SQSH_SIZEOF_METABLOCK, &map_size)) {
 		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}

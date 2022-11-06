@@ -58,7 +58,7 @@ write_data(void *ptr, size_t size, size_t nmemb, void *userdata) {
 	size_t byte_size;
 	struct SqshMapping *mapping = userdata;
 
-	if (MULT_OVERFLOW(size, nmemb, &byte_size)) {
+	if (SQSH_MULT_OVERFLOW(size, nmemb, &byte_size)) {
 		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}

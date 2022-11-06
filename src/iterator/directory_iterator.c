@@ -59,7 +59,7 @@ directory_iterator_index_lookup(
 
 		// BUG: the branch could be taken too early when the name is a prefix
 		if (strncmp(name, (char *)index_name,
-					MIN(index_name_size, name_len + 1)) < 0) {
+					SQSH_MIN(index_name_size, name_len + 1)) < 0) {
 			break;
 		}
 		iterator->next_offset =

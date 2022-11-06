@@ -116,7 +116,7 @@ sqsh_fragment_table_to_buffer(
 	uint32_t offset = sqsh_inode_file_fragment_block_offset(inode);
 	uint32_t size = sqsh_inode_file_size(inode) % block_size;
 	uint32_t end_offset;
-	if (ADD_OVERFLOW(offset, size, &end_offset)) {
+	if (SQSH_ADD_OVERFLOW(offset, size, &end_offset)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	rv = sqsh_buffer_init(&intermediate_buffer);

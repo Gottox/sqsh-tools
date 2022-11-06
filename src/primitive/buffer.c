@@ -57,7 +57,7 @@ sqsh_buffer_add_capacity(
 	uint8_t *new_data;
 	size_t new_capacity;
 
-	if (ADD_OVERFLOW(buffer_size, additional_size, &new_capacity)) {
+	if (SQSH_ADD_OVERFLOW(buffer_size, additional_size, &new_capacity)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
@@ -79,7 +79,7 @@ int
 sqsh_buffer_add_size(struct SqshBuffer *buffer, size_t additional_size) {
 	const size_t buffer_size = buffer->size;
 	size_t new_size;
-	if (ADD_OVERFLOW(buffer_size, additional_size, &new_size)) {
+	if (SQSH_ADD_OVERFLOW(buffer_size, additional_size, &new_size)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
