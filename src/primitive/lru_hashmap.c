@@ -55,19 +55,21 @@
 #define SQSH_LRU_HASHMAP_DEBUG_INCREASE_OVERFLOW(h)
 #endif
 
+#define COLLISION_RESERVE_BITS 2
+
 static uint32_t
 hash_to_start_index(struct SqshLruHashmap *hashmap, uint64_t hash) {
 	union {
 		uint64_t hash;
-		uint8_t bytes[8];
+		uint8_t bytes[sizeof(uint64_t)];
 	} hash_bytes = {.hash = hash}, target_bytes = {0};
 
 	for (size_t i = 0; i < sizeof(uint64_t); i++) {
 		target_bytes.bytes[i] = hash_bytes.bytes[i] ^
 				hash_bytes.bytes[sizeof(uint64_t) - i - 1];
 	}
-	// reserve the lower 2 bits for collisions.
-	target_bytes.hash <<= 2;
+	// reserve the lower COLLISION_RESERVE_BITS bits for collisions.
+	target_bytes.hash <<= COLLISION_RESERVE_BITS;
 	return target_bytes.hash % hashmap->size;
 }
 
