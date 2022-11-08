@@ -39,7 +39,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef SQSH_LRU_HASHMAP_DEBUG_DEBUG
+#ifdef SQSH_LRU_HASHMAP_DEBUG
 #define SQSH_LRU_HASHMAP_DEBUG_INCREASE_MISS(h) \
 	{ h->misses++; }
 #define SQSH_LRU_HASHMAP_DEBUG_INCREASE_HIT(h) \
@@ -169,7 +169,7 @@ sqsh_lru_hashmap_init(struct SqshLruHashmap *hashmap, size_t size) {
 	hashmap->newest = NULL;
 	hashmap->oldest = NULL;
 	hashmap->entries = NULL;
-#ifdef SQSH_LRU_HASHMAP_DEBUG_DEBUG
+#ifdef SQSH_LRU_HASHMAP_DEBUG
 	hashmap->hits = 0;
 	hashmap->misses = 0;
 	hashmap->collisions = 0;
@@ -256,7 +256,7 @@ sqsh_lru_hashmap_cleanup(struct SqshLruHashmap *hashmap) {
 		}
 		free(hashmap->entries);
 	}
-#ifdef SQSH_LRU_HASHMAP_DEBUG_DEBUG
+#ifdef SQSH_LRU_HASHMAP_DEBUG
 	fprintf(stderr, "Hashmap size:        %lu\n", hashmap->size);
 	fprintf(stderr, "Hashmap collisions:  %lu\n", hashmap->collisions);
 	fprintf(stderr, "Hashmap misses:      %lu\n", hashmap->misses);
