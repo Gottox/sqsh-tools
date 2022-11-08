@@ -35,8 +35,8 @@
 #define TEST_H
 
 #ifdef NDEBUG
-#undef NDEBUG
-#define _NDEBUG
+#	undef NDEBUG
+#	define _NDEBUG
 #endif
 
 #define _GNU_SOURCE
@@ -74,24 +74,24 @@ main(int argc, char **argv) {
 }
 
 #ifdef _NDEBUG
-#define ASSERT_ABRT(x) \
-	{ x; }
+#	define ASSERT_ABRT(x) \
+		{ x; }
 #else
-#define ASSERT_ABRT(x) \
-	{ \
-		switch (fork()) { \
-		case 0: \
-			close(STDERR_FILENO); \
-			{ x; } \
-			exit(0); \
-		default: { \
-			int s; \
-			wait(&s); \
-			if (WIFSIGNALED(s) == 0) \
-				assert("Abort expected" && 0); \
-		} \
-		} \
-	}
+#	define ASSERT_ABRT(x) \
+		{ \
+			switch (fork()) { \
+			case 0: \
+				close(STDERR_FILENO); \
+				{ x; } \
+				exit(0); \
+			default: { \
+				int s; \
+				wait(&s); \
+				if (WIFSIGNALED(s) == 0) \
+					assert("Abort expected" && 0); \
+			} \
+			} \
+		}
 #endif
 
 static void

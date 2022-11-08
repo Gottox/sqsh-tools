@@ -35,7 +35,7 @@
 
 #ifndef SQSH_ITERATOR_H
 
-#define SQSH_ITERATOR_H
+#	define SQSH_ITERATOR_H
 
 // iterator/directory_index_iterator.c
 

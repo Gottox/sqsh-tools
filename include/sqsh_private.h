@@ -44,7 +44,7 @@
 
 #ifndef SQSH_PRIVATE_H
 
-#define SQSH_PRIVATE_H
+#	define SQSH_PRIVATE_H
 
 struct SqshTrailingContext;
 

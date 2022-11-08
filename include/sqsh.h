@@ -43,15 +43,15 @@
 
 #ifndef SQSH_H
 
-#define SQSH_H
+#	define SQSH_H
 
 enum SqshSourceType {
 	SQSH_SOURCE_TYPE_PATH,
 	SQSH_SOURCE_TYPE_FD,
 	SQSH_SOURCE_TYPE_MEMORY,
-#ifdef CONFIG_CURL
+#	ifdef CONFIG_CURL
 	SQSH_SOURCE_TYPE_CURL,
-#endif
+#	endif
 };
 /**
  * @brief The SqshConfig struct contains all the configuration options for

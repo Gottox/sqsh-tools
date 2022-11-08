@@ -9,4 +9,5 @@ KeepEmptyLinesAtTheStartOfBlocks: false
 TabWidth: 4
 UseTab: ForContinuationAndIndentation
 AlignTrailingComments: false
+IndentPPDirectives: AfterHash
 ...
