@@ -37,6 +37,7 @@
 
 #include "sqsh_common.h"
 
+#include <pthread.h>
 #include <stdbool.h>
 
 // primitive/buffer.c
@@ -174,5 +175,42 @@ void *sqsh_ref_count_retain(struct SqshRefCount *ref_count);
  */
 int
 sqsh_ref_count_release(struct SqshRefCount *ref_count, sqshRefCountDtor dtor);
+
+// primitive/lru_hashmap.c
+
+typedef int (*SqshLruHashmapDtor)(void *);
+
+struct SqshLruEntry {
+	struct SqshRefCount *pointer;
+	struct SqshLruEntry *newer;
+	struct SqshLruEntry *older;
+	uint64_t hash;
+};
+
+struct SqshLruHashmap {
+	size_t size;
+	struct SqshLruEntry *oldest;
+	struct SqshLruEntry *newest;
+	struct SqshLruEntry *entries;
+	pthread_mutex_t lock;
+	sqshRefCountDtor dtor;
+#ifdef SQSH_LRU_HASHMAP_DEBUG
+	size_t collisions;
+	size_t misses;
+	size_t hits;
+	size_t overflows;
+#endif
+};
+
+SQSH_NO_UNUSED int
+sqsh_lru_hashmap_init(struct SqshLruHashmap *hashmap, size_t size);
+SQSH_NO_UNUSED int sqsh_lru_hashmap_put(
+		struct SqshLruHashmap *hashmap, uint64_t hash,
+		struct SqshRefCount *pointer);
+struct SqshRefCount *
+sqsh_lru_hashmap_get(struct SqshLruHashmap *hashmap, uint64_t hash);
+struct SqshRefCount *
+sqsh_lru_hashmap_remove(struct SqshLruHashmap *hashmap, uint64_t hash);
+int sqsh_lru_hashmap_cleanup(struct SqshLruHashmap *hashmap);
 
 #endif /* end of include guard SQSH_PRIMITIVE_H */

@@ -54,6 +54,7 @@ sqsh_src = [
 	'src/mapper/static_mapper.c',
 	'src/primitive/buffer.c',
 	'src/primitive/ref_count.c',
+	'src/primitive/lru_hashmap.c',
 	'src/table/fragment_table.c',
 	'src/table/table.c',
 	'src/table/xattr_table.c',
