@@ -92,8 +92,6 @@ int sqsh_extract_null(
 sqsh_extract_func_t
 compression_by_id(int id) {
 	switch ((enum SqshSuperblockCompressionId)id) {
-	case SQSH_COMPRESSION_NONE:
-		return sqsh_extract_null;
 	case SQSH_COMPRESSION_GZIP:
 		return sqsh_extract_zlib;
 	case SQSH_COMPRESSION_LZMA:

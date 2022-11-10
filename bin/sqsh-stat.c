@@ -47,8 +47,6 @@
 static char *
 compression_id_name(int id) {
 	switch (id) {
-	case SQSH_COMPRESSION_NONE:
-		return "none";
 	case SQSH_COMPRESSION_GZIP:
 		return "gzip";
 	case SQSH_COMPRESSION_XZ:
@@ -237,7 +235,6 @@ stat_image(struct Sqsh *sqsh) {
 			break;
 		default:
 		case SQSH_COMPRESSION_LZMA:
-		case SQSH_COMPRESSION_NONE:
 			puts("  WARNING: compression options are present, but "
 				 "not supported by the compression algorithm");
 		}

@@ -27,7 +27,6 @@ sqsh_hdr = [
 
 sqsh_src = [
 	'src/compression/compression.c',
-	'src/compression/null.c',
 	'src/context/compression_options_context.c',
 	'src/context/file_context.c',
 	'src/context/inode_context.c',

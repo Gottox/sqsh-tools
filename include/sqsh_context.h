@@ -625,7 +625,6 @@ int sqsh_metablock_cleanup(struct SqshMetablockContext *context);
 // context/superblock_context.c
 
 enum SqshSuperblockCompressionId {
-	SQSH_COMPRESSION_NONE = 0,
 	SQSH_COMPRESSION_GZIP = 1,
 	SQSH_COMPRESSION_LZMA = 2,
 	SQSH_COMPRESSION_LZO = 3,
