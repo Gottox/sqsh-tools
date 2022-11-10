@@ -138,6 +138,8 @@ sqsh_error_str(int error_code) {
 		return "Mapper mapping error";
 	case SQSH_ERROR_COMPRESSION_UNSUPPORTED:
 		return "Compression unkown";
+	case SQSH_ERROR_INDEX_OUT_OF_BOUNDS:
+		return "Index out of bounds";
 	case SQSH_ERROR_TODO:
 		return "Todo";
 	}

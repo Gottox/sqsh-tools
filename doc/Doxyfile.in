@@ -24,7 +24,7 @@ WARN_AS_ERROR        = YES
 
 
 # Input files
-INPUT         = @DOXYGEN_INPUT@/include
+INPUT         = @DOXYGEN_INPUT@/README.md @DOXYGEN_INPUT@/include
 EXCLUDE       = ../include/sqsh_data_private.h
 FILE_PATTERNS = *.h README.md
 EXCLUDE_PATTERNS = *_internal.h

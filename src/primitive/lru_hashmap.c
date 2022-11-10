@@ -165,9 +165,11 @@ lru_attach(struct SqshLruHashmap *hashmap, struct SqshLruEntry *entry) {
 }
 
 int
-sqsh_lru_hashmap_init(struct SqshLruHashmap *hashmap, size_t size) {
+sqsh_lru_hashmap_init(
+		struct SqshLruHashmap *hashmap, size_t size, sqshRefCountDtor dtor) {
 	int rv = 0;
 	hashmap->size = size;
+	hashmap->dtor = dtor;
 	hashmap->newest = NULL;
 	hashmap->oldest = NULL;
 	hashmap->entries = NULL;

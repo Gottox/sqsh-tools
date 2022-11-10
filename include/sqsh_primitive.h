@@ -40,6 +40,67 @@
 #include <pthread.h>
 #include <stdbool.h>
 
+// primitive/slice.c
+
+/**
+ * @brief        Generic representation of a region of memory.
+ */
+struct SqshSlice {
+	const uint8_t *data;
+	size_t size;
+};
+
+/**
+ * @brief      Creates a new slice from a given data pointer and size.
+ * @memberof   SqshSlice
+ *
+ * @param[out] slice  The slice to be created.
+ * @param[in]  data  The data pointer
+ * @param[in]  size  The size
+ *
+ * @return     0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int
+sqsh_slice_init(struct SqshSlice *slice, const uint8_t *data, size_t size);
+/**
+ * @brief      Creates a new slice from a given data pointer and size.
+ * @memberof   SqshSlice
+ *
+ * @param[out] slice  The slice to be created.
+ * @param[in]  source The source slice
+ * @param[in]  offset The offset
+ * @param[in]  size   The size
+ *
+ * @return     0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int sqsh_slice_init_subslice(
+		struct SqshSlice *slice, const struct SqshSlice *source,
+		sqsh_index_t offset, size_t size);
+/**
+ * @brief      Returns a pointer to the data of the slice.
+ * @memberof   SqshSlice
+ *
+ * @param[in]  slice  The slice
+ * @return     The data pointer
+ */
+SQSH_NO_UNUSED const uint8_t *sqsh_slice_data(const struct SqshSlice *slice);
+/**
+ * @brief      Returns the size of the slice.
+ * @memberof   SqshSlice
+ *
+ * @param[in]  slice  The slice
+ * @return     The size
+ */
+SQSH_NO_UNUSED size_t sqsh_slice_size(const struct SqshSlice *slice);
+/**
+ * @brief     cleans up the slice
+ * @memberof  SqshSlice
+ *
+ * @param[in] slice  The slice
+ * @return    0 on success, less than 0 on error
+ */
+int sqsh_slice_cleanup(struct SqshSlice *slice);
+
 // primitive/buffer.c
 
 /**
@@ -58,7 +119,7 @@ struct SqshBuffer {
  * @brief sqsh_buffer_init initializes a SqshBuffer.
  * @memberof SqshBuffer
  *
- * @param buffer The SqshBuffer to initialize.
+ * @param[out] buffer The SqshBuffer to initialize.
  */
 SQSH_NO_UNUSED int sqsh_buffer_init(struct SqshBuffer *buffer);
 
@@ -71,8 +132,8 @@ SQSH_NO_UNUSED int sqsh_buffer_init(struct SqshBuffer *buffer);
  * sqsh_buffer_add_capacity before. Otherwise the function behavior is
  * undefined.
  *
- * @param buffer The SqshBuffer to increase.
- * @param additional_size The additional size to increase the buffer.
+ * @param[in,out] buffer The SqshBuffer to increase.
+ * @param[in] additional_size The additional size to increase the buffer.
  */
 SQSH_NO_UNUSED int
 sqsh_buffer_add_size(struct SqshBuffer *buffer, size_t additional_size);
@@ -82,9 +143,13 @@ sqsh_buffer_add_size(struct SqshBuffer *buffer, size_t additional_size);
  * and sets additional_buffer to the beginning of the additional memory.
  * @memberof SqshBuffer
  *
- * @param buffer The SqshBuffer to free.
- * @param additional_buffer The pointer to the additional memory.
- * @param additional_size The size of the additional memory.
+ * After sqsh_buffer_add_capacity has been called, the buffer will behave
+ * undefined if you query data or size. In order to use the buffer again, you
+ * need to call sqsh_buffer_add_size again.
+ *
+ * @param[in,out] buffer The SqshBuffer to free.
+ * @param[in] additional_buffer The pointer to the additional memory.
+ * @param[in] additional_size The size of the additional memory.
  */
 SQSH_NO_UNUSED int sqsh_buffer_add_capacity(
 		struct SqshBuffer *buffer, uint8_t **additional_buffer,
@@ -94,9 +159,9 @@ SQSH_NO_UNUSED int sqsh_buffer_add_capacity(
  * @brief sqsh_buffer_append
  * @memberof SqshBuffer
  *
- * @param buffer The SqshBuffer to append to.
- * @param source The data to append.
- * @param source_size The size of the data to append.
+ * @param[in,out] buffer The SqshBuffer to append to.
+ * @param[in] source The data to append.
+ * @param[in] source_size The size of the data to append.
  */
 SQSH_NO_UNUSED int sqsh_buffer_append(
 		struct SqshBuffer *buffer, const uint8_t *source,
@@ -109,7 +174,7 @@ SQSH_NO_UNUSED int sqsh_buffer_append(
  * This does not free the memory allocated by the buffer so that
  * the buffer can be reused.
  *
- * @param buffer The SqshBuffer to drain.
+ * @param[in,out] buffer The SqshBuffer to drain.
  */
 
 void sqsh_buffer_drain(struct SqshBuffer *buffer);
@@ -117,14 +182,14 @@ void sqsh_buffer_drain(struct SqshBuffer *buffer);
 /**
  * @brief sqsh_buffer_data returns the data of the SqshBuffer.
  * @memberof SqshBuffer
- * @param buffer The SqshBuffer to get the data from.
+ * @param[in] buffer The SqshBuffer to get the data from.
  * @return a pointer to the data of the SqshBuffer.
  */
 const uint8_t *sqsh_buffer_data(const struct SqshBuffer *buffer);
 /**
  * @brief sqsh_buffer_size returns the size of the SqshBuffer.
  * @memberof SqshBuffer
- * @param buffer The SqshBuffer to get the size from.
+ * @param[in] buffer The SqshBuffer to get the size from.
  * @return the size of the SqshBuffer.
  */
 size_t sqsh_buffer_size(const struct SqshBuffer *buffer);
@@ -132,7 +197,7 @@ size_t sqsh_buffer_size(const struct SqshBuffer *buffer);
 /**
  * @brief sqsh_buffer_cleanup frees the memory managed by the SqshBuffer.
  * @memberof SqshBuffer
- * @param buffer The SqshBuffer to cleanup.
+ * @param[in,out] buffer The SqshBuffer to cleanup.
  */
 int sqsh_buffer_cleanup(struct SqshBuffer *buffer);
 
@@ -150,8 +215,8 @@ struct SqshRefCount {
 /**
  * @brief Initialize a SqshRefCount struct.
  * @memberof SqshRefCount
- * @param ref_count A pointer to the SqshRefCount struct.
- * @param object_size The size of the object to be reference counted.
+ * @param[out] ref_count A pointer to the SqshRefCount struct.
+ * @param[in] object_size The size of the object to be reference counted.
  * reaches 0.
  * @return 0 on success, less than 0 on error.
  */
@@ -160,7 +225,7 @@ int sqsh_ref_count_new(struct SqshRefCount **ref_count, size_t object_size);
 /**
  * @brief Increment the reference count of a SqshRefCount struct.
  * @memberof SqshRefCount
- * @param ref_count A pointer to the SqshRefCount struct.
+ * @param[in] ref_count A pointer to the SqshRefCount struct.
  * @return pointer to the reference counted object.
  */
 void *sqsh_ref_count_retain(struct SqshRefCount *ref_count);
@@ -169,8 +234,9 @@ void *sqsh_ref_count_retain(struct SqshRefCount *ref_count);
  * @brief Decrement the reference count of a SqshRefCount struct. If the
  * reference count reaches 0, the destructor function is called.
  * @memberof SqshRefCount
- * @param ref_count A pointer to the SqshRefCount struct.
- * @param dtor A pointer to a function that is called when the reference count
+ * @param[in,out] ref_count A pointer to the SqshRefCount struct.
+ * @param[in] dtor A pointer to a function that is called when the reference
+ * count
  * @return amount of references left.
  */
 int
@@ -202,15 +268,54 @@ struct SqshLruHashmap {
 #endif
 };
 
-SQSH_NO_UNUSED int
-sqsh_lru_hashmap_init(struct SqshLruHashmap *hashmap, size_t size);
+/**
+ * @brief sqsh_lru_hashmap_init initializes a SqshLruHashmap.
+ * @memberof SqshLruHashmap
+ *
+ * @param[out] hashmap The SqshLruHashmap to initialize.
+ * @param[in] size The size of the hashmap.
+ * @param[in] dtor The destructor function to call when an entry is removed.
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int sqsh_lru_hashmap_init(
+		struct SqshLruHashmap *hashmap, size_t size, sqshRefCountDtor dtor);
+/**
+ * @brief sqsh_lru_hashmap_put puts an entry into the hashmap.
+ * @memberof SqshLruHashmap
+ *
+ * @param[in,out] hashmap The SqshLruHashmap to put the entry into.
+ * @param[in] hash The hash of the entry.
+ * @param[in] pointer The pointer to the entry.
+ * @return 0 on success, less than 0 on error.
+ */
 SQSH_NO_UNUSED int sqsh_lru_hashmap_put(
 		struct SqshLruHashmap *hashmap, uint64_t hash,
 		struct SqshRefCount *pointer);
+/**
+ * @brief sqsh_lru_hashmap_get gets an entry from the hashmap.
+ * @memberof SqshLruHashmap
+ *
+ * @param[in,out] hashmap The SqshLruHashmap to get the entry from.
+ * @param[in] hash The hash of the entry.
+ * @return a pointer to the entry or NULL if the entry was not found.
+ */
 struct SqshRefCount *
 sqsh_lru_hashmap_get(struct SqshLruHashmap *hashmap, uint64_t hash);
+/**
+ * @brief sqsh_lru_hashmap_remove removes an entry from the hashmap.
+ * @memberof SqshLruHashmap
+ *
+ * @param[in,out] hashmap The SqshLruHashmap to remove the entry from.
+ * @param[in] hash The hash of the entry.
+ */
 struct SqshRefCount *
 sqsh_lru_hashmap_remove(struct SqshLruHashmap *hashmap, uint64_t hash);
+/**
+ * @brief sqsh_lru_hashmap_cleanup cleans up the hashmap.
+ * @memberof SqshLruHashmap
+ *
+ * @param[in,out] hashmap The SqshLruHashmap to cleanup.
+ */
 int sqsh_lru_hashmap_cleanup(struct SqshLruHashmap *hashmap);
 
 #endif /* end of include guard SQSH_PRIMITIVE_H */
