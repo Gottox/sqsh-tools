@@ -203,7 +203,7 @@ int sqsh_buffer_cleanup(struct SqshBuffer *buffer);
 
 // primitive/ref_count.c
 
-typedef int (*sqshRefCountDtor)(void *);
+typedef int (*sqsh_ref_count_dtor_t)(void *);
 
 /**
  * @brief A container struct for reference counting objects.
@@ -239,8 +239,8 @@ void *sqsh_ref_count_retain(struct SqshRefCount *ref_count);
  * count
  * @return amount of references left.
  */
-int
-sqsh_ref_count_release(struct SqshRefCount *ref_count, sqshRefCountDtor dtor);
+int sqsh_ref_count_release(
+		struct SqshRefCount *ref_count, sqsh_ref_count_dtor_t dtor);
 
 // primitive/lru_hashmap.c
 
@@ -259,7 +259,7 @@ struct SqshLruHashmap {
 	struct SqshLruEntry *newest;
 	struct SqshLruEntry *entries;
 	pthread_mutex_t lock;
-	sqshRefCountDtor dtor;
+	sqsh_ref_count_dtor_t dtor;
 #ifdef SQSH_LRU_HASHMAP_DEBUG
 	size_t collisions;
 	size_t misses;
@@ -278,7 +278,8 @@ struct SqshLruHashmap {
  * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int sqsh_lru_hashmap_init(
-		struct SqshLruHashmap *hashmap, size_t size, sqshRefCountDtor dtor);
+		struct SqshLruHashmap *hashmap, size_t size,
+		sqsh_ref_count_dtor_t dtor);
 /**
  * @brief sqsh_lru_hashmap_put puts an entry into the hashmap.
  * @memberof SqshLruHashmap

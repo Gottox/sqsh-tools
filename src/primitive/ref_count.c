@@ -65,7 +65,8 @@ sqsh_ref_count_retain(struct SqshRefCount *ref_count) {
 }
 
 int
-sqsh_ref_count_release(struct SqshRefCount *ref_count, sqshRefCountDtor dtor) {
+sqsh_ref_count_release(
+		struct SqshRefCount *ref_count, sqsh_ref_count_dtor_t dtor) {
 	if (ref_count == NULL) {
 		return 0;
 	}
