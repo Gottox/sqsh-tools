@@ -33,8 +33,8 @@ developing efficient cache tactics.
 ### ... open an archive?
 
 ```c
-struct Sqsh archive = { 0 };
-int rv = sqsh_open(&archive, "/path/to/archive.squashfs");
+int rv;
+struct Sqsh archive = sqsh_new("/path/to/archive.squashfs", NULL, &rv);
 if (rv < 0)
 	abort();
 // Do something with the archive!
