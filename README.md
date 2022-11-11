@@ -1,6 +1,12 @@
 # libsqsh
 
-squashfs implementation as library.
+squashfs is an open and free compressed read-only filesystem. It is used in
+embedded devices, live-CDs, or in packaging. It was original introduced into
+the kernel, but there are multiple user space implementations.
+
+libsqsh is a purely 2-Clause BSD Licensed implementation of the squashfs
+filesystem. It covers the complete squashfs feature set, while still being
+as minimal as possible.
 
 ## Features
 
