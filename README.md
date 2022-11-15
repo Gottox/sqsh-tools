@@ -38,7 +38,7 @@ struct Sqsh archive = sqsh_new("/path/to/archive.squashfs", NULL, &rv);
 if (rv < 0)
 	abort();
 // Do something with the archive!
-sqsh_cleanup(&archive);
+sqsh_free(archive);
 ```
 
 ### ... get metainformations about a file?
