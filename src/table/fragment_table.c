@@ -32,9 +32,9 @@
  */
 
 #include <sqsh.h>
-// TODO: remove private header
 #include <sqsh_compression.h>
 #include <sqsh_context.h>
+// TODO: remove private header
 #include <sqsh_data_private.h>
 #include <sqsh_error.h>
 #include <sqsh_table.h>
