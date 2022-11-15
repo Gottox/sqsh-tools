@@ -95,6 +95,23 @@ out:
 	return rv;
 }
 
+struct SqshXattrIterator *
+sqsh_xattr_iterator_new(
+		struct SqshXattrTable *xattr_table,
+		const struct SqshInodeContext *inode, int *err) {
+	struct SqshXattrIterator *iterator =
+			calloc(1, sizeof(struct SqshXattrIterator));
+	if (iterator == NULL) {
+		return NULL;
+	}
+	*err = sqsh_xattr_iterator_init(iterator, xattr_table, inode);
+	if (*err < 0) {
+		free(iterator);
+		return NULL;
+	}
+	return iterator;
+}
+
 static const struct SqshXattrValue *
 get_value(struct SqshXattrIterator *iterator) {
 	const uint8_t *data;

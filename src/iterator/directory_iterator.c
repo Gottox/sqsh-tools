@@ -69,7 +69,7 @@ directory_iterator_index_lookup(
 	if (rv < 0) {
 		return rv;
 	}
-	rv = sqsh_inode_directory_index_iterator_clean(&index_iterator);
+	rv = sqsh_inode_directory_index_iterator_cleanup(&index_iterator);
 	return rv;
 }
 
@@ -159,6 +159,21 @@ sqsh_directory_iterator_init(
 	iterator->current_offset = 0;
 
 	return rv;
+}
+
+struct SqshDirectoryIterator *
+sqsh_directory_iterator_new(struct SqshInodeContext *inode, int *err) {
+	struct SqshDirectoryIterator *iterator =
+			calloc(1, sizeof(struct SqshDirectoryIterator));
+	if (iterator == NULL) {
+		return NULL;
+	}
+	*err = sqsh_directory_iterator_init(iterator, inode);
+	if (*err < 0) {
+		free(iterator);
+		return NULL;
+	}
+	return iterator;
 }
 
 int
@@ -258,13 +273,6 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator) {
 	return 1;
 }
 
-int
-sqsh_directory_iterator_cleanup(struct SqshDirectoryIterator *iterator) {
-	int rv = 0;
-	rv = sqsh_metablock_stream_cleanup(&iterator->metablock);
-	return rv;
-}
-
 const char *
 sqsh_directory_iterator_name(const struct SqshDirectoryIterator *iterator) {
 	const struct SqshDirectoryEntry *entry = current_entry(iterator);
@@ -283,4 +291,18 @@ sqsh_directory_iterator_name_dup(
 	} else {
 		return -SQSH_ERROR_MALLOC_FAILED;
 	}
+}
+
+int
+sqsh_directory_iterator_cleanup(struct SqshDirectoryIterator *iterator) {
+	int rv = 0;
+	rv = sqsh_metablock_stream_cleanup(&iterator->metablock);
+	return rv;
+}
+
+int
+sqsh_directory_iterator_free(struct SqshDirectoryIterator *iterator) {
+	int rv = sqsh_directory_iterator_cleanup(iterator);
+	free(iterator);
+	return rv;
 }

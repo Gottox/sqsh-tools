@@ -81,6 +81,23 @@ sqsh_inode_directory_index_iterator_init(
 	return rv;
 }
 
+SQSH_NO_UNUSED
+struct SqshInodeDirectoryIndexIterator *
+sqsh_inode_directory_index_iterator_new(
+		struct SqshInodeContext *inode, int *err) {
+	struct SqshInodeDirectoryIndexIterator *iterator =
+			calloc(1, sizeof(struct SqshInodeDirectoryIndexIterator));
+	if (iterator == NULL) {
+		return NULL;
+	}
+	*err = sqsh_inode_directory_index_iterator_init(iterator, inode);
+	if (*err < 0) {
+		free(iterator);
+		return NULL;
+	}
+	return iterator;
+}
+
 int
 sqsh_inode_directory_index_iterator_next(
 		struct SqshInodeDirectoryIndexIterator *iterator) {
@@ -137,8 +154,16 @@ sqsh_inode_directory_index_iterator_name(
 }
 
 int
-sqsh_inode_directory_index_iterator_clean(
-		struct SqshInodeDirectoryIndexIterator __attribute__((unused)) *
-		iterator) {
+sqsh_inode_directory_index_iterator_cleanup(
+		struct SqshInodeDirectoryIndexIterator *iterator) {
+	(void)iterator;
 	return 0;
+}
+
+int
+sqsh_inode_directory_index_iterator_free(
+		struct SqshInodeDirectoryIndexIterator *iterator) {
+	int rv = sqsh_inode_directory_index_iterator_cleanup(iterator);
+	free(iterator);
+	return rv;
 }
