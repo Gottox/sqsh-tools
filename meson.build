@@ -30,6 +30,7 @@ sqsh_src = [
 	'src/context/compression_options_context.c',
 	'src/context/file_context.c',
 	'src/context/inode_context.c',
+	'src/context/path_resolver_context.c',
 	'src/context/metablock_context.c',
 	'src/context/metablock_stream_context.c',
 	'src/context/superblock_context.c',

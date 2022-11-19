@@ -41,64 +41,6 @@
 #include <stdint.h>
 #include <string.h>
 
-static const char *
-path_find_next_segment(const char *segment) {
-	segment = strchr(segment, '/');
-	if (segment == NULL) {
-		return NULL;
-	} else {
-		return segment + 1;
-	}
-}
-
-size_t
-path_get_segment_len(const char *segment) {
-	const char *next_segment = path_find_next_segment(segment);
-	if (next_segment == NULL) {
-		return strlen(segment);
-	} else {
-		return next_segment - segment - 1;
-	}
-}
-
-static int
-path_segments_count(const char *path) {
-	int count = 0;
-	for (; path; path = path_find_next_segment(path)) {
-		count++;
-	}
-
-	return count;
-}
-
-static int
-path_find_inode_ref(
-		uint64_t *target, uint64_t dir_ref, struct Sqsh *sqsh, const char *name,
-		const size_t name_len) {
-	struct SqshInodeContext inode = {0};
-	struct SqshDirectoryIterator iter = {0};
-	int rv = 0;
-	rv = sqsh_inode_init_by_ref(&inode, sqsh, dir_ref);
-	if (rv < 0) {
-		goto out;
-	}
-	rv = sqsh_directory_iterator_init(&iter, &inode);
-	if (rv < 0) {
-		goto out;
-	}
-	rv = sqsh_directory_iterator_lookup(&iter, name, name_len);
-	if (rv < 0) {
-		goto out;
-	}
-
-	*target = sqsh_directory_iterator_inode_ref(&iter);
-
-out:
-	sqsh_directory_iterator_cleanup(&iter);
-	sqsh_inode_cleanup(&inode);
-	return rv;
-}
-
 static const struct SqshInode *
 get_inode(const struct SqshInodeContext *inode) {
 	return (const struct SqshInode *)sqsh_metablock_stream_data(
@@ -249,42 +191,16 @@ sqsh_inode_init_by_inode_number(
 int
 sqsh_inode_init_by_path(
 		struct SqshInodeContext *inode, struct Sqsh *sqsh, const char *path) {
-	int i;
 	int rv = 0;
-	int segment_count = path_segments_count(path) + 1;
-	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
-	const char *segment = path;
-	uint64_t *inode_refs = calloc(segment_count, sizeof(uint64_t));
-	if (inode_refs == NULL) {
-		rv = SQSH_ERROR_MALLOC_FAILED;
+	struct SqshPathResolverContext resolver = {0};
+	rv = sqsh_path_resolver_init(&resolver, sqsh);
+	if (rv < 0) {
 		goto out;
 	}
-	inode_refs[0] = sqsh_superblock_inode_root_ref(superblock);
-
-	for (i = 0; segment; segment = path_find_next_segment(segment)) {
-		size_t segment_len = path_get_segment_len(segment);
-
-		if (segment_len == 0 || (segment_len == 1 && segment[0] == '.')) {
-			continue;
-		} else if (segment_len == 2 && strncmp(segment, "..", 2) == 0) {
-			i = SQSH_MAX(0, i - 1);
-			continue;
-		} else {
-			uint64_t parent_inode_ref = inode_refs[i];
-			i++;
-			rv = path_find_inode_ref(
-					&inode_refs[i], parent_inode_ref, sqsh, segment,
-					segment_len);
-			if (rv < 0) {
-				goto out;
-			}
-		}
-	}
-
-	rv = sqsh_inode_init_by_ref(inode, sqsh, inode_refs[i]);
+	rv = sqsh_path_resolver_resolve(&resolver, inode, path);
 
 out:
-	free(inode_refs);
+	sqsh_path_resolver_cleanup(&resolver);
 	return rv;
 }
 

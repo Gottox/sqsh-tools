@@ -587,6 +587,42 @@ sqsh_inode_ref_to_block(uint64_t ref, uint32_t *block_index, uint16_t *offset);
 SQSH_NO_UNUSED uint64_t
 sqsh_inode_ref_from_block(uint32_t block_index, uint16_t offset);
 
+// context/path_resolver_context.c
+
+struct SqshPathResolverContext {
+	struct Sqsh *sqsh;
+};
+
+/**
+ * @brief initializes a path resolver context.
+ * @memberof SqshPathResolverContext
+ * @param context The path resolver context.
+ * @param sqsh The sqsh context.
+ * @return int 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int sqsh_path_resolver_init(
+		struct SqshPathResolverContext *context, struct Sqsh *sqsh);
+
+/**
+ * @brief Initialize the inode context from a path.
+ * @memberof SqshPathResolverContext
+ * @param context The path resolver context.
+ * @param inode The inode context to initialize.
+ * @param path The path the file or directory.
+ * @return int 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int sqsh_path_resolver_resolve(
+		struct SqshPathResolverContext *context, struct SqshInodeContext *inode,
+		const char *path);
+
+/**
+ * @brief cleans up a path resolver context.
+ * @memberof SqshPathResolverContext
+ * @param context The path resolver context.
+ * @return int 0 on success, less than 0 on error.
+ */
+int sqsh_path_resolver_cleanup(struct SqshPathResolverContext *context);
+
 // context/metablock_context.c
 
 #define SQSH_METABLOCK_BLOCK_SIZE 8192
