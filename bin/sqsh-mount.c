@@ -260,13 +260,13 @@ sqshfuse_readdir(
 	(void)flags; // TODO
 	int rv = 0;
 	struct SqshInodeContext inode = {0};
-	struct SqshDirectoryIterator iter = {0};
+	struct SqshDirectoryIterator *iter = NULL;
 	rv = sqsh_inode_init_by_path(&inode, data.sqsh, path);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
 	}
-	rv = sqsh_directory_iterator_init(&iter, &inode);
+	iter = sqsh_directory_iterator_new(&inode, &rv);
 	if (rv < 0) {
 		rv = -ENOMEM;
 		goto out;
@@ -275,9 +275,9 @@ sqshfuse_readdir(
 	filler(buf, ".", NULL, 0, 0);
 	filler(buf, "..", NULL, 0, 0);
 
-	while (sqsh_directory_iterator_next(&iter) > 0) {
+	while (sqsh_directory_iterator_next(iter) > 0) {
 		char *name;
-		rv = sqsh_directory_iterator_name_dup(&iter, &name);
+		rv = sqsh_directory_iterator_name_dup(iter, &name);
 		if (rv < 0) {
 			rv = -ENOMEM;
 			goto out;
@@ -291,7 +291,7 @@ sqshfuse_readdir(
 	}
 
 out:
-	sqsh_directory_iterator_cleanup(&iter);
+	sqsh_directory_iterator_free(iter);
 	sqsh_inode_cleanup(&inode);
 	return rv;
 }

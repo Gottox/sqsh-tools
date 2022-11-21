@@ -114,7 +114,7 @@ extract_directory(
 		const struct PathStack *path_stack) {
 	int rv;
 	char cwd[PATH_MAX] = {0};
-	struct SqshDirectoryIterator iter = {0};
+	struct SqshDirectoryIterator *iter = NULL;
 	uint16_t mode = sqsh_inode_permission(inode);
 
 	if (getcwd(cwd, sizeof(cwd)) == NULL) {
@@ -132,14 +132,14 @@ extract_directory(
 		goto out;
 	}
 
-	rv = sqsh_directory_iterator_init(&iter, inode);
+	iter = sqsh_directory_iterator_new(inode, &rv);
 	if (rv < 0) {
-		print_err(rv, "sqsh_directory_iterator_init", path_stack);
+		print_err(rv, "sqsh_directory_iterator_new", path_stack);
 		goto out;
 	}
 
-	while (sqsh_directory_iterator_next(&iter) > 0) {
-		rv = extract_directory_entry(&iter, path_stack);
+	while (sqsh_directory_iterator_next(iter) > 0) {
+		rv = extract_directory_entry(iter, path_stack);
 		// Don't stop on error, but continue with next entry.
 		/*if (rv < 0) {
 			goto out;
@@ -152,7 +152,7 @@ extract_directory(
 		goto out;
 	}
 out:
-	sqsh_directory_iterator_cleanup(&iter);
+	sqsh_directory_iterator_free(iter);
 	return rv;
 }
 

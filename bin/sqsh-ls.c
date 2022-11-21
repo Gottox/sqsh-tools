@@ -193,18 +193,18 @@ out:
 
 static int
 ls(struct Sqsh *sqsh, const char *path, struct SqshInodeContext *inode) {
-	int rv;
-	struct SqshDirectoryIterator iter = {0};
+	int rv = 0;
+	struct SqshDirectoryIterator *iter = NULL;
 
-	rv = sqsh_directory_iterator_init(&iter, inode);
+	iter = sqsh_directory_iterator_new(inode, &rv);
 	if (rv < 0) {
-		sqsh_perror(rv, "sqsh_directory_iterator_init");
+		sqsh_perror(rv, "sqsh_directory_iterator_new");
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	while (sqsh_directory_iterator_next(&iter) > 0) {
-		rv = ls_item(sqsh, path, &iter);
+	while (sqsh_directory_iterator_next(iter) > 0) {
+		rv = ls_item(sqsh, path, iter);
 		if (rv < 0) {
 			rv = EXIT_FAILURE;
 			goto out;
@@ -212,7 +212,7 @@ ls(struct Sqsh *sqsh, const char *path, struct SqshInodeContext *inode) {
 	}
 
 out:
-	sqsh_directory_iterator_cleanup(&iter);
+	sqsh_directory_iterator_free(iter);
 
 	return rv;
 }
