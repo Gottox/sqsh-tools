@@ -336,3 +336,10 @@ sqsh_xattr_iterator_cleanup(struct SqshXattrIterator *iterator) {
 	sqsh_metablock_stream_cleanup(&iterator->metablock);
 	return 0;
 }
+
+int
+sqsh_xattr_iterator_free(struct SqshXattrIterator *iterator) {
+	int rv = sqsh_xattr_iterator_cleanup(iterator);
+	free(iterator);
+	return rv;
+}
