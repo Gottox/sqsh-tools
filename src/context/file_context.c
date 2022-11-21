@@ -192,10 +192,11 @@ sqsh_file_size(struct SqshFileContext *context) {
 	size_t offset = context->seek_pos % block_size;
 	size_t buffer_size = sqsh_buffer_size(&context->buffer);
 
-	if (buffer_size < offset)
+	if (buffer_size < offset) {
 		return 0;
-	else
+	} else {
 		return buffer_size - offset;
+	}
 }
 
 int
