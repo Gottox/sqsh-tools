@@ -215,6 +215,16 @@ SQSH_NO_UNUSED int
 sqsh_file_init(struct SqshFileContext *context, struct SqshInodeContext *inode);
 
 /**
+ * @brief Initializes a SqshFileContext struct.
+ * @memberof SqshFileContext
+ * @param inode The inode context to retrieve the file contents from.
+ * @param err Pointer to set to an error code on error.
+ * @return The Initialized file context
+ */
+SQSH_NO_UNUSED
+struct SqshFileContext *sqsh_file_new(struct SqshInodeContext *inode, int *err);
+
+/**
  * @brief Seek to a position in the file content.
  * @memberof SqshFileContext
  * @param context The file context to seek in. If the context buffer
@@ -257,6 +267,13 @@ uint64_t sqsh_file_size(struct SqshFileContext *context);
  * @param context The file context to clean up.
  */
 int sqsh_file_cleanup(struct SqshFileContext *context);
+
+/**
+ * @brief Frees the resources used by the file context.
+ * @memberof SqshFileContext
+ * @param context The file context to free.
+ */
+int sqsh_file_free(struct SqshFileContext *context);
 
 // context/metablock_stream_context.c
 

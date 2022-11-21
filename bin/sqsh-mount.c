@@ -323,7 +323,7 @@ sqshfuse_read(
 	(void)fi;
 	int rv = 0;
 	struct SqshInodeContext inode = {0};
-	struct SqshFileContext file = {0};
+	struct SqshFileContext *file = NULL;
 
 	rv = sqsh_inode_init_by_path(&inode, data.sqsh, path);
 	if (rv < 0) {
@@ -331,7 +331,7 @@ sqshfuse_read(
 		rv = -EINVAL;
 		goto out;
 	}
-	rv = sqsh_file_init(&file, &inode);
+	file = sqsh_file_new(&inode, &rv);
 	if (rv < 0) {
 		// TODO: Better return type
 		rv = -EINVAL;
@@ -339,13 +339,13 @@ sqshfuse_read(
 	}
 
 	size = SQSH_MIN(size, sqsh_inode_file_size(&inode));
-	rv = sqsh_file_seek(&file, offset);
+	rv = sqsh_file_seek(file, offset);
 	if (rv < 0) {
 		// TODO: Better return type
 		rv = -EINVAL;
 		goto out;
 	}
-	rv = sqsh_file_read(&file, size);
+	rv = sqsh_file_read(file, size);
 	if (rv < 0) {
 		// TODO: Better return type
 		rv = -EINVAL;
@@ -353,12 +353,12 @@ sqshfuse_read(
 	}
 
 	if (size != 0) {
-		memcpy(buf, sqsh_file_data(&file), size);
+		memcpy(buf, sqsh_file_data(file), size);
 	}
 
 	rv = size;
 out:
-	sqsh_file_cleanup(&file);
+	sqsh_file_free(file);
 	sqsh_inode_cleanup(&inode);
 	return rv;
 }

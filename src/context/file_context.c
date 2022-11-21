@@ -86,6 +86,20 @@ sqsh_file_init(
 	return sqsh_file_seek(context, 0);
 }
 
+struct SqshFileContext *
+sqsh_file_new(struct SqshInodeContext *inode, int *err) {
+	struct SqshFileContext *context = calloc(1, sizeof(struct SqshFileContext));
+	if (context == NULL) {
+		return NULL;
+	}
+	*err = sqsh_file_init(context, inode);
+	if (*err < 0) {
+		free(context);
+		return NULL;
+	}
+	return context;
+}
+
 int
 sqsh_file_seek(struct SqshFileContext *context, uint64_t seek_pos) {
 	if (seek_pos > sqsh_inode_file_size(context->inode)) {
@@ -204,4 +218,11 @@ sqsh_file_cleanup(struct SqshFileContext *context) {
 	sqsh_buffer_cleanup(&context->buffer);
 
 	return 0;
+}
+
+int
+sqsh_file_free(struct SqshFileContext *context) {
+	int rv = sqsh_file_cleanup(context);
+	free(context);
+	return rv;
 }

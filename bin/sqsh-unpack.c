@@ -162,16 +162,16 @@ extract_file(
 		const struct PathStack *path_stack) {
 	int rv = 0;
 	FILE *file = NULL;
-	struct SqshFileContext content = {0};
+	struct SqshFileContext *content;
 	uint16_t mode = sqsh_inode_permission(inode);
 
-	rv = sqsh_file_init(&content, inode);
+	content = sqsh_file_new(inode, &rv);
 	if (rv < 0) {
-		print_err(rv, "sqsh_file_init", path_stack);
+		print_err(rv, "sqsh_file_new", path_stack);
 		goto out;
 	}
 
-	rv = sqsh_file_read(&content, sqsh_inode_file_size(inode));
+	rv = sqsh_file_read(content, sqsh_inode_file_size(inode));
 	if (rv < 0) {
 		print_err(rv, "sqsh_file_read", path_stack);
 		goto out;
@@ -182,7 +182,7 @@ extract_file(
 		print_err(rv = -errno, "fopen", path_stack);
 		goto out;
 	}
-	fwrite(sqsh_file_data(&content), sizeof(uint8_t), sqsh_file_size(&content),
+	fwrite(sqsh_file_data(content), sizeof(uint8_t), sqsh_file_size(content),
 		   file);
 	fclose(file);
 	rv = chmod(filename, mode);
@@ -191,7 +191,7 @@ extract_file(
 		goto out;
 	}
 out:
-	sqsh_file_cleanup(&content);
+	sqsh_file_free(content);
 	return rv;
 }
 
