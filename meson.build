@@ -138,24 +138,26 @@ if get_option('default_library') == 'both'
 	libsqsh = libsqsh.get_static_lib()
 endif
 
-foreach p : [ 'sqsh-cat', 'sqsh-ls', 'sqsh-stat', 'sqsh-xattr', 'sqsh-unpack' ]
-	executable(p, 'bin/'+p+'.c',
-		install: not meson.is_subproject(),
-		c_args : build_args,
-		include_directories : 'include',
-		link_with : libsqsh
-	)
-endforeach
+if get_option('tools')
+	foreach p : [ 'sqsh-cat', 'sqsh-ls', 'sqsh-stat', 'sqsh-xattr', 'sqsh-unpack' ]
+		executable(p, 'bin/'+p+'.c',
+			install: not meson.is_subproject(),
+			c_args : build_args,
+			include_directories : 'include',
+			link_with : libsqsh
+		)
+	endforeach
 
-if get_option('fuse')
-	executable('sqsh-mount',
-		'bin/sqsh-mount.c',
-		install: not meson.is_subproject(),
-		c_args : build_args,
-		dependencies: dependency('fuse3'),
-		include_directories : 'include',
-		link_with : libsqsh
-	)
+	if get_option('fuse')
+		executable('sqsh-mount',
+			'bin/sqsh-mount.c',
+			install: not meson.is_subproject(),
+			c_args : build_args,
+			dependencies: dependency('fuse3'),
+			include_directories : 'include',
+			link_with : libsqsh
+		)
+	endif
 endif
 
 if get_option('test')
