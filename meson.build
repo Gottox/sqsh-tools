@@ -192,4 +192,26 @@ if get_option('test')
 	endforeach
 endif
 
+libsqsh_dep = declare_dependency(
+  link_with : libsqsh,
+  include_directories : 'include',
+  dependencies : [ libsqsh_deps ],
+)
+
+install_headers(
+  sqsh_hdr,
+  subdir: 'libsqsh'
+)
+
+pkg_mod = import('pkgconfig')
+pkg_mod.generate(
+  libsqsh,
+  name : 'libsqsh',
+  filebase : 'libsqsh',
+  description : 'A library to access squashfs archives',
+  subdirs : 'libsqsh',
+  libraries : libsqsh,
+  version : meson.project_version(),
+)
+
 subdir('doc')
