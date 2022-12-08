@@ -18,3 +18,5 @@ option('doc',   type : 'boolean', value : false,
 	description: 'Generate documentation.')
 option('tools', type : 'boolean', value : true,
 	description: 'Build libsqsh tools.')
+option('fuzzer', type : 'boolean', value : false,
+	description: 'Build fuzzers.')

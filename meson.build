@@ -194,6 +194,18 @@ if get_option('test')
 	endforeach
 endif
 
+if get_option('fuzzer')
+	executable(
+		'simple_fuzzer',
+			[ 'fuzzer/simple.c' ],
+			install : false,
+			include_directories : 'include',
+			c_args : build_args + [ '-fsanitize=fuzzer' ],
+			link_args : '-fsanitize=fuzzer',
+			link_with : libsqsh
+		)
+endif
+
 libsqsh_dep = declare_dependency(
   link_with : libsqsh,
   include_directories : 'include',

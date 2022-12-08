@@ -5,29 +5,26 @@
  * Distributed under terms of the MIT license.
  */
 
-#include "../src/context/content_context.h"
-#include "../src/context/directory_context.h"
-#include "../src/context/inode_context.h"
-#include "../src/context/superblock_context.h"
-#include "../src/sqsh.h"
-#include <stdint.h>
+#include <sqsh_context.h>
+#include <sqsh_iterator.h>
+#include <sqsh_private.h>
 
 static int
 read_file(struct SqshInodeContext *inode) {
 	struct SqshFileContext file = {0};
 	int rv;
-	rv = sqsh_content_init(&file, inode);
+	rv = sqsh_file_init(&file, inode);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = sqsh_content_read(&file, sqsh_inode_file_size(inode));
+	rv = sqsh_file_read(&file, sqsh_inode_file_size(inode));
 	if (rv < 0) {
 		goto out;
 	}
 
 out:
-	sqsh_content_cleanup(&file);
+	sqsh_file_cleanup(&file);
 	// noop
 	return 0;
 }
@@ -36,25 +33,23 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 	int rv = 0;
 	struct Sqsh sqsh = {0};
 	struct SqshInodeContext inode = {0};
-	struct SqshDirectoryContext dir = {0};
 	struct SqshDirectoryIterator iter = {0};
-	rv = sqsh_init(&sqsh, (uint8_t *)data, size);
+	rv = sqsh_init(
+			&sqsh, (uint8_t *)data,
+			&(struct SqshConfig){
+					.source_type = SQSH_SOURCE_TYPE_MEMORY,
+					.source_size = size,
+			});
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = sqsh_inode_load(
-			&inode, &sqsh.superblock,
-			sqsh_superblock_inode_root_ref(&sqsh.superblock));
+	rv = sqsh_inode_init_root(&inode, &sqsh);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = sqsh_directory_init(&dir, &sqsh.superblock, &inode);
-	if (rv < 0) {
-		goto out;
-	}
-	rv = sqsh_directory_iterator_init(&iter, &dir);
+	rv = sqsh_directory_iterator_init(&iter, &inode);
 	if (rv < 0) {
 		goto out;
 	}
@@ -66,7 +61,6 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 out:
 
 	sqsh_directory_iterator_cleanup(&iter);
-	sqsh_directory_cleanup(&dir);
 	sqsh_inode_cleanup(&inode);
 	sqsh_cleanup(&sqsh);
 

@@ -7,9 +7,9 @@
 NINJA_TARGETS := test benchmark install dist scan-build clang-format uninstall \
 	all tidy doc coverage-html
 
-MESON_FLAGS = -Dtest=true -Ddoc=true -Db_coverage=true
+MESON_FLAGS = -Dtest=true -Ddoc=true -Db_coverage=true -Dfuzzer=true
 
-SANATIZE = 1
+SANATIZE = 0
 
 ifeq ($(PODMAN), 1)
 	W = podman run --rm -ti -v .:/host gottox/sqsh-build
@@ -32,7 +32,7 @@ $(NINJA_TARGETS): $(BUILD_DIR)
 
 $(BUILD_DIR): meson.build Makefile
 	[ -d "$@" ] && rm -r "$@" || true
-	$W meson setup "$@" $(MESON_FLAGS)
+	$W CC=clang meson setup "$@" $(MESON_FLAGS)
 
 .PHONY: clean
 
