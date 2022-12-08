@@ -49,9 +49,7 @@ enum SqshSourceType {
 	SQSH_SOURCE_TYPE_PATH,
 	SQSH_SOURCE_TYPE_FD,
 	SQSH_SOURCE_TYPE_MEMORY,
-#	ifdef CONFIG_CURL
 	SQSH_SOURCE_TYPE_CURL,
-#	endif
 };
 /**
  * @brief The SqshConfig struct contains all the configuration options for

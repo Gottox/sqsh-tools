@@ -72,9 +72,7 @@ struct SqshCurlMap {
 	uint64_t file_time;
 };
 
-#ifdef CONFIG_CURL
 extern struct SqshMemoryMapperImpl sqsh_mapper_impl_curl;
-#endif
 
 // mapper/mmap_full_mapper.c
 
