@@ -142,7 +142,6 @@ sqsh_init(
 
 out:
 	if (rv < 0) {
-		sqsh_mapper_cleanup(&sqsh->mapper);
 		sqsh_cleanup(sqsh);
 	}
 	return rv;
