@@ -68,6 +68,7 @@ struct Sqsh;
 
 /**
  * @brief sqsh_new initializes a sqsh context in heap.
+ * @memberof Sqsh
  * @param source the source to retrieve the archive from
  * @param config the configuration for the sqsh context.
  * @param err the error pointer.
