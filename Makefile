@@ -7,7 +7,7 @@
 NINJA_TARGETS := test benchmark install dist scan-build clang-format uninstall \
 	all tidy doc coverage-html
 
-MESON_FLAGS = -Dtest=true -Ddoc=true -Db_coverage=true -Dfuzzer=true
+MESON_FLAGS = -Dtest=true -Ddoc=internal -Db_coverage=true -Dfuzzer=true
 
 SANATIZE = 0
 

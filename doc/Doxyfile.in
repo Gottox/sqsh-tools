@@ -13,6 +13,7 @@ HAVE_DOT              = YES
 DOT_IMAGE_FORMAT      = svg
 INTERACTIVE_SVG       = YES
 FULL_PATH_NAMES       = NO
+INTERNAL_DOCS         = @DOXYGEN_INTERNAL_DOCS@
 
 # Warning and progress messages
 QUIET                = YES
@@ -30,6 +31,7 @@ FILE_PATTERNS = *.h README.md
 EXCLUDE_PATTERNS = *_internal.h
 RECURSIVE     = YES
 USE_MDFILE_AS_MAINPAGE = README.md
+EXCLUDE_SYMBOLS         = SQSH_*_H SQSH_H
 
 
 # Output files

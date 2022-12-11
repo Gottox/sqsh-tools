@@ -14,7 +14,8 @@ option('fuse',  type : 'boolean',
 	description: 'Support FUSE filesystem.')
 option('test',  type : 'boolean', value : false,
 	description: 'Run tests.')
-option('doc',   type : 'boolean', value : false,
+option('doc',   type : 'combo', choices: ['true', 'false', 'internal'],
+	value : 'false',
 	description: 'Generate documentation.')
 option('tools', type : 'boolean', value : true,
 	description: 'Build libsqsh tools.')
