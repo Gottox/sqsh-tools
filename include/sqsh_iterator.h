@@ -31,12 +31,15 @@
  * @file         sqsh_iterator.h
  */
 
+#ifndef SQSH_ITERATOR_H
+#define SQSH_ITERATOR_H
+
 #include "sqsh_common.h"
 #include "sqsh_context.h"
 
-#ifndef SQSH_ITERATOR_H
-
-#	define SQSH_ITERATOR_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // iterator/directory_index_iterator.c
 
@@ -159,4 +162,7 @@ uint16_t sqsh_xattr_iterator_value_size(struct SqshXattrIterator *iterator);
 int sqsh_xattr_iterator_cleanup(struct SqshXattrIterator *iterator);
 int sqsh_xattr_iterator_free(struct SqshXattrIterator *iterator);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* end of include guard SQSH_ITERATOR_H */

@@ -43,8 +43,11 @@
 #include <stdlib.h>
 
 #ifndef SQSH_PRIVATE_H
-
 #	define SQSH_PRIVATE_H
+
+#	ifdef __cplusplus
+extern "C" {
+#	endif
 
 /**
  * @brief The Sqsh struct contains all information about the current
@@ -91,4 +94,7 @@ SQSH_NO_UNUSED int sqsh__init(
  */
 int sqsh__cleanup(struct Sqsh *sqsh);
 
+#	ifdef __cplusplus
+}
+#	endif
 #endif /* end of include guard SQSH_PRIVATE_H */

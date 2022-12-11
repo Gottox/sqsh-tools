@@ -33,10 +33,13 @@
  */
 
 #ifndef SQSH_ERROR_H
-
 #define SQSH_ERROR_H
 
 #include "sqsh_common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define SQSH_ERROR_SECTION (1 << 8)
 enum SqshError {
@@ -88,4 +91,7 @@ void sqsh_perror(int error_code, const char *msg);
 
 SQSH_NO_UNUSED const char *sqsh_error_str(int errorcode);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* end of include guard SQSH_ERROR_H */

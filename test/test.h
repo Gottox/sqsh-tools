@@ -39,7 +39,9 @@
 #	define _NDEBUG
 #endif
 
-#define _GNU_SOURCE
+#ifndef _GNU_SOURCE
+#	define _GNU_SOURCE
+#endif
 
 #include <assert.h>
 #include <libgen.h>
@@ -52,25 +54,25 @@
 #include <time.h>
 #include <unistd.h>
 
-static char _progname[PATH_MAX] = {0};
-static char *_current = NULL;
-static char *_color_bad = "";
-static char *_color_status = "";
-static char *_color_good = "";
-static char *_color_reset = "";
+static char T_progname[PATH_MAX] = {0};
+static const char *T_current = NULL;
+static const char *T_color_bad = "";
+static const char *T_color_status = "";
+static const char *T_color_good = "";
+static const char *T_color_reset = "";
 
-static int _test_def();
+static int T_test_def(const char *needle);
 
 int
 main(int argc, char **argv) {
 	if (isatty(STDERR_FILENO)) {
-		_color_bad = "\x1b[31;1m";
-		_color_status = "\x1b[33m";
-		_color_good = "\x1b[32;1m";
-		_color_reset = "\x1b[0m";
+		T_color_bad = "\x1b[31;1m";
+		T_color_status = "\x1b[33m";
+		T_color_good = "\x1b[32;1m";
+		T_color_reset = "\x1b[0m";
 	}
-	strcpy(_progname, argv[0]);
-	return _test_def(argc < 2 ? NULL : argv[1]);
+	strcpy(T_progname, argv[0]);
+	return T_test_def(argc < 2 ? NULL : argv[1]);
 }
 
 #ifdef _NDEBUG
@@ -95,27 +97,27 @@ main(int argc, char **argv) {
 #endif
 
 static void
-run_test(void (*func)(), char *name) {
+run_test(void (*func)(), const char *name) {
 	clock_t time = clock();
-	_current = name;
-	fprintf(stderr, "%s%s '%s'%s\n", _color_reset, _progname, name,
-			_color_status);
+	T_current = name;
+	fprintf(stderr, "%s%s '%s'%s\n", T_color_reset, T_progname, name,
+			T_color_status);
 	func();
-	fprintf(stderr, "%s finished in %lfms\n", _color_reset,
+	fprintf(stderr, "%s finished in %lfms\n", T_color_reset,
 			(double)(clock() - time) * 1000.0 / (double)CLOCKS_PER_SEC);
 }
 
-#define DEFINE static int _test_def(char *needle) {
+#define DEFINE static int T_test_def(const char *needle) {
 #define TEST(x) \
 	if (needle == NULL || strstr(#x, needle)) \
 	run_test(x, #x)
 #define TEST_OFF(x) \
 	(void)x; \
-	fprintf(stderr, "%s '%s'\n IGNORED\n", _progname, #x);
+	fprintf(stderr, "%s '%s'\n IGNORED\n", T_progname, #x);
 
 #define DEFINE_END \
-	fprintf(stderr, "%s%s is OK!%s\n\n", _color_good, _progname, \
-			_color_reset); \
+	fprintf(stderr, "%s%s is OK!%s\n\n", T_color_good, T_progname, \
+			T_color_reset); \
 	return 0; \
 	}
 

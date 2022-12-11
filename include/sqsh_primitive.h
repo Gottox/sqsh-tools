@@ -32,13 +32,16 @@
  */
 
 #ifndef SQSH_PRIMITIVE_H
-
 #define SQSH_PRIMITIVE_H
 
 #include "sqsh_common.h"
 
 #include <pthread.h>
 #include <stdbool.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // primitive/slice.c
 
@@ -317,4 +320,7 @@ sqsh_lru_hashmap_remove(struct SqshLruHashmap *hashmap, uint64_t hash);
  */
 int sqsh_lru_hashmap_cleanup(struct SqshLruHashmap *hashmap);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* end of include guard SQSH_PRIMITIVE_H */

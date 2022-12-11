@@ -32,11 +32,14 @@
  */
 
 #ifndef SQSH_CONTEXT_H
-
 #define SQSH_CONTEXT_H
 
 #include "sqsh_mapper.h"
 #include "sqsh_primitive.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct Sqsh;
 struct SqshXattrIterator;
@@ -777,4 +780,7 @@ const uint8_t *sqsh_trailing_data(struct SqshTrailingContext *context);
 
 int sqsh_trailing_cleanup(struct SqshTrailingContext *context);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* end of include guard SQSH_CONTEXT_H */

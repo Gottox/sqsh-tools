@@ -27,12 +27,15 @@
  ******************************************************************************/
 
 #ifndef SQSH_DATA_H
-
 #define SQSH_DATA_H
 
 #include "sqsh_common.h"
 #include <stdbool.h>
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // data/compression_options_data.c
 
@@ -375,4 +378,7 @@ uint32_t sqsh_data_xattr_id_table_xattr_ids(
 const uint64_t *
 sqsh_data_xattr_id_table(const struct SqshXattrIdTable *xattr_id_table);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* end of include guard SQSH_DATA_H */

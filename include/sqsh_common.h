@@ -33,11 +33,14 @@
  */
 
 #ifndef SQSH_COMMON_H
-
 #define SQSH_COMMON_H
 
 #include <stddef.h>
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define SQSH_MIN(a, b) (a < b ? a : b)
 #define SQSH_MAX(a, b) (a > b ? a : b)
@@ -60,4 +63,7 @@ typedef size_t sqsh_index_t;
 
 SQSH_NO_UNUSED void *sqsh_memdup(const void *source, size_t size);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* end of include guard SQSH_COMMON_H */

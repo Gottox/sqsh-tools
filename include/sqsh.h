@@ -31,6 +31,9 @@
  * @file         sqsh.h
  */
 
+#ifndef SQSH_H
+#define SQSH_H
+
 #include "sqsh_common.h"
 #include "sqsh_compression.h"
 #include "sqsh_context.h"
@@ -41,9 +44,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#ifndef SQSH_H
-
-#	define SQSH_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum SqshSourceType {
 	SQSH_SOURCE_TYPE_PATH,
@@ -168,4 +171,7 @@ int sqsh_compression_options(
  */
 int sqsh_free(struct Sqsh *sqsh);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* end of include guard SQSH_H */

@@ -32,10 +32,13 @@
  */
 
 #ifndef SQSH_DATA_PRIVATE_H
-
 #define SQSH_DATA_PRIVATE_H
 
 #include "sqsh_data.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // data/compression_options_internal.c
 
@@ -330,4 +333,7 @@ struct SQSH_UNALIGNED SqshXattrIdTable {
 SQSH_STATIC_ASSERT(
 		sizeof(struct SqshXattrIdTable) == SQSH_SIZEOF_XATTR_ID_TABLE);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* end of include guard SQSH_DATA_PRIVATE */

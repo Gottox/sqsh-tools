@@ -1,6 +1,6 @@
 project(
 	'libsqsh',
-	['c'],
+	['c', 'cpp'],
 	default_options : [
 		'c_std=c18',
 		'optimization=0',
@@ -66,6 +66,7 @@ sqsh_test = [
 	'test/integration.c',
 	'test/primitive/buffer.c',
 	'test/primitive/ref_count.c',
+	'test/cpp-test.cpp',
 ]
 
 libsqsh_deps = [ ]
@@ -183,6 +184,7 @@ if get_option('test')
 		command : ['utils/header_from_bin.sh','@INPUT@', '@OUTPUT@', '@PRIVATE_DIR@'],
 	)
 	foreach p : sqsh_test
+		message(p)
 		t = executable(p.underscorify(),
 			[ p, squashfs_h ],
 			install : false,

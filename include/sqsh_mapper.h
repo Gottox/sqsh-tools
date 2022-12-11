@@ -32,13 +32,16 @@
  */
 
 #ifndef SQSH_MAPPER_H
-
 #define SQSH_MAPPER_H
 
 #include "sqsh_primitive.h"
 #include <pthread.h>
 #include <stddef.h>
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // mapper/canary_mapper.c
 
@@ -169,4 +172,7 @@ int sqsh_mapping_resize(struct SqshMapping *mapping, size_t new_size);
 const uint8_t *sqsh_mapping_data(const struct SqshMapping *mapping);
 int sqsh_mapping_unmap(struct SqshMapping *mapping);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* end of include guard SQSH_MAPPER_H */

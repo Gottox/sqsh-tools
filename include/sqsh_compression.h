@@ -32,11 +32,14 @@
  */
 
 #ifndef SQSH_COMPRESSION_H
-
 #define SQSH_COMPRESSION_H
 
 #include <stddef.h>
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 union SqshCompressionOptions;
 struct SqshSuperblockContext;
@@ -61,4 +64,7 @@ int sqsh_compression_decompress_to_buffer(
 
 int sqsh_compression_cleanup(struct SqshCompression *compression);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* end of include guard SQSH_COMPRESSION_H */

@@ -32,10 +32,13 @@
  */
 
 #ifndef SQSH_TABLE_H
-
 #define SQSH_TABLE_H
 
 #include "sqsh_mapper.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct SqshInodeContext;
 
@@ -96,4 +99,7 @@ uint64_t sqsh_xattr_table_start(struct SqshXattrTable *table);
 
 int sqsh_xattr_table_cleanup(struct SqshXattrTable *context);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* end of include guard SQSH_TABLE_H */
