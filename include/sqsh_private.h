@@ -46,10 +46,14 @@
 
 #	define SQSH_PRIVATE_H
 
-struct SqshTrailingContext;
-
+/**
+ * @brief The Sqsh struct contains all information about the current
+ * sqsh session.
+ */
 struct Sqsh {
-	uint32_t error;
+	/**
+	 * @privatesection
+	 */
 	struct SqshMapper mapper;
 	struct SqshCompression data_compression;
 	struct SqshCompression metablock_compression;
@@ -64,5 +68,27 @@ struct Sqsh {
 	uint8_t initialized;
 	struct SqshConfig config;
 };
+
+/**
+ * @internal
+ * @brief sqsh__init initializes the Sqsh structure.
+ * @memberof Sqsh
+ * @param sqsh the Sqsh structure to initialize.
+ * @param source the source to retrieve the archive from
+ * @param config the configuration for the Sqsh session.
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int sqsh__init(
+		struct Sqsh *sqsh, const void *source, const struct SqshConfig *config);
+
+/**
+ * @internal
+ * @brief sqsh__cleanup frees all resources allocated by the Sqsh structure and
+ * cleans up the structure.
+ * @memberof Sqsh
+ * @param sqsh the Sqsh structure to cleanup.
+ * @return 0 on success, less than 0 on error.
+ */
+int sqsh__cleanup(struct Sqsh *sqsh);
 
 #endif /* end of include guard SQSH_PRIVATE_H */

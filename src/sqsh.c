@@ -55,7 +55,7 @@ sqsh_new(const void *source, const struct SqshConfig *config, int *err) {
 	if (sqsh == NULL) {
 		return NULL;
 	}
-	*err = sqsh_init(sqsh, source, config);
+	*err = sqsh__init(sqsh, source, config);
 	if (*err < 0) {
 		free(sqsh);
 		return NULL;
@@ -64,7 +64,7 @@ sqsh_new(const void *source, const struct SqshConfig *config, int *err) {
 }
 
 int
-sqsh_init(
+sqsh__init(
 		struct Sqsh *sqsh, const void *source,
 		const struct SqshConfig *config) {
 	int rv = 0;
@@ -142,7 +142,7 @@ sqsh_init(
 
 out:
 	if (rv < 0) {
-		sqsh_cleanup(sqsh);
+		sqsh__cleanup(sqsh);
 	}
 	return rv;
 }
@@ -266,7 +266,7 @@ sqsh_mapper(struct Sqsh *sqsh) {
 }
 
 int
-sqsh_cleanup(struct Sqsh *sqsh) {
+sqsh__cleanup(struct Sqsh *sqsh) {
 	int rv = 0;
 
 	if (is_initialized(sqsh, INITIALIZED_ID_TABLE)) {
@@ -294,7 +294,7 @@ sqsh_cleanup(struct Sqsh *sqsh) {
 
 int
 sqsh_free(struct Sqsh *sqsh) {
-	int rv = sqsh_cleanup(sqsh);
+	int rv = sqsh__cleanup(sqsh);
 	free(sqsh);
 	return rv;
 }

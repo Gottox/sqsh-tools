@@ -34,7 +34,7 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 	struct Sqsh sqsh = {0};
 	struct SqshInodeContext inode = {0};
 	struct SqshDirectoryIterator iter = {0};
-	rv = sqsh_init(
+	rv = sqsh__init(
 			&sqsh, (uint8_t *)data,
 			&(struct SqshConfig){
 					.source_type = SQSH_SOURCE_TYPE_MEMORY,
@@ -62,7 +62,7 @@ out:
 
 	sqsh_directory_iterator_cleanup(&iter);
 	sqsh_inode_cleanup(&inode);
-	sqsh_cleanup(&sqsh);
+	sqsh__cleanup(&sqsh);
 
 	return rv; // Non-zero return values are reserved for future use.
 }

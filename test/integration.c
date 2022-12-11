@@ -47,7 +47,7 @@ sqsh_empty() {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = 0,
 	};
-	rv = sqsh_init(&sqsh, NULL, &config);
+	rv = sqsh__init(&sqsh, NULL, &config);
 	assert(rv == -SQSH_ERROR_SUPERBLOCK_TOO_SMALL);
 }
 
@@ -61,13 +61,13 @@ sqsh_get_nonexistant() {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = sizeof(squash_image),
 	};
-	rv = sqsh_init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_by_path(&inode, &sqsh, "/nonexistant");
 	assert(rv < 0);
 
-	rv = sqsh_cleanup(&sqsh);
+	rv = sqsh__cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -82,7 +82,7 @@ sqsh_ls() {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = sizeof(squash_image),
 	};
-	rv = sqsh_init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_root(&inode, &sqsh);
@@ -122,7 +122,7 @@ sqsh_ls() {
 	rv = sqsh_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = sqsh_cleanup(&sqsh);
+	rv = sqsh__cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -138,7 +138,7 @@ sqsh_cat_fragment() {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = sizeof(squash_image),
 	};
-	rv = sqsh_init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_by_path(&inode, &sqsh, "a");
@@ -162,7 +162,7 @@ sqsh_cat_fragment() {
 	rv = sqsh_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = sqsh_cleanup(&sqsh);
+	rv = sqsh__cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -178,7 +178,7 @@ sqsh_cat_datablock_and_fragment() {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = sizeof(squash_image),
 	};
-	rv = sqsh_init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_by_path(&inode, &sqsh, "b");
@@ -205,7 +205,7 @@ sqsh_cat_datablock_and_fragment() {
 	rv = sqsh_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = sqsh_cleanup(&sqsh);
+	rv = sqsh__cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -221,7 +221,7 @@ sqsh_cat_size_overflow() {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = sizeof(squash_image),
 	};
-	rv = sqsh_init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_by_path(&inode, &sqsh, "b");
@@ -248,7 +248,7 @@ sqsh_cat_size_overflow() {
 	rv = sqsh_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = sqsh_cleanup(&sqsh);
+	rv = sqsh__cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -262,7 +262,7 @@ sqsh_test_uid_and_gid() {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = sizeof(squash_image),
 	};
-	rv = sqsh_init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_root(&inode, &sqsh);
@@ -276,7 +276,7 @@ sqsh_test_uid_and_gid() {
 	rv = sqsh_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = sqsh_cleanup(&sqsh);
+	rv = sqsh__cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -289,7 +289,7 @@ sqsh_test_extended_dir() {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = sizeof(squash_image),
 	};
-	rv = sqsh_init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_by_path(&inode, &sqsh, "/large_dir/999");
@@ -298,7 +298,7 @@ sqsh_test_extended_dir() {
 	rv = sqsh_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = sqsh_cleanup(&sqsh);
+	rv = sqsh__cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -316,7 +316,7 @@ sqsh_test_xattr() {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = sizeof(squash_image),
 	};
-	rv = sqsh_init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_root(&inode, &sqsh);
@@ -394,7 +394,7 @@ sqsh_test_xattr() {
 	rv = sqsh_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = sqsh_cleanup(&sqsh);
+	rv = sqsh__cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -427,7 +427,7 @@ fuzz_crash_1() {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = sizeof(input),
 	};
-	rv = sqsh_init(&sqsh, input, &config);
+	rv = sqsh__init(&sqsh, input, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_by_path(&inode, &sqsh, "");
@@ -436,7 +436,7 @@ fuzz_crash_1() {
 	rv = sqsh_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = sqsh_cleanup(&sqsh);
+	rv = sqsh__cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -462,7 +462,7 @@ fuzz_crash_2() {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = sizeof(input),
 	};
-	rv = sqsh_init(&sqsh, input, &config);
+	rv = sqsh__init(&sqsh, input, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_by_path(&inode, &sqsh, "");
@@ -471,7 +471,7 @@ fuzz_crash_2() {
 	rv = sqsh_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = sqsh_cleanup(&sqsh);
+	rv = sqsh__cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -498,7 +498,7 @@ fuzz_crash_3() {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = sizeof(input),
 	};
-	rv = sqsh_init(&sqsh, input, &config);
+	rv = sqsh__init(&sqsh, input, &config);
 	assert(rv == 0);
 
 	rv = sqsh_inode_init_by_path(&inode, &sqsh, "");
@@ -507,7 +507,7 @@ fuzz_crash_3() {
 	rv = sqsh_inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = sqsh_cleanup(&sqsh);
+	rv = sqsh__cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -545,11 +545,11 @@ fuzz_crash_4() {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = sizeof(input),
 	};
-	rv = sqsh_init(&sqsh, input, &config);
+	rv = sqsh__init(&sqsh, input, &config);
 	assert(rv == 0);
 	rv = sqsh_id_table(&sqsh, &id_table);
 	assert(rv == -SQSH_ERROR_SIZE_MISSMATCH);
-	sqsh_cleanup(&sqsh);
+	sqsh__cleanup(&sqsh);
 }
 
 static void
@@ -586,11 +586,11 @@ fuzz_crash_5() {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = sizeof(input),
 	};
-	rv = sqsh_init(&sqsh, input, &config);
+	rv = sqsh__init(&sqsh, input, &config);
 	assert(rv == 0);
 	rv = sqsh_id_table(&sqsh, &id_table);
 	assert(rv == -SQSH_ERROR_SIZE_MISSMATCH);
-	sqsh_cleanup(&sqsh);
+	sqsh__cleanup(&sqsh);
 }
 
 static void
@@ -613,11 +613,11 @@ fuzz_crash_6() {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = sizeof(input),
 	};
-	rv = sqsh_init(&sqsh, input, &config);
+	rv = sqsh__init(&sqsh, input, &config);
 	assert(rv == 0);
 	rv = sqsh_id_table(&sqsh, &id_table);
 	assert(rv == -SQSH_ERROR_SIZE_MISSMATCH);
-	sqsh_cleanup(&sqsh);
+	sqsh__cleanup(&sqsh);
 }
 
 static void
@@ -641,11 +641,11 @@ fuzz_crash_7() {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = sizeof(input),
 	};
-	rv = sqsh_init(&sqsh, input, &config);
+	rv = sqsh__init(&sqsh, input, &config);
 	assert(rv == 0);
 	rv = sqsh_id_table(&sqsh, &id_table);
 	assert(rv == -SQSH_ERROR_SIZE_MISSMATCH);
-	sqsh_cleanup(&sqsh);
+	sqsh__cleanup(&sqsh);
 }
 
 static void
@@ -669,9 +669,9 @@ fuzz_crash_8() {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = sizeof(input),
 	};
-	rv = sqsh_init(&sqsh, input, &config);
+	rv = sqsh__init(&sqsh, input, &config);
 	assert(rv != 0);
-	sqsh_cleanup(&sqsh);
+	sqsh__cleanup(&sqsh);
 }
 
 DEFINE

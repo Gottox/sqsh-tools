@@ -244,8 +244,6 @@ int sqsh_ref_count_release(
 
 // primitive/lru_hashmap.c
 
-typedef int (*SqshLruHashmapDtor)(void *);
-
 struct SqshLruEntry {
 	struct SqshRefCount *pointer;
 	struct SqshLruEntry *newer;

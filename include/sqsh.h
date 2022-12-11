@@ -60,10 +60,6 @@ struct SqshConfig {
 	size_t source_size;
 };
 
-/**
- * @brief The SqshContext struct contains all information about the current
- * sqsh session.
- */
 struct Sqsh;
 
 /**
@@ -76,17 +72,6 @@ struct Sqsh;
  */
 SQSH_NO_UNUSED struct Sqsh *
 sqsh_new(const void *source, const struct SqshConfig *config, int *err);
-
-/**
- * @brief sqsh_init initializes the Sqsh structure.
- * @memberof Sqsh
- * @param sqsh the Sqsh structure to initialize.
- * @param source the source to retrieve the archive from
- * @param config the configuration for the Sqsh session.
- * @return 0 on success, less than 0 on error.
- */
-SQSH_NO_UNUSED int sqsh_init(
-		struct Sqsh *sqsh, const void *source, const struct SqshConfig *config);
 
 /**
  * @brief sqsh_superblock returns the superblock context.
@@ -174,15 +159,6 @@ int sqsh_xattr_table(struct Sqsh *sqsh, struct SqshXattrTable **xattr_table);
 int sqsh_compression_options(
 		struct Sqsh *sqsh,
 		struct SqshCompressionOptionsContext **compression_options);
-
-/**
- * @brief sqsh_cleanup frees all resources allocated by the Sqsh structure and
- * cleans up the structure.
- * @memberof Sqsh
- * @param sqsh the Sqsh structure to cleanup.
- * @return 0 on success, less than 0 on error.
- */
-int sqsh_cleanup(struct Sqsh *sqsh);
 
 /**
  * @brief sqsh_free frees up a heap allocated Sqsh structure.
