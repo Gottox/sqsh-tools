@@ -38,7 +38,7 @@
 #include <sqsh_primitive.h>
 
 static void
-init_buffer() {
+init_buffer(void) {
 	int rv;
 	struct SqshBuffer buffer = {0};
 
@@ -49,7 +49,7 @@ init_buffer() {
 }
 
 static void
-append_to_buffer() {
+append_to_buffer(void) {
 	int rv;
 	struct SqshBuffer buffer = {0};
 

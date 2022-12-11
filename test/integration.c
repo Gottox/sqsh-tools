@@ -40,7 +40,7 @@
 #include <stdint.h>
 
 static void
-sqsh_empty() {
+sqsh_empty(void) {
 	int rv;
 	struct Sqsh sqsh = {0};
 	const struct SqshConfig config = {
@@ -52,7 +52,7 @@ sqsh_empty() {
 }
 
 static void
-sqsh_get_nonexistant() {
+sqsh_get_nonexistant(void) {
 	int rv;
 	struct SqshInodeContext inode = {0};
 	struct Sqsh sqsh = {0};
@@ -72,7 +72,7 @@ sqsh_get_nonexistant() {
 }
 
 static void
-sqsh_ls() {
+sqsh_ls(void) {
 	int rv;
 	char *name;
 	struct SqshInodeContext inode = {0};
@@ -127,7 +127,7 @@ sqsh_ls() {
 }
 
 static void
-sqsh_cat_fragment() {
+sqsh_cat_fragment(void) {
 	int rv;
 	const uint8_t *data;
 	size_t size;
@@ -167,7 +167,7 @@ sqsh_cat_fragment() {
 }
 
 static void
-sqsh_cat_datablock_and_fragment() {
+sqsh_cat_datablock_and_fragment(void) {
 	int rv;
 	const uint8_t *data;
 	size_t size;
@@ -210,7 +210,7 @@ sqsh_cat_datablock_and_fragment() {
 }
 
 static void
-sqsh_cat_size_overflow() {
+sqsh_cat_size_overflow(void) {
 	int rv;
 	const uint8_t *data;
 	size_t size;
@@ -253,7 +253,7 @@ sqsh_cat_size_overflow() {
 }
 
 static void
-sqsh_test_uid_and_gid() {
+sqsh_test_uid_and_gid(void) {
 	int rv;
 	uint32_t uid, gid;
 	struct SqshInodeContext inode = {0};
@@ -281,7 +281,7 @@ sqsh_test_uid_and_gid() {
 }
 
 static void
-sqsh_test_extended_dir() {
+sqsh_test_extended_dir(void) {
 	int rv;
 	struct SqshInodeContext inode = {0};
 	struct Sqsh sqsh = {0};
@@ -303,7 +303,7 @@ sqsh_test_extended_dir() {
 }
 
 static void
-sqsh_test_xattr() {
+sqsh_test_xattr(void) {
 	const char *expected_value = "1234567891234567891234567890001234567890";
 	int rv;
 	char *name, *value;
@@ -399,7 +399,7 @@ sqsh_test_xattr() {
 }
 
 static void
-fuzz_crash_1() {
+fuzz_crash_1(void) {
 	int rv;
 	static const uint8_t input[] = {
 			0x68, 0x73, 0x71, 0x73, 0x3,  0x0,  0x0,  0x0,  0x96, 0x97, 0x0,
@@ -441,7 +441,7 @@ fuzz_crash_1() {
 }
 
 static void
-fuzz_crash_2() {
+fuzz_crash_2(void) {
 	int rv;
 	static const uint8_t input[] = {
 			0x68, 0x73, 0x71, 0x73, 0x23, 0x0,  0x0,  0x0,  0x96, 0x97, 0x68,
@@ -476,7 +476,7 @@ fuzz_crash_2() {
 }
 
 static void
-fuzz_crash_3() {
+fuzz_crash_3(void) {
 	int rv;
 	static const uint8_t input[] = {
 			0x68, 0x73, 0x71, 0x73, 0x23, 0x0, 0x0,  0x0,  0x96, 0x97, 0x68,
@@ -512,7 +512,7 @@ fuzz_crash_3() {
 }
 
 static void
-fuzz_crash_4() {
+fuzz_crash_4(void) {
 	int rv;
 	static const uint8_t input[] = {
 			0x68, 0x73, 0x71, 0x73, 0xa,  0xf8, 0x0,  0x0,  0x0,  0x0,  0xb1,
@@ -553,7 +553,7 @@ fuzz_crash_4() {
 }
 
 static void
-fuzz_crash_5() {
+fuzz_crash_5(void) {
 	int rv;
 	static const uint8_t input[] = {
 			0x68, 0x73, 0x71, 0x73, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0xb1,
@@ -594,7 +594,7 @@ fuzz_crash_5() {
 }
 
 static void
-fuzz_crash_6() {
+fuzz_crash_6(void) {
 	int rv;
 	static const uint8_t input[] = {
 			0x68, 0x73, 0x71, 0x73, 0x0,  0x0, 0x0, 0x0, 0x80, 0x0,  0x0, 0x1,
@@ -621,7 +621,7 @@ fuzz_crash_6() {
 }
 
 static void
-fuzz_crash_7() {
+fuzz_crash_7(void) {
 	int rv;
 	static const uint8_t input[] = {
 			0x68, 0x73, 0x71, 0x73, 0x97, 0x97, 0x97, 0x97, 0x97, 0x97, 0x0,
@@ -649,7 +649,7 @@ fuzz_crash_7() {
 }
 
 static void
-fuzz_crash_8() {
+fuzz_crash_8(void) {
 	int rv;
 	static const uint8_t input[] = {
 			0xa, 0x0, 0x0,  0x0,  0x0,  0x0,  0x0, 0x0,  0x0, 0x0, 0x0,

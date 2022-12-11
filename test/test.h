@@ -97,7 +97,7 @@ main(int argc, char **argv) {
 #endif
 
 static void
-run_test(void (*func)(), const char *name) {
+run_test(void (*func)(void), const char *name) {
 	clock_t time = clock();
 	T_current = name;
 	fprintf(stderr, "%s%s '%s'%s\n", T_color_reset, T_progname, name,
