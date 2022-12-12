@@ -27,12 +27,19 @@ jobs:
     strategy:
       matrix:
         cc: [gcc, clang]
-        curl: [true, false]
-        zlib: [true, false]
-        lz4: [true, false]
-        lzma: [true, false]
-        lzo2: [true, false]
-        zstd: [true, false]
+        include:
+        - curl: true
+          zlib: true
+          lz4: true
+          lzma: true
+          lzo2: true
+          zstd: true
+        - curl: false
+          zlib: false
+          lz4: false
+          lzma: false
+          lzo2: false
+          zstd: false
     steps:
     - uses: actions/checkout@v3
     - name: configure
