@@ -27,18 +27,23 @@ jobs:
     strategy:
       matrix:
         cc: [gcc, clang]
-        all_features: [true, false]
+        curl: [true, false]
+        zlib: [true, false]
+        lz4: [true, false]
+        lzma: [true, false]
+        lzo2: [true, false]
+        zstd: [true, false]
     steps:
     - uses: actions/checkout@v3
     - name: configure
       run: |
         CC=${{ matrix.cc }} meson setup /tmp/build \
-          -Dcurl=${{ matrix.all_features }} \
-          -Dzlib=${{ matrix.all_features }} \
-          -Dlz4=${{ matrix.all_features }} \
-          -Dlzma=${{ matrix.all_features }} \
-          -Dlzo2=${{ matrix.all_features }} \
-          -Dzstd=${{ matrix.all_features }}
+          -Dcurl=${{ matrix.curl }} \
+          -Dzlib=${{ matrix.zlib }} \
+          -Dlz4=${{ matrix.lz4 }} \
+          -Dlzma=${{ matrix.lzma }} \
+          -Dlzo2=${{ matrix.lzo2 }} \
+          -Dzstd=${{ matrix.zstd }}
     - name: build
       run: |
          ninja -C /tmp/build
