@@ -53,7 +53,8 @@ static int (*print_item)(const struct SqshDirectoryIterator *, const char *) =
 		print_simple;
 
 static int
-ls(struct Sqsh *sqsh, const char *path, struct SqshInodeContext *inode);
+ls(struct SqshPathResolverContext *resolver, const char *path,
+   struct SqshInodeContext *inode);
 
 static int
 usage(char *arg0) {
@@ -149,7 +150,7 @@ out:
 }
 
 static int
-ls_item(struct Sqsh *sqsh, const char *path,
+ls_item(struct SqshPathResolverContext *resolver, const char *path,
 		struct SqshDirectoryIterator *iter) {
 	int rv = 0;
 	int len = 0;
@@ -179,7 +180,7 @@ ls_item(struct Sqsh *sqsh, const char *path,
 		if (rv < 0) {
 			goto out;
 		}
-		rv = ls(sqsh, current_path, &entry_inode);
+		rv = ls(resolver, current_path, &entry_inode);
 		if (rv < 0) {
 			goto out;
 		}
@@ -192,7 +193,8 @@ out:
 }
 
 static int
-ls(struct Sqsh *sqsh, const char *path, struct SqshInodeContext *inode) {
+ls(struct SqshPathResolverContext *resolver, const char *path,
+   struct SqshInodeContext *inode) {
 	int rv = 0;
 	struct SqshDirectoryIterator *iter = NULL;
 
@@ -204,7 +206,7 @@ ls(struct Sqsh *sqsh, const char *path, struct SqshInodeContext *inode) {
 	}
 
 	while (sqsh_directory_iterator_next(iter) > 0) {
-		rv = ls_item(sqsh, path, iter);
+		rv = ls_item(resolver, path, iter);
 		if (rv < 0) {
 			rv = EXIT_FAILURE;
 			goto out;
@@ -218,11 +220,11 @@ out:
 }
 
 static int
-ls_path(struct Sqsh *sqsh, char *path) {
+ls_path(struct SqshPathResolverContext *resolver, char *path) {
 	struct SqshInodeContext inode = {0};
 	int rv = 0;
 
-	rv = sqsh_inode_init_by_path(&inode, sqsh, path);
+	rv = sqsh_path_resolver_resolve(resolver, &inode, path);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		goto out;
@@ -234,7 +236,7 @@ ls_path(struct Sqsh *sqsh, char *path) {
 			goto out;
 		}
 
-		rv = ls(sqsh, path, &inode);
+		rv = ls(resolver, path, &inode);
 		if (rv < 0) {
 			sqsh_perror(rv, path);
 			rv = EXIT_FAILURE;
@@ -259,6 +261,7 @@ main(int argc, char *argv[]) {
 	int opt = 0;
 	const char *image_path;
 	struct Sqsh *sqsh;
+	struct SqshPathResolverContext *resolver = NULL;
 
 	while ((opt = getopt(argc, argv, "vrhl")) != -1) {
 		switch (opt) {
@@ -289,23 +292,30 @@ main(int argc, char *argv[]) {
 		rv = EXIT_FAILURE;
 		goto out;
 	}
+	resolver = sqsh_path_resolver_new(sqsh, &rv);
+	if (rv < 0) {
+		sqsh_perror(rv, image_path);
+		rv = EXIT_FAILURE;
+		goto out;
+	}
 
 	for (; optind < argc; optind++) {
 		has_listed = true;
-		rv = ls_path(sqsh, argv[optind]);
+		rv = ls_path(resolver, argv[optind]);
 		if (rv < 0) {
 			goto out;
 		}
 	}
 
 	if (has_listed == false) {
-		rv = ls_path(sqsh, NULL);
+		rv = ls_path(resolver, NULL);
 		if (rv < 0) {
 			goto out;
 		}
 	}
 
 out:
+	sqsh_path_resolver_free(resolver);
 	sqsh_free(sqsh);
 	return rv;
 }

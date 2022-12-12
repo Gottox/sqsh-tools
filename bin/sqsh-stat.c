@@ -265,11 +265,11 @@ inode_type_name(int type) {
 }
 
 static int
-stat_file(struct Sqsh *sqsh, const char *path) {
+stat_file(struct SqshPathResolverContext *resolver, const char *path) {
 	int rv = 0;
 	struct SqshInodeContext inode = {0};
 	bool has_fragment = false;
-	rv = sqsh_inode_init_by_path(&inode, sqsh, path);
+	rv = sqsh_path_resolver_resolve(resolver, &inode, path);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		return rv;
@@ -328,6 +328,7 @@ main(int argc, char *argv[]) {
 	int opt = 0;
 	const char *image_path;
 	struct Sqsh *sqsh;
+	struct SqshPathResolverContext *resolver = NULL;
 
 	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {
@@ -352,16 +353,23 @@ main(int argc, char *argv[]) {
 		rv = EXIT_FAILURE;
 		goto out;
 	}
+	resolver = sqsh_path_resolver_new(sqsh, &rv);
+	if (rv < 0) {
+		sqsh_perror(rv, image_path);
+		rv = EXIT_FAILURE;
+		goto out;
+	}
 
 	if (optind == argc) {
 		rv = stat_image(sqsh);
 	} else if (optind + 1 == argc) {
-		rv = stat_file(sqsh, argv[optind]);
+		rv = stat_file(resolver, argv[optind]);
 	} else {
 		rv = usage(argv[0]);
 	}
 
 out:
+	sqsh_path_resolver_free(resolver);
 	sqsh_free(sqsh);
 	return rv;
 }

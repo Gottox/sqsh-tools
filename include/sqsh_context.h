@@ -385,16 +385,6 @@ sqsh_inode_init_root(struct SqshInodeContext *context, struct Sqsh *sqsh);
 SQSH_NO_UNUSED int sqsh_inode_init_by_inode_number(
 		struct SqshInodeContext *context, struct Sqsh *sqsh,
 		uint64_t inode_number);
-/**
- * @brief Initialize the inode context from a path.
- * @memberof SqshInodeContext
- * @param context The inode context to initialize.
- * @param sqsh The sqsh context.
- * @param path The path the file or directory.
- * @return int 0 on success, less than 0 on error.
- */
-SQSH_NO_UNUSED int sqsh_inode_init_by_path(
-		struct SqshInodeContext *context, struct Sqsh *sqsh, const char *path);
 
 /**
  * @brief returns whether the inode is an extended structure.
@@ -614,6 +604,16 @@ struct SqshPathResolverContext {
 };
 
 /**
+ * @brief initializes a path resolver context in heap
+ * @memberof SqshPathResolverContext
+ * @param sqsh The sqsh context.
+ * @param err Pointer to set to an error code on error.
+ * @return The Initialized path resolver context
+ */
+struct SqshPathResolverContext *
+sqsh_path_resolver_new(struct Sqsh *sqsh, int *err);
+
+/**
  * @brief initializes a path resolver context.
  * @memberof SqshPathResolverContext
  * @param context The path resolver context.
@@ -642,6 +642,14 @@ SQSH_NO_UNUSED int sqsh_path_resolver_resolve(
  * @return int 0 on success, less than 0 on error.
  */
 int sqsh_path_resolver_cleanup(struct SqshPathResolverContext *context);
+
+/**
+ * @brief cleans up a path resolver context and frees the memory.
+ * @memberof SqshPathResolverContext
+ * @param context The path resolver context.
+ * @return int 0 on success, less than 0 on error.
+ */
+int sqsh_path_resolver_free(struct SqshPathResolverContext *context);
 
 // context/metablock_context.c
 

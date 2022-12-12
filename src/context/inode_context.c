@@ -188,22 +188,6 @@ sqsh_inode_init_by_inode_number(
 	return sqsh_inode_init_by_ref(inode, sqsh, inode_ref);
 }
 
-int
-sqsh_inode_init_by_path(
-		struct SqshInodeContext *inode, struct Sqsh *sqsh, const char *path) {
-	int rv = 0;
-	struct SqshPathResolverContext resolver = {0};
-	rv = sqsh_path_resolver_init(&resolver, sqsh);
-	if (rv < 0) {
-		goto out;
-	}
-	rv = sqsh_path_resolver_resolve(&resolver, inode, path);
-
-out:
-	sqsh_path_resolver_cleanup(&resolver);
-	return rv;
-}
-
 bool
 sqsh_inode_is_extended(const struct SqshInodeContext *context) {
 	const struct SqshInode *inode = get_inode(context);

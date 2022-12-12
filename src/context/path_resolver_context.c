@@ -96,6 +96,21 @@ out:
 	return rv;
 }
 
+struct SqshPathResolverContext *
+sqsh_path_resolver_new(struct Sqsh *sqsh, int *err) {
+	struct SqshPathResolverContext *context =
+			calloc(1, sizeof(struct SqshPathResolverContext));
+	if (context == NULL) {
+		return NULL;
+	}
+	*err = sqsh_path_resolver_init(context, sqsh);
+	if (*err < 0) {
+		free(context);
+		return NULL;
+	}
+	return context;
+}
+
 int
 sqsh_path_resolver_init(
 		struct SqshPathResolverContext *context, struct Sqsh *sqsh) {
@@ -149,4 +164,14 @@ int
 sqsh_path_resolver_cleanup(struct SqshPathResolverContext *context) {
 	(void)context;
 	return 0;
+}
+
+int
+sqsh_path_resolver_free(struct SqshPathResolverContext *context) {
+	if (context == NULL) {
+		return 0;
+	}
+	int rv = sqsh_path_resolver_cleanup(context);
+	free(context);
+	return rv;
 }

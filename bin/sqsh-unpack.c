@@ -316,6 +316,7 @@ main(int argc, char *argv[]) {
 	char *src_path = "/";
 	char *target_path = NULL;
 	struct Sqsh *sqsh;
+	struct SqshPathResolverContext *resolver = NULL;
 	struct SqshInodeContext inode = {0};
 
 	while ((opt = getopt(argc, argv, "cvVh")) != -1) {
@@ -353,8 +354,14 @@ main(int argc, char *argv[]) {
 		rv = EXIT_FAILURE;
 		goto out;
 	}
+	resolver = sqsh_path_resolver_new(sqsh, &rv);
+	if (rv < 0) {
+		sqsh_perror(rv, image_path);
+		rv = EXIT_FAILURE;
+		goto out;
+	}
 
-	rv = sqsh_inode_init_by_path(&inode, sqsh, src_path);
+	rv = sqsh_path_resolver_resolve(resolver, &inode, src_path);
 	if (rv < 0) {
 		sqsh_perror(rv, src_path);
 		rv = EXIT_FAILURE;
@@ -395,6 +402,7 @@ main(int argc, char *argv[]) {
 	}
 out:
 	sqsh_inode_cleanup(&inode);
+	sqsh_path_resolver_free(resolver);
 	sqsh_free(sqsh);
 	return rv;
 }

@@ -49,12 +49,12 @@ usage(char *arg0) {
 }
 
 static int
-cat_path(struct Sqsh *sqsh, char *path) {
+cat_path(struct SqshPathResolverContext *sqsh, char *path) {
 	struct SqshInodeContext inode = {0};
 	struct SqshFileContext *file = NULL;
 
 	int rv = 0;
-	rv = sqsh_inode_init_by_path(&inode, sqsh, path);
+	rv = sqsh_path_resolver_resolve(sqsh, &inode, path);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		rv = EXIT_FAILURE;
@@ -87,7 +87,8 @@ main(int argc, char *argv[]) {
 	int rv = 0;
 	int opt = 0;
 	const char *image_path;
-	struct Sqsh *sqsh;
+	struct Sqsh *sqsh = NULL;
+	struct SqshPathResolverContext *resolver = NULL;
 
 	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {
@@ -112,15 +113,22 @@ main(int argc, char *argv[]) {
 		rv = EXIT_FAILURE;
 		goto out;
 	}
+	resolver = sqsh_path_resolver_new(sqsh, &rv);
+	if (rv < 0) {
+		sqsh_perror(rv, image_path);
+		rv = EXIT_FAILURE;
+		goto out;
+	}
 
 	for (; optind < argc; optind++) {
-		rv = cat_path(sqsh, argv[optind]);
+		rv = cat_path(resolver, argv[optind]);
 		if (rv < 0) {
 			goto out;
 		}
 	}
 
 out:
+	sqsh_path_resolver_free(resolver);
 	sqsh_free(sqsh);
 	return rv;
 }
