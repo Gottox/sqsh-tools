@@ -33,7 +33,7 @@
 
 #include "common.h"
 #include "test.h"
-#include <sqsh_context.h>
+#include <sqsh_context_private.h>
 #include <sqsh_iterator.h>
 #include <sqsh_private.h>
 #include <squashfs_image.h>
@@ -155,7 +155,7 @@ sqsh_cat_fragment(void) {
 	rv = sqsh_path_resolver_resolve(&resolver, &inode, "a");
 	assert(rv == 0);
 
-	rv = sqsh_file_init(&file, &inode);
+	rv = sqsh__file_init(&file, &inode);
 	assert(rv == 0);
 
 	size = sqsh_inode_file_size(&inode);
@@ -167,7 +167,7 @@ sqsh_cat_fragment(void) {
 	data = sqsh_file_data(&file);
 	assert(memcmp(data, "a\n", size) == 0);
 
-	rv = sqsh_file_cleanup(&file);
+	rv = sqsh__file_cleanup(&file);
 	assert(rv == 0);
 
 	rv = sqsh_inode_cleanup(&inode);
@@ -202,7 +202,7 @@ sqsh_cat_datablock_and_fragment(void) {
 	rv = sqsh_path_resolver_resolve(&resolver, &inode, "b");
 	assert(rv == 0);
 
-	rv = sqsh_file_init(&file, &inode);
+	rv = sqsh__file_init(&file, &inode);
 	assert(rv == 0);
 
 	size = sqsh_inode_file_size(&inode);
@@ -217,7 +217,7 @@ sqsh_cat_datablock_and_fragment(void) {
 		assert(data[i] == 'b');
 	}
 
-	rv = sqsh_file_cleanup(&file);
+	rv = sqsh__file_cleanup(&file);
 	assert(rv == 0);
 
 	rv = sqsh_inode_cleanup(&inode);
@@ -252,7 +252,7 @@ sqsh_cat_size_overflow(void) {
 	rv = sqsh_path_resolver_resolve(&resolver, &inode, "b");
 	assert(rv == 0);
 
-	rv = sqsh_file_init(&file, &inode);
+	rv = sqsh__file_init(&file, &inode);
 	assert(rv == 0);
 	size = sqsh_inode_file_size(&inode);
 	assert(size == 1050000);
@@ -267,7 +267,7 @@ sqsh_cat_size_overflow(void) {
 		assert(data[i] == 'b');
 	}
 
-	rv = sqsh_file_cleanup(&file);
+	rv = sqsh__file_cleanup(&file);
 	assert(rv == 0);
 
 	rv = sqsh_inode_cleanup(&inode);

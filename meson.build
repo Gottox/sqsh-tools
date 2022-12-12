@@ -16,6 +16,7 @@ sqsh_hdr = [
 	'include/sqsh_common.h',
 	'include/sqsh_compression.h',
 	'include/sqsh_context.h',
+	'include/sqsh_context_private.h',
 	'include/sqsh_data.h',
 	'include/sqsh_data_private.h',
 	'include/sqsh_error.h',

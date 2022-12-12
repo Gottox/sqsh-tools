@@ -33,7 +33,7 @@
 
 #include <sqsh.h>
 #include <sqsh_compression.h>
-#include <sqsh_context.h>
+#include <sqsh_context_private.h>
 #include <sqsh_error.h>
 #include <sqsh_table.h>
 #include <stdint.h>
@@ -54,7 +54,7 @@ datablock_offset(struct SqshFileContext *context, uint32_t block_index) {
 }
 
 int
-sqsh_file_init(
+sqsh__file_init(
 		struct SqshFileContext *context, struct SqshInodeContext *inode) {
 	int rv = 0;
 	struct Sqsh *sqsh = inode->sqsh;
@@ -92,7 +92,7 @@ sqsh_file_new(struct SqshInodeContext *inode, int *err) {
 	if (context == NULL) {
 		return NULL;
 	}
-	*err = sqsh_file_init(context, inode);
+	*err = sqsh__file_init(context, inode);
 	if (*err < 0) {
 		free(context);
 		return NULL;
@@ -214,7 +214,7 @@ sqsh_file_size(struct SqshFileContext *context) {
 }
 
 int
-sqsh_file_cleanup(struct SqshFileContext *context) {
+sqsh__file_cleanup(struct SqshFileContext *context) {
 	sqsh_buffer_cleanup(&context->buffer);
 
 	return 0;
@@ -225,7 +225,7 @@ sqsh_file_free(struct SqshFileContext *context) {
 	if (context == NULL) {
 		return 0;
 	}
-	int rv = sqsh_file_cleanup(context);
+	int rv = sqsh__file_cleanup(context);
 	free(context);
 	return rv;
 }

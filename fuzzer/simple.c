@@ -5,7 +5,7 @@
  * Distributed under terms of the MIT license.
  */
 
-#include <sqsh_context.h>
+#include <sqsh_context_private.h>
 #include <sqsh_iterator.h>
 #include <sqsh_private.h>
 
@@ -13,7 +13,7 @@ static int
 read_file(struct SqshInodeContext *inode) {
 	struct SqshFileContext file = {0};
 	int rv;
-	rv = sqsh_file_init(&file, inode);
+	rv = sqsh__file_init(&file, inode);
 	if (rv < 0) {
 		goto out;
 	}
@@ -24,7 +24,7 @@ read_file(struct SqshInodeContext *inode) {
 	}
 
 out:
-	sqsh_file_cleanup(&file);
+	sqsh__file_cleanup(&file);
 	// noop
 	return 0;
 }
