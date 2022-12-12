@@ -674,6 +674,21 @@ fuzz_crash_8(void) {
 	sqsh__cleanup(&sqsh);
 }
 
+static void
+free_null_crash_1(void) {
+	int rv;
+	rv = sqsh_free(NULL);
+	assert(rv == 0);
+	rv = sqsh_file_free(NULL);
+	assert(rv == 0);
+	rv = sqsh_inode_directory_index_iterator_free(NULL);
+	assert(rv == 0);
+	sqsh_directory_iterator_free(NULL);
+	assert(rv == 0);
+	sqsh_xattr_iterator_free(NULL);
+	assert(rv == 0);
+}
+
 DEFINE
 TEST(sqsh_empty);
 TEST(sqsh_ls);
@@ -692,4 +707,5 @@ TEST_OFF(fuzz_crash_5);
 TEST_OFF(fuzz_crash_6);
 TEST_OFF(fuzz_crash_7);
 TEST(fuzz_crash_8);
+TEST(free_null_crash_1);
 DEFINE_END

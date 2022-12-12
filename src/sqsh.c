@@ -294,6 +294,9 @@ sqsh__cleanup(struct Sqsh *sqsh) {
 
 int
 sqsh_free(struct Sqsh *sqsh) {
+	if (sqsh == NULL) {
+		return 0;
+	}
 	int rv = sqsh__cleanup(sqsh);
 	free(sqsh);
 	return rv;

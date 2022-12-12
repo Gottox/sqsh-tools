@@ -222,6 +222,9 @@ sqsh_file_cleanup(struct SqshFileContext *context) {
 
 int
 sqsh_file_free(struct SqshFileContext *context) {
+	if (context == NULL) {
+		return 0;
+	}
 	int rv = sqsh_file_cleanup(context);
 	free(context);
 	return rv;

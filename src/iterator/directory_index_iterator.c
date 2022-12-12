@@ -163,6 +163,9 @@ sqsh_inode_directory_index_iterator_cleanup(
 int
 sqsh_inode_directory_index_iterator_free(
 		struct SqshInodeDirectoryIndexIterator *iterator) {
+	if (iterator == NULL) {
+		return 0;
+	}
 	int rv = sqsh_inode_directory_index_iterator_cleanup(iterator);
 	free(iterator);
 	return rv;

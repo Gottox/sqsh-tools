@@ -339,6 +339,9 @@ sqsh_xattr_iterator_cleanup(struct SqshXattrIterator *iterator) {
 
 int
 sqsh_xattr_iterator_free(struct SqshXattrIterator *iterator) {
+	if (iterator == NULL) {
+		return 0;
+	}
 	int rv = sqsh_xattr_iterator_cleanup(iterator);
 	free(iterator);
 	return rv;

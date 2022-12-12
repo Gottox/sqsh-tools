@@ -302,6 +302,9 @@ sqsh_directory_iterator_cleanup(struct SqshDirectoryIterator *iterator) {
 
 int
 sqsh_directory_iterator_free(struct SqshDirectoryIterator *iterator) {
+	if (iterator == NULL) {
+		return 0;
+	}
 	int rv = sqsh_directory_iterator_cleanup(iterator);
 	free(iterator);
 	return rv;
