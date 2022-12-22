@@ -7,9 +7,11 @@
 NINJA_TARGETS := test benchmark install dist scan-build clang-format uninstall \
 	all tidy doc coverage-html
 
-MESON_FLAGS = -Dtest=true -Ddoc=internal -Db_coverage=true -Dfuzzer=true
+MESON_FLAGS = -Dtest=true -Ddoc=internal -Db_coverage=true
 
 SANATIZE = 0
+
+CC = gcc
 
 ifeq ($(PODMAN), 1)
 	W = podman run --rm -ti -v .:/host gottox/sqsh-build env
@@ -20,6 +22,9 @@ else
 	ifeq ($(SANATIZE),1)
 		MESON_FLAGS += -Db_sanitize=address,undefined
 	endif
+endif
+ifeq ($(CC),clang)
+	MESON_FLAGS += -Dfuzzer=true
 endif
 ifeq ($(OPTIMIZE),1)
 	MESON_FLAGS += --optimization=2
@@ -32,7 +37,7 @@ $(NINJA_TARGETS): $(BUILD_DIR)
 
 $(BUILD_DIR): meson.build Makefile
 	[ -d "$@" ] && rm -r "$@" || true
-	$W CC=clang meson setup "$@" $(MESON_FLAGS)
+	$W CC=$(CC) meson setup "$@" $(MESON_FLAGS)
 
 .PHONY: clean
 
