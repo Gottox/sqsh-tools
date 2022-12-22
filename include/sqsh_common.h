@@ -42,26 +42,12 @@
 extern "C" {
 #endif
 
-#define SQSH_MIN(a, b) (a < b ? a : b)
-#define SQSH_MAX(a, b) (a > b ? a : b)
-
-#define SQSH_ADD_OVERFLOW(a, b, res) __builtin_add_overflow(a, b, res)
-#define SQSH_SUB_OVERFLOW(a, b, res) __builtin_sub_overflow(a, b, res)
-#define SQSH_MULT_OVERFLOW(a, b, res) __builtin_mul_overflow(a, b, res)
-
 #define SQSH_NO_UNUSED __attribute__((warn_unused_result))
 #define SQSH_UNALIGNED __attribute__((packed, aligned(1)))
 
 #define SQSH_STATIC_ASSERT(cond) _Static_assert(cond, #cond)
 
-// Does not work for x == 0
-#define SQSH_DEVIDE_CEIL(x, y) (((x - 1) / y) + 1)
-
-#define SQSH_PADDING(x, p) SQSH_DEVIDE_CEIL(x, p) * p
-
 typedef size_t sqsh_index_t;
-
-SQSH_NO_UNUSED void *sqsh_memdup(const void *source, size_t size);
 
 #ifdef __cplusplus
 }

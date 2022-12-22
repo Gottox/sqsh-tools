@@ -31,6 +31,7 @@
  * @file         metablock_context.c
  */
 
+#include "../utils.h"
 #include <sqsh.h>
 #include <sqsh_compression.h>
 #include <sqsh_context.h>

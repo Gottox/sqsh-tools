@@ -31,6 +31,7 @@
  * @file         metablock_stream_context.c
  */
 
+#include "../utils.h"
 #include <sqsh_context.h>
 #include <sqsh_data.h>
 #include <sqsh_error.h>

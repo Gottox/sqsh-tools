@@ -4,6 +4,7 @@
  * @created     : Wednesday Nov 09, 2022 11:08:10 CET
  */
 
+#include "../utils.h"
 #include <sqsh_error.h>
 #include <sqsh_primitive.h>
 

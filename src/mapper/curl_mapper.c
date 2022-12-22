@@ -31,14 +31,16 @@
  * @file         curl_mapper.c
  */
 
+#include "../utils.h"
+#include <sqsh_data.h>
+#include <sqsh_error.h>
+#include <sqsh_mapper.h>
+
 #include <curl/curl.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
 #include <pthread.h>
-#include <sqsh_data.h>
-#include <sqsh_error.h>
-#include <sqsh_mapper.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>

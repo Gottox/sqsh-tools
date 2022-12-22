@@ -39,6 +39,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../src/utils.h"
 #include "common.h"
 #include <sqsh_context.h>
 #include <sqsh_iterator.h>

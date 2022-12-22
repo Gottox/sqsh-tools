@@ -1,3 +1,4 @@
+// utils.c
 /******************************************************************************
  *                                                                            *
  * Copyright (c) 2022, Enno Boland <g@s01.de>                                 *
@@ -28,20 +29,44 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         utils.c
+ * @file         sqsh_utils.h
  */
 
+#ifndef SQSH_UTILS_H
+#define SQSH_UTILS_H
+
+#include <assert.h>
 #include <sqsh_common.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
-void *
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define SQSH_MIN(a, b) (a < b ? a : b)
+#define SQSH_MAX(a, b) (a > b ? a : b)
+
+#define SQSH_ADD_OVERFLOW(a, b, res) __builtin_add_overflow(a, b, res)
+#define SQSH_SUB_OVERFLOW(a, b, res) __builtin_sub_overflow(a, b, res)
+#define SQSH_MULT_OVERFLOW(a, b, res) __builtin_mul_overflow(a, b, res)
+
+// Does not work for x == 0
+#define SQSH_DEVIDE_CEIL(x, y) (((x - 1) / y) + 1)
+#define SQSH_PADDING(x, p) SQSH_DEVIDE_CEIL(x, p) * p
+
+SQSH_NO_UNUSED static inline void *
 sqsh_memdup(const void *source, size_t size) {
-	void *target = calloc(size + 1, sizeof(char));
+	void *target = calloc(size + 1, sizeof(uint8_t));
 	if (target == NULL) {
 		return NULL;
 	}
-	memcpy(target, source, size);
-
-	return target;
+	return memcpy(target, source, size);
 }
+
+#ifdef __cplusplus
+}
+#endif
+#endif /* end of include guard SQSH_UTILS_H */

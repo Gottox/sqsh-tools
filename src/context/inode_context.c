@@ -31,6 +31,7 @@
  * @file         inode.c
  */
 
+#include "../utils.h"
 #include <sqsh.h>
 #include <sqsh_context.h>
 #include <sqsh_data_private.h>

@@ -31,6 +31,7 @@
  * @file         path_resolver_context.c
  */
 
+#include "../utils.h"
 #include <sqsh.h>
 #include <sqsh_context.h>
 #include <sqsh_error.h>

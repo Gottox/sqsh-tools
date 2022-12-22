@@ -31,6 +31,7 @@
  * @file         buffer.c
  */
 
+#include "../utils.h"
 #include <sqsh_error.h>
 #include <sqsh_primitive.h>
 

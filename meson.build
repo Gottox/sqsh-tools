@@ -26,6 +26,10 @@ sqsh_hdr = [
 	'include/sqsh_table.h',
 ]
 
+sqsh_hdr_priv = [
+	'src/utils.h',
+]
+
 sqsh_src = [
 	'src/compression/compression.c',
 	'src/context/compression_options_context.c',
@@ -60,7 +64,6 @@ sqsh_src = [
 	'src/table/fragment_table.c',
 	'src/table/table.c',
 	'src/table/xattr_table.c',
-	'src/utils.c',
 ]
 
 sqsh_test = [
@@ -131,7 +134,7 @@ libsqsh = library(
   link_args : link_args,
   include_directories : 'include',
   dependencies : [ libsqsh_deps ],
-  sources: sqsh_hdr,
+  sources: sqsh_hdr + sqsh_hdr_priv,
   version : meson.project_version(),
   soversion : meson.project_version().split('.')[0]
 )

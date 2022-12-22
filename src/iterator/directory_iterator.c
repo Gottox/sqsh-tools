@@ -31,11 +31,13 @@
  * @file         directory.c
  */
 
+#include "../utils.h"
 #include <sqsh.h>
 #include <sqsh_context.h>
 #include <sqsh_data.h>
 #include <sqsh_error.h>
 #include <sqsh_iterator.h>
+
 #include <string.h>
 
 static int
