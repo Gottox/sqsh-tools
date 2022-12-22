@@ -22,13 +22,13 @@ sqsh_slice_init_subslice(
 	sqsh_index_t end_offset;
 
 	if (SQSH_ADD_OVERFLOW(offset, size, &end_offset)) {
-		return SQSH_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	if (offset > source->size) {
-		return SQSH_ERROR_INDEX_OUT_OF_BOUNDS;
+		return -SQSH_ERROR_INDEX_OUT_OF_BOUNDS;
 	}
 	if (end_offset > source->size) {
-		return SQSH_ERROR_INDEX_OUT_OF_BOUNDS;
+		return -SQSH_ERROR_INDEX_OUT_OF_BOUNDS;
 	}
 	return sqsh_slice_init(slice, &source->data[offset], size);
 }

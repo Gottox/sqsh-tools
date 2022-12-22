@@ -141,7 +141,7 @@ sqsh_file_read(struct SqshFileContext *context, uint64_t size) {
 		goto out;
 	}
 	if (sqsh_inode_file_size(context->inode) > size) {
-		rv = SQSH_ERROR_SIZE_MISSMATCH;
+		rv = -SQSH_ERROR_SIZE_MISSMATCH;
 	}
 
 	for (; block_index < block_count && sqsh_file_size(context) < size;

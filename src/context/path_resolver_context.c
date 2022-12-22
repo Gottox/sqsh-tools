@@ -130,7 +130,7 @@ sqsh_path_resolver_resolve(
 	const char *segment = path;
 	uint64_t *inode_refs = calloc(segment_count, sizeof(uint64_t));
 	if (inode_refs == NULL) {
-		rv = SQSH_ERROR_MALLOC_FAILED;
+		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
 	inode_refs[0] = sqsh_superblock_inode_root_ref(superblock);

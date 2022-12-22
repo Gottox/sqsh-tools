@@ -115,7 +115,7 @@ sqsh_compression_init(
 		size_t block_size) {
 	sqsh_extract_func_t impl = compression_by_id(compression_id);
 	if (impl == NULL) {
-		return SQSH_ERROR_COMPRESSION_UNSUPPORTED;
+		return -SQSH_ERROR_COMPRESSION_UNSUPPORTED;
 	}
 	compression->impl = impl;
 	compression->block_size = block_size;
