@@ -39,6 +39,7 @@ sqsh_src = [
 	'src/context/metablock_context.c',
 	'src/context/metablock_stream_context.c',
 	'src/context/superblock_context.c',
+	'src/context/trailing_context.c',
 	'src/data/compression_options_data.c',
 	'src/data/datablock_data.c',
 	'src/data/directory_data.c',
