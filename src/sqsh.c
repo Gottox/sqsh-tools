@@ -41,7 +41,6 @@ enum InitializedBitmap {
 	INITIALIZED_EXPORT_TABLE = 1 << 1,
 	INITIALIZED_XATTR_TABLE = 1 << 2,
 	INITIALIZED_FRAGMENT_TABLE = 1 << 3,
-	INITIALIZED_COMPRESSION_OPTIONS = 1 << 4,
 };
 
 static bool
@@ -113,14 +112,6 @@ sqsh__init(
 	rv = sqsh_superblock_init(&sqsh->superblock, &sqsh->mapper);
 	if (rv < 0) {
 		goto out;
-	}
-
-	if (sqsh_superblock_has_compression_options(&sqsh->superblock)) {
-		sqsh->initialized |= INITIALIZED_COMPRESSION_OPTIONS;
-		rv = sqsh_compression_options_init(&sqsh->compression_options, sqsh);
-		if (rv < 0) {
-			goto out;
-		}
 	}
 
 	enum SqshSuperblockCompressionId compression_id =
@@ -233,18 +224,6 @@ out:
 	return rv;
 }
 
-int
-sqsh_compression_options(
-		struct Sqsh *sqsh,
-		struct SqshCompressionOptionsContext **compression_options) {
-	if (sqsh_superblock_has_compression_options(&sqsh->superblock)) {
-		*compression_options = &sqsh->compression_options;
-		return 0;
-	} else {
-		return -SQSH_ERROR_NO_COMPRESSION_OPTIONS;
-	}
-}
-
 struct SqshCompression *
 sqsh_data_compression(struct Sqsh *sqsh) {
 	return &sqsh->data_compression;
@@ -280,9 +259,6 @@ sqsh__cleanup(struct Sqsh *sqsh) {
 	}
 	if (is_initialized(sqsh, INITIALIZED_FRAGMENT_TABLE)) {
 		sqsh_fragment_table_cleanup(&sqsh->fragment_table);
-	}
-	if (is_initialized(sqsh, INITIALIZED_COMPRESSION_OPTIONS)) {
-		sqsh_compression_options_cleanup(&sqsh->compression_options);
 	}
 	sqsh_compression_cleanup(&sqsh->data_compression);
 	sqsh_compression_cleanup(&sqsh->metablock_compression);

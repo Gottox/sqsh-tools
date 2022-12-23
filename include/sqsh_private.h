@@ -67,7 +67,6 @@ struct Sqsh {
 	struct SqshTable export_table;
 	struct SqshXattrTable xattr_table;
 	struct SqshFragmentTable fragment_table;
-	struct SqshCompressionOptionsContext compression_options;
 	uint8_t initialized;
 	struct SqshConfig config;
 };

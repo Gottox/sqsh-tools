@@ -54,15 +54,6 @@ struct SqshTrailingContext;
 // context/compression_options_context.c
 
 /**
- * @brief The compression options context is used to store the
- * compression options for a specific compression algorithm.
- */
-struct SqshCompressionOptionsContext {
-	uint16_t compression_id;
-	struct SqshBuffer buffer;
-};
-
-/**
  * @brief definitions of gzip strategies
  */
 enum SqshGzipStrategies {
@@ -104,13 +95,15 @@ enum SqshLzoAlgorithm {
 };
 
 /**
- * @brief Initialize the compression options context.
+ * @brief Initializes a SqshCompressionOptionsContext struct.
  * @memberof SqshCompressionOptionsContext
- * @param context the compression options context
- * @param sqsh the Sqsh struct
+ * @param sqsh Sqsh context
+ * @param err Pointer to set to an error code on error.
+ * @return The Initialized file context
  */
-SQSH_NO_UNUSED int sqsh_compression_options_init(
-		struct SqshCompressionOptionsContext *context, struct Sqsh *sqsh);
+SQSH_NO_UNUSED
+struct SqshCompressionOptionsContext *
+sqsh_compression_options_new(struct Sqsh *sqsh, int *err);
 
 /**
  * @brief returns the compression level of gzip
@@ -179,16 +172,21 @@ uint32_t sqsh_compression_options_zstd_compression_level(
  */
 enum SqshLzoAlgorithm sqsh_compression_options_lzo_algorithm(
 		const struct SqshCompressionOptionsContext *context);
+/**
+ * @brief returns the compression level of lzo
+ * @memberof SqshCompressionOptionsContext
+ * @param context the compression options context
+ */
 uint32_t sqsh_compression_options_lzo_compression_level(
 		const struct SqshCompressionOptionsContext *context);
 
 /**
- * @brief Frees the resources used by the compression options context.
+ * @brief Frees a SqshCompressionOptionsContext struct.
  * @memberof SqshCompressionOptionsContext
- * @param context the compression options context
+ * @param context The file context to free.
  */
 int
-sqsh_compression_options_cleanup(struct SqshCompressionOptionsContext *context);
+sqsh_compression_options_free(struct SqshCompressionOptionsContext *context);
 
 // context/file_context.c
 

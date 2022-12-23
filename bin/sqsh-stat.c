@@ -212,7 +212,7 @@ stat_image(struct Sqsh *sqsh) {
 	time_t mtime = sqsh_superblock_modification_time(superblock);
 	printf("       modification time: %s\n", ctime(&mtime));
 
-	rv = sqsh_compression_options(sqsh, &compression_options);
+	compression_options = sqsh_compression_options_new(sqsh, &rv);
 	if (rv == -SQSH_ERROR_NO_COMPRESSION_OPTIONS) {
 		rv = 0;
 	} else if (rv == 0) {
@@ -239,6 +239,7 @@ stat_image(struct Sqsh *sqsh) {
 				 "not supported by the compression algorithm");
 		}
 	}
+	sqsh_compression_options_free(compression_options);
 	return rv;
 }
 

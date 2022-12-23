@@ -41,6 +41,36 @@
 extern "C" {
 #endif
 
+struct Sqsh;
+
+// context/compression_options_context.c
+
+/**
+ * @brief The compression options context is used to store the
+ * compression options for a specific compression algorithm.
+ */
+struct SqshCompressionOptionsContext {
+	uint16_t compression_id;
+	struct SqshBuffer buffer;
+};
+
+/**
+ * @brief Initialize the compression options context.
+ * @memberof SqshCompressionOptionsContext
+ * @param context the compression options context
+ * @param sqsh the Sqsh struct
+ */
+SQSH_NO_UNUSED int sqsh__compression_options_init(
+		struct SqshCompressionOptionsContext *context, struct Sqsh *sqsh);
+
+/**
+ * @brief Frees the resources used by the compression options context.
+ * @memberof SqshCompressionOptionsContext
+ * @param context the compression options context
+ */
+int sqsh__compression_options_cleanup(
+		struct SqshCompressionOptionsContext *context);
+
 // context/file_context.c
 
 /**

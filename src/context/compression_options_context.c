@@ -32,7 +32,7 @@
  */
 
 #include <sqsh.h>
-#include <sqsh_context.h>
+#include <sqsh_context_private.h>
 #include <sqsh_data.h>
 #include <stdint.h>
 
@@ -41,8 +41,23 @@ compression_options(const struct SqshCompressionOptionsContext *context) {
 	return (union SqshCompressionOptions *)sqsh_buffer_data(&context->buffer);
 }
 
+struct SqshCompressionOptionsContext *
+sqsh_compression_options_new(struct Sqsh *sqsh, int *err) {
+	struct SqshCompressionOptionsContext *context =
+			calloc(1, sizeof(struct SqshCompressionOptionsContext));
+	if (context == NULL) {
+		return NULL;
+	}
+	*err = sqsh__compression_options_init(context, sqsh);
+	if (*err < 0) {
+		free(context);
+		return NULL;
+	}
+	return context;
+}
+
 int
-sqsh_compression_options_init(
+sqsh__compression_options_init(
 		struct SqshCompressionOptionsContext *context, struct Sqsh *sqsh) {
 	int rv = 0;
 	struct SqshMetablockContext metablock = {0};
@@ -67,7 +82,7 @@ sqsh_compression_options_init(
 out:
 	sqsh_metablock_cleanup(&metablock);
 	if (rv < 0) {
-		sqsh_compression_options_cleanup(context);
+		sqsh__compression_options_cleanup(context);
 	}
 	return rv;
 }
@@ -174,9 +189,19 @@ sqsh_compression_options_size(
 }
 
 int
-sqsh_compression_options_cleanup(
+sqsh__compression_options_cleanup(
 		struct SqshCompressionOptionsContext *context) {
 	sqsh_buffer_cleanup(&context->buffer);
 
 	return 0;
+}
+
+int
+sqsh_compression_options_free(struct SqshCompressionOptionsContext *context) {
+	if (context == NULL) {
+		return 0;
+	}
+	int rv = sqsh__compression_options_cleanup(context);
+	free(context);
+	return rv;
 }

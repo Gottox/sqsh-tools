@@ -152,18 +152,6 @@ int sqsh_fragment_table(
 int sqsh_xattr_table(struct Sqsh *sqsh, struct SqshXattrTable **xattr_table);
 
 /**
- * @brief sqsh_compression_options returns the compression options context.
- * @memberof Sqsh
- * @param sqsh the Sqsh structure.
- * @param compression_options double pointer that will be set to the
- * compression options context.
- * @return 0 on success, less than 0 on error.
- */
-int sqsh_compression_options(
-		struct Sqsh *sqsh,
-		struct SqshCompressionOptionsContext **compression_options);
-
-/**
  * @brief sqsh_free frees up a heap allocated Sqsh structure.
  * @memberof Sqsh
  * @param sqsh the Sqsh structure to free.
