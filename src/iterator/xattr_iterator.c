@@ -54,7 +54,10 @@ sqsh_xattr_iterator_init(
 		return 0;
 	}
 	if (index != SQSH_INODE_NO_XATTR && xattr_table == NULL) {
-		return -SQSH_INODE_NO_XATTR;
+		// TODO: Be more specific about the error code. This incidates
+		// not only a missing xattr table but also links into the non
+		// existing table. So the archive must be considerred corrupt.
+		return -SQSH_ERROR_NO_XATTR_TABLE;
 	}
 
 	rv = sqsh_table_get(&xattr_table->table, index, &ref);
