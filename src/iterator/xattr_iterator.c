@@ -31,13 +31,15 @@
  * @file         xattr_iterator.c
  */
 
+#include "../utils.h"
+#include <sqsh.h>
 #include <sqsh_context.h>
 #include <sqsh_iterator.h>
 // TODO: this should be replaced with the non-private version
-#include "../utils.h"
 #include <sqsh_data_private.h>
 #include <sqsh_error.h>
 #include <sqsh_table.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -47,6 +49,8 @@ sqsh_xattr_iterator_init(
 		const struct SqshInodeContext *inode) {
 	int rv;
 	struct SqshXattrLookupTable ref = {0};
+	struct Sqsh *sqsh = xattr_table->sqsh;
+	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 	uint32_t index = sqsh_inode_xattr_index(inode);
 
 	if (index == SQSH_INODE_NO_XATTR) {
@@ -66,11 +70,13 @@ sqsh_xattr_iterator_init(
 		goto out;
 	}
 
+	// The XATTR table is the last block in the file system.
+	uint64_t archive_size = sqsh_superblock_bytes_used(superblock);
+
 	uint64_t start_block = sqsh_xattr_table_start(xattr_table);
 
-	// TODO upper bounds should not be SIZE_MAX.
 	rv = sqsh_metablock_stream_init(
-			&iterator->metablock, xattr_table->sqsh, start_block, SIZE_MAX);
+			&iterator->metablock, sqsh, start_block, archive_size);
 	if (rv < 0) {
 		goto out;
 	}
