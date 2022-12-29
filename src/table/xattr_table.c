@@ -87,6 +87,13 @@ sqsh_xattr_table_start(struct SqshXattrTable *table) {
 }
 
 int
+sqsh_xattr_table_get(
+		const struct SqshXattrTable *table, sqsh_index_t index,
+		struct SqshXattrLookupTable *target) {
+	return sqsh_table_get(&table->table, index, target);
+}
+
+int
 sqsh_xattr_table_cleanup(struct SqshXattrTable *context) {
 	sqsh_table_cleanup(&context->table);
 	sqsh_mapping_unmap(&context->header);

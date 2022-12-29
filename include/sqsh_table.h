@@ -80,6 +80,8 @@ int sqsh_fragment_table_cleanup(struct SqshFragmentTable *context);
 
 // table/xattr_table.c
 
+struct SqshXattrLookupTable;
+
 enum SqshXattrType {
 	SQSH_XATTR_USER = 0,
 	SQSH_XATTR_TRUSTED = 1,
@@ -96,6 +98,10 @@ SQSH_NO_UNUSED int
 sqsh_xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh);
 
 uint64_t sqsh_xattr_table_start(struct SqshXattrTable *table);
+
+int sqsh_xattr_table_get(
+		const struct SqshXattrTable *table, sqsh_index_t index,
+		struct SqshXattrLookupTable *target);
 
 int sqsh_xattr_table_cleanup(struct SqshXattrTable *context);
 

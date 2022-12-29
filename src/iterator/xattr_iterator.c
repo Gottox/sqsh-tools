@@ -64,9 +64,8 @@ sqsh_xattr_iterator_init(
 		return -SQSH_ERROR_NO_XATTR_TABLE;
 	}
 
-	rv = sqsh_table_get(&xattr_table->table, index, &ref);
+	rv = sqsh_xattr_table_get(xattr_table, index, &ref);
 	if (rv < 0) {
-		sqsh_xattr_iterator_cleanup(iterator);
 		goto out;
 	}
 
