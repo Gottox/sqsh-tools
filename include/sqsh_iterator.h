@@ -131,11 +131,10 @@ struct SqshXattrIterator {
 };
 
 SQSH_NO_UNUSED int sqsh_xattr_iterator_init(
-		struct SqshXattrIterator *iterator, struct SqshXattrTable *xattr_table,
+		struct SqshXattrIterator *iterator,
 		const struct SqshInodeContext *inode);
-SQSH_NO_UNUSED struct SqshXattrIterator *sqsh_xattr_iterator_new(
-		struct SqshXattrTable *xattr_table,
-		const struct SqshInodeContext *inode, int *err);
+SQSH_NO_UNUSED struct SqshXattrIterator *
+sqsh_xattr_iterator_new(const struct SqshInodeContext *inode, int *err);
 
 int sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator);
 

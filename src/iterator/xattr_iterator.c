@@ -45,13 +45,19 @@
 
 int
 sqsh_xattr_iterator_init(
-		struct SqshXattrIterator *iterator, struct SqshXattrTable *xattr_table,
+		struct SqshXattrIterator *iterator,
 		const struct SqshInodeContext *inode) {
 	int rv;
 	struct SqshXattrLookupTable ref = {0};
-	struct Sqsh *sqsh = xattr_table->sqsh;
+	struct SqshXattrTable *xattr_table = NULL;
+	struct Sqsh *sqsh = inode->sqsh;
 	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 	uint32_t index = sqsh_inode_xattr_index(inode);
+
+	rv = sqsh_xattr_table(sqsh, &xattr_table);
+	if (rv < 0) {
+		return rv;
+	}
 
 	if (index == SQSH_INODE_NO_XATTR) {
 		iterator->remaining_entries = 0;
@@ -105,15 +111,13 @@ out:
 }
 
 struct SqshXattrIterator *
-sqsh_xattr_iterator_new(
-		struct SqshXattrTable *xattr_table,
-		const struct SqshInodeContext *inode, int *err) {
+sqsh_xattr_iterator_new(const struct SqshInodeContext *inode, int *err) {
 	struct SqshXattrIterator *iterator =
 			calloc(1, sizeof(struct SqshXattrIterator));
 	if (iterator == NULL) {
 		return NULL;
 	}
-	*err = sqsh_xattr_iterator_init(iterator, xattr_table, inode);
+	*err = sqsh_xattr_iterator_init(iterator, inode);
 	if (*err < 0) {
 		free(iterator);
 		return NULL;

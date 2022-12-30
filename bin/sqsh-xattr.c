@@ -68,7 +68,7 @@ print_value(const char *value, size_t size) {
 static int
 fattr_path(struct SqshPathResolverContext *resolver, char *path) {
 	struct SqshInodeContext inode = {0};
-	struct SqshXattrIterator iter = {0};
+	struct SqshXattrIterator *iter = NULL;
 
 	int rv = 0;
 	rv = sqsh_path_resolver_resolve(resolver, &inode, path);
@@ -78,20 +78,20 @@ fattr_path(struct SqshPathResolverContext *resolver, char *path) {
 		goto out;
 	}
 
-	rv = sqsh_inode_xattr_iterator(&inode, &iter);
+	iter = sqsh_xattr_iterator_new(&inode, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	while ((rv = sqsh_xattr_iterator_next(&iter)) > 0) {
-		const char *prefix = sqsh_xattr_iterator_prefix(&iter);
-		uint16_t prefix_len = sqsh_xattr_iterator_prefix_size(&iter);
-		const char *name = sqsh_xattr_iterator_name(&iter);
-		uint16_t name_len = sqsh_xattr_iterator_name_size(&iter);
-		const char *value = sqsh_xattr_iterator_value(&iter);
-		uint16_t value_len = sqsh_xattr_iterator_value_size(&iter);
+	while ((rv = sqsh_xattr_iterator_next(iter)) > 0) {
+		const char *prefix = sqsh_xattr_iterator_prefix(iter);
+		uint16_t prefix_len = sqsh_xattr_iterator_prefix_size(iter);
+		const char *name = sqsh_xattr_iterator_name(iter);
+		uint16_t name_len = sqsh_xattr_iterator_name_size(iter);
+		const char *value = sqsh_xattr_iterator_value(iter);
+		uint16_t value_len = sqsh_xattr_iterator_value_size(iter);
 
 		fwrite(prefix, prefix_len, 1, stdout);
 		fwrite(name, name_len, 1, stdout);
@@ -101,7 +101,7 @@ fattr_path(struct SqshPathResolverContext *resolver, char *path) {
 	}
 
 out:
-	sqsh_xattr_iterator_cleanup(&iter);
+	sqsh_xattr_iterator_free(iter);
 	sqsh_inode_cleanup(&inode);
 	return rv;
 }

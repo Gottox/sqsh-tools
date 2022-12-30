@@ -157,7 +157,7 @@ sqshfuse_getxattr(
 	const char *value_ptr = NULL;
 	size_t value_size;
 	struct SqshInodeContext inode = {0};
-	struct SqshXattrIterator iter = {0};
+	struct SqshXattrIterator *iter = NULL;
 
 	rv = sqsh_path_resolver_resolve(data.resolver, &inode, path);
 	if (rv < 0) {
@@ -165,7 +165,7 @@ sqshfuse_getxattr(
 		goto out;
 	}
 
-	rv = sqsh_inode_xattr_iterator(&inode, &iter);
+	iter = sqsh_xattr_iterator_new(&inode, &rv);
 	if (rv < 0) {
 		// TODO: this means that the archive is corrupt, not that it has no
 		// xattrs. Handle the error accordingly.
@@ -173,10 +173,10 @@ sqshfuse_getxattr(
 		goto out;
 	}
 
-	while (value_ptr == NULL && (rv = sqsh_xattr_iterator_next(&iter)) > 0) {
-		if (sqsh_xattr_iterator_fullname_cmp(&iter, name) == 0) {
-			value_ptr = sqsh_xattr_iterator_value(&iter);
-			value_size = sqsh_xattr_iterator_value_size(&iter);
+	while (value_ptr == NULL && (rv = sqsh_xattr_iterator_next(iter)) > 0) {
+		if (sqsh_xattr_iterator_fullname_cmp(iter, name) == 0) {
+			value_ptr = sqsh_xattr_iterator_value(iter);
+			value_size = sqsh_xattr_iterator_value_size(iter);
 		}
 	}
 	if (rv < 0) {
@@ -186,7 +186,7 @@ sqshfuse_getxattr(
 		rv = -ENODATA;
 		goto out;
 	} else if (value_size <= size) {
-		value_ptr = sqsh_xattr_iterator_value(&iter);
+		value_ptr = sqsh_xattr_iterator_value(iter);
 		memcpy(value, value_ptr, value_size);
 	} else if (size != 0) {
 		rv = -ERANGE;
@@ -195,7 +195,7 @@ sqshfuse_getxattr(
 
 	rv = value_size;
 out:
-	sqsh_xattr_iterator_cleanup(&iter);
+	sqsh_xattr_iterator_free(iter);
 	sqsh_inode_cleanup(&inode);
 	return rv;
 }
@@ -206,7 +206,7 @@ sqshfuse_listxattr(const char *path, char *list, size_t size) {
 	const char *prefix, *name;
 	char *p;
 	struct SqshInodeContext inode = {0};
-	struct SqshXattrIterator iter = {0};
+	struct SqshXattrIterator *iter = NULL;
 
 	rv = sqsh_path_resolver_resolve(data.resolver, &inode, path);
 	if (rv < 0) {
@@ -214,7 +214,7 @@ sqshfuse_listxattr(const char *path, char *list, size_t size) {
 		goto out;
 	}
 
-	rv = sqsh_inode_xattr_iterator(&inode, &iter);
+	iter = sqsh_xattr_iterator_new(&inode, &rv);
 	if (rv < 0) {
 		rv = -EINVAL; // TODO: find correct error code for this.
 		goto out;
@@ -222,25 +222,25 @@ sqshfuse_listxattr(const char *path, char *list, size_t size) {
 
 	p = list;
 	length = 0;
-	while ((rv = sqsh_xattr_iterator_next(&iter)) > 0) {
-		prefix = sqsh_xattr_iterator_prefix(&iter);
+	while ((rv = sqsh_xattr_iterator_next(iter)) > 0) {
+		prefix = sqsh_xattr_iterator_prefix(iter);
 		if (prefix == NULL) {
 			rv = -EINVAL; // TODO: find correct error code for this.
 			goto out;
 		}
-		element_length = sqsh_xattr_iterator_prefix_size(&iter);
+		element_length = sqsh_xattr_iterator_prefix_size(iter);
 		length += element_length;
 		if (length < size) {
 			strcpy(p, prefix);
 			p = &list[length];
 		}
 
-		name = sqsh_xattr_iterator_name(&iter);
+		name = sqsh_xattr_iterator_name(iter);
 		if (name == NULL) {
 			rv = -EINVAL; // TODO: find correct error code for this.
 			goto out;
 		}
-		element_length = sqsh_xattr_iterator_name_size(&iter);
+		element_length = sqsh_xattr_iterator_name_size(iter);
 		length += element_length;
 		if (length + 1 < size) {
 			strcpy(p, name);
@@ -257,7 +257,7 @@ sqshfuse_listxattr(const char *path, char *list, size_t size) {
 	rv = length;
 
 out:
-	sqsh_xattr_iterator_cleanup(&iter);
+	sqsh_xattr_iterator_free(iter);
 	sqsh_inode_cleanup(&inode);
 	return rv;
 }

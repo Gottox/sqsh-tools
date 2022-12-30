@@ -542,9 +542,12 @@ uint32_t sqsh_inode_gid(const struct SqshInodeContext *context);
  * @return the index of the extended attribute inside of the xattr table.
  */
 uint32_t sqsh_inode_xattr_index(const struct SqshInodeContext *context);
-SQSH_NO_UNUSED int sqsh_inode_xattr_iterator(
-		const struct SqshInodeContext *context,
-		struct SqshXattrIterator *iterator);
+/**
+ * @brief cleans up the inode context.
+ * @memberof SqshInodeContext
+ * @param context The inode context.
+ * @return int 0 on success, less than 0 on error.
+ */
 int sqsh_inode_cleanup(struct SqshInodeContext *context);
 /**
  * @brief converts an inode reference into a block index and a block offset

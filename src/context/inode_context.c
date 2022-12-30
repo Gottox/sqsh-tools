@@ -569,20 +569,6 @@ sqsh_inode_xattr_index(const struct SqshInodeContext *context) {
 }
 
 int
-sqsh_inode_xattr_iterator(
-		const struct SqshInodeContext *inode,
-		struct SqshXattrIterator *iterator) {
-	int rv = 0;
-	struct SqshXattrTable *table = NULL;
-
-	rv = sqsh_xattr_table(inode->sqsh, &table);
-	if (rv < 0 && rv != -SQSH_ERROR_NO_XATTR_TABLE) {
-		return rv;
-	}
-	return sqsh_xattr_iterator_init(iterator, table, inode);
-}
-
-int
 sqsh_inode_cleanup(struct SqshInodeContext *inode) {
 	return sqsh_metablock_stream_cleanup(&inode->metablock);
 }
