@@ -107,7 +107,7 @@ sqsh_directory_iterator_inode_ref(const struct SqshDirectoryIterator *iterator);
 enum SqshInodeContextType sqsh_directory_iterator_inode_type(
 		const struct SqshDirectoryIterator *iterator);
 SQSH_NO_UNUSED struct SqshInodeContext *sqsh_directory_iterator_inode_load(
-		const struct SqshDirectoryIterator *iterator, int *rv);
+		const struct SqshDirectoryIterator *iterator, int *err);
 const char *
 sqsh_directory_iterator_name(const struct SqshDirectoryIterator *iterator);
 SQSH_NO_UNUSED int sqsh_directory_iterator_name_dup(
