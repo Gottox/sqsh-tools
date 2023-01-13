@@ -90,21 +90,21 @@ extract_directory_entry(
 		struct SqshDirectoryIterator *iter,
 		const struct PathStack *path_stack) {
 	int rv;
-	struct SqshInodeContext inode = {0};
+	struct SqshInodeContext *inode = NULL;
 	const char *filename_ptr = sqsh_directory_iterator_name(iter);
 	size_t size = sqsh_directory_iterator_name_size(iter);
 	char filename[size + 1];
 	memcpy(filename, filename_ptr, size);
 	filename[size] = '\0';
 
-	rv = sqsh_directory_iterator_inode_load(iter, &inode);
+	inode = sqsh_directory_iterator_inode_load(iter, &rv);
 	if (rv < 0) {
 		print_err(rv, "sqsh_directory_iterator_inode_load", path_stack);
 		goto out;
 	}
-	rv = extract(filename, &inode, path_stack);
+	rv = extract(filename, inode, path_stack);
 out:
-	sqsh_inode_cleanup(&inode);
+	sqsh_inode_free(inode);
 	return rv;
 }
 

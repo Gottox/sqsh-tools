@@ -320,6 +320,17 @@ struct SqshInodeContext {
 };
 
 /**
+ * @brief Initializes an inode context in heap
+ * @memberof SqshInodeContext
+ * @param sqsh The sqsh context to use.
+ * @param inode_ref The inode reference to initialize the context with.
+ * @param err err the error pointer.
+ * @return a pointer to the sqsh context or NULL if an error occurred.
+ */
+SQSH_NO_UNUSED struct SqshInodeContext *
+sqsh_inode_new(struct Sqsh *sqsh, uint64_t inode_ref, int *err);
+
+/**
  * @brief Initialize the inode context from a inode reference. inode references
  * @memberof SqshInodeContext
  * are descriptors of the physical location of an inode inside the inode table.
@@ -549,6 +560,13 @@ uint32_t sqsh_inode_xattr_index(const struct SqshInodeContext *context);
  * @return int 0 on success, less than 0 on error.
  */
 int sqsh_inode_cleanup(struct SqshInodeContext *context);
+/**
+ * @brief cleans up an inode context and frees the memory.
+ * @memberof SqshInodeContext
+ * @param context The inode context.
+ * @return int 0 on success, less than 0 on error.
+ */
+int sqsh_inode_free(struct SqshInodeContext *context);
 /**
  * @brief converts an inode reference into a block index and a block offset
  * @memberof SqshInodeContext

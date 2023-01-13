@@ -122,6 +122,21 @@ get_size_info(const struct SqshInodeContext *context, int index) {
 	abort();
 }
 
+struct SqshInodeContext *
+sqsh_inode_new(struct Sqsh *sqsh, uint64_t inode_ref, int *err) {
+	struct SqshInodeContext *context =
+			calloc(1, sizeof(struct SqshInodeContext));
+	if (context == NULL) {
+		return NULL;
+	}
+	*err = sqsh_inode_init_by_ref(context, sqsh, inode_ref);
+	if (*err < 0) {
+		free(context);
+		return NULL;
+	}
+	return context;
+}
+
 int
 sqsh_inode_init_by_ref(
 		struct SqshInodeContext *inode, struct Sqsh *sqsh, uint64_t inode_ref) {
@@ -571,6 +586,16 @@ sqsh_inode_xattr_index(const struct SqshInodeContext *context) {
 int
 sqsh_inode_cleanup(struct SqshInodeContext *inode) {
 	return sqsh_metablock_stream_cleanup(&inode->metablock);
+}
+
+int
+sqsh_inode_free(struct SqshInodeContext *context) {
+	if (context == NULL) {
+		return 0;
+	}
+	int rv = sqsh_inode_cleanup(context);
+	free(context);
+	return rv;
 }
 
 void

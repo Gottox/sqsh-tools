@@ -219,14 +219,13 @@ sqsh_directory_iterator_inode_type(
 	return SQSH_INODE_TYPE_UNKNOWN;
 }
 
-int
+struct SqshInodeContext *
 sqsh_directory_iterator_inode_load(
-		const struct SqshDirectoryIterator *iterator,
-		struct SqshInodeContext *inode) {
+		const struct SqshDirectoryIterator *iterator, int *rv) {
 	uint64_t inode_ref = sqsh_directory_iterator_inode_ref(iterator);
 	struct Sqsh *sqsh = iterator->inode->sqsh;
 
-	return sqsh_inode_init_by_ref(inode, sqsh, inode_ref);
+	return sqsh_inode_new(sqsh, inode_ref, rv);
 }
 
 int

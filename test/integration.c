@@ -340,7 +340,7 @@ sqsh_test_xattr(void) {
 	int rv;
 	char *name, *value;
 	struct SqshInodeContext inode = {0};
-	struct SqshInodeContext entry_inode = {0};
+	struct SqshInodeContext *entry_inode = NULL;
 	struct SqshDirectoryIterator dir_iter = {0};
 	struct SqshXattrIterator xattr_iter = {0};
 	struct Sqsh sqsh = {0};
@@ -370,9 +370,9 @@ sqsh_test_xattr(void) {
 	assert(rv == 1);
 	assert(strcmp("a", name) == 0);
 	free(name);
-	rv = sqsh_directory_iterator_inode_load(&dir_iter, &entry_inode);
+	entry_inode = sqsh_directory_iterator_inode_load(&dir_iter, &rv);
 	assert(rv == 0);
-	rv = sqsh_xattr_iterator_init(&xattr_iter, &entry_inode);
+	rv = sqsh_xattr_iterator_init(&xattr_iter, entry_inode);
 	assert(rv == 0);
 	rv = sqsh_xattr_iterator_next(&xattr_iter);
 	assert(rv > 0);
@@ -389,7 +389,7 @@ sqsh_test_xattr(void) {
 	assert(rv == 0);
 	rv = sqsh_xattr_iterator_cleanup(&xattr_iter);
 	assert(rv == 0);
-	rv = sqsh_inode_cleanup(&entry_inode);
+	rv = sqsh_inode_free(entry_inode);
 	assert(rv == 0);
 
 	rv = sqsh_directory_iterator_next(&dir_iter);
@@ -398,9 +398,9 @@ sqsh_test_xattr(void) {
 	assert(rv == 1);
 	assert(strcmp("b", name) == 0);
 	free(name);
-	rv = sqsh_directory_iterator_inode_load(&dir_iter, &entry_inode);
+	entry_inode = sqsh_directory_iterator_inode_load(&dir_iter, &rv);
 	assert(rv == 0);
-	rv = sqsh_xattr_iterator_init(&xattr_iter, &entry_inode);
+	rv = sqsh_xattr_iterator_init(&xattr_iter, entry_inode);
 	assert(rv == 0);
 	rv = sqsh_xattr_iterator_next(&xattr_iter);
 	assert(rv > 0);
@@ -417,7 +417,7 @@ sqsh_test_xattr(void) {
 	assert(rv == 0);
 	rv = sqsh_xattr_iterator_cleanup(&xattr_iter);
 	assert(rv == 0);
-	rv = sqsh_inode_cleanup(&entry_inode);
+	rv = sqsh_inode_free(entry_inode);
 	assert(rv == 0);
 
 	rv = sqsh_directory_iterator_cleanup(&dir_iter);

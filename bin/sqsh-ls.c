@@ -137,15 +137,15 @@ print_detail_inode(struct SqshInodeContext *inode, const char *path) {
 static int
 print_detail(const struct SqshDirectoryIterator *iter, const char *path) {
 	int rv = 0;
-	struct SqshInodeContext inode = {0};
+	struct SqshInodeContext *inode = NULL;
 
-	rv = sqsh_directory_iterator_inode_load(iter, &inode);
+	inode = sqsh_directory_iterator_inode_load(iter, &rv);
 	if (rv < 0) {
 		goto out;
 	}
-	print_detail_inode(&inode, path);
+	print_detail_inode(inode, path);
 out:
-	sqsh_inode_cleanup(&inode);
+	sqsh_inode_free(inode);
 	return rv;
 }
 
@@ -154,7 +154,7 @@ ls_item(struct SqshPathResolverContext *resolver, const char *path,
 		struct SqshDirectoryIterator *iter) {
 	int rv = 0;
 	int len = 0;
-	struct SqshInodeContext entry_inode = {0};
+	struct SqshInodeContext *entry_inode = NULL;
 	const char *name = sqsh_directory_iterator_name(iter);
 	const int name_size = sqsh_directory_iterator_name_size(iter);
 	char *current_path =
@@ -176,15 +176,15 @@ ls_item(struct SqshPathResolverContext *resolver, const char *path,
 
 	if (recursive &&
 		sqsh_directory_iterator_inode_type(iter) == SQSH_INODE_TYPE_DIRECTORY) {
-		rv = sqsh_directory_iterator_inode_load(iter, &entry_inode);
+		entry_inode = sqsh_directory_iterator_inode_load(iter, &rv);
 		if (rv < 0) {
 			goto out;
 		}
-		rv = ls(resolver, current_path, &entry_inode);
+		rv = ls(resolver, current_path, entry_inode);
 		if (rv < 0) {
 			goto out;
 		}
-		sqsh_inode_cleanup(&entry_inode);
+		sqsh_inode_free(entry_inode);
 	}
 
 out:
