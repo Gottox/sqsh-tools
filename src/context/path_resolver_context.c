@@ -33,7 +33,7 @@
 
 #include "../utils.h"
 #include <sqsh.h>
-#include <sqsh_context.h>
+#include <sqsh_context_private.h>
 #include <sqsh_error.h>
 #include <sqsh_iterator.h>
 
@@ -76,7 +76,7 @@ path_find_inode_ref(
 	struct SqshInodeContext inode = {0};
 	struct SqshDirectoryIterator iter = {0};
 	int rv = 0;
-	rv = sqsh_inode_init_by_ref(&inode, sqsh, dir_ref);
+	rv = sqsh__inode_init(&inode, sqsh, dir_ref);
 	if (rv < 0) {
 		goto out;
 	}
@@ -93,7 +93,7 @@ path_find_inode_ref(
 
 out:
 	sqsh_directory_iterator_cleanup(&iter);
-	sqsh_inode_cleanup(&inode);
+	sqsh__inode_cleanup(&inode);
 	return rv;
 }
 
@@ -119,12 +119,12 @@ sqsh_path_resolver_init(
 	return 0;
 }
 
-int
+struct SqshInodeContext *
 sqsh_path_resolver_resolve(
-		struct SqshPathResolverContext *context, struct SqshInodeContext *inode,
-		const char *path) {
+		struct SqshPathResolverContext *context, const char *path, int *err) {
 	int i;
 	int rv = 0;
+	struct SqshInodeContext *inode = NULL;
 	int segment_count = path_segments_count(path) + 1;
 	struct SqshSuperblockContext *superblock = sqsh_superblock(context->sqsh);
 	const char *segment = path;
@@ -154,11 +154,12 @@ sqsh_path_resolver_resolve(
 		}
 	}
 
-	rv = sqsh_inode_init_by_ref(inode, context->sqsh, inode_refs[i]);
+	inode = sqsh_inode_new(context->sqsh, inode_refs[i], &rv);
 
 out:
 	free(inode_refs);
-	return rv;
+	*err = rv;
+	return inode;
 }
 
 int

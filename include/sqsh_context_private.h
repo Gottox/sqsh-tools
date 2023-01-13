@@ -110,6 +110,32 @@ SQSH_NO_UNUSED int sqsh__file_init(
  */
 int sqsh__file_cleanup(struct SqshFileContext *context);
 
+// context/inode_context.c
+
+/**
+ * @internal
+ * @brief Initialize the inode context from a inode reference. inode references
+ * @memberof SqshInodeContext
+ * are descriptors of the physical location of an inode inside the inode table.
+ * They are diffrent from the inode number. In doubt use the inode number.
+ *
+ * @param context The inode context to initialize.
+ * @param sqsh The sqsh context.
+ * @param inode_ref The inode reference.
+ * @return int 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int sqsh__inode_init(
+		struct SqshInodeContext *context, struct Sqsh *sqsh,
+		uint64_t inode_ref);
+/**
+ * @internal
+ * @brief cleans up the inode context.
+ * @memberof SqshInodeContext
+ * @param context The inode context.
+ * @return int 0 on success, less than 0 on error.
+ */
+int sqsh__inode_cleanup(struct SqshInodeContext *context);
+
 #ifdef __cplusplus
 }
 #endif

@@ -100,26 +100,26 @@ sqshfuse_getattr(
 	int rv = 0;
 	memset(stbuf, 0, sizeof(struct stat));
 
-	struct SqshInodeContext inode = {0};
+	struct SqshInodeContext *inode = NULL;
 	struct SqshSuperblockContext *superblock = sqsh_superblock(data.sqsh);
 
-	rv = sqsh_path_resolver_resolve(data.resolver, &inode, path);
+	inode = sqsh_path_resolver_resolve(data.resolver, path, &rv);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
 	}
 
-	stbuf->st_ino = sqsh_inode_number(&inode);
-	stbuf->st_mode = sqsh_inode_permission(&inode);
-	stbuf->st_nlink = sqsh_inode_hard_link_count(&inode);
-	stbuf->st_uid = sqsh_inode_uid(&inode);
-	stbuf->st_gid = sqsh_inode_gid(&inode);
-	stbuf->st_rdev = sqsh_inode_device_id(&inode);
-	stbuf->st_size = sqsh_inode_file_size(&inode);
+	stbuf->st_ino = sqsh_inode_number(inode);
+	stbuf->st_mode = sqsh_inode_permission(inode);
+	stbuf->st_nlink = sqsh_inode_hard_link_count(inode);
+	stbuf->st_uid = sqsh_inode_uid(inode);
+	stbuf->st_gid = sqsh_inode_gid(inode);
+	stbuf->st_rdev = sqsh_inode_device_id(inode);
+	stbuf->st_size = sqsh_inode_file_size(inode);
 	stbuf->st_blksize = sqsh_superblock_block_size(superblock);
 	stbuf->st_mtime = stbuf->st_ctime = stbuf->st_atime =
-			sqsh_inode_modified_time(&inode);
-	switch (sqsh_inode_type(&inode)) {
+			sqsh_inode_modified_time(inode);
+	switch (sqsh_inode_type(inode)) {
 	case SQSH_INODE_TYPE_DIRECTORY:
 		stbuf->st_mode |= S_IFDIR;
 		break;
@@ -146,7 +146,7 @@ sqshfuse_getattr(
 		goto out;
 	}
 out:
-	sqsh_inode_cleanup(&inode);
+	sqsh_inode_free(inode);
 	return rv;
 }
 
@@ -156,16 +156,16 @@ sqshfuse_getxattr(
 	int rv = 0;
 	const char *value_ptr = NULL;
 	size_t value_size;
-	struct SqshInodeContext inode = {0};
+	struct SqshInodeContext *inode = NULL;
 	struct SqshXattrIterator *iter = NULL;
 
-	rv = sqsh_path_resolver_resolve(data.resolver, &inode, path);
+	inode = sqsh_path_resolver_resolve(data.resolver, path, &rv);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
 	}
 
-	iter = sqsh_xattr_iterator_new(&inode, &rv);
+	iter = sqsh_xattr_iterator_new(inode, &rv);
 	if (rv < 0) {
 		// TODO: this means that the archive is corrupt, not that it has no
 		// xattrs. Handle the error accordingly.
@@ -196,7 +196,7 @@ sqshfuse_getxattr(
 	rv = value_size;
 out:
 	sqsh_xattr_iterator_free(iter);
-	sqsh_inode_cleanup(&inode);
+	sqsh_inode_free(inode);
 	return rv;
 }
 static int
@@ -205,16 +205,16 @@ sqshfuse_listxattr(const char *path, char *list, size_t size) {
 	size_t element_length, length;
 	const char *prefix, *name;
 	char *p;
-	struct SqshInodeContext inode = {0};
+	struct SqshInodeContext *inode = NULL;
 	struct SqshXattrIterator *iter = NULL;
 
-	rv = sqsh_path_resolver_resolve(data.resolver, &inode, path);
+	inode = sqsh_path_resolver_resolve(data.resolver, path, &rv);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
 	}
 
-	iter = sqsh_xattr_iterator_new(&inode, &rv);
+	iter = sqsh_xattr_iterator_new(inode, &rv);
 	if (rv < 0) {
 		rv = -EINVAL; // TODO: find correct error code for this.
 		goto out;
@@ -258,7 +258,7 @@ sqshfuse_listxattr(const char *path, char *list, size_t size) {
 
 out:
 	sqsh_xattr_iterator_free(iter);
-	sqsh_inode_cleanup(&inode);
+	sqsh_inode_free(inode);
 	return rv;
 }
 
@@ -270,14 +270,14 @@ sqshfuse_readdir(
 	(void)offset; // TODO
 	(void)flags; // TODO
 	int rv = 0;
-	struct SqshInodeContext inode = {0};
+	struct SqshInodeContext *inode = NULL;
 	struct SqshDirectoryIterator *iter = NULL;
-	rv = sqsh_path_resolver_resolve(data.resolver, &inode, path);
+	inode = sqsh_path_resolver_resolve(data.resolver, path, &rv);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
 	}
-	iter = sqsh_directory_iterator_new(&inode, &rv);
+	iter = sqsh_directory_iterator_new(inode, &rv);
 	if (rv < 0) {
 		rv = -ENOMEM;
 		goto out;
@@ -303,16 +303,16 @@ sqshfuse_readdir(
 
 out:
 	sqsh_directory_iterator_free(iter);
-	sqsh_inode_cleanup(&inode);
+	sqsh_inode_free(inode);
 	return rv;
 }
 
 static int
 sqshfuse_open(const char *path, struct fuse_file_info *fi) {
 	int rv = 0;
-	struct SqshInodeContext inode = {0};
+	struct SqshInodeContext *inode = NULL;
 
-	rv = sqsh_path_resolver_resolve(data.resolver, &inode, path);
+	inode = sqsh_path_resolver_resolve(data.resolver, path, &rv);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
@@ -323,7 +323,7 @@ sqshfuse_open(const char *path, struct fuse_file_info *fi) {
 	}
 
 out:
-	sqsh_inode_cleanup(&inode);
+	sqsh_inode_free(inode);
 	return rv;
 }
 
@@ -333,23 +333,23 @@ sqshfuse_read(
 		struct fuse_file_info *fi) {
 	(void)fi;
 	int rv = 0;
-	struct SqshInodeContext inode = {0};
+	struct SqshInodeContext *inode = NULL;
 	struct SqshFileContext *file = NULL;
 
-	rv = sqsh_path_resolver_resolve(data.resolver, &inode, path);
+	inode = sqsh_path_resolver_resolve(data.resolver, path, &rv);
 	if (rv < 0) {
 		// TODO: Better return type
 		rv = -EINVAL;
 		goto out;
 	}
-	file = sqsh_file_new(&inode, &rv);
+	file = sqsh_file_new(inode, &rv);
 	if (rv < 0) {
 		// TODO: Better return type
 		rv = -EINVAL;
 		goto out;
 	}
 
-	size = SQSH_MIN(size, sqsh_inode_file_size(&inode));
+	size = SQSH_MIN(size, sqsh_inode_file_size(inode));
 	rv = sqsh_file_seek(file, offset);
 	if (rv < 0) {
 		// TODO: Better return type
@@ -370,30 +370,30 @@ sqshfuse_read(
 	rv = size;
 out:
 	sqsh_file_free(file);
-	sqsh_inode_cleanup(&inode);
+	sqsh_inode_free(inode);
 	return rv;
 }
 
 static int
 sqshfuse_readlink(const char *path, char *buf, size_t size) {
 	int rv = 0;
-	struct SqshInodeContext inode = {0};
+	struct SqshInodeContext *inode = NULL;
 
-	rv = sqsh_path_resolver_resolve(data.resolver, &inode, path);
+	inode = sqsh_path_resolver_resolve(data.resolver, path, &rv);
 	if (rv < 0) {
 		rv = -ENOENT;
 		goto out;
 	}
 
-	const char *symlink = sqsh_inode_symlink(&inode);
-	size_t symlink_size = sqsh_inode_symlink_size(&inode);
+	const char *symlink = sqsh_inode_symlink(inode);
+	size_t symlink_size = sqsh_inode_symlink_size(inode);
 	size_t cpy_size = SQSH_MIN(symlink_size, size - 1);
 
 	memcpy(buf, symlink, cpy_size);
 	buf[cpy_size] = 0;
 
 out:
-	sqsh_inode_cleanup(&inode);
+	sqsh_inode_free(inode);
 	return rv;
 }
 

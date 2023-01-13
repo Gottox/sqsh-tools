@@ -221,22 +221,22 @@ out:
 
 static int
 ls_path(struct SqshPathResolverContext *resolver, char *path) {
-	struct SqshInodeContext inode = {0};
+	struct SqshInodeContext *inode = NULL;
 	int rv = 0;
 
-	rv = sqsh_path_resolver_resolve(resolver, &inode, path);
+	inode = sqsh_path_resolver_resolve(resolver, path, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		goto out;
 	}
-	if (sqsh_inode_type(&inode) == SQSH_INODE_TYPE_DIRECTORY) {
+	if (sqsh_inode_type(inode) == SQSH_INODE_TYPE_DIRECTORY) {
 		if (rv < 0) {
 			sqsh_perror(rv, path);
 			rv = EXIT_FAILURE;
 			goto out;
 		}
 
-		rv = ls(resolver, path, &inode);
+		rv = ls(resolver, path, inode);
 		if (rv < 0) {
 			sqsh_perror(rv, path);
 			rv = EXIT_FAILURE;
@@ -244,13 +244,13 @@ ls_path(struct SqshPathResolverContext *resolver, char *path) {
 		}
 	} else {
 		if (print_item == print_detail) {
-			print_detail_inode(&inode, path);
+			print_detail_inode(inode, path);
 		} else {
 			puts(path);
 		}
 	}
 out:
-	sqsh_inode_cleanup(&inode);
+	sqsh_inode_free(inode);
 	return rv;
 }
 

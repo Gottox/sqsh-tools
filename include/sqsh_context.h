@@ -331,41 +331,6 @@ SQSH_NO_UNUSED struct SqshInodeContext *
 sqsh_inode_new(struct Sqsh *sqsh, uint64_t inode_ref, int *err);
 
 /**
- * @brief Initialize the inode context from a inode reference. inode references
- * @memberof SqshInodeContext
- * are descriptors of the physical location of an inode inside the inode table.
- * They are diffrent from the inode number. In doubt use the inode number.
- *
- * @param context The inode context to initialize.
- * @param sqsh The sqsh context.
- * @param inode_ref The inode reference.
- * @return int 0 on success, less than 0 on error.
- */
-SQSH_NO_UNUSED int sqsh_inode_init_by_ref(
-		struct SqshInodeContext *context, struct Sqsh *sqsh,
-		uint64_t inode_ref);
-/**
- * @brief Initialize the inode context of the root directory.
- * @memberof SqshInodeContext
- * @param context The inode context to initialize.
- * @param sqsh The sqsh context.
- * @return int 0 on success, less than 0 on error.
- */
-SQSH_NO_UNUSED int
-sqsh_inode_init_root(struct SqshInodeContext *context, struct Sqsh *sqsh);
-/**
- * @brief Initialize the inode context from an inode number.
- * @memberof SqshInodeContext
- * @param context The inode context to initialize.
- * @param sqsh The sqsh context.
- * @param inode_number The inode number.
- * @return int 0 on success, less than 0 on error.
- */
-SQSH_NO_UNUSED int sqsh_inode_init_by_inode_number(
-		struct SqshInodeContext *context, struct Sqsh *sqsh,
-		uint64_t inode_number);
-
-/**
  * @brief returns whether the inode is an extended structure.
  * @memberof SqshInodeContext
  * @param context The inode context.
@@ -554,13 +519,6 @@ uint32_t sqsh_inode_gid(const struct SqshInodeContext *context);
  */
 uint32_t sqsh_inode_xattr_index(const struct SqshInodeContext *context);
 /**
- * @brief cleans up the inode context.
- * @memberof SqshInodeContext
- * @param context The inode context.
- * @return int 0 on success, less than 0 on error.
- */
-int sqsh_inode_cleanup(struct SqshInodeContext *context);
-/**
  * @brief cleans up an inode context and frees the memory.
  * @memberof SqshInodeContext
  * @param context The inode context.
@@ -616,13 +574,12 @@ SQSH_NO_UNUSED int sqsh_path_resolver_init(
  * @brief Initialize the inode context from a path.
  * @memberof SqshPathResolverContext
  * @param context The path resolver context.
- * @param inode The inode context to initialize.
  * @param path The path the file or directory.
- * @return int 0 on success, less than 0 on error.
+ * @param err Pointer to set to an error code on error.
+ * @return an inode context on success, NULL on error
  */
-SQSH_NO_UNUSED int sqsh_path_resolver_resolve(
-		struct SqshPathResolverContext *context, struct SqshInodeContext *inode,
-		const char *path);
+SQSH_NO_UNUSED struct SqshInodeContext *sqsh_path_resolver_resolve(
+		struct SqshPathResolverContext *context, const char *path, int *err);
 
 /**
  * @brief cleans up a path resolver context.

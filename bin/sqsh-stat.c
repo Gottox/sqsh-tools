@@ -268,58 +268,56 @@ inode_type_name(int type) {
 static int
 stat_file(struct SqshPathResolverContext *resolver, const char *path) {
 	int rv = 0;
-	struct SqshInodeContext inode = {0};
+	struct SqshInodeContext *inode = NULL;
 	bool has_fragment = false;
-	rv = sqsh_path_resolver_resolve(resolver, &inode, path);
+	inode = sqsh_path_resolver_resolve(resolver, path, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		return rv;
 	}
 
-	int inode_type = sqsh_inode_type(&inode);
+	int inode_type = sqsh_inode_type(inode);
 	printf("         inode type: %s\n", inode_type_name(inode_type));
 	printf(" extended structure: %s\n",
-		   sqsh_inode_is_extended(&inode) ? "yes" : "no");
-	printf("       inode number: %i\n", sqsh_inode_number(&inode));
-	printf("        permissions: %04o\n", sqsh_inode_permission(&inode));
-	printf("                uid: %i\n", sqsh_inode_uid(&inode));
-	printf("                gid: %i\n", sqsh_inode_gid(&inode));
-	printf("    hard link count: %i\n", sqsh_inode_hard_link_count(&inode));
-	printf("          file size: %" PRIu64 "\n", sqsh_inode_file_size(&inode));
+		   sqsh_inode_is_extended(inode) ? "yes" : "no");
+	printf("       inode number: %i\n", sqsh_inode_number(inode));
+	printf("        permissions: %04o\n", sqsh_inode_permission(inode));
+	printf("                uid: %i\n", sqsh_inode_uid(inode));
+	printf("                gid: %i\n", sqsh_inode_gid(inode));
+	printf("    hard link count: %i\n", sqsh_inode_hard_link_count(inode));
+	printf("          file size: %" PRIu64 "\n", sqsh_inode_file_size(inode));
 	switch (inode_type) {
 	case SQSH_INODE_TYPE_FILE:
-		has_fragment = sqsh_inode_file_has_fragment(&inode);
+		has_fragment = sqsh_inode_file_has_fragment(inode);
 		printf("       has fragment: %s\n", has_fragment ? "yes" : "no");
 		if (has_fragment) {
 			printf("     fragment index: %i\n",
-				   sqsh_inode_file_fragment_block_index(&inode));
+				   sqsh_inode_file_fragment_block_index(inode));
 			printf("    fragment offset: %i\n",
-				   sqsh_inode_file_fragment_block_offset(&inode));
+				   sqsh_inode_file_fragment_block_offset(inode));
 		}
-		printf("   number of blocks: %i\n",
-			   sqsh_inode_file_block_count(&inode));
-		for (uint32_t i = 0; i < sqsh_inode_file_block_count(&inode); i++) {
-			bool is_compressed = sqsh_inode_file_block_is_compressed(&inode, i);
-			uint32_t size = sqsh_inode_file_block_size(&inode, i);
+		printf("   number of blocks: %i\n", sqsh_inode_file_block_count(inode));
+		for (uint32_t i = 0; i < sqsh_inode_file_block_count(inode); i++) {
+			bool is_compressed = sqsh_inode_file_block_is_compressed(inode, i);
+			uint32_t size = sqsh_inode_file_block_size(inode, i);
 
 			printf("                    - %i (compressed: %s)\n", size,
 				   is_compressed ? "yes" : "no");
 		}
 		break;
 	case SQSH_INODE_TYPE_SYMLINK:
-		printf("     symlink target: %.*s\n", sqsh_inode_symlink_size(&inode),
-			   sqsh_inode_symlink(&inode));
+		printf("     symlink target: %.*s\n", sqsh_inode_symlink_size(inode),
+			   sqsh_inode_symlink(inode));
 		break;
 	case SQSH_INODE_TYPE_BLOCK:
 	case SQSH_INODE_TYPE_CHAR:
 		printf("       device major: %i\n",
-			   (sqsh_inode_device_id(&inode) & 0xFFF00) >> 8);
-		printf("       device minor: %i\n",
-			   sqsh_inode_device_id(&inode) & 0xFF);
+			   (sqsh_inode_device_id(inode) & 0xFFF00) >> 8);
+		printf("       device minor: %i\n", sqsh_inode_device_id(inode) & 0xFF);
 		break;
 	}
 
-	sqsh_inode_cleanup(&inode);
+	sqsh_inode_free(inode);
 	return rv;
 }
 

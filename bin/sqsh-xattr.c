@@ -67,18 +67,18 @@ print_value(const char *value, size_t size) {
 }
 static int
 fattr_path(struct SqshPathResolverContext *resolver, char *path) {
-	struct SqshInodeContext inode = {0};
+	struct SqshInodeContext *inode = NULL;
 	struct SqshXattrIterator *iter = NULL;
 
 	int rv = 0;
-	rv = sqsh_path_resolver_resolve(resolver, &inode, path);
+	inode = sqsh_path_resolver_resolve(resolver, path, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	iter = sqsh_xattr_iterator_new(&inode, &rv);
+	iter = sqsh_xattr_iterator_new(inode, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		rv = EXIT_FAILURE;
@@ -102,7 +102,7 @@ fattr_path(struct SqshPathResolverContext *resolver, char *path) {
 
 out:
 	sqsh_xattr_iterator_free(iter);
-	sqsh_inode_cleanup(&inode);
+	sqsh_inode_free(inode);
 	return rv;
 }
 

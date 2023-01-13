@@ -49,26 +49,26 @@ usage(char *arg0) {
 }
 
 static int
-cat_path(struct SqshPathResolverContext *sqsh, char *path) {
-	struct SqshInodeContext inode = {0};
+cat_path(struct SqshPathResolverContext *resolver, char *path) {
+	struct SqshInodeContext *inode = NULL;
 	struct SqshFileContext *file = NULL;
 
 	int rv = 0;
-	rv = sqsh_path_resolver_resolve(sqsh, &inode, path);
+	inode = sqsh_path_resolver_resolve(resolver, path, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	file = sqsh_file_new(&inode, &rv);
+	file = sqsh_file_new(inode, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	rv = sqsh_file_read(file, sqsh_inode_file_size(&inode));
+	rv = sqsh_file_read(file, sqsh_inode_file_size(inode));
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		rv = EXIT_FAILURE;
@@ -78,7 +78,7 @@ cat_path(struct SqshPathResolverContext *sqsh, char *path) {
 	fwrite(sqsh_file_data(file), sizeof(uint8_t), sqsh_file_size(file), stdout);
 out:
 	sqsh_file_free(file);
-	sqsh_inode_cleanup(&inode);
+	sqsh_inode_free(inode);
 	return rv;
 }
 

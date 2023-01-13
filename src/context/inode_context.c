@@ -33,7 +33,7 @@
 
 #include "../utils.h"
 #include <sqsh.h>
-#include <sqsh_context.h>
+#include <sqsh_context_private.h>
 #include <sqsh_data_private.h>
 #include <sqsh_error.h>
 #include <sqsh_iterator.h>
@@ -122,23 +122,8 @@ get_size_info(const struct SqshInodeContext *context, int index) {
 	abort();
 }
 
-struct SqshInodeContext *
-sqsh_inode_new(struct Sqsh *sqsh, uint64_t inode_ref, int *err) {
-	struct SqshInodeContext *context =
-			calloc(1, sizeof(struct SqshInodeContext));
-	if (context == NULL) {
-		return NULL;
-	}
-	*err = sqsh_inode_init_by_ref(context, sqsh, inode_ref);
-	if (*err < 0) {
-		free(context);
-		return NULL;
-	}
-	return context;
-}
-
 int
-sqsh_inode_init_by_ref(
+sqsh__inode_init(
 		struct SqshInodeContext *inode, struct Sqsh *sqsh, uint64_t inode_ref) {
 	uint32_t inode_block;
 	uint16_t inode_offset;
@@ -176,32 +161,19 @@ sqsh_inode_init_by_ref(
 	return rv;
 }
 
-int
-sqsh_inode_init_root(struct SqshInodeContext *inode, struct Sqsh *sqsh) {
-	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
-	uint64_t inode_ref = sqsh_superblock_inode_root_ref(superblock);
-
-	return sqsh_inode_init_by_ref(inode, sqsh, inode_ref);
-}
-
-int
-sqsh_inode_init_by_inode_number(
-		struct SqshInodeContext *inode, struct Sqsh *sqsh,
-		uint64_t inode_number) {
-	int rv = 0;
-	uint64_t inode_ref;
-	struct SqshTable *export_table;
-
-	rv = sqsh_export_table(sqsh, &export_table);
-	if (rv < 0) {
-		return rv;
+struct SqshInodeContext *
+sqsh_inode_new(struct Sqsh *sqsh, uint64_t inode_ref, int *err) {
+	struct SqshInodeContext *context =
+			calloc(1, sizeof(struct SqshInodeContext));
+	if (context == NULL) {
+		return NULL;
 	}
-
-	rv = sqsh_table_get(export_table, inode_number, &inode_ref);
-	if (rv < 0) {
-		return rv;
+	*err = sqsh__inode_init(context, sqsh, inode_ref);
+	if (*err < 0) {
+		free(context);
+		return NULL;
 	}
-	return sqsh_inode_init_by_ref(inode, sqsh, inode_ref);
+	return context;
 }
 
 bool
@@ -584,7 +556,7 @@ sqsh_inode_xattr_index(const struct SqshInodeContext *context) {
 }
 
 int
-sqsh_inode_cleanup(struct SqshInodeContext *inode) {
+sqsh__inode_cleanup(struct SqshInodeContext *inode) {
 	return sqsh_metablock_stream_cleanup(&inode->metablock);
 }
 
@@ -593,7 +565,7 @@ sqsh_inode_free(struct SqshInodeContext *context) {
 	if (context == NULL) {
 		return 0;
 	}
-	int rv = sqsh_inode_cleanup(context);
+	int rv = sqsh__inode_cleanup(context);
 	free(context);
 	return rv;
 }

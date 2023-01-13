@@ -317,7 +317,7 @@ main(int argc, char *argv[]) {
 	char *target_path = NULL;
 	struct Sqsh *sqsh;
 	struct SqshPathResolverContext *resolver = NULL;
-	struct SqshInodeContext inode = {0};
+	struct SqshInodeContext *inode = NULL;
 
 	while ((opt = getopt(argc, argv, "cvVh")) != -1) {
 		switch (opt) {
@@ -361,7 +361,7 @@ main(int argc, char *argv[]) {
 		goto out;
 	}
 
-	rv = sqsh_path_resolver_resolve(resolver, &inode, src_path);
+	inode = sqsh_path_resolver_resolve(resolver, src_path, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, src_path);
 		rv = EXIT_FAILURE;
@@ -373,7 +373,7 @@ main(int argc, char *argv[]) {
 		if (strcmp(target_path, "/") == 0) {
 			target_path = ".";
 		}
-	} else if (sqsh_inode_type(&inode) != SQSH_INODE_TYPE_DIRECTORY) {
+	} else if (sqsh_inode_type(inode) != SQSH_INODE_TYPE_DIRECTORY) {
 		struct stat st = {0};
 		rv = stat(target_path, &st);
 		if (rv < 0) {
@@ -395,13 +395,13 @@ main(int argc, char *argv[]) {
 		}
 	}
 
-	rv = extract(target_path, &inode, NULL);
+	rv = extract(target_path, inode, NULL);
 	if (rv < 0) {
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 out:
-	sqsh_inode_cleanup(&inode);
+	sqsh_inode_free(inode);
 	sqsh_path_resolver_free(resolver);
 	sqsh_free(sqsh);
 	return rv;
