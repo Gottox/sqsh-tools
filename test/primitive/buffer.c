@@ -1,7 +1,7 @@
 /*
  * BSD 2-Clause License
  *
- * Copyright (c) 2022, Enno Boland
+ * Copyright (c) 2023, Enno Boland
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
