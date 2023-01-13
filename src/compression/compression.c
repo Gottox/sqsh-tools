@@ -31,7 +31,7 @@
  * @file         null.c
  */
 
-#include <sqsh_compression.h>
+#include <sqsh_compression_private.h>
 #include <sqsh_context.h>
 #include <sqsh_data.h>
 #include <sqsh_error.h>
@@ -110,7 +110,7 @@ compression_by_id(int id) {
 }
 
 int
-sqsh_compression_init(
+sqsh__compression_init(
 		struct SqshCompression *compression, int compression_id,
 		size_t block_size) {
 	sqsh_extract_func_t impl = compression_by_id(compression_id);
@@ -123,7 +123,7 @@ sqsh_compression_init(
 }
 
 int
-sqsh_compression_decompress_to_buffer(
+sqsh__compression_decompress_to_buffer(
 		const struct SqshCompression *compression, struct SqshBuffer *buffer,
 		const uint8_t *compressed, const size_t compressed_size) {
 	int rv = 0;
@@ -148,7 +148,7 @@ sqsh_compression_decompress_to_buffer(
 }
 
 int
-sqsh_compression_cleanup(struct SqshCompression *compression) {
+sqsh__compression_cleanup(struct SqshCompression *compression) {
 	compression->impl = NULL;
 	compression->block_size = 0;
 	return 0;

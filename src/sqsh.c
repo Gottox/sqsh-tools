@@ -31,6 +31,7 @@
  * @file         sqsh.c
  */
 
+#include <sqsh_compression_private.h>
 #include <sqsh_private.h>
 #include <string.h>
 
@@ -118,14 +119,14 @@ sqsh__init(
 			sqsh_superblock_compression_id(&sqsh->superblock);
 	uint32_t data_block_size = sqsh_superblock_block_size(&sqsh->superblock);
 
-	rv = sqsh_compression_init(
+	rv = sqsh__compression_init(
 			&sqsh->metablock_compression, compression_id,
 			SQSH_METABLOCK_BLOCK_SIZE);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = sqsh_compression_init(
+	rv = sqsh__compression_init(
 			&sqsh->data_compression, compression_id, data_block_size);
 	if (rv < 0) {
 		goto out;
@@ -260,8 +261,8 @@ sqsh__cleanup(struct Sqsh *sqsh) {
 	if (is_initialized(sqsh, INITIALIZED_FRAGMENT_TABLE)) {
 		sqsh_fragment_table_cleanup(&sqsh->fragment_table);
 	}
-	sqsh_compression_cleanup(&sqsh->data_compression);
-	sqsh_compression_cleanup(&sqsh->metablock_compression);
+	sqsh__compression_cleanup(&sqsh->data_compression);
+	sqsh__compression_cleanup(&sqsh->metablock_compression);
 	sqsh_superblock_cleanup(&sqsh->superblock);
 	sqsh_mapper_cleanup(&sqsh->mapper);
 

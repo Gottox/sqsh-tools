@@ -28,11 +28,11 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_compression.h
+ * @file         sqsh_compression_private.h
  */
 
-#ifndef SQSH_COMPRESSION_H
-#define SQSH_COMPRESSION_H
+#ifndef SQSH_COMPRESSION_PRIVATE_H
+#define SQSH_COMPRESSION_PRIVATE_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -41,8 +41,6 @@
 extern "C" {
 #endif
 
-union SqshCompressionOptions;
-struct SqshSuperblockContext;
 struct SqshBuffer;
 
 typedef int (*sqsh_extract_func_t)(
@@ -54,17 +52,17 @@ struct SqshCompression {
 	size_t block_size;
 };
 
-int sqsh_compression_init(
+int sqsh__compression_init(
 		struct SqshCompression *compression, int compression_id,
 		size_t block_size);
 
-int sqsh_compression_decompress_to_buffer(
+int sqsh__compression_decompress_to_buffer(
 		const struct SqshCompression *compression, struct SqshBuffer *buffer,
 		const uint8_t *compressed, const size_t compressed_size);
 
-int sqsh_compression_cleanup(struct SqshCompression *compression);
+int sqsh__compression_cleanup(struct SqshCompression *compression);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* end of include guard SQSH_COMPRESSION_H */
+#endif /* end of include guard SQSH_COMPRESSION_PRIVATE_H */

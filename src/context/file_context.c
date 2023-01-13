@@ -33,7 +33,7 @@
 
 #include "../utils.h"
 #include <sqsh.h>
-#include <sqsh_compression.h>
+#include <sqsh_compression_private.h>
 #include <sqsh_context_private.h>
 #include <sqsh_error.h>
 #include <sqsh_table.h>
@@ -154,7 +154,7 @@ sqsh_file_read(struct SqshFileContext *context, uint64_t size) {
 		const uint8_t *data = &sqsh_mapping_data(&mapping)[outer_offset];
 		const size_t size = outer_block_size;
 		if (is_compressed) {
-			rv = sqsh_compression_decompress_to_buffer(
+			rv = sqsh__compression_decompress_to_buffer(
 					context->compression, buffer, data, size);
 		} else {
 			rv = sqsh_buffer_append(buffer, data, size);

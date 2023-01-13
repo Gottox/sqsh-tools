@@ -32,7 +32,7 @@
  */
 
 #include "sqsh_common.h"
-#include "sqsh_compression.h"
+#include "sqsh_compression_private.h"
 #include "sqsh_context.h"
 #include "sqsh_error.h"
 #include "sqsh_mapper.h"

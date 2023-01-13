@@ -14,7 +14,7 @@ project(
 sqsh_hdr = [
 	'include/sqsh.h',
 	'include/sqsh_common.h',
-	'include/sqsh_compression.h',
+	'include/sqsh_compression_private.h',
 	'include/sqsh_context.h',
 	'include/sqsh_context_private.h',
 	'include/sqsh_data.h',

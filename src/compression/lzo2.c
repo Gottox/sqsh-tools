@@ -33,7 +33,7 @@
 
 #include <lzo/lzo1x.h>
 #include <lzo/lzoconf.h>
-#include <sqsh_compression.h>
+#include <sqsh_compression_private.h>
 #include <sqsh_data.h>
 #include <sqsh_error.h>
 #include <stdint.h>

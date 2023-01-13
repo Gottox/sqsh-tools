@@ -32,7 +32,7 @@
  */
 
 #include <lzma.h>
-#include <sqsh_compression.h>
+#include <sqsh_compression_private.h>
 #include <sqsh_error.h>
 #include <stdint.h>
 #include <stdlib.h>

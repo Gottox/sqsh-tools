@@ -33,7 +33,7 @@
 
 #include "../utils.h"
 #include <sqsh.h>
-#include <sqsh_compression.h>
+#include <sqsh_compression_private.h>
 #include <sqsh_context.h>
 #include <sqsh_data.h>
 #include <sqsh_error.h>
@@ -99,7 +99,7 @@ sqsh_metablock_to_buffer(
 	const uint8_t *data = sqsh_data_metablock_data(metablock);
 
 	if (is_compressed) {
-		rv = sqsh_compression_decompress_to_buffer(
+		rv = sqsh__compression_decompress_to_buffer(
 				context->compression, buffer, data, size);
 	} else {
 		rv = sqsh_buffer_append(buffer, data, size);
