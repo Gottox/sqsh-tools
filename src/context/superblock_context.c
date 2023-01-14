@@ -31,7 +31,7 @@
  * @file         superblock_context.c
  */
 
-#include <sqsh_context.h>
+#include <sqsh_context_private.h>
 #include <sqsh_data.h>
 #include <sqsh_error.h>
 #include <stdint.h>
@@ -62,7 +62,7 @@ check_flag(
 }
 
 int
-sqsh_superblock_init(
+sqsh__superblock_init(
 		struct SqshSuperblockContext *context, struct SqshMapper *mapper) {
 	int rv = 0;
 
@@ -212,7 +212,7 @@ sqsh_superblock_bytes_used(const struct SqshSuperblockContext *context) {
 }
 
 int
-sqsh_superblock_cleanup(struct SqshSuperblockContext *superblock) {
+sqsh__superblock_cleanup(struct SqshSuperblockContext *superblock) {
 	sqsh_mapping_unmap(&superblock->mapping);
 	return 0;
 }

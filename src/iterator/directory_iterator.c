@@ -45,7 +45,7 @@ directory_iterator_index_lookup(
 		struct SqshDirectoryIterator *iterator, const char *name,
 		const size_t name_len) {
 	int rv = 0;
-	struct SqshInodeDirectoryIndexIterator index_iterator = {0};
+	struct SqshDirectoryIndexIterator index_iterator = {0};
 	struct SqshInodeContext *inode = iterator->inode;
 
 	rv = sqsh__directory_index_iterator_init(&index_iterator, inode);

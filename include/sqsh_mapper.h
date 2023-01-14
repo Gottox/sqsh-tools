@@ -35,14 +35,12 @@
 #define SQSH_MAPPER_H
 
 #include "sqsh_primitive.h"
-#include <pthread.h>
-#include <stddef.h>
-#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+////////////////////////////////////////
 // mapper/canary_mapper.c
 
 struct SqshCanaryMapper {
@@ -58,6 +56,7 @@ struct SqshCanaryMap {
 
 extern struct SqshMemoryMapperImpl sqsh_mapper_impl_canary;
 
+////////////////////////////////////////
 // mapper/curl_mapper.c
 
 struct SqshCurlMapper {
@@ -77,6 +76,7 @@ struct SqshCurlMap {
 
 extern struct SqshMemoryMapperImpl sqsh_mapper_impl_curl;
 
+////////////////////////////////////////
 // mapper/mmap_full_mapper.c
 
 struct SqshMmapFullMapper {
@@ -91,6 +91,7 @@ struct SqshMmapFullMap {
 
 extern struct SqshMemoryMapperImpl sqsh_mapper_impl_mmap_full;
 
+////////////////////////////////////////
 // mapper/mmap_mapper.c
 
 struct SqshMmapMapper {
@@ -108,6 +109,7 @@ struct SqshMmapMap {
 
 extern struct SqshMemoryMapperImpl sqsh_mapper_impl_mmap;
 
+////////////////////////////////////////
 // mapper/static_mapper.c
 
 struct SqshStaticMapper {
@@ -122,6 +124,7 @@ struct SqshStaticMap {
 
 extern struct SqshMemoryMapperImpl sqsh_mapper_impl_static;
 
+////////////////////////////////////////
 // mapper/mapper.c
 
 struct SqshMapper;

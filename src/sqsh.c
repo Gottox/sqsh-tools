@@ -110,7 +110,7 @@ sqsh__init(
 		goto out;
 	}
 
-	rv = sqsh_superblock_init(&sqsh->superblock, &sqsh->mapper);
+	rv = sqsh__superblock_init(&sqsh->superblock, &sqsh->mapper);
 	if (rv < 0) {
 		goto out;
 	}
@@ -263,7 +263,7 @@ sqsh__cleanup(struct Sqsh *sqsh) {
 	}
 	sqsh__compression_cleanup(&sqsh->data_compression);
 	sqsh__compression_cleanup(&sqsh->metablock_compression);
-	sqsh_superblock_cleanup(&sqsh->superblock);
+	sqsh__superblock_cleanup(&sqsh->superblock);
 	sqsh_mapper_cleanup(&sqsh->mapper);
 
 	return rv;

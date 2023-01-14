@@ -36,10 +36,13 @@
 
 #include "sqsh_data.h"
 
+#define SQSH_STATIC_ASSERT(cond) _Static_assert(cond, #cond)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+////////////////////////////////////////
 // data/compression_options_internal.c
 
 struct SQSH_UNALIGNED SqshCompressionOptionsGzip {
@@ -93,6 +96,7 @@ SQSH_STATIC_ASSERT(
 		sizeof(union SqshCompressionOptions) ==
 		SQSH_SIZEOF_COMPRESSION_OPTIONS);
 
+////////////////////////////////////////
 // data/datablock_internal.c
 
 struct SQSH_UNALIGNED SqshDatablockSize {
@@ -101,6 +105,7 @@ struct SQSH_UNALIGNED SqshDatablockSize {
 SQSH_STATIC_ASSERT(
 		sizeof(struct SqshDatablockSize) == SQSH_SIZEOF_DATABLOCK_SIZE);
 
+////////////////////////////////////////
 // data/directory_internal.c
 
 struct SQSH_UNALIGNED SqshDirectoryEntry {
@@ -124,6 +129,7 @@ struct SQSH_UNALIGNED SqshDirectoryFragment {
 SQSH_STATIC_ASSERT(
 		sizeof(struct SqshDirectoryFragment) == SQSH_SIZEOF_DIRECTORY_FRAGMENT);
 
+////////////////////////////////////////
 // data/fragment_internal.c
 
 struct SQSH_UNALIGNED SqshFragment {
@@ -134,6 +140,7 @@ struct SQSH_UNALIGNED SqshFragment {
 
 SQSH_STATIC_ASSERT(sizeof(struct SqshFragment) == SQSH_SIZEOF_FRAGMENT);
 
+////////////////////////////////////////
 // data/inode_internal.c
 
 struct SQSH_UNALIGNED SqshInodeDirectoryIndex {
@@ -266,6 +273,7 @@ struct SQSH_UNALIGNED SqshInode {
 	} data;
 };
 
+////////////////////////////////////////
 // data/metablock_internal.c
 
 struct SQSH_UNALIGNED SqshMetablock {
@@ -275,6 +283,7 @@ struct SQSH_UNALIGNED SqshMetablock {
 
 SQSH_STATIC_ASSERT(sizeof(struct SqshMetablock) == SQSH_SIZEOF_METABLOCK);
 
+////////////////////////////////////////
 // data/superblock_internal.c
 
 struct SQSH_UNALIGNED SqshSuperblock {
@@ -301,6 +310,7 @@ struct SQSH_UNALIGNED SqshSuperblock {
 
 SQSH_STATIC_ASSERT(sizeof(struct SqshSuperblock) == SQSH_SIZEOF_SUPERBLOCK);
 
+////////////////////////////////////////
 // data/xattr_internal.c
 
 struct SQSH_UNALIGNED SqshXattrKey {

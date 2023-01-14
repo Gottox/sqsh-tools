@@ -34,7 +34,6 @@
 #ifndef SQSH_CONTEXT_H
 #define SQSH_CONTEXT_H
 
-#include "sqsh_mapper.h"
 #include "sqsh_primitive.h"
 
 #ifdef __cplusplus
@@ -51,6 +50,7 @@ struct SqshMetablockStreamContext;
 struct SqshSuperblockContext;
 struct SqshTrailingContext;
 
+////////////////////////////////////////
 // context/compression_options_context.c
 
 /**
@@ -97,8 +97,8 @@ enum SqshLzoAlgorithm {
 /**
  * @brief Initializes a SqshCompressionOptionsContext struct.
  * @memberof SqshCompressionOptionsContext
- * @param sqsh Sqsh context
- * @param err Pointer to set to an error code on error.
+ * @param[in] sqsh Sqsh context
+ * @param[out] err Pointer to an int where the error code will be stored.
  * @return The Initialized file context
  */
 SQSH_NO_UNUSED
@@ -108,21 +108,21 @@ sqsh_compression_options_new(struct Sqsh *sqsh, int *err);
 /**
  * @brief returns the compression level of gzip
  * @memberof SqshCompressionOptionsContext
- * @param context the compression options context
+ * @param[in] context the compression options context
  */
 uint32_t sqsh_compression_options_gzip_compression_level(
 		const struct SqshCompressionOptionsContext *context);
 /**
  * @brief returns the compression window size of gzip
  * @memberof SqshCompressionOptionsContext
- * @param context the compression options context
+ * @param[in] context the compression options context
  */
 uint16_t sqsh_compression_options_gzip_window_size(
 		const struct SqshCompressionOptionsContext *context);
 /**
  * @brief returns the compression strategy of gzip
  * @memberof SqshCompressionOptionsContext
- * @param context the compression options context
+ * @param[in] context the compression options context
  */
 enum SqshGzipStrategies sqsh_compression_options_gzip_strategies(
 		const struct SqshCompressionOptionsContext *context);
@@ -130,14 +130,14 @@ enum SqshGzipStrategies sqsh_compression_options_gzip_strategies(
 /**
  * @brief returns the dictionary size of xz
  * @memberof SqshCompressionOptionsContext
- * @param context the compression options context
+ * @param[in] context the compression options context
  */
 uint32_t sqsh_compression_options_xz_dictionary_size(
 		const struct SqshCompressionOptionsContext *context);
 /**
  * @brief returns the compression options of xz
  * @memberof SqshCompressionOptionsContext
- * @param context the compression options context
+ * @param[in] context the compression options context
  */
 enum SqshXzFilters sqsh_compression_options_xz_filters(
 		const struct SqshCompressionOptionsContext *context);
@@ -145,14 +145,14 @@ enum SqshXzFilters sqsh_compression_options_xz_filters(
 /**
  * @brief returns the version of lz4 used
  * @memberof SqshCompressionOptionsContext
- * @param context the compression options context
+ * @param[in] context the compression options context
  */
 uint32_t sqsh_compression_options_lz4_version(
 		const struct SqshCompressionOptionsContext *context);
 /**
  * @brief returns the flags of lz4
  * @memberof SqshCompressionOptionsContext
- * @param context the compression options context
+ * @param[in] context the compression options context
  */
 uint32_t sqsh_compression_options_lz4_flags(
 		const struct SqshCompressionOptionsContext *context);
@@ -160,7 +160,7 @@ uint32_t sqsh_compression_options_lz4_flags(
 /**
  * @brief returns the compression level of zstd
  * @memberof SqshCompressionOptionsContext
- * @param context the compression options context
+ * @param[in] context the compression options context
  */
 uint32_t sqsh_compression_options_zstd_compression_level(
 		const struct SqshCompressionOptionsContext *context);
@@ -168,14 +168,14 @@ uint32_t sqsh_compression_options_zstd_compression_level(
 /**
  * @brief returns the algorithm of lzo
  * @memberof SqshCompressionOptionsContext
- * @param context the compression options context
+ * @param[in] context the compression options context
  */
 enum SqshLzoAlgorithm sqsh_compression_options_lzo_algorithm(
 		const struct SqshCompressionOptionsContext *context);
 /**
  * @brief returns the compression level of lzo
  * @memberof SqshCompressionOptionsContext
- * @param context the compression options context
+ * @param[in] context the compression options context
  */
 uint32_t sqsh_compression_options_lzo_compression_level(
 		const struct SqshCompressionOptionsContext *context);
@@ -183,11 +183,12 @@ uint32_t sqsh_compression_options_lzo_compression_level(
 /**
  * @brief Frees a SqshCompressionOptionsContext struct.
  * @memberof SqshCompressionOptionsContext
- * @param context The file context to free.
+ * @param[in] context The file context to free.
  */
 int
 sqsh_compression_options_free(struct SqshCompressionOptionsContext *context);
 
+////////////////////////////////////////
 // context/file_context.c
 
 struct SqshFileContext;
@@ -195,12 +196,13 @@ struct SqshFileContext;
 /**
  * @brief Initializes a SqshFileContext struct.
  * @memberof SqshFileContext
- * @param inode The inode context to retrieve the file contents from.
- * @param err Pointer to set to an error code on error.
+ * @param[in] inode The inode context to retrieve the file contents from.
+ * @param[out] err Pointer to an int where the error code will be stored.
  * @return The Initialized file context
  */
 SQSH_NO_UNUSED
-struct SqshFileContext *sqsh_file_new(struct SqshInodeContext *inode, int *err);
+struct SqshFileContext *
+sqsh_file_new(const struct SqshInodeContext *inode, int *err);
 
 /**
  * @brief Seek to a position in the file content.
@@ -245,6 +247,7 @@ uint64_t sqsh_file_size(struct SqshFileContext *context);
  * @param context The file context to free.
  */
 int sqsh_file_free(struct SqshFileContext *context);
+////////////////////////////////////////
 // context/inode_context.c
 
 #define SQSH_INODE_NO_FRAGMENT 0xFFFFFFFF
@@ -288,7 +291,7 @@ enum SqshInodeContextType {
  * @memberof SqshInodeContext
  * @param sqsh The sqsh context to use.
  * @param inode_ref The inode reference to initialize the context with.
- * @param err err the error pointer.
+ * @param[out] err Pointer to an int where the error code will be stored.
  * @return a pointer to the sqsh context or NULL if an error occurred.
  */
 SQSH_NO_UNUSED struct SqshInodeContext *
@@ -508,6 +511,7 @@ sqsh_inode_ref_to_block(uint64_t ref, uint32_t *block_index, uint16_t *offset);
 SQSH_NO_UNUSED uint64_t
 sqsh_inode_ref_from_block(uint32_t block_index, uint16_t offset);
 
+////////////////////////////////////////
 // context/path_resolver_context.c
 
 struct SqshPathResolverContext {
@@ -518,7 +522,7 @@ struct SqshPathResolverContext {
  * @brief initializes a path resolver context in heap
  * @memberof SqshPathResolverContext
  * @param sqsh The sqsh context.
- * @param err Pointer to set to an error code on error.
+ * @param[out] err Pointer to an int where the error code will be stored.
  * @return The Initialized path resolver context
  */
 struct SqshPathResolverContext *
@@ -539,7 +543,7 @@ SQSH_NO_UNUSED int sqsh_path_resolver_init(
  * @memberof SqshPathResolverContext
  * @param context The path resolver context.
  * @param path The path the file or directory.
- * @param err Pointer to set to an error code on error.
+ * @param[out] err Pointer to an int where the error code will be stored.
  * @return an inode context on success, NULL on error
  */
 SQSH_NO_UNUSED struct SqshInodeContext *sqsh_path_resolver_resolve(
@@ -561,6 +565,7 @@ int sqsh_path_resolver_cleanup(struct SqshPathResolverContext *context);
  */
 int sqsh_path_resolver_free(struct SqshPathResolverContext *context);
 
+////////////////////////////////////////
 // context/superblock_context.c
 
 enum SqshSuperblockCompressionId {
@@ -587,13 +592,7 @@ enum SqshSuperblockFlags {
 	SQSH_SUPERBLOCK_UNCOMPRESSED_IDS = 0x0800,
 };
 
-struct SqshSuperblockContext {
-	const struct SqshSuperblock *superblock;
-	struct SqshMapping mapping;
-};
-
-SQSH_NO_UNUSED int sqsh_superblock_init(
-		struct SqshSuperblockContext *context, struct SqshMapper *mapper);
+struct SqshSuperblockContext;
 
 const void *sqsh_superblock_data_from_offset(
 		const struct SqshSuperblockContext *context, uint64_t offset);
@@ -647,8 +646,7 @@ uint32_t sqsh_superblock_fragment_entry_count(
 uint64_t
 sqsh_superblock_bytes_used(const struct SqshSuperblockContext *context);
 
-int sqsh_superblock_cleanup(struct SqshSuperblockContext *superblock);
-
+////////////////////////////////////////
 // context/trailing_context.c
 
 struct SqshTrailingContext {

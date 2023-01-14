@@ -41,64 +41,269 @@
 extern "C" {
 #endif
 
+////////////////////////////////////////
 // iterator/directory_iterator.c
-
-struct SqshInodeContext;
-struct Sqsh;
 
 struct SqshDirectoryIterator;
 
+/**
+ * @brief Allocates and initializes a new directory iterator.
+ * @memberof SqshDirectoryIterator
+ *
+ * @param[in]  inode      The inode to iterate through.
+ * @param[out] err        Pointer to an int where the error code will be stored.
+ *
+ * @return The new iterator on success, NULL on error.
+ */
 SQSH_NO_UNUSED struct SqshDirectoryIterator *
 sqsh_directory_iterator_new(struct SqshInodeContext *inode, int *err);
+
+/**
+ * @brief Advances the iterator to the next entry.
+ * @memberof SqshDirectoryIterator
+ *
+ * @param[in,out] iterator The iterator to advance.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 SQSH_NO_UNUSED int
 sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator);
+
+/**
+ * @brief Looks up an entry by name.
+ * @memberof SqshDirectoryIterator
+ *
+ * @param[in,out] iterator The iterator to use.
+ * @param[in]     name     The name of the entry to look up.
+ * @param[in]     name_len The length of the name.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 SQSH_NO_UNUSED int sqsh_directory_iterator_lookup(
 		struct SqshDirectoryIterator *iterator, const char *name,
 		const size_t name_len);
+
+/**
+ * @brief Retrieves the size of the name of the current entry.
+ * @memberof SqshDirectoryIterator
+ *
+ * @param[in] iterator The iterator to use.
+ *
+ * @return The size of the name on success, a negative value on error.
+ */
 int
 sqsh_directory_iterator_name_size(const struct SqshDirectoryIterator *iterator);
+
+/**
+ * @brief Retrieves the inode reference of the current entry.
+ * @memberof SqshDirectoryIterator
+ *
+ * @param[in] iterator The iterator to use.
+ *
+ * @return The inode reference on success, a negative value on error.
+ */
 uint64_t
 sqsh_directory_iterator_inode_ref(const struct SqshDirectoryIterator *iterator);
+
+/**
+ * @brief Retrieves the inode type of the current entry.
+ * @memberof SqshDirectoryIterator
+ *
+ * @param[in] iterator The iterator to use.
+ *
+ * @return The inode type on success, SqshInodeContextTypeInvalid on error.
+ */
 enum SqshInodeContextType sqsh_directory_iterator_inode_type(
 		const struct SqshDirectoryIterator *iterator);
+
+/**
+ * @brief Loads the inode of the current entry.
+ * @memberof SqshDirectoryIterator
+ *
+ * @param[in]  iterator The iterator to use.
+ * @param[out] err  Pointer to an int where the error code will be stored.
+ *
+ * @return The loaded inode on success, NULL on error.
+ */
 SQSH_NO_UNUSED struct SqshInodeContext *sqsh_directory_iterator_inode_load(
 		const struct SqshDirectoryIterator *iterator, int *err);
+
+/**
+ * @brief Retrieves the name of the current entry. Note that the name is not
+ * null-terminated.
+ * @memberof SqshDirectoryIterator
+ *
+ * @param[in] iterator The iterator to use.
+ *
+ * @return The name of the current entry.
+ */
 const char *
 sqsh_directory_iterator_name(const struct SqshDirectoryIterator *iterator);
+/**
+ * @brief creates a heap allocated copy of the name of the current entry.
+ * The caller is responsible for freeing the memory.
+ * @memberof SqshDirectoryIterator
+ *
+ * @param[in]  iterator    The iterator to use.
+ * @param[out] name_buffer The buffer to hold the duplicated name.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 SQSH_NO_UNUSED int sqsh_directory_iterator_name_dup(
 		const struct SqshDirectoryIterator *iterator, char **name_buffer);
+/**
+ * @brief Frees the resources used by a directory iterator.
+ * @memberof SqshDirectoryIterator
+ *
+ * @param[in] iterator The iterator to free.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 int sqsh_directory_iterator_free(struct SqshDirectoryIterator *iterator);
 
+////////////////////////////////////////
 // iterator/xattr_iterator.c
 
-struct SqshInodeContext;
 struct SqshXattrIterator;
 
+/**
+ * @brief Allocates and initializes a new xattr iterator.
+ *
+ * @param[in]  inode  The inode to iterate through xattrs.
+ * @param[out] err    Pointer to an int where the error code will be stored.
+ *
+ * @return The new iterator on success, NULL on error.
+ */
 SQSH_NO_UNUSED struct SqshXattrIterator *
 sqsh_xattr_iterator_new(const struct SqshInodeContext *inode, int *err);
 
+/**
+ * @brief Advances the iterator to the next xattr.
+ *
+ * @param[in,out] iterator The iterator to advance.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 int sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator);
 
+/**
+ * @brief Retrieves the type of the current xattr.
+ *
+ * @param[in] iterator The iterator to use.
+ *
+ * @return The type of the current xattr.
+ */
 uint16_t sqsh_xattr_iterator_type(struct SqshXattrIterator *iterator);
 
+/**
+ * @brief Checks if the current xattr is indirect.
+ *
+ * @param[in] iterator The iterator to use.
+ *
+ * @return true if the xattr is indirect, false otherwise.
+ */
 bool sqsh_xattr_iterator_is_indirect(struct SqshXattrIterator *iterator);
 
+/**
+ * @brief Retrieves the prefix of the current xattr.
+ *
+ * @param[in] iterator The iterator to use.
+ *
+ * @return The prefix of the current xattr.
+ */
 const char *sqsh_xattr_iterator_prefix(struct SqshXattrIterator *iterator);
+
+/**
+ * @brief Retrieves the size of the prefix of the current xattr.
+ *
+ * @param[in] iterator The iterator to use.
+ *
+ * @return The size of the prefix of the current xattr.
+ */
 uint16_t sqsh_xattr_iterator_prefix_size(struct SqshXattrIterator *iterator);
+
+/**
+ * @brief Retrieves the name of the current xattr.
+ *
+ * @param[in] iterator The iterator to use.
+ *
+ * @return The name of the current xattr.
+ */
 const char *sqsh_xattr_iterator_name(struct SqshXattrIterator *iterator);
+
+/**
+ * @brief Retrieves the size of the name of the current xattr.
+ *
+ * @param[in] iterator The iterator to use.
+ *
+ * @return The size of the name of the current xattr.
+ */
 uint16_t sqsh_xattr_iterator_name_size(struct SqshXattrIterator *iterator);
+
+/**
+ * @brief Compares the full name of the current xattr with a given name.
+ *
+ * @param[in] iterator The iterator to use.
+ * @param[in] name     The name to compare with.
+ *
+ * @return 0 if the names match, a negative value if the current xattr's name
+ *         is less than the given name, a positive value if the current xattr's
+ *         name is greater than the given name.
+ */
 int sqsh_xattr_iterator_fullname_cmp(
 		struct SqshXattrIterator *iterator, const char *name);
+
+/**
+ * @brief creates a heap allocated copy of the full name of the current entry.
+ * The caller is responsible for freeing the memory.
+ * @memberof SqshXattrIterator
+ *
+ * @param[in]  iterator        The iterator to use.
+ * @param[out] fullname_buffer The buffer to hold the duplicated full name.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 int sqsh_xattr_iterator_fullname_dup(
 		struct SqshXattrIterator *iterator, char **fullname_buffer);
 
+/**
+ * @brief creates a heap allocated copy of the value of the current entry.
+ * The caller is responsible for freeing the memory.
+ * @memberof SqshXattrIterator
+ *
+ * @param[in]  iterator    The iterator to use.
+ * @param[out] value_buffer The buffer to hold the duplicated value.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 int sqsh_xattr_iterator_value_dup(
 		struct SqshXattrIterator *iterator, char **value_buffer);
 
+/**
+ * @brief Retrieves the value of the current xattr.
+ *
+ * @param[in] iterator The iterator to use.
+ *
+ * @return The value of the current xattr.
+ */
 const char *sqsh_xattr_iterator_value(struct SqshXattrIterator *iterator);
 
+/**
+ * @brief Retrieves the size of the value of the current xattr.
+ *
+ * @param[in] iterator The iterator to use.
+ *
+ * @return The size of the value of the current xattr.
+ */
 uint16_t sqsh_xattr_iterator_value_size(struct SqshXattrIterator *iterator);
 
+/**
+ * @brief Frees the resources used by an xattr iterator.
+ *
+ * @param[in] iterator The iterator to free.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 int sqsh_xattr_iterator_free(struct SqshXattrIterator *iterator);
 
 #ifdef __cplusplus

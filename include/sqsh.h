@@ -67,9 +67,11 @@ struct Sqsh;
 /**
  * @brief sqsh_new initializes a sqsh context in heap.
  * @memberof Sqsh
- * @param source the source to retrieve the archive from
- * @param config the configuration for the sqsh context.
- * @param err the error pointer.
+ *
+ * @param[in] source the source to retrieve the archive from
+ * @param[in] config the configuration for the sqsh context.
+ * @param[out] err   Pointer to an int where the error code will be stored.
+ *
  * @return a pointer to the sqsh context or NULL if an error occurred.
  */
 SQSH_NO_UNUSED struct Sqsh *
@@ -78,7 +80,9 @@ sqsh_new(const void *source, const struct SqshConfig *config, int *err);
 /**
  * @brief sqsh_superblock returns the superblock context.
  * @memberof Sqsh
- * @param sqsh the Sqsh structure.
+ *
+ * @param[in] sqsh the Sqsh structure.
+ *
  * @return the superblock context.
  */
 struct SqshSuperblockContext *sqsh_superblock(struct Sqsh *sqsh);
@@ -86,14 +90,18 @@ struct SqshSuperblockContext *sqsh_superblock(struct Sqsh *sqsh);
 /**
  * @brief sqsh_mapper returns the mapper to retrieve chunks of the sqsh file.
  * @memberof Sqsh
- * @param sqsh the Sqsh structure.
+ *
+ * @param[in] sqsh the Sqsh structure.
+ *
  * @return the mapper context.
  */
 struct SqshMapper *sqsh_mapper(struct Sqsh *sqsh);
 /**
  * @brief sqsh_data_compression returns the compression context for data blocks
  * @memberof Sqsh
- * @param sqsh the Sqsh structure.
+ *
+ * @param[in] sqsh the Sqsh structure.
+ *
  * @return the compression context.
  */
 struct SqshCompression *sqsh_data_compression(struct Sqsh *sqsh);
@@ -102,59 +110,67 @@ struct SqshCompression *sqsh_data_compression(struct Sqsh *sqsh);
  * @brief sqsh_data_compression returns the compression context for metadata
  * blocks.
  * @memberof Sqsh
- * @param sqsh the Sqsh structure.
+ *
+ * @param[in] sqsh the Sqsh structure.
+ *
  * @return the compression context.
  */
 struct SqshCompression *sqsh_metablock_compression(struct Sqsh *sqsh);
 
 /**
- * @brief sqsh_id_table returns the id table context.
- * @memberof Sqsh
- * @param sqsh the Sqsh structure.
- * @param id_table double pointer that will be set to the uid/gid table.
- * @return 0 on success, less than 0 on error.
+ * @brief Retrieves the id table of a Sqsh instance.
+ *
+ * @param[in]  sqsh       The Sqsh instance to retrieve the id table from.
+ * @param[out] id_table   Pointer to a struct SqshTable where the id table will
+ * be stored.
+ *
+ * @return 0 on success, a negative value on error.
  */
 int sqsh_id_table(struct Sqsh *sqsh, struct SqshTable **id_table);
 
 /**
- * @brief sqsh_export_table returns the export table context. If the archive
- * does not contain an export table, the function returns
- * `-SQSH_ERROR_NO_EXPORT_TABLE`
- * @memberof Sqsh
- * @param sqsh the Sqsh structure.
- * @param export_table double pointer that will be set to the export table.
- * @return 0 on success, less than 0 on error.
+ * @brief Retrieves the export table of a Sqsh instance.
+ *
+ * @param[in]  sqsh           The Sqsh instance to retrieve the export table
+ *                            from.
+ * @param[out] export_table   Pointer to a struct SqshTable where the export
+ *                            table will be stored.
+ *
+ * @return 0 on success, a negative value on error.
  */
 int sqsh_export_table(struct Sqsh *sqsh, struct SqshTable **export_table);
 
 /**
- * @brief sqsh_fragment_table returns the fragment table context. If the archive
- * does not contain a fragment table, the function returns
- * `-SQSH_ERROR_NO_FRAGMENT_TABLE`.
- * @memberof Sqsh
- * @param sqsh the Sqsh structure.
- * @param fragment_table double pointer that will be set to the fragment table.
- * @return 0 on success, less than 0 on error.
+ * @brief Retrieves the fragment table of a Sqsh instance.
+ *
+ * @param[in]  sqsh             The Sqsh instance to retrieve the fragment table
+ *                              from.
+ * @param[out] fragment_table   Pointer to a struct SqshTable where the export
+ *                              table will be stored.
+ *
+ * @return 0 on success, a negative value on error.
  */
 int sqsh_fragment_table(
 		struct Sqsh *sqsh, struct SqshFragmentTable **fragment_table);
 
 /**
- * @brief sqsh_xattr_table returns the xattr table context. If the archive
- * does not contain an xattr table, the function returns
- * `-SQSH_ERROR_NO_XATTR_TABLE`.
- * @memberof Sqsh
- * @param sqsh the Sqsh structure.
- * @param xattr_table double pointer that will be set to the xattr table.
- * @return 0 on success, less than 0 on error.
+ * @brief Retrieves the xattr table of a Sqsh instance.
+ *
+ * @param[in]  sqsh          The Sqsh instance to retrieve the xattr table
+ *                           from.
+ * @param[out] xattr_table   Pointer to a struct SqshTable where the export
+ *                           table will be stored.
+ *
+ * @return 0 on success, a negative value on error.
  */
 int sqsh_xattr_table(struct Sqsh *sqsh, struct SqshXattrTable **xattr_table);
 
 /**
- * @brief sqsh_free frees up a heap allocated Sqsh structure.
- * @memberof Sqsh
- * @param sqsh the Sqsh structure to free.
- * @return 0 on success, less than 0 on error.
+ * @brief Frees the resources used by a Sqsh instance.
+ *
+ * @param[in] sqsh The Sqsh instance to free.
+ *
+ * @return 0 on success, a negative value on error.
  */
 int sqsh_free(struct Sqsh *sqsh);
 

@@ -42,6 +42,7 @@ extern "C" {
 
 struct SqshInodeContext;
 
+////////////////////////////////////////
 // table/table.c
 
 struct SqshTable {
@@ -67,6 +68,7 @@ struct SqshFragmentTable {
 	struct SqshCompression *compression;
 };
 
+////////////////////////////////////////
 // table/fragment_table.c
 
 SQSH_NO_UNUSED int
@@ -78,6 +80,7 @@ SQSH_NO_UNUSED int sqsh_fragment_table_to_buffer(
 
 int sqsh_fragment_table_cleanup(struct SqshFragmentTable *context);
 
+////////////////////////////////////////
 // table/xattr_table.c
 
 struct SqshXattrLookupTable;

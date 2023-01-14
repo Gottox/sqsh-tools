@@ -1,4 +1,3 @@
-// error.c
 /******************************************************************************
  *                                                                            *
  * Copyright (c) 2023, Enno Boland <g@s01.de>                                 *
@@ -41,6 +40,8 @@
 extern "C" {
 #endif
 
+////////////////////////////////////////
+// error.c
 #define SQSH_ERROR_SECTION (1 << 8)
 enum SqshError {
 	// Avoid collisions with errno

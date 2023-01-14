@@ -56,7 +56,7 @@ datablock_offset(struct SqshFileContext *context, uint32_t block_index) {
 
 int
 sqsh__file_init(
-		struct SqshFileContext *context, struct SqshInodeContext *inode) {
+		struct SqshFileContext *context, const struct SqshInodeContext *inode) {
 	int rv = 0;
 	struct Sqsh *sqsh = inode->sqsh;
 	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
@@ -88,7 +88,7 @@ sqsh__file_init(
 }
 
 struct SqshFileContext *
-sqsh_file_new(struct SqshInodeContext *inode, int *err) {
+sqsh_file_new(const struct SqshInodeContext *inode, int *err) {
 	struct SqshFileContext *context = calloc(1, sizeof(struct SqshFileContext));
 	if (context == NULL) {
 		return NULL;

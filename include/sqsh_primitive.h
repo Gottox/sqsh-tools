@@ -43,6 +43,7 @@
 extern "C" {
 #endif
 
+////////////////////////////////////////
 // primitive/slice.c
 
 /**
@@ -104,6 +105,7 @@ SQSH_NO_UNUSED size_t sqsh_slice_size(const struct SqshSlice *slice);
  */
 int sqsh_slice_cleanup(struct SqshSlice *slice);
 
+////////////////////////////////////////
 // primitive/buffer.c
 
 /**
@@ -204,6 +206,7 @@ size_t sqsh_buffer_size(const struct SqshBuffer *buffer);
  */
 int sqsh_buffer_cleanup(struct SqshBuffer *buffer);
 
+////////////////////////////////////////
 // primitive/ref_count.c
 
 typedef int (*sqsh_ref_count_dtor_t)(void *);
@@ -245,6 +248,7 @@ void *sqsh_ref_count_retain(struct SqshRefCount *ref_count);
 int sqsh_ref_count_release(
 		struct SqshRefCount *ref_count, sqsh_ref_count_dtor_t dtor);
 
+////////////////////////////////////////
 // primitive/lru_hashmap.c
 
 struct SqshLruEntry {

@@ -34,6 +34,7 @@
 #ifndef SQSH_CONTEXT_PRIVATE_H
 #define SQSH_CONTEXT_PRIVATE_H
 
+#include "sqsh_context.h"
 #include "sqsh_mapper.h"
 #include "sqsh_primitive.h"
 
@@ -43,6 +44,37 @@ extern "C" {
 
 struct Sqsh;
 
+////////////////////////////////////////
+// context/superblock_context.c
+
+struct SqshSuperblockContext {
+	const struct SqshSuperblock *superblock;
+	struct SqshMapping mapping;
+};
+
+/**
+ * @internal
+ *
+ * @brief Initializes a superblock context.
+ *
+ * @param[out] context The context to initialize.
+ * @param[in]  mapper  The mapper to use for the superblock.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+SQSH_NO_UNUSED int sqsh__superblock_init(
+		struct SqshSuperblockContext *context, struct SqshMapper *mapper);
+
+/**
+ * @brief Cleans up a superblock context.
+ *
+ * @param[in] superblock The context to clean up.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+int sqsh__superblock_cleanup(struct SqshSuperblockContext *superblock);
+
+////////////////////////////////////////
 // context/compression_options_context.c
 
 /**
@@ -71,6 +103,7 @@ SQSH_NO_UNUSED int sqsh__compression_options_init(
 int sqsh__compression_options_cleanup(
 		struct SqshCompressionOptionsContext *context);
 
+////////////////////////////////////////
 // context/file_context.c
 
 /**
@@ -84,7 +117,7 @@ struct SqshFileContext {
 	 */
 	struct SqshMapper *mapper;
 	struct SqshFragmentTable *fragment_table;
-	struct SqshInodeContext *inode;
+	const struct SqshInodeContext *inode;
 	struct SqshBuffer buffer;
 	struct SqshCompression *compression;
 	uint64_t seek_pos;
@@ -95,21 +128,26 @@ struct SqshFileContext {
  * @internal
  * @brief Initializes a SqshFileContext struct.
  * @memberof SqshFileContext
- * @param context The file context to initialize.
- * @param inode The inode context to retrieve the file contents from.
+ *
+ * @param[out] context The file context to initialize.
+ * @param[in] inode    The inode context to retrieve the file contents from.
+ *
  * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int sqsh__file_init(
-		struct SqshFileContext *context, struct SqshInodeContext *inode);
+		struct SqshFileContext *context, const struct SqshInodeContext *inode);
 
 /**
  * @internal
  * @brief Frees the resources used by the file context.
+ *
  * @memberof SqshFileContext
+ *
  * @param context The file context to clean up.
  */
 int sqsh__file_cleanup(struct SqshFileContext *context);
 
+////////////////////////////////////////
 // context/metablock_context.c
 
 #define SQSH_METABLOCK_BLOCK_SIZE 8192
@@ -128,9 +166,11 @@ struct SqshMetablockContext {
 
 /**
  * @brief sqsh__metablock_context_init
- * @param context The SqshMetablockContext to initialize.
- * @param sqsh The Sqsh struct.
+ *
+ * @param[out] context The SqshMetablockContext to initialize.
+ * @param[in] sqsh The Sqsh struct.
  * @param address The address of the metablock.
+ *
  * @return 0 on success, less than 0 on error.
  */
 int sqsh__metablock_init(
@@ -145,6 +185,7 @@ SQSH_NO_UNUSED int sqsh__metablock_to_buffer(
 
 int sqsh__metablock_cleanup(struct SqshMetablockContext *context);
 
+////////////////////////////////////////
 // context/metablock_stream_context.c
 
 struct SqshMetablockStreamContext {
@@ -177,6 +218,7 @@ sqsh__metablock_stream_size(const struct SqshMetablockStreamContext *context);
 
 int sqsh__metablock_stream_cleanup(struct SqshMetablockStreamContext *context);
 
+////////////////////////////////////////
 // context/inode_context.c
 
 struct SqshInodeContext {

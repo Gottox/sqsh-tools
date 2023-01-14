@@ -35,6 +35,7 @@
 #ifndef SQSH_COMMON_H
 #define SQSH_COMMON_H
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -43,9 +44,6 @@ extern "C" {
 #endif
 
 #define SQSH_NO_UNUSED __attribute__((warn_unused_result))
-#define SQSH_UNALIGNED __attribute__((packed, aligned(1)))
-
-#define SQSH_STATIC_ASSERT(cond) _Static_assert(cond, #cond)
 
 typedef size_t sqsh_index_t;
 
