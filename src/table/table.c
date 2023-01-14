@@ -33,7 +33,7 @@
 
 #include "../utils.h"
 #include <sqsh.h>
-#include <sqsh_context.h>
+#include <sqsh_context_private.h>
 #include <sqsh_error.h>
 #include <sqsh_table.h>
 #include <stdint.h>
@@ -106,12 +106,12 @@ sqsh_table_get(
 		goto out;
 	}
 
-	rv = sqsh_metablock_init(&metablock, sqsh, metablock_address);
+	rv = sqsh__metablock_init(&metablock, sqsh, metablock_address);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = sqsh_metablock_to_buffer(&metablock, &buffer);
+	rv = sqsh__metablock_to_buffer(&metablock, &buffer);
 	if (rv < 0) {
 		goto out;
 	}
@@ -120,7 +120,7 @@ sqsh_table_get(
 		   table->element_size);
 
 out:
-	sqsh_metablock_cleanup(&metablock);
+	sqsh__metablock_cleanup(&metablock);
 	sqsh_buffer_cleanup(&buffer);
 	return rv;
 }

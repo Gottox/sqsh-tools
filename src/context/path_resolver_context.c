@@ -35,7 +35,7 @@
 #include <sqsh.h>
 #include <sqsh_context_private.h>
 #include <sqsh_error.h>
-#include <sqsh_iterator.h>
+#include <sqsh_iterator_private.h>
 
 #include <string.h>
 
@@ -80,7 +80,7 @@ path_find_inode_ref(
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh_directory_iterator_init(&iter, &inode);
+	rv = sqsh__directory_iterator_init(&iter, &inode);
 	if (rv < 0) {
 		goto out;
 	}
@@ -92,7 +92,7 @@ path_find_inode_ref(
 	*target = sqsh_directory_iterator_inode_ref(&iter);
 
 out:
-	sqsh_directory_iterator_cleanup(&iter);
+	sqsh__directory_iterator_cleanup(&iter);
 	sqsh__inode_cleanup(&inode);
 	return rv;
 }

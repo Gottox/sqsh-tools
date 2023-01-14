@@ -63,7 +63,7 @@ sqsh__compression_options_init(
 	struct SqshMetablockContext metablock = {0};
 	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 
-	rv = sqsh_metablock_init(&metablock, sqsh, SQSH_SIZEOF_SUPERBLOCK);
+	rv = sqsh__metablock_init(&metablock, sqsh, SQSH_SIZEOF_SUPERBLOCK);
 	if (rv < 0) {
 		goto out;
 	}
@@ -73,14 +73,14 @@ sqsh__compression_options_init(
 		goto out;
 	}
 
-	rv = sqsh_metablock_to_buffer(&metablock, &context->buffer);
+	rv = sqsh__metablock_to_buffer(&metablock, &context->buffer);
 	if (rv < 0) {
 		goto out;
 	}
 	context->compression_id = sqsh_superblock_compression_id(superblock);
 
 out:
-	sqsh_metablock_cleanup(&metablock);
+	sqsh__metablock_cleanup(&metablock);
 	if (rv < 0) {
 		sqsh__compression_options_cleanup(context);
 	}

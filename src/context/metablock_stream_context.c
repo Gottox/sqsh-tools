@@ -32,12 +32,12 @@
  */
 
 #include "../utils.h"
-#include <sqsh_context.h>
+#include <sqsh_context_private.h>
 #include <sqsh_data.h>
 #include <sqsh_error.h>
 
 SQSH_NO_UNUSED int
-sqsh_metablock_stream_init(
+sqsh__metablock_stream_init(
 		struct SqshMetablockStreamContext *context, struct Sqsh *sqsh,
 		uint64_t address, uint64_t max_address) {
 	// TODO check for max_address
@@ -46,28 +46,28 @@ sqsh_metablock_stream_init(
 
 	context->sqsh = sqsh;
 	context->base_address = address;
-	rv = sqsh_metablock_stream_seek(context, address, 0);
+	rv = sqsh__metablock_stream_seek(context, address, 0);
 	if (rv < 0) {
 		goto out;
 	}
 out:
 	if (rv < 0) {
-		sqsh_metablock_stream_cleanup(context);
+		sqsh__metablock_stream_cleanup(context);
 	}
 	return rv;
 }
 
 int
-sqsh_metablock_stream_seek_ref(
+sqsh__metablock_stream_seek_ref(
 		struct SqshMetablockStreamContext *context, uint64_t ref) {
 	uint64_t address_offset = ref >> 16;
 	uint16_t index = ref & 0xFFFF;
 
-	return sqsh_metablock_stream_seek(context, address_offset, index);
+	return sqsh__metablock_stream_seek(context, address_offset, index);
 }
 
 int
-sqsh_metablock_stream_seek(
+sqsh__metablock_stream_seek(
 		struct SqshMetablockStreamContext *context, uint64_t address_offset,
 		uint32_t buffer_offset) {
 	sqsh_buffer_drain(&context->buffer);
@@ -88,32 +88,32 @@ add_block(struct SqshMetablockStreamContext *context) {
 	uint64_t address = context->current_address;
 	uint32_t metablock_size;
 
-	rv = sqsh_metablock_init(&metablock, context->sqsh, address);
+	rv = sqsh__metablock_init(&metablock, context->sqsh, address);
 	if (rv < 0) {
 		goto out;
 	}
 	metablock_size =
-			SQSH_SIZEOF_METABLOCK + sqsh_metablock_compressed_size(&metablock);
+			SQSH_SIZEOF_METABLOCK + sqsh__metablock_compressed_size(&metablock);
 	if (SQSH_ADD_OVERFLOW(address, metablock_size, &context->current_address)) {
 		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
 
-	rv = sqsh_metablock_to_buffer(&metablock, &context->buffer);
+	rv = sqsh__metablock_to_buffer(&metablock, &context->buffer);
 	if (rv < 0) {
 		goto out;
 	}
 
 out:
-	sqsh_metablock_cleanup(&metablock);
+	sqsh__metablock_cleanup(&metablock);
 	return rv;
 }
 
 int
-sqsh_metablock_stream_more(
+sqsh__metablock_stream_more(
 		struct SqshMetablockStreamContext *context, uint64_t size) {
 	int rv = 0;
-	while (sqsh_metablock_stream_size(context) < size) {
+	while (sqsh__metablock_stream_size(context) < size) {
 		rv = add_block(context);
 		if (rv < 0) {
 			return rv;
@@ -123,8 +123,8 @@ sqsh_metablock_stream_more(
 }
 
 const uint8_t *
-sqsh_metablock_stream_data(const struct SqshMetablockStreamContext *context) {
-	if (sqsh_metablock_stream_size(context) > 0) {
+sqsh__metablock_stream_data(const struct SqshMetablockStreamContext *context) {
+	if (sqsh__metablock_stream_size(context) > 0) {
 		return &sqsh_buffer_data(&context->buffer)[context->buffer_offset];
 	} else {
 		return NULL;
@@ -132,7 +132,7 @@ sqsh_metablock_stream_data(const struct SqshMetablockStreamContext *context) {
 }
 
 size_t
-sqsh_metablock_stream_size(const struct SqshMetablockStreamContext *context) {
+sqsh__metablock_stream_size(const struct SqshMetablockStreamContext *context) {
 	size_t buffer_size = sqsh_buffer_size(&context->buffer);
 
 	if (buffer_size > context->buffer_offset) {
@@ -143,7 +143,7 @@ sqsh_metablock_stream_size(const struct SqshMetablockStreamContext *context) {
 }
 
 int
-sqsh_metablock_stream_cleanup(struct SqshMetablockStreamContext *context) {
+sqsh__metablock_stream_cleanup(struct SqshMetablockStreamContext *context) {
 	sqsh_buffer_cleanup(&context->buffer);
 	return 0;
 }

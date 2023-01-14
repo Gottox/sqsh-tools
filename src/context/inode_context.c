@@ -44,13 +44,13 @@
 
 static const struct SqshInode *
 get_inode(const struct SqshInodeContext *inode) {
-	return (const struct SqshInode *)sqsh_metablock_stream_data(
+	return (const struct SqshInode *)sqsh__metablock_stream_data(
 			&inode->metablock);
 }
 
 static int
 inode_data_more(struct SqshInodeContext *inode, size_t size) {
-	int rv = sqsh_metablock_stream_more(&inode->metablock, size);
+	int rv = sqsh__metablock_stream_more(&inode->metablock, size);
 
 	if (rv < 0) {
 		return rv;
@@ -133,13 +133,13 @@ sqsh__inode_init(
 	int rv = 0;
 	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 
-	rv = sqsh_metablock_stream_init(
+	rv = sqsh__metablock_stream_init(
 			&inode->metablock, sqsh,
 			sqsh_superblock_inode_table_start(superblock), ~0);
 	if (rv < 0) {
 		return rv;
 	}
-	rv = sqsh_metablock_stream_seek(
+	rv = sqsh__metablock_stream_seek(
 			&inode->metablock, inode_block, inode_offset);
 	if (rv < 0) {
 		return rv;
@@ -557,7 +557,7 @@ sqsh_inode_xattr_index(const struct SqshInodeContext *context) {
 
 int
 sqsh__inode_cleanup(struct SqshInodeContext *inode) {
-	return sqsh_metablock_stream_cleanup(&inode->metablock);
+	return sqsh__metablock_stream_cleanup(&inode->metablock);
 }
 
 int

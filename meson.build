@@ -21,6 +21,7 @@ sqsh_hdr = [
 	'include/sqsh_data_private.h',
 	'include/sqsh_error.h',
 	'include/sqsh_iterator.h',
+	'include/sqsh_iterator_private.h',
 	'include/sqsh_mapper.h',
 	'include/sqsh_primitive.h',
 	'include/sqsh_table.h',

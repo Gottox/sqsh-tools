@@ -245,38 +245,6 @@ uint64_t sqsh_file_size(struct SqshFileContext *context);
  * @param context The file context to free.
  */
 int sqsh_file_free(struct SqshFileContext *context);
-
-// context/metablock_stream_context.c
-
-struct SqshMetablockStreamContext {
-	struct Sqsh *sqsh;
-	struct SqshBuffer buffer;
-	uint64_t base_address;
-	uint64_t current_address;
-	uint16_t buffer_offset;
-};
-
-SQSH_NO_UNUSED int sqsh_metablock_stream_init(
-		struct SqshMetablockStreamContext *context, struct Sqsh *sqsh,
-		uint64_t address, uint64_t max_address);
-
-SQSH_NO_UNUSED int sqsh_metablock_stream_seek_ref(
-		struct SqshMetablockStreamContext *context, uint64_t ref);
-
-SQSH_NO_UNUSED int sqsh_metablock_stream_seek(
-		struct SqshMetablockStreamContext *context, uint64_t address_offset,
-		uint32_t buffer_offset);
-
-SQSH_NO_UNUSED int sqsh_metablock_stream_more(
-		struct SqshMetablockStreamContext *context, uint64_t size);
-
-const uint8_t *
-sqsh_metablock_stream_data(const struct SqshMetablockStreamContext *context);
-
-size_t
-sqsh_metablock_stream_size(const struct SqshMetablockStreamContext *context);
-
-int sqsh_metablock_stream_cleanup(struct SqshMetablockStreamContext *context);
 // context/inode_context.c
 
 #define SQSH_INODE_NO_FRAGMENT 0xFFFFFFFF
@@ -314,10 +282,6 @@ enum SqshInodeContextType {
 /**
  * @brief Inode context.
  */
-struct SqshInodeContext {
-	struct SqshMetablockStreamContext metablock;
-	struct Sqsh *sqsh;
-};
 
 /**
  * @brief Initializes an inode context in heap
@@ -596,41 +560,6 @@ int sqsh_path_resolver_cleanup(struct SqshPathResolverContext *context);
  * @return int 0 on success, less than 0 on error.
  */
 int sqsh_path_resolver_free(struct SqshPathResolverContext *context);
-
-// context/metablock_context.c
-
-#define SQSH_METABLOCK_BLOCK_SIZE 8192
-
-/**
- * @brief The SqshMetablockContext struct
- *
- * The SqshMetablockContext struct contains all information about a
- * metablock.
- */
-struct SqshMetablockContext {
-	struct SqshMapping mapping;
-	struct SqshBuffer buffer;
-	struct SqshCompression *compression;
-};
-
-/**
- * @brief sqsh_metablock_context_init
- * @param context The SqshMetablockContext to initialize.
- * @param sqsh The Sqsh struct.
- * @param address The address of the metablock.
- * @return 0 on success, less than 0 on error.
- */
-int sqsh_metablock_init(
-		struct SqshMetablockContext *context, struct Sqsh *sqsh,
-		uint64_t address);
-
-uint32_t
-sqsh_metablock_compressed_size(const struct SqshMetablockContext *context);
-
-SQSH_NO_UNUSED int sqsh_metablock_to_buffer(
-		struct SqshMetablockContext *context, struct SqshBuffer *buffer);
-
-int sqsh_metablock_cleanup(struct SqshMetablockContext *context);
 
 // context/superblock_context.c
 

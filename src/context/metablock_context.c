@@ -34,7 +34,7 @@
 #include "../utils.h"
 #include <sqsh.h>
 #include <sqsh_compression_private.h>
-#include <sqsh_context.h>
+#include <sqsh_context_private.h>
 #include <sqsh_data.h>
 #include <sqsh_error.h>
 #include <stdint.h>
@@ -45,7 +45,7 @@ get_metablock(const struct SqshMetablockContext *context) {
 }
 
 int
-sqsh_metablock_init(
+sqsh__metablock_init(
 		struct SqshMetablockContext *context, struct Sqsh *sqsh,
 		uint64_t address) {
 	int rv = 0;
@@ -60,20 +60,20 @@ sqsh_metablock_init(
 
 out:
 	if (rv < 0) {
-		sqsh_metablock_cleanup(context);
+		sqsh__metablock_cleanup(context);
 	}
 
 	return rv;
 }
 
 uint32_t
-sqsh_metablock_compressed_size(const struct SqshMetablockContext *context) {
+sqsh__metablock_compressed_size(const struct SqshMetablockContext *context) {
 	const struct SqshMetablock *metablock = get_metablock(context);
 	return sqsh_data_metablock_size(metablock);
 }
 
 int
-sqsh_metablock_to_buffer(
+sqsh__metablock_to_buffer(
 		struct SqshMetablockContext *context, struct SqshBuffer *buffer) {
 	int rv = 0;
 	const struct SqshMetablock *metablock = get_metablock(context);
@@ -113,7 +113,7 @@ out:
 }
 
 int
-sqsh_metablock_cleanup(struct SqshMetablockContext *context) {
+sqsh__metablock_cleanup(struct SqshMetablockContext *context) {
 	sqsh_mapping_unmap(&context->mapping);
 	return 0;
 }

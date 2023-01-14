@@ -33,14 +33,14 @@
 
 #include <sqsh.h>
 #include <sqsh_data.h>
-#include <sqsh_iterator.h>
+#include <sqsh_iterator_private.h>
 
 static const uint64_t INODE_HEADER_SIZE =
 		SQSH_SIZEOF_INODE_HEADER + SQSH_SIZEOF_INODE_DIRECTORY_EXT;
 
 static const struct SqshInode *
 get_inode(const struct SqshInodeDirectoryIndexIterator *iterator) {
-	return (const struct SqshInode *)sqsh_metablock_stream_data(
+	return (const struct SqshInode *)sqsh__metablock_stream_data(
 			&iterator->inode->metablock);
 }
 
@@ -56,11 +56,11 @@ current_directory_index(
 static int
 directory_index_data_more(
 		struct SqshInodeDirectoryIndexIterator *iterator, size_t size) {
-	return sqsh_metablock_stream_more(&iterator->inode->metablock, size);
+	return sqsh__metablock_stream_more(&iterator->inode->metablock, size);
 }
 
 int
-sqsh_inode_directory_index_iterator_init(
+sqsh__directory_index_iterator_init(
 		struct SqshInodeDirectoryIndexIterator *iterator,
 		struct SqshInodeContext *inode) {
 	int rv = 0;
@@ -83,14 +83,13 @@ sqsh_inode_directory_index_iterator_init(
 
 SQSH_NO_UNUSED
 struct SqshInodeDirectoryIndexIterator *
-sqsh_inode_directory_index_iterator_new(
-		struct SqshInodeContext *inode, int *err) {
+sqsh__directory_index_iterator_new(struct SqshInodeContext *inode, int *err) {
 	struct SqshInodeDirectoryIndexIterator *iterator =
 			calloc(1, sizeof(struct SqshInodeDirectoryIndexIterator));
 	if (iterator == NULL) {
 		return NULL;
 	}
-	*err = sqsh_inode_directory_index_iterator_init(iterator, inode);
+	*err = sqsh__directory_index_iterator_init(iterator, inode);
 	if (*err < 0) {
 		free(iterator);
 		return NULL;
@@ -99,7 +98,7 @@ sqsh_inode_directory_index_iterator_new(
 }
 
 int
-sqsh_inode_directory_index_iterator_next(
+sqsh__directory_index_iterator_next(
 		struct SqshInodeDirectoryIndexIterator *iterator) {
 	int rv = 0;
 	iterator->current_offset = iterator->next_offset;
@@ -114,8 +113,7 @@ sqsh_inode_directory_index_iterator_next(
 	}
 
 	// Make sure current index has its name populated
-	iterator->next_offset +=
-			sqsh_inode_directory_index_iterator_name_size(iterator);
+	iterator->next_offset += sqsh__directory_index_iterator_name_size(iterator);
 	rv = directory_index_data_more(iterator, iterator->next_offset);
 	if (rv < 0) {
 		return rv;
@@ -125,28 +123,28 @@ sqsh_inode_directory_index_iterator_next(
 }
 
 uint32_t
-sqsh_inode_directory_index_iterator_index(
+sqsh__directory_index_iterator_index(
 		struct SqshInodeDirectoryIndexIterator *iterator) {
 	const struct SqshInodeDirectoryIndex *current =
 			current_directory_index(iterator);
 	return sqsh_data_inode_directory_index_index(current);
 }
 uint32_t
-sqsh_inode_directory_index_iterator_start(
+sqsh__directory_index_iterator_start(
 		struct SqshInodeDirectoryIndexIterator *iterator) {
 	const struct SqshInodeDirectoryIndex *current =
 			current_directory_index(iterator);
 	return sqsh_data_inode_directory_index_start(current);
 }
 uint32_t
-sqsh_inode_directory_index_iterator_name_size(
+sqsh__directory_index_iterator_name_size(
 		struct SqshInodeDirectoryIndexIterator *iterator) {
 	const struct SqshInodeDirectoryIndex *current =
 			current_directory_index(iterator);
 	return sqsh_data_inode_directory_index_name_size(current) + 1;
 }
 const char *
-sqsh_inode_directory_index_iterator_name(
+sqsh__directory_index_iterator_name(
 		struct SqshInodeDirectoryIndexIterator *iterator) {
 	const struct SqshInodeDirectoryIndex *current =
 			current_directory_index(iterator);
@@ -154,19 +152,19 @@ sqsh_inode_directory_index_iterator_name(
 }
 
 int
-sqsh_inode_directory_index_iterator_cleanup(
+sqsh__directory_index_iterator_cleanup(
 		struct SqshInodeDirectoryIndexIterator *iterator) {
 	(void)iterator;
 	return 0;
 }
 
 int
-sqsh_inode_directory_index_iterator_free(
+sqsh__directory_index_iterator_free(
 		struct SqshInodeDirectoryIndexIterator *iterator) {
 	if (iterator == NULL) {
 		return 0;
 	}
-	int rv = sqsh_inode_directory_index_iterator_cleanup(iterator);
+	int rv = sqsh__directory_index_iterator_cleanup(iterator);
 	free(iterator);
 	return rv;
 }

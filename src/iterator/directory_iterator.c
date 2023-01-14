@@ -36,7 +36,7 @@
 #include <sqsh_context.h>
 #include <sqsh_data.h>
 #include <sqsh_error.h>
-#include <sqsh_iterator.h>
+#include <sqsh_iterator_private.h>
 
 #include <string.h>
 
@@ -48,16 +48,15 @@ directory_iterator_index_lookup(
 	struct SqshInodeDirectoryIndexIterator index_iterator = {0};
 	struct SqshInodeContext *inode = iterator->inode;
 
-	rv = sqsh_inode_directory_index_iterator_init(&index_iterator, inode);
+	rv = sqsh__directory_index_iterator_init(&index_iterator, inode);
 	if (rv < 0) {
 		return 0;
 	}
-	while ((rv = sqsh_inode_directory_index_iterator_next(&index_iterator)) >
-		   0) {
+	while ((rv = sqsh__directory_index_iterator_next(&index_iterator)) > 0) {
 		const char *index_name =
-				sqsh_inode_directory_index_iterator_name(&index_iterator);
+				sqsh__directory_index_iterator_name(&index_iterator);
 		uint32_t index_name_size =
-				sqsh_inode_directory_index_iterator_name_size(&index_iterator);
+				sqsh__directory_index_iterator_name_size(&index_iterator);
 
 		// BUG: the branch could be taken too early when the name is a prefix
 		if (strncmp(name, (char *)index_name,
@@ -65,13 +64,13 @@ directory_iterator_index_lookup(
 			break;
 		}
 		iterator->next_offset =
-				sqsh_inode_directory_index_iterator_index(&index_iterator);
+				sqsh__directory_index_iterator_index(&index_iterator);
 	}
 	iterator->remaining_entries = 0;
 	if (rv < 0) {
 		return rv;
 	}
-	rv = sqsh_inode_directory_index_iterator_cleanup(&index_iterator);
+	rv = sqsh__directory_index_iterator_cleanup(&index_iterator);
 	return rv;
 }
 
@@ -85,13 +84,13 @@ directory_iterator_current_fragment(
 
 static int
 directory_data_more(struct SqshDirectoryIterator *iterator, size_t size) {
-	int rv = sqsh_metablock_stream_more(&iterator->metablock, size);
+	int rv = sqsh__metablock_stream_more(&iterator->metablock, size);
 	if (rv < 0) {
 		return rv;
 	}
 
 	iterator->fragments =
-			(struct SqshDirectoryFragment *)sqsh_metablock_stream_data(
+			(struct SqshDirectoryFragment *)sqsh__metablock_stream_data(
 					&iterator->metablock);
 	return 0;
 }
@@ -127,7 +126,7 @@ sqsh_directory_iterator_lookup(
 }
 
 int
-sqsh_directory_iterator_init(
+sqsh__directory_iterator_init(
 		struct SqshDirectoryIterator *iterator,
 		struct SqshInodeContext *inode) {
 	int rv = 0;
@@ -142,13 +141,13 @@ sqsh_directory_iterator_init(
 	iterator->size = sqsh_inode_file_size(inode) - 3;
 	iterator->inode = inode;
 
-	rv = sqsh_metablock_stream_init(
+	rv = sqsh__metablock_stream_init(
 			&iterator->metablock, sqsh,
 			sqsh_superblock_directory_table_start(superblock), ~0);
 	if (rv < 0) {
 		return rv;
 	}
-	rv = sqsh_metablock_stream_seek(
+	rv = sqsh__metablock_stream_seek(
 			&iterator->metablock, iterator->block_start,
 			iterator->block_offset);
 	if (rv < 0) {
@@ -170,7 +169,7 @@ sqsh_directory_iterator_new(struct SqshInodeContext *inode, int *err) {
 	if (iterator == NULL) {
 		return NULL;
 	}
-	*err = sqsh_directory_iterator_init(iterator, inode);
+	*err = sqsh__directory_iterator_init(iterator, inode);
 	if (*err < 0) {
 		free(iterator);
 		return NULL;
@@ -295,9 +294,9 @@ sqsh_directory_iterator_name_dup(
 }
 
 int
-sqsh_directory_iterator_cleanup(struct SqshDirectoryIterator *iterator) {
+sqsh__directory_iterator_cleanup(struct SqshDirectoryIterator *iterator) {
 	int rv = 0;
-	rv = sqsh_metablock_stream_cleanup(&iterator->metablock);
+	rv = sqsh__metablock_stream_cleanup(&iterator->metablock);
 	return rv;
 }
 
@@ -306,7 +305,7 @@ sqsh_directory_iterator_free(struct SqshDirectoryIterator *iterator) {
 	if (iterator == NULL) {
 		return 0;
 	}
-	int rv = sqsh_directory_iterator_cleanup(iterator);
+	int rv = sqsh__directory_iterator_cleanup(iterator);
 	free(iterator);
 	return rv;
 }

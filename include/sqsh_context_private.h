@@ -110,7 +110,79 @@ SQSH_NO_UNUSED int sqsh__file_init(
  */
 int sqsh__file_cleanup(struct SqshFileContext *context);
 
+// context/metablock_context.c
+
+#define SQSH_METABLOCK_BLOCK_SIZE 8192
+
+/**
+ * @brief The SqshMetablockContext struct
+ *
+ * The SqshMetablockContext struct contains all information about a
+ * metablock.
+ */
+struct SqshMetablockContext {
+	struct SqshMapping mapping;
+	struct SqshBuffer buffer;
+	struct SqshCompression *compression;
+};
+
+/**
+ * @brief sqsh__metablock_context_init
+ * @param context The SqshMetablockContext to initialize.
+ * @param sqsh The Sqsh struct.
+ * @param address The address of the metablock.
+ * @return 0 on success, less than 0 on error.
+ */
+int sqsh__metablock_init(
+		struct SqshMetablockContext *context, struct Sqsh *sqsh,
+		uint64_t address);
+
+uint32_t
+sqsh__metablock_compressed_size(const struct SqshMetablockContext *context);
+
+SQSH_NO_UNUSED int sqsh__metablock_to_buffer(
+		struct SqshMetablockContext *context, struct SqshBuffer *buffer);
+
+int sqsh__metablock_cleanup(struct SqshMetablockContext *context);
+
+// context/metablock_stream_context.c
+
+struct SqshMetablockStreamContext {
+	struct Sqsh *sqsh;
+	struct SqshBuffer buffer;
+	uint64_t base_address;
+	uint64_t current_address;
+	uint16_t buffer_offset;
+};
+
+SQSH_NO_UNUSED int sqsh__metablock_stream_init(
+		struct SqshMetablockStreamContext *context, struct Sqsh *sqsh,
+		uint64_t address, uint64_t max_address);
+
+SQSH_NO_UNUSED int sqsh__metablock_stream_seek_ref(
+		struct SqshMetablockStreamContext *context, uint64_t ref);
+
+SQSH_NO_UNUSED int sqsh__metablock_stream_seek(
+		struct SqshMetablockStreamContext *context, uint64_t address_offset,
+		uint32_t buffer_offset);
+
+SQSH_NO_UNUSED int sqsh__metablock_stream_more(
+		struct SqshMetablockStreamContext *context, uint64_t size);
+
+const uint8_t *
+sqsh__metablock_stream_data(const struct SqshMetablockStreamContext *context);
+
+size_t
+sqsh__metablock_stream_size(const struct SqshMetablockStreamContext *context);
+
+int sqsh__metablock_stream_cleanup(struct SqshMetablockStreamContext *context);
+
 // context/inode_context.c
+
+struct SqshInodeContext {
+	struct SqshMetablockStreamContext metablock;
+	struct Sqsh *sqsh;
+};
 
 /**
  * @internal
