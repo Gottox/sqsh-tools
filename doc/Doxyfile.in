@@ -12,7 +12,8 @@ IGNORE_PREFIX         = sqsh_
 HAVE_DOT              = YES
 DOT_IMAGE_FORMAT      = svg
 INTERACTIVE_SVG       = YES
-FULL_PATH_NAMES       = NO
+FULL_PATH_NAMES       = YES
+STRIP_FROM_PATH       = ../include/
 INTERNAL_DOCS         = @DOXYGEN_INTERNAL_DOCS@
 
 # Warning and progress messages
