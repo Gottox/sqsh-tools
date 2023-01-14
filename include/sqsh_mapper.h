@@ -201,17 +201,95 @@ struct SqshMapper {
 	} data;
 };
 
+/**
+ * @memberof SqshMapper
+ * @brief Initializes a mapper with an implementation and input data.
+ *
+ * @param[out] mapper The mapper to initialize.
+ * @param[in]  impl The implementation to use for the mapper.
+ * @param[in]  input The input data to map.
+ * @param[in]  size The size of the input data.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 int sqsh_mapper_init(
 		struct SqshMapper *mapper, struct SqshMemoryMapperImpl *impl,
 		const void *input, size_t size);
+
+/**
+ * @memberof SqshMapper
+ * @brief Maps a portion of the input data to a mapping.
+ *
+ * @param[out] mapping The mapping to store the mapped data.
+ * @param[in]  mapper The mapper to use for the mapping.
+ * @param[in]  offset The offset in the input data to start the mapping.
+ * @param[in]  size The size of the mapped data.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 int sqsh_mapper_map(
 		struct SqshMapping *mapping, struct SqshMapper *mapper,
 		sqsh_index_t offset, size_t size);
+
+/**
+ * @memberof SqshMapper
+ * @brief Retrieves the size of the input data in a mapper.
+ *
+ * @param[in] mapper The mapper to retrieve the size from.
+ *
+ * @return The size of the input data in the mapper.
+ */
 size_t sqsh_mapper_size(const struct SqshMapper *mapper);
+
+/**
+ * @memberof SqshMapper
+ * @brief Cleans up a mapper.
+ *
+ * @param[in] mapper The mapper to clean up.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 int sqsh_mapper_cleanup(struct SqshMapper *mapper);
+
+/**
+ * @memberof SqshMapping
+ * @brief Retrieves the size of a mapping.
+ *
+ * @param[in] mapping The mapping to retrieve the size from.
+ *
+ * @return The size of the mapping.
+ */
 size_t sqsh_mapping_size(struct SqshMapping *mapping);
+
+/**
+ * @memberof SqshMapping
+ * @brief Resizes a mapping to a new size.
+ *
+ * @param[in] mapping The mapping to resize.
+ * @param[in] new_size The new size of the mapping.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 int sqsh_mapping_resize(struct SqshMapping *mapping, size_t new_size);
+
+/**
+ * @memberof SqshMapping
+ * @brief Retrieves the data in a mapping.
+ *
+ * @param[in] mapping The mapping to retrieve the data from.
+ *
+ * @return The data in the mapping.
+ */
 const uint8_t *sqsh_mapping_data(const struct SqshMapping *mapping);
+
+/**
+ * @memberof SqshMapping
+ * @brief Unmaps a mapping.
+ *
+ * @param[in] mapping The mapping to unmap.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 int sqsh_mapping_unmap(struct SqshMapping *mapping);
 
 #ifdef __cplusplus

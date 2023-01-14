@@ -55,14 +55,46 @@ struct SqshCompression {
 	size_t block_size;
 };
 
+/**
+ * @internal
+ * @memberof SqshCompression
+ * @brief Initializes a compression context.
+ *
+ * @param[out] compression      The context to initialize.
+ * @param[in]  compression_id   The id of the compression algorithm to use.
+ * @param[in]  block_size       The block size to use for the compression.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 int sqsh__compression_init(
 		struct SqshCompression *compression, int compression_id,
 		size_t block_size);
 
+/**
+ * @internal
+ * @memberof SqshCompression
+ * @brief Decompresses data to a buffer.
+ *
+ * @param[in]     compression     The compression context to use.
+ * @param[out]    buffer          The buffer to store the decompressed data.
+ * @param[in]     compressed      The compressed data to decompress.
+ * @param[in]     compressed_size The size of the compressed data.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 int sqsh__compression_decompress_to_buffer(
 		const struct SqshCompression *compression, struct SqshBuffer *buffer,
 		const uint8_t *compressed, const size_t compressed_size);
 
+/**
+ * @internal
+ *
+ * @brief Cleans up a compression context.
+ *
+ * @param[in] compression The context to clean up.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 int sqsh__compression_cleanup(struct SqshCompression *compression);
 
 #ifdef __cplusplus

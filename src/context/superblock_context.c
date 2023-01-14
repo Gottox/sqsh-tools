@@ -106,20 +106,6 @@ out:
 	return rv;
 }
 
-const void *
-sqsh_superblock_data_from_offset(
-		const struct SqshSuperblockContext *context, uint64_t offset) {
-	const uint8_t *tmp = (uint8_t *)context->superblock;
-	if (offset > sqsh_superblock_bytes_used(context)) {
-		return NULL;
-	}
-	if (offset < SQSH_SIZEOF_SUPERBLOCK) {
-		return NULL;
-	}
-
-	return &tmp[offset];
-}
-
 enum SqshSuperblockCompressionId
 sqsh_superblock_compression_id(const struct SqshSuperblockContext *context) {
 	return sqsh_data_superblock_compression_id(context->superblock);

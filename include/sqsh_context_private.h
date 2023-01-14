@@ -265,6 +265,40 @@ SQSH_NO_UNUSED int sqsh__inode_init(
  */
 int sqsh__inode_cleanup(struct SqshInodeContext *context);
 
+////////////////////////////////////////
+// context/path_resolver_context.c
+
+struct SqshPathResolverContext {
+	/**
+	 * @privatesection
+	 */
+	struct Sqsh *sqsh;
+};
+
+/**
+ * @internal
+ * @memberof SqshPathResolverContext
+ * @brief initializes a path resolver context.
+ *
+ * @param[out] context The path resolver context.
+ * @param[in] sqsh The sqsh context.
+ *
+ * @return int 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int sqsh__path_resolver_init(
+		struct SqshPathResolverContext *context, struct Sqsh *sqsh);
+
+/**
+ * @internal
+ * @brief cleans up a path resolver context.
+ * @memberof SqshPathResolverContext
+ *
+ * @param[in] context The path resolver context.
+ *
+ * @return int 0 on success, less than 0 on error.
+ */
+int sqsh_path_resolver_cleanup(struct SqshPathResolverContext *context);
+
 #ifdef __cplusplus
 }
 #endif

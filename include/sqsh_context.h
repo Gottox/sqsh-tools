@@ -247,6 +247,7 @@ uint64_t sqsh_file_size(struct SqshFileContext *context);
  * @param context The file context to free.
  */
 int sqsh_file_free(struct SqshFileContext *context);
+
 ////////////////////////////////////////
 // context/inode_context.c
 
@@ -281,10 +282,6 @@ enum SqshInodeContextType {
 	SQSH_INODE_TYPE_FIFO,
 	SQSH_INODE_TYPE_SOCKET,
 };
-
-/**
- * @brief Inode context.
- */
 
 /**
  * @brief Initializes an inode context in heap
@@ -458,8 +455,11 @@ SQSH_NO_UNUSED int sqsh_inode_symlink_dup(
 uint32_t sqsh_inode_symlink_size(const struct SqshInodeContext *context);
 
 /**
+ * @memberof SqshInodeContext
  * @brief returns the device id of the device inode.
+ *
  * @param context The inode context.
+ *
  * @return the name of the inode or 0 if the inode is not a device.
  */
 uint32_t sqsh_inode_device_id(const struct SqshInodeContext *context);
@@ -467,34 +467,42 @@ uint32_t sqsh_inode_device_id(const struct SqshInodeContext *context);
 /**
  * @brief returns the uid of the inode.
  * @memberof SqshInodeContext
+ *
  * @param context The inode context.
+ *
  * @return the uid of the inode.
  */
 uint32_t sqsh_inode_uid(const struct SqshInodeContext *context);
 /**
  * @brief returns the gid of the inode.
  * @memberof SqshInodeContext
+ *
  * @param context The inode context.
+ *
  * @return the gid of the inode.
  */
 uint32_t sqsh_inode_gid(const struct SqshInodeContext *context);
 /**
  * @brief returns index of the extended attribute inside of the xattr table.
  * @memberof SqshInodeContext
+ *
  * @param context The inode context.
+ *
  * @return the index of the extended attribute inside of the xattr table.
  */
 uint32_t sqsh_inode_xattr_index(const struct SqshInodeContext *context);
 /**
- * @brief cleans up an inode context and frees the memory.
  * @memberof SqshInodeContext
+ * @brief cleans up an inode context and frees the memory.
+ *
  * @param context The inode context.
+ *
  * @return int 0 on success, less than 0 on error.
  */
 int sqsh_inode_free(struct SqshInodeContext *context);
 /**
- * @brief converts an inode reference into a block index and a block offset
  * @memberof SqshInodeContext
+ * @brief converts an inode reference into a block index and a block offset
  * @param ref The inode reference.
  * @param block_index a pointer where the block index will be stored.
  * @param offset a pointer where the block offset will be stored.
@@ -502,10 +510,12 @@ int sqsh_inode_free(struct SqshInodeContext *context);
 void
 sqsh_inode_ref_to_block(uint64_t ref, uint32_t *block_index, uint16_t *offset);
 /**
- * @brief converts a block index and a block offset into an inode reference.
  * @memberof SqshInodeContext
+ * @brief converts a block index and a block offset into an inode reference.
+ *
  * @param block_index The block index.
  * @param offset The block offset.
+ *
  * @return the inode reference.
  */
 SQSH_NO_UNUSED uint64_t
@@ -514,51 +524,30 @@ sqsh_inode_ref_from_block(uint32_t block_index, uint16_t offset);
 ////////////////////////////////////////
 // context/path_resolver_context.c
 
-struct SqshPathResolverContext {
-	/**
-	 * @privatesection
-	 */
-	struct Sqsh *sqsh;
-};
+struct SqshPathResolverContext;
 
 /**
- * @brief initializes a path resolver context in heap
  * @memberof SqshPathResolverContext
- * @param sqsh The sqsh context.
- * @param[out] err Pointer to an int where the error code will be stored.
+ * @brief initializes a path resolver context in heap
+ *
+ * @param[in]  sqsh The sqsh context.
+ * @param[out] err  Pointer to an int where the error code will be stored.
+ *
  * @return The Initialized path resolver context
  */
 struct SqshPathResolverContext *
 sqsh_path_resolver_new(struct Sqsh *sqsh, int *err);
 
 /**
- * @brief initializes a path resolver context.
- * @memberof SqshPathResolverContext
- * @param context The path resolver context.
- * @param sqsh The sqsh context.
- * @return int 0 on success, less than 0 on error.
- */
-SQSH_NO_UNUSED int sqsh_path_resolver_init(
-		struct SqshPathResolverContext *context, struct Sqsh *sqsh);
-
-/**
  * @brief Initialize the inode context from a path.
  * @memberof SqshPathResolverContext
- * @param context The path resolver context.
- * @param path The path the file or directory.
+ * @param[in] context The path resolver context.
+ * @param[in] path The path the file or directory.
  * @param[out] err Pointer to an int where the error code will be stored.
  * @return an inode context on success, NULL on error
  */
 SQSH_NO_UNUSED struct SqshInodeContext *sqsh_path_resolver_resolve(
 		struct SqshPathResolverContext *context, const char *path, int *err);
-
-/**
- * @brief cleans up a path resolver context.
- * @memberof SqshPathResolverContext
- * @param context The path resolver context.
- * @return int 0 on success, less than 0 on error.
- */
-int sqsh_path_resolver_cleanup(struct SqshPathResolverContext *context);
 
 /**
  * @brief cleans up a path resolver context and frees the memory.
@@ -597,55 +586,201 @@ enum SqshSuperblockFlags {
 
 struct SqshSuperblockContext;
 
-const void *sqsh_superblock_data_from_offset(
-		const struct SqshSuperblockContext *context, uint64_t offset);
-
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the compression id of a superblock context.
+ *
+ * @param[in] context The superblock context to retrieve the compression id
+ * from.
+ *
+ * @return The compression id of the superblock context.
+ */
 enum SqshSuperblockCompressionId
 sqsh_superblock_compression_id(const struct SqshSuperblockContext *context);
 
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the start offset of the directory table in a superblock
+ * context.
+ *
+ * @param[in] context The superblock context to retrieve the directory table
+ * start offset from.
+ *
+ * @return The start offset of the directory table in the superblock context.
+ */
 uint64_t sqsh_superblock_directory_table_start(
 		const struct SqshSuperblockContext *context);
 
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the start offset of the fragment table in a superblock
+ * context.
+ *
+ * @param[in] context The superblock context to retrieve the fragment table
+ * start offset from.
+ *
+ * @return The start offset of the fragment table in the superblock context.
+ */
 uint64_t sqsh_superblock_fragment_table_start(
 		const struct SqshSuperblockContext *context);
 
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the number of inodes in an archive.
+ *
+ * @param[in] context The superblock context to retrieve the inode count from.
+ *
+ * @return The number of inodes in the superblock context.
+ */
 uint32_t
 sqsh_superblock_inode_count(const struct SqshSuperblockContext *context);
 
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the start offset of the inode table in an archive.
+ *
+ * @param[in] context The superblock context to retrieve the inode table start
+ * offset from.
+ *
+ * @return The start offset of the inode table in the superblock context.
+ */
 uint64_t
 sqsh_superblock_inode_table_start(const struct SqshSuperblockContext *context);
 
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the start offset of the id table in an archive.
+ *
+ * @param[in] context The superblock context to retrieve the id table start
+ * offset from.
+ *
+ * @return The start offset of the id table in the superblock context.
+ */
 uint64_t
 sqsh_superblock_id_table_start(const struct SqshSuperblockContext *context);
 
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the number of ids in an archive.
+ *
+ * @param[in] context The superblock context to retrieve the ids count from.
+ *
+ * @return The number of inodes in the superblock context.
+ */
 uint16_t sqsh_superblock_id_count(const struct SqshSuperblockContext *context);
 
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the start offset of the export table in an archive.
+ *
+ * @param[in] context The superblock context to retrieve the export table start
+ * offset from.
+ *
+ * @return The start offset of the export table in the superblock context.
+ */
 uint64_t
 sqsh_superblock_export_table_start(const struct SqshSuperblockContext *context);
 
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the start offset of the xattr id table in an archive.
+ *
+ * @param[in] context The superblock context to retrieve the xattr id table
+ * start offset from.
+ *
+ * @return The start offset of the xattr id table in the superblock context.
+ */
 uint64_t sqsh_superblock_xattr_id_table_start(
 		const struct SqshSuperblockContext *context);
 
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the reference of the root inode in a superblock context.
+ *
+ * @param[in] context The superblock context to retrieve the root inode
+ * reference from.
+ *
+ * @return The reference of the root inode in the superblock context.
+ */
 uint64_t
 sqsh_superblock_inode_root_ref(const struct SqshSuperblockContext *context);
 
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Checks if a superblock context has fragment table.
+ *
+ * @param[in] context The superblock context to check.
+ *
+ * @return True if the superblock context has a fragment table, false otherwise.
+ */
 bool sqsh_superblock_has_fragments(const struct SqshSuperblockContext *context);
 
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Checks if a superblock context has an export table.
+ *
+ * @param[in] context The superblock context to check.
+ *
+ * @return True if the superblock context has an export table, false otherwise.
+ */
 bool
 sqsh_superblock_has_export_table(const struct SqshSuperblockContext *context);
 
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Checks if a superblock context has compression options.
+ *
+ * @param[in] context The superblock context to check.
+ *
+ * @return True if the superblock context has compression options, false
+ * otherwise.
+ */
 bool sqsh_superblock_has_compression_options(
 		const struct SqshSuperblockContext *context);
 
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the block size of a superblock context.
+ *
+ * @param[in] context The superblock context to retrieve the block size from.
+ *
+ * @return The block size of the superblock context.
+ */
 uint32_t
 sqsh_superblock_block_size(const struct SqshSuperblockContext *context);
 
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the modification time of a superblock context.
+ *
+ * @param[in] context The superblock context to retrieve the modification time
+ * from.
+ *
+ * @return The modification time of the superblock context.
+ */
 uint32_t
 sqsh_superblock_modification_time(const struct SqshSuperblockContext *context);
 
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the number of fragment entries in a superblock context.
+ *
+ * @param[in] context The superblock context to retrieve the fragment entry
+ * count from.
+ *
+ * @return The number of fragment entries in the superblock context.
+ */
 uint32_t sqsh_superblock_fragment_entry_count(
 		const struct SqshSuperblockContext *context);
 
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the number of bytes used in a superblock context.
+ *
+ * @param[in] context The superblock context to retrieve the bytes used from.
+ *
+ * @return The number of bytes used in the superblock context.
+ */
 uint64_t
 sqsh_superblock_bytes_used(const struct SqshSuperblockContext *context);
 
@@ -659,12 +794,45 @@ struct SqshTrailingContext {
 	struct SqshMapping *mapping;
 };
 
+/**
+ * @memberof SqshTrailingContext
+ * @brief Initializes a trailing context.
+ *
+ * @param[out] context The context to initialize.
+ * @param[in]  sqsh The Sqsh instance to use for the context.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 int sqsh_trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh);
 
+/**
+ * @memberof SqshTrailingContext
+ * @brief Retrieves the size of the trailing data in a context.
+ *
+ * @param[in] context The context to retrieve the size from.
+ *
+ * @return The size of the trailing data in the context.
+ */
 size_t sqsh_trailing_size(struct SqshTrailingContext *context);
 
+/**
+ * @memberof SqshTrailingContext
+ * @brief Retrieves the trailing data in a context.
+ *
+ * @param[in] context The context to retrieve the data from.
+ *
+ * @return The trailing data in the context.
+ */
 const uint8_t *sqsh_trailing_data(struct SqshTrailingContext *context);
 
+/**
+ * @memberof SqshTrailingContext
+ * @brief Cleans up a trailing context.
+ *
+ * @param[in] context The context to clean up.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 int sqsh_trailing_cleanup(struct SqshTrailingContext *context);
 
 #ifdef __cplusplus

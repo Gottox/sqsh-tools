@@ -47,8 +47,8 @@ extern "C" {
 struct SqshDirectoryIterator;
 
 /**
- * @brief Allocates and initializes a new directory iterator.
  * @memberof SqshDirectoryIterator
+ * @brief Allocates and initializes a new directory iterator.
  *
  * @param[in]  inode      The inode to iterate through.
  * @param[out] err        Pointer to an int where the error code will be stored.
@@ -59,8 +59,8 @@ SQSH_NO_UNUSED struct SqshDirectoryIterator *
 sqsh_directory_iterator_new(struct SqshInodeContext *inode, int *err);
 
 /**
- * @brief Advances the iterator to the next entry.
  * @memberof SqshDirectoryIterator
+ * @brief Advances the iterator to the next entry.
  *
  * @param[in,out] iterator The iterator to advance.
  *
@@ -70,8 +70,8 @@ SQSH_NO_UNUSED int
 sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator);
 
 /**
- * @brief Looks up an entry by name.
  * @memberof SqshDirectoryIterator
+ * @brief Looks up an entry by name.
  *
  * @param[in,out] iterator The iterator to use.
  * @param[in]     name     The name of the entry to look up.
@@ -84,8 +84,8 @@ SQSH_NO_UNUSED int sqsh_directory_iterator_lookup(
 		const size_t name_len);
 
 /**
- * @brief Retrieves the size of the name of the current entry.
  * @memberof SqshDirectoryIterator
+ * @brief Retrieves the size of the name of the current entry.
  *
  * @param[in] iterator The iterator to use.
  *
@@ -95,8 +95,8 @@ int
 sqsh_directory_iterator_name_size(const struct SqshDirectoryIterator *iterator);
 
 /**
- * @brief Retrieves the inode reference of the current entry.
  * @memberof SqshDirectoryIterator
+ * @brief Retrieves the inode reference of the current entry.
  *
  * @param[in] iterator The iterator to use.
  *
@@ -106,8 +106,8 @@ uint64_t
 sqsh_directory_iterator_inode_ref(const struct SqshDirectoryIterator *iterator);
 
 /**
- * @brief Retrieves the inode type of the current entry.
  * @memberof SqshDirectoryIterator
+ * @brief Retrieves the inode type of the current entry.
  *
  * @param[in] iterator The iterator to use.
  *
@@ -117,8 +117,8 @@ enum SqshInodeContextType sqsh_directory_iterator_inode_type(
 		const struct SqshDirectoryIterator *iterator);
 
 /**
- * @brief Loads the inode of the current entry.
  * @memberof SqshDirectoryIterator
+ * @brief Loads the inode of the current entry.
  *
  * @param[in]  iterator The iterator to use.
  * @param[out] err  Pointer to an int where the error code will be stored.
@@ -129,9 +129,9 @@ SQSH_NO_UNUSED struct SqshInodeContext *sqsh_directory_iterator_inode_load(
 		const struct SqshDirectoryIterator *iterator, int *err);
 
 /**
+ * @memberof SqshDirectoryIterator
  * @brief Retrieves the name of the current entry. Note that the name is not
  * null-terminated.
- * @memberof SqshDirectoryIterator
  *
  * @param[in] iterator The iterator to use.
  *
@@ -140,9 +140,9 @@ SQSH_NO_UNUSED struct SqshInodeContext *sqsh_directory_iterator_inode_load(
 const char *
 sqsh_directory_iterator_name(const struct SqshDirectoryIterator *iterator);
 /**
+ * @memberof SqshDirectoryIterator
  * @brief creates a heap allocated copy of the name of the current entry.
  * The caller is responsible for freeing the memory.
- * @memberof SqshDirectoryIterator
  *
  * @param[in]  iterator    The iterator to use.
  * @param[out] name_buffer The buffer to hold the duplicated name.
@@ -152,8 +152,8 @@ sqsh_directory_iterator_name(const struct SqshDirectoryIterator *iterator);
 SQSH_NO_UNUSED int sqsh_directory_iterator_name_dup(
 		const struct SqshDirectoryIterator *iterator, char **name_buffer);
 /**
- * @brief Frees the resources used by a directory iterator.
  * @memberof SqshDirectoryIterator
+ * @brief Frees the resources used by a directory iterator.
  *
  * @param[in] iterator The iterator to free.
  *
@@ -167,6 +167,7 @@ int sqsh_directory_iterator_free(struct SqshDirectoryIterator *iterator);
 struct SqshXattrIterator;
 
 /**
+ * @memberof SqshXattrIterator
  * @brief Allocates and initializes a new xattr iterator.
  *
  * @param[in]  inode  The inode to iterate through xattrs.
@@ -178,6 +179,7 @@ SQSH_NO_UNUSED struct SqshXattrIterator *
 sqsh_xattr_iterator_new(const struct SqshInodeContext *inode, int *err);
 
 /**
+ * @memberof SqshXattrIterator
  * @brief Advances the iterator to the next xattr.
  *
  * @param[in,out] iterator The iterator to advance.
@@ -187,6 +189,7 @@ sqsh_xattr_iterator_new(const struct SqshInodeContext *inode, int *err);
 int sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator);
 
 /**
+ * @memberof SqshXattrIterator
  * @brief Retrieves the type of the current xattr.
  *
  * @param[in] iterator The iterator to use.
@@ -196,6 +199,7 @@ int sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator);
 uint16_t sqsh_xattr_iterator_type(struct SqshXattrIterator *iterator);
 
 /**
+ * @memberof SqshXattrIterator
  * @brief Checks if the current xattr is indirect.
  *
  * @param[in] iterator The iterator to use.
@@ -205,6 +209,7 @@ uint16_t sqsh_xattr_iterator_type(struct SqshXattrIterator *iterator);
 bool sqsh_xattr_iterator_is_indirect(struct SqshXattrIterator *iterator);
 
 /**
+ * @memberof SqshXattrIterator
  * @brief Retrieves the prefix of the current xattr.
  *
  * @param[in] iterator The iterator to use.
@@ -214,6 +219,7 @@ bool sqsh_xattr_iterator_is_indirect(struct SqshXattrIterator *iterator);
 const char *sqsh_xattr_iterator_prefix(struct SqshXattrIterator *iterator);
 
 /**
+ * @memberof SqshXattrIterator
  * @brief Retrieves the size of the prefix of the current xattr.
  *
  * @param[in] iterator The iterator to use.
@@ -223,6 +229,7 @@ const char *sqsh_xattr_iterator_prefix(struct SqshXattrIterator *iterator);
 uint16_t sqsh_xattr_iterator_prefix_size(struct SqshXattrIterator *iterator);
 
 /**
+ * @memberof SqshXattrIterator
  * @brief Retrieves the name of the current xattr.
  *
  * @param[in] iterator The iterator to use.
@@ -232,6 +239,7 @@ uint16_t sqsh_xattr_iterator_prefix_size(struct SqshXattrIterator *iterator);
 const char *sqsh_xattr_iterator_name(struct SqshXattrIterator *iterator);
 
 /**
+ * @memberof SqshXattrIterator
  * @brief Retrieves the size of the name of the current xattr.
  *
  * @param[in] iterator The iterator to use.
@@ -241,6 +249,7 @@ const char *sqsh_xattr_iterator_name(struct SqshXattrIterator *iterator);
 uint16_t sqsh_xattr_iterator_name_size(struct SqshXattrIterator *iterator);
 
 /**
+ * @memberof SqshXattrIterator
  * @brief Compares the full name of the current xattr with a given name.
  *
  * @param[in] iterator The iterator to use.
@@ -254,9 +263,9 @@ int sqsh_xattr_iterator_fullname_cmp(
 		struct SqshXattrIterator *iterator, const char *name);
 
 /**
+ * @memberof SqshXattrIterator
  * @brief creates a heap allocated copy of the full name of the current entry.
  * The caller is responsible for freeing the memory.
- * @memberof SqshXattrIterator
  *
  * @param[in]  iterator        The iterator to use.
  * @param[out] fullname_buffer The buffer to hold the duplicated full name.
@@ -267,9 +276,9 @@ int sqsh_xattr_iterator_fullname_dup(
 		struct SqshXattrIterator *iterator, char **fullname_buffer);
 
 /**
+ * @memberof SqshXattrIterator
  * @brief creates a heap allocated copy of the value of the current entry.
  * The caller is responsible for freeing the memory.
- * @memberof SqshXattrIterator
  *
  * @param[in]  iterator    The iterator to use.
  * @param[out] value_buffer The buffer to hold the duplicated value.
@@ -280,6 +289,7 @@ int sqsh_xattr_iterator_value_dup(
 		struct SqshXattrIterator *iterator, char **value_buffer);
 
 /**
+ * @memberof SqshXattrIterator
  * @brief Retrieves the value of the current xattr.
  *
  * @param[in] iterator The iterator to use.
@@ -289,6 +299,7 @@ int sqsh_xattr_iterator_value_dup(
 const char *sqsh_xattr_iterator_value(struct SqshXattrIterator *iterator);
 
 /**
+ * @memberof SqshXattrIterator
  * @brief Retrieves the size of the value of the current xattr.
  *
  * @param[in] iterator The iterator to use.
@@ -298,6 +309,7 @@ const char *sqsh_xattr_iterator_value(struct SqshXattrIterator *iterator);
 uint16_t sqsh_xattr_iterator_value_size(struct SqshXattrIterator *iterator);
 
 /**
+ * @memberof SqshXattrIterator
  * @brief Frees the resources used by an xattr iterator.
  *
  * @param[in] iterator The iterator to free.

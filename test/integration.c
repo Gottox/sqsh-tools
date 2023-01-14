@@ -65,7 +65,7 @@ sqsh_get_nonexistant(void) {
 	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
-	rv = sqsh_path_resolver_init(&resolver, &sqsh);
+	rv = sqsh__path_resolver_init(&resolver, &sqsh);
 	assert(rv == 0);
 
 	inode = sqsh_path_resolver_resolve(&resolver, "/nonexistant", &rv);
@@ -153,7 +153,7 @@ sqsh_cat_fragment(void) {
 	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
-	rv = sqsh_path_resolver_init(&resolver, &sqsh);
+	rv = sqsh__path_resolver_init(&resolver, &sqsh);
 	assert(rv == 0);
 
 	inode = sqsh_path_resolver_resolve(&resolver, "a", &rv);
@@ -200,7 +200,7 @@ sqsh_cat_datablock_and_fragment(void) {
 	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
-	rv = sqsh_path_resolver_init(&resolver, &sqsh);
+	rv = sqsh__path_resolver_init(&resolver, &sqsh);
 	assert(rv == 0);
 
 	inode = sqsh_path_resolver_resolve(&resolver, "b", &rv);
@@ -250,7 +250,7 @@ sqsh_cat_size_overflow(void) {
 	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
-	rv = sqsh_path_resolver_init(&resolver, &sqsh);
+	rv = sqsh__path_resolver_init(&resolver, &sqsh);
 	assert(rv == 0);
 
 	inode = sqsh_path_resolver_resolve(&resolver, "b", &rv);
@@ -328,7 +328,7 @@ sqsh_test_extended_dir(void) {
 	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
-	rv = sqsh_path_resolver_init(&resolver, &sqsh);
+	rv = sqsh__path_resolver_init(&resolver, &sqsh);
 	assert(rv == 0);
 
 	inode = sqsh_path_resolver_resolve(&resolver, "/large_dir/999", &rv);
@@ -473,7 +473,7 @@ fuzz_crash_1(void) {
 	rv = sqsh__init(&sqsh, input, &config);
 	assert(rv == 0);
 
-	rv = sqsh_path_resolver_init(&resolver, &sqsh);
+	rv = sqsh__path_resolver_init(&resolver, &sqsh);
 	assert(rv == 0);
 
 	inode = sqsh_path_resolver_resolve(&resolver, "", &rv);
@@ -512,7 +512,7 @@ fuzz_crash_2(void) {
 	rv = sqsh__init(&sqsh, input, &config);
 	assert(rv == 0);
 
-	rv = sqsh_path_resolver_init(&resolver, &sqsh);
+	rv = sqsh__path_resolver_init(&resolver, &sqsh);
 	assert(rv == 0);
 
 	inode = sqsh_path_resolver_resolve(&resolver, "", &rv);
@@ -552,7 +552,7 @@ fuzz_crash_3(void) {
 	rv = sqsh__init(&sqsh, input, &config);
 	assert(rv == 0);
 
-	rv = sqsh_path_resolver_init(&resolver, &sqsh);
+	rv = sqsh__path_resolver_init(&resolver, &sqsh);
 	assert(rv == 0);
 
 	inode = sqsh_path_resolver_resolve(&resolver, "", &rv);

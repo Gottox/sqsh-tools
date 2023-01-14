@@ -104,7 +104,7 @@ sqsh_path_resolver_new(struct Sqsh *sqsh, int *err) {
 	if (context == NULL) {
 		return NULL;
 	}
-	*err = sqsh_path_resolver_init(context, sqsh);
+	*err = sqsh__path_resolver_init(context, sqsh);
 	if (*err < 0) {
 		free(context);
 		return NULL;
@@ -113,7 +113,7 @@ sqsh_path_resolver_new(struct Sqsh *sqsh, int *err) {
 }
 
 int
-sqsh_path_resolver_init(
+sqsh__path_resolver_init(
 		struct SqshPathResolverContext *context, struct Sqsh *sqsh) {
 	context->sqsh = sqsh;
 	return 0;
