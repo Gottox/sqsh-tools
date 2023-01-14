@@ -190,7 +190,6 @@ if get_option('test')
 		command : ['utils/header_from_bin.sh','@INPUT@', '@OUTPUT@', '@PRIVATE_DIR@'],
 	)
 	foreach p : sqsh_test
-		message(p)
 		t = executable(p.underscorify(),
 			[ p, squashfs_h ],
 			install : false,
