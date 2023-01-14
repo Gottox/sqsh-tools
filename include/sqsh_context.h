@@ -95,10 +95,12 @@ enum SqshLzoAlgorithm {
 };
 
 /**
- * @brief Initializes a SqshCompressionOptionsContext struct.
  * @memberof SqshCompressionOptionsContext
+ * @brief Initializes a SqshCompressionOptionsContext struct.
+ *
  * @param[in] sqsh Sqsh context
  * @param[out] err Pointer to an int where the error code will be stored.
+ *
  * @return The Initialized file context
  */
 SQSH_NO_UNUSED
@@ -106,83 +108,94 @@ struct SqshCompressionOptionsContext *
 sqsh_compression_options_new(struct Sqsh *sqsh, int *err);
 
 /**
- * @brief returns the compression level of gzip
  * @memberof SqshCompressionOptionsContext
+ * @brief returns the compression level of gzip
+ *
  * @param[in] context the compression options context
  */
 uint32_t sqsh_compression_options_gzip_compression_level(
 		const struct SqshCompressionOptionsContext *context);
 /**
- * @brief returns the compression window size of gzip
  * @memberof SqshCompressionOptionsContext
+ * @brief returns the compression window size of gzip
+ *
  * @param[in] context the compression options context
  */
 uint16_t sqsh_compression_options_gzip_window_size(
 		const struct SqshCompressionOptionsContext *context);
 /**
- * @brief returns the compression strategy of gzip
  * @memberof SqshCompressionOptionsContext
+ * @brief returns the compression strategy of gzip
+ *
  * @param[in] context the compression options context
  */
 enum SqshGzipStrategies sqsh_compression_options_gzip_strategies(
 		const struct SqshCompressionOptionsContext *context);
 
 /**
- * @brief returns the dictionary size of xz
  * @memberof SqshCompressionOptionsContext
+ * @brief returns the dictionary size of xz
+ *
  * @param[in] context the compression options context
  */
 uint32_t sqsh_compression_options_xz_dictionary_size(
 		const struct SqshCompressionOptionsContext *context);
 /**
- * @brief returns the compression options of xz
  * @memberof SqshCompressionOptionsContext
+ * @brief returns the compression options of xz
+ *
  * @param[in] context the compression options context
  */
 enum SqshXzFilters sqsh_compression_options_xz_filters(
 		const struct SqshCompressionOptionsContext *context);
 
 /**
- * @brief returns the version of lz4 used
  * @memberof SqshCompressionOptionsContext
+ * @brief returns the version of lz4 used
+ *
  * @param[in] context the compression options context
  */
 uint32_t sqsh_compression_options_lz4_version(
 		const struct SqshCompressionOptionsContext *context);
 /**
- * @brief returns the flags of lz4
  * @memberof SqshCompressionOptionsContext
+ * @brief returns the flags of lz4
+ *
  * @param[in] context the compression options context
  */
 uint32_t sqsh_compression_options_lz4_flags(
 		const struct SqshCompressionOptionsContext *context);
 
 /**
- * @brief returns the compression level of zstd
  * @memberof SqshCompressionOptionsContext
+ * @brief returns the compression level of zstd
+ *
  * @param[in] context the compression options context
  */
 uint32_t sqsh_compression_options_zstd_compression_level(
 		const struct SqshCompressionOptionsContext *context);
 
 /**
- * @brief returns the algorithm of lzo
  * @memberof SqshCompressionOptionsContext
+ * @brief returns the algorithm of lzo
+ *
  * @param[in] context the compression options context
  */
 enum SqshLzoAlgorithm sqsh_compression_options_lzo_algorithm(
 		const struct SqshCompressionOptionsContext *context);
 /**
- * @brief returns the compression level of lzo
  * @memberof SqshCompressionOptionsContext
+ * @brief returns the compression level of lzo
+ *
  * @param[in] context the compression options context
  */
 uint32_t sqsh_compression_options_lzo_compression_level(
 		const struct SqshCompressionOptionsContext *context);
 
 /**
- * @brief Frees a SqshCompressionOptionsContext struct.
  * @memberof SqshCompressionOptionsContext
+ * @brief Frees a SqshCompressionOptionsContext struct.
+ *
  * @param[in] context The file context to free.
  */
 int
@@ -194,10 +207,12 @@ sqsh_compression_options_free(struct SqshCompressionOptionsContext *context);
 struct SqshFileContext;
 
 /**
- * @brief Initializes a SqshFileContext struct.
  * @memberof SqshFileContext
+ * @brief Initializes a SqshFileContext struct.
+ *
  * @param[in] inode The inode context to retrieve the file contents from.
  * @param[out] err Pointer to an int where the error code will be stored.
+ *
  * @return The Initialized file context
  */
 SQSH_NO_UNUSED
@@ -205,46 +220,55 @@ struct SqshFileContext *
 sqsh_file_new(const struct SqshInodeContext *inode, int *err);
 
 /**
- * @brief Seek to a position in the file content.
  * @memberof SqshFileContext
- * @param context The file context to seek in. If the context buffer
+ * @brief Seek to a position in the file content.
+ *
+ * @param[in] context The file context to seek in. If the context buffer
  * already contains data, it will be cleared.
  * @param seek_pos The offset to seek to.
+ *
  * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int
 sqsh_file_seek(struct SqshFileContext *context, uint64_t seek_pos);
 
 /**
+ * @memberof SqshFileContext
  * @brief Reads data from the current seek position
  * and writes it to the content buffer.
- * @memberof SqshFileContext
- * @param context The file context to read from.
+ *
+ * @param[in] context The file context to read from.
  * @param size The size of the buffer.
+ *
  * @return The number of bytes read on success, less than 0 on error.
  */
 int sqsh_file_read(struct SqshFileContext *context, uint64_t size);
 
 /**
- * @brief Gets a pointer to read file content.
  * @memberof SqshFileContext
- * @param context The file context to get the data from.
+ * @brief Gets a pointer to read file content.
+ *
+ * @param[in] context The file context to get the data from.
+ *
  * @return A pointer to the data in the file content buffer.
  */
 const uint8_t *sqsh_file_data(struct SqshFileContext *context);
 
 /**
- * @brief Gets the size of the file content buffer.
  * @memberof SqshFileContext
- * @param context The file context to get the size from.
+ * @brief Gets the size of the file content buffer.
+ *
+ * @param[in] context The file context to get the size from.
+ *
  * @return The size of the file content buffer.
  */
 uint64_t sqsh_file_size(struct SqshFileContext *context);
 
 /**
- * @brief Frees the resources used by the file context.
  * @memberof SqshFileContext
- * @param context The file context to free.
+ * @brief Frees the resources used by the file context.
+ *
+ * @param[in] context The file context to free.
  */
 int sqsh_file_free(struct SqshFileContext *context);
 
@@ -284,171 +308,227 @@ enum SqshInodeContextType {
 };
 
 /**
- * @brief Initializes an inode context in heap
  * @memberof SqshInodeContext
+ * @brief Initializes an inode context in heap
+ *
  * @param sqsh The sqsh context to use.
  * @param inode_ref The inode reference to initialize the context with.
  * @param[out] err Pointer to an int where the error code will be stored.
+ *
  * @return a pointer to the sqsh context or NULL if an error occurred.
  */
 SQSH_NO_UNUSED struct SqshInodeContext *
 sqsh_inode_new(struct Sqsh *sqsh, uint64_t inode_ref, int *err);
 
 /**
- * @brief returns whether the inode is an extended structure.
  * @memberof SqshInodeContext
- * @param context The inode context.
+ * @brief returns whether the inode is an extended structure.
+ *
+ * @param[in] context The inode context.
+ *
  * @return true if the inode is an extended structure.
  */
 bool sqsh_inode_is_extended(const struct SqshInodeContext *context);
+
 /**
- * @brief Getter for the inode hard link count.
  * @memberof SqshInodeContext
- * @param context The inode context.
+ * @brief Getter for the inode hard link count.
+ *
+ * @param[in] context The inode context.
+ *
  * @return the amount of hard links to the inode.
  */
 uint32_t sqsh_inode_hard_link_count(const struct SqshInodeContext *context);
+
 /**
- * @brief Getter for the file size. 0 if the file has no size.
  * @memberof SqshInodeContext
- * @param context The inode context.
+ * @brief Getter for the file size. 0 if the file has no size.
+ *
+ * @param[in] context The inode context.
+ *
  * @return the inode type.
  */
 uint64_t sqsh_inode_file_size(const struct SqshInodeContext *context);
+
 /**
- * @brief Getter for the permissions of the inode.
  * @memberof SqshInodeContext
- * @param context The inode context.
+ * @brief Getter for the permissions of the inode.
+ *
+ * @param[in] context The inode context.
+ *
  * @return the permissions of the inode.
  */
 uint16_t sqsh_inode_permission(const struct SqshInodeContext *context);
+
 /**
- * @brief Getter for the inode number.
  * @memberof SqshInodeContext
- * @param context The inode context.
+ * @brief Getter for the inode number.
+ *
+ * @param[in] context The inode context.
+ *
  * @return the inode number.
  */
 uint32_t sqsh_inode_number(const struct SqshInodeContext *context);
+
 /**
- * @brief Getter for the inode modification time.
  * @memberof SqshInodeContext
- * @param context The inode context.
+ * @brief Getter for the inode modification time.
+ *
+ * @param[in] context The inode context.
+ *
  * @return the inode modification time.
  */
 uint32_t sqsh_inode_modified_time(const struct SqshInodeContext *context);
+
 /**
- * @brief Getter for the start block of the file content. This is only
  * @memberof SqshInodeContext
+ * @brief Getter for the start block of the file content. This is only
  * internally used and will be used while retrieving the file content.
- * @param context The inode context.
+ *
+ * @param[in] context The inode context.
+ *
  * @return the start block of the file content or UINT64_MAX if the inode
  * is not a file.
  */
 uint64_t sqsh_inode_file_blocks_start(const struct SqshInodeContext *context);
+
 /**
- * @brief Getter for the amount of blocks of the file content. This is only
  * @memberof SqshInodeContext
+ * @brief Getter for the amount of blocks of the file content. This is only
  * internally used and will be used while retrieving the file content.
- * @param context The inode context.
+ *
+ * @param[in] context The inode context.
+ *
  * @return the amount of blocks of the file content. If the inode is not a
  * file 0, UINT32_MAX will be returned.
  */
 uint32_t sqsh_inode_file_block_count(const struct SqshInodeContext *context);
+
 /**
- * @brief Getter the size of a block of the file content. This is only
  * @memberof SqshInodeContext
+ * @brief Getter the size of a block of the file content. This is only
  * internally used and will be used while retrieving the file content.
- * @param context The inode context.
+ *
+ * @param[in] context The inode context.
  * @param index The index of the block.
+ *
  * @return the size of the block with the index.
  */
 uint32_t sqsh_inode_file_block_size(
 		const struct SqshInodeContext *context, uint32_t index);
+
 /**
- * @brief Checks whether a certain block is compressed.
  * @memberof SqshInodeContext
- * @param context The inode context.
+ * @brief Checks whether a certain block is compressed.
+ *
+ * @param[in] context The inode context.
  * @param index The index of the block.
+ *
  * @return true if the block is compressed, false otherwise.
  */
 bool sqsh_inode_file_block_is_compressed(
 		const struct SqshInodeContext *context, int index);
+
 /**
- * @brief retrieve the fragment block index. This is only internally used
  * @memberof SqshInodeContext
+ * @brief retrieve the fragment block index. This is only internally used
+ *
  * and will be used while retrieving the file content.
- * @param context The inode context.
+ * @param[in] context The inode context.
+ *
  * @return the fragment block index.
  */
 uint32_t
 sqsh_inode_file_fragment_block_index(const struct SqshInodeContext *context);
+
 /**
- * @brief retrieve the fragment block offset. This is only internally used
  * @memberof SqshInodeContext
+ * @brief retrieve the fragment block offset. This is only internally used
  * and will be used while retrieving the file content.
- * @param context The inode context.
+ *
+ * @param[in] context The inode context.
+ *
  * @return the offset inside of the fragment block.
  */
 uint32_t
 sqsh_inode_file_fragment_block_offset(const struct SqshInodeContext *context);
+
 /**
- * @brief retrieve the directory block start. This is only internally used
  * @memberof SqshInodeContext
+ * @brief retrieve the directory block start. This is only internally used
  * and will be used while iterating over the directory entries.
- * @param context The inode context.
+ *
+ * @param[in] context The inode context.
+ *
  * @return the directory block start.
  */
 uint32_t
 sqsh_inode_directory_block_start(const struct SqshInodeContext *context);
+
 /**
- * @brief retrieve the directory block offset. This is only internally used
  * @memberof SqshInodeContext
+ * @brief retrieve the directory block offset. This is only internally used
  * and will be used while iterating over the directory entries.
- * @param context The inode context.
+ *
+ * @param[in] context The inode context.
+ *
  * @return the directory block offset.
  */
 uint32_t
 sqsh_inode_directory_block_offset(const struct SqshInodeContext *context);
+
 /**
- * @brief returns true if the inode has a fragment block.
  * @memberof SqshInodeContext
- * @param context The inode context.
+ * @brief returns true if the inode has a fragment block.
+ *
+ * @param[in] context The inode context.
+ *
  * @return true if the inode has a fragment block, false otherwise.
  */
 bool sqsh_inode_file_has_fragment(const struct SqshInodeContext *context);
 
 /**
- * @brief returns the type of the inode.
  * @memberof SqshInodeContext
- * @param context The inode context.
+ * @brief returns the type of the inode.
+ *
+ * @param[in] context The inode context.
+ *
  * @return the type of the inode.
  */
 enum SqshInodeContextType
 sqsh_inode_type(const struct SqshInodeContext *context);
 
 /**
- * @brief returns the target of a symbolic link. Be aware that the returned
  * @memberof SqshInodeContext
+ * @brief returns the target of a symbolic link. Be aware that the returned
  * value is not zero terminated. If you need a zero terminated string use
  * sqsh_inode_symlink_dup().
- * @param context The inode context.
+ *
+ * @param[in] context The inode context.
+ *
  * @return the name of the inode or NULL if the inode is not a symbolic link.
  */
 const char *sqsh_inode_symlink(const struct SqshInodeContext *context);
+
 /**
- * @brief sets a heap allocated, zero terminated string of the target of a
  * @memberof SqshInodeContext
+ * @brief sets a heap allocated, zero terminated string of the target of a
  * symbolic link.
- * @param context The inode context.
+ *
+ * @param[in] context The inode context.
  * @param namebuffer a pointer that will be set to the allocated string.
+ *
  * @return int 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int sqsh_inode_symlink_dup(
 		const struct SqshInodeContext *context, char **namebuffer);
+
 /**
- * @brief returns the length of the target of a symbolic link in bytes.
  * @memberof SqshInodeContext
- * @param context The inode context.
+ * @brief returns the length of the target of a symbolic link in bytes.
+ *
+ * @param[in] context The inode context.
+ *
  * @return the length of the target of a symbolic link in bytes or 0 if the
  * inode is not a symbolic link.
  */
@@ -456,61 +536,67 @@ uint32_t sqsh_inode_symlink_size(const struct SqshInodeContext *context);
 
 /**
  * @memberof SqshInodeContext
+ *
  * @brief returns the device id of the device inode.
  *
- * @param context The inode context.
+ * @param[in] context The inode context.
  *
  * @return the name of the inode or 0 if the inode is not a device.
  */
 uint32_t sqsh_inode_device_id(const struct SqshInodeContext *context);
 
 /**
- * @brief returns the uid of the inode.
  * @memberof SqshInodeContext
+ * @brief returns the uid of the inode.
  *
- * @param context The inode context.
+ * @param[in] context The inode context.
  *
  * @return the uid of the inode.
  */
 uint32_t sqsh_inode_uid(const struct SqshInodeContext *context);
+
 /**
- * @brief returns the gid of the inode.
  * @memberof SqshInodeContext
+ * @brief returns the gid of the inode.
  *
- * @param context The inode context.
+ * @param[in] context The inode context.
  *
  * @return the gid of the inode.
  */
 uint32_t sqsh_inode_gid(const struct SqshInodeContext *context);
+
 /**
- * @brief returns index of the extended attribute inside of the xattr table.
  * @memberof SqshInodeContext
+ * @brief returns index of the extended attribute inside of the xattr table.
  *
- * @param context The inode context.
+ * @param[in] context The inode context.
  *
  * @return the index of the extended attribute inside of the xattr table.
  */
+
 uint32_t sqsh_inode_xattr_index(const struct SqshInodeContext *context);
 /**
  * @memberof SqshInodeContext
  * @brief cleans up an inode context and frees the memory.
  *
- * @param context The inode context.
+ * @param[in] context The inode context.
  *
  * @return int 0 on success, less than 0 on error.
  */
 int sqsh_inode_free(struct SqshInodeContext *context);
+
 /**
  * @memberof SqshInodeContext
  * @brief converts an inode reference into a block index and a block offset
+ *
  * @param ref The inode reference.
  * @param block_index a pointer where the block index will be stored.
  * @param offset a pointer where the block offset will be stored.
  */
 void
 sqsh_inode_ref_to_block(uint64_t ref, uint32_t *block_index, uint16_t *offset);
+
 /**
- * @memberof SqshInodeContext
  * @brief converts a block index and a block offset into an inode reference.
  *
  * @param block_index The block index.
@@ -539,20 +625,24 @@ struct SqshPathResolverContext *
 sqsh_path_resolver_new(struct Sqsh *sqsh, int *err);
 
 /**
- * @brief Initialize the inode context from a path.
  * @memberof SqshPathResolverContext
+ * @brief Initialize the inode context from a path.
+ *
  * @param[in] context The path resolver context.
  * @param[in] path The path the file or directory.
  * @param[out] err Pointer to an int where the error code will be stored.
+ *
  * @return an inode context on success, NULL on error
  */
 SQSH_NO_UNUSED struct SqshInodeContext *sqsh_path_resolver_resolve(
 		struct SqshPathResolverContext *context, const char *path, int *err);
 
 /**
- * @brief cleans up a path resolver context and frees the memory.
  * @memberof SqshPathResolverContext
- * @param context The path resolver context.
+ * @brief cleans up a path resolver context and frees the memory.
+ *
+ * @param[in] context The path resolver context.
+ *
  * @return int 0 on success, less than 0 on error.
  */
 int sqsh_path_resolver_free(struct SqshPathResolverContext *context);
