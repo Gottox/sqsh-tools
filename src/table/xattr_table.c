@@ -35,7 +35,7 @@
 #include <sqsh_context.h>
 #include <sqsh_data.h>
 #include <sqsh_error.h>
-#include <sqsh_table.h>
+#include <sqsh_table_private.h>
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -47,7 +47,7 @@ get_header(const struct SqshXattrTable *context) {
 }
 
 int
-sqsh_xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh) {
+sqsh__xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh) {
 	int rv = 0;
 	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 	struct SqshMapper *mapper = sqsh_mapper(sqsh);
@@ -66,7 +66,7 @@ sqsh_xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh) {
 
 	const struct SqshXattrIdTable *header = get_header(context);
 
-	rv = sqsh_table_init(
+	rv = sqsh__table_init(
 			&context->table, sqsh, xattr_address + SQSH_SIZEOF_XATTR_ID_TABLE,
 			SQSH_SIZEOF_XATTR_LOOKUP_TABLE,
 			sqsh_data_xattr_id_table_xattr_ids(header));
@@ -75,7 +75,7 @@ sqsh_xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh) {
 	}
 out:
 	if (rv < 0) {
-		sqsh_xattr_table_cleanup(context);
+		sqsh__xattr_table_cleanup(context);
 	}
 	return rv;
 }
@@ -94,7 +94,7 @@ sqsh_xattr_table_get(
 }
 
 int
-sqsh_xattr_table_cleanup(struct SqshXattrTable *context) {
+sqsh__xattr_table_cleanup(struct SqshXattrTable *context) {
 	sqsh_table_cleanup(&context->table);
 	sqsh_mapping_unmap(&context->header);
 	return 0;

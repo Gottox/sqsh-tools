@@ -38,11 +38,11 @@
 // TODO: remove private header
 #include <sqsh_data_private.h>
 #include <sqsh_error.h>
-#include <sqsh_table.h>
+#include <sqsh_table_private.h>
 #include <stdint.h>
 
 int
-sqsh_fragment_table_init(struct SqshFragmentTable *table, struct Sqsh *sqsh) {
+sqsh__fragment_table_init(struct SqshFragmentTable *table, struct Sqsh *sqsh) {
 	int rv = 0;
 	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 	uint64_t start = sqsh_superblock_fragment_table_start(superblock);
@@ -50,7 +50,7 @@ sqsh_fragment_table_init(struct SqshFragmentTable *table, struct Sqsh *sqsh) {
 
 	table->compression = sqsh_data_compression(sqsh);
 	table->mapper = sqsh_mapper(sqsh);
-	rv = sqsh_table_init(
+	rv = sqsh__table_init(
 			&table->table, sqsh, start, SQSH_SIZEOF_FRAGMENT, count);
 	if (rv < 0) {
 		goto out;
@@ -146,7 +146,7 @@ out:
 }
 
 int
-sqsh_fragment_table_cleanup(struct SqshFragmentTable *table) {
+sqsh__fragment_table_cleanup(struct SqshFragmentTable *table) {
 	sqsh_table_cleanup(&table->table);
 	return 0;
 }

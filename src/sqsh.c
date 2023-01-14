@@ -145,7 +145,7 @@ sqsh_id_table(struct Sqsh *sqsh, struct SqshTable **id_table) {
 	uint64_t table_start = sqsh_superblock_id_table_start(&sqsh->superblock);
 
 	if (!is_initialized(sqsh, INITIALIZED_ID_TABLE)) {
-		rv = sqsh_table_init(
+		rv = sqsh__table_init(
 				&sqsh->id_table, sqsh, table_start, sizeof(uint32_t),
 				sqsh_superblock_id_count(&sqsh->superblock));
 		if (rv < 0) {
@@ -168,7 +168,7 @@ sqsh_export_table(struct Sqsh *sqsh, struct SqshTable **export_table) {
 	}
 
 	if (!(sqsh->initialized & INITIALIZED_EXPORT_TABLE)) {
-		rv = sqsh_table_init(
+		rv = sqsh__table_init(
 				&sqsh->export_table, sqsh, table_start, sizeof(uint64_t),
 				sqsh_superblock_inode_count(&sqsh->superblock));
 		if (rv < 0) {
@@ -192,7 +192,7 @@ sqsh_fragment_table(
 	}
 
 	if (!is_initialized(sqsh, INITIALIZED_FRAGMENT_TABLE)) {
-		rv = sqsh_fragment_table_init(&sqsh->fragment_table, sqsh);
+		rv = sqsh__fragment_table_init(&sqsh->fragment_table, sqsh);
 
 		if (rv < 0) {
 			goto out;
@@ -214,7 +214,7 @@ sqsh_xattr_table(struct Sqsh *sqsh, struct SqshXattrTable **xattr_table) {
 	}
 
 	if (!(sqsh->initialized & INITIALIZED_XATTR_TABLE)) {
-		rv = sqsh_xattr_table_init(&sqsh->xattr_table, sqsh);
+		rv = sqsh__xattr_table_init(&sqsh->xattr_table, sqsh);
 		if (rv < 0) {
 			goto out;
 		}
@@ -256,10 +256,10 @@ sqsh__cleanup(struct Sqsh *sqsh) {
 		sqsh_table_cleanup(&sqsh->export_table);
 	}
 	if (is_initialized(sqsh, INITIALIZED_XATTR_TABLE)) {
-		sqsh_xattr_table_cleanup(&sqsh->xattr_table);
+		sqsh__xattr_table_cleanup(&sqsh->xattr_table);
 	}
 	if (is_initialized(sqsh, INITIALIZED_FRAGMENT_TABLE)) {
-		sqsh_fragment_table_cleanup(&sqsh->fragment_table);
+		sqsh__fragment_table_cleanup(&sqsh->fragment_table);
 	}
 	sqsh__compression_cleanup(&sqsh->data_compression);
 	sqsh__compression_cleanup(&sqsh->metablock_compression);

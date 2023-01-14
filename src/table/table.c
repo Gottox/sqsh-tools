@@ -35,7 +35,7 @@
 #include <sqsh.h>
 #include <sqsh_context_private.h>
 #include <sqsh_error.h>
-#include <sqsh_table.h>
+#include <sqsh_table_private.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -49,7 +49,7 @@ lookup_table_get(const struct SqshTable *table, sqsh_index_t index) {
 }
 
 int
-sqsh_table_init(
+sqsh__table_init(
 		struct SqshTable *table, struct Sqsh *sqsh, sqsh_index_t start_block,
 		size_t element_size, size_t element_count) {
 	int rv = 0;

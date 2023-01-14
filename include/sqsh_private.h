@@ -36,7 +36,7 @@
 #include "sqsh_context_private.h"
 #include "sqsh_error.h"
 #include "sqsh_mapper.h"
-#include "sqsh_table.h"
+#include "sqsh_table_private.h"
 
 #include <sqsh.h>
 #include <stdint.h>

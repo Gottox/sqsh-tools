@@ -102,6 +102,7 @@ sqsh__xattr_iterator_init(
 	iterator->key_offset = 0;
 	iterator->value_offset = 0;
 	iterator->context = xattr_table;
+	iterator->sqsh = sqsh;
 
 out:
 	if (rv < 0) {
@@ -154,8 +155,7 @@ xattr_value_indirect_load(struct SqshXattrIterator *iterator) {
 
 	uint64_t start_block = sqsh_xattr_table_start(iterator->context);
 	rv = sqsh__metablock_stream_init(
-			&iterator->out_of_line_value, iterator->context->sqsh, start_block,
-			~0);
+			&iterator->out_of_line_value, iterator->sqsh, start_block, ~0);
 	if (rv < 0) {
 		goto out;
 	}

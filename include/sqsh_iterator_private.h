@@ -218,6 +218,7 @@ struct SqshXattrIterator {
 	/**
 	 * @privatesection
 	 */
+	struct Sqsh *sqsh;
 	struct SqshMetablockStreamContext metablock;
 	struct SqshMetablockStreamContext out_of_line_value;
 	struct SqshXattrTable *context;
