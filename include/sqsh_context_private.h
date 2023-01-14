@@ -48,6 +48,9 @@ struct Sqsh;
 // context/superblock_context.c
 
 struct SqshSuperblockContext {
+	/**
+	 * @privatesection
+	 */
 	const struct SqshSuperblock *superblock;
 	struct SqshMapping mapping;
 };
@@ -82,6 +85,9 @@ int sqsh__superblock_cleanup(struct SqshSuperblockContext *superblock);
  * compression options for a specific compression algorithm.
  */
 struct SqshCompressionOptionsContext {
+	/**
+	 * @privatesection
+	 */
 	uint16_t compression_id;
 	struct SqshBuffer buffer;
 };
@@ -159,6 +165,9 @@ int sqsh__file_cleanup(struct SqshFileContext *context);
  * metablock.
  */
 struct SqshMetablockContext {
+	/**
+	 * @privatesection
+	 */
 	struct SqshMapping mapping;
 	struct SqshBuffer buffer;
 	struct SqshCompression *compression;
@@ -189,6 +198,9 @@ int sqsh__metablock_cleanup(struct SqshMetablockContext *context);
 // context/metablock_stream_context.c
 
 struct SqshMetablockStreamContext {
+	/**
+	 * @privatesection
+	 */
 	struct Sqsh *sqsh;
 	struct SqshBuffer buffer;
 	uint64_t base_address;
@@ -222,6 +234,9 @@ int sqsh__metablock_stream_cleanup(struct SqshMetablockStreamContext *context);
 // context/inode_context.c
 
 struct SqshInodeContext {
+	/**
+	 * @privatesection
+	 */
 	struct SqshMetablockStreamContext metablock;
 	struct Sqsh *sqsh;
 };

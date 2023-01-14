@@ -515,6 +515,9 @@ sqsh_inode_ref_from_block(uint32_t block_index, uint16_t offset);
 // context/path_resolver_context.c
 
 struct SqshPathResolverContext {
+	/**
+	 * @privatesection
+	 */
 	struct Sqsh *sqsh;
 };
 
@@ -650,6 +653,9 @@ sqsh_superblock_bytes_used(const struct SqshSuperblockContext *context);
 // context/trailing_context.c
 
 struct SqshTrailingContext {
+	/**
+	 * @privatesection
+	 */
 	struct SqshMapping *mapping;
 };
 

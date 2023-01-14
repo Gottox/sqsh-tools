@@ -48,6 +48,9 @@ typedef int (*sqsh_extract_func_t)(
 		const size_t compressed_size);
 
 struct SqshCompression {
+	/**
+	 * @privatesection
+	 */
 	sqsh_extract_func_t impl;
 	size_t block_size;
 };

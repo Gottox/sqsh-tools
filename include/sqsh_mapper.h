@@ -44,11 +44,17 @@ extern "C" {
 // mapper/canary_mapper.c
 
 struct SqshCanaryMapper {
+	/**
+	 * @privatesection
+	 */
 	const uint8_t *data;
 	size_t size;
 };
 
 struct SqshCanaryMap {
+	/**
+	 * @privatesection
+	 */
 	uint64_t offset;
 	uint8_t *data;
 	size_t size;
@@ -60,6 +66,9 @@ extern struct SqshMemoryMapperImpl sqsh_mapper_impl_canary;
 // mapper/curl_mapper.c
 
 struct SqshCurlMapper {
+	/**
+	 * @privatesection
+	 */
 	const char *url;
 	uint64_t expected_time;
 	uint64_t expected_size;
@@ -68,6 +77,9 @@ struct SqshCurlMapper {
 };
 
 struct SqshCurlMap {
+	/**
+	 * @privatesection
+	 */
 	struct SqshBuffer buffer;
 	uint64_t offset;
 	uint64_t total_size;
@@ -80,11 +92,17 @@ extern struct SqshMemoryMapperImpl sqsh_mapper_impl_curl;
 // mapper/mmap_full_mapper.c
 
 struct SqshMmapFullMapper {
+	/**
+	 * @privatesection
+	 */
 	uint8_t *data;
 	size_t size;
 };
 
 struct SqshMmapFullMap {
+	/**
+	 * @privatesection
+	 */
 	uint8_t *data;
 	size_t size;
 };
@@ -95,12 +113,18 @@ extern struct SqshMemoryMapperImpl sqsh_mapper_impl_mmap_full;
 // mapper/mmap_mapper.c
 
 struct SqshMmapMapper {
+	/**
+	 * @privatesection
+	 */
 	int fd;
 	long page_size;
 	size_t size;
 };
 
 struct SqshMmapMap {
+	/**
+	 * @privatesection
+	 */
 	uint8_t *data;
 	size_t offset;
 	size_t page_offset;
@@ -113,11 +137,17 @@ extern struct SqshMemoryMapperImpl sqsh_mapper_impl_mmap;
 // mapper/static_mapper.c
 
 struct SqshStaticMapper {
+	/**
+	 * @privatesection
+	 */
 	const uint8_t *data;
 	size_t size;
 };
 
 struct SqshStaticMap {
+	/**
+	 * @privatesection
+	 */
 	const uint8_t *data;
 	size_t size;
 };
@@ -130,6 +160,9 @@ extern struct SqshMemoryMapperImpl sqsh_mapper_impl_static;
 struct SqshMapper;
 
 struct SqshMapping {
+	/**
+	 * @privatesection
+	 */
 	struct SqshMapper *mapper;
 	union {
 		struct SqshMmapFullMap mc;
@@ -141,6 +174,9 @@ struct SqshMapping {
 };
 
 struct SqshMemoryMapperImpl {
+	/**
+	 * @privatesection
+	 */
 	int (*init)(struct SqshMapper *mapper, const void *input, size_t size);
 	int (*mapping)(struct SqshMapping *map, sqsh_index_t offset, size_t size);
 	size_t (*size)(const struct SqshMapper *mapper);
@@ -152,6 +188,9 @@ struct SqshMemoryMapperImpl {
 };
 
 struct SqshMapper {
+	/**
+	 * @privatesection
+	 */
 	struct SqshMemoryMapperImpl *impl;
 	union {
 		struct SqshMmapFullMapper mc;

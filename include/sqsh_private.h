@@ -75,9 +75,11 @@ struct Sqsh {
  * @internal
  * @brief sqsh__init initializes the Sqsh structure.
  * @memberof Sqsh
+ *
  * @param sqsh the Sqsh structure to initialize.
  * @param source the source to retrieve the archive from
  * @param config the configuration for the Sqsh session.
+ *
  * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int sqsh__init(
@@ -87,7 +89,9 @@ SQSH_NO_UNUSED int sqsh__init(
  * @internal
  * @brief sqsh__cleanup frees all resources allocated by the Sqsh structure and
  * cleans up the structure.
+ *
  * @memberof Sqsh
+ *
  * @param sqsh the Sqsh structure to cleanup.
  * @return 0 on success, less than 0 on error.
  */

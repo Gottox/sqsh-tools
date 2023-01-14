@@ -50,6 +50,9 @@ extern "C" {
  * @brief        Generic representation of a region of memory.
  */
 struct SqshSlice {
+	/**
+	 * @privatesection
+	 */
 	const uint8_t *data;
 	size_t size;
 };
@@ -115,6 +118,9 @@ int sqsh_slice_cleanup(struct SqshSlice *slice);
  * buffer.
  */
 struct SqshBuffer {
+	/**
+	 * @privatesection
+	 */
 	uint8_t *data;
 	size_t size;
 	size_t capacity;

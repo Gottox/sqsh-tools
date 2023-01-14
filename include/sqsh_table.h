@@ -46,6 +46,9 @@ struct SqshInodeContext;
 // table/table.c
 
 struct SqshTable {
+	/**
+	 * @privatesection
+	 */
 	struct Sqsh *sqsh;
 	struct SqshMapper *mapper;
 	struct SqshMapping lookup_table;
@@ -62,6 +65,9 @@ sqsh_table_get(const struct SqshTable *table, sqsh_index_t index, void *target);
 int sqsh_table_cleanup(struct SqshTable *table);
 
 struct SqshFragmentTable {
+	/**
+	 * @privatesection
+	 */
 	const struct SqshSuperblockContext *superblock;
 	struct SqshTable table;
 	struct SqshMapper *mapper;
@@ -92,6 +98,9 @@ enum SqshXattrType {
 };
 
 struct SqshXattrTable {
+	/**
+	 * @privatesection
+	 */
 	struct Sqsh *sqsh;
 	struct SqshMapping header;
 	struct SqshTable table;
