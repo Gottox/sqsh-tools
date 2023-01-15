@@ -174,24 +174,53 @@ struct SqshMetablockContext {
 };
 
 /**
- * @brief sqsh__metablock_context_init
+ * @memberof SqshMetablockContext
+ * @brief Initializes a metablock context with a SQSH context and an address.
  *
- * @param[out] context The SqshMetablockContext to initialize.
- * @param[in] sqsh The Sqsh struct.
- * @param address The address of the metablock.
+ * @param[out] context The metablock context to initialize.
+ * @param[in]  sqsh The SQSH context to use for the metablock.
+ * @param[in]  address The starting offset of the metablock in blocks.
  *
- * @return 0 on success, less than 0 on error.
+ * @return 0 on success, a negative value on error.
  */
 int sqsh__metablock_init(
 		struct SqshMetablockContext *context, struct Sqsh *sqsh,
 		uint64_t address);
 
+/**
+ * @internal
+ * @memberof SqshMetablockContext
+ * @brief Retrieves the compressed size of the metablock.
+ *
+ * @param[in] context The metablock context.
+ *
+ * @return The compressed size of the metablock.
+ */
 uint32_t
 sqsh__metablock_compressed_size(const struct SqshMetablockContext *context);
 
+/**
+ * @internal
+ * @memberof SqshMetablockContext
+ * @brief Writes the metablock to a buffer.
+ *
+ * @param[in]  context The metablock context.
+ * @param[out] buffer The buffer to write the metablock to.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 SQSH_NO_UNUSED int sqsh__metablock_to_buffer(
 		struct SqshMetablockContext *context, struct SqshBuffer *buffer);
 
+/**
+ * @internal
+ * @memberof SqshMetablockContext
+ * @brief Cleans up a metablock context.
+ *
+ * @param[in] context The metablock context to clean up.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 int sqsh__metablock_cleanup(struct SqshMetablockContext *context);
 
 ////////////////////////////////////////
@@ -208,26 +237,93 @@ struct SqshMetablockStreamContext {
 	uint16_t buffer_offset;
 };
 
+/**
+ * @internal
+ * @memberof SqshMetablockStreamContext
+ * @brief Initializes a metablock stream context.
+ *
+ * @param[out] context The metablock stream context to initialize.
+ * @param[in] sqsh The sqsh context.
+ * @param[in] address The starting address of the stream.
+ * @param[in] max_address The maximum address of the stream.
+ *
+ * @return 0 on success, negative value on error.
+ */
 SQSH_NO_UNUSED int sqsh__metablock_stream_init(
 		struct SqshMetablockStreamContext *context, struct Sqsh *sqsh,
 		uint64_t address, uint64_t max_address);
 
+/**
+ * @internal
+ * @memberof SqshMetablockStreamContext
+ * @brief Seeks to a specific metablock reference in the stream.
+ *
+ * @param[in,out] context The metablock stream context.
+ * @param[in] ref The metablock reference to seek to.
+ *
+ * @return 0 on success, negative value on error.
+ */
 SQSH_NO_UNUSED int sqsh__metablock_stream_seek_ref(
 		struct SqshMetablockStreamContext *context, uint64_t ref);
 
+/**
+ * @internal
+ * @memberof SqshMetablockStreamContext
+ * @brief Seeks to a specific offset in the stream.
+ *
+ * @param[in,out] context The metablock stream context.
+ * @param[in] address_offset The address offset to seek to.
+ * @param[in] buffer_offset The buffer offset to seek to.
+ *
+ * @return 0 on success, negative value on error.
+ */
 SQSH_NO_UNUSED int sqsh__metablock_stream_seek(
 		struct SqshMetablockStreamContext *context, uint64_t address_offset,
 		uint32_t buffer_offset);
 
+/**
+ * @internal
+ * @memberof SqshMetablockStreamContext
+ * @brief fills the buffer of the stream context to a specific size.
+ *
+ * @param[in,out] context The metablock stream context.
+ * @param[in] size The of the
+ *
+ * @return 0 on success, negative value on error.
+ */
 SQSH_NO_UNUSED int sqsh__metablock_stream_more(
 		struct SqshMetablockStreamContext *context, uint64_t size);
 
+/**
+ * @internal
+ * @brief Retrieve the current data buffer of the metablock stream
+ *
+ * @param[in] context The metablock stream context
+ *
+ * @return Pointer to the current data buffer
+ */
 const uint8_t *
 sqsh__metablock_stream_data(const struct SqshMetablockStreamContext *context);
 
+/**
+ * @internal
+ * @brief Retrieve the current size of the data buffer of the metablock stream
+ *
+ * @param[in] context The metablock stream context
+ *
+ * @return The current size of the data buffer
+ */
 size_t
 sqsh__metablock_stream_size(const struct SqshMetablockStreamContext *context);
 
+/**
+ * @internal
+ * @brief Clean up the metablock stream context
+ *
+ * @param[in] context The metablock stream context
+ *
+ * @return 0 on success, a negative value on error
+ */
 int sqsh__metablock_stream_cleanup(struct SqshMetablockStreamContext *context);
 
 ////////////////////////////////////////
