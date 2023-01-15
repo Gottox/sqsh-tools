@@ -35,11 +35,11 @@
 #include <sqsh_data_private.h>
 
 uint64_t
-sqsh_data_fragment_start(const struct SqshFragment *fragment) {
+sqsh_data_fragment_start(const struct SqshDataFragment *fragment) {
 	return le64toh(fragment->start);
 }
 
-const struct SqshDatablockSize *
-sqsh_data_fragment_size_info(const struct SqshFragment *fragment) {
+const struct SqshDataDatablockSize *
+sqsh_data_fragment_size_info(const struct SqshDataFragment *fragment) {
 	return &fragment->size;
 }

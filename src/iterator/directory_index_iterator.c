@@ -38,17 +38,17 @@
 static const uint64_t INODE_HEADER_SIZE =
 		SQSH_SIZEOF_INODE_HEADER + SQSH_SIZEOF_INODE_DIRECTORY_EXT;
 
-static const struct SqshInode *
+static const struct SqshDataInode *
 get_inode(const struct SqshDirectoryIndexIterator *iterator) {
-	return (const struct SqshInode *)sqsh__metablock_stream_data(
+	return (const struct SqshDataInode *)sqsh__metablock_stream_data(
 			&iterator->inode->metablock);
 }
 
 // TODO: use sqsh_data_inode_directory_ext_index().
-static const struct SqshInodeDirectoryIndex *
+static const struct SqshDataInodeDirectoryIndex *
 current_directory_index(const struct SqshDirectoryIndexIterator *iterator) {
 	const uint8_t *tmp = (const uint8_t *)get_inode(iterator);
-	return (const struct SqshInodeDirectoryIndex
+	return (const struct SqshDataInodeDirectoryIndex
 					*)&tmp[iterator->current_offset];
 }
 
@@ -73,7 +73,7 @@ sqsh__directory_index_iterator_init(
 	iterator->current_offset = 0;
 	iterator->next_offset = INODE_HEADER_SIZE;
 
-	const struct SqshInodeDirectoryExt *xdir =
+	const struct SqshDataInodeDirectoryExt *xdir =
 			sqsh_data_inode_directory_ext(get_inode(iterator));
 	iterator->remaining_entries =
 			sqsh_data_inode_directory_ext_index_count(xdir);
@@ -124,28 +124,28 @@ sqsh__directory_index_iterator_next(
 uint32_t
 sqsh__directory_index_iterator_index(
 		const struct SqshDirectoryIndexIterator *iterator) {
-	const struct SqshInodeDirectoryIndex *current =
+	const struct SqshDataInodeDirectoryIndex *current =
 			current_directory_index(iterator);
 	return sqsh_data_inode_directory_index_index(current);
 }
 uint32_t
 sqsh__directory_index_iterator_start(
 		const struct SqshDirectoryIndexIterator *iterator) {
-	const struct SqshInodeDirectoryIndex *current =
+	const struct SqshDataInodeDirectoryIndex *current =
 			current_directory_index(iterator);
 	return sqsh_data_inode_directory_index_start(current);
 }
 uint32_t
 sqsh__directory_index_iterator_name_size(
 		const struct SqshDirectoryIndexIterator *iterator) {
-	const struct SqshInodeDirectoryIndex *current =
+	const struct SqshDataInodeDirectoryIndex *current =
 			current_directory_index(iterator);
 	return sqsh_data_inode_directory_index_name_size(current) + 1;
 }
 const char *
 sqsh__directory_index_iterator_name(
 		const struct SqshDirectoryIndexIterator *iterator) {
-	const struct SqshInodeDirectoryIndex *current =
+	const struct SqshDataInodeDirectoryIndex *current =
 			current_directory_index(iterator);
 	return (const char *)sqsh_data_inode_directory_index_name(current);
 }

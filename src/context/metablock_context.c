@@ -39,9 +39,10 @@
 #include <sqsh_error.h>
 #include <stdint.h>
 
-static const struct SqshMetablock *
+static const struct SqshDataMetablock *
 get_metablock(const struct SqshMetablockContext *context) {
-	return (const struct SqshMetablock *)sqsh_mapping_data(&context->mapping);
+	return (const struct SqshDataMetablock *)sqsh_mapping_data(
+			&context->mapping);
 }
 
 int
@@ -68,7 +69,7 @@ out:
 
 uint32_t
 sqsh__metablock_compressed_size(const struct SqshMetablockContext *context) {
-	const struct SqshMetablock *metablock = get_metablock(context);
+	const struct SqshDataMetablock *metablock = get_metablock(context);
 	return sqsh_data_metablock_size(metablock);
 }
 
@@ -76,7 +77,7 @@ int
 sqsh__metablock_to_buffer(
 		struct SqshMetablockContext *context, struct SqshBuffer *buffer) {
 	int rv = 0;
-	const struct SqshMetablock *metablock = get_metablock(context);
+	const struct SqshDataMetablock *metablock = get_metablock(context);
 	uint32_t size = sqsh_data_metablock_size(metablock);
 	bool is_compressed = sqsh_data_metablock_is_compressed(metablock);
 	uint32_t map_size;

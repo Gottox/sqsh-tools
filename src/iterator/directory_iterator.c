@@ -74,11 +74,11 @@ directory_iterator_index_lookup(
 	return rv;
 }
 
-static const struct SqshDirectoryFragment *
+static const struct SqshDataDirectoryFragment *
 directory_iterator_current_fragment(
 		const struct SqshDirectoryIterator *iterator) {
 	const uint8_t *tmp = (const uint8_t *)iterator->fragments;
-	return (const struct SqshDirectoryFragment
+	return (const struct SqshDataDirectoryFragment
 					*)&tmp[iterator->current_fragment_offset];
 }
 
@@ -90,15 +90,15 @@ directory_data_more(struct SqshDirectoryIterator *iterator, size_t size) {
 	}
 
 	iterator->fragments =
-			(struct SqshDirectoryFragment *)sqsh__metablock_stream_data(
+			(struct SqshDataDirectoryFragment *)sqsh__metablock_stream_data(
 					&iterator->metablock);
 	return 0;
 }
 
-static struct SqshDirectoryEntry *
+static struct SqshDataDirectoryEntry *
 current_entry(const struct SqshDirectoryIterator *iterator) {
 	const uint8_t *tmp = (const uint8_t *)iterator->fragments;
-	return (struct SqshDirectoryEntry *)&tmp[iterator->current_offset];
+	return (struct SqshDataDirectoryEntry *)&tmp[iterator->current_offset];
 }
 
 int
@@ -180,14 +180,14 @@ sqsh_directory_iterator_new(struct SqshInodeContext *inode, int *err) {
 int
 sqsh_directory_iterator_name_size(
 		const struct SqshDirectoryIterator *iterator) {
-	const struct SqshDirectoryEntry *entry = current_entry(iterator);
+	const struct SqshDataDirectoryEntry *entry = current_entry(iterator);
 	return sqsh_data_directory_entry_name_size(entry) + 1;
 }
 
 uint64_t
 sqsh_directory_iterator_inode_ref(
 		const struct SqshDirectoryIterator *iterator) {
-	const struct SqshDirectoryFragment *fragment =
+	const struct SqshDataDirectoryFragment *fragment =
 			directory_iterator_current_fragment(iterator);
 	uint32_t block_index = sqsh_data_directory_fragment_start(fragment);
 	uint16_t block_offset =
@@ -245,7 +245,7 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator) {
 		}
 		iterator->current_fragment_offset = iterator->current_offset;
 
-		const struct SqshDirectoryFragment *current_fragment =
+		const struct SqshDataDirectoryFragment *current_fragment =
 				directory_iterator_current_fragment(iterator);
 		iterator->remaining_entries =
 				sqsh_data_directory_fragment_count(current_fragment) + 1;
@@ -275,7 +275,7 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator) {
 
 const char *
 sqsh_directory_iterator_name(const struct SqshDirectoryIterator *iterator) {
-	const struct SqshDirectoryEntry *entry = current_entry(iterator);
+	const struct SqshDataDirectoryEntry *entry = current_entry(iterator);
 	return (char *)sqsh_data_directory_entry_name(entry);
 }
 

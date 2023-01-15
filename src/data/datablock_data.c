@@ -35,12 +35,12 @@
 #include <sqsh_data_private.h>
 
 uint32_t
-sqsh_data_datablock_size(const struct SqshDatablockSize *datablock_size) {
+sqsh_data_datablock_size(const struct SqshDataDatablockSize *datablock_size) {
 	return le32toh(datablock_size->size) & ~(1 << 24);
 }
 
 bool
 sqsh_data_datablock_is_compressed(
-		const struct SqshDatablockSize *datablock_size) {
+		const struct SqshDataDatablockSize *datablock_size) {
 	return !(le32toh(datablock_size->size) & (1 << 24));
 }

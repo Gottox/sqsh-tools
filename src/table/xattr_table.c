@@ -41,9 +41,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const struct SqshXattrIdTable *
+static const struct SqshDataXattrIdTable *
 get_header(const struct SqshXattrTable *context) {
-	return (struct SqshXattrIdTable *)sqsh_mapping_data(&context->header);
+	return (struct SqshDataXattrIdTable *)sqsh_mapping_data(&context->header);
 }
 
 int
@@ -64,7 +64,7 @@ sqsh__xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh) {
 		goto out;
 	}
 
-	const struct SqshXattrIdTable *header = get_header(context);
+	const struct SqshDataXattrIdTable *header = get_header(context);
 
 	rv = sqsh__table_init(
 			&context->table, sqsh, xattr_address + SQSH_SIZEOF_XATTR_ID_TABLE,
@@ -82,14 +82,14 @@ out:
 
 uint64_t
 sqsh_xattr_table_start(struct SqshXattrTable *table) {
-	const struct SqshXattrIdTable *header = get_header(table);
+	const struct SqshDataXattrIdTable *header = get_header(table);
 	return sqsh_data_xattr_id_table_xattr_table_start(header);
 }
 
 int
 sqsh_xattr_table_get(
 		const struct SqshXattrTable *table, sqsh_index_t index,
-		struct SqshXattrLookupTable *target) {
+		struct SqshDataXattrLookupTable *target) {
 	return sqsh_table_get(&table->table, index, target);
 }
 

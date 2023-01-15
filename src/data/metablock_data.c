@@ -35,16 +35,16 @@
 #include <sqsh_data_private.h>
 
 int
-sqsh_data_metablock_is_compressed(const struct SqshMetablock *metablock) {
+sqsh_data_metablock_is_compressed(const struct SqshDataMetablock *metablock) {
 	return !(htole16(metablock->header) & 0x8000);
 }
 
 const uint8_t *
-sqsh_data_metablock_data(const struct SqshMetablock *metablock) {
+sqsh_data_metablock_data(const struct SqshDataMetablock *metablock) {
 	return (uint8_t *)&metablock[1];
 }
 
 size_t
-sqsh_data_metablock_size(const struct SqshMetablock *metablock) {
+sqsh_data_metablock_size(const struct SqshDataMetablock *metablock) {
 	return htole16(metablock->header) & 0x7FFF;
 }

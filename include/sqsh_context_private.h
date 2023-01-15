@@ -51,7 +51,7 @@ struct SqshSuperblockContext {
 	/**
 	 * @privatesection
 	 */
-	const struct SqshSuperblock *superblock;
+	const struct SqshDataSuperblock *superblock;
 	struct SqshMapping mapping;
 };
 

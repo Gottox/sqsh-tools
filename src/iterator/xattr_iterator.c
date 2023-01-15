@@ -48,7 +48,7 @@ sqsh__xattr_iterator_init(
 		struct SqshXattrIterator *iterator,
 		const struct SqshInodeContext *inode) {
 	int rv;
-	struct SqshXattrLookupTable ref = {0};
+	struct SqshDataXattrLookupTable ref = {0};
 	struct SqshXattrTable *xattr_table = NULL;
 	struct Sqsh *sqsh = inode->sqsh;
 	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
@@ -126,7 +126,7 @@ sqsh_xattr_iterator_new(const struct SqshInodeContext *inode, int *err) {
 	return iterator;
 }
 
-static const struct SqshXattrValue *
+static const struct SqshDataXattrValue *
 get_value(struct SqshXattrIterator *iterator) {
 	const uint8_t *data;
 	if (iterator->value_offset == 0) {
@@ -134,19 +134,19 @@ get_value(struct SqshXattrIterator *iterator) {
 	} else {
 		data = sqsh__metablock_stream_data(&iterator->metablock);
 	}
-	return (const struct SqshXattrValue *)&data[iterator->value_offset];
+	return (const struct SqshDataXattrValue *)&data[iterator->value_offset];
 }
 
-static const struct SqshXattrKey *
+static const struct SqshDataXattrKey *
 get_key(struct SqshXattrIterator *iterator) {
 	const uint8_t *data = sqsh__metablock_stream_data(&iterator->metablock);
 
-	return (const struct SqshXattrKey *)&data[iterator->key_offset];
+	return (const struct SqshDataXattrKey *)&data[iterator->key_offset];
 }
 
 static int
 xattr_value_indirect_load(struct SqshXattrIterator *iterator) {
-	const struct SqshXattrValue *value = get_value(iterator);
+	const struct SqshDataXattrValue *value = get_value(iterator);
 	int rv = 0;
 	if (sqsh_data_xattr_value_size(value) != 8) {
 		return -SQSH_ERROR_SIZE_MISSMATCH;

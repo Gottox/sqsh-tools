@@ -36,29 +36,29 @@
 #include <string.h>
 
 uint16_t
-sqsh_data_xattr_key_type(const struct SqshXattrKey *xattr_key) {
+sqsh_data_xattr_key_type(const struct SqshDataXattrKey *xattr_key) {
 	return le16toh(xattr_key->type);
 }
 
 uint16_t
-sqsh_data_xattr_key_name_size(const struct SqshXattrKey *xattr_key) {
+sqsh_data_xattr_key_name_size(const struct SqshDataXattrKey *xattr_key) {
 	return le16toh(xattr_key->name_size);
 }
 const uint8_t *
-sqsh_data_xattr_key_name(const struct SqshXattrKey *xattr_key) {
+sqsh_data_xattr_key_name(const struct SqshDataXattrKey *xattr_key) {
 	return (const uint8_t *)&xattr_key[1];
 }
 
 uint32_t
-sqsh_data_xattr_value_size(const struct SqshXattrValue *xattr_value) {
+sqsh_data_xattr_value_size(const struct SqshDataXattrValue *xattr_value) {
 	return le32toh(xattr_value->value_size);
 }
 const uint8_t *
-sqsh_data_xattr_value(const struct SqshXattrValue *xattr_value) {
+sqsh_data_xattr_value(const struct SqshDataXattrValue *xattr_value) {
 	return (const uint8_t *)&xattr_value[1];
 }
 uint64_t
-sqsh_data_xattr_value_ref(const struct SqshXattrValue *xattr_value) {
+sqsh_data_xattr_value_ref(const struct SqshDataXattrValue *xattr_value) {
 	uint64_t ref = 0;
 
 	memcpy(&ref, sqsh_data_xattr_value(xattr_value), sizeof(uint64_t));
@@ -67,33 +67,33 @@ sqsh_data_xattr_value_ref(const struct SqshXattrValue *xattr_value) {
 
 uint64_t
 sqsh_data_xattr_lookup_table_xattr_ref(
-		const struct SqshXattrLookupTable *lookup_table) {
+		const struct SqshDataXattrLookupTable *lookup_table) {
 	return le64toh(lookup_table->xattr_ref);
 }
 uint32_t
 sqsh_data_xattr_lookup_table_count(
-		const struct SqshXattrLookupTable *lookup_table) {
+		const struct SqshDataXattrLookupTable *lookup_table) {
 	return le32toh(lookup_table->count);
 }
 uint32_t
 sqsh_data_xattr_lookup_table_size(
-		const struct SqshXattrLookupTable *lookup_table) {
+		const struct SqshDataXattrLookupTable *lookup_table) {
 	return le32toh(lookup_table->size);
 }
 
 uint64_t
 sqsh_data_xattr_id_table_xattr_table_start(
-		const struct SqshXattrIdTable *xattr_id_table) {
+		const struct SqshDataXattrIdTable *xattr_id_table) {
 	return le64toh(xattr_id_table->xattr_table_start);
 }
 uint32_t
 sqsh_data_xattr_id_table_xattr_ids(
-		const struct SqshXattrIdTable *xattr_id_table) {
+		const struct SqshDataXattrIdTable *xattr_id_table) {
 	return le32toh(xattr_id_table->xattr_ids);
 }
 uint64_t
 sqsh_data_xattr_id_table_ref(
-		const struct SqshXattrIdTable *xattr_id_table, uint64_t index) {
+		const struct SqshDataXattrIdTable *xattr_id_table, uint64_t index) {
 	const uint64_t *table = (const uint64_t *)&xattr_id_table[1];
 
 	return le64toh(table[index]);

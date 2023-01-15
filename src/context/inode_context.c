@@ -42,9 +42,9 @@
 #include <stdint.h>
 #include <string.h>
 
-static const struct SqshInode *
+static const struct SqshDataInode *
 get_inode(const struct SqshInodeContext *inode) {
-	return (const struct SqshInode *)sqsh__metablock_stream_data(
+	return (const struct SqshDataInode *)sqsh__metablock_stream_data(
 			&inode->metablock);
 }
 
@@ -63,7 +63,7 @@ inode_load(struct SqshInodeContext *context) {
 	int rv = 0;
 	size_t size = SQSH_SIZEOF_INODE_HEADER;
 
-	const struct SqshInode *inode = get_inode(context);
+	const struct SqshDataInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
 	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
 		size += SQSH_SIZEOF_INODE_DIRECTORY;
@@ -104,12 +104,12 @@ inode_load(struct SqshInodeContext *context) {
 	return rv;
 }
 
-static const struct SqshDatablockSize *
+static const struct SqshDataDatablockSize *
 get_size_info(const struct SqshInodeContext *context, int index) {
-	const struct SqshInodeFile *basic_file;
-	const struct SqshInodeFileExt *extended_file;
+	const struct SqshDataInodeFile *basic_file;
+	const struct SqshDataInodeFileExt *extended_file;
 
-	const struct SqshInode *inode = get_inode(context);
+	const struct SqshDataInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
 	case SQSH_INODE_TYPE_BASIC_FILE:
 		basic_file = sqsh_data_inode_file(inode);
@@ -178,7 +178,7 @@ sqsh_inode_new(struct Sqsh *sqsh, uint64_t inode_ref, int *err) {
 
 bool
 sqsh_inode_is_extended(const struct SqshInodeContext *context) {
-	const struct SqshInode *inode = get_inode(context);
+	const struct SqshDataInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
 	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
 	case SQSH_INODE_TYPE_BASIC_FILE:
@@ -202,7 +202,7 @@ sqsh_inode_is_extended(const struct SqshInodeContext *context) {
 
 uint32_t
 sqsh_inode_hard_link_count(const struct SqshInodeContext *context) {
-	const struct SqshInode *inode = get_inode(context);
+	const struct SqshDataInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
 	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
 		return sqsh_data_inode_directory_hard_link_count(
@@ -243,12 +243,12 @@ sqsh_inode_hard_link_count(const struct SqshInodeContext *context) {
 
 uint64_t
 sqsh_inode_file_size(const struct SqshInodeContext *context) {
-	const struct SqshInodeFile *basic_file;
-	const struct SqshInodeFileExt *extended_file;
-	const struct SqshInodeDirectory *basic_dir;
-	const struct SqshInodeDirectoryExt *extended_dir;
+	const struct SqshDataInodeFile *basic_file;
+	const struct SqshDataInodeFileExt *extended_file;
+	const struct SqshDataInodeDirectory *basic_dir;
+	const struct SqshDataInodeDirectoryExt *extended_dir;
 
-	const struct SqshInode *inode = get_inode(context);
+	const struct SqshDataInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
 	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
 		basic_dir = sqsh_data_inode_directory(inode);
@@ -283,10 +283,10 @@ sqsh_inode_modified_time(const struct SqshInodeContext *inode) {
 
 uint64_t
 sqsh_inode_file_blocks_start(const struct SqshInodeContext *context) {
-	const struct SqshInodeFile *basic_file;
-	const struct SqshInodeFileExt *extended_file;
+	const struct SqshDataInodeFile *basic_file;
+	const struct SqshDataInodeFileExt *extended_file;
 
-	const struct SqshInode *inode = get_inode(context);
+	const struct SqshDataInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
 	case SQSH_INODE_TYPE_BASIC_FILE:
 		basic_file = sqsh_data_inode_file(inode);
@@ -318,7 +318,7 @@ sqsh_inode_file_block_count(const struct SqshInodeContext *context) {
 uint32_t
 sqsh_inode_file_block_size(
 		const struct SqshInodeContext *inode, uint32_t index) {
-	const struct SqshDatablockSize *size_info = get_size_info(inode, index);
+	const struct SqshDataDatablockSize *size_info = get_size_info(inode, index);
 
 	return sqsh_data_datablock_size(size_info);
 }
@@ -326,17 +326,17 @@ sqsh_inode_file_block_size(
 bool
 sqsh_inode_file_block_is_compressed(
 		const struct SqshInodeContext *inode, int index) {
-	const struct SqshDatablockSize *size_info = get_size_info(inode, index);
+	const struct SqshDataDatablockSize *size_info = get_size_info(inode, index);
 
 	return sqsh_data_datablock_is_compressed(size_info);
 }
 
 uint32_t
 sqsh_inode_file_fragment_block_index(const struct SqshInodeContext *context) {
-	const struct SqshInodeFile *basic_file;
-	const struct SqshInodeFileExt *extended_file;
+	const struct SqshDataInodeFile *basic_file;
+	const struct SqshDataInodeFileExt *extended_file;
 
-	const struct SqshInode *inode = get_inode(context);
+	const struct SqshDataInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
 	case SQSH_INODE_TYPE_BASIC_FILE:
 		basic_file = sqsh_data_inode_file(inode);
@@ -350,9 +350,9 @@ sqsh_inode_file_fragment_block_index(const struct SqshInodeContext *context) {
 
 uint32_t
 sqsh_inode_directory_block_start(const struct SqshInodeContext *context) {
-	const struct SqshInodeDirectory *basic_file;
-	const struct SqshInodeDirectoryExt *extended_file;
-	const struct SqshInode *inode = get_inode(context);
+	const struct SqshDataInodeDirectory *basic_file;
+	const struct SqshDataInodeDirectoryExt *extended_file;
+	const struct SqshDataInode *inode = get_inode(context);
 
 	switch (sqsh_data_inode_type(inode)) {
 	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
@@ -367,9 +367,9 @@ sqsh_inode_directory_block_start(const struct SqshInodeContext *context) {
 
 uint32_t
 sqsh_inode_directory_block_offset(const struct SqshInodeContext *context) {
-	const struct SqshInodeDirectory *basic_directory;
-	const struct SqshInodeDirectoryExt *extended_directory;
-	const struct SqshInode *inode = get_inode(context);
+	const struct SqshDataInodeDirectory *basic_directory;
+	const struct SqshDataInodeDirectoryExt *extended_directory;
+	const struct SqshDataInode *inode = get_inode(context);
 
 	switch (sqsh_data_inode_type(inode)) {
 	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
@@ -384,9 +384,9 @@ sqsh_inode_directory_block_offset(const struct SqshInodeContext *context) {
 
 uint32_t
 sqsh_inode_file_fragment_block_offset(const struct SqshInodeContext *context) {
-	const struct SqshInodeFile *basic_file;
-	const struct SqshInodeFileExt *extended_file;
-	const struct SqshInode *inode = get_inode(context);
+	const struct SqshDataInodeFile *basic_file;
+	const struct SqshDataInodeFileExt *extended_file;
+	const struct SqshDataInode *inode = get_inode(context);
 
 	switch (sqsh_data_inode_type(inode)) {
 	case SQSH_INODE_TYPE_BASIC_FILE:
@@ -407,7 +407,7 @@ sqsh_inode_file_has_fragment(const struct SqshInodeContext *inode) {
 
 enum SqshInodeContextType
 sqsh_inode_type(const struct SqshInodeContext *context) {
-	const struct SqshInode *inode = get_inode(context);
+	const struct SqshDataInode *inode = get_inode(context);
 
 	switch (sqsh_data_inode_type(inode)) {
 	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
@@ -437,10 +437,10 @@ sqsh_inode_type(const struct SqshInodeContext *context) {
 
 const char *
 sqsh_inode_symlink(const struct SqshInodeContext *context) {
-	const struct SqshInodeSymlink *basic;
-	const struct SqshInodeSymlinkExt *extended;
+	const struct SqshDataInodeSymlink *basic;
+	const struct SqshDataInodeSymlinkExt *extended;
 
-	const struct SqshInode *inode = get_inode(context);
+	const struct SqshDataInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
 	case SQSH_INODE_TYPE_BASIC_SYMLINK:
 		basic = sqsh_data_inode_symlink(inode);
@@ -468,10 +468,10 @@ sqsh_inode_symlink_dup(
 
 uint32_t
 sqsh_inode_symlink_size(const struct SqshInodeContext *context) {
-	const struct SqshInodeSymlink *basic;
-	const struct SqshInodeSymlinkExt *extended;
+	const struct SqshDataInodeSymlink *basic;
+	const struct SqshDataInodeSymlinkExt *extended;
 
-	const struct SqshInode *inode = get_inode(context);
+	const struct SqshDataInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
 	case SQSH_INODE_TYPE_BASIC_SYMLINK:
 		basic = sqsh_data_inode_symlink(inode);
@@ -485,10 +485,10 @@ sqsh_inode_symlink_size(const struct SqshInodeContext *context) {
 
 uint32_t
 sqsh_inode_device_id(const struct SqshInodeContext *context) {
-	const struct SqshInodeDevice *basic;
-	const struct SqshInodeDeviceExt *extended;
+	const struct SqshDataInodeDevice *basic;
+	const struct SqshDataInodeDeviceExt *extended;
 
-	const struct SqshInode *inode = get_inode(context);
+	const struct SqshDataInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
 	case SQSH_INODE_TYPE_BASIC_BLOCK:
 	case SQSH_INODE_TYPE_BASIC_CHAR:
@@ -532,7 +532,7 @@ sqsh_inode_gid(const struct SqshInodeContext *context) {
 
 uint32_t
 sqsh_inode_xattr_index(const struct SqshInodeContext *context) {
-	const struct SqshInode *inode = get_inode(context);
+	const struct SqshDataInode *inode = get_inode(context);
 	switch (sqsh_data_inode_type(inode)) {
 	case SQSH_INODE_TYPE_EXTENDED_DIRECTORY:
 		return sqsh_data_inode_directory_ext_xattr_idx(

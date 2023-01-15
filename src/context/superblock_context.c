@@ -75,8 +75,9 @@ sqsh__superblock_init(
 	if (rv < 0) {
 		goto out;
 	}
-	const struct SqshSuperblock *superblock =
-			(const struct SqshSuperblock *)sqsh_mapping_data(&context->mapping);
+	const struct SqshDataSuperblock *superblock =
+			(const struct SqshDataSuperblock *)sqsh_mapping_data(
+					&context->mapping);
 
 	if (sqsh_data_superblock_magic(superblock) != SUPERBLOCK_MAGIC) {
 		rv = -SQSH_ERROR_WRONG_MAGIC;

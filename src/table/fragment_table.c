@@ -69,9 +69,9 @@ read_fragment_data(
 	int rv = 0;
 	uint64_t start;
 	uint32_t size;
-	const struct SqshDatablockSize *size_info;
+	const struct SqshDataDatablockSize *size_info;
 	bool is_compressed;
-	struct SqshFragment fragment = {0};
+	struct SqshDataFragment fragment = {0};
 	struct SqshMapping memory_map = {0};
 	const uint8_t *data;
 

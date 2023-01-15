@@ -92,7 +92,7 @@ SQSH_NO_UNUSED int sqsh_fragment_table_to_buffer(
 ////////////////////////////////////////
 // table/xattr_table.c
 
-struct SqshXattrLookupTable;
+struct SqshDataXattrLookupTable;
 struct Sqsh;
 struct SqshXattrTable;
 
@@ -129,7 +129,7 @@ uint64_t sqsh_xattr_table_start(struct SqshXattrTable *table);
  */
 int sqsh_xattr_table_get(
 		const struct SqshXattrTable *table, sqsh_index_t index,
-		struct SqshXattrLookupTable *target);
+		struct SqshDataXattrLookupTable *target);
 
 #ifdef __cplusplus
 }

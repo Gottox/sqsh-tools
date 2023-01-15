@@ -47,15 +47,15 @@ extern "C" {
 #define SQSH_SIZEOF_COMPRESSION_OPTIONS_LZO 8
 #define SQSH_SIZEOF_COMPRESSION_OPTIONS 8
 
-struct SQSH_UNALIGNED SqshCompressionOptionsGzip;
+struct SQSH_UNALIGNED SqshDataCompressionOptionsGzip;
 
-struct SQSH_UNALIGNED SqshCompressionOptionsXz;
+struct SQSH_UNALIGNED SqshDataCompressionOptionsXz;
 
-struct SQSH_UNALIGNED SqshCompressionOptionsLz4;
+struct SQSH_UNALIGNED SqshDataCompressionOptionsLz4;
 
-struct SQSH_UNALIGNED SqshCompressionOptionsZstd;
+struct SQSH_UNALIGNED SqshDataCompressionOptionsZstd;
 
-struct SQSH_UNALIGNED SqshCompressionOptionsLzo;
+struct SQSH_UNALIGNED SqshDataCompressionOptionsLzo;
 
 union SqshCompressionOptions;
 
@@ -89,12 +89,12 @@ uint32_t sqsh_data_compression_options_lzo_compression_level(
 
 #define SQSH_SIZEOF_DATABLOCK_SIZE 4
 
-struct SQSH_UNALIGNED SqshDatablockSize;
+struct SQSH_UNALIGNED SqshDataDatablockSize;
 
 uint32_t
-sqsh_data_datablock_size(const struct SqshDatablockSize *datablock_size);
+sqsh_data_datablock_size(const struct SqshDataDatablockSize *datablock_size);
 bool sqsh_data_datablock_is_compressed(
-		const struct SqshDatablockSize *datablock_size);
+		const struct SqshDataDatablockSize *datablock_size);
 
 ////////////////////////////////////////
 // data/directory_data.c
@@ -102,40 +102,42 @@ bool sqsh_data_datablock_is_compressed(
 #define SQSH_SIZEOF_DIRECTORY_FRAGMENT 12
 #define SQSH_SIZEOF_DIRECTORY_ENTRY 8
 
-struct SQSH_UNALIGNED SqshDirectoryEntry;
+struct SQSH_UNALIGNED SqshDataDirectoryEntry;
 
-struct SQSH_UNALIGNED SqshDirectoryFragment;
+struct SQSH_UNALIGNED SqshDataDirectoryFragment;
 
 uint16_t
-sqsh_data_directory_entry_offset(const struct SqshDirectoryEntry *entry);
-int16_t
-sqsh_data_directory_entry_inode_offset(const struct SqshDirectoryEntry *entry);
-uint16_t sqsh_data_directory_entry_type(const struct SqshDirectoryEntry *entry);
+sqsh_data_directory_entry_offset(const struct SqshDataDirectoryEntry *entry);
+int16_t sqsh_data_directory_entry_inode_offset(
+		const struct SqshDataDirectoryEntry *entry);
 uint16_t
-sqsh_data_directory_entry_name_size(const struct SqshDirectoryEntry *entry);
+sqsh_data_directory_entry_type(const struct SqshDataDirectoryEntry *entry);
+uint16_t
+sqsh_data_directory_entry_name_size(const struct SqshDataDirectoryEntry *entry);
 const uint8_t *
-sqsh_data_directory_entry_name(const struct SqshDirectoryEntry *entry);
+sqsh_data_directory_entry_name(const struct SqshDataDirectoryEntry *entry);
 
 uint32_t sqsh_data_directory_fragment_count(
-		const struct SqshDirectoryFragment *fragment);
+		const struct SqshDataDirectoryFragment *fragment);
 uint32_t sqsh_data_directory_fragment_start(
-		const struct SqshDirectoryFragment *fragment);
+		const struct SqshDataDirectoryFragment *fragment);
 uint32_t sqsh_data_directory_fragment_inode_number(
-		const struct SqshDirectoryFragment *fragment);
-const struct SqshDirectoryEntry *sqsh_data_directory_fragment_entries(
-		const struct SqshDirectoryFragment *fragment);
+		const struct SqshDataDirectoryFragment *fragment);
+const struct SqshDataDirectoryEntry *sqsh_data_directory_fragment_entries(
+		const struct SqshDataDirectoryFragment *fragment);
 
 ////////////////////////////////////////
 // data/fragment_data.c
 
 #define SQSH_SIZEOF_FRAGMENT 16
 
-struct SQSH_UNALIGNED SqshFragment;
+struct SQSH_UNALIGNED SqshDataFragment;
 
-uint64_t sqsh_data_fragment_start(const struct SqshFragment *fragment);
-const struct SqshDatablockSize *
-sqsh_data_fragment_size_info(const struct SqshFragment *fragment);
-uint32_t sqsh_data_fragment_is_compressed(const struct SqshFragment *fragment);
+uint64_t sqsh_data_fragment_start(const struct SqshDataFragment *fragment);
+const struct SqshDataDatablockSize *
+sqsh_data_fragment_size_info(const struct SqshDataFragment *fragment);
+uint32_t
+sqsh_data_fragment_is_compressed(const struct SqshDataFragment *fragment);
 
 ////////////////////////////////////////
 // data/inode_data.c
@@ -154,199 +156,212 @@ uint32_t sqsh_data_fragment_is_compressed(const struct SqshFragment *fragment);
 #define SQSH_SIZEOF_INODE_IPC_EXT 8
 #define SQSH_SIZEOF_INODE_HEADER 16
 
-struct SQSH_UNALIGNED SqshInodeDirectory;
-struct SQSH_UNALIGNED SqshInodeDirectoryExt;
-struct SQSH_UNALIGNED SqshInodeFile;
-struct SQSH_UNALIGNED SqshInodeFileExt;
-struct SQSH_UNALIGNED SqshInodeSymlink;
-struct SQSH_UNALIGNED SqshInodeSymlinkExt;
-struct SQSH_UNALIGNED SqshInodeSymlinkExtTail;
-struct SQSH_UNALIGNED SqshInodeDevice;
-struct SQSH_UNALIGNED SqshInodeDeviceExt;
-struct SQSH_UNALIGNED SqshInodeIpc;
-struct SQSH_UNALIGNED SqshInodeIpcExt;
-struct SQSH_UNALIGNED SqshInode;
+struct SQSH_UNALIGNED SqshDataInodeDirectory;
+struct SQSH_UNALIGNED SqshDataInodeDirectoryExt;
+struct SQSH_UNALIGNED SqshDataInodeFile;
+struct SQSH_UNALIGNED SqshDataInodeFileExt;
+struct SQSH_UNALIGNED SqshDataInodeSymlink;
+struct SQSH_UNALIGNED SqshDataInodeSymlinkExt;
+struct SQSH_UNALIGNED SqshDataInodeSymlinkExtTail;
+struct SQSH_UNALIGNED SqshDataInodeDevice;
+struct SQSH_UNALIGNED SqshDataInodeDeviceExt;
+struct SQSH_UNALIGNED SqshDataInodeIpc;
+struct SQSH_UNALIGNED SqshDataInodeIpcExt;
+struct SQSH_UNALIGNED SqshDataInode;
 
-struct SQSH_UNALIGNED SqshInodeDirectoryIndex;
+struct SQSH_UNALIGNED SqshDataInodeDirectoryIndex;
 
-uint16_t sqsh_data_inode_type(const struct SqshInode *inode);
-uint16_t sqsh_data_inode_permissions(const struct SqshInode *inode);
-uint16_t sqsh_data_inode_uid_idx(const struct SqshInode *inode);
-uint16_t sqsh_data_inode_gid_idx(const struct SqshInode *inode);
-uint32_t sqsh_data_inode_modified_time(const struct SqshInode *inode);
-uint32_t sqsh_data_inode_number(const struct SqshInode *inode);
+uint16_t sqsh_data_inode_type(const struct SqshDataInode *inode);
+uint16_t sqsh_data_inode_permissions(const struct SqshDataInode *inode);
+uint16_t sqsh_data_inode_uid_idx(const struct SqshDataInode *inode);
+uint16_t sqsh_data_inode_gid_idx(const struct SqshDataInode *inode);
+uint32_t sqsh_data_inode_modified_time(const struct SqshDataInode *inode);
+uint32_t sqsh_data_inode_number(const struct SqshDataInode *inode);
 
-const struct SqshInodeDirectory *
-sqsh_data_inode_directory(const struct SqshInode *inode);
-const struct SqshInodeDirectoryExt *
-sqsh_data_inode_directory_ext(const struct SqshInode *inode);
-const struct SqshInodeFile *sqsh_data_inode_file(const struct SqshInode *inode);
-const struct SqshInodeFileExt *
-sqsh_data_inode_file_ext(const struct SqshInode *inode);
-const struct SqshInodeSymlink *
-sqsh_data_inode_symlink(const struct SqshInode *inode);
-const struct SqshInodeSymlinkExt *
-sqsh_data_inode_symlink_ext(const struct SqshInode *inode);
-const struct SqshInodeDevice *
-sqsh_data_inode_device(const struct SqshInode *inode);
-const struct SqshInodeDeviceExt *
-sqsh_data_inode_device_ext(const struct SqshInode *inode);
-const struct SqshInodeIpc *sqsh_data_inode_ipc(const struct SqshInode *inode);
-const struct SqshInodeIpcExt *
-sqsh_data_inode_ipc_ext(const struct SqshInode *inode);
+const struct SqshDataInodeDirectory *
+sqsh_data_inode_directory(const struct SqshDataInode *inode);
+const struct SqshDataInodeDirectoryExt *
+sqsh_data_inode_directory_ext(const struct SqshDataInode *inode);
+const struct SqshDataInodeFile *
+sqsh_data_inode_file(const struct SqshDataInode *inode);
+const struct SqshDataInodeFileExt *
+sqsh_data_inode_file_ext(const struct SqshDataInode *inode);
+const struct SqshDataInodeSymlink *
+sqsh_data_inode_symlink(const struct SqshDataInode *inode);
+const struct SqshDataInodeSymlinkExt *
+sqsh_data_inode_symlink_ext(const struct SqshDataInode *inode);
+const struct SqshDataInodeDevice *
+sqsh_data_inode_device(const struct SqshDataInode *inode);
+const struct SqshDataInodeDeviceExt *
+sqsh_data_inode_device_ext(const struct SqshDataInode *inode);
+const struct SqshDataInodeIpc *
+sqsh_data_inode_ipc(const struct SqshDataInode *inode);
+const struct SqshDataInodeIpcExt *
+sqsh_data_inode_ipc_ext(const struct SqshDataInode *inode);
 
 uint32_t sqsh_data_inode_directory_block_start(
-		const struct SqshInodeDirectory *directory);
+		const struct SqshDataInodeDirectory *directory);
 uint32_t sqsh_data_inode_directory_hard_link_count(
-		const struct SqshInodeDirectory *directory);
-uint16_t
-sqsh_data_inode_directory_file_size(const struct SqshInodeDirectory *directory);
+		const struct SqshDataInodeDirectory *directory);
+uint16_t sqsh_data_inode_directory_file_size(
+		const struct SqshDataInodeDirectory *directory);
 uint16_t sqsh_data_inode_directory_block_offset(
-		const struct SqshInodeDirectory *directory);
+		const struct SqshDataInodeDirectory *directory);
 uint32_t sqsh_data_inode_directory_parent_inode_number(
-		const struct SqshInodeDirectory *directory);
+		const struct SqshDataInodeDirectory *directory);
 
 uint32_t sqsh_data_inode_directory_ext_hard_link_count(
-		const struct SqshInodeDirectoryExt *directory_ext);
+		const struct SqshDataInodeDirectoryExt *directory_ext);
 uint32_t sqsh_data_inode_directory_ext_file_size(
-		const struct SqshInodeDirectoryExt *directory_ext);
+		const struct SqshDataInodeDirectoryExt *directory_ext);
 uint32_t sqsh_data_inode_directory_ext_block_start(
-		const struct SqshInodeDirectoryExt *directory_ext);
+		const struct SqshDataInodeDirectoryExt *directory_ext);
 uint32_t sqsh_data_inode_directory_ext_parent_inode_number(
-		const struct SqshInodeDirectoryExt *directory_ext);
+		const struct SqshDataInodeDirectoryExt *directory_ext);
 uint16_t sqsh_data_inode_directory_ext_index_count(
-		const struct SqshInodeDirectoryExt *directory_ext);
+		const struct SqshDataInodeDirectoryExt *directory_ext);
 uint16_t sqsh_data_inode_directory_ext_block_offset(
-		const struct SqshInodeDirectoryExt *directory_ext);
+		const struct SqshDataInodeDirectoryExt *directory_ext);
 uint32_t sqsh_data_inode_directory_ext_xattr_idx(
-		const struct SqshInodeDirectoryExt *directory_ext);
+		const struct SqshDataInodeDirectoryExt *directory_ext);
 const uint8_t *sqsh_data_inode_directory_ext_index(
-		const struct SqshInodeDirectoryExt *directory_ext);
+		const struct SqshDataInodeDirectoryExt *directory_ext);
 
 uint32_t sqsh_data_inode_directory_index_index(
-		const struct SqshInodeDirectoryIndex *directory_index);
+		const struct SqshDataInodeDirectoryIndex *directory_index);
 uint32_t sqsh_data_inode_directory_index_start(
-		const struct SqshInodeDirectoryIndex *directory_index);
+		const struct SqshDataInodeDirectoryIndex *directory_index);
 uint32_t sqsh_data_inode_directory_index_name_size(
-		const struct SqshInodeDirectoryIndex *directory_index);
+		const struct SqshDataInodeDirectoryIndex *directory_index);
 const uint8_t *sqsh_data_inode_directory_index_name(
-		const struct SqshInodeDirectoryIndex *directory_index);
+		const struct SqshDataInodeDirectoryIndex *directory_index);
 
-uint32_t sqsh_data_inode_file_blocks_start(const struct SqshInodeFile *file);
 uint32_t
-sqsh_data_inode_file_fragment_block_index(const struct SqshInodeFile *file);
-uint32_t sqsh_data_inode_file_block_offset(const struct SqshInodeFile *file);
-uint32_t sqsh_data_inode_file_size(const struct SqshInodeFile *file);
-const struct SqshDatablockSize *
-sqsh_data_inode_file_block_sizes(const struct SqshInodeFile *file);
+sqsh_data_inode_file_blocks_start(const struct SqshDataInodeFile *file);
+uint32_t
+sqsh_data_inode_file_fragment_block_index(const struct SqshDataInodeFile *file);
+uint32_t
+sqsh_data_inode_file_block_offset(const struct SqshDataInodeFile *file);
+uint32_t sqsh_data_inode_file_size(const struct SqshDataInodeFile *file);
+const struct SqshDataDatablockSize *
+sqsh_data_inode_file_block_sizes(const struct SqshDataInodeFile *file);
 
+uint64_t sqsh_data_inode_file_ext_blocks_start(
+		const struct SqshDataInodeFileExt *file_ext);
 uint64_t
-sqsh_data_inode_file_ext_blocks_start(const struct SqshInodeFileExt *file_ext);
-uint64_t sqsh_data_inode_file_ext_size(const struct SqshInodeFileExt *file_ext);
+sqsh_data_inode_file_ext_size(const struct SqshDataInodeFileExt *file_ext);
 uint64_t
-sqsh_data_inode_file_ext_sparse(const struct SqshInodeFileExt *file_ext);
+sqsh_data_inode_file_ext_sparse(const struct SqshDataInodeFileExt *file_ext);
 uint32_t sqsh_data_inode_file_ext_hard_link_count(
-		const struct SqshInodeFileExt *file_ext);
+		const struct SqshDataInodeFileExt *file_ext);
 uint32_t sqsh_data_inode_file_ext_fragment_block_index(
-		const struct SqshInodeFileExt *file_ext);
+		const struct SqshDataInodeFileExt *file_ext);
+uint32_t sqsh_data_inode_file_ext_block_offset(
+		const struct SqshDataInodeFileExt *file_ext);
 uint32_t
-sqsh_data_inode_file_ext_block_offset(const struct SqshInodeFileExt *file_ext);
-uint32_t
-sqsh_data_inode_file_ext_xattr_idx(const struct SqshInodeFileExt *file_ext);
-const struct SqshDatablockSize *
-sqsh_data_inode_file_ext_block_sizes(const struct SqshInodeFileExt *file_ext);
+sqsh_data_inode_file_ext_xattr_idx(const struct SqshDataInodeFileExt *file_ext);
+const struct SqshDataDatablockSize *sqsh_data_inode_file_ext_block_sizes(
+		const struct SqshDataInodeFileExt *file_ext);
 
 uint32_t sqsh_data_inode_symlink_hard_link_count(
-		const struct SqshInodeSymlink *directory);
-uint32_t
-sqsh_data_inode_symlink_target_size(const struct SqshInodeSymlink *directory);
-const uint8_t *
-sqsh_data_inode_symlink_target_path(const struct SqshInodeSymlink *directory);
+		const struct SqshDataInodeSymlink *directory);
+uint32_t sqsh_data_inode_symlink_target_size(
+		const struct SqshDataInodeSymlink *directory);
+const uint8_t *sqsh_data_inode_symlink_target_path(
+		const struct SqshDataInodeSymlink *directory);
 
 uint32_t sqsh_data_inode_symlink_ext_hard_link_count(
-		const struct SqshInodeSymlinkExt *directory);
+		const struct SqshDataInodeSymlinkExt *directory);
 uint32_t sqsh_data_inode_symlink_ext_target_size(
-		const struct SqshInodeSymlinkExt *directory);
+		const struct SqshDataInodeSymlinkExt *directory);
 const uint8_t *sqsh_data_inode_symlink_ext_target_path(
-		const struct SqshInodeSymlinkExt *directory);
+		const struct SqshDataInodeSymlinkExt *directory);
 uint32_t sqsh_data_inode_symlink_ext_xattr_idx(
-		const struct SqshInodeSymlinkExt *directory);
+		const struct SqshDataInodeSymlinkExt *directory);
 
+uint32_t sqsh_data_inode_device_hard_link_count(
+		const struct SqshDataInodeDevice *device);
 uint32_t
-sqsh_data_inode_device_hard_link_count(const struct SqshInodeDevice *device);
-uint32_t sqsh_data_inode_device_device(const struct SqshInodeDevice *device);
+sqsh_data_inode_device_device(const struct SqshDataInodeDevice *device);
 
 uint32_t sqsh_data_inode_device_ext_hard_link_count(
-		const struct SqshInodeDeviceExt *device);
+		const struct SqshDataInodeDeviceExt *device);
 uint32_t
-sqsh_data_inode_device_ext_device(const struct SqshInodeDeviceExt *device);
-uint32_t
-sqsh_data_inode_device_ext_xattr_idx(const struct SqshInodeDeviceExt *device);
-
-uint32_t sqsh_data_inode_ipc_hard_link_count(const struct SqshInodeIpc *ipc);
+sqsh_data_inode_device_ext_device(const struct SqshDataInodeDeviceExt *device);
+uint32_t sqsh_data_inode_device_ext_xattr_idx(
+		const struct SqshDataInodeDeviceExt *device);
 
 uint32_t
-sqsh_data_inode_ipc_ext_hard_link_count(const struct SqshInodeIpcExt *ipc);
-uint32_t sqsh_data_inode_ipc_ext_xattr_idx(const struct SqshInodeIpcExt *ipc);
+sqsh_data_inode_ipc_hard_link_count(const struct SqshDataInodeIpc *ipc);
+
+uint32_t
+sqsh_data_inode_ipc_ext_hard_link_count(const struct SqshDataInodeIpcExt *ipc);
+uint32_t
+sqsh_data_inode_ipc_ext_xattr_idx(const struct SqshDataInodeIpcExt *ipc);
 
 ////////////////////////////////////////
 // data/metablock_data.c
 
 #define SQSH_SIZEOF_METABLOCK 2
 
-struct SQSH_UNALIGNED SqshMetablock;
+struct SQSH_UNALIGNED SqshDataMetablock;
 
-int sqsh_data_metablock_is_compressed(const struct SqshMetablock *metablock);
+int
+sqsh_data_metablock_is_compressed(const struct SqshDataMetablock *metablock);
 
-const uint8_t *sqsh_data_metablock_data(const struct SqshMetablock *metablock);
+const uint8_t *
+sqsh_data_metablock_data(const struct SqshDataMetablock *metablock);
 
-size_t sqsh_data_metablock_size(const struct SqshMetablock *metablock);
+size_t sqsh_data_metablock_size(const struct SqshDataMetablock *metablock);
 
 ////////////////////////////////////////
 // data/superblock_data.c
 
 #define SQSH_SIZEOF_SUPERBLOCK 96
 
-struct SQSH_UNALIGNED SqshSuperblock;
+struct SQSH_UNALIGNED SqshDataSuperblock;
 
-int
-sqsh_data_superblock_init(const struct SqshSuperblock *superblock, size_t size);
+int sqsh_data_superblock_init(
+		const struct SqshDataSuperblock *superblock, size_t size);
 
-uint32_t sqsh_data_superblock_magic(const struct SqshSuperblock *superblock);
 uint32_t
-sqsh_data_superblock_inode_count(const struct SqshSuperblock *superblock);
+sqsh_data_superblock_magic(const struct SqshDataSuperblock *superblock);
 uint32_t
-sqsh_data_superblock_modification_time(const struct SqshSuperblock *superblock);
+sqsh_data_superblock_inode_count(const struct SqshDataSuperblock *superblock);
+uint32_t sqsh_data_superblock_modification_time(
+		const struct SqshDataSuperblock *superblock);
 uint32_t
-sqsh_data_superblock_block_size(const struct SqshSuperblock *superblock);
+sqsh_data_superblock_block_size(const struct SqshDataSuperblock *superblock);
 uint32_t sqsh_data_superblock_fragment_entry_count(
-		const struct SqshSuperblock *superblock);
+		const struct SqshDataSuperblock *superblock);
+uint16_t sqsh_data_superblock_compression_id(
+		const struct SqshDataSuperblock *superblock);
 uint16_t
-sqsh_data_superblock_compression_id(const struct SqshSuperblock *superblock);
+sqsh_data_superblock_block_log(const struct SqshDataSuperblock *superblock);
 uint16_t
-sqsh_data_superblock_block_log(const struct SqshSuperblock *superblock);
-uint16_t sqsh_data_superblock_flags(const struct SqshSuperblock *superblock);
-uint16_t sqsh_data_superblock_id_count(const struct SqshSuperblock *superblock);
+sqsh_data_superblock_flags(const struct SqshDataSuperblock *superblock);
 uint16_t
-sqsh_data_superblock_version_major(const struct SqshSuperblock *superblock);
+sqsh_data_superblock_id_count(const struct SqshDataSuperblock *superblock);
 uint16_t
-sqsh_data_superblock_version_minor(const struct SqshSuperblock *superblock);
+sqsh_data_superblock_version_major(const struct SqshDataSuperblock *superblock);
+uint16_t
+sqsh_data_superblock_version_minor(const struct SqshDataSuperblock *superblock);
+uint64_t sqsh_data_superblock_root_inode_ref(
+		const struct SqshDataSuperblock *superblock);
 uint64_t
-sqsh_data_superblock_root_inode_ref(const struct SqshSuperblock *superblock);
-uint64_t
-sqsh_data_superblock_bytes_used(const struct SqshSuperblock *superblock);
-uint64_t
-sqsh_data_superblock_id_table_start(const struct SqshSuperblock *superblock);
+sqsh_data_superblock_bytes_used(const struct SqshDataSuperblock *superblock);
+uint64_t sqsh_data_superblock_id_table_start(
+		const struct SqshDataSuperblock *superblock);
 uint64_t sqsh_data_superblock_xattr_id_table_start(
-		const struct SqshSuperblock *superblock);
-uint64_t
-sqsh_data_superblock_inode_table_start(const struct SqshSuperblock *superblock);
+		const struct SqshDataSuperblock *superblock);
+uint64_t sqsh_data_superblock_inode_table_start(
+		const struct SqshDataSuperblock *superblock);
 uint64_t sqsh_data_superblock_directory_table_start(
-		const struct SqshSuperblock *superblock);
+		const struct SqshDataSuperblock *superblock);
 uint64_t sqsh_data_superblock_fragment_table_start(
-		const struct SqshSuperblock *superblock);
+		const struct SqshDataSuperblock *superblock);
 uint64_t sqsh_data_superblock_export_table_start(
-		const struct SqshSuperblock *superblock);
+		const struct SqshDataSuperblock *superblock);
 
 ////////////////////////////////////////
 // data/xattr_data.c
@@ -356,35 +371,40 @@ uint64_t sqsh_data_superblock_export_table_start(
 #define SQSH_SIZEOF_XATTR_LOOKUP_TABLE 16
 #define SQSH_SIZEOF_XATTR_ID_TABLE 16
 
-struct SQSH_UNALIGNED SqshXattrKey;
+struct SQSH_UNALIGNED SqshDataXattrKey;
 
-struct SQSH_UNALIGNED SqshXattrValue;
+struct SQSH_UNALIGNED SqshDataXattrValue;
 
-struct SQSH_UNALIGNED SqshXattrLookupTable;
+struct SQSH_UNALIGNED SqshDataXattrLookupTable;
 
-struct SQSH_UNALIGNED SqshXattrIdTable;
+struct SQSH_UNALIGNED SqshDataXattrIdTable;
 
-uint16_t sqsh_data_xattr_key_type(const struct SqshXattrKey *xattr_key);
-uint16_t sqsh_data_xattr_key_name_size(const struct SqshXattrKey *xattr_key);
-const uint8_t *sqsh_data_xattr_key_name(const struct SqshXattrKey *xattr_key);
+uint16_t sqsh_data_xattr_key_type(const struct SqshDataXattrKey *xattr_key);
+uint16_t
+sqsh_data_xattr_key_name_size(const struct SqshDataXattrKey *xattr_key);
+const uint8_t *
+sqsh_data_xattr_key_name(const struct SqshDataXattrKey *xattr_key);
 
-uint32_t sqsh_data_xattr_value_size(const struct SqshXattrValue *xattr_value);
-uint64_t sqsh_data_xattr_value_ref(const struct SqshXattrValue *xattr_value);
-const uint8_t *sqsh_data_xattr_value(const struct SqshXattrValue *xattr_value);
+uint32_t
+sqsh_data_xattr_value_size(const struct SqshDataXattrValue *xattr_value);
+uint64_t
+sqsh_data_xattr_value_ref(const struct SqshDataXattrValue *xattr_value);
+const uint8_t *
+sqsh_data_xattr_value(const struct SqshDataXattrValue *xattr_value);
 
 uint64_t sqsh_data_xattr_lookup_table_xattr_ref(
-		const struct SqshXattrLookupTable *lookup_table);
+		const struct SqshDataXattrLookupTable *lookup_table);
 uint32_t sqsh_data_xattr_lookup_table_count(
-		const struct SqshXattrLookupTable *lookup_table);
+		const struct SqshDataXattrLookupTable *lookup_table);
 uint32_t sqsh_data_xattr_lookup_table_size(
-		const struct SqshXattrLookupTable *lookup_table);
+		const struct SqshDataXattrLookupTable *lookup_table);
 
 uint64_t sqsh_data_xattr_id_table_xattr_table_start(
-		const struct SqshXattrIdTable *xattr_id_table);
+		const struct SqshDataXattrIdTable *xattr_id_table);
 uint32_t sqsh_data_xattr_id_table_xattr_ids(
-		const struct SqshXattrIdTable *xattr_id_table);
+		const struct SqshDataXattrIdTable *xattr_id_table);
 const uint64_t *
-sqsh_data_xattr_id_table(const struct SqshXattrIdTable *xattr_id_table);
+sqsh_data_xattr_id_table(const struct SqshDataXattrIdTable *xattr_id_table);
 
 #ifdef __cplusplus
 }
