@@ -57,25 +57,28 @@
 
 #define COLLISION_RESERVE_BITS 2
 
-static uint32_t
-hash_to_start_index(struct SqshLruHashmap *hashmap, uint64_t hash) {
-	union {
-		uint64_t hash;
-		uint8_t bytes[sizeof(uint64_t)];
-	} hash_bytes = {.hash = hash}, target_bytes = {0};
-
-	for (size_t i = 0; i < sizeof(uint64_t); i++) {
-		target_bytes.bytes[i] = hash_bytes.bytes[i] ^
-				hash_bytes.bytes[sizeof(uint64_t) - i - 1];
+static uint64_t
+djb2_hash(void *data, size_t size) {
+	uint64_t hash = 5381;
+	uint8_t *p = data;
+	for (size_t i = 0; i < size; i++) {
+		hash = ((hash << 5) + hash) + p[i];
 	}
+	return hash;
+}
+
+static uint32_t
+number_to_start_index(struct SqshLruHashmap *hashmap, uint64_t number) {
+	uint64_t hash = djb2_hash(&number, sizeof(uint64_t));
+
 	// reserve the lower COLLISION_RESERVE_BITS bits for collisions.
-	target_bytes.hash <<= COLLISION_RESERVE_BITS;
-	return target_bytes.hash % hashmap->size;
+	hash <<= COLLISION_RESERVE_BITS;
+	return hash % hashmap->size;
 }
 
 static struct SqshLruEntry *
 find_entry(struct SqshLruHashmap *hashmap, uint64_t hash, bool find_free) {
-	uint32_t start_index = hash_to_start_index(hashmap, hash);
+	uint32_t start_index = number_to_start_index(hashmap, hash);
 	sqsh_index_t i = 0, index = 0;
 	struct SqshLruEntry *candidate = NULL;
 
