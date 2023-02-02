@@ -32,6 +32,7 @@
  */
 
 #include "../utils.h"
+#include "sqsh_common.h"
 #include <sqsh.h>
 #include <sqsh_compression_private.h>
 #include <sqsh_context_private.h>
@@ -192,7 +193,7 @@ out:
 const uint8_t *
 sqsh_file_data(struct SqshFileContext *context) {
 	uint32_t block_size = context->block_size;
-	off_t offset = context->seek_pos % block_size;
+	sqsh_index_t offset = context->seek_pos % block_size;
 
 	if (sqsh_file_size(context) == 0) {
 		return NULL;

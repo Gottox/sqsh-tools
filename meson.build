@@ -79,8 +79,6 @@ sqsh_test = [
 libsqsh_deps = [ ]
 
 build_args = [
-	'-DVERSION="' + meson.project_version() + '"',
-	'-D_DEFAULT_SOURCE',
 	'-pthread'
 ]
 
@@ -147,10 +145,11 @@ if get_option('default_library') == 'both'
 endif
 
 if get_option('tools')
+	tool_build_args = build_args + ['-DVERSION="' + meson.project_version() + '"']
 	foreach p : [ 'sqsh-cat', 'sqsh-ls', 'sqsh-stat', 'sqsh-xattr', 'sqsh-unpack' ]
 		executable(p, 'bin/'+p+'.c',
 			install: not meson.is_subproject(),
-			c_args : build_args,
+			c_args : tool_build_args,
 			include_directories : 'include',
 			link_with : libsqsh
 		)
@@ -160,7 +159,7 @@ if get_option('tools')
 		executable('sqsh-mount',
 			'bin/sqsh-mount.c',
 			install: not meson.is_subproject(),
-			c_args : build_args,
+			c_args : tool_build_args,
 			dependencies: dependency('fuse3'),
 			include_directories : 'include',
 			link_with : libsqsh

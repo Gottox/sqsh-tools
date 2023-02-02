@@ -32,7 +32,7 @@
  */
 
 #define FUSE_USE_VERSION 35
-
+#define _DEFAULT_SOURCE
 #include <errno.h>
 #include <fuse.h>
 #include <stddef.h>

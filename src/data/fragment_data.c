@@ -31,6 +31,7 @@
  * @file         fragment_data.c
  */
 
+#define _DEFAULT_SOURCE
 #include <endian.h>
 #include <sqsh_data_private.h>
 

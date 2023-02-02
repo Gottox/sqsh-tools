@@ -31,6 +31,9 @@
  * @file         sqsh-ls.c
  */
 
+// TODO: remove _DEFAULT_SOURCE when references to S_ISUID, S_ISGID, S_ISVTX are
+// removed.
+#define _DEFAULT_SOURCE
 #include "common.h"
 #include <sqsh_context.h>
 #include <sqsh_iterator.h>
@@ -109,6 +112,7 @@ print_detail_inode(struct SqshInodeContext *inode, const char *path) {
 		putchar((S_IW##t & mode) ? 'w' : '-'); \
 		putchar((S_IX##t & mode) ? xchar : unxchar); \
 	}
+	// TODO: these macros depend on system specific values
 	xchar = (S_ISUID & mode) ? 's' : 'x';
 	unxchar = (S_ISUID & mode) ? 'S' : '-';
 	PRINT_MODE(USR);
