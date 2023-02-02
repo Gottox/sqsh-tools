@@ -28,6 +28,28 @@ developing efficient cache tactics.
 * open remote file systems through http (needs *libcurl*)
 * ... much more
 
+## building
+
+### dependencies
+
+* libc
+* libcurl *optional*
+* zlib *optional*
+* liblz4 *optional*
+* liblzma *optional*
+* lzo2 *optional*
+* libzstd *optional*
+* fuse3 *optional*
+
+### compile & install
+
+```bash
+meson setup build
+cd build
+meson compile
+meson install
+```
+
 ## How to...?
 
 ### ... open an archive?
