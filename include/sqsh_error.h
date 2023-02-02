@@ -44,6 +44,7 @@ extern "C" {
 // error.c
 #define SQSH_ERROR_SECTION (1 << 8)
 enum SqshError {
+	SQSH_SUCCESS = 0,
 	// Avoid collisions with errno
 	SQSH_ERROR_SUPERBLOCK_TOO_SMALL = SQSH_ERROR_SECTION + 1,
 	SQSH_ERROR_WRONG_MAGIC,

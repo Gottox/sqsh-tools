@@ -60,6 +60,8 @@ sqsh_error_str(int error_code) {
 		return strerror(error_code);
 	}
 	switch ((enum SqshError)error_code) {
+	case SQSH_SUCCESS:
+		return "Success";
 	case SQSH_ERROR_NO_COMPRESSION_OPTIONS:
 		return "No compression options";
 	case SQSH_ERROR_SUPERBLOCK_TOO_SMALL:
