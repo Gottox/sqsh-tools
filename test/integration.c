@@ -100,6 +100,7 @@ sqsh_ls(void) {
 	assert(rv == 0);
 
 	iter = sqsh_directory_iterator_new(&inode, &rv);
+	assert(iter != NULL);
 	assert(rv == 0);
 
 	rv = sqsh_directory_iterator_next(iter);
@@ -365,6 +366,7 @@ sqsh_test_xattr(void) {
 	assert(rv == 0);
 
 	xattr_iter = sqsh_xattr_iterator_new(&inode, &rv);
+	assert(xattr_iter != NULL);
 	assert(rv == 0);
 	rv = sqsh_xattr_iterator_next(xattr_iter);
 	assert(rv == 0);
@@ -372,6 +374,7 @@ sqsh_test_xattr(void) {
 	assert(rv == 0);
 
 	dir_iter = sqsh_directory_iterator_new(&inode, &rv);
+	assert(dir_iter != NULL);
 	assert(rv == 0);
 
 	rv = sqsh_directory_iterator_next(dir_iter);
@@ -383,6 +386,7 @@ sqsh_test_xattr(void) {
 	entry_inode = sqsh_directory_iterator_inode_load(dir_iter, &rv);
 	assert(rv == 0);
 	xattr_iter = sqsh_xattr_iterator_new(entry_inode, &rv);
+	assert(xattr_iter != NULL);
 	assert(rv == 0);
 	rv = sqsh_xattr_iterator_next(xattr_iter);
 	assert(rv > 0);
@@ -411,6 +415,7 @@ sqsh_test_xattr(void) {
 	entry_inode = sqsh_directory_iterator_inode_load(dir_iter, &rv);
 	assert(rv == 0);
 	xattr_iter = sqsh_xattr_iterator_new(entry_inode, &rv);
+	assert(xattr_iter != NULL);
 	assert(rv == 0);
 	rv = sqsh_xattr_iterator_next(xattr_iter);
 	assert(rv > 0);
