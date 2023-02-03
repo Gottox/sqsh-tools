@@ -4,9 +4,9 @@
  * @created     : Wednesday Nov 09, 2022 11:08:10 CET
  */
 
+#include "../../include/sqsh_error.h"
+#include "../../include/sqsh_primitive.h"
 #include "../utils.h"
-#include <sqsh_error.h>
-#include <sqsh_primitive.h>
 
 SQSH_NO_UNUSED int
 sqsh_slice_init(struct SqshSlice *slice, const uint8_t *data, size_t size) {

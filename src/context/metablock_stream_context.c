@@ -31,10 +31,10 @@
  * @file         metablock_stream_context.c
  */
 
+#include "../../include/sqsh_context_private.h"
+#include "../../include/sqsh_data.h"
+#include "../../include/sqsh_error.h"
 #include "../utils.h"
-#include <sqsh_context_private.h>
-#include <sqsh_data.h>
-#include <sqsh_error.h>
 
 SQSH_NO_UNUSED int
 sqsh__metablock_stream_init(

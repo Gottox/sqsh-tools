@@ -31,14 +31,14 @@
  * @file         xattr_iterator.c
  */
 
+#include "../../include/sqsh.h"
+#include "../../include/sqsh_context.h"
+#include "../../include/sqsh_iterator_private.h"
 #include "../utils.h"
-#include <sqsh.h>
-#include <sqsh_context.h>
-#include <sqsh_iterator_private.h>
 // TODO: this should be replaced with the non-private version
-#include <sqsh_data_private.h>
-#include <sqsh_error.h>
-#include <sqsh_table.h>
+#include "../../include/sqsh_data_private.h"
+#include "../../include/sqsh_error.h"
+#include "../../include/sqsh_table.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>

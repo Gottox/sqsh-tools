@@ -32,8 +32,8 @@
  */
 
 #define _DEFAULT_SOURCE
+#include "../../include/sqsh_data_private.h"
 #include <endian.h>
-#include <sqsh_data_private.h>
 
 uint32_t
 sqsh_data_compression_options_gzip_compression_level(

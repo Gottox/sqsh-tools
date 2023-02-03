@@ -31,10 +31,10 @@
  * @file         curl_mapper.c
  */
 
+#include "../../include/sqsh_data.h"
+#include "../../include/sqsh_error.h"
+#include "../../include/sqsh_mapper.h"
 #include "../utils.h"
-#include <sqsh_data.h>
-#include <sqsh_error.h>
-#include <sqsh_mapper.h>
 
 #include <curl/curl.h>
 #include <errno.h>

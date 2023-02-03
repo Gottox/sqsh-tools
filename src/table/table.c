@@ -31,11 +31,11 @@
  * @file         table.c
  */
 
+#include "../../include/sqsh.h"
+#include "../../include/sqsh_context_private.h"
+#include "../../include/sqsh_error.h"
+#include "../../include/sqsh_table_private.h"
 #include "../utils.h"
-#include <sqsh.h>
-#include <sqsh_context_private.h>
-#include <sqsh_error.h>
-#include <sqsh_table_private.h>
 #include <stdint.h>
 #include <string.h>
 

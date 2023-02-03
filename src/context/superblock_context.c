@@ -31,9 +31,9 @@
  * @file         superblock_context.c
  */
 
-#include <sqsh_context_private.h>
-#include <sqsh_data.h>
-#include <sqsh_error.h>
+#include "../../include/sqsh_context_private.h"
+#include "../../include/sqsh_data.h"
+#include "../../include/sqsh_error.h"
 #include <stdint.h>
 
 static const uint32_t SUPERBLOCK_MAGIC = 0x73717368;

@@ -32,8 +32,8 @@
  */
 
 #define _DEFAULT_SOURCE
+#include "../../include/sqsh_data_private.h"
 #include <endian.h>
-#include <sqsh_data_private.h>
 
 int
 sqsh_data_metablock_is_compressed(const struct SqshDataMetablock *metablock) {

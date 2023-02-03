@@ -31,11 +31,11 @@
  * @file         lz4.c
  */
 
+#include "../../include/sqsh_compression_private.h"
+#include "../../include/sqsh_context.h"
+#include "../../include/sqsh_data.h"
+#include "../../include/sqsh_error.h"
 #include <lz4.h>
-#include <sqsh_compression_private.h>
-#include <sqsh_context.h>
-#include <sqsh_data.h>
-#include <sqsh_error.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>

@@ -31,9 +31,9 @@
  * @file         ref_count.c
  */
 
+#include "../../include/sqsh_error.h"
+#include "../../include/sqsh_primitive.h"
 #include "../utils.h"
-#include <sqsh_error.h>
-#include <sqsh_primitive.h>
 #include <stdlib.h>
 
 static void *

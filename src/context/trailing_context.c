@@ -31,9 +31,9 @@
  * @file        : trailing_context.c
  */
 
+#include "../../include/sqsh.h"
+#include "../../include/sqsh_context.h"
 #include "../utils.h"
-#include <sqsh.h>
-#include <sqsh_context.h>
 
 int
 sqsh_trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh) {

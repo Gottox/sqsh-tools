@@ -31,9 +31,9 @@
  * @file         mmap_full_mapper.c
  */
 
+#include "../../include/sqsh_mapper.h"
 #include <errno.h>
 #include <fcntl.h>
-#include <sqsh_mapper.h>
 #include <stdint.h>
 #include <sys/mman.h>
 #include <sys/stat.h>

@@ -31,9 +31,9 @@
  * @file         compression_option_context.c
  */
 
-#include <sqsh.h>
-#include <sqsh_context_private.h>
-#include <sqsh_data.h>
+#include "../../include/sqsh.h"
+#include "../../include/sqsh_context_private.h"
+#include "../../include/sqsh_data.h"
 #include <stdint.h>
 
 static const union SqshCompressionOptions *

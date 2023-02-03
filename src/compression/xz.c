@@ -31,10 +31,10 @@
  * @file         xz.c
  */
 
+#include "../../include/sqsh_compression_private.h"
+#include "../../include/sqsh_data.h"
+#include "../../include/sqsh_error.h"
 #include <lzma.h>
-#include <sqsh_compression_private.h>
-#include <sqsh_data.h>
-#include <sqsh_error.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>

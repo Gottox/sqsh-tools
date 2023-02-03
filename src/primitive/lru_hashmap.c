@@ -31,8 +31,8 @@
  * @file         lru_hashmap.c
  */
 
-#include <sqsh_error.h>
-#include <sqsh_primitive.h>
+#include "../../include/sqsh_error.h"
+#include "../../include/sqsh_primitive.h"
 
 #include <stdbool.h>
 #include <stdint.h>
