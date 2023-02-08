@@ -78,13 +78,18 @@ out:
 static size_t
 header_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
 	static const char *format =
-			"Content-Range: bytes %" PRIu64 "-%" PRIu64 "/%" PRIu64 "\r\n%n";
-	int rv = 0;
+			"Content-Range: bytes %" PRIu64 "-%" PRIu64 "/%" PRIu64 "\r\n%zn";
+	size_t len = 0;
 	uint64_t start = 0;
 	uint64_t end = 0;
 	uint64_t total = 0;
-	size_t header_size = size * nitems;
+	int scanned_fields = 0;
+	size_t header_size;
 	struct SqshMapping *mapping = (struct SqshMapping *)userdata;
+
+	if (SQSH_MULT_OVERFLOW(size, nitems, &header_size)) {
+		return 0;
+	}
 
 	if (header_size < CONTENT_RANGE_LENGTH) {
 		return header_size;
@@ -97,10 +102,9 @@ header_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
 	if (header == NULL) {
 		return 0;
 	}
-	rv = 0;
-	sscanf(header, format, &start, &end, &total, &rv);
+	scanned_fields = sscanf(header, format, &start, &end, &total, &len);
 
-	if ((size_t)rv != header_size) {
+	if ((size_t)len != header_size || scanned_fields != 3) {
 		free(header);
 		return 0;
 	}
@@ -213,7 +217,7 @@ static int
 sqsh_mapping_curl_resize(struct SqshMapping *mapping, size_t new_size) {
 	int rv = 0;
 	char range_buffer[512] = {0};
-	CURL *handle = get_handle(mapping);
+	CURL *handle = NULL;
 	new_size = SQSH_PADDING(new_size, 512);
 	size_t current_size = sqsh_mapping_size(mapping);
 	uint64_t new_offset = mapping->data.cl.offset + current_size;
@@ -238,6 +242,7 @@ sqsh_mapping_curl_resize(struct SqshMapping *mapping, size_t new_size) {
 		rv = -SQSH_ERROR_MAPPER_MAP;
 		goto out;
 	}
+	handle = get_handle(mapping);
 	curl_easy_setopt(handle, CURLOPT_RANGE, range_buffer);
 	curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_data);
 	curl_easy_setopt(handle, CURLOPT_WRITEDATA, mapping);
