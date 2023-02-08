@@ -7,6 +7,10 @@
 
 #define BIN_COMMON_H
 
+#ifndef _DEFAULT_SOURCE
+#	define _DEFAULT_SOURCE
+#endif
+
 #include <ctype.h>
 #include <sqsh.h>
 #include <string.h>

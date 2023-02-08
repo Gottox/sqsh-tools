@@ -31,10 +31,8 @@
  * @file         sqsh-ls.c
  */
 
-// TODO: remove _DEFAULT_SOURCE when references to S_ISUID, S_ISGID, S_ISVTX are
-// removed.
-#define _DEFAULT_SOURCE
 #include "common.h"
+
 #include <sqsh_context.h>
 #include <sqsh_iterator.h>
 

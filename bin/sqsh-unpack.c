@@ -31,8 +31,8 @@
  * @file         sqsh-unpack.c
  */
 
-#define _DEFAULT_SOURCE
 #include "common.h"
+
 #include <sqsh_context.h>
 #include <sqsh_iterator.h>
 

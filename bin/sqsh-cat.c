@@ -32,6 +32,7 @@
  */
 
 #include "common.h"
+
 #include <sqsh_context.h>
 
 #include <assert.h>

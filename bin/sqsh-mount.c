@@ -31,18 +31,19 @@
  * @file         sqsh-mount.c
  */
 
+#include "common.h"
+
+#include "../src/utils.h"
+#include <sqsh_context.h>
+#include <sqsh_iterator.h>
+
 #define FUSE_USE_VERSION 35
-#define _DEFAULT_SOURCE
 #include <errno.h>
 #include <fuse.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-
-#include "../src/utils.h"
-#include "common.h"
-#include <sqsh_context.h>
-#include <sqsh_iterator.h>
+#include <sys/stat.h>
 
 static struct {
 	struct Sqsh *sqsh;
