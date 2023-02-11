@@ -76,7 +76,7 @@ out:
 }
 
 static int
-parse_content_range(CURL *handle, uint64_t *total) {
+get_total_size(CURL *handle, uint64_t *total) {
 	int rv = 0;
 	int dummy;
 	struct curl_header *header = NULL;
@@ -86,20 +86,38 @@ parse_content_range(CURL *handle, uint64_t *total) {
 	rv = curl_easy_header(
 			handle, "Content-Range", 0, CURLH_HEADER, -1, &header);
 	if (rv != CURLE_OK) {
-		return -SQSH_ERROR_INVALID_RANGE_HEADER;
+		return -SQSH_ERROR_CURL_INVALID_RANGE_HEADER;
 	}
 
 	scanned_fields = sscanf(header->value, format, &dummy, &dummy, total);
 
 	if (scanned_fields != 3) {
-		return -SQSH_ERROR_INVALID_RANGE_HEADER;
+		return -SQSH_ERROR_CURL_INVALID_RANGE_HEADER;
 	}
 
 	return 0;
 }
 
+static int
+get_file_time(CURL *handle, uint64_t *file_time) {
+	curl_off_t file_time_t;
+	int rv;
+
+	rv = curl_easy_getinfo(handle, CURLINFO_FILETIME_T, &file_time_t);
+	// According to curl docs, file_time_t is set to -1 if the server does not
+	// report a file time. We treat this as an error as we need to detect if
+	// the file has changed.
+	if (rv != CURLE_OK || file_time_t < 0) {
+		return -SQSH_ERROR_MAPPER_MAP;
+	}
+	// We checked for negative values above, so this cast should be safe.
+	*file_time = (uint64_t)file_time_t;
+
+	return 0;
+}
+
 static CURL *
-get_handle(struct SqshMapping *mapping) {
+configure_handle(struct SqshMapping *mapping) {
 	CURL *handle = mapping->mapper->data.cl.handle;
 	pthread_mutex_lock(&mapping->mapper->data.cl.handle_lock);
 	curl_easy_reset(handle);
@@ -113,9 +131,9 @@ get_handle(struct SqshMapping *mapping) {
 }
 
 static void
-release_handle(struct SqshMapper *mapper, CURL *handle) {
-	if (handle == mapper->data.cl.handle) {
-		pthread_mutex_unlock(&mapper->data.cl.handle_lock);
+release_handle(struct SqshMapping *mapping, CURL *handle) {
+	if (handle == mapping->mapper->data.cl.handle) {
+		pthread_mutex_unlock(&mapping->mapper->data.cl.handle_lock);
 	}
 }
 
@@ -142,8 +160,6 @@ sqsh_mapper_curl_init(
 	if (rv < 0) {
 		goto out;
 	}
-	mapper->data.cl.expected_size = mapping.data.cl.total_size;
-	mapper->data.cl.expected_time = mapping.data.cl.file_time;
 	sqsh_mapping_unmap(&mapping);
 
 out:
@@ -189,6 +205,7 @@ sqsh_mapping_curl_unmap(struct SqshMapping *mapping) {
 	sqsh_buffer_cleanup(&mapping->data.cl.buffer);
 	return 0;
 }
+
 static const uint8_t *
 sqsh_mapping_curl_data(const struct SqshMapping *mapping) {
 	return sqsh_buffer_data(&mapping->data.cl.buffer);
@@ -196,26 +213,32 @@ sqsh_mapping_curl_data(const struct SqshMapping *mapping) {
 
 static int
 sqsh_mapping_curl_resize(struct SqshMapping *mapping, size_t new_size) {
-	int rv = 0;
-	char range_buffer[512] = {0};
-	CURL *handle = NULL;
+	// TODO: Declutter the initialisation of this function. Also check for
+	// integer overflows.
+	const uint64_t expected_size = mapping->mapper->data.cl.expected_size;
+	const uint64_t expected_time = mapping->mapper->data.cl.expected_time;
+
 	new_size = SQSH_PADDING(new_size, 512);
+
+	int rv = 0;
+	// The actual max-size this string should ever use is 42, but we
+	// add some padding to be a nice number. Not that 42 isn't nice.
+	char range_buffer[64] = {0};
+	CURL *handle = NULL;
 	size_t current_size = sqsh_mapping_size(mapping);
-	uint64_t new_offset = mapping->data.cl.offset + current_size;
-	uint64_t end_offset = new_offset + new_size - current_size - 1;
+	const uint64_t new_offset = mapping->data.cl.offset + current_size;
+	// The end offset is capped at the expected size. That's the size
+	// we expect the file to have.
+	const uint64_t end_offset =
+			SQSH_MIN(new_offset + new_size - current_size, expected_size) - 1;
+	uint64_t total_size = UINT64_MAX;
+	uint64_t file_time = UINT64_MAX;
 	long http_code = 0;
-	uint64_t expected_size = mapping->mapper->data.cl.expected_size;
-	uint64_t expected_time = mapping->mapper->data.cl.expected_time;
 
 	if (new_size <= current_size) {
 		return 0;
 	}
 
-	if (end_offset > mapping->mapper->data.cl.expected_size - 1) {
-		end_offset = mapping->mapper->data.cl.expected_size - 1;
-	}
-
-	// TODO: check for negative values of offset
 	rv = snprintf(
 			range_buffer, sizeof(range_buffer), "%" PRIu64 "-%" PRIu64,
 			new_offset, end_offset);
@@ -223,7 +246,7 @@ sqsh_mapping_curl_resize(struct SqshMapping *mapping, size_t new_size) {
 		rv = -SQSH_ERROR_MAPPER_MAP;
 		goto out;
 	}
-	handle = get_handle(mapping);
+	handle = configure_handle(mapping);
 	curl_easy_setopt(handle, CURLOPT_RANGE, range_buffer);
 	curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_data);
 	curl_easy_setopt(handle, CURLOPT_WRITEDATA, mapping);
@@ -240,38 +263,39 @@ sqsh_mapping_curl_resize(struct SqshMapping *mapping, size_t new_size) {
 		goto out;
 	}
 
-	rv = parse_content_range(handle, &mapping->data.cl.total_size);
+	rv = get_total_size(handle, &total_size);
 	if (rv < 0) {
 		goto out;
 	}
 
-	uint64_t file_time;
-	rv = curl_easy_getinfo(handle, CURLINFO_FILETIME, &file_time);
-	if (rv != CURLE_OK) {
-		rv = -SQSH_ERROR_MAPPER_MAP;
-		goto out;
-	}
-	rv = 0;
-	mapping->data.cl.file_time = file_time;
-
-	if (file_time == UINT64_MAX) {
-		rv = -SQSH_ERROR_MAPPER_MAP;
+	rv = get_file_time(handle, &file_time);
+	if (rv < 0) {
 		goto out;
 	}
 
-	if (expected_time != UINT64_MAX && file_time != expected_time) {
+	// UINT64_MAX is used to indicate, that expected_time or expected_size
+	// has not been set yet. If the server reports UINT64_MAX, something fishy
+	// is going on, so we bail out here.
+	if (total_size == UINT64_MAX || file_time == UINT64_MAX) {
 		rv = -SQSH_ERROR_MAPPER_MAP;
 		goto out;
 	}
 
-	if (expected_size != UINT64_MAX &&
-		mapping->data.cl.total_size != expected_size) {
+	if (expected_time == UINT64_MAX) {
+		mapping->mapper->data.cl.expected_time = file_time;
+	} else if (file_time != expected_time) {
 		rv = -SQSH_ERROR_MAPPER_MAP;
 		goto out;
 	}
 
+	if (expected_size == UINT64_MAX) {
+		mapping->mapper->data.cl.expected_size = total_size;
+	} else if (total_size != expected_size) {
+		rv = -SQSH_ERROR_MAPPER_MAP;
+		goto out;
+	}
 out:
-	release_handle(mapping->mapper, handle);
+	release_handle(mapping, handle);
 	return rv;
 }
 

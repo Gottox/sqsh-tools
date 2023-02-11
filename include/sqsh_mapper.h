@@ -82,8 +82,6 @@ struct SqshCurlMap {
 	 */
 	struct SqshBuffer buffer;
 	uint64_t offset;
-	uint64_t total_size;
-	uint64_t file_time;
 };
 
 extern struct SqshMemoryMapperImpl sqsh_mapper_impl_curl;
