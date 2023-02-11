@@ -142,6 +142,8 @@ sqsh_error_str(int error_code) {
 		return "Compression unkown";
 	case SQSH_ERROR_INDEX_OUT_OF_BOUNDS:
 		return "Index out of bounds";
+	case SQSH_ERROR_INVALID_RANGE_HEADER:
+		return "Invalid range header";
 	case SQSH_ERROR_TODO:
 		return "Todo";
 	}

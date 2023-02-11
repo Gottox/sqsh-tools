@@ -75,44 +75,27 @@ out:
 	return rv;
 }
 
-static size_t
-header_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
-	static const char *format =
-			"Content-Range: bytes %" PRIu64 "-%" PRIu64 "/%" PRIu64 "\r\n%zn";
-	size_t len = 0;
-	uint64_t start = 0;
-	uint64_t end = 0;
-	uint64_t total = 0;
-	int scanned_fields = 0;
-	size_t header_size;
-	struct SqshMapping *mapping = (struct SqshMapping *)userdata;
+static int
+parse_content_range(CURL *handle, uint64_t *total) {
+	int rv = 0;
+	int dummy;
+	struct curl_header *header = NULL;
+	static const char *format = "bytes %" PRIu64 "-%" PRIu64 "/%" PRIu64;
+	int scanned_fields;
 
-	if (SQSH_MULT_OVERFLOW(size, nitems, &header_size)) {
-		return 0;
+	rv = curl_easy_header(
+			handle, "Content-Range", 0, CURLH_HEADER, -1, &header);
+	if (rv != CURLE_OK) {
+		return -SQSH_ERROR_INVALID_RANGE_HEADER;
 	}
 
-	if (header_size < CONTENT_RANGE_LENGTH) {
-		return header_size;
-	}
-	if (strncmp(buffer, CONTENT_RANGE, CONTENT_RANGE_LENGTH) != 0) {
-		return header_size;
-	}
+	scanned_fields = sscanf(header->value, format, &dummy, &dummy, total);
 
-	char *header = sqsh_memdup(buffer, header_size);
-	if (header == NULL) {
-		return 0;
-	}
-	scanned_fields = sscanf(header, format, &start, &end, &total, &len);
-
-	if ((size_t)len != header_size || scanned_fields != 3) {
-		free(header);
-		return 0;
+	if (scanned_fields != 3) {
+		return -SQSH_ERROR_INVALID_RANGE_HEADER;
 	}
 
-	mapping->data.cl.total_size = total;
-
-	free(header);
-	return header_size;
+	return 0;
 }
 
 static CURL *
@@ -126,8 +109,6 @@ get_handle(struct SqshMapping *mapping) {
 	curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1L);
 	curl_easy_setopt(handle, CURLOPT_FAILONERROR, 1L);
 	curl_easy_setopt(handle, CURLOPT_FILETIME, 1L);
-	curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, header_callback);
-	curl_easy_setopt(handle, CURLOPT_HEADERDATA, mapping);
 	return handle;
 }
 
@@ -254,9 +235,13 @@ sqsh_mapping_curl_resize(struct SqshMapping *mapping, size_t new_size) {
 	}
 
 	rv = curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &http_code);
-
 	if (http_code != 206 || rv != CURLE_OK) {
 		rv = -SQSH_ERROR_MAPPER_MAP;
+		goto out;
+	}
+
+	rv = parse_content_range(handle, &mapping->data.cl.total_size);
+	if (rv < 0) {
 		goto out;
 	}
 
