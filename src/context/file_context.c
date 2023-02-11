@@ -124,6 +124,7 @@ sqsh_file_read(struct SqshFileContext *context, uint64_t size) {
 	uint32_t block_count = sqsh_inode_file_block_count(context->inode);
 	uint64_t block_offset = datablock_offset(context, block_index);
 	uint64_t block_whole_size;
+	uint64_t mapping_offset;
 
 	uint32_t outer_block_size;
 	uint64_t outer_offset = 0;
@@ -133,10 +134,11 @@ sqsh_file_read(struct SqshFileContext *context, uint64_t size) {
 				&block_whole_size)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
-	// TODO: Handle integer overflow when adding start_block to block_offset
+	if (SQSH_ADD_OVERFLOW(start_block, block_offset, &mapping_offset)) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
 	rv = sqsh_mapper_map(
-			&mapping, context->mapper, start_block + block_offset,
-			block_whole_size);
+			&mapping, context->mapper, mapping_offset, block_whole_size);
 
 	if (rv < 0) {
 		goto out;
@@ -163,9 +165,10 @@ sqsh_file_read(struct SqshFileContext *context, uint64_t size) {
 		if (rv < 0) {
 			goto out;
 		}
-		// TODO: Handle integer overflow when adding outer_offset to
-		// outer_block_size.
-		outer_offset += outer_block_size;
+		if (SQSH_ADD_OVERFLOW(outer_offset, outer_block_size, &outer_offset)) {
+			rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+			goto out;
+		}
 	}
 
 	if (sqsh_file_size(context) < size) {
