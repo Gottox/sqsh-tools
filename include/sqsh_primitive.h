@@ -227,12 +227,13 @@ struct SqshRefCount {
 /**
  * @brief Initialize a SqshRefCount struct.
  * @memberof SqshRefCount
- * @param[out] ref_count A pointer to the SqshRefCount struct.
  * @param[in] object_size The size of the object to be reference counted.
  * reaches 0.
- * @return 0 on success, less than 0 on error.
+ * @param[out] err A pointer to an int that will be set to 0 on success and
+ * less than 0 on error.
+ * @return A pointer to the SqshRefCount struct.
  */
-int sqsh_ref_count_new(struct SqshRefCount **ref_count, size_t object_size);
+struct SqshRefCount *sqsh_ref_count_new(size_t object_size, int *err);
 
 /**
  * @brief Increment the reference count of a SqshRefCount struct.

@@ -41,22 +41,23 @@ get_data(struct SqshRefCount *ref_count) {
 	return (void *)&ref_count[1];
 }
 
-int
-sqsh_ref_count_new(struct SqshRefCount **ref_count, size_t object_size) {
+struct SqshRefCount *
+sqsh_ref_count_new(size_t object_size, int *err) {
 	struct SqshRefCount *ptr;
 	size_t outer_size = 0;
 	if (SQSH_ADD_OVERFLOW(
 				sizeof(struct SqshRefCount), object_size, &outer_size)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
+		*err = -SQSH_ERROR_INTEGER_OVERFLOW;
+		return NULL;
 	}
 	ptr = calloc(1, outer_size);
 	if (ptr == NULL) {
-		return -SQSH_ERROR_MALLOC_FAILED;
+		*err = -SQSH_ERROR_MALLOC_FAILED;
+		return NULL;
 	}
 
 	ptr->references = 0;
-	*ref_count = ptr;
-	return 0;
+	return ptr;
 }
 
 void *

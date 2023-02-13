@@ -45,10 +45,12 @@ dummy_dtor(void *pointer) {
 
 static void
 init_refcount(void) {
+	int rv = 0;
 	struct SqshRefCount *ref = NULL;
 	int *my_int;
 
-	sqsh_ref_count_new(&ref, sizeof(int));
+	ref = sqsh_ref_count_new(sizeof(int), &rv);
+	assert(rv == 0);
 	my_int = sqsh_ref_count_retain(ref);
 	sqsh_ref_count_release(ref, dummy_dtor);
 	(void)my_int;
