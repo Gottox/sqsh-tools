@@ -60,8 +60,6 @@ struct Sqsh {
 	struct SqshMapper mapper;
 	struct SqshCompression data_compression;
 	struct SqshCompression metablock_compression;
-	struct SqshMapper table_mapper;
-	struct SqshMapping table_map;
 	struct SqshSuperblockContext superblock;
 	struct SqshTable id_table;
 	struct SqshTable export_table;
