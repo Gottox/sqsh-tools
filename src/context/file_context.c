@@ -38,8 +38,6 @@
 #include "../../include/sqsh_table.h"
 #include "../utils.h"
 #include "sqsh_common.h"
-#include <stdint.h>
-#include <stdio.h>
 
 static uint64_t
 datablock_offset(struct SqshFileContext *context, uint32_t block_index) {
@@ -112,84 +110,79 @@ sqsh_file_seek(struct SqshFileContext *context, uint64_t seek_pos) {
 	return 0;
 }
 
-int
-sqsh_file_read(struct SqshFileContext *context, uint64_t size) {
-	int rv = 0;
-	struct SqshMapping mapping = {0};
-	struct SqshFragmentTable *table = context->fragment_table;
+static int
+attach_fragment(struct SqshFileContext *context, const uint64_t size) {
+	const struct SqshFragmentTable *table = context->fragment_table;
+	const struct SqshInodeContext *inode = context->inode;
 	struct SqshBuffer *buffer = &context->buffer;
-	uint64_t start_block = sqsh_inode_file_blocks_start(context->inode);
-	bool is_compressed;
+	int rv = 0;
+
+	if (sqsh_file_size(context) >= size) {
+		return 0;
+	}
+
+	if (!sqsh_inode_file_has_fragment(inode)) {
+		return -SQSH_ERROR_TODO;
+	}
+
+	rv = sqsh_fragment_table_to_buffer(table, inode, buffer);
+	if (rv < 0) {
+		return rv;
+	}
+
+	if (sqsh_file_size(context) < size) {
+		return -SQSH_ERROR_TODO;
+	}
+
+	return 0;
+}
+
+int
+sqsh_file_read(struct SqshFileContext *context, const uint64_t size) {
+	int rv = 0;
+	const uint64_t start_block = sqsh_inode_file_blocks_start(context->inode);
+	const uint32_t block_count = sqsh_inode_file_block_count(context->inode);
+
+	struct SqshMapCursor cursor = {0};
+	struct SqshBuffer *buffer = &context->buffer;
 	uint32_t block_index = context->seek_pos / context->block_size;
-	uint32_t block_count = sqsh_inode_file_block_count(context->inode);
 	uint64_t block_offset = datablock_offset(context, block_index);
-	uint64_t block_whole_size;
-	uint64_t mapping_offset;
 
-	uint32_t outer_block_size;
-	uint64_t outer_offset = 0;
-
-	if (SQSH_SUB_OVERFLOW(
-				datablock_offset(context, block_count), block_offset,
-				&block_whole_size)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
-	if (SQSH_ADD_OVERFLOW(start_block, block_offset, &mapping_offset)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
-	rv = sqsh_mapper_map(
-			&mapping, context->mapper, mapping_offset, block_whole_size);
-
+	// TODO: check for a sane upper limit.
+	rv = sqsh__map_cursor_init(
+			&cursor, context->mapper, start_block, UINT64_MAX);
 	if (rv < 0) {
 		goto out;
-	}
-	if (sqsh_inode_file_size(context->inode) > size) {
-		rv = -SQSH_ERROR_SIZE_MISSMATCH;
 	}
 
 	for (; block_index < block_count && sqsh_file_size(context) < size;
 		 block_index++) {
-		is_compressed = sqsh_inode_file_block_is_compressed(
-				context->inode, block_index);
-		outer_block_size =
+		const uint32_t block_size =
 				sqsh_inode_file_block_size(context->inode, block_index);
+		const bool is_compressed = sqsh_inode_file_block_is_compressed(
+				context->inode, block_index);
+		rv = sqsh__map_cursor_advance(&cursor, block_offset, block_size);
+		if (rv < 0) {
+			goto out;
+		}
 
-		const uint8_t *data = &sqsh_mapping_data(&mapping)[outer_offset];
-		const size_t size = outer_block_size;
+		const uint8_t *data = sqsh__map_cursor_data(&cursor);
 		if (is_compressed) {
 			rv = sqsh__compression_decompress_to_buffer(
-					context->compression, buffer, data, size);
+					context->compression, buffer, data, block_size);
 		} else {
-			rv = sqsh_buffer_append(buffer, data, size);
+			rv = sqsh_buffer_append(buffer, data, block_size);
 		}
-		if (rv < 0) {
-			goto out;
-		}
-		if (SQSH_ADD_OVERFLOW(outer_offset, outer_block_size, &outer_offset)) {
-			rv = -SQSH_ERROR_INTEGER_OVERFLOW;
-			goto out;
-		}
+		block_offset = block_size;
 	}
 
-	if (sqsh_file_size(context) < size) {
-		if (!sqsh_inode_file_has_fragment(context->inode)) {
-			rv = -SQSH_ERROR_TODO;
-			goto out;
-		}
-
-		rv = sqsh_fragment_table_to_buffer(table, context->inode, buffer);
-		if (rv < 0) {
-			goto out;
-		}
-
-		if (sqsh_file_size(context) < size) {
-			rv = -SQSH_ERROR_TODO;
-			goto out;
-		}
+	rv = attach_fragment(context, size);
+	if (rv < 0) {
+		goto out;
 	}
 
 out:
-	sqsh_mapping_unmap(&mapping);
+	sqsh__map_cursor_cleanup(&cursor);
 	return rv;
 }
 

@@ -290,6 +290,64 @@ const uint8_t *sqsh_mapping_data(const struct SqshMapping *mapping);
  */
 int sqsh_mapping_unmap(struct SqshMapping *mapping);
 
+////////////////////////////////////////
+// mapper/cursor.c
+
+struct SqshMapCursor {
+	/**
+	 * @privatesection
+	 */
+	sqsh_index_t offset;
+	uint64_t upper_limit;
+	size_t size;
+	struct SqshMapping mapping;
+	struct SqshMapper *mapper;
+};
+
+/**
+ * @memberof SqshMapCursor
+ * @brief Initializes a mapping cursor
+ *
+ * @param cursor The cursor to initialize
+ * @param mapper The mapper to use
+ * @param start_address The start address of the cursor
+ * @param upper_limit The upper limit of the cursor
+ * @return 0 on success, negative on error
+ */
+int sqsh__map_cursor_init(
+		struct SqshMapCursor *cursor, struct SqshMapper *mapper,
+		const uint64_t start_address, uint64_t upper_limit);
+
+/**
+ * @memberof SqshMapCursor
+ * @brief Advances the cursor
+ *
+ * @param cursor The cursor to advance
+ * @param offset The offset to advance to
+ * @param size The size to advance
+ * @return 0 on success, negative on error
+ */
+int sqsh__map_cursor_advance(
+		struct SqshMapCursor *cursor, sqsh_index_t offset, size_t size);
+
+/**
+ * @memberof SqshMapCursor
+ * @brief Returns the current data of the cursor
+ *
+ * @param cursor The cursor to get the data from
+ * @return The current data of the cursor
+ */
+const uint8_t *sqsh__map_cursor_data(struct SqshMapCursor *cursor);
+
+/**
+ * @memberof SqshMapCursor
+ * @brief Cleans up the cursor
+ *
+ * @param cursor The cursor to clean up
+ * @return 0 on success, negative on error
+ */
+int sqsh__map_cursor_cleanup(struct SqshMapCursor *cursor);
+
 #ifdef __cplusplus
 }
 #endif

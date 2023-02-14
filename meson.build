@@ -56,6 +56,7 @@ sqsh_src = [
 	'src/iterator/directory_iterator.c',
 	'src/iterator/xattr_iterator.c',
 	'src/mapper/canary_mapper.c',
+	'src/mapper/cursor.c',
 	'src/mapper/mapper.c',
 	'src/mapper/mmap_full_mapper.c',
 	'src/mapper/mmap_mapper.c',
