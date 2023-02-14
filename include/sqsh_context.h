@@ -262,7 +262,7 @@ const uint8_t *sqsh_file_data(struct SqshFileContext *context);
  *
  * @return The size of the file content buffer.
  */
-uint64_t sqsh_file_size(struct SqshFileContext *context);
+uint64_t sqsh_file_size(const struct SqshFileContext *context);
 
 /**
  * @memberof SqshFileContext

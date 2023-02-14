@@ -206,10 +206,10 @@ sqsh_file_data(struct SqshFileContext *context) {
 }
 
 uint64_t
-sqsh_file_size(struct SqshFileContext *context) {
-	uint32_t block_size = context->block_size;
-	size_t offset = context->seek_pos % block_size;
-	size_t buffer_size = sqsh_buffer_size(&context->buffer);
+sqsh_file_size(const struct SqshFileContext *context) {
+	const uint32_t block_size = context->block_size;
+	const size_t offset = context->seek_pos % block_size;
+	const size_t buffer_size = sqsh_buffer_size(&context->buffer);
 
 	if (buffer_size < offset) {
 		return 0;
