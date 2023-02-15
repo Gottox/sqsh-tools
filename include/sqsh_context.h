@@ -885,7 +885,7 @@ sqsh_superblock_bytes_used(const struct SqshSuperblockContext *context);
  *
  * @return The size of the trailing data in the context.
  */
-size_t sqsh_trailing_size(struct SqshTrailingContext *context);
+size_t sqsh_trailing_size(const struct SqshTrailingContext *context);
 
 /**
  * @memberof SqshTrailingContext
@@ -895,7 +895,7 @@ size_t sqsh_trailing_size(struct SqshTrailingContext *context);
  *
  * @return The trailing data in the context.
  */
-const uint8_t *sqsh_trailing_data(struct SqshTrailingContext *context);
+const uint8_t *sqsh_trailing_data(const struct SqshTrailingContext *context);
 
 #ifdef __cplusplus
 }

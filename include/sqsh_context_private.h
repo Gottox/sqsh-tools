@@ -402,7 +402,7 @@ struct SqshTrailingContext {
 	/**
 	 * @privatesection
 	 */
-	struct SqshMapping *mapping;
+	struct SqshMapCursor cursor;
 };
 
 /**

@@ -34,9 +34,11 @@
 #include "../../include/sqsh.h"
 #include "../../include/sqsh_context_private.h"
 #include "../utils.h"
+#include "sqsh_mapper.h"
 
 int
 sqsh__trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh) {
+	int rv = 0;
 	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 	uint64_t trailing_start = sqsh_superblock_bytes_used(superblock);
 	struct SqshMapper *mapper = sqsh_mapper(sqsh);
@@ -44,28 +46,43 @@ sqsh__trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh) {
 	uint64_t trailing_size;
 
 	if (archive_size <= trailing_start) {
-		return -SQSH_ERROR_TODO;
+		rv = -SQSH_ERROR_TODO;
+		goto out;
 	}
 
 	if (SQSH_SUB_OVERFLOW(archive_size, trailing_start, &trailing_size)) {
-		return -SQSH_ERROR_TODO;
+		rv = -SQSH_ERROR_TODO;
+		goto out;
 	}
 
-	return sqsh_mapper_map(
-			context->mapping, mapper, trailing_start, trailing_size);
+	rv = sqsh__map_cursor_init(
+			&context->cursor, mapper, trailing_start, trailing_size);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = sqsh__map_cursor_all(&context->cursor);
+	if (rv < 0) {
+		goto out;
+	}
+out:
+	if (rv < 0) {
+		sqsh__trailing_cleanup(context);
+	}
+	return rv;
 }
 
 size_t
-sqsh_trailing_size(struct SqshTrailingContext *context) {
-	return sqsh_mapping_size(context->mapping);
+sqsh_trailing_size(const struct SqshTrailingContext *context) {
+	return sqsh__map_cursor_size(&context->cursor);
 }
 
 const uint8_t *
-sqsh_trailing_data(struct SqshTrailingContext *context) {
-	return sqsh_mapping_data(context->mapping);
+sqsh_trailing_data(const struct SqshTrailingContext *context) {
+	return sqsh__map_cursor_data(&context->cursor);
 }
 
 int
 sqsh__trailing_cleanup(struct SqshTrailingContext *context) {
-	return sqsh_mapping_unmap(context->mapping);
+	return sqsh__map_cursor_cleanup(&context->cursor);
 }
