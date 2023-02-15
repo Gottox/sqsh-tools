@@ -53,8 +53,11 @@ sqsh__map_cursor_init(
 int
 sqsh__map_cursor_advance(
 		struct SqshMapCursor *cursor, sqsh_index_t offset, size_t size) {
-	cursor->offset += offset;
-	size_t new_size = cursor->offset + size;
+	size_t new_size;
+
+	if (SQSH_ADD_OVERFLOW(cursor->offset, offset, &cursor->offset)) {
+		return SQSH_ERROR_INTEGER_OVERFLOW;
+	}
 	if (SQSH_ADD_OVERFLOW(cursor->size, size, &new_size)) {
 		return SQSH_ERROR_INTEGER_OVERFLOW;
 	}
