@@ -89,7 +89,7 @@ read_fragment_data(
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__map_cursor_advance(&fragment_mapping, 0, size);
+	rv = sqsh__map_cursor_all(&fragment_mapping);
 	if (rv < 0) {
 		goto out;
 	}

@@ -76,7 +76,7 @@ sqsh__table_init(
 	if (rv < 0) {
 		return rv;
 	}
-	rv = sqsh__map_cursor_advance(&table->lookup_table, 0, lookup_table_size);
+	rv = sqsh__map_cursor_all(&table->lookup_table);
 	if (rv < 0) {
 		return rv;
 	}

@@ -68,6 +68,11 @@ sqsh__map_cursor_advance(
 	return sqsh_mapping_resize(&cursor->mapping, new_size);
 }
 
+int
+sqsh__map_cursor_all(struct SqshMapCursor *cursor) {
+	return sqsh__map_cursor_advance(cursor, 0, cursor->upper_limit);
+}
+
 const uint8_t *
 sqsh__map_cursor_data(const struct SqshMapCursor *cursor) {
 	return &sqsh_mapping_data(&cursor->mapping)[cursor->offset];

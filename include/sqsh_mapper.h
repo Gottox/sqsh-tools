@@ -332,6 +332,16 @@ int sqsh__map_cursor_advance(
 
 /**
  * @memberof SqshMapCursor
+ * @brief Loads all data into the cursor. This is useful for
+ * tables that must reside completely in memory.
+ *
+ * @param cursor The cursor to advance
+ * @return 0 on success, negative on error
+ */
+int sqsh__map_cursor_all(struct SqshMapCursor *cursor);
+
+/**
+ * @memberof SqshMapCursor
  * @brief Returns the current data of the cursor
  *
  * @param cursor The cursor to get the data from
