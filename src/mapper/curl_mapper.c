@@ -305,6 +305,7 @@ sqsh_mapping_curl_size(const struct SqshMapping *mapping) {
 }
 
 struct SqshMemoryMapperImpl sqsh_mapper_impl_curl = {
+		.size_hint = 4096,
 		.init = sqsh_mapper_curl_init,
 		.mapping = sqsh_mapper_curl_map,
 		.size = sqsh_mapper_curl_size,

@@ -175,6 +175,7 @@ struct SqshMemoryMapperImpl {
 	/**
 	 * @privatesection
 	 */
+	size_t size_hint;
 	int (*init)(struct SqshMapper *mapper, const void *input, size_t size);
 	int (*mapping)(struct SqshMapping *map, sqsh_index_t offset, size_t size);
 	size_t (*size)(const struct SqshMapper *mapper);
