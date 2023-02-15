@@ -338,7 +338,7 @@ int sqsh__map_cursor_advance(
  * @param cursor The cursor to get the data from
  * @return The current data of the cursor
  */
-const uint8_t *sqsh__map_cursor_data(struct SqshMapCursor *cursor);
+const uint8_t *sqsh__map_cursor_data(const struct SqshMapCursor *cursor);
 
 /**
  * @memberof SqshMapCursor

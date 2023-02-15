@@ -68,7 +68,7 @@ sqsh__map_cursor_advance(
 }
 
 const uint8_t *
-sqsh__map_cursor_data(struct SqshMapCursor *cursor) {
+sqsh__map_cursor_data(const struct SqshMapCursor *cursor) {
 	return &sqsh_mapping_data(&cursor->mapping)[cursor->offset];
 }
 
