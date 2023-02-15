@@ -85,7 +85,7 @@ sqsh_mapping_static_mem_size(const struct SqshMapping *mapping) {
 }
 
 struct SqshMemoryMapperImpl sqsh_mapper_impl_static = {
-		.size_hint = 0,
+		.size_hint = SIZE_MAX,
 		.init = sqsh_mapper_static_mem_init,
 		.mapping = sqsh_mapper_static_mem_map,
 		.size = sqsh_mapper_static_mem_size,
