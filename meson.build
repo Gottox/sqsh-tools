@@ -74,6 +74,7 @@ sqsh_test = [
 	'test/integration.c',
 	'test/primitive/buffer.c',
 	'test/primitive/ref_count.c',
+	'test/mapper/cursor.c',
 	'test/cpp-test.cpp',
 ]
 
