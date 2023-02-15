@@ -395,6 +395,37 @@ SQSH_NO_UNUSED int sqsh__path_resolver_init(
  */
 int sqsh_path_resolver_cleanup(struct SqshPathResolverContext *context);
 
+////////////////////////////////////////
+// context/trailing_context.c
+
+struct SqshTrailingContext {
+	/**
+	 * @privatesection
+	 */
+	struct SqshMapping *mapping;
+};
+
+/**
+ * @memberof SqshTrailingContext
+ * @brief Initializes a trailing context.
+ *
+ * @param[out] context The context to initialize.
+ * @param[in]  sqsh The Sqsh instance to use for the context.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+int sqsh__trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh);
+
+/**
+ * @memberof SqshTrailingContext
+ * @brief Cleans up a trailing context.
+ *
+ * @param[in] context The context to clean up.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+int sqsh__trailing_cleanup(struct SqshTrailingContext *context);
+
 #ifdef __cplusplus
 }
 #endif

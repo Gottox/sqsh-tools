@@ -32,11 +32,11 @@
  */
 
 #include "../../include/sqsh.h"
-#include "../../include/sqsh_context.h"
+#include "../../include/sqsh_context_private.h"
 #include "../utils.h"
 
 int
-sqsh_trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh) {
+sqsh__trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh) {
 	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 	uint64_t trailing_start = sqsh_superblock_bytes_used(superblock);
 	struct SqshMapper *mapper = sqsh_mapper(sqsh);
@@ -66,6 +66,6 @@ sqsh_trailing_data(struct SqshTrailingContext *context) {
 }
 
 int
-sqsh_trailing_cleanup(struct SqshTrailingContext *context) {
+sqsh__trailing_cleanup(struct SqshTrailingContext *context) {
 	return sqsh_mapping_unmap(context->mapping);
 }

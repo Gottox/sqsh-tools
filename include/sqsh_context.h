@@ -877,24 +877,6 @@ sqsh_superblock_bytes_used(const struct SqshSuperblockContext *context);
 ////////////////////////////////////////
 // context/trailing_context.c
 
-struct SqshTrailingContext {
-	/**
-	 * @privatesection
-	 */
-	struct SqshMapping *mapping;
-};
-
-/**
- * @memberof SqshTrailingContext
- * @brief Initializes a trailing context.
- *
- * @param[out] context The context to initialize.
- * @param[in]  sqsh The Sqsh instance to use for the context.
- *
- * @return 0 on success, a negative value on error.
- */
-int sqsh_trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh);
-
 /**
  * @memberof SqshTrailingContext
  * @brief Retrieves the size of the trailing data in a context.
@@ -914,16 +896,6 @@ size_t sqsh_trailing_size(struct SqshTrailingContext *context);
  * @return The trailing data in the context.
  */
 const uint8_t *sqsh_trailing_data(struct SqshTrailingContext *context);
-
-/**
- * @memberof SqshTrailingContext
- * @brief Cleans up a trailing context.
- *
- * @param[in] context The context to clean up.
- *
- * @return 0 on success, a negative value on error.
- */
-int sqsh_trailing_cleanup(struct SqshTrailingContext *context);
 
 #ifdef __cplusplus
 }
