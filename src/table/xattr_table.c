@@ -36,6 +36,7 @@
 #include "../../include/sqsh_data.h"
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_table_private.h"
+#include "sqsh_mapper.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -43,7 +44,8 @@
 
 static const struct SqshDataXattrIdTable *
 get_header(const struct SqshXattrTable *context) {
-	return (struct SqshDataXattrIdTable *)sqsh_mapping_data(&context->header);
+	return (struct SqshDataXattrIdTable *)sqsh__map_cursor_data(
+			&context->header);
 }
 
 int
@@ -57,15 +59,22 @@ sqsh__xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh) {
 		return -SQSH_ERROR_SIZE_MISSMATCH;
 	}
 	context->sqsh = sqsh;
-	rv = sqsh_mapper_map(
+	rv = sqsh__map_cursor_init(
 			&context->header, mapper, xattr_address,
 			SQSH_SIZEOF_XATTR_ID_TABLE);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh__map_cursor_all(&context->header);
 	if (rv < 0) {
 		goto out;
 	}
 
 	const struct SqshDataXattrIdTable *header = get_header(context);
 
+	// TODO: sqsh__table_init currently does the mapping of the table
+	// itself. This results in mapping the table and the header. They
+	// should be mapped once.
 	rv = sqsh__table_init(
 			&context->table, sqsh, xattr_address + SQSH_SIZEOF_XATTR_ID_TABLE,
 			SQSH_SIZEOF_XATTR_LOOKUP_TABLE,
@@ -96,6 +105,6 @@ sqsh_xattr_table_get(
 int
 sqsh__xattr_table_cleanup(struct SqshXattrTable *context) {
 	sqsh_table_cleanup(&context->table);
-	sqsh_mapping_unmap(&context->header);
+	sqsh__map_cursor_cleanup(&context->header);
 	return 0;
 }

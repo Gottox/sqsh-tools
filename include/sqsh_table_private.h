@@ -134,7 +134,7 @@ struct SqshXattrTable {
 	 * @privatesection
 	 */
 	struct Sqsh *sqsh;
-	struct SqshMapping header;
+	struct SqshMapCursor header;
 	struct SqshTable table;
 };
 
