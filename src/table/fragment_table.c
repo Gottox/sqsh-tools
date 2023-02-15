@@ -72,7 +72,7 @@ read_fragment_data(
 	const struct SqshDataDatablockSize *size_info;
 	bool is_compressed;
 	struct SqshDataFragment fragment_info = {0};
-	struct SqshMapping fragment_mapping = {0};
+	struct SqshMapCursor fragment_mapping = {0};
 	const uint8_t *data;
 
 	rv = sqsh_table_get(&table->table, index, &fragment_info);
@@ -85,12 +85,16 @@ read_fragment_data(
 	size = sqsh_data_datablock_size(size_info);
 	is_compressed = sqsh_data_datablock_is_compressed(size_info);
 
-	rv = sqsh_mapper_map(&fragment_mapping, table->mapper, start, size);
+	rv = sqsh__map_cursor_init(&fragment_mapping, table->mapper, start, size);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh__map_cursor_advance(&fragment_mapping, 0, size);
 	if (rv < 0) {
 		goto out;
 	}
 
-	data = sqsh_mapping_data(&fragment_mapping);
+	data = sqsh__map_cursor_data(&fragment_mapping);
 	if (is_compressed) {
 		rv = sqsh__compression_decompress_to_buffer(
 				table->compression, buffer, data, size);
@@ -101,7 +105,7 @@ read_fragment_data(
 		goto out;
 	}
 out:
-	sqsh_mapping_unmap(&fragment_mapping);
+	sqsh__map_cursor_cleanup(&fragment_mapping);
 	return rv;
 }
 
