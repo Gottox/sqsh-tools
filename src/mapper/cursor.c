@@ -78,6 +78,11 @@ sqsh__map_cursor_data(const struct SqshMapCursor *cursor) {
 	return &sqsh_mapping_data(&cursor->mapping)[cursor->offset];
 }
 
+size_t
+sqsh__map_cursor_size(const struct SqshMapCursor *cursor) {
+	return sqsh_mapping_size(&cursor->mapping) - cursor->offset;
+}
+
 int
 sqsh__map_cursor_cleanup(struct SqshMapCursor *cursor) {
 	sqsh_mapping_unmap(&cursor->mapping);

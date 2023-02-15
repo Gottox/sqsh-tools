@@ -258,7 +258,7 @@ int sqsh_mapper_cleanup(struct SqshMapper *mapper);
  *
  * @return The size of the mapping.
  */
-size_t sqsh_mapping_size(struct SqshMapping *mapping);
+size_t sqsh_mapping_size(const struct SqshMapping *mapping);
 
 /**
  * @memberof SqshMapping
@@ -348,6 +348,15 @@ int sqsh__map_cursor_all(struct SqshMapCursor *cursor);
  * @return The current data of the cursor
  */
 const uint8_t *sqsh__map_cursor_data(const struct SqshMapCursor *cursor);
+
+/**
+ * @memberof SqshMapCursor
+ * @brief Returns the current size of the cursor
+ *
+ * @param cursor The cursor to get the size from
+ * @return The current size of the cursor
+ */
+size_t sqsh__map_cursor_size(const struct SqshMapCursor *cursor);
 
 /**
  * @memberof SqshMapCursor

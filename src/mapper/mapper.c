@@ -100,7 +100,7 @@ sqsh_mapping_resize(struct SqshMapping *mapping, size_t new_size) {
 }
 
 size_t
-sqsh_mapping_size(struct SqshMapping *mapping) {
+sqsh_mapping_size(const struct SqshMapping *mapping) {
 	return mapping->mapper->impl->map_size(mapping);
 }
 
