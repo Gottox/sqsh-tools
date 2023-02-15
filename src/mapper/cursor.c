@@ -43,11 +43,12 @@ int
 sqsh__map_cursor_init(
 		struct SqshMapCursor *cursor, struct SqshMapper *mapper,
 		const uint64_t start_address, const uint64_t upper_limit) {
-	cursor->mapper = mapper;
 	cursor->offset = 0;
-	cursor->size = 0;
 	cursor->upper_limit = upper_limit;
-	return sqsh_mapper_map(&cursor->mapping, mapper, start_address, 4096);
+	cursor->mapper = mapper;
+	return sqsh_mapper_map(
+			&cursor->mapping, mapper, start_address,
+			SQSH_MIN(4096, upper_limit));
 }
 
 int
@@ -58,7 +59,7 @@ sqsh__map_cursor_advance(
 	if (SQSH_ADD_OVERFLOW(cursor->offset, offset, &cursor->offset)) {
 		return SQSH_ERROR_INTEGER_OVERFLOW;
 	}
-	if (SQSH_ADD_OVERFLOW(cursor->size, size, &new_size)) {
+	if (SQSH_ADD_OVERFLOW(cursor->offset, size, &new_size)) {
 		return SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	if (new_size > cursor->upper_limit) {

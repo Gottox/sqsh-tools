@@ -300,7 +300,6 @@ struct SqshMapCursor {
 	 */
 	sqsh_index_t offset;
 	uint64_t upper_limit;
-	size_t size;
 	struct SqshMapping mapping;
 	struct SqshMapper *mapper;
 };
