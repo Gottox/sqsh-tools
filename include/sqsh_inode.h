@@ -380,4 +380,4 @@ sqsh_inode_ref_from_block(uint32_t block_index, uint16_t offset);
 #ifdef __cplusplus
 }
 #endif
-#endif /* end of include guard SQSH_INODE_H */
+#endif // SQSH_INODE_H

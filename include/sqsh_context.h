@@ -565,4 +565,4 @@ const uint8_t *sqsh_trailing_data(const struct SqshTrailingContext *context);
 #ifdef __cplusplus
 }
 #endif
-#endif /* end of include guard SQSH_CONTEXT_H */
+#endif // SQSH_CONTEXT_H

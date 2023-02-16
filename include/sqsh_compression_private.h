@@ -100,4 +100,4 @@ int sqsh__compression_cleanup(struct SqshCompression *compression);
 #ifdef __cplusplus
 }
 #endif
-#endif /* end of include guard SQSH_COMPRESSION_PRIVATE_H */
+#endif // SQSH_COMPRESSION_PRIVATE_H

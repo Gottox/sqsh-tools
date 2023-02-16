@@ -393,4 +393,4 @@ int sqsh__trailing_cleanup(struct SqshTrailingContext *context);
 #ifdef __cplusplus
 }
 #endif
-#endif /* end of include guard SQSH_CONTEXT_PRIVATE_H */
+#endif // SQSH_CONTEXT_PRIVATE_H

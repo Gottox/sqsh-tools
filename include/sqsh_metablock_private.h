@@ -150,4 +150,4 @@ int sqsh__metablock_iterator_cleanup(struct SqshMetablockIterator *iterator);
 #ifdef __cplusplus
 }
 #endif
-#endif /* end of include guard SQSH_METABLOCK_PRIVATE_H */
+#endif // SQSH_METABLOCK_PRIVATE_H

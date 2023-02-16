@@ -131,4 +131,4 @@ int sqsh_xattr_table_get(
 #ifdef __cplusplus
 }
 #endif
-#endif /* end of include guard SQSH_TABLE_H */
+#endif // SQSH_TABLE_H

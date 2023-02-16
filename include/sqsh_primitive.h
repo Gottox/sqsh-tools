@@ -334,4 +334,4 @@ int sqsh_lru_hashmap_cleanup(struct SqshLruHashmap *hashmap);
 #ifdef __cplusplus
 }
 #endif
-#endif /* end of include guard SQSH_PRIMITIVE_H */
+#endif // SQSH_PRIMITIVE_H

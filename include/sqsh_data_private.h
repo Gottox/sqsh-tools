@@ -353,4 +353,4 @@ SQSH_STATIC_ASSERT(
 #ifdef __cplusplus
 }
 #endif
-#endif /* end of include guard SQSH_DATA_PRIVATE */
+#endif // SQSH_DATA_PRIVATE_H

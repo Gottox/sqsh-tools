@@ -131,4 +131,4 @@ int sqsh__xattr_iterator_cleanup(struct SqshXattrIterator *iterator);
 #ifdef __cplusplus
 }
 #endif
-#endif /* end of include guard SQSH_ITERATOR_PRIVATE_H */
+#endif // SQSH_ITERATOR_PRIVATE_H

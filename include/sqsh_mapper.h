@@ -370,4 +370,4 @@ int sqsh__map_cursor_cleanup(struct SqshMapCursor *cursor);
 #ifdef __cplusplus
 }
 #endif
-#endif /* end of include guard SQSH_MAPPER_H */
+#endif // SQSH_MAPPER_H

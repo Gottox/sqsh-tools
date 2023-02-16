@@ -204,4 +204,4 @@ int sqsh__directory_index_iterator_free(
 #ifdef __cplusplus
 }
 #endif
-#endif /* end of include guard SQSH_INODE_PRIVATE_H */
+#endif // SQSH_INODE_PRIVATE_H

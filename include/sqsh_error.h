@@ -97,4 +97,4 @@ SQSH_NO_UNUSED const char *sqsh_error_str(int errorcode);
 #ifdef __cplusplus
 }
 #endif
-#endif /* end of include guard SQSH_ERROR_H */
+#endif // SQSH_ERROR_H

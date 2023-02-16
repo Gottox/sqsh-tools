@@ -321,4 +321,4 @@ int sqsh_xattr_iterator_free(struct SqshXattrIterator *iterator);
 #ifdef __cplusplus
 }
 #endif
-#endif /* end of include guard SQSH_ITERATOR_H */
+#endif // SQSH_ITERATOR_H

@@ -28,8 +28,11 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh.h
+ * @file         sqsh_private.h
  */
+
+#ifndef SQSH_PRIVATE_H
+#define SQSH_PRIVATE_H
 
 #include "sqsh.h"
 #include "sqsh_common.h"
@@ -42,12 +45,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#ifndef SQSH_PRIVATE_H
-#	define SQSH_PRIVATE_H
-
-#	ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#	endif
+#endif
 
 /**
  * @brief The Sqsh struct contains all information about the current
@@ -95,7 +95,7 @@ SQSH_NO_UNUSED int sqsh__init(
  */
 int sqsh__cleanup(struct Sqsh *sqsh);
 
-#	ifdef __cplusplus
+#ifdef __cplusplus
 }
-#	endif
-#endif /* end of include guard SQSH_PRIVATE_H */
+#endif
+#endif // SQSH_PRIVATE_H

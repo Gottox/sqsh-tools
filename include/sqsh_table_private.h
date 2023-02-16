@@ -165,4 +165,4 @@ int sqsh__xattr_table_cleanup(struct SqshXattrTable *context);
 #ifdef __cplusplus
 }
 #endif
-#endif /* end of include guard SQSH_TABLE_PRIVATE_H */
+#endif // SQSH_TABLE_PRIVATE_H

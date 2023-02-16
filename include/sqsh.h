@@ -177,4 +177,4 @@ int sqsh_free(struct Sqsh *sqsh);
 #ifdef __cplusplus
 }
 #endif
-#endif /* end of include guard SQSH_H */
+#endif // SQSH_H

@@ -409,4 +409,4 @@ sqsh_data_xattr_id_table(const struct SqshDataXattrIdTable *xattr_id_table);
 #ifdef __cplusplus
 }
 #endif
-#endif /* end of include guard SQSH_DATA_H */
+#endif // SQSH_DATA_H
