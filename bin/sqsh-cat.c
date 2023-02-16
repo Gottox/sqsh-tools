@@ -33,7 +33,7 @@
 
 #include "common.h"
 
-#include <sqsh_context.h>
+#include <sqsh_inode.h>
 
 #include <assert.h>
 #include <limits.h>

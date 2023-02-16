@@ -34,6 +34,7 @@
 #include "common.h"
 #include "test.h"
 #include <sqsh_context_private.h>
+#include <sqsh_inode_private.h>
 #include <sqsh_iterator_private.h>
 #include <sqsh_private.h>
 #include <squashfs_image.h>

@@ -33,15 +33,17 @@
 
 #include "../../include/sqsh.h"
 #include "../../include/sqsh_context.h"
-#include "../../include/sqsh_iterator_private.h"
-#include "../utils.h"
-// TODO: this should be replaced with the non-private version
-#include "../../include/sqsh_data_private.h"
 #include "../../include/sqsh_error.h"
+#include "../../include/sqsh_iterator_private.h"
 #include "../../include/sqsh_table.h"
+#include "../utils.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+// TODO: this should be replaced with the non-private version
+#include "../../include/sqsh_data_private.h"
+#include "../../include/sqsh_inode_private.h"
 
 int
 sqsh__xattr_iterator_init(

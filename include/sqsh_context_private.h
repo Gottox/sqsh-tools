@@ -326,41 +326,6 @@ sqsh__metablock_stream_size(const struct SqshMetablockStreamContext *context);
 int sqsh__metablock_stream_cleanup(struct SqshMetablockStreamContext *context);
 
 ////////////////////////////////////////
-// context/inode_context.c
-
-struct SqshInodeContext {
-	/**
-	 * @privatesection
-	 */
-	struct SqshMetablockStreamContext metablock;
-	struct Sqsh *sqsh;
-};
-
-/**
- * @internal
- * @brief Initialize the inode context from a inode reference. inode references
- * @memberof SqshInodeContext
- * are descriptors of the physical location of an inode inside the inode table.
- * They are diffrent from the inode number. In doubt use the inode number.
- *
- * @param context The inode context to initialize.
- * @param sqsh The sqsh context.
- * @param inode_ref The inode reference.
- * @return int 0 on success, less than 0 on error.
- */
-SQSH_NO_UNUSED int sqsh__inode_init(
-		struct SqshInodeContext *context, struct Sqsh *sqsh,
-		uint64_t inode_ref);
-/**
- * @internal
- * @brief cleans up the inode context.
- * @memberof SqshInodeContext
- * @param context The inode context.
- * @return int 0 on success, less than 0 on error.
- */
-int sqsh__inode_cleanup(struct SqshInodeContext *context);
-
-////////////////////////////////////////
 // context/path_resolver_context.c
 
 struct SqshPathResolverContext {

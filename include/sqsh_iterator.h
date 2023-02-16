@@ -35,7 +35,7 @@
 #define SQSH_ITERATOR_H
 
 #include "sqsh_common.h"
-#include "sqsh_context.h"
+#include "sqsh_inode.h"
 
 #ifdef __cplusplus
 extern "C" {

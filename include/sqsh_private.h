@@ -31,6 +31,7 @@
  * @file         sqsh.h
  */
 
+#include "sqsh.h"
 #include "sqsh_common.h"
 #include "sqsh_compression_private.h"
 #include "sqsh_context_private.h"
@@ -38,7 +39,6 @@
 #include "sqsh_mapper.h"
 #include "sqsh_table_private.h"
 
-#include <sqsh.h>
 #include <stdint.h>
 #include <stdlib.h>
 

@@ -33,6 +33,7 @@
 
 #include "../../include/sqsh.h"
 #include "../../include/sqsh_data.h"
+#include "../../include/sqsh_inode_private.h"
 #include "../../include/sqsh_iterator_private.h"
 
 static const uint64_t INODE_HEADER_SIZE =
