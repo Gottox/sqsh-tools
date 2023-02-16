@@ -45,7 +45,7 @@ sqsh_data_metablock_data(const struct SqshDataMetablock *metablock) {
 	return (uint8_t *)&metablock[1];
 }
 
-size_t
+uint16_t
 sqsh_data_metablock_size(const struct SqshDataMetablock *metablock) {
 	return htole16(metablock->header) & 0x7FFF;
 }

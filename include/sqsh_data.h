@@ -312,7 +312,7 @@ sqsh_data_metablock_is_compressed(const struct SqshDataMetablock *metablock);
 const uint8_t *
 sqsh_data_metablock_data(const struct SqshDataMetablock *metablock);
 
-size_t sqsh_data_metablock_size(const struct SqshDataMetablock *metablock);
+uint16_t sqsh_data_metablock_size(const struct SqshDataMetablock *metablock);
 
 ////////////////////////////////////////
 // data/superblock_data.c
