@@ -33,18 +33,9 @@
 
 #include "../../include/sqsh.h"
 #include "../../include/sqsh_compression_private.h"
-#include "../../include/sqsh_context.h"
 #include "../../include/sqsh_data.h"
 #include "../../include/sqsh_error.h"
-#include "../../include/sqsh_iterator_private.h"
-#include "../utils.h"
-#include "sqsh_compression_private.h"
-#include "sqsh_context_private.h"
-#include "sqsh_data_private.h"
-#include "sqsh_mapper.h"
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include "../../include/sqsh_metablock_private.h"
 
 int
 sqsh__metablock_iterator_init(
@@ -79,6 +70,23 @@ sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator) {
 	rv = sqsh__map_cursor_advance(
 			&iterator->cursor, SQSH_METABLOCK_BLOCK_SIZE, iterator->size);
 
+out:
+	return rv;
+}
+
+int
+sqsh__metablock_iterator_skip(
+		struct SqshMetablockIterator *iterator, uint64_t amount) {
+	int rv = 0;
+
+	// TODO: replace _next calls with directly accessing the cursor and not
+	// mapping the data, just the headers
+	for (uint64_t i = 0; i < amount; i++) {
+		rv = sqsh__metablock_iterator_next(iterator);
+		if (rv < 0) {
+			goto out;
+		}
+	}
 out:
 	return rv;
 }
