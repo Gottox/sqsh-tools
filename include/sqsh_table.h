@@ -102,9 +102,6 @@ enum SqshXattrType {
 	SQSH_XATTR_SECURITY = 2,
 };
 
-SQSH_NO_UNUSED int
-sqsh__xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh);
-
 /**
  * @memberof SqshXattrTable
  * @brief Retrieves the starting offset of the table.
