@@ -46,15 +46,15 @@
 extern "C" {
 #endif
 
-#define SQSH_MIN(a, b) (a < b ? a : b)
-#define SQSH_MAX(a, b) (a > b ? a : b)
+#define SQSH_MIN(a, b) ((a) < (b) ? (a) : (b))
+#define SQSH_MAX(a, b) ((a) > (b) ? (a) : (b))
 
 #define SQSH_ADD_OVERFLOW(a, b, res) __builtin_add_overflow(a, b, res)
 #define SQSH_SUB_OVERFLOW(a, b, res) __builtin_sub_overflow(a, b, res)
 #define SQSH_MULT_OVERFLOW(a, b, res) __builtin_mul_overflow(a, b, res)
 
 // Does not work for x == 0
-#define SQSH_DEVIDE_CEIL(x, y) (((x - 1) / y) + 1)
+#define SQSH_DEVIDE_CEIL(x, y) ((((x)-1) / (y)) + 1)
 #define SQSH_PADDING(x, p) SQSH_DEVIDE_CEIL(x, p) * p
 
 SQSH_NO_UNUSED static inline void *
