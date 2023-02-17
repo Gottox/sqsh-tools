@@ -27,6 +27,8 @@ sqsh_hdr = [
 	'include/sqsh_primitive.h',
 	'include/sqsh_table.h',
 	'include/sqsh_table_private.h',
+	'include/sqsh_xattr.h',
+	'include/sqsh_xattr_private.h',
 ]
 
 sqsh_hdr_priv = [
@@ -54,7 +56,6 @@ sqsh_src = [
 	'src/inode/directory_index_iterator.c',
 	'src/inode/inode_context.c',
 	'src/iterator/directory_iterator.c',
-	'src/iterator/xattr_iterator.c',
 	'src/mapper/canary_mapper.c',
 	'src/mapper/cursor.c',
 	'src/mapper/mapper.c',
@@ -69,7 +70,8 @@ sqsh_src = [
 	'src/sqsh.c',
 	'src/table/fragment_table.c',
 	'src/table/table.c',
-	'src/table/xattr_table.c',
+	'src/xattr/xattr_iterator.c',
+	'src/xattr/xattr_table.c',
 ]
 
 sqsh_test = [
@@ -240,3 +242,13 @@ pkg_mod.generate(
 )
 
 subdir('doc')
+
+clangtidy = find_program('clang-tidy', required: false)
+if clangtidy.found()
+    run_target(
+        'tidy',
+        command: [
+            clangtidy,
+            '-p', meson.project_build_root()
+        ] + files(sqsh_src + sqsh_hdr + sqsh_hdr_priv))
+endif
