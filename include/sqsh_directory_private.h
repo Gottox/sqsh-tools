@@ -54,7 +54,6 @@ struct SqshDirectoryIterator {
 	uint32_t size;
 
 	const struct SqshDataDirectoryFragment *fragments;
-	struct SqshDirectoryContext *directory;
 	struct SqshMetablockStreamContext metablock;
 	size_t remaining_entries;
 	sqsh_index_t current_fragment_offset;
