@@ -63,6 +63,7 @@ struct SqshConfig {
 };
 
 struct Sqsh;
+struct SqshXattrTable;
 
 /**
  * @brief sqsh_new initializes a sqsh context in heap.

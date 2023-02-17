@@ -34,8 +34,8 @@
 #include "../../include/sqsh.h"
 #include "../../include/sqsh_context.h"
 #include "../../include/sqsh_error.h"
-#include "../../include/sqsh_iterator_private.h"
 #include "../../include/sqsh_table.h"
+#include "../../include/sqsh_xattr_private.h"
 #include "../utils.h"
 #include <stdint.h>
 #include <stdlib.h>

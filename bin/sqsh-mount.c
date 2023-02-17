@@ -36,6 +36,7 @@
 #include "../src/utils.h"
 #include <sqsh_context.h>
 #include <sqsh_iterator.h>
+#include <sqsh_xattr.h>
 
 #define FUSE_USE_VERSION 35
 #include <errno.h>

@@ -89,45 +89,6 @@ SQSH_NO_UNUSED int sqsh_fragment_table_to_buffer(
 		const struct SqshFragmentTable *context,
 		const struct SqshInodeContext *inode, struct SqshBuffer *buffer);
 
-////////////////////////////////////////
-// table/xattr_table.c
-
-struct SqshDataXattrLookupTable;
-struct Sqsh;
-struct SqshXattrTable;
-
-enum SqshXattrType {
-	SQSH_XATTR_USER = 0,
-	SQSH_XATTR_TRUSTED = 1,
-	SQSH_XATTR_SECURITY = 2,
-};
-
-/**
- * @memberof SqshXattrTable
- * @brief Retrieves the starting offset of the table.
- *
- * @param[in] table The extended attribute table to retrieve the offset from.
- *
- * @return The starting offset of the table.
- */
-uint64_t sqsh_xattr_table_start(struct SqshXattrTable *table);
-
-/**
- * @memberof SqshXattrTable
- * @brief Retrieves an extended attribute from the table.
- *
- * @param[in]  table The extended attribute table to retrieve the attribute
- * from.
- * @param[in]  index The index of the attribute to retrieve.
- * @param[out] target The extended attribute lookup table to store the attribute
- * in.
- *
- * @return 0 on success, a negative value on error.
- */
-int sqsh_xattr_table_get(
-		const struct SqshXattrTable *table, sqsh_index_t index,
-		struct SqshDataXattrLookupTable *target);
-
 #ifdef __cplusplus
 }
 #endif

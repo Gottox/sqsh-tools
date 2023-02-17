@@ -41,6 +41,7 @@
 #include "sqsh_error.h"
 #include "sqsh_mapper.h"
 #include "sqsh_table_private.h"
+#include "sqsh_xattr_private.h"
 
 #include <stdint.h>
 #include <stdlib.h>

@@ -36,6 +36,7 @@
 #include <sqsh.h>
 #include <sqsh_context.h>
 #include <sqsh_iterator.h>
+#include <sqsh_xattr.h>
 
 #include <assert.h>
 #include <limits.h>

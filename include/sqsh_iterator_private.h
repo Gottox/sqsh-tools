@@ -86,48 +86,6 @@ SQSH_NO_UNUSED int sqsh__directory_iterator_init(
  */
 int sqsh__directory_iterator_cleanup(struct SqshDirectoryIterator *iterator);
 
-////////////////////////////////////////
-// iterator/xattr_iterator.c
-
-struct SqshXattrIterator {
-	/**
-	 * @privatesection
-	 */
-	struct Sqsh *sqsh;
-	struct SqshMetablockStreamContext metablock;
-	struct SqshMetablockStreamContext out_of_line_value;
-	struct SqshXattrTable *context;
-	int remaining_entries;
-	sqsh_index_t next_offset;
-	sqsh_index_t key_offset;
-	sqsh_index_t value_offset;
-};
-
-/**
- * @internal
- * @memberof SqshXattrIterator
- * @brief Initializes a new xattr iterator.
- *
- * @param[out] iterator The iterator to initialize.
- * @param[in]  inode    The inode to iterate through xattrs.
- *
- * @return 0 on success, a negative value on error.
- */
-SQSH_NO_UNUSED int sqsh__xattr_iterator_init(
-		struct SqshXattrIterator *iterator,
-		const struct SqshInodeContext *inode);
-
-/**
- * @internal
- * @memberof SqshXattrIterator
- * @brief Cleans up resources used by an xattr iterator.
- *
- * @param[in] iterator The iterator to cleanup.
- *
- * @return 0 on success, a negative value on error.
- */
-int sqsh__xattr_iterator_cleanup(struct SqshXattrIterator *iterator);
-
 #ifdef __cplusplus
 }
 #endif
