@@ -109,50 +109,6 @@ int sqsh__compression_options_cleanup(
 		struct SqshCompressionOptionsContext *context);
 
 ////////////////////////////////////////
-// context/file_context.c
-
-/**
- * @brief The SqshFileContext struct
- *
- * This struct is used to assemble file contents.
- */
-struct SqshFileContext {
-	/**
-	 * @privatesection
-	 */
-	struct SqshMapper *mapper;
-	struct SqshFragmentTable *fragment_table;
-	const struct SqshInodeContext *inode;
-	struct SqshBuffer buffer;
-	struct SqshCompression *compression;
-	uint64_t seek_pos;
-	uint32_t block_size;
-};
-
-/**
- * @internal
- * @brief Initializes a SqshFileContext struct.
- * @memberof SqshFileContext
- *
- * @param[out] context The file context to initialize.
- * @param[in] inode    The inode context to retrieve the file contents from.
- *
- * @return 0 on success, less than 0 on error.
- */
-SQSH_NO_UNUSED int sqsh__file_init(
-		struct SqshFileContext *context, const struct SqshInodeContext *inode);
-
-/**
- * @internal
- * @brief Frees the resources used by the file context.
- *
- * @memberof SqshFileContext
- *
- * @param context The file context to clean up.
- */
-int sqsh__file_cleanup(struct SqshFileContext *context);
-
-////////////////////////////////////////
 // context/metablock_context.c
 
 #define SQSH_METABLOCK_BLOCK_SIZE 8192

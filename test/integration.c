@@ -35,6 +35,7 @@
 #include "test.h"
 #include <sqsh_context_private.h>
 #include <sqsh_directory_private.h>
+#include <sqsh_file_private.h>
 #include <sqsh_inode_private.h>
 #include <sqsh_private.h>
 #include <squashfs_image.h>

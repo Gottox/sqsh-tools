@@ -35,6 +35,7 @@
 
 #include <sqsh_context.h>
 #include <sqsh_directory.h>
+#include <sqsh_file.h>
 
 #include <errno.h>
 #include <libgen.h>

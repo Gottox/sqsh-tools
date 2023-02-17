@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Copyright (c) 2021, Enno Boland <g@s01.de>                                 *
+ * Copyright (c) 2023, Enno Boland <g@s01.de>                                 *
  *                                                                            *
  * Redistribution and use in source and binary forms, with or without         *
  * modification, are permitted provided that the following conditions are     *
@@ -28,109 +28,65 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh-cat.c
+ * @file         sqsh_file.h
  */
 
-#include "common.h"
+#ifndef SQSH_FILE_PRIVATE_H
+#define SQSH_FILE_PRIVATE_H
 
-#include <sqsh_file.h>
-#include <sqsh_inode.h>
+#include "sqsh_file.h"
 
-#include <assert.h>
-#include <limits.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-static int
-usage(char *arg0) {
-	printf("usage: %s FILESYSTEM PATH [PATH ...]\n", arg0);
-	printf("       %s -v\n", arg0);
-	return EXIT_FAILURE;
+struct Sqsh;
+
+////////////////////////////////////////
+// context/file_context.c
+
+/**
+ * @brief The SqshFileContext struct
+ *
+ * This struct is used to assemble file contents.
+ */
+struct SqshFileContext {
+	/**
+	 * @privatesection
+	 */
+	struct SqshMapper *mapper;
+	struct SqshFragmentTable *fragment_table;
+	const struct SqshInodeContext *inode;
+	struct SqshBuffer buffer;
+	struct SqshCompression *compression;
+	uint64_t seek_pos;
+	uint32_t block_size;
+};
+
+/**
+ * @internal
+ * @brief Initializes a SqshFileContext struct.
+ * @memberof SqshFileContext
+ *
+ * @param[out] context The file context to initialize.
+ * @param[in] inode    The inode context to retrieve the file contents from.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int sqsh__file_init(
+		struct SqshFileContext *context, const struct SqshInodeContext *inode);
+
+/**
+ * @internal
+ * @brief Frees the resources used by the file context.
+ *
+ * @memberof SqshFileContext
+ *
+ * @param context The file context to clean up.
+ */
+int sqsh__file_cleanup(struct SqshFileContext *context);
+
+#ifdef __cplusplus
 }
-
-static int
-cat_path(struct SqshPathResolverContext *resolver, char *path) {
-	struct SqshInodeContext *inode = NULL;
-	struct SqshFileContext *file = NULL;
-
-	int rv = 0;
-	inode = sqsh_path_resolver_resolve(resolver, path, &rv);
-	if (rv < 0) {
-		sqsh_perror(rv, path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-	file = sqsh_file_new(inode, &rv);
-	if (rv < 0) {
-		sqsh_perror(rv, path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-	rv = sqsh_file_read(file, sqsh_inode_file_size(inode));
-	if (rv < 0) {
-		sqsh_perror(rv, path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-	fwrite(sqsh_file_data(file), sizeof(uint8_t), sqsh_file_size(file), stdout);
-out:
-	sqsh_file_free(file);
-	sqsh_inode_free(inode);
-	return rv;
-}
-
-int
-main(int argc, char *argv[]) {
-	int rv = 0;
-	int opt = 0;
-	const char *image_path;
-	struct Sqsh *sqsh = NULL;
-	struct SqshPathResolverContext *resolver = NULL;
-
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
-		switch (opt) {
-		case 'v':
-			puts("sqsh-cat-" VERSION);
-			return 0;
-		default:
-			return usage(argv[0]);
-		}
-	}
-
-	if (optind + 1 >= argc) {
-		return usage(argv[0]);
-	}
-
-	image_path = argv[optind];
-	optind++;
-
-	sqsh = open_archive(image_path, &rv);
-	if (rv < 0) {
-		sqsh_perror(rv, image_path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-	resolver = sqsh_path_resolver_new(sqsh, &rv);
-	if (rv < 0) {
-		sqsh_perror(rv, image_path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-	for (; optind < argc; optind++) {
-		rv = cat_path(resolver, argv[optind]);
-		if (rv < 0) {
-			goto out;
-		}
-	}
-
-out:
-	sqsh_path_resolver_free(resolver);
-	sqsh_free(sqsh);
-	return rv;
-}
+#endif
+#endif // SQSH_FILE_PRIVATE_H
