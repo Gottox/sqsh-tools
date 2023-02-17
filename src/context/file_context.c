@@ -174,6 +174,9 @@ sqsh_file_read(struct SqshFileContext *context, const uint64_t size) {
 		} else {
 			rv = sqsh_buffer_append(buffer, data, block_size);
 		}
+		if (rv < 0) {
+			goto out;
+		}
 		block_offset = block_size;
 	}
 
