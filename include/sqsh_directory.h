@@ -28,11 +28,11 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_iterator.h
+ * @file         sqsh_directory.h
  */
 
-#ifndef SQSH_ITERATOR_H
-#define SQSH_ITERATOR_H
+#ifndef SQSH_DIRECTORY_H
+#define SQSH_DIRECTORY_H
 
 #include "sqsh_common.h"
 #include "sqsh_inode.h"
@@ -164,4 +164,4 @@ int sqsh_directory_iterator_free(struct SqshDirectoryIterator *iterator);
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_ITERATOR_H
+#endif // SQSH_DIRECTORY_H

@@ -28,21 +28,21 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_iterator_private.h
+ * @file         sqsh_directory_private.h
  */
 
 #ifndef SQSH_ITERATOR_PRIVATE_H
 #define SQSH_ITERATOR_PRIVATE_H
 
 #include "sqsh_context_private.h"
-#include "sqsh_iterator.h"
+#include "sqsh_directory.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 ////////////////////////////////////////
-// iterator/directory_iterator.c
+// directory/directory_iterator.c
 
 struct SqshDirectoryIterator {
 	/**

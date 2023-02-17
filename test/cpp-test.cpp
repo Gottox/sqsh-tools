@@ -40,7 +40,7 @@ extern "C" {
 #include "test.h"
 }
 #include <sqsh_context.h>
-#include <sqsh_iterator.h>
+#include <sqsh_directory.h>
 #include <sqsh_private.h>
 #include <squashfs_image.h>
 #include <stdint.h>

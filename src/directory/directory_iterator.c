@@ -33,9 +33,9 @@
 
 #include "../../include/sqsh.h"
 #include "../../include/sqsh_data.h"
+#include "../../include/sqsh_directory_private.h"
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_inode_private.h"
-#include "../../include/sqsh_iterator_private.h"
 #include "../utils.h"
 
 #include <string.h>

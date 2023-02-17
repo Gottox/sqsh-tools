@@ -35,7 +35,6 @@
 #include "../../include/sqsh_data_private.h"
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_inode_private.h"
-#include "../../include/sqsh_iterator.h"
 #include "../../include/sqsh_table.h"
 #include "../utils.h"
 

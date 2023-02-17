@@ -34,7 +34,7 @@
 #include "common.h"
 
 #include <sqsh_context.h>
-#include <sqsh_iterator.h>
+#include <sqsh_directory.h>
 
 #include <assert.h>
 #include <inttypes.h>
