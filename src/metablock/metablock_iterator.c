@@ -67,6 +67,11 @@ sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator) {
 	iterator->size = sqsh_data_metablock_size(metablock);
 	iterator->is_compressed = sqsh_data_metablock_is_compressed(metablock);
 
+	if (iterator->size > SQSH_METABLOCK_BLOCK_SIZE) {
+		rv = -SQSH_ERROR_TODO;
+		goto out;
+	}
+
 	rv = sqsh__map_cursor_advance(
 			&iterator->cursor, SQSH_SIZEOF_METABLOCK, iterator->size);
 
