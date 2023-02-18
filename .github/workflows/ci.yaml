@@ -77,11 +77,13 @@ jobs:
           -Dtest=false \
           -Ddoc=true
     - name: generate
+      if: ${{ github.ref_type == 'tag' }}
       run: |
         cd /tmp/build
         meson compile doc
     - name: deploy
       uses: peaceiris/actions-gh-pages@v3
+      if: ${{ github.ref_type == 'tag' }}
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: /tmp/build/doc/html
