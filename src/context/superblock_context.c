@@ -38,8 +38,6 @@
 #include "sqsh_mapper.h"
 #include <stdint.h>
 
-static const uint32_t SUPERBLOCK_MAGIC = 0x73717368;
-
 enum SqshInitialized {
 	SQSH_INITIALIZED_ID_TABLE = 1 << 0,
 	SQSH_INITIALIZED_EXPORT_TABLE = 1 << 2,
@@ -90,7 +88,7 @@ sqsh__superblock_init(
 	}
 	const struct SqshDataSuperblock *superblock = get_header(context);
 
-	if (sqsh_data_superblock_magic(superblock) != SUPERBLOCK_MAGIC) {
+	if (sqsh_data_superblock_magic(superblock) != SQSH_SUPERBLOCK_MAGIC) {
 		rv = -SQSH_ERROR_WRONG_MAGIC;
 		goto out;
 	}

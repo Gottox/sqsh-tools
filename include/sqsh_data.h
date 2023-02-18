@@ -319,6 +319,8 @@ uint16_t sqsh_data_metablock_size(const struct SqshDataMetablock *metablock);
 
 #define SQSH_SIZEOF_SUPERBLOCK 96
 
+#define SQSH_SUPERBLOCK_MAGIC 0x73717368
+
 struct SQSH_UNALIGNED SqshDataSuperblock;
 
 int sqsh_data_superblock_init(
