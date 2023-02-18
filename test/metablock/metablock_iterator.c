@@ -49,8 +49,7 @@ next_once(void) {
 			METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
 	};
 	const uint8_t *p;
-	rv = mk_stub(&sqsh, payload, sizeof(payload));
-	assert(rv == 0);
+	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_iterator_init(
 			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
@@ -69,6 +68,7 @@ next_once(void) {
 	assert(rv == 0);
 
 	sqsh__cleanup(&sqsh);
+	free(data);
 }
 
 static void
@@ -81,8 +81,7 @@ next_twice(void) {
 			METABLOCK_HEADER(0, 4), 'e', 'f', 'g', 'h',
 	};
 	const uint8_t *p;
-	rv = mk_stub(&sqsh, payload, sizeof(payload));
-	assert(rv == 0);
+	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_iterator_init(
 			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
@@ -110,6 +109,7 @@ next_twice(void) {
 	assert(rv == 0);
 
 	sqsh__cleanup(&sqsh);
+	free(data);
 }
 
 DEFINE

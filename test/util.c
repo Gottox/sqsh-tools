@@ -11,7 +11,9 @@
 #include "../include/sqsh_private.h"
 #include "sqsh_context.h"
 
-int
+#include <assert.h>
+
+uint8_t *
 mk_stub(struct Sqsh *sqsh, uint8_t *payload, size_t payload_size) {
 	struct SqshDataSuperblock superblock = {
 			.magic = SQSH_SUPERBLOCK_MAGIC,
@@ -42,5 +44,6 @@ mk_stub(struct Sqsh *sqsh, uint8_t *payload, size_t payload_size) {
 	const struct SqshConfig config = {
 			.source_size = SQSH_SIZEOF_SUPERBLOCK + payload_size,
 			.source_type = SQSH_SOURCE_TYPE_MEMORY};
-	return sqsh__init(sqsh, data, &config);
+	assert(0 == sqsh__init(sqsh, data, &config));
+	return data;
 }
