@@ -39,7 +39,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// TODO: make UINT16_BYTES(x) byte order independent
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 #	define UINT16_BYTES(x) (uint8_t)(x), (uint8_t)((x) >> 8)
 #	define UINT32_BYTES(x) \
@@ -53,8 +52,9 @@
 #	define UINT64_BYTES(x) \
 		UINT32_BYTES((uint16_t)((x) >> 8)), UINT16_BYTES((uint16_t)(x))
 #endif
+
 #define METABLOCK_HEADER(c, s) UINT16_BYTES(((c) ? 0 : 0x8000) + (s))
 
-int mk_stub(struct Sqsh *sqsh, uint8_t *payload, size_t payload_size);
+uint8_t *mk_stub(struct Sqsh *sqsh, uint8_t *payload, size_t payload_size);
 
 #endif /* !COMMON_H */
