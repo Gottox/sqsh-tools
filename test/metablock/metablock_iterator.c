@@ -40,10 +40,6 @@
 #include <sqsh_private.h>
 #include <stdint.h>
 
-// TODO: make UINT16_BYTES(x) byte order independent
-#define UINT16_BYTES(x) (uint8_t)(x), (uint8_t)((x) >> 8)
-#define METABLOCK_HEADER(c, s) UINT16_BYTES(((c) >> 15) + (s))
-
 static void
 next_once(void) {
 	int rv;
