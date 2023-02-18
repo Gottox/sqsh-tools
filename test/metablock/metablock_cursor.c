@@ -113,7 +113,7 @@ advance_twice(void) {
 }
 
 static void
-advance_overlapping() {
+advance_overlapping(void) {
 	int rv;
 	struct Sqsh sqsh;
 	struct SqshMetablockCursor cursor;
