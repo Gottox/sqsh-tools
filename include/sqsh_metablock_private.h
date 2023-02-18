@@ -173,8 +173,8 @@ struct SqshMetablockCursor {
  * @return 0 on success, less than zero on error.
  */
 int sqsh__metablock_cursor_init(
-    struct SqshMetablockCursor *cursor, struct Sqsh *sqsh,
-    const uint64_t start_address, const uint64_t upper_limit);
+		struct SqshMetablockCursor *cursor, struct Sqsh *sqsh,
+		const uint64_t start_address, const uint64_t upper_limit);
 
 /**
  * @internal
@@ -188,24 +188,26 @@ int sqsh__metablock_cursor_init(
  * @return 0 on success, less than zero on error.
  */
 int sqsh__metablock_cursor_advance(
-    struct SqshMetablockCursor *cursor, sqsh_index_t offset, size_t size);
+		struct SqshMetablockCursor *cursor, sqsh_index_t offset, size_t size);
 
 /**
  * @internal
  * @memberof SqshMetablockCursor
- * @brief Returns a pointer to the data at the current position of the metablock cursor.
+ * @brief Returns a pointer to the data at the current position of the metablock
+ * cursor.
  *
  * @param[in] cursor Pointer to the metablock cursor.
  *
  * @return Pointer to the data at the current position of the metablock cursor.
  */
-const uint8_t *sqsh__metablock_cursor_data(
-    const struct SqshMetablockCursor *cursor);
+const uint8_t *
+sqsh__metablock_cursor_data(const struct SqshMetablockCursor *cursor);
 
 /**
  * @internal
  * @memberof SqshMetablockCursor
- * @brief Returns the size of the data at the current position of the metablock cursor.
+ * @brief Returns the size of the data at the current position of the metablock
+ * cursor.
  *
  * @param[in] cursor Pointer to the metablock cursor.
  *
@@ -223,7 +225,6 @@ size_t sqsh__metablock_cursor_size(const struct SqshMetablockCursor *cursor);
  * @return 0 on success, less than zero on error.
  */
 int sqsh__metablock_cursor_cleanup(struct SqshMetablockCursor *cursor);
-
 
 #ifdef __cplusplus
 }
