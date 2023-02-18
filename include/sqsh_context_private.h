@@ -111,8 +111,6 @@ int sqsh__compression_options_cleanup(
 ////////////////////////////////////////
 // context/metablock_context.c
 
-#define SQSH_METABLOCK_BLOCK_SIZE 8192
-
 /**
  * @brief The SqshMetablockContext struct
  *

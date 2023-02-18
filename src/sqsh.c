@@ -32,6 +32,7 @@
  */
 
 #include "../include/sqsh_compression_private.h"
+#include "../include/sqsh_data.h"
 #include "../include/sqsh_private.h"
 #include <string.h>
 

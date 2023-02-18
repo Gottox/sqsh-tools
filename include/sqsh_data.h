@@ -304,6 +304,8 @@ sqsh_data_inode_ipc_ext_xattr_idx(const struct SqshDataInodeIpcExt *ipc);
 
 #define SQSH_SIZEOF_METABLOCK 2
 
+#define SQSH_METABLOCK_BLOCK_SIZE 8192
+
 struct SQSH_UNALIGNED SqshDataMetablock;
 
 int
