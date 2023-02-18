@@ -78,11 +78,15 @@ sqsh_src = [
 ]
 
 sqsh_test = [
-	'test/integration.c',
+	'test/metablock/metablock_iterator.c',
 	'test/primitive/buffer.c',
 	'test/primitive/ref_count.c',
 	'test/mapper/cursor.c',
+	'test/integration.c',
 	'test/cpp-test.cpp',
+]
+sqsh_test_util = [
+	'test/util.c',
 ]
 
 libsqsh_deps = [ ]
@@ -200,7 +204,7 @@ if get_option('test')
 	)
 	foreach p : sqsh_test
 		t = executable(p.underscorify(),
-			[ p, squashfs_h ],
+			[ p, squashfs_h, sqsh_test_util ],
 			install : false,
 			c_args : build_args,
 			include_directories : 'include',

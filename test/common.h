@@ -34,6 +34,11 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include "../include/sqsh.h"
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+
 #define NSON_P(s) s, strlen(s)
 #define INPUT_CHECK(name, parser, ...) \
 	static void name() { \
@@ -58,5 +63,7 @@
 			free(input); \
 		} \
 	}
+
+int mk_stub(struct Sqsh *sqsh, uint8_t *payload, size_t payload_size);
 
 #endif /* !COMMON_H */
