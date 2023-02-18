@@ -66,6 +66,7 @@ sqsh_src = [
 	'src/mapper/mmap_mapper.c',
 	'src/mapper/static_mapper.c',
 	'src/metablock/metablock_iterator.c',
+	'src/metablock/metablock_cursor.c',
 	'src/primitive/buffer.c',
 	'src/primitive/lru_hashmap.c',
 	'src/primitive/ref_count.c',
