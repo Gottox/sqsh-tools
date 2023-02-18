@@ -41,14 +41,6 @@ extern "C" {
 #endif
 
 struct Sqsh;
-struct SqshXattrIterator;
-struct SqshCompressionOptionsContext;
-struct SqshFileContext;
-struct SqshInodeContext;
-struct SqshMetablockContext;
-struct SqshMetablockStreamContext;
-struct SqshSuperblockContext;
-struct SqshTrailingContext;
 
 ////////////////////////////////////////
 // context/compression_options_context.c
@@ -470,6 +462,8 @@ sqsh_superblock_bytes_used(const struct SqshSuperblockContext *context);
 
 ////////////////////////////////////////
 // context/trailing_context.c
+
+struct SqshTrailingContext;
 
 /**
  * @memberof SqshTrailingContext
