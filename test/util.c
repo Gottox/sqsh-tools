@@ -19,7 +19,7 @@ mk_stub(struct Sqsh *sqsh, uint8_t *payload, size_t payload_size) {
 			.modification_time = 0,
 			.block_size = 4096,
 			.fragment_entry_count = 0,
-			.compression_id = SQSH_COMPRESSION_ZSTD,
+			.compression_id = SQSH_COMPRESSION_GZIP,
 			.block_log = 12,
 			.flags = 0,
 			.id_count = 0,
