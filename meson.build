@@ -79,6 +79,7 @@ sqsh_src = [
 
 sqsh_test = [
 	'test/metablock/metablock_iterator.c',
+	'test/metablock/metablock_cursor.c',
 	'test/primitive/buffer.c',
 	'test/primitive/ref_count.c',
 	'test/mapper/cursor.c',
