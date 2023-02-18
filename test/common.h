@@ -40,8 +40,20 @@
 #include <string.h>
 
 // TODO: make UINT16_BYTES(x) byte order independent
-#define UINT16_BYTES(x) (uint8_t)(x), (uint8_t)((x) >> 8)
-#define METABLOCK_HEADER(c, s) UINT16_BYTES(((c) >> 15) + (s))
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+#	define UINT16_BYTES(x) (uint8_t)(x), (uint8_t)((x) >> 8)
+#	define UINT32_BYTES(x) \
+		UINT16_BYTES((uint16_t)(x)), UINT16_BYTES((uint16_t)((x) >> 8))
+#	define UINT64_BYTES(x) \
+		UINT32_BYTES((uint32_t)(x)), UINT32_BYTES((uint32_t)((x) >> 8))
+#else
+#	define UINT16_BYTES(x) (uint8_t)((x) >> 8), (uint8_t)(x)
+#	define UINT32_BYTES(x) \
+		UINT16_BYTES((uint16_t)((x) >> 8)), UINT16_BYTES((uint16_t)(x))
+#	define UINT64_BYTES(x) \
+		UINT32_BYTES((uint16_t)((x) >> 8)), UINT16_BYTES((uint16_t)(x))
+#endif
+#define METABLOCK_HEADER(c, s) UINT16_BYTES(((c) ? 0 : 0x8000) + (s))
 
 int mk_stub(struct Sqsh *sqsh, uint8_t *payload, size_t payload_size);
 
