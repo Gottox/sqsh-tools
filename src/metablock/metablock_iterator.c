@@ -56,7 +56,7 @@ sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator) {
 	int rv = 0;
 
 	rv = sqsh__map_cursor_advance(
-			&iterator->cursor, iterator->size, SQSH_METABLOCK_BLOCK_SIZE);
+			&iterator->cursor, iterator->size, SQSH_SIZEOF_METABLOCK);
 	if (rv < 0) {
 		goto out;
 	}
@@ -68,7 +68,7 @@ sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator) {
 	iterator->is_compressed = sqsh_data_metablock_is_compressed(metablock);
 
 	rv = sqsh__map_cursor_advance(
-			&iterator->cursor, SQSH_METABLOCK_BLOCK_SIZE, iterator->size);
+			&iterator->cursor, SQSH_SIZEOF_METABLOCK, iterator->size);
 
 out:
 	return rv;
