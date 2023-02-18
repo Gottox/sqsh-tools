@@ -50,6 +50,8 @@ sqsh__metablock_cursor_init(
 	if (rv < 0) {
 		goto out;
 	}
+	cursor->size = 0;
+	cursor->offset = 0;
 
 out:
 	if (rv < 0) {
@@ -89,7 +91,7 @@ sqsh__metablock_cursor_advance(
 		}
 	}
 	cursor->offset = new_offset;
-	cursor->size = new_size;
+	cursor->size = size;
 	return 0;
 }
 
