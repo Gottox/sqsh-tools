@@ -34,11 +34,13 @@
 #ifndef SQSH_METABLOCK_PRIVATE_H
 #define SQSH_METABLOCK_PRIVATE_H
 
-#include "sqsh_context_private.h"
+#include "sqsh_mapper.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+struct Sqsh;
 
 ////////////////////////////////////////
 // metablock/metablock_iterator.c
