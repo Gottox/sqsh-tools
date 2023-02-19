@@ -105,7 +105,7 @@ struct SqshMapper *sqsh_mapper(struct Sqsh *sqsh);
  *
  * @return the compression context.
  */
-struct SqshCompression *sqsh_data_compression(struct Sqsh *sqsh);
+const struct SqshCompression *sqsh_data_compression(const struct Sqsh *sqsh);
 
 /**
  * @brief sqsh_data_compression returns the compression context for metadata
@@ -116,7 +116,8 @@ struct SqshCompression *sqsh_data_compression(struct Sqsh *sqsh);
  *
  * @return the compression context.
  */
-struct SqshCompression *sqsh_metablock_compression(struct Sqsh *sqsh);
+const struct SqshCompression *
+sqsh_metablock_compression(const struct Sqsh *sqsh);
 
 /**
  * @brief Retrieves the id table of a Sqsh instance.

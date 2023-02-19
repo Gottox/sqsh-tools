@@ -51,7 +51,7 @@ struct SqshMetablockIterator {
 	 */
 	struct SqshMapCursor cursor;
 	bool is_compressed;
-	struct SqshCompression *compression;
+	const struct SqshCompression *compression;
 	uint16_t size;
 };
 

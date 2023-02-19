@@ -124,7 +124,7 @@ struct SqshMetablockContext {
 	 */
 	struct SqshMapping mapping;
 	struct SqshBuffer buffer;
-	struct SqshCompression *compression;
+	const struct SqshCompression *compression;
 };
 
 /**

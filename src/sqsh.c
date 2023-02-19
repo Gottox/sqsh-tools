@@ -227,13 +227,13 @@ out:
 	return rv;
 }
 
-struct SqshCompression *
-sqsh_data_compression(struct Sqsh *sqsh) {
+const struct SqshCompression *
+sqsh_data_compression(const struct Sqsh *sqsh) {
 	return &sqsh->data_compression;
 }
 
-struct SqshCompression *
-sqsh_metablock_compression(struct Sqsh *sqsh) {
+const struct SqshCompression *
+sqsh_metablock_compression(const struct Sqsh *sqsh) {
 	return &sqsh->metablock_compression;
 }
 

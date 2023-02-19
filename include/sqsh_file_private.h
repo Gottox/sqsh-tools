@@ -58,7 +58,7 @@ struct SqshFileContext {
 	struct SqshFragmentTable *fragment_table;
 	const struct SqshInodeContext *inode;
 	struct SqshBuffer buffer;
-	struct SqshCompression *compression;
+	const struct SqshCompression *compression;
 	uint64_t seek_pos;
 	uint32_t block_size;
 };
