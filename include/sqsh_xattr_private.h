@@ -51,9 +51,10 @@ struct SqshXattrIterator {
 	 */
 	struct Sqsh *sqsh;
 	struct SqshMetablockCursor metablock;
-	struct SqshMetablockStreamContext out_of_line_value;
+	struct SqshMetablockCursor out_of_line_value;
 	struct SqshXattrTable *context;
-	int remaining_entries;
+	size_t remaining_entries;
+	uint64_t upper_limit;
 	sqsh_index_t next_offset;
 	sqsh_index_t value_index;
 };

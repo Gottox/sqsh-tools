@@ -102,6 +102,7 @@ sqsh__xattr_iterator_init(
 	iterator->value_index = 0;
 	iterator->context = xattr_table;
 	iterator->sqsh = sqsh;
+	iterator->upper_limit = archive_size;
 
 out:
 	if (rv < 0) {
@@ -127,12 +128,15 @@ sqsh_xattr_iterator_new(const struct SqshInodeContext *inode, int *err) {
 
 static const struct SqshDataXattrValue *
 get_value(struct SqshXattrIterator *iterator) {
-	const uint8_t *data;
+	const struct SqshMetablockCursor *source;
+
 	if (iterator->value_index == 0) {
-		data = sqsh__metablock_stream_data(&iterator->out_of_line_value);
+		source = &iterator->out_of_line_value;
 	} else {
-		data = sqsh__metablock_cursor_data(&iterator->metablock);
+		source = &iterator->metablock;
 	}
+
+	const uint8_t *data = sqsh__metablock_cursor_data(source);
 	return (const struct SqshDataXattrValue *)&data[iterator->value_index];
 }
 
@@ -151,19 +155,22 @@ xattr_value_indirect_load(struct SqshXattrIterator *iterator) {
 		return -SQSH_ERROR_SIZE_MISSMATCH;
 	}
 	uint64_t ref = sqsh_data_xattr_value_ref(value);
+	uint64_t outer_offset = sqsh_address_ref_outer_offset(ref);
+	uint16_t inner_offset = sqsh_address_ref_inner_offset(ref);
 
 	uint64_t start_block = sqsh_xattr_table_start(iterator->context);
-	rv = sqsh__metablock_stream_init(
-			&iterator->out_of_line_value, iterator->sqsh, start_block, ~0);
-	if (rv < 0) {
-		goto out;
-	}
-	rv = sqsh__metablock_stream_seek_ref(&iterator->out_of_line_value, ref);
-	if (rv < 0) {
-		goto out;
-	}
 	size_t size = SQSH_SIZEOF_XATTR_VALUE;
-	rv = sqsh__metablock_stream_more(&iterator->out_of_line_value, size);
+	if (SQSH_ADD_OVERFLOW(start_block, outer_offset, &start_block)) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+	rv = sqsh__metablock_cursor_init(
+			&iterator->out_of_line_value, iterator->sqsh, start_block,
+			iterator->upper_limit);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh__metablock_cursor_advance(
+			&iterator->out_of_line_value, inner_offset, size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -172,7 +179,7 @@ xattr_value_indirect_load(struct SqshXattrIterator *iterator) {
 	iterator->value_index = 0;
 	value = get_value(iterator);
 	size += sqsh_data_xattr_value_size(value);
-	rv = sqsh__metablock_stream_more(&iterator->out_of_line_value, size);
+	rv = sqsh__metablock_cursor_advance(&iterator->out_of_line_value, 0, size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -186,7 +193,7 @@ sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator) {
 	int rv = 0;
 	size_t size = SQSH_SIZEOF_XATTR_KEY + SQSH_SIZEOF_XATTR_VALUE;
 
-	sqsh__metablock_stream_cleanup(&iterator->out_of_line_value);
+	sqsh__metablock_cursor_cleanup(&iterator->out_of_line_value);
 
 	if (iterator->remaining_entries == 0) {
 		return 0;
@@ -338,7 +345,7 @@ sqsh_xattr_iterator_value_size(struct SqshXattrIterator *iterator) {
 
 int
 sqsh__xattr_iterator_cleanup(struct SqshXattrIterator *iterator) {
-	sqsh__metablock_stream_cleanup(&iterator->out_of_line_value);
+	sqsh__metablock_cursor_cleanup(&iterator->out_of_line_value);
 	sqsh__metablock_cursor_cleanup(&iterator->metablock);
 	return 0;
 }
