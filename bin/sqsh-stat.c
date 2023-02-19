@@ -201,9 +201,9 @@ stat_image(struct Sqsh *sqsh) {
 	printf("           has fragments: %s\n",
 		   sqsh_superblock_has_fragments(superblock) ? "yes" : "no");
 	printf("        has export table: %s\n",
-		   sqsh_superblock_has_fragments(superblock) ? "yes" : "no");
+		   sqsh_superblock_has_export_table(superblock) ? "yes" : "no");
 	printf(" has compression options: %s\n",
-		   sqsh_superblock_has_fragments(superblock) ? "yes" : "no");
+		   sqsh_superblock_has_compression_options(superblock) ? "yes" : "no");
 	printf("              block size: %i\n",
 		   sqsh_superblock_block_size(superblock));
 	printf("          fragment count: %i\n",
