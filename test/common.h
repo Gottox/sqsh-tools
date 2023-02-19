@@ -57,6 +57,6 @@
 
 uint8_t *
 mk_stub(struct Sqsh *sqsh, uint8_t *payload, size_t payload_size,
-		uint64_t *target_size);
+		size_t *target_size);
 
 #endif /* !COMMON_H */
