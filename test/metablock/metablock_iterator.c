@@ -114,7 +114,67 @@ next_twice(void) {
 	free(data);
 }
 
+static void
+next_compressed(void) {
+	int rv;
+	struct Sqsh sqsh = {0};
+	struct SqshMetablockIterator iter;
+	uint8_t payload[] = {
+			METABLOCK_HEADER(1, CHUNK_SIZE(ZLIB_ABCD)),
+			ZLIB_ABCD,
+			METABLOCK_HEADER(1, CHUNK_SIZE(ZLIB_EFGH)),
+			ZLIB_EFGH,
+	};
+	const uint8_t *p;
+	size_t target_size;
+	struct SqshBuffer buffer = {0};
+
+	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload), &target_size);
+
+	rv = sqsh_buffer_init(&buffer);
+	assert(rv == 0);
+
+	rv = sqsh__metablock_iterator_init(
+			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, target_size);
+	assert(rv == 0);
+
+	rv = sqsh__metablock_iterator_next(&iter);
+	assert(rv == 0);
+
+	assert(sqsh__metablock_iterator_size(&iter) == CHUNK_SIZE(ZLIB_ABCD));
+
+	sqsh__metablock_iterator_append_to_buffer(&iter, &buffer);
+
+	assert(sqsh_buffer_size(&buffer) == 4);
+
+	p = sqsh_buffer_data(&buffer);
+	assert(p != NULL);
+	assert(memcmp(p, "abcd", 4) == 0);
+
+	rv = sqsh__metablock_iterator_next(&iter);
+	assert(rv == 0);
+	sqsh_buffer_drain(&buffer);
+
+	assert(sqsh__metablock_iterator_size(&iter) == CHUNK_SIZE(ZLIB_EFGH));
+
+	sqsh__metablock_iterator_append_to_buffer(&iter, &buffer);
+
+	assert(sqsh_buffer_size(&buffer) == 4);
+
+	p = sqsh__metablock_iterator_data(&iter);
+	assert(p != NULL);
+	assert(memcmp(p, "efgh", 4) == 0);
+
+	rv = sqsh__metablock_iterator_cleanup(&iter);
+	assert(rv == 0);
+
+	sqsh_buffer_cleanup(&buffer);
+	sqsh__cleanup(&sqsh);
+	free(data);
+}
+
 DEFINE
 TEST(next_once);
 TEST(next_twice);
+TEST(next_compressed);
 DEFINE_END
