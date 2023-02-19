@@ -60,8 +60,8 @@ out:
 int
 sqsh__metablock_stream_seek_ref(
 		struct SqshMetablockStreamContext *context, uint64_t ref) {
-	uint64_t address_offset = ref >> 16;
-	uint16_t index = ref & 0xFFFF;
+	uint64_t address_offset = sqsh_address_ref_outer_offset(ref);
+	uint16_t index = sqsh_address_ref_inner_offset(ref);
 
 	return sqsh__metablock_stream_seek(context, address_offset, index);
 }

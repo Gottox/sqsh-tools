@@ -66,6 +66,16 @@ sqsh_memdup(const void *source, size_t size) {
 	return memcpy(target, source, size);
 }
 
+SQSH_NO_UNUSED static inline uint64_t
+sqsh_address_ref_outer_offset(uint64_t ref) {
+	return ref >> 16;
+}
+
+SQSH_NO_UNUSED static inline uint16_t
+sqsh_address_ref_inner_offset(uint64_t ref) {
+	return ref & 0xFFFF;
+}
+
 #ifdef __cplusplus
 }
 #endif
