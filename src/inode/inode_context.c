@@ -130,7 +130,7 @@ sqsh__inode_init(
 	sqsh_inode_ref_to_block(inode_ref, &inode_block, &inode_offset);
 
 	int rv = 0;
-	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
+	const struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 
 	rv = sqsh__metablock_stream_init(
 			&inode->metablock, sqsh,
@@ -299,7 +299,8 @@ sqsh_inode_file_blocks_start(const struct SqshInodeContext *context) {
 
 uint32_t
 sqsh_inode_file_block_count(const struct SqshInodeContext *context) {
-	struct SqshSuperblockContext *superblock = sqsh_superblock(context->sqsh);
+	const struct SqshSuperblockContext *superblock =
+			sqsh_superblock(context->sqsh);
 	uint64_t file_size = sqsh_inode_file_size(context);
 	uint32_t block_size = sqsh_superblock_block_size(superblock);
 

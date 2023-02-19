@@ -127,7 +127,8 @@ sqsh_path_resolver_resolve(
 	int rv = 0;
 	struct SqshInodeContext *inode = NULL;
 	int segment_count = path_segments_count(path) + 1;
-	struct SqshSuperblockContext *superblock = sqsh_superblock(context->sqsh);
+	const struct SqshSuperblockContext *superblock =
+			sqsh_superblock(context->sqsh);
 	const char *segment = path;
 	uint64_t *inode_refs = calloc(segment_count, sizeof(uint64_t));
 	if (inode_refs == NULL) {

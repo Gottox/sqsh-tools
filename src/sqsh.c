@@ -237,8 +237,8 @@ sqsh_metablock_compression(struct Sqsh *sqsh) {
 	return &sqsh->metablock_compression;
 }
 
-struct SqshSuperblockContext *
-sqsh_superblock(struct Sqsh *sqsh) {
+const struct SqshSuperblockContext *
+sqsh_superblock(const struct Sqsh *sqsh) {
 	return &sqsh->superblock;
 }
 

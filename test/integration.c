@@ -88,7 +88,7 @@ sqsh_ls(void) {
 	struct SqshInodeContext inode = {0};
 	struct SqshDirectoryIterator *iter = NULL;
 	struct Sqsh sqsh = {0};
-	struct SqshSuperblockContext *superblock;
+	const struct SqshSuperblockContext *superblock;
 	const struct SqshConfig config = {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = sizeof(squash_image),
@@ -293,7 +293,7 @@ sqsh_test_uid_and_gid(void) {
 	uint32_t uid, gid;
 	struct SqshInodeContext inode = {0};
 	struct Sqsh sqsh = {0};
-	struct SqshSuperblockContext *superblock;
+	const struct SqshSuperblockContext *superblock;
 	const struct SqshConfig config = {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = sizeof(squash_image),
@@ -354,7 +354,7 @@ sqsh_test_xattr(void) {
 	struct SqshDirectoryIterator *dir_iter = NULL;
 	struct SqshXattrIterator *xattr_iter = NULL;
 	struct Sqsh sqsh = {0};
-	struct SqshSuperblockContext *superblock;
+	const struct SqshSuperblockContext *superblock;
 	const struct SqshConfig config = {
 			.source_type = SQSH_SOURCE_TYPE_MEMORY,
 			.source_size = sizeof(squash_image),

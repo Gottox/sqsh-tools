@@ -39,7 +39,7 @@
 int
 sqsh__trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh) {
 	int rv = 0;
-	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
+	const struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 	uint64_t trailing_start = sqsh_superblock_bytes_used(superblock);
 	struct SqshMapper *mapper = sqsh_mapper(sqsh);
 	size_t archive_size = sqsh_mapper_size(mapper);

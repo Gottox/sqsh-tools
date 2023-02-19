@@ -44,7 +44,7 @@
 int
 sqsh__fragment_table_init(struct SqshFragmentTable *table, struct Sqsh *sqsh) {
 	int rv = 0;
-	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
+	const struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 	uint64_t start = sqsh_superblock_fragment_table_start(superblock);
 	uint32_t count = sqsh_superblock_fragment_entry_count(superblock);
 

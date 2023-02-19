@@ -188,7 +188,7 @@ stat_lzo_options(
 
 static int
 stat_image(struct Sqsh *sqsh) {
-	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
+	const struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 	struct SqshCompressionOptionsContext *compression_options;
 	int compression_id = sqsh_superblock_compression_id(superblock);
 	int rv = 0;

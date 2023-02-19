@@ -104,7 +104,7 @@ sqshfuse_getattr(
 	memset(stbuf, 0, sizeof(struct stat));
 
 	struct SqshInodeContext *inode = NULL;
-	struct SqshSuperblockContext *superblock = sqsh_superblock(data.sqsh);
+	const struct SqshSuperblockContext *superblock = sqsh_superblock(data.sqsh);
 
 	inode = sqsh_path_resolver_resolve(data.resolver, path, &rv);
 	if (rv < 0) {

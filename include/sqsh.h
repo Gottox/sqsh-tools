@@ -86,7 +86,7 @@ sqsh_new(const void *source, const struct SqshConfig *config, int *err);
  *
  * @return the superblock context.
  */
-struct SqshSuperblockContext *sqsh_superblock(struct Sqsh *sqsh);
+const struct SqshSuperblockContext *sqsh_superblock(const struct Sqsh *sqsh);
 
 /**
  * @brief sqsh_mapper returns the mapper to retrieve chunks of the sqsh file.

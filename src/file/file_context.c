@@ -59,7 +59,7 @@ sqsh__file_init(
 		struct SqshFileContext *context, const struct SqshInodeContext *inode) {
 	int rv = 0;
 	struct Sqsh *sqsh = inode->sqsh;
-	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
+	const struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 
 	if (sqsh_inode_type(inode) != SQSH_INODE_TYPE_FILE) {
 		return -SQSH_ERROR_NOT_A_FILE;
