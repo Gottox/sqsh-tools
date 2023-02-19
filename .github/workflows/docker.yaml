@@ -6,6 +6,15 @@ on:
 
 jobs:
   docker:
+    strategy:
+      matrix:
+        include:
+          - base_image: alpine
+            tag_suffix: x86_64
+            extra_tags: latest x86_64
+          - base_image: i386/alpine
+            tag_suffix: i386
+            extra_tags: i386
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -14,9 +23,12 @@ jobs:
       uses: redhat-actions/buildah-build@v2
       with:
         image: sqsh-build
+        build-args: |
+          BASE_IMAGE=${{matrix.base_image}}
         tags: >
-          sha-${{ github.sha }} latest
-          ${{ github.ref_name }}
+          sha-${{ github.sha }}-${{ matrix.tag_suffix }}
+          ${{ github.ref_name }}-${{ matrix.tag_suffix }}
+          ${{ matrix.extra_tags }}
         context: utils
         containerfiles: utils/Dockerfile
     - name: Push to Dockerhub
