@@ -161,7 +161,7 @@ next_compressed(void) {
 
 	assert(sqsh_buffer_size(&buffer) == 4);
 
-	p = sqsh__metablock_iterator_data(&iter);
+	p = sqsh_buffer_data(&buffer);
 	assert(p != NULL);
 	assert(memcmp(p, "efgh", 4) == 0);
 
