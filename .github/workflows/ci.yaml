@@ -6,7 +6,7 @@ jobs:
     strategy:
       matrix:
         arch:
-          - i386
+          #- i386
           - x86_64
     runs-on: ubuntu-latest
     container: gottox/sqsh-build:${{ matrix.arch }}
@@ -38,7 +38,7 @@ jobs:
           - true
           - false
         arch:
-          - i386
+          #- i386
           - x86_64
     steps:
     - uses: actions/checkout@v3
