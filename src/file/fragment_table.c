@@ -48,7 +48,7 @@ sqsh__fragment_table_init(struct SqshFragmentTable *table, struct Sqsh *sqsh) {
 	uint64_t start = sqsh_superblock_fragment_table_start(superblock);
 	uint32_t count = sqsh_superblock_fragment_entry_count(superblock);
 
-	table->compression = sqsh_data_compression(sqsh);
+	table->compression = sqsh_compression_data(sqsh);
 	table->mapper = sqsh_mapper(sqsh);
 	rv = sqsh__table_init(
 			&table->table, sqsh, start, SQSH_SIZEOF_FRAGMENT, count);

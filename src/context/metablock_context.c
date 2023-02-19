@@ -57,7 +57,7 @@ sqsh__metablock_init(
 	if (rv < 0) {
 		goto out;
 	}
-	context->compression = sqsh_metablock_compression(sqsh);
+	context->compression = sqsh_compression_metablock(sqsh);
 
 out:
 	if (rv < 0) {

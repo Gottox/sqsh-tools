@@ -68,7 +68,7 @@ sqsh__file_init(
 	context->inode = inode;
 	context->block_size = sqsh_superblock_block_size(superblock);
 	context->mapper = sqsh_mapper(sqsh);
-	context->compression = sqsh_data_compression(sqsh);
+	context->compression = sqsh_compression_data(sqsh);
 
 	if (sqsh_inode_file_has_fragment(inode)) {
 		rv = sqsh_fragment_table(sqsh, &context->fragment_table);

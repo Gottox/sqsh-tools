@@ -98,17 +98,17 @@ const struct SqshSuperblockContext *sqsh_superblock(const struct Sqsh *sqsh);
  */
 struct SqshMapper *sqsh_mapper(struct Sqsh *sqsh);
 /**
- * @brief sqsh_data_compression returns the compression context for data blocks
+ * @brief sqsh_compression_data returns the compression context for data blocks
  * @memberof Sqsh
  *
  * @param[in] sqsh the Sqsh structure.
  *
  * @return the compression context.
  */
-const struct SqshCompression *sqsh_data_compression(const struct Sqsh *sqsh);
+const struct SqshCompression *sqsh_compression_data(const struct Sqsh *sqsh);
 
 /**
- * @brief sqsh_data_compression returns the compression context for metadata
+ * @brief sqsh_compression_data returns the compression context for metadata
  * blocks.
  * @memberof Sqsh
  *
@@ -117,7 +117,7 @@ const struct SqshCompression *sqsh_data_compression(const struct Sqsh *sqsh);
  * @return the compression context.
  */
 const struct SqshCompression *
-sqsh_metablock_compression(const struct Sqsh *sqsh);
+sqsh_compression_metablock(const struct Sqsh *sqsh);
 
 /**
  * @brief Retrieves the id table of a Sqsh instance.

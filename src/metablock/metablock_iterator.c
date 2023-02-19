@@ -45,7 +45,7 @@ sqsh__metablock_iterator_init(
 		uint64_t start_address, uint64_t upper_limit) {
 	struct SqshMapper *mapper = sqsh_mapper(sqsh);
 	const struct SqshCompression *compression =
-			sqsh_metablock_compression(sqsh);
+			sqsh_compression_metablock(sqsh);
 
 	iterator->size = 0;
 	iterator->is_compressed = false;

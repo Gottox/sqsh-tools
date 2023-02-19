@@ -97,7 +97,7 @@ sqsh_compression_options_gzip_compression_level(
 	if (context->compression_id != SQSH_COMPRESSION_GZIP) {
 		return UINT32_MAX;
 	}
-	return sqsh_data_compression_options_gzip_compression_level(
+	return sqsh_compression_data_options_gzip_compression_level(
 			compression_options(context));
 }
 uint16_t
@@ -106,7 +106,7 @@ sqsh_compression_options_gzip_window_size(
 	if (context->compression_id != SQSH_COMPRESSION_GZIP) {
 		return UINT16_MAX;
 	}
-	return sqsh_data_compression_options_gzip_window_size(
+	return sqsh_compression_data_options_gzip_window_size(
 			compression_options(context));
 }
 enum SqshGzipStrategies
@@ -115,7 +115,7 @@ sqsh_compression_options_gzip_strategies(
 	if (context->compression_id != SQSH_COMPRESSION_GZIP) {
 		return UINT16_MAX;
 	}
-	return sqsh_data_compression_options_gzip_strategies(
+	return sqsh_compression_data_options_gzip_strategies(
 			compression_options(context));
 }
 
@@ -125,7 +125,7 @@ sqsh_compression_options_xz_dictionary_size(
 	if (context->compression_id != SQSH_COMPRESSION_XZ) {
 		return UINT32_MAX;
 	}
-	return sqsh_data_compression_options_xz_dictionary_size(
+	return sqsh_compression_data_options_xz_dictionary_size(
 			compression_options(context));
 }
 uint32_t
@@ -134,7 +134,7 @@ sqsh_compression_options_xz_filters(
 	if (context->compression_id != SQSH_COMPRESSION_XZ) {
 		return UINT32_MAX;
 	}
-	return sqsh_data_compression_options_xz_filters(
+	return sqsh_compression_data_options_xz_filters(
 			compression_options(context));
 }
 
@@ -144,7 +144,7 @@ sqsh_compression_options_lz4_version(
 	if (context->compression_id != SQSH_COMPRESSION_LZ4) {
 		return UINT32_MAX;
 	}
-	return sqsh_data_compression_options_lz4_version(
+	return sqsh_compression_data_options_lz4_version(
 			compression_options(context));
 }
 uint32_t
@@ -153,7 +153,7 @@ sqsh_compression_options_lz4_flags(
 	if (context->compression_id != SQSH_COMPRESSION_LZ4) {
 		return UINT32_MAX;
 	}
-	return sqsh_data_compression_options_lz4_flags(
+	return sqsh_compression_data_options_lz4_flags(
 			compression_options(context));
 }
 
@@ -163,7 +163,7 @@ sqsh_compression_options_zstd_compression_level(
 	if (context->compression_id != SQSH_COMPRESSION_ZSTD) {
 		return UINT32_MAX;
 	}
-	return sqsh_data_compression_options_zstd_compression_level(
+	return sqsh_compression_data_options_zstd_compression_level(
 			compression_options(context));
 }
 
@@ -173,7 +173,7 @@ sqsh_compression_options_lzo_algorithm(
 	if (context->compression_id != SQSH_COMPRESSION_LZO) {
 		return UINT32_MAX;
 	}
-	return sqsh_data_compression_options_lzo_algorithm(
+	return sqsh_compression_data_options_lzo_algorithm(
 			compression_options(context));
 }
 uint32_t
@@ -182,7 +182,7 @@ sqsh_compression_options_lzo_compression_level(
 	if (context->compression_id != SQSH_COMPRESSION_LZO) {
 		return UINT32_MAX;
 	}
-	return sqsh_data_compression_options_lzo_compression_level(
+	return sqsh_compression_data_options_lzo_compression_level(
 			compression_options(context));
 }
 
