@@ -34,6 +34,7 @@
 #include "../include/sqsh_compression_private.h"
 #include "../include/sqsh_data.h"
 #include "../include/sqsh_private.h"
+#include "sqsh_context.h"
 #include <string.h>
 
 static const uint64_t NO_SEGMENT = 0xFFFFFFFFFFFFFFFF;

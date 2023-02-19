@@ -14,7 +14,8 @@
 #include <assert.h>
 
 uint8_t *
-mk_stub(struct Sqsh *sqsh, uint8_t *payload, size_t payload_size) {
+mk_stub(struct Sqsh *sqsh, uint8_t *payload, size_t payload_size,
+		uint64_t *target_size) {
 	struct SqshDataSuperblock superblock = {
 			.magic = SQSH_SUPERBLOCK_MAGIC,
 			.inode_count = 0,
@@ -41,8 +42,9 @@ mk_stub(struct Sqsh *sqsh, uint8_t *payload, size_t payload_size) {
 	memcpy(data, &superblock, SQSH_SIZEOF_SUPERBLOCK);
 	memcpy(&data[SQSH_SIZEOF_SUPERBLOCK], payload, payload_size);
 
+	*target_size = SQSH_SIZEOF_SUPERBLOCK + payload_size;
 	const struct SqshConfig config = {
-			.source_size = SQSH_SIZEOF_SUPERBLOCK + payload_size,
+			.source_size = *target_size,
 			.source_type = SQSH_SOURCE_TYPE_MEMORY};
 	assert(0 == sqsh__init(sqsh, data, &config));
 	return data;

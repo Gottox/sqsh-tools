@@ -43,16 +43,17 @@
 static void
 advance_once(void) {
 	int rv;
-	struct Sqsh sqsh;
-	struct SqshMetablockCursor cursor;
+	struct Sqsh sqsh = {0};
+	struct SqshMetablockCursor cursor = {0};
 	uint8_t payload[] = {
 			METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
 	};
 	const uint8_t *p;
-	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload));
+	size_t target_size;
+	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload), &target_size);
 
 	rv = sqsh__metablock_cursor_init(
-			&cursor, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&cursor, &sqsh, SQSH_SIZEOF_SUPERBLOCK, target_size);
 	assert(rv == 0);
 
 	rv = sqsh__metablock_cursor_advance(&cursor, 0, 4);
@@ -74,17 +75,18 @@ advance_once(void) {
 static void
 advance_twice(void) {
 	int rv;
-	struct Sqsh sqsh;
-	struct SqshMetablockCursor cursor;
+	struct Sqsh sqsh = {0};
+	struct SqshMetablockCursor cursor = {0};
 	uint8_t payload[] = {
 			METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
 			METABLOCK_HEADER(0, 4), 'e', 'f', 'g', 'h',
 	};
 	const uint8_t *p;
-	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload));
+	size_t target_size;
+	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload), &target_size);
 
 	rv = sqsh__metablock_cursor_init(
-			&cursor, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&cursor, &sqsh, SQSH_SIZEOF_SUPERBLOCK, target_size);
 	assert(rv == 0);
 
 	rv = sqsh__metablock_cursor_advance(&cursor, 0, 4);
@@ -115,17 +117,18 @@ advance_twice(void) {
 static void
 advance_overlapping(void) {
 	int rv;
-	struct Sqsh sqsh;
+	struct Sqsh sqsh = {0};
 	struct SqshMetablockCursor cursor;
 	uint8_t payload[] = {
 			METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
 			METABLOCK_HEADER(0, 4), 'e', 'f', 'g', 'h',
 	};
 	const uint8_t *p;
-	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload));
+	size_t target_size;
+	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload), &target_size);
 
 	rv = sqsh__metablock_cursor_init(
-			&cursor, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&cursor, &sqsh, SQSH_SIZEOF_SUPERBLOCK, target_size);
 	assert(rv == 0);
 
 	rv = sqsh__metablock_cursor_advance(&cursor, 2, 4);

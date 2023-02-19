@@ -36,7 +36,7 @@
 #include "../../include/sqsh_data.h"
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_xattr_private.h"
-#include "sqsh_mapper.h"
+#include "../utils.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -51,17 +51,18 @@ get_header(const struct SqshXattrTable *context) {
 int
 sqsh__xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh) {
 	int rv = 0;
-	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
+	const struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 	struct SqshMapper *mapper = sqsh_mapper(sqsh);
-	uint64_t xattr_address = sqsh_superblock_xattr_id_table_start(superblock);
-	uint64_t bytes_used = sqsh_superblock_bytes_used(superblock);
-	if (xattr_address + SQSH_SIZEOF_XATTR_ID_TABLE >= bytes_used) {
-		return -SQSH_ERROR_SIZE_MISSMATCH;
+	const uint64_t xattr_address =
+			sqsh_superblock_xattr_id_table_start(superblock);
+	uint64_t upper_limit;
+	if (SQSH_ADD_OVERFLOW(
+				xattr_address, SQSH_SIZEOF_XATTR_ID_TABLE, &upper_limit)) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	context->sqsh = sqsh;
 	rv = sqsh__map_cursor_init(
-			&context->header, mapper, xattr_address,
-			SQSH_SIZEOF_XATTR_ID_TABLE);
+			&context->header, mapper, xattr_address, upper_limit);
 	if (rv < 0) {
 		goto out;
 	}

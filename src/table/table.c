@@ -51,13 +51,14 @@ lookup_table_get(const struct SqshTable *table, sqsh_index_t index) {
 
 int
 sqsh__table_init(
-		struct SqshTable *table, struct Sqsh *sqsh, sqsh_index_t start_block,
+		struct SqshTable *table, struct Sqsh *sqsh, uint64_t start_block,
 		size_t element_size, size_t element_count) {
 	int rv = 0;
 	size_t byte_size;
 	size_t table_size;
 	size_t lookup_table_size;
 	size_t lookup_table_count;
+	uint64_t upper_limit;
 	struct SqshMapper *mapper = sqsh_mapper(sqsh);
 
 	if (SQSH_MULT_OVERFLOW(element_size, element_count, &table_size)) {
@@ -72,8 +73,12 @@ sqsh__table_init(
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
+	if (SQSH_ADD_OVERFLOW(start_block, lookup_table_size, &upper_limit)) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+
 	rv = sqsh__map_cursor_init(
-			&table->lookup_table, mapper, start_block, lookup_table_size);
+			&table->lookup_table, mapper, start_block, upper_limit);
 	if (rv < 0) {
 		return rv;
 	}

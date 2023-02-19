@@ -37,6 +37,8 @@
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_metablock_private.h"
 
+#include <string.h>
+
 int
 sqsh__metablock_iterator_init(
 		struct SqshMetablockIterator *iterator, struct Sqsh *sqsh,

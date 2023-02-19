@@ -50,13 +50,12 @@ struct SqshXattrIterator {
 	 * @privatesection
 	 */
 	struct Sqsh *sqsh;
-	struct SqshMetablockStreamContext metablock;
+	struct SqshMetablockCursor metablock;
 	struct SqshMetablockStreamContext out_of_line_value;
 	struct SqshXattrTable *context;
 	int remaining_entries;
 	sqsh_index_t next_offset;
-	sqsh_index_t key_offset;
-	sqsh_index_t value_offset;
+	sqsh_index_t value_index;
 };
 
 /**

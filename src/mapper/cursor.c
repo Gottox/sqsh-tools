@@ -48,7 +48,7 @@ sqsh__map_cursor_init(
 	cursor->mapper = mapper;
 	return sqsh_mapper_map(
 			&cursor->mapping, mapper, start_address,
-			SQSH_MIN(4096, upper_limit));
+			SQSH_MIN(4096, upper_limit - start_address));
 }
 
 int

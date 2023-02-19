@@ -72,7 +72,7 @@ struct SqshTable {
  * @return 0 on success, a negative value on error.
  */
 int sqsh__table_init(
-		struct SqshTable *table, struct Sqsh *sqsh, sqsh_index_t start_block,
+		struct SqshTable *table, struct Sqsh *sqsh, uint64_t start_block,
 		size_t element_size, size_t element_count);
 
 /**

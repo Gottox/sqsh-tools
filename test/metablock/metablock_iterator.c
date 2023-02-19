@@ -43,16 +43,17 @@
 static void
 next_once(void) {
 	int rv;
-	struct Sqsh sqsh;
+	struct Sqsh sqsh = {0};
 	struct SqshMetablockIterator iter;
 	uint8_t payload[] = {
 			METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
 	};
 	const uint8_t *p;
-	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload));
+	size_t target_size;
+	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload), &target_size);
 
 	rv = sqsh__metablock_iterator_init(
-			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, target_size);
 	assert(rv == 0);
 
 	rv = sqsh__metablock_iterator_next(&iter);
@@ -74,17 +75,18 @@ next_once(void) {
 static void
 next_twice(void) {
 	int rv;
-	struct Sqsh sqsh;
+	struct Sqsh sqsh = {0};
 	struct SqshMetablockIterator iter;
 	uint8_t payload[] = {
 			METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
 			METABLOCK_HEADER(0, 4), 'e', 'f', 'g', 'h',
 	};
 	const uint8_t *p;
-	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload));
+	size_t target_size;
+	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload), &target_size);
 
 	rv = sqsh__metablock_iterator_init(
-			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, target_size);
 	assert(rv == 0);
 
 	rv = sqsh__metablock_iterator_next(&iter);
