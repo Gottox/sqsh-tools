@@ -36,6 +36,7 @@
 
 #include "sqsh_context.h"
 #include "sqsh_mapper.h"
+#include "sqsh_metablock_private.h"
 #include "sqsh_primitive.h"
 
 #ifdef __cplusplus
@@ -88,7 +89,7 @@ struct SqshCompressionOptionsContext {
 	 * @privatesection
 	 */
 	uint16_t compression_id;
-	struct SqshBuffer buffer;
+	struct SqshMetablockIterator metablock;
 };
 
 /**

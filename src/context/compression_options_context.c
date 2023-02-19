@@ -34,11 +34,13 @@
 #include "../../include/sqsh.h"
 #include "../../include/sqsh_context_private.h"
 #include "../../include/sqsh_data.h"
+#include "../../include/sqsh_metablock_private.h"
 #include <stdint.h>
 
 static const union SqshCompressionOptions *
 compression_options(const struct SqshCompressionOptionsContext *context) {
-	return (union SqshCompressionOptions *)sqsh_buffer_data(&context->buffer);
+	return (union SqshCompressionOptions *)sqsh__metablock_iterator_data(
+			&context->metablock);
 }
 
 struct SqshCompressionOptionsContext *
@@ -60,27 +62,29 @@ int
 sqsh__compression_options_init(
 		struct SqshCompressionOptionsContext *context, struct Sqsh *sqsh) {
 	int rv = 0;
-	struct SqshMetablockContext metablock = {0};
 	struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 
-	rv = sqsh__metablock_init(&metablock, sqsh, SQSH_SIZEOF_SUPERBLOCK);
+	// TODO: sane limit
+	rv = sqsh__metablock_iterator_init(
+			&context->metablock, sqsh, SQSH_SIZEOF_SUPERBLOCK, UINT64_MAX);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = sqsh_buffer_init(&context->buffer);
+	rv = sqsh__metablock_iterator_next(&context->metablock);
 	if (rv < 0) {
+		rv = -SQSH_ERROR_TODO;
 		goto out;
 	}
 
-	rv = sqsh__metablock_to_buffer(&metablock, &context->buffer);
-	if (rv < 0) {
+	if (sqsh__metablock_iterator_is_compressed(&context->metablock)) {
+		rv = -SQSH_ERROR_TODO;
 		goto out;
 	}
+
 	context->compression_id = sqsh_superblock_compression_id(superblock);
 
 out:
-	sqsh__metablock_cleanup(&metablock);
 	if (rv < 0) {
 		sqsh__compression_options_cleanup(context);
 	}
@@ -185,13 +189,13 @@ sqsh_compression_options_lzo_compression_level(
 size_t
 sqsh_compression_options_size(
 		const struct SqshCompressionOptionsContext *context) {
-	return sqsh_buffer_size(&context->buffer);
+	return sqsh__metablock_iterator_size(&context->metablock);
 }
 
 int
 sqsh__compression_options_cleanup(
 		struct SqshCompressionOptionsContext *context) {
-	sqsh_buffer_cleanup(&context->buffer);
+	sqsh__metablock_iterator_cleanup(&context->metablock);
 
 	return 0;
 }
