@@ -40,8 +40,6 @@ sqsh_hdr_priv = [
 sqsh_src = [
 	'src/compression/compression.c',
 	'src/context/compression_options_context.c',
-	'src/context/metablock_context.c',
-	'src/context/metablock_stream_context.c',
 	'src/context/path_resolver_context.c',
 	'src/context/superblock_context.c',
 	'src/context/trailing_context.c',
