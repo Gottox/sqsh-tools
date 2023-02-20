@@ -60,7 +60,6 @@ sqsh__xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh) {
 				xattr_address, SQSH_SIZEOF_XATTR_ID_TABLE, &upper_limit)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
-	context->sqsh = sqsh;
 	rv = sqsh__map_cursor_init(
 			&context->header, mapper, xattr_address, upper_limit);
 	if (rv < 0) {
