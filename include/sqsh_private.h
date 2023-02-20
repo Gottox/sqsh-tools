@@ -40,9 +40,6 @@
 #include "sqsh_error.h"
 #include "sqsh_xattr_private.h"
 
-#include <stdint.h>
-#include <stdlib.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
