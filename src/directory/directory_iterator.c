@@ -38,6 +38,7 @@
 #include "../../include/sqsh_inode_private.h"
 #include "../utils.h"
 
+#include <stdint.h>
 #include <string.h>
 
 static int
@@ -47,6 +48,9 @@ directory_iterator_index_lookup(
 	int rv = 0;
 	struct SqshDirectoryIndexIterator index_iterator = {0};
 	struct SqshInodeContext *inode = iterator->inode;
+
+	// disable fast index lookup for now.
+	return 0;
 
 	rv = sqsh__directory_index_iterator_init(&index_iterator, inode);
 	if (rv < 0) {
@@ -74,31 +78,16 @@ directory_iterator_index_lookup(
 	return rv;
 }
 
-static const struct SqshDataDirectoryFragment *
-directory_iterator_current_fragment(
-		const struct SqshDirectoryIterator *iterator) {
-	const uint8_t *tmp = (const uint8_t *)iterator->fragments;
-	return (const struct SqshDataDirectoryFragment
-					*)&tmp[iterator->current_fragment_offset];
-}
-
-static int
-directory_data_more(struct SqshDirectoryIterator *iterator, size_t size) {
-	int rv = sqsh__metablock_stream_more(&iterator->metablock, size);
-	if (rv < 0) {
-		return rv;
-	}
-
-	iterator->fragments =
-			(struct SqshDataDirectoryFragment *)sqsh__metablock_stream_data(
-					&iterator->metablock);
-	return 0;
-}
-
 static struct SqshDataDirectoryEntry *
-current_entry(const struct SqshDirectoryIterator *iterator) {
-	const uint8_t *tmp = (const uint8_t *)iterator->fragments;
-	return (struct SqshDataDirectoryEntry *)&tmp[iterator->current_offset];
+get_entry(const struct SqshDirectoryIterator *iterator) {
+	const uint8_t *data = sqsh__metablock_cursor_data(&iterator->metablock);
+	return (struct SqshDataDirectoryEntry *)data;
+}
+
+static struct SqshDataDirectoryFragment *
+get_fragment(const struct SqshDirectoryIterator *iterator) {
+	const uint8_t *data = sqsh__metablock_cursor_data(&iterator->metablock);
+	return (struct SqshDataDirectoryFragment *)data;
 }
 
 int
@@ -136,28 +125,26 @@ sqsh__directory_iterator_init(
 	if (sqsh_inode_type(inode) != SQSH_INODE_TYPE_DIRECTORY) {
 		return -SQSH_ERROR_NOT_A_DIRECTORY;
 	}
-	iterator->block_start = sqsh_inode_directory_block_start(inode);
-	iterator->block_offset = sqsh_inode_directory_block_offset(inode);
+
+	const uint64_t outer_offset = sqsh_inode_directory_block_start(inode);
+	const uint32_t inner_offset = sqsh_inode_directory_block_offset(inode);
+	uint64_t start_address = sqsh_superblock_directory_table_start(superblock);
+	// TODO: Use a better upper limit
+	const uint64_t upper_limit = sqsh_superblock_bytes_used(superblock);
+	if (SQSH_ADD_OVERFLOW(start_address, outer_offset, &start_address)) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+
 	iterator->size = sqsh_inode_file_size(inode) - 3;
 	iterator->inode = inode;
 
-	rv = sqsh__metablock_stream_init(
-			&iterator->metablock, sqsh,
-			sqsh_superblock_directory_table_start(superblock), ~0);
-	if (rv < 0) {
-		return rv;
-	}
-	rv = sqsh__metablock_stream_seek(
-			&iterator->metablock, iterator->block_start,
-			iterator->block_offset);
+	rv = sqsh__metablock_cursor_init(
+			&iterator->metablock, sqsh, start_address, upper_limit);
 	if (rv < 0) {
 		return rv;
 	}
 
-	iterator->current_fragment_offset = 0;
-	iterator->remaining_entries = 0;
-	iterator->next_offset = 0;
-	iterator->current_offset = 0;
+	iterator->next_offset = inner_offset;
 
 	return rv;
 }
@@ -180,18 +167,16 @@ sqsh_directory_iterator_new(struct SqshInodeContext *inode, int *err) {
 int
 sqsh_directory_iterator_name_size(
 		const struct SqshDirectoryIterator *iterator) {
-	const struct SqshDataDirectoryEntry *entry = current_entry(iterator);
+	const struct SqshDataDirectoryEntry *entry = get_entry(iterator);
 	return sqsh_data_directory_entry_name_size(entry) + 1;
 }
 
 uint64_t
 sqsh_directory_iterator_inode_ref(
 		const struct SqshDirectoryIterator *iterator) {
-	const struct SqshDataDirectoryFragment *fragment =
-			directory_iterator_current_fragment(iterator);
-	uint32_t block_index = sqsh_data_directory_fragment_start(fragment);
+	uint32_t block_index = iterator->start_base;
 	uint16_t block_offset =
-			sqsh_data_directory_entry_offset(current_entry(iterator));
+			sqsh_data_directory_entry_offset(get_entry(iterator));
 
 	return sqsh_inode_ref_from_block(block_index, block_offset);
 }
@@ -199,7 +184,7 @@ sqsh_directory_iterator_inode_ref(
 enum SqshInodeContextType
 sqsh_directory_iterator_inode_type(
 		const struct SqshDirectoryIterator *iterator) {
-	switch (sqsh_data_directory_entry_type(current_entry(iterator))) {
+	switch (sqsh_data_directory_entry_type(get_entry(iterator))) {
 	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
 		return SQSH_INODE_TYPE_DIRECTORY;
 	case SQSH_INODE_TYPE_BASIC_FILE:
@@ -230,52 +215,61 @@ sqsh_directory_iterator_inode_load(
 int
 sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator) {
 	int rv = 0;
-	iterator->current_offset = iterator->next_offset;
-
-	if (iterator->next_offset >= iterator->size) {
+	uint64_t next_offset = iterator->next_offset;
+	size_t size = 0;
+	if (iterator->size == 0) {
 		// TODO: Check if 0 is really okay here.
 		return 0;
 	} else if (iterator->remaining_entries == 0) {
 		// New fragment begins
-		iterator->next_offset += SQSH_SIZEOF_DIRECTORY_FRAGMENT;
-
-		rv = directory_data_more(iterator, iterator->next_offset);
+		rv = sqsh__metablock_cursor_advance(
+				&iterator->metablock, next_offset,
+				SQSH_SIZEOF_DIRECTORY_FRAGMENT);
 		if (rv < 0) {
 			return rv;
 		}
-		iterator->current_fragment_offset = iterator->current_offset;
 
-		const struct SqshDataDirectoryFragment *current_fragment =
-				directory_iterator_current_fragment(iterator);
+		const struct SqshDataDirectoryFragment *fragment =
+				get_fragment(iterator);
 		iterator->remaining_entries =
-				sqsh_data_directory_fragment_count(current_fragment) + 1;
+				sqsh_data_directory_fragment_count(fragment) + 1;
+		iterator->start_base = sqsh_data_directory_fragment_start(fragment);
+		iterator->inode_base =
+				sqsh_data_directory_fragment_inode_number(fragment);
 
-		iterator->current_offset = iterator->next_offset;
+		next_offset = SQSH_SIZEOF_DIRECTORY_FRAGMENT;
+		iterator->size -= SQSH_SIZEOF_DIRECTORY_FRAGMENT;
 	}
 	iterator->remaining_entries--;
 
 	// Make sure next entry is loaded:
-	iterator->next_offset += SQSH_SIZEOF_DIRECTORY_ENTRY;
-	rv = directory_data_more(iterator, iterator->next_offset);
+	size = SQSH_SIZEOF_DIRECTORY_ENTRY;
+	rv = sqsh__metablock_cursor_advance(
+			&iterator->metablock, next_offset, size);
 	if (rv < 0) {
 		return rv;
 	}
 
 	// Make sure next entry has its name populated
-	iterator->next_offset += sqsh_directory_iterator_name_size(iterator);
+	if (SQSH_ADD_OVERFLOW(
+				size, sqsh_directory_iterator_name_size(iterator), &size)) {
+		return SQSH_ERROR_INTEGER_OVERFLOW;
+	}
 	// May invalidate pointers into directory entries. that's why the
-	// current_entry() call is repeated below.
-	rv = directory_data_more(iterator, iterator->next_offset);
+	// get_entry() call is repeated below.
+	rv = sqsh__metablock_cursor_advance(&iterator->metablock, 0, size);
 	if (rv < 0) {
 		return rv;
 	}
 
+	iterator->next_offset = size;
+	iterator->size -= size;
 	return 1;
 }
 
 const char *
 sqsh_directory_iterator_name(const struct SqshDirectoryIterator *iterator) {
-	const struct SqshDataDirectoryEntry *entry = current_entry(iterator);
+	const struct SqshDataDirectoryEntry *entry = get_entry(iterator);
 	return (char *)sqsh_data_directory_entry_name(entry);
 }
 
@@ -296,7 +290,7 @@ sqsh_directory_iterator_name_dup(
 int
 sqsh__directory_iterator_cleanup(struct SqshDirectoryIterator *iterator) {
 	int rv = 0;
-	rv = sqsh__metablock_stream_cleanup(&iterator->metablock);
+	rv = sqsh__metablock_cursor_cleanup(&iterator->metablock);
 	return rv;
 }
 

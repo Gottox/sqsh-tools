@@ -49,16 +49,15 @@ struct SqshDirectoryIterator {
 	 * @privatesection
 	 */
 	struct SqshInodeContext *inode;
-	uint32_t block_start;
-	uint32_t block_offset;
 	uint32_t size;
 
 	const struct SqshDataDirectoryFragment *fragments;
-	struct SqshMetablockStreamContext metablock;
+	struct SqshMetablockCursor metablock;
 	size_t remaining_entries;
-	sqsh_index_t current_fragment_offset;
 	sqsh_index_t next_offset;
-	sqsh_index_t current_offset;
+
+	uint32_t start_base;
+	uint32_t inode_base;
 };
 
 /**
