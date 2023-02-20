@@ -35,7 +35,6 @@
 #define SQSH_CONTEXT_PRIVATE_H
 
 #include "sqsh_context.h"
-#include "sqsh_mapper.h"
 #include "sqsh_metablock_private.h"
 
 #ifdef __cplusplus

@@ -40,6 +40,8 @@
 extern "C" {
 #endif
 
+struct Sqsh;
+
 ////////////////////////////////////////
 // mapper/canary_mapper.c
 

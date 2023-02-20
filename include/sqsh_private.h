@@ -36,7 +36,6 @@
 
 #include "sqsh.h"
 #include "sqsh_compression_private.h"
-#include "sqsh_context_private.h"
 #include "sqsh_error.h"
 #include "sqsh_xattr_private.h"
 
