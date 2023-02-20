@@ -113,7 +113,7 @@ sqsh_mapping_mmap_complete_size(const struct SqshMapping *mapping) {
 }
 
 const struct SqshMemoryMapperImpl sqsh_mapper_impl_mmap_full = {
-		.size_hint = SIZE_MAX,
+		.block_size_hint = SIZE_MAX,
 		.init = sqsh_mapper_mmap_complete_init,
 		.mapping = sqsh_mapper_mmap_complete_map,
 		.size = sqsh_mapper_mmap_complete_size,

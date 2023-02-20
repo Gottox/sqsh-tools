@@ -35,6 +35,7 @@
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_mapper.h"
 #include "../utils.h"
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -46,6 +47,12 @@ sqsh_mapper_init(
 		mapper->impl = config->source_mapper;
 	} else {
 		mapper->impl = &sqsh_mapper_impl_mmap;
+	}
+
+	if (config->mapper_block_size) {
+		mapper->block_size = config->mapper_block_size;
+	} else {
+		mapper->block_size = mapper->impl->block_size_hint;
 	}
 	return mapper->impl->init(mapper, input, config->source_size);
 }
@@ -69,6 +76,10 @@ sqsh_mapper_map(
 	return mapper->impl->mapping(mapping, offset, size);
 }
 
+size_t
+sqsh_mapper_block_size(const struct SqshMapper *mapper) {
+	return mapper->block_size;
+}
 size_t
 sqsh_mapper_size(const struct SqshMapper *mapper) {
 	return mapper->impl->size(mapper);

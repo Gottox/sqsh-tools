@@ -178,7 +178,7 @@ struct SqshMemoryMapperImpl {
 	/**
 	 * @privatesection
 	 */
-	size_t size_hint;
+	size_t block_size_hint;
 	int (*init)(struct SqshMapper *mapper, const void *input, size_t size);
 	int (*mapping)(struct SqshMapping *map, sqsh_index_t offset, size_t size);
 	size_t (*size)(const struct SqshMapper *mapper);
@@ -194,6 +194,7 @@ struct SqshMapper {
 	 * @privatesection
 	 */
 	const struct SqshMemoryMapperImpl *impl;
+	size_t block_size;
 	union {
 		struct SqshMmapFullMapper mc;
 		struct SqshMmapMapper mm;
@@ -244,6 +245,17 @@ int sqsh_mapper_map(
  * @return The size of the input data in the mapper.
  */
 size_t sqsh_mapper_size(const struct SqshMapper *mapper);
+
+/**
+ * @internal
+ * @memberof SqshMapper
+ * @brief Retrieves the block size for a mapper.
+ *
+ * @param[in] mapper The mapper to retrieve the size from.
+ *
+ * @return The size of the input data in the mapper.
+ */
+size_t sqsh_mapper_block_size(const struct SqshMapper *mapper);
 
 /**
  * @internal
