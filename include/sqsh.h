@@ -46,7 +46,7 @@ extern "C" {
  */
 struct SqshConfig {
 	size_t source_size;
-	struct SqshMemoryMapperImpl *source_mapper;
+	const struct SqshMemoryMapperImpl *source_mapper;
 };
 
 struct Sqsh;
