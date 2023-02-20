@@ -72,6 +72,16 @@ SQSH_NO_UNUSED struct Sqsh *
 sqsh_new(const void *source, const struct SqshConfig *config, int *err);
 
 /**
+ * @brief sqsh_superblock returns the configuration object of the sqsh context.
+ * @memberof Sqsh
+ *
+ * @param[in] sqsh the Sqsh structure.
+ *
+ * @return the superblock context.
+ */
+const struct SqshConfig *sqsh_config(const struct Sqsh *sqsh);
+
+/**
  * @brief sqsh_superblock returns the superblock context.
  * @memberof Sqsh
  *

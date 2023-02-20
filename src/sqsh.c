@@ -142,6 +142,16 @@ out:
 	return rv;
 }
 
+const struct SqshConfig *
+sqsh_config(const struct Sqsh *sqsh) {
+	return &sqsh->config;
+}
+
+const struct SqshSuperblockContext *
+sqsh_superblock(const struct Sqsh *sqsh) {
+	return &sqsh->superblock;
+}
+
 int
 sqsh_id_table(struct Sqsh *sqsh, struct SqshTable **id_table) {
 	int rv = 0;
@@ -236,11 +246,6 @@ sqsh_compression_data(const struct Sqsh *sqsh) {
 const struct SqshCompression *
 sqsh_compression_metablock(const struct Sqsh *sqsh) {
 	return &sqsh->metablock_compression;
-}
-
-const struct SqshSuperblockContext *
-sqsh_superblock(const struct Sqsh *sqsh) {
-	return &sqsh->superblock;
 }
 
 struct SqshMapper *
