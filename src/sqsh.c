@@ -82,10 +82,12 @@ sqsh__init(
 		config = memset(&sqsh->config, 0, sizeof(struct SqshConfig));
 	}
 
+	config = sqsh_config(sqsh);
+
 	switch (config->source_type) {
 	case SQSH_SOURCE_TYPE_PATH:
 		rv = sqsh_mapper_init(
-				&sqsh->mapper, &sqsh_mapper_impl_mmap, source, strlen(source));
+				&sqsh->mapper, &sqsh_mapper_impl_mmap, source, config);
 		break;
 	case SQSH_SOURCE_TYPE_FD:
 		rv = -SQSH_ERROR_TODO;
@@ -96,13 +98,12 @@ sqsh__init(
 			goto out;
 		}
 		rv = sqsh_mapper_init(
-				&sqsh->mapper, &sqsh_mapper_impl_static, source,
-				config->source_size);
+				&sqsh->mapper, &sqsh_mapper_impl_static, source, config);
 		break;
 #ifdef CONFIG_CURL
 	case SQSH_SOURCE_TYPE_CURL:
 		rv = sqsh_mapper_init(
-				&sqsh->mapper, &sqsh_mapper_impl_curl, source, strlen(source));
+				&sqsh->mapper, &sqsh_mapper_impl_curl, source, config);
 		break;
 #endif
 	default:

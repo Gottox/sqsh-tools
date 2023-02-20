@@ -31,6 +31,7 @@
  * @file         mapper.c
  */
 
+#include "../../include/sqsh.h"
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_mapper.h"
 #include "../utils.h"
@@ -40,20 +41,9 @@
 int
 sqsh_mapper_init(
 		struct SqshMapper *mapper, struct SqshMemoryMapperImpl *impl,
-		const void *input, size_t size) {
+		const void *input, const struct SqshConfig *config) {
 	mapper->impl = impl;
-	return mapper->impl->init(mapper, input, size);
-}
-
-int
-sqsh_mapper_init_mmap(struct SqshMapper *mapper, const char *path) {
-	return sqsh_mapper_init(mapper, &sqsh_mapper_impl_mmap, path, strlen(path));
-}
-
-int
-sqsh_mapper_init_static(
-		struct SqshMapper *mapper, const uint8_t *input, size_t size) {
-	return sqsh_mapper_init(mapper, &sqsh_mapper_impl_static, input, size);
+	return mapper->impl->init(mapper, input, config->source_size);
 }
 
 int

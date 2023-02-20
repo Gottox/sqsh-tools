@@ -41,6 +41,7 @@ extern "C" {
 #endif
 
 struct Sqsh;
+struct SqshConfig;
 
 ////////////////////////////////////////
 // mapper/canary_mapper.c
@@ -210,13 +211,13 @@ struct SqshMapper {
  * @param[out] mapper The mapper to initialize.
  * @param[in]  impl The implementation to use for the mapper.
  * @param[in]  input The input data to map.
- * @param[in]  size The size of the input data.
+ * @param[in]  config The configuration of this sqsh archive.
  *
  * @return 0 on success, a negative value on error.
  */
 int sqsh_mapper_init(
 		struct SqshMapper *mapper, struct SqshMemoryMapperImpl *impl,
-		const void *input, size_t size);
+		const void *input, const struct SqshConfig *config);
 
 /**
  * @internal
