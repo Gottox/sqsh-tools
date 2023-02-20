@@ -105,6 +105,18 @@ const struct SqshSuperblockContext *sqsh_superblock(const struct Sqsh *sqsh);
  * @return the mapper context.
  */
 struct SqshMapper *sqsh_mapper(struct Sqsh *sqsh);
+
+/**
+ * @memberof Sqsh
+ * @brief sqsh_mapper returns the map manager to retrieve chunks of the sqsh
+ * file.
+ *
+ * @param[in] sqsh the Sqsh structure.
+ *
+ * @return the mapper context.
+ */
+struct SqshMapManager *sqsh_map_manager(struct Sqsh *sqsh);
+
 /**
  * @memberof Sqsh
  * @brief sqsh_compression_data returns the compression context for data blocks

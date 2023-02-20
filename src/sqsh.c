@@ -229,6 +229,11 @@ sqsh_mapper(struct Sqsh *sqsh) {
 	return &sqsh->mapper;
 }
 
+struct SqshMapManager *
+sqsh_map_manager(struct Sqsh *sqsh) {
+	return &sqsh->map_manager;
+}
+
 int
 sqsh__cleanup(struct Sqsh *sqsh) {
 	int rv = 0;

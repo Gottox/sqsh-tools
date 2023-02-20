@@ -42,6 +42,7 @@
 extern "C" {
 #endif
 
+struct Sqsh;
 struct SqshConfig;
 
 ////////////////////////////////////////
@@ -303,6 +304,76 @@ const uint8_t *sqsh__mapping_data(const struct SqshMapping *mapping);
  * @return 0 on success, a negative value on error.
  */
 int sqsh__mapping_unmap(struct SqshMapping *mapping);
+
+////////////////////////////////////////
+// mapper/map_manager.c
+
+struct SqshMapManager {
+	/**
+	 * @privatesection
+	 */
+	struct SqshMapper mapper;
+	struct SqshRefCountArray maps;
+};
+
+/**
+ * Initializes a new instance of SqshMapManager.
+ *
+ * @param[out] manager The SqshMapManager instance to initialize.
+ * @param[in] input The input to use.
+ * @param[in] sqsh The Sqsh instance to use.
+ *
+ * @return Returns 0 on success, a negative value on error.
+ */
+int sqsh__map_manager_init(
+		struct SqshMapManager *manager, const void *input,
+		const struct Sqsh *sqsh);
+
+/**
+ * Gets the size of the backing archive.
+ *
+ * @param[in] manager The SqshMapManager instance.
+ *
+ * @return Returns the size of a chunk.
+ */
+uint64_t sqsh__map_manager_size(const struct SqshMapManager *manager);
+
+/**
+ * Gets the size of a chunk.
+ *
+ * @param[in] manager The SqshMapManager instance.
+ *
+ * @return Returns the size of a chunk.
+ */
+size_t sqsh__map_manager_chunk_size(const struct SqshMapManager *manager);
+
+/**
+ * Gets the number of chunks in the file.
+ *
+ * @param[in] manager The SqshMapManager instance.
+ *
+ * @return Returns the number of chunks in the file.
+ */
+size_t sqsh__map_manager_chunk_count(const struct SqshMapManager *manager);
+
+/**
+ * Gets a map for a chunk.
+ *
+ * @param[in] manager The SqshMapManager instance.
+ * @param[in] index The index of the chunk to map.
+ *
+ * @return Returns 0 on success, a negative value on error.
+ */
+int sqsh__map_manager_get(struct SqshMapManager *manager, sqsh_index_t index);
+
+/**
+ * Cleans up the resources used by a SqshMapManager instance.
+ *
+ * @param[in] manager The SqshMapManager instance to cleanup.
+ *
+ * @return Returns 0 on success, a negative value on error.
+ */
+int sqsh__map_manager_cleanup(struct SqshMapManager *manager);
 
 ////////////////////////////////////////
 // mapper/cursor.c

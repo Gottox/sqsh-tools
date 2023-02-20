@@ -37,6 +37,7 @@
 #include "sqsh_common.h"
 
 #include <pthread.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -164,8 +165,9 @@ struct SqshRefCountArray {
 	/**
 	 * @privatesection
 	 */
-	void **data;
+	uint8_t *data;
 	size_t size;
+	size_t element_size;
 	int *ref_count;
 	pthread_mutex_t mutex;
 	sqsh_ref_count_array_cleanup_t cleanup;
@@ -178,11 +180,12 @@ struct SqshRefCountArray {
  *
  * @param array The array to initialize.
  * @param size The size of the array.
+ * @param element_size The size of each element.
  * @param cleanup The cleanup function.
  * @return 0 on success, a negative value on error.
  */
 int sqsh__ref_count_array_init(
-		struct SqshRefCountArray *array, size_t size,
+		struct SqshRefCountArray *array, size_t size, size_t element_size,
 		sqsh_ref_count_array_cleanup_t cleanup);
 
 /**

@@ -38,10 +38,10 @@
 
 int
 sqsh__ref_count_array_init(
-		struct SqshRefCountArray *array, size_t size,
+		struct SqshRefCountArray *array, size_t size, size_t element_size,
 		sqsh_ref_count_array_cleanup_t cleanup) {
 	int rv = 0;
-	array->data = calloc(size, sizeof(void *));
+	array->data = calloc(size, element_size);
 	if (array->data == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
@@ -65,6 +65,7 @@ int
 sqsh__ref_count_array_set(
 		struct SqshRefCountArray *array, int index, void *data, int span) {
 	int rv;
+	sqsh_index_t offset;
 
 	rv = pthread_mutex_lock(&array->mutex);
 	if (rv < 0) {
@@ -76,9 +77,14 @@ sqsh__ref_count_array_set(
 		goto out;
 	}
 
-	array->data[index] = data;
+	if (SQSH_MULT_OVERFLOW(index, array->element_size, &offset)) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
+
+	memcpy(&array->data[offset], data, array->element_size);
 	for (int i = 1; i < span; ++i) {
-		if (array->data[index + i] == NULL) {
+		if (array->ref_count[index + i] == 0) {
 			array->ref_count[index + i] = index * -1;
 		}
 	}
@@ -89,6 +95,16 @@ out:
 	return rv;
 }
 
+static void *
+get_element(struct SqshRefCountArray *array, int index) {
+	sqsh_index_t offset;
+
+	if (SQSH_MULT_OVERFLOW(index, array->element_size, &offset)) {
+		return NULL;
+	}
+
+	return (void *)&array->data[offset];
+}
 const void *
 sqsh__ref_count_array_retain(struct SqshRefCountArray *array, int *index) {
 	int rv;
@@ -105,7 +121,7 @@ sqsh__ref_count_array_retain(struct SqshRefCountArray *array, int *index) {
 
 	array->ref_count[*index] += 1;
 
-	data = array->data[*index];
+	data = get_element(array, *index);
 
 	pthread_mutex_unlock(&array->mutex);
 	return data;
@@ -124,8 +140,8 @@ sqsh__ref_count_array_release(struct SqshRefCountArray *array, int index) {
 	array->ref_count[index] -= 1;
 
 	if (array->ref_count[index] == 0) {
-		array->cleanup(array->data[index]);
-		array->data[index] = NULL;
+		void *data = get_element(array, index);
+		array->cleanup(data);
 	}
 
 	pthread_mutex_unlock(&array->mutex);
@@ -140,12 +156,14 @@ sqsh__ref_count_array_size(struct SqshRefCountArray *array) {
 
 int
 sqsh__ref_count_array_cleanup(struct SqshRefCountArray *array) {
+	void *data;
 	for (size_t i = 0; i < array->size; ++i) {
-		array->cleanup(array->data[i]);
+		data = get_element(array, i);
+		array->cleanup(data);
 	}
-	pthread_mutex_destroy(&array->mutex);
 	free(array->data);
 	free(array->ref_count);
+	pthread_mutex_destroy(&array->mutex);
 
 	return 0;
 }

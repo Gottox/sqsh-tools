@@ -60,6 +60,7 @@ sqsh_src = [
 	'src/inode/inode_context.c',
 	'src/mapper/canary_mapper.c',
 	'src/mapper/cursor.c',
+	'src/mapper/map_manager.c',
 	'src/mapper/mapper.c',
 	'src/mapper/mmap_full_mapper.c',
 	'src/mapper/mmap_mapper.c',
