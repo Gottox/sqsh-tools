@@ -129,7 +129,7 @@ sqsh__metablock_iterator_append_to_buffer(
 		return sqsh__compression_decompress_to_buffer(
 				iterator->compression, buffer, data, size);
 	} else {
-		return sqsh_buffer_append(buffer, data, size);
+		return sqsh__buffer_append(buffer, data, size);
 	}
 }
 

@@ -21,12 +21,12 @@ sqsh_hdr = [
 	'include/sqsh_data_private.h',
 	'include/sqsh_directory.h',
 	'include/sqsh_directory_private.h',
+	'include/sqsh_error.h',
 	'include/sqsh_file.h',
 	'include/sqsh_file_private.h',
-	'include/sqsh_error.h',
 	'include/sqsh_mapper.h',
 	'include/sqsh_metablock_private.h',
-	'include/sqsh_primitive.h',
+	'include/sqsh_primitive_private.h',
 	'include/sqsh_table.h',
 	'include/sqsh_table_private.h',
 	'include/sqsh_xattr.h',
@@ -63,8 +63,8 @@ sqsh_src = [
 	'src/mapper/mmap_full_mapper.c',
 	'src/mapper/mmap_mapper.c',
 	'src/mapper/static_mapper.c',
-	'src/metablock/metablock_iterator.c',
 	'src/metablock/metablock_cursor.c',
+	'src/metablock/metablock_iterator.c',
 	'src/primitive/buffer.c',
 	'src/sqsh.c',
 	'src/table/table.c',
@@ -73,12 +73,12 @@ sqsh_src = [
 ]
 
 sqsh_test = [
-	'test/metablock/metablock_iterator.c',
-	'test/metablock/metablock_cursor.c',
-	'test/primitive/buffer.c',
-	'test/mapper/cursor.c',
-	'test/integration.c',
 	'test/cpp-test.cpp',
+	'test/integration.c',
+	'test/mapper/cursor.c',
+	'test/metablock/metablock_cursor.c',
+	'test/metablock/metablock_iterator.c',
+	'test/primitive/buffer.c',
 ]
 sqsh_test_util = [
 	'test/util.c',

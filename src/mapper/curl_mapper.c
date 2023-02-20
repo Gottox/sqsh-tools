@@ -64,7 +64,7 @@ write_data(void *ptr, size_t size, size_t nmemb, void *userdata) {
 		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
-	rv = sqsh_buffer_append(&mapping->data.cl.buffer, ptr, byte_size);
+	rv = sqsh__buffer_append(&mapping->data.cl.buffer, ptr, byte_size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -172,7 +172,7 @@ sqsh_mapper_curl_map(
 	int rv = 0;
 
 	mapping->data.cl.offset = offset;
-	rv = sqsh_buffer_init(&mapping->data.cl.buffer);
+	rv = sqsh__buffer_init(&mapping->data.cl.buffer);
 	if (rv < 0) {
 		goto out;
 	}
@@ -202,13 +202,13 @@ sqsh_mapper_curl_cleanup(struct SqshMapper *mapper) {
 
 static int
 sqsh_mapping_curl_unmap(struct SqshMapping *mapping) {
-	sqsh_buffer_cleanup(&mapping->data.cl.buffer);
+	sqsh__buffer_cleanup(&mapping->data.cl.buffer);
 	return 0;
 }
 
 static const uint8_t *
 sqsh_mapping_curl_data(const struct SqshMapping *mapping) {
-	return sqsh_buffer_data(&mapping->data.cl.buffer);
+	return sqsh__buffer_data(&mapping->data.cl.buffer);
 }
 
 static int
@@ -301,7 +301,7 @@ out:
 
 static size_t
 sqsh_mapping_curl_size(const struct SqshMapping *mapping) {
-	return sqsh_buffer_size(&mapping->data.cl.buffer);
+	return sqsh__buffer_size(&mapping->data.cl.buffer);
 }
 
 struct SqshMemoryMapperImpl sqsh_mapper_impl_curl = {

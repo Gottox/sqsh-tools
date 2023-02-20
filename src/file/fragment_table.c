@@ -100,7 +100,7 @@ read_fragment_data(
 		rv = sqsh__compression_decompress_to_buffer(
 				table->compression, buffer, data, size);
 	} else {
-		rv = sqsh_buffer_append(buffer, data, size);
+		rv = sqsh__buffer_append(buffer, data, size);
 	}
 	if (rv < 0) {
 		goto out;
@@ -125,7 +125,7 @@ sqsh_fragment_table_to_buffer(
 	if (SQSH_ADD_OVERFLOW(offset, size, &end_offset)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
-	rv = sqsh_buffer_init(&intermediate_buffer);
+	rv = sqsh__buffer_init(&intermediate_buffer);
 	if (rv < 0) {
 		goto out;
 	}
@@ -135,18 +135,18 @@ sqsh_fragment_table_to_buffer(
 		goto out;
 	}
 
-	if (end_offset > sqsh_buffer_size(&intermediate_buffer)) {
+	if (end_offset > sqsh__buffer_size(&intermediate_buffer)) {
 		return -SQSH_ERROR_SIZE_MISSMATCH;
 	}
 
-	data = sqsh_buffer_data(&intermediate_buffer);
+	data = sqsh__buffer_data(&intermediate_buffer);
 
-	rv = sqsh_buffer_append(buffer, &data[offset], size);
+	rv = sqsh__buffer_append(buffer, &data[offset], size);
 	if (rv < 0) {
 		goto out;
 	}
 out:
-	sqsh_buffer_cleanup(&intermediate_buffer);
+	sqsh__buffer_cleanup(&intermediate_buffer);
 	return 0;
 }
 

@@ -79,7 +79,7 @@ sqsh__file_init(
 		context->fragment_table = NULL;
 	}
 
-	rv = sqsh_buffer_init(&context->buffer);
+	rv = sqsh__buffer_init(&context->buffer);
 	if (rv < 0) {
 		return rv;
 	}
@@ -172,7 +172,7 @@ sqsh_file_read(struct SqshFileContext *context, const uint64_t size) {
 			rv = sqsh__compression_decompress_to_buffer(
 					context->compression, buffer, data, block_size);
 		} else {
-			rv = sqsh_buffer_append(buffer, data, block_size);
+			rv = sqsh__buffer_append(buffer, data, block_size);
 		}
 		if (rv < 0) {
 			goto out;
@@ -198,7 +198,7 @@ sqsh_file_data(struct SqshFileContext *context) {
 	if (sqsh_file_size(context) == 0) {
 		return NULL;
 	} else {
-		return &sqsh_buffer_data(&context->buffer)[offset];
+		return &sqsh__buffer_data(&context->buffer)[offset];
 	}
 }
 
@@ -206,7 +206,7 @@ uint64_t
 sqsh_file_size(const struct SqshFileContext *context) {
 	const uint32_t block_size = context->block_size;
 	const size_t offset = context->seek_pos % block_size;
-	const size_t buffer_size = sqsh_buffer_size(&context->buffer);
+	const size_t buffer_size = sqsh__buffer_size(&context->buffer);
 
 	if (buffer_size < offset) {
 		return 0;
@@ -217,7 +217,7 @@ sqsh_file_size(const struct SqshFileContext *context) {
 
 int
 sqsh__file_cleanup(struct SqshFileContext *context) {
-	sqsh_buffer_cleanup(&context->buffer);
+	sqsh__buffer_cleanup(&context->buffer);
 
 	return 0;
 }

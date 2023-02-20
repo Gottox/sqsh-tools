@@ -32,7 +32,7 @@
  */
 
 #include "../../include/sqsh_error.h"
-#include "../../include/sqsh_primitive.h"
+#include "../../include/sqsh_primitive_private.h"
 #include "../utils.h"
 
 #include <stdbool.h>
@@ -41,7 +41,7 @@
 #include <string.h>
 
 int
-sqsh_buffer_init(struct SqshBuffer *buffer) {
+sqsh__buffer_init(struct SqshBuffer *buffer) {
 	int rv = 0;
 
 	buffer->data = NULL;
@@ -51,7 +51,7 @@ sqsh_buffer_init(struct SqshBuffer *buffer) {
 }
 
 int
-sqsh_buffer_add_capacity(
+sqsh__buffer_add_capacity(
 		struct SqshBuffer *buffer, uint8_t **additional_buffer,
 		size_t additional_size) {
 	const size_t buffer_size = buffer->size;
@@ -77,7 +77,7 @@ sqsh_buffer_add_capacity(
 }
 
 int
-sqsh_buffer_add_size(struct SqshBuffer *buffer, size_t additional_size) {
+sqsh__buffer_add_size(struct SqshBuffer *buffer, size_t additional_size) {
 	const size_t buffer_size = buffer->size;
 	size_t new_size;
 	if (SQSH_ADD_OVERFLOW(buffer_size, additional_size, &new_size)) {
@@ -89,23 +89,23 @@ sqsh_buffer_add_size(struct SqshBuffer *buffer, size_t additional_size) {
 }
 
 int
-sqsh_buffer_append(
+sqsh__buffer_append(
 		struct SqshBuffer *buffer, const uint8_t *source, const size_t size) {
 	int rv = 0;
 	uint8_t *additional_buffer;
 
-	rv = sqsh_buffer_add_capacity(buffer, &additional_buffer, size);
+	rv = sqsh__buffer_add_capacity(buffer, &additional_buffer, size);
 	if (rv < 0) {
 		return rv;
 	}
 
 	memcpy(additional_buffer, source, size);
-	rv = sqsh_buffer_add_size(buffer, size);
+	rv = sqsh__buffer_add_size(buffer, size);
 	return rv;
 }
 
 void
-sqsh_buffer_drain(struct SqshBuffer *buffer) {
+sqsh__buffer_drain(struct SqshBuffer *buffer) {
 	buffer->size = 0;
 	// TODO: cleaning the buffer is only for debug purposes. Remove it later.
 	if (buffer->data) {
@@ -114,16 +114,16 @@ sqsh_buffer_drain(struct SqshBuffer *buffer) {
 }
 
 const uint8_t *
-sqsh_buffer_data(const struct SqshBuffer *buffer) {
+sqsh__buffer_data(const struct SqshBuffer *buffer) {
 	return buffer->data;
 }
 size_t
-sqsh_buffer_size(const struct SqshBuffer *buffer) {
+sqsh__buffer_size(const struct SqshBuffer *buffer) {
 	return buffer->size;
 }
 
 int
-sqsh_buffer_cleanup(struct SqshBuffer *buffer) {
+sqsh__buffer_cleanup(struct SqshBuffer *buffer) {
 	free(buffer->data);
 	buffer->data = NULL;
 	buffer->size = buffer->capacity = 0;

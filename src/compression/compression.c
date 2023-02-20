@@ -35,7 +35,7 @@
 #include "../../include/sqsh_context.h"
 #include "../../include/sqsh_data.h"
 #include "../../include/sqsh_error.h"
-#include "../../include/sqsh_primitive.h"
+#include "../../include/sqsh_primitive_private.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -133,7 +133,7 @@ sqsh__compression_decompress_to_buffer(
 	uint8_t *decompressed = NULL;
 	sqsh_extract_func_t extract = compression->impl;
 
-	rv = sqsh_buffer_add_capacity(buffer, &decompressed, max_size);
+	rv = sqsh__buffer_add_capacity(buffer, &decompressed, max_size);
 	if (rv < 0) {
 		return rv;
 	}
@@ -144,7 +144,7 @@ sqsh__compression_decompress_to_buffer(
 	}
 	size = max_size;
 
-	rv = sqsh_buffer_add_size(buffer, size);
+	rv = sqsh__buffer_add_size(buffer, size);
 	return rv;
 }
 

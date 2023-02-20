@@ -34,7 +34,7 @@
 #ifndef SQSH_MAPPER_H
 #define SQSH_MAPPER_H
 
-#include "sqsh_primitive.h"
+#include "sqsh_primitive_private.h"
 
 #ifdef __cplusplus
 extern "C" {

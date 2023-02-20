@@ -46,7 +46,7 @@ sqsh__metablock_cursor_init(
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh_buffer_init(&cursor->buffer);
+	rv = sqsh__buffer_init(&cursor->buffer);
 	if (rv < 0) {
 		goto out;
 	}
@@ -78,7 +78,7 @@ sqsh__metablock_cursor_advance(
 		return SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
-	while (sqsh_buffer_size(&cursor->buffer) < end_offset) {
+	while (sqsh__buffer_size(&cursor->buffer) < end_offset) {
 		rv = sqsh__metablock_iterator_next(&cursor->iterator);
 		if (rv < 0) {
 			return rv;
@@ -97,7 +97,7 @@ sqsh__metablock_cursor_advance(
 
 const uint8_t *
 sqsh__metablock_cursor_data(const struct SqshMetablockCursor *cursor) {
-	const uint8_t *data = sqsh_buffer_data(&cursor->buffer);
+	const uint8_t *data = sqsh__buffer_data(&cursor->buffer);
 
 	return &data[cursor->offset];
 }
@@ -110,7 +110,7 @@ sqsh__metablock_cursor_size(const struct SqshMetablockCursor *cursor) {
 int
 sqsh__metablock_cursor_cleanup(struct SqshMetablockCursor *cursor) {
 	sqsh__metablock_iterator_cleanup(&cursor->iterator);
-	sqsh_buffer_cleanup(&cursor->buffer);
+	sqsh__buffer_cleanup(&cursor->buffer);
 
 	return 0;
 }

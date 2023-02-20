@@ -35,16 +35,16 @@
 #include "../common.h"
 #include "../test.h"
 
-#include <sqsh_primitive.h>
+#include <sqsh_primitive_private.h>
 
 static void
 init_buffer(void) {
 	int rv;
 	struct SqshBuffer buffer = {0};
 
-	rv = sqsh_buffer_init(&buffer);
+	rv = sqsh__buffer_init(&buffer);
 	assert(rv == 0);
-	rv = sqsh_buffer_cleanup(&buffer);
+	rv = sqsh__buffer_cleanup(&buffer);
 	assert(rv == 0);
 }
 
@@ -53,20 +53,20 @@ append_to_buffer(void) {
 	int rv;
 	struct SqshBuffer buffer = {0};
 
-	rv = sqsh_buffer_init(&buffer);
+	rv = sqsh__buffer_init(&buffer);
 	assert(rv == 0);
 
 	const uint8_t hello_world[] = "Hello World";
-	rv = sqsh_buffer_append(&buffer, hello_world, sizeof(hello_world));
+	rv = sqsh__buffer_append(&buffer, hello_world, sizeof(hello_world));
 	assert(rv == 0);
-	rv = sqsh_buffer_append(&buffer, hello_world, sizeof(hello_world));
+	rv = sqsh__buffer_append(&buffer, hello_world, sizeof(hello_world));
 	assert(rv == 0);
 
-	const uint8_t *data = sqsh_buffer_data(&buffer);
+	const uint8_t *data = sqsh__buffer_data(&buffer);
 	rv = memcmp(data, "Hello World\0Hello World\0", sizeof(hello_world) * 2);
 	assert(rv == 0);
 
-	rv = sqsh_buffer_cleanup(&buffer);
+	rv = sqsh__buffer_cleanup(&buffer);
 	assert(rv == 0);
 }
 

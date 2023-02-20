@@ -131,7 +131,7 @@ next_compressed(void) {
 
 	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload), &target_size);
 
-	rv = sqsh_buffer_init(&buffer);
+	rv = sqsh__buffer_init(&buffer);
 	assert(rv == 0);
 
 	rv = sqsh__metablock_iterator_init(
@@ -145,30 +145,30 @@ next_compressed(void) {
 
 	sqsh__metablock_iterator_append_to_buffer(&iter, &buffer);
 
-	assert(sqsh_buffer_size(&buffer) == 4);
+	assert(sqsh__buffer_size(&buffer) == 4);
 
-	p = sqsh_buffer_data(&buffer);
+	p = sqsh__buffer_data(&buffer);
 	assert(p != NULL);
 	assert(memcmp(p, "abcd", 4) == 0);
 
 	rv = sqsh__metablock_iterator_next(&iter);
 	assert(rv == 0);
-	sqsh_buffer_drain(&buffer);
+	sqsh__buffer_drain(&buffer);
 
 	assert(sqsh__metablock_iterator_size(&iter) == CHUNK_SIZE(ZLIB_EFGH));
 
 	sqsh__metablock_iterator_append_to_buffer(&iter, &buffer);
 
-	assert(sqsh_buffer_size(&buffer) == 4);
+	assert(sqsh__buffer_size(&buffer) == 4);
 
-	p = sqsh_buffer_data(&buffer);
+	p = sqsh__buffer_data(&buffer);
 	assert(p != NULL);
 	assert(memcmp(p, "efgh", 4) == 0);
 
 	rv = sqsh__metablock_iterator_cleanup(&iter);
 	assert(rv == 0);
 
-	sqsh_buffer_cleanup(&buffer);
+	sqsh__buffer_cleanup(&buffer);
 	sqsh__cleanup(&sqsh);
 	free(data);
 }
