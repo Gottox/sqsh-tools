@@ -35,6 +35,7 @@
 #include "../include/sqsh_data.h"
 #include "../include/sqsh_private.h"
 #include "sqsh_context.h"
+#include "sqsh_mapper.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -84,32 +85,7 @@ sqsh__init(
 
 	config = sqsh_config(sqsh);
 
-	switch (config->source_type) {
-	case SQSH_SOURCE_TYPE_PATH:
-		rv = sqsh_mapper_init(
-				&sqsh->mapper, &sqsh_mapper_impl_mmap, source, config);
-		break;
-	case SQSH_SOURCE_TYPE_FD:
-		rv = -SQSH_ERROR_TODO;
-		break;
-	case SQSH_SOURCE_TYPE_MEMORY:
-		if (config->source_size == 0) {
-			rv = -SQSH_ERROR_SUPERBLOCK_TOO_SMALL;
-			goto out;
-		}
-		rv = sqsh_mapper_init(
-				&sqsh->mapper, &sqsh_mapper_impl_static, source, config);
-		break;
-#ifdef CONFIG_CURL
-	case SQSH_SOURCE_TYPE_CURL:
-		rv = sqsh_mapper_init(
-				&sqsh->mapper, &sqsh_mapper_impl_curl, source, config);
-		break;
-#endif
-	default:
-		rv = -SQSH_ERROR_TODO;
-	}
-
+	rv = sqsh_mapper_init(&sqsh->mapper, source, config);
 	if (rv < 0) {
 		goto out;
 	}

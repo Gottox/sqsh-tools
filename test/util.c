@@ -9,7 +9,7 @@
 #include "../include/sqsh_data.h"
 #include "../include/sqsh_data_private.h"
 #include "../include/sqsh_private.h"
-#include "sqsh_context.h"
+#include <sqsh_mapper.h>
 
 #include <assert.h>
 
@@ -45,7 +45,8 @@ mk_stub(struct Sqsh *sqsh, uint8_t *payload, size_t payload_size,
 	*target_size = SQSH_SIZEOF_SUPERBLOCK + payload_size;
 	const struct SqshConfig config = {
 			.source_size = *target_size,
-			.source_type = SQSH_SOURCE_TYPE_MEMORY};
+			.source_mapper = &sqsh_mapper_impl_static,
+	};
 	assert(0 == sqsh__init(sqsh, data, &config));
 	return data;
 }

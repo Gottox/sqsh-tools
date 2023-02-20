@@ -37,11 +37,11 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 	struct Sqsh sqsh = {0};
 	struct SqshInodeContext inode = {0};
 	struct SqshDirectoryIterator iter = {0};
-	struct SqshSuperblockContext *superblock = NULL;
+	const struct SqshSuperblockContext *superblock;
 	rv = sqsh__init(
 			&sqsh, (uint8_t *)data,
 			&(struct SqshConfig){
-					.source_type = SQSH_SOURCE_TYPE_MEMORY,
+					.source_mapper = &sqsh_mapper_impl_static,
 					.source_size = size,
 			});
 	if (rv < 0) {

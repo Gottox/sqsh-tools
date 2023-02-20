@@ -209,15 +209,14 @@ struct SqshMapper {
  * @brief Initializes a mapper with an implementation and input data.
  *
  * @param[out] mapper The mapper to initialize.
- * @param[in]  impl The implementation to use for the mapper.
  * @param[in]  input The input data to map.
  * @param[in]  config The configuration of this sqsh archive.
  *
  * @return 0 on success, a negative value on error.
  */
 int sqsh_mapper_init(
-		struct SqshMapper *mapper, struct SqshMemoryMapperImpl *impl,
-		const void *input, const struct SqshConfig *config);
+		struct SqshMapper *mapper, const void *input,
+		const struct SqshConfig *config);
 
 /**
  * @internal

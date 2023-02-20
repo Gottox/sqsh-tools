@@ -46,7 +46,7 @@ sqsh_empty(void) {
 	int rv;
 	struct Sqsh sqsh = {0};
 	const struct SqshConfig config = {
-			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_mapper = &sqsh_mapper_impl_static,
 			.source_size = 0,
 	};
 	rv = sqsh__init(&sqsh, NULL, &config);
@@ -61,7 +61,7 @@ sqsh_get_nonexistant(void) {
 	struct SqshPathResolverContext resolver = {0};
 
 	const struct SqshConfig config = {
-			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_mapper = &sqsh_mapper_impl_static,
 			.source_size = sizeof(squash_image),
 	};
 	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
@@ -90,7 +90,7 @@ sqsh_ls(void) {
 	struct Sqsh sqsh = {0};
 	const struct SqshSuperblockContext *superblock;
 	const struct SqshConfig config = {
-			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_mapper = &sqsh_mapper_impl_static,
 			.source_size = sizeof(squash_image),
 	};
 	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
@@ -150,7 +150,7 @@ sqsh_cat_fragment(void) {
 	struct Sqsh sqsh = {0};
 	struct SqshPathResolverContext resolver = {0};
 	const struct SqshConfig config = {
-			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_mapper = &sqsh_mapper_impl_static,
 			.source_size = sizeof(squash_image),
 	};
 	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
@@ -197,7 +197,7 @@ sqsh_cat_datablock_and_fragment(void) {
 	struct Sqsh sqsh = {0};
 	struct SqshPathResolverContext resolver = {0};
 	const struct SqshConfig config = {
-			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_mapper = &sqsh_mapper_impl_static,
 			.source_size = sizeof(squash_image),
 	};
 	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
@@ -247,7 +247,7 @@ sqsh_cat_size_overflow(void) {
 	struct Sqsh sqsh = {0};
 	struct SqshPathResolverContext resolver = {0};
 	const struct SqshConfig config = {
-			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_mapper = &sqsh_mapper_impl_static,
 			.source_size = sizeof(squash_image),
 	};
 	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
@@ -295,7 +295,7 @@ sqsh_test_uid_and_gid(void) {
 	struct Sqsh sqsh = {0};
 	const struct SqshSuperblockContext *superblock;
 	const struct SqshConfig config = {
-			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_mapper = &sqsh_mapper_impl_static,
 			.source_size = sizeof(squash_image),
 	};
 	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
@@ -325,7 +325,7 @@ sqsh_test_extended_dir(void) {
 	struct Sqsh sqsh = {0};
 	struct SqshPathResolverContext resolver = {0};
 	const struct SqshConfig config = {
-			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_mapper = &sqsh_mapper_impl_static,
 			.source_size = sizeof(squash_image),
 	};
 	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
@@ -356,7 +356,7 @@ sqsh_test_xattr(void) {
 	struct Sqsh sqsh = {0};
 	const struct SqshSuperblockContext *superblock;
 	const struct SqshConfig config = {
-			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_mapper = &sqsh_mapper_impl_static,
 			.source_size = sizeof(squash_image),
 	};
 	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
@@ -474,7 +474,7 @@ fuzz_crash_1(void) {
 	struct Sqsh sqsh = {0};
 	struct SqshPathResolverContext resolver = {0};
 	const struct SqshConfig config = {
-			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_mapper = &sqsh_mapper_impl_static,
 			.source_size = sizeof(input),
 	};
 	rv = sqsh__init(&sqsh, input, &config);
@@ -513,7 +513,7 @@ fuzz_crash_2(void) {
 	struct Sqsh sqsh = {0};
 	struct SqshPathResolverContext resolver = {0};
 	const struct SqshConfig config = {
-			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_mapper = &sqsh_mapper_impl_static,
 			.source_size = sizeof(input),
 	};
 	rv = sqsh__init(&sqsh, input, &config);
@@ -553,7 +553,7 @@ fuzz_crash_3(void) {
 	struct Sqsh sqsh = {0};
 	struct SqshPathResolverContext resolver = {0};
 	const struct SqshConfig config = {
-			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_mapper = &sqsh_mapper_impl_static,
 			.source_size = sizeof(input),
 	};
 	rv = sqsh__init(&sqsh, input, &config);
@@ -603,7 +603,7 @@ fuzz_crash_4(void) {
 	struct SqshTable *id_table = NULL;
 	struct Sqsh sqsh = {0};
 	const struct SqshConfig config = {
-			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_mapper = &sqsh_mapper_impl_static,
 			.source_size = sizeof(input),
 	};
 	rv = sqsh__init(&sqsh, input, &config);
@@ -644,7 +644,7 @@ fuzz_crash_5(void) {
 	struct SqshTable *id_table = NULL;
 	struct Sqsh sqsh = {0};
 	const struct SqshConfig config = {
-			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_mapper = &sqsh_mapper_impl_static,
 			.source_size = sizeof(input),
 	};
 	rv = sqsh__init(&sqsh, input, &config);
@@ -671,7 +671,7 @@ fuzz_crash_6(void) {
 	struct SqshTable *id_table = NULL;
 	struct Sqsh sqsh = {0};
 	const struct SqshConfig config = {
-			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_mapper = &sqsh_mapper_impl_static,
 			.source_size = sizeof(input),
 	};
 	rv = sqsh__init(&sqsh, input, &config);
@@ -699,7 +699,7 @@ fuzz_crash_7(void) {
 	struct SqshTable *id_table = NULL;
 	struct Sqsh sqsh = {0};
 	const struct SqshConfig config = {
-			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_mapper = &sqsh_mapper_impl_static,
 			.source_size = sizeof(input),
 	};
 	rv = sqsh__init(&sqsh, input, &config);
@@ -727,7 +727,7 @@ fuzz_crash_8(void) {
 
 	struct Sqsh sqsh = {0};
 	const struct SqshConfig config = {
-			.source_type = SQSH_SOURCE_TYPE_MEMORY,
+			.source_mapper = &sqsh_mapper_impl_static,
 			.source_size = sizeof(input),
 	};
 	rv = sqsh__init(&sqsh, input, &config);

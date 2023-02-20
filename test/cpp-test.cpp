@@ -31,6 +31,7 @@
  * @file         cpp-test.c
  */
 
+#include "sqsh_mapper.h"
 #ifndef __cplusplus
 #	error "This file is C++ only"
 #endif
@@ -50,7 +51,7 @@ sqsh_empty() {
 	int rv;
 	struct Sqsh sqsh = {};
 	struct SqshConfig config = {};
-	config.source_type = SQSH_SOURCE_TYPE_MEMORY;
+	config.source_mapper = &sqsh_mapper_impl_static;
 	config.source_size = 0;
 	rv = sqsh__init(&sqsh, NULL, &config);
 	assert(rv == -SQSH_ERROR_SUPERBLOCK_TOO_SMALL);

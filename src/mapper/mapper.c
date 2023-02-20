@@ -40,9 +40,13 @@
 
 int
 sqsh_mapper_init(
-		struct SqshMapper *mapper, struct SqshMemoryMapperImpl *impl,
-		const void *input, const struct SqshConfig *config) {
-	mapper->impl = impl;
+		struct SqshMapper *mapper, const void *input,
+		const struct SqshConfig *config) {
+	if (config->source_mapper) {
+		mapper->impl = config->source_mapper;
+	} else {
+		mapper->impl = &sqsh_mapper_impl_mmap;
+	}
 	return mapper->impl->init(mapper, input, config->source_size);
 }
 

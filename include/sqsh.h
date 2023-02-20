@@ -40,19 +40,13 @@
 extern "C" {
 #endif
 
-enum SqshSourceType {
-	SQSH_SOURCE_TYPE_PATH,
-	SQSH_SOURCE_TYPE_FD,
-	SQSH_SOURCE_TYPE_MEMORY,
-	SQSH_SOURCE_TYPE_CURL,
-};
 /**
  * @brief The SqshConfig struct contains all the configuration options for
  * a sqsh session.
  */
 struct SqshConfig {
-	enum SqshSourceType source_type;
 	size_t source_size;
+	struct SqshMemoryMapperImpl *source_mapper;
 };
 
 struct Sqsh;
