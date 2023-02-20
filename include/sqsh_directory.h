@@ -34,7 +34,6 @@
 #ifndef SQSH_DIRECTORY_H
 #define SQSH_DIRECTORY_H
 
-#include "sqsh_common.h"
 #include "sqsh_inode.h"
 
 #ifdef __cplusplus

@@ -35,6 +35,7 @@
 #include "../../include/sqsh_context.h"
 #include "../../include/sqsh_data.h"
 #include "../../include/sqsh_error.h"
+#include "../../include/sqsh_primitive.h"
 
 #include <stdint.h>
 #include <stdlib.h>

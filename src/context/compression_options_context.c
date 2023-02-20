@@ -34,8 +34,10 @@
 #include "../../include/sqsh.h"
 #include "../../include/sqsh_context_private.h"
 #include "../../include/sqsh_data.h"
+#include "../../include/sqsh_error.h"
 #include "../../include/sqsh_metablock_private.h"
 #include <stdint.h>
+#include <stdlib.h>
 
 static const union SqshCompressionOptions *
 compression_options(const struct SqshCompressionOptionsContext *context) {

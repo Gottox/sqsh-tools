@@ -33,6 +33,7 @@
 
 #include "../../include/sqsh.h"
 #include "../../include/sqsh_context_private.h"
+#include "../../include/sqsh_error.h"
 #include "../utils.h"
 #include "sqsh_mapper.h"
 

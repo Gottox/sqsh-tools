@@ -33,6 +33,7 @@
 
 #include "common.h"
 
+#include <sqsh_context.h>
 #include <sqsh_file.h>
 #include <sqsh_inode.h>
 

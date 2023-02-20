@@ -33,12 +33,12 @@
 
 #include "../../include/sqsh.h"
 #include "../../include/sqsh_compression_private.h"
+#include "../../include/sqsh_context.h"
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_file_private.h"
 #include "../../include/sqsh_inode_private.h"
 #include "../../include/sqsh_table.h"
 #include "../utils.h"
-#include "sqsh_common.h"
 
 static uint64_t
 datablock_offset(struct SqshFileContext *context, uint32_t block_index) {

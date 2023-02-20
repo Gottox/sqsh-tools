@@ -34,7 +34,6 @@
 #ifndef SQSH_XATTR_H
 #define SQSH_XATTR_H
 
-#include "sqsh_common.h"
 #include "sqsh_inode.h"
 
 #ifdef __cplusplus

@@ -34,7 +34,7 @@
 #ifndef SQSH_INODE_H
 #define SQSH_INODE_H
 
-#include "sqsh_primitive.h"
+#include "sqsh_common.h"
 
 #ifdef __cplusplus
 extern "C" {

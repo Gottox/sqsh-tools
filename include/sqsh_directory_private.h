@@ -34,8 +34,8 @@
 #ifndef SQSH_ITERATOR_PRIVATE_H
 #define SQSH_ITERATOR_PRIVATE_H
 
-#include "sqsh_context_private.h"
 #include "sqsh_directory.h"
+#include "sqsh_metablock_private.h"
 
 #ifdef __cplusplus
 extern "C" {

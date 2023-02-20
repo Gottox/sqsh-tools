@@ -13,6 +13,8 @@
 
 #include <ctype.h>
 #include <sqsh.h>
+#include <sqsh_error.h>
+#include <stdlib.h>
 #include <string.h>
 
 static struct Sqsh *

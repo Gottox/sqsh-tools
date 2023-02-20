@@ -34,14 +34,7 @@
 #ifndef SQSH_H
 #define SQSH_H
 
-#include "sqsh_common.h"
-#include "sqsh_context.h"
-#include "sqsh_error.h"
-#include "sqsh_mapper.h"
 #include "sqsh_table.h"
-
-#include <stdint.h>
-#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {

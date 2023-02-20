@@ -33,13 +33,14 @@
 
 #include "../../include/sqsh.h"
 #include "../../include/sqsh_compression_private.h"
+#include "../../include/sqsh_context.h"
+#include "../../include/sqsh_error.h"
 #include "../../include/sqsh_inode.h"
+#include "../../include/sqsh_table_private.h"
 #include "../utils.h"
+
 // TODO: remove private header
 #include "../../include/sqsh_data_private.h"
-#include "../../include/sqsh_error.h"
-#include "../../include/sqsh_table_private.h"
-#include <stdint.h>
 
 int
 sqsh__fragment_table_init(struct SqshFragmentTable *table, struct Sqsh *sqsh) {

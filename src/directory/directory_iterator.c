@@ -32,6 +32,7 @@
  */
 
 #include "../../include/sqsh.h"
+#include "../../include/sqsh_context.h"
 #include "../../include/sqsh_data.h"
 #include "../../include/sqsh_directory_private.h"
 #include "../../include/sqsh_error.h"
@@ -49,7 +50,8 @@ directory_iterator_index_lookup(
 	struct SqshDirectoryIndexIterator index_iterator = {0};
 	struct SqshInodeContext *inode = iterator->inode;
 
-	rv = sqsh__directory_index_iterator_init(&index_iterator, inode);
+	rv = sqsh__directory_index_iterator_init(
+			&index_iterator, inode->sqsh, inode->inode_ref);
 	if (rv < 0) {
 		return rv;
 	}

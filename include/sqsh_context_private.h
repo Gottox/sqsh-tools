@@ -37,7 +37,6 @@
 #include "sqsh_context.h"
 #include "sqsh_mapper.h"
 #include "sqsh_metablock_private.h"
-#include "sqsh_primitive.h"
 
 #ifdef __cplusplus
 extern "C" {

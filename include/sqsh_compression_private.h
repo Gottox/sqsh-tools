@@ -34,8 +34,7 @@
 #ifndef SQSH_COMPRESSION_PRIVATE_H
 #define SQSH_COMPRESSION_PRIVATE_H
 
-#include <stddef.h>
-#include <stdint.h>
+#include "sqsh_common.h"
 
 #ifdef __cplusplus
 extern "C" {

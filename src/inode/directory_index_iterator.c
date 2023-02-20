@@ -36,6 +36,8 @@
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_inode_private.h"
 
+#include <stdlib.h>
+
 static const uint64_t INODE_HEADER_SIZE =
 		SQSH_SIZEOF_INODE_HEADER + SQSH_SIZEOF_INODE_DIRECTORY_EXT;
 
