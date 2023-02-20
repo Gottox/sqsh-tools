@@ -104,34 +104,43 @@ sqsh_table_get(
 		const struct SqshTable *table, sqsh_index_t index, void *target) {
 	int rv = 0;
 	struct Sqsh *sqsh = table->sqsh;
-	struct SqshMetablockContext metablock = {0};
-	struct SqshBuffer buffer = {0};
+	struct SqshMetablockCursor metablock = {0};
 	uint64_t lookup_index =
 			index * table->element_size / SQSH_METABLOCK_BLOCK_SIZE;
 	uint64_t metablock_address = lookup_table_get(table, lookup_index);
 	uint64_t element_index =
 			(index * table->element_size) % SQSH_METABLOCK_BLOCK_SIZE;
 
+	uint64_t upper_limit;
+	if (SQSH_MULT_OVERFLOW(
+				table->element_size, table->element_count, &upper_limit)) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+	if (SQSH_ADD_OVERFLOW(metablock_address, upper_limit, &upper_limit)) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = sqsh__metablock_init(&metablock, sqsh, metablock_address);
+	rv = sqsh__metablock_cursor_init(
+			&metablock, sqsh, metablock_address, upper_limit);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = sqsh__metablock_to_buffer(&metablock, &buffer);
+	rv = sqsh__metablock_cursor_advance(
+			&metablock, element_index, table->element_size);
 	if (rv < 0) {
 		goto out;
 	}
 
-	memcpy(target, &sqsh_buffer_data(&buffer)[element_index],
+	memcpy(target, sqsh__metablock_cursor_data(&metablock),
 		   table->element_size);
 
 out:
-	sqsh__metablock_cleanup(&metablock);
-	sqsh_buffer_cleanup(&buffer);
+	sqsh__metablock_cursor_cleanup(&metablock);
 	return rv;
 }
 
