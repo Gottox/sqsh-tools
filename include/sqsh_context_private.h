@@ -91,8 +91,9 @@ struct SqshCompressionOptionsContext {
 };
 
 /**
- * @brief Initialize the compression options context.
+ * @internal
  * @memberof SqshCompressionOptionsContext
+ * @brief Initialize the compression options context.
  * @param context the compression options context
  * @param sqsh the Sqsh struct
  */
@@ -100,8 +101,9 @@ SQSH_NO_UNUSED int sqsh__compression_options_init(
 		struct SqshCompressionOptionsContext *context, struct Sqsh *sqsh);
 
 /**
- * @brief Frees the resources used by the compression options context.
+ * @internal
  * @memberof SqshCompressionOptionsContext
+ * @brief Frees the resources used by the compression options context.
  * @param context the compression options context
  */
 int sqsh__compression_options_cleanup(
@@ -132,8 +134,8 @@ SQSH_NO_UNUSED int sqsh__path_resolver_init(
 
 /**
  * @internal
- * @brief cleans up a path resolver context.
  * @memberof SqshPathResolverContext
+ * @brief cleans up a path resolver context.
  *
  * @param[in] context The path resolver context.
  *
@@ -152,6 +154,7 @@ struct SqshTrailingContext {
 };
 
 /**
+ * @internal
  * @memberof SqshTrailingContext
  * @brief Initializes a trailing context.
  *
@@ -163,6 +166,7 @@ struct SqshTrailingContext {
 int sqsh__trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh);
 
 /**
+ * @internal
  * @memberof SqshTrailingContext
  * @brief Cleans up a trailing context.
  *

@@ -61,17 +61,19 @@ struct SqshBuffer {
 };
 
 /**
- * @brief sqsh__buffer_init initializes a SqshBuffer.
+ * @internal
  * @memberof SqshBuffer
+ * @brief sqsh__buffer_init initializes a SqshBuffer.
  *
  * @param[out] buffer The SqshBuffer to initialize.
  */
 SQSH_NO_UNUSED int sqsh__buffer_init(struct SqshBuffer *buffer);
 
 /**
+ * @internal
+ * @memberof SqshBuffer
  * @brief sqsh__buffer_add_size tells SqshBuffer to increase the buffer by
  * additional_size
- * @memberof SqshBuffer
  *
  * Please be aware, that the buffer needs to be allocated by
  * sqsh__buffer_add_capacity before. Otherwise the function behavior is
@@ -84,9 +86,10 @@ SQSH_NO_UNUSED int
 sqsh__buffer_add_size(struct SqshBuffer *buffer, size_t additional_size);
 
 /**
+ * @internal
+ * @memberof SqshBuffer
  * @brief sqsh__buffer_add_size allocates additional memory for the SqshBuffer
  * and sets additional_buffer to the beginning of the additional memory.
- * @memberof SqshBuffer
  *
  * After sqsh__buffer_add_capacity has been called, the buffer will behave
  * undefined if you query data or size. In order to use the buffer again, you
@@ -101,8 +104,9 @@ SQSH_NO_UNUSED int sqsh__buffer_add_capacity(
 		size_t additional_size);
 
 /**
- * @brief sqsh__buffer_append
+ * @internal
  * @memberof SqshBuffer
+ * @brief sqsh__buffer_append
  *
  * @param[in,out] buffer The SqshBuffer to append to.
  * @param[in] source The data to append.
@@ -113,8 +117,9 @@ SQSH_NO_UNUSED int sqsh__buffer_append(
 		const size_t source_size);
 
 /**
- * @brief sqsh__buffer_drain resets the buffer size to 0.
+ * @internal
  * @memberof SqshBuffer
+ * @brief sqsh__buffer_drain resets the buffer size to 0.
  *
  * This does not free the memory allocated by the buffer so that
  * the buffer can be reused.
@@ -125,23 +130,27 @@ SQSH_NO_UNUSED int sqsh__buffer_append(
 void sqsh__buffer_drain(struct SqshBuffer *buffer);
 
 /**
- * @brief sqsh__buffer_data returns the data of the SqshBuffer.
+ * @internal
  * @memberof SqshBuffer
+ * @brief sqsh__buffer_data returns the data of the SqshBuffer.
  * @param[in] buffer The SqshBuffer to get the data from.
  * @return a pointer to the data of the SqshBuffer.
  */
 const uint8_t *sqsh__buffer_data(const struct SqshBuffer *buffer);
+
 /**
- * @brief sqsh__buffer_size returns the size of the SqshBuffer.
+ * @internal
  * @memberof SqshBuffer
+ * @brief sqsh__buffer_size returns the size of the SqshBuffer.
  * @param[in] buffer The SqshBuffer to get the size from.
  * @return the size of the SqshBuffer.
  */
 size_t sqsh__buffer_size(const struct SqshBuffer *buffer);
 
 /**
- * @brief sqsh__buffer_cleanup frees the memory managed by the SqshBuffer.
+ * @internal
  * @memberof SqshBuffer
+ * @brief sqsh__buffer_cleanup frees the memory managed by the SqshBuffer.
  * @param[in,out] buffer The SqshBuffer to cleanup.
  */
 int sqsh__buffer_cleanup(struct SqshBuffer *buffer);

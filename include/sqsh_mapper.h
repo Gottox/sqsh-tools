@@ -203,6 +203,7 @@ struct SqshMapper {
 };
 
 /**
+ * @internal
  * @memberof SqshMapper
  * @brief Initializes a mapper with an implementation and input data.
  *
@@ -218,6 +219,7 @@ int sqsh_mapper_init(
 		const void *input, size_t size);
 
 /**
+ * @internal
  * @memberof SqshMapper
  * @brief Maps a portion of the input data to a mapping.
  *
@@ -233,6 +235,7 @@ int sqsh_mapper_map(
 		sqsh_index_t offset, size_t size);
 
 /**
+ * @internal
  * @memberof SqshMapper
  * @brief Retrieves the size of the input data in a mapper.
  *
@@ -243,6 +246,7 @@ int sqsh_mapper_map(
 size_t sqsh_mapper_size(const struct SqshMapper *mapper);
 
 /**
+ * @internal
  * @memberof SqshMapper
  * @brief Cleans up a mapper.
  *
@@ -253,6 +257,7 @@ size_t sqsh_mapper_size(const struct SqshMapper *mapper);
 int sqsh_mapper_cleanup(struct SqshMapper *mapper);
 
 /**
+ * @internal
  * @memberof SqshMapping
  * @brief Retrieves the size of a mapping.
  *
@@ -263,6 +268,7 @@ int sqsh_mapper_cleanup(struct SqshMapper *mapper);
 size_t sqsh_mapping_size(const struct SqshMapping *mapping);
 
 /**
+ * @internal
  * @memberof SqshMapping
  * @brief Resizes a mapping to a new size.
  *
@@ -274,6 +280,7 @@ size_t sqsh_mapping_size(const struct SqshMapping *mapping);
 int sqsh_mapping_resize(struct SqshMapping *mapping, size_t new_size);
 
 /**
+ * @internal
  * @memberof SqshMapping
  * @brief Retrieves the data in a mapping.
  *
@@ -284,6 +291,7 @@ int sqsh_mapping_resize(struct SqshMapping *mapping, size_t new_size);
 const uint8_t *sqsh_mapping_data(const struct SqshMapping *mapping);
 
 /**
+ * @internal
  * @memberof SqshMapping
  * @brief Unmaps a mapping.
  *
@@ -307,6 +315,7 @@ struct SqshMapCursor {
 };
 
 /**
+ * @internal
  * @memberof SqshMapCursor
  * @brief Initializes a mapping cursor
  *
@@ -321,6 +330,7 @@ int sqsh__map_cursor_init(
 		const uint64_t start_address, uint64_t upper_limit);
 
 /**
+ * @internal
  * @memberof SqshMapCursor
  * @brief Advances the cursor
  *
@@ -333,6 +343,7 @@ int sqsh__map_cursor_advance(
 		struct SqshMapCursor *cursor, sqsh_index_t offset, size_t size);
 
 /**
+ * @internal
  * @memberof SqshMapCursor
  * @brief Loads all data into the cursor. This is useful for
  * tables that must reside completely in memory.
@@ -343,6 +354,7 @@ int sqsh__map_cursor_advance(
 int sqsh__map_cursor_all(struct SqshMapCursor *cursor);
 
 /**
+ * @internal
  * @memberof SqshMapCursor
  * @brief Returns the current data of the cursor
  *
@@ -352,6 +364,7 @@ int sqsh__map_cursor_all(struct SqshMapCursor *cursor);
 const uint8_t *sqsh__map_cursor_data(const struct SqshMapCursor *cursor);
 
 /**
+ * @internal
  * @memberof SqshMapCursor
  * @brief Returns the current size of the cursor
  *
@@ -361,6 +374,7 @@ const uint8_t *sqsh__map_cursor_data(const struct SqshMapCursor *cursor);
 size_t sqsh__map_cursor_size(const struct SqshMapCursor *cursor);
 
 /**
+ * @internal
  * @memberof SqshMapCursor
  * @brief Cleans up the cursor
  *
