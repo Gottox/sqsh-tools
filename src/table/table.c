@@ -31,14 +31,14 @@
  * @file         table.c
  */
 
+#include "../../include/sqsh_table_private.h"
+
 #include "../../include/sqsh.h"
-#include "../../include/sqsh_context_private.h"
 #include "../../include/sqsh_data.h"
 #include "../../include/sqsh_error.h"
-#include "../../include/sqsh_table_private.h"
 #include "../utils.h"
-#include <stdint.h>
-#include <string.h>
+
+#include "../../include/sqsh_context_private.h"
 
 typedef const __attribute__((aligned(1))) uint64_t unaligned_uint64_t;
 static uint64_t

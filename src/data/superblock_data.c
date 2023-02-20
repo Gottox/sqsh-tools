@@ -32,7 +32,9 @@
  */
 
 #define _DEFAULT_SOURCE
+
 #include "../../include/sqsh_data_private.h"
+
 #include <endian.h>
 
 uint32_t

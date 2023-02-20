@@ -31,16 +31,14 @@
  * @file         inode.c
  */
 
+#include "../../include/sqsh_inode_private.h"
+
 #include "../../include/sqsh.h"
 #include "../../include/sqsh_context.h"
-#include "../../include/sqsh_data_private.h"
 #include "../../include/sqsh_error.h"
-#include "../../include/sqsh_inode_private.h"
-#include "../../include/sqsh_table.h"
 #include "../utils.h"
 
-#include <stdint.h>
-#include <string.h>
+#include "../../include/sqsh_data_private.h"
 
 static const struct SqshDataInode *
 get_inode(const struct SqshInodeContext *inode) {

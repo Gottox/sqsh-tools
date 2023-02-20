@@ -32,14 +32,10 @@
  */
 
 #include "../../include/sqsh_compression_private.h"
-#include "../../include/sqsh_context.h"
-#include "../../include/sqsh_data.h"
+
 #include "../../include/sqsh_error.h"
+
 #include <lz4.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
 
 int
 sqsh_extract_lz4(

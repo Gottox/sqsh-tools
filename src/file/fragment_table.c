@@ -31,13 +31,15 @@
  * @file         fragment_table.c
  */
 
+#include "../../include/sqsh_table_private.h"
+
 #include "../../include/sqsh.h"
-#include "../../include/sqsh_compression_private.h"
 #include "../../include/sqsh_context.h"
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_inode.h"
-#include "../../include/sqsh_table_private.h"
 #include "../utils.h"
+
+#include "../../include/sqsh_compression_private.h"
 
 // TODO: remove private header
 #include "../../include/sqsh_data_private.h"

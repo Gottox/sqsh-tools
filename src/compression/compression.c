@@ -32,15 +32,10 @@
  */
 
 #include "../../include/sqsh_compression_private.h"
+
 #include "../../include/sqsh_context.h"
-#include "../../include/sqsh_data.h"
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_primitive_private.h"
-
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
 
 #ifdef CONFIG_LZMA
 int sqsh_extract_lzma(

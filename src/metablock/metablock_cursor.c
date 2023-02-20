@@ -31,10 +31,10 @@
  * @file         metablock_iterator.c
  */
 
-#include "../../include/sqsh_common.h"
 #include "../../include/sqsh_metablock_private.h"
+
+#include "../../include/sqsh_error.h"
 #include "../utils.h"
-#include "sqsh_error.h"
 
 int
 sqsh__metablock_cursor_init(

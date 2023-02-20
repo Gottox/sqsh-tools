@@ -31,11 +31,11 @@
  * @file        : trailing_context.c
  */
 
-#include "../../include/sqsh.h"
 #include "../../include/sqsh_context_private.h"
+
+#include "../../include/sqsh.h"
 #include "../../include/sqsh_error.h"
 #include "../utils.h"
-#include "sqsh_mapper.h"
 
 int
 sqsh__trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh) {

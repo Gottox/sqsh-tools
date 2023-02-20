@@ -31,16 +31,12 @@
  * @file         xattr_table.c
  */
 
+#include "../../include/sqsh_xattr_private.h"
+
 #include "../../include/sqsh.h"
-#include "../../include/sqsh_context.h"
 #include "../../include/sqsh_data.h"
 #include "../../include/sqsh_error.h"
-#include "../../include/sqsh_xattr_private.h"
 #include "../utils.h"
-
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
 
 static const struct SqshDataXattrIdTable *
 get_header(const struct SqshXattrTable *context) {

@@ -32,13 +32,9 @@
  */
 
 #include "../../include/sqsh_mapper.h"
-#include <errno.h>
-#include <fcntl.h>
-#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
-#include <sys/mman.h>
-#include <unistd.h>
 
 static int
 sqsh_mapper_canary_init(

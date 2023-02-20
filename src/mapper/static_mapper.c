@@ -28,16 +28,10 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         mmap_mapper.c
+ * @file         static_mapper.c
  */
 
 #include "../../include/sqsh_mapper.h"
-#include <errno.h>
-#include <fcntl.h>
-#include <stdint.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
 static int
 sqsh_mapper_static_mem_init(

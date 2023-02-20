@@ -31,10 +31,10 @@
  * @file         ref_count_array.c
  */
 
-#include "../../include/sqsh_error.h"
 #include "../../include/sqsh_primitive_private.h"
+
+#include "../../include/sqsh_error.h"
 #include "../utils.h"
-#include <stdlib.h>
 
 int
 sqsh__ref_count_array_init(

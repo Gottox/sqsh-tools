@@ -32,9 +32,9 @@
  */
 
 #include "../../include/sqsh_mapper.h"
+
 #include <errno.h>
 #include <fcntl.h>
-#include <stdint.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>

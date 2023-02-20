@@ -31,14 +31,10 @@
  * @file         buffer.c
  */
 
-#include "../../include/sqsh_error.h"
 #include "../../include/sqsh_primitive_private.h"
-#include "../utils.h"
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
+#include "../../include/sqsh_error.h"
+#include "../utils.h"
 
 int
 sqsh__buffer_init(struct SqshBuffer *buffer) {

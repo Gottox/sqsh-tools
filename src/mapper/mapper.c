@@ -31,13 +31,11 @@
  * @file         mapper.c
  */
 
+#include "../../include/sqsh_mapper.h"
+
 #include "../../include/sqsh.h"
 #include "../../include/sqsh_error.h"
-#include "../../include/sqsh_mapper.h"
 #include "../utils.h"
-#include <stddef.h>
-#include <stdint.h>
-#include <string.h>
 
 int
 sqsh_mapper_init(

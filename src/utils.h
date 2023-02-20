@@ -36,9 +36,7 @@
 #define SQSH_UTILS_H
 
 #include "../include/sqsh_common.h"
-#include <assert.h>
-#include <stddef.h>
-#include <stdint.h>
+
 #include <stdlib.h>
 #include <string.h>
 

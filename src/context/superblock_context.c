@@ -32,11 +32,9 @@
  */
 
 #include "../../include/sqsh_context_private.h"
+
 #include "../../include/sqsh_data.h"
 #include "../../include/sqsh_error.h"
-#include "sqsh_data_private.h"
-#include "sqsh_mapper.h"
-#include <stdint.h>
 
 enum SqshInitialized {
 	SQSH_INITIALIZED_ID_TABLE = 1 << 0,

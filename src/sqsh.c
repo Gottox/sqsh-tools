@@ -31,11 +31,10 @@
  * @file         sqsh.c
  */
 
-#include "../include/sqsh_compression_private.h"
-#include "../include/sqsh_data.h"
 #include "../include/sqsh_private.h"
-#include "sqsh_context.h"
-#include "sqsh_mapper.h"
+
+#include "../include/sqsh_data.h"
+
 #include <stdlib.h>
 #include <string.h>
 

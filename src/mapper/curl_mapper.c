@@ -31,23 +31,14 @@
  * @file         curl_mapper.c
  */
 
+#include "../../include/sqsh_mapper.h"
+
 #include "../../include/sqsh_data.h"
 #include "../../include/sqsh_error.h"
-#include "../../include/sqsh_mapper.h"
 #include "../utils.h"
 
 #include <curl/curl.h>
-#include <errno.h>
-#include <fcntl.h>
 #include <inttypes.h>
-#include <pthread.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
 #define SUPERBLOCK_REQUEST_SIZE \
 	(SQSH_SIZEOF_SUPERBLOCK + SQSH_SIZEOF_COMPRESSION_OPTIONS)

@@ -31,13 +31,10 @@
  * @file         cursor.c
  */
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
+#include "../../include/sqsh_mapper.h"
 
 #include "../../include/sqsh_error.h"
-#include "../../include/sqsh_mapper.h"
-#include "src/utils.h"
+#include "../utils.h"
 
 int
 sqsh__map_cursor_init(

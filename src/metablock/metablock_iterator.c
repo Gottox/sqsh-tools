@@ -31,15 +31,16 @@
  * @file         metablock_iterator.c
  */
 
+#include "../../include/sqsh_metablock_private.h"
+
 #include "../../include/sqsh.h"
-#include "../../include/sqsh_compression_private.h"
 #include "../../include/sqsh_data.h"
 #include "../../include/sqsh_error.h"
-// TODO: Remove this header
-#include "../../include/sqsh_metablock_private.h"
-#include "../../include/sqsh_private.h"
 
 #include <string.h>
+
+#include "../../include/sqsh_compression_private.h"
+#include "../../include/sqsh_private.h"
 
 int
 sqsh__metablock_iterator_init(
