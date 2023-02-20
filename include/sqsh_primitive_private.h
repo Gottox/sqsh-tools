@@ -146,6 +146,82 @@ size_t sqsh__buffer_size(const struct SqshBuffer *buffer);
  */
 int sqsh__buffer_cleanup(struct SqshBuffer *buffer);
 
+////////////////////////////////////////
+// primitive/ref_count_array.c
+
+typedef void (*sqsh_ref_count_array_cleanup_t)(void *data);
+
+struct SqshRefCountArray {
+	/**
+	 * @privatesection
+	 */
+	void **data;
+	size_t size;
+	int *ref_count;
+	pthread_mutex_t mutex;
+	sqsh_ref_count_array_cleanup_t cleanup;
+};
+
+/**
+ * @brief Initializes a reference-counted array.
+ *
+ * @param array The array to initialize.
+ * @param size The size of the array.
+ * @param cleanup The cleanup function.
+ * @return 0 on success, a negative value on error.
+ */
+int sqsh__ref_count_array_init(
+		struct SqshRefCountArray *array, size_t size,
+		sqsh_ref_count_array_cleanup_t cleanup);
+
+/**
+ * @brief Sets a value in a reference-counted array.
+ *
+ * @param array The array to set the value in.
+ * @param index The index to set the value at.
+ * @param data The data to set.
+ * @param span The number of indices to span. (Use 1 for a single index.)
+ * @return 0 on success, a negative value on error.
+ */
+int sqsh__ref_count_array_set(
+		struct SqshRefCountArray *array, int index, void *data, int span);
+
+/**
+ * @brief Gets the size of a reference-counted array.
+ *
+ * @param array The array to get the size of.
+ * @return The size of the array.
+ */
+size_t sqsh__ref_count_array_size(struct SqshRefCountArray *array);
+
+/**
+ * @brief Retains the data at a specified index in a reference-counted array.
+ *
+ * @param array The array containing the data.
+ * @param index The index of the data.
+ * @return A pointer to the retained data.
+ */
+const void *
+sqsh__ref_count_array_retain(struct SqshRefCountArray *array, int *index);
+
+/**
+ * @brief Releases the reference to the data at a specified index in a
+ * reference-counted array.
+ *
+ * @param array The array containing the data.
+ * @param index The index of the data.
+ * @return 0 on success, a negative value on error.
+ */
+int sqsh__ref_count_array_release(struct SqshRefCountArray *array, int index);
+
+/**
+ * @brief Cleans up a reference-counted array.
+ *
+ * @param array The array to cleanup.
+ * @return 0 on success, a negative value on error.
+ */
+int sqsh__ref_count_array_cleanup(struct SqshRefCountArray *array);
+
 #ifdef __cplusplus
 }
 #endif
