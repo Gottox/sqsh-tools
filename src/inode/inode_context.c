@@ -43,18 +43,8 @@
 
 static const struct SqshDataInode *
 get_inode(const struct SqshInodeContext *inode) {
-	return (const struct SqshDataInode *)sqsh__metablock_stream_data(
+	return (const struct SqshDataInode *)sqsh__metablock_cursor_data(
 			&inode->metablock);
-}
-
-static int
-inode_data_more(struct SqshInodeContext *inode, size_t size) {
-	int rv = sqsh__metablock_stream_more(&inode->metablock, size);
-
-	if (rv < 0) {
-		return rv;
-	}
-	return rv;
 }
 
 static int
@@ -99,7 +89,7 @@ inode_load(struct SqshInodeContext *context) {
 		size += SQSH_SIZEOF_INODE_IPC_EXT;
 		break;
 	}
-	rv = inode_data_more(context, size);
+	rv = sqsh__metablock_cursor_advance(&context->metablock, 0, size);
 	return rv;
 }
 
@@ -124,28 +114,29 @@ get_size_info(const struct SqshInodeContext *context, int index) {
 int
 sqsh__inode_init(
 		struct SqshInodeContext *inode, struct Sqsh *sqsh, uint64_t inode_ref) {
-	uint32_t inode_block;
-	uint16_t inode_offset;
+	uint32_t address_outer;
+	uint16_t address_inner;
 
-	sqsh_inode_ref_to_block(inode_ref, &inode_block, &inode_offset);
+	sqsh_inode_ref_to_block(inode_ref, &address_outer, &address_inner);
+
+	inode->inode_ref = inode_ref;
 
 	int rv = 0;
 	const struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 
-	rv = sqsh__metablock_stream_init(
-			&inode->metablock, sqsh,
-			sqsh_superblock_inode_table_start(superblock), ~0);
-	if (rv < 0) {
-		return rv;
-	}
-	rv = sqsh__metablock_stream_seek(
-			&inode->metablock, inode_block, inode_offset);
-	if (rv < 0) {
-		return rv;
-	}
+	const uint64_t inode_table_start =
+			sqsh_superblock_inode_table_start(superblock);
 
-	// loading enough data to identify the inode
-	rv = inode_data_more(inode, SQSH_SIZEOF_INODE_HEADER);
+	if (SQSH_ADD_OVERFLOW(inode_table_start, address_outer, &address_outer)) {
+		return SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+	rv = sqsh__metablock_cursor_init(
+			&inode->metablock, sqsh, address_outer, ~0);
+	if (rv < 0) {
+		return rv;
+	}
+	rv = sqsh__metablock_cursor_advance(
+			&inode->metablock, address_inner, SQSH_SIZEOF_INODE_HEADER);
 	if (rv < 0) {
 		return rv;
 	}
@@ -557,7 +548,7 @@ sqsh_inode_xattr_index(const struct SqshInodeContext *context) {
 
 int
 sqsh__inode_cleanup(struct SqshInodeContext *inode) {
-	return sqsh__metablock_stream_cleanup(&inode->metablock);
+	return sqsh__metablock_cursor_cleanup(&inode->metablock);
 }
 
 int

@@ -34,8 +34,8 @@
 #ifndef SQSH_INODE_PRIVATE_H
 #define SQSH_INODE_PRIVATE_H
 
-#include "sqsh_context_private.h"
 #include "sqsh_inode.h"
+#include "sqsh_metablock_private.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,7 +48,8 @@ struct SqshInodeContext {
 	/**
 	 * @privatesection
 	 */
-	struct SqshMetablockStreamContext metablock;
+	uint64_t inode_ref;
+	struct SqshMetablockCursor metablock;
 	struct Sqsh *sqsh;
 };
 
@@ -83,9 +84,8 @@ struct SqshDirectoryIndexIterator {
 	/**
 	 * @privatesection
 	 */
-	struct SqshInodeContext *inode;
+	struct SqshInodeContext inode;
 	size_t remaining_entries;
-	sqsh_index_t current_offset;
 	sqsh_index_t next_offset;
 };
 
@@ -94,28 +94,30 @@ struct SqshDirectoryIndexIterator {
  * @memberof SqshDirectoryIndexIterator
  * @brief Initializes an iterator for a directory index
  *
- * @param[in] iterator The iterator to initialize
- * @param[in] inode    The inode for the directory to iterate over
+ * @param[out] iterator  The iterator to initialize
+ * @param[in] sqsh      The sqsh context
+ * @param[in] inode_ref The inode ref for the directory to iterate over
  *
  * @return 0 on success, negative value on error
  */
 SQSH_NO_UNUSED int sqsh__directory_index_iterator_init(
-		struct SqshDirectoryIndexIterator *iterator,
-		struct SqshInodeContext *inode);
+		struct SqshDirectoryIndexIterator *iterator, struct Sqsh *sqsh,
+		uint64_t inode_ref);
 
 /**
  * @internal
  * @memberof SqshDirectoryIndexIterator
  * @brief Creates a new iterator for a directory index
  *
- * @param[in] inode The inode for the directory to iterate over
- * @param[out] err  Pointer to an int where the error code will be stored
+ * @param[in] inode_ref  The inode ref for the directory to iterate over
+ * @param[in] sqsh       The sqsh context
+ * @param[out] err       Pointer to an int where the error code will be stored
  *
  * @return The newly created iterator on success, NULL on error
  */
 SQSH_NO_UNUSED
-struct SqshDirectoryIndexIterator *
-sqsh__directory_index_iterator_new(struct SqshInodeContext *inode, int *err);
+struct SqshDirectoryIndexIterator *sqsh__directory_index_iterator_new(
+		uint64_t inode_ref, struct Sqsh *sqsh, int *err);
 
 /**
  * @internal
@@ -186,7 +188,7 @@ const char *sqsh__directory_index_iterator_name(
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__directory_index_iterator_cleanup(
+int sqsh__directory_index_iterator_cleanup(
 		struct SqshDirectoryIndexIterator *iterator);
 
 /**
