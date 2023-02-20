@@ -59,8 +59,8 @@ struct Sqsh;
 struct SqshXattrTable;
 
 /**
- * @brief sqsh_new initializes a sqsh context in heap.
  * @memberof Sqsh
+ * @brief sqsh_new initializes a sqsh context in heap.
  *
  * @param[in] source the source to retrieve the archive from
  * @param[in] config the configuration for the sqsh context.
@@ -72,8 +72,8 @@ SQSH_NO_UNUSED struct Sqsh *
 sqsh_new(const void *source, const struct SqshConfig *config, int *err);
 
 /**
- * @brief sqsh_superblock returns the configuration object of the sqsh context.
  * @memberof Sqsh
+ * @brief sqsh_superblock returns the configuration object of the sqsh context.
  *
  * @param[in] sqsh the Sqsh structure.
  *
@@ -82,8 +82,8 @@ sqsh_new(const void *source, const struct SqshConfig *config, int *err);
 const struct SqshConfig *sqsh_config(const struct Sqsh *sqsh);
 
 /**
- * @brief sqsh_superblock returns the superblock context.
  * @memberof Sqsh
+ * @brief sqsh_superblock returns the superblock context.
  *
  * @param[in] sqsh the Sqsh structure.
  *
@@ -92,8 +92,8 @@ const struct SqshConfig *sqsh_config(const struct Sqsh *sqsh);
 const struct SqshSuperblockContext *sqsh_superblock(const struct Sqsh *sqsh);
 
 /**
- * @brief sqsh_mapper returns the mapper to retrieve chunks of the sqsh file.
  * @memberof Sqsh
+ * @brief sqsh_mapper returns the mapper to retrieve chunks of the sqsh file.
  *
  * @param[in] sqsh the Sqsh structure.
  *
@@ -101,8 +101,8 @@ const struct SqshSuperblockContext *sqsh_superblock(const struct Sqsh *sqsh);
  */
 struct SqshMapper *sqsh_mapper(struct Sqsh *sqsh);
 /**
- * @brief sqsh_compression_data returns the compression context for data blocks
  * @memberof Sqsh
+ * @brief sqsh_compression_data returns the compression context for data blocks
  *
  * @param[in] sqsh the Sqsh structure.
  *
@@ -111,9 +111,9 @@ struct SqshMapper *sqsh_mapper(struct Sqsh *sqsh);
 const struct SqshCompression *sqsh_compression_data(const struct Sqsh *sqsh);
 
 /**
+ * @memberof Sqsh
  * @brief sqsh_compression_data returns the compression context for metadata
  * blocks.
- * @memberof Sqsh
  *
  * @param[in] sqsh the Sqsh structure.
  *
@@ -123,6 +123,7 @@ const struct SqshCompression *
 sqsh_compression_metablock(const struct Sqsh *sqsh);
 
 /**
+ * @memberof Sqsh
  * @brief Retrieves the id table of a Sqsh instance.
  *
  * @param[in]  sqsh       The Sqsh instance to retrieve the id table from.
@@ -134,6 +135,7 @@ sqsh_compression_metablock(const struct Sqsh *sqsh);
 int sqsh_id_table(struct Sqsh *sqsh, struct SqshTable **id_table);
 
 /**
+ * @memberof Sqsh
  * @brief Retrieves the export table of a Sqsh instance.
  *
  * @param[in]  sqsh           The Sqsh instance to retrieve the export table
@@ -146,6 +148,7 @@ int sqsh_id_table(struct Sqsh *sqsh, struct SqshTable **id_table);
 int sqsh_export_table(struct Sqsh *sqsh, struct SqshTable **export_table);
 
 /**
+ * @memberof Sqsh
  * @brief Retrieves the fragment table of a Sqsh instance.
  *
  * @param[in]  sqsh             The Sqsh instance to retrieve the fragment table
@@ -159,6 +162,7 @@ int sqsh_fragment_table(
 		struct Sqsh *sqsh, struct SqshFragmentTable **fragment_table);
 
 /**
+ * @memberof Sqsh
  * @brief Retrieves the xattr table of a Sqsh instance.
  *
  * @param[in]  sqsh          The Sqsh instance to retrieve the xattr table
@@ -171,6 +175,7 @@ int sqsh_fragment_table(
 int sqsh_xattr_table(struct Sqsh *sqsh, struct SqshXattrTable **xattr_table);
 
 /**
+ * @memberof Sqsh
  * @brief Frees the resources used by a Sqsh instance.
  *
  * @param[in] sqsh The Sqsh instance to free.

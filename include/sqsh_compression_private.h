@@ -87,7 +87,7 @@ int sqsh__compression_decompress_to_buffer(
 
 /**
  * @internal
- *
+ * @memberof SqshCompression
  * @brief Cleans up a compression context.
  *
  * @param[in] compression The context to clean up.

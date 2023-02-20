@@ -172,6 +172,8 @@ struct SqshRefCountArray {
 };
 
 /**
+ * @internal
+ * @memberof SqshRefCountArray
  * @brief Initializes a reference-counted array.
  *
  * @param array The array to initialize.
@@ -184,6 +186,8 @@ int sqsh__ref_count_array_init(
 		sqsh_ref_count_array_cleanup_t cleanup);
 
 /**
+ * @internal
+ * @memberof SqshRefCountArray
  * @brief Sets a value in a reference-counted array.
  *
  * @param array The array to set the value in.
@@ -196,6 +200,8 @@ int sqsh__ref_count_array_set(
 		struct SqshRefCountArray *array, int index, void *data, int span);
 
 /**
+ * @internal
+ * @memberof SqshRefCountArray
  * @brief Gets the size of a reference-counted array.
  *
  * @param array The array to get the size of.
@@ -204,6 +210,8 @@ int sqsh__ref_count_array_set(
 size_t sqsh__ref_count_array_size(struct SqshRefCountArray *array);
 
 /**
+ * @internal
+ * @memberof SqshRefCountArray
  * @brief Retains the data at a specified index in a reference-counted array.
  *
  * @param array The array containing the data.
@@ -214,6 +222,8 @@ const void *
 sqsh__ref_count_array_retain(struct SqshRefCountArray *array, int *index);
 
 /**
+ * @internal
+ * @memberof SqshRefCountArray
  * @brief Releases the reference to the data at a specified index in a
  * reference-counted array.
  *
@@ -224,6 +234,8 @@ sqsh__ref_count_array_retain(struct SqshRefCountArray *array, int *index);
 int sqsh__ref_count_array_release(struct SqshRefCountArray *array, int index);
 
 /**
+ * @internal
+ * @memberof SqshRefCountArray
  * @brief Cleans up a reference-counted array.
  *
  * @param array The array to cleanup.

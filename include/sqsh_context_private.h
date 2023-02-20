@@ -55,7 +55,7 @@ struct SqshSuperblockContext {
 
 /**
  * @internal
- *
+ * @memberof SqshSuperblockContext
  * @brief Initializes a superblock context.
  *
  * @param[out] context The context to initialize.
@@ -67,6 +67,8 @@ SQSH_NO_UNUSED int sqsh__superblock_init(
 		struct SqshSuperblockContext *context, struct SqshMapper *mapper);
 
 /**
+ * @internal
+ * @memberof SqshSuperblockContext
  * @brief Cleans up a superblock context.
  *
  * @param[in] superblock The context to clean up.
