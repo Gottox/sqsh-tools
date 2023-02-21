@@ -70,10 +70,6 @@ read_fragment_data(
 		const struct SqshFragmentTable *table, struct SqshBuffer *buffer,
 		uint32_t index) {
 	int rv = 0;
-	uint64_t start;
-	uint32_t size;
-	const struct SqshDataDatablockSize *size_info;
-	bool is_compressed;
 	struct SqshDataFragment fragment_info = {0};
 	struct SqshMapCursor fragment_mapping = {0};
 	const uint8_t *data;
@@ -83,13 +79,19 @@ read_fragment_data(
 		goto out;
 	}
 
-	start = sqsh_data_fragment_start(&fragment_info);
-	size_info = sqsh_data_fragment_size_info(&fragment_info);
-	size = sqsh_data_datablock_size(size_info);
-	is_compressed = sqsh_data_datablock_is_compressed(size_info);
+	const uint64_t start_address = sqsh_data_fragment_start(&fragment_info);
+	const struct SqshDataDatablockSize *size_info =
+			sqsh_data_fragment_size_info(&fragment_info);
+	const uint32_t size = sqsh_data_datablock_size(size_info);
+	const bool is_compressed = sqsh_data_datablock_is_compressed(size_info);
+	uint64_t upper_limit;
+	if (SQSH_ADD_OVERFLOW(start_address, size, &upper_limit)) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
 
 	rv = sqsh__map_cursor_init(
-			&fragment_mapping, table->map_manager, start, size);
+			&fragment_mapping, table->map_manager, start_address, upper_limit);
 	if (rv < 0) {
 		goto out;
 	}
