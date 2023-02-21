@@ -5,11 +5,11 @@
  * Distributed under terms of the MIT license.
  */
 
+#include "../include/sqsh_context.h"
 #include "../include/sqsh_directory_private.h"
 #include "../include/sqsh_file_private.h"
 #include "../include/sqsh_inode_private.h"
 #include "../include/sqsh_private.h"
-#include "sqsh_context.h"
 #include <stdint.h>
 
 static int
