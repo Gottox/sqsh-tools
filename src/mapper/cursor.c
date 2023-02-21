@@ -38,12 +38,12 @@
 
 static sqsh_index_t
 get_index(const struct SqshMapCursor *cursor, uint64_t address) {
-	return address / sqsh__map_manager_chunk_size(cursor->map_manager);
+	return address / sqsh__map_manager_block_size(cursor->map_manager);
 }
 
 static sqsh_index_t
 get_offset(const struct SqshMapCursor *cursor, uint64_t address) {
-	return address % sqsh__map_manager_chunk_size(cursor->map_manager);
+	return address % sqsh__map_manager_block_size(cursor->map_manager);
 }
 
 int
@@ -90,7 +90,7 @@ out:
 static int
 setup_buffered(struct SqshMapCursor *cursor) {
 	int rv = 0;
-	size_t size = sqsh__map_manager_chunk_size(cursor->map_manager);
+	size_t size = sqsh__map_manager_block_size(cursor->map_manager);
 
 	sqsh__buffer_drain(&cursor->buffer);
 
@@ -166,7 +166,9 @@ sqsh__map_cursor_size(const struct SqshMapCursor *cursor) {
 
 int
 sqsh__map_cursor_cleanup(struct SqshMapCursor *cursor) {
-	sqsh__map_manager_release(cursor->map_manager, cursor->current_mapping);
+	if (cursor->map_manager) {
+		sqsh__map_manager_release(cursor->map_manager, cursor->current_mapping);
+	}
 	cursor->current_mapping = NULL;
 	sqsh__buffer_cleanup(&cursor->buffer);
 	return 0;

@@ -80,12 +80,12 @@ sqsh__map_manager_size(const struct SqshMapManager *manager) {
 }
 
 size_t
-sqsh__map_manager_chunk_size(const struct SqshMapManager *manager) {
+sqsh__map_manager_block_size(const struct SqshMapManager *manager) {
 	return sqsh__mapper_block_size(&manager->mapper);
 }
 
 size_t
-sqsh__map_manager_chunk_count(const struct SqshMapManager *manager) {
+sqsh__map_manager_block_count(const struct SqshMapManager *manager) {
 	return sqsh__ref_count_array_size(&manager->maps);
 }
 
@@ -103,7 +103,7 @@ load_mapping(
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
-	if (index == sqsh__map_manager_chunk_count(manager) - 1) {
+	if (index == sqsh__map_manager_block_count(manager) - 1) {
 		size = sqsh__map_manager_size(manager) % size;
 	}
 

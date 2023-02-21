@@ -93,15 +93,6 @@ sqsh__mapper_cleanup(struct SqshMapper *mapper) {
 	return rv;
 }
 
-int
-sqsh__mapping_resize(struct SqshMapping *mapping, size_t new_size) {
-	if (new_size <= sqsh__mapping_size(mapping)) {
-		return 0;
-	} else {
-		return mapping->mapper->impl->map_resize(mapping, new_size);
-	}
-}
-
 size_t
 sqsh__mapping_size(const struct SqshMapping *mapping) {
 	return mapping->mapper->impl->map_size(mapping);

@@ -75,19 +75,6 @@ sqsh_mapping_canary_data(const struct SqshMapping *mapping) {
 	return mapping->data.cn.data;
 }
 
-static int
-sqsh_mapping_canary_resize(struct SqshMapping *mapping, size_t new_size) {
-	int rv;
-	uint64_t offset = mapping->data.cn.offset;
-	struct SqshMapper *mapper = mapping->mapper;
-
-	rv = sqsh__mapping_unmap(mapping);
-	if (rv < 0) {
-		return rv;
-	}
-	return sqsh__mapper_map(mapping, mapper, offset, new_size);
-}
-
 static size_t
 sqsh_mapping_canary_size(const struct SqshMapping *mapping) {
 	return mapping->data.cn.size;
@@ -100,7 +87,6 @@ static const struct SqshMemoryMapperImpl impl = {
 		.size = sqsh_mapper_canary_size,
 		.cleanup = sqsh_mapper_canary_cleanup,
 		.map_data = sqsh_mapping_canary_data,
-		.map_resize = sqsh_mapping_canary_resize,
 		.map_size = sqsh_mapping_canary_size,
 		.unmap = sqsh_mapping_canary_unmap,
 };

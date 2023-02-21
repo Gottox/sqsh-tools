@@ -67,12 +67,6 @@ sqsh_mapping_static_mem_data(const struct SqshMapping *mapping) {
 	return mapping->data.sm.data;
 }
 
-static int
-sqsh_mapping_static_mem_resize(struct SqshMapping *mapping, size_t new_size) {
-	mapping->data.sm.size = new_size;
-	return 0;
-}
-
 static size_t
 sqsh_mapping_static_mem_size(const struct SqshMapping *mapping) {
 	return mapping->data.sm.size;
@@ -85,7 +79,6 @@ static const struct SqshMemoryMapperImpl impl = {
 		.size = sqsh_mapper_static_mem_size,
 		.cleanup = sqsh_mapper_static_mem_cleanup,
 		.map_data = sqsh_mapping_static_mem_data,
-		.map_resize = sqsh_mapping_static_mem_resize,
 		.map_size = sqsh_mapping_static_mem_size,
 		.unmap = sqsh_mapping_static_mem_unmap,
 };

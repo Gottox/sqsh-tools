@@ -35,7 +35,6 @@
 
 #include "../../include/sqsh_error.h"
 #include "../utils.h"
-#include <stdint.h>
 
 int
 sqsh__ref_count_array_init(

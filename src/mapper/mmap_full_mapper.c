@@ -101,11 +101,6 @@ static const uint8_t *
 sqsh_mapping_mmap_complete_data(const struct SqshMapping *mapping) {
 	return mapping->data.mc.data;
 }
-static int
-sqsh_mapping_mmap_complete_resize(
-		struct SqshMapping *mapper, size_t __attribute__((unused)) new_size) {
-	return mapper->data.mc.size;
-}
 
 static size_t
 sqsh_mapping_mmap_complete_size(const struct SqshMapping *mapping) {
@@ -119,7 +114,6 @@ const struct SqshMemoryMapperImpl impl = {
 		.size = sqsh_mapper_mmap_complete_size,
 		.cleanup = sqsh_mapper_mmap_complete_cleanup,
 		.map_data = sqsh_mapping_mmap_complete_data,
-		.map_resize = sqsh_mapping_mmap_complete_resize,
 		.map_size = sqsh_mapping_mmap_complete_size,
 		.unmap = sqsh_mapping_mmap_complete_unmap,
 };

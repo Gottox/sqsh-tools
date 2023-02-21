@@ -120,36 +120,6 @@ sqsh_mapping_mmap_data(const struct SqshMapping *mapping) {
 	return &mapping->data.mm.data[mapping->data.mm.page_offset];
 }
 
-int
-sqsh_mapping_mmap_resize(struct SqshMapping *mapping, size_t new_size) {
-#ifdef _GNU_SOURCE
-	uint8_t *data = mapping->data.mm.data;
-	size_t size = mapping->data.mm.size;
-	size_t page_offset = mapping->data.mm.page_offset;
-
-	data = mremap(
-			data, page_offset + size, page_offset + new_size, MREMAP_MAYMOVE);
-
-	if (data == MAP_FAILED) {
-		return -errno;
-	}
-
-	mapping->data.mm.size = new_size;
-	mapping->data.mm.data = data;
-
-	return 0;
-#else
-	int rv;
-	uint64_t offset = mapping->data.mm.offset;
-	struct SqshMemoryMapper *mapper = mapping->mapper;
-
-	rv = sqsh_mapping_unmap(mapping);
-	if (rv < 0) {
-		return rv;
-	}
-	return sqsh_mapper_map(mapping, mapper, offset, new_size);
-#endif
-}
 static size_t
 sqsh_mapping_mmap_size(const struct SqshMapping *mapping) {
 	return mapping->data.mm.size;
@@ -169,7 +139,6 @@ static const struct SqshMemoryMapperImpl impl = {
 		.cleanup = sqsh_mapper_mmap_cleanup,
 		.map_data = sqsh_mapping_mmap_data,
 		.map_size = sqsh_mapping_mmap_size,
-		.map_resize = sqsh_mapping_mmap_resize,
 		.unmap = sqsh_mapping_mmap_unmap,
 };
 const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_mmap = &impl;

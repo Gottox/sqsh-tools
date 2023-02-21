@@ -45,31 +45,44 @@
 #define CONTENT_RANGE "Content-Range: "
 #define CONTENT_RANGE_LENGTH (sizeof(CONTENT_RANGE) - 1)
 
+struct SqshCurlWriteInfo {
+	uint8_t *buffer;
+	size_t offset;
+	size_t size;
+	int rv;
+};
+
 static size_t
 write_data(void *ptr, size_t size, size_t nmemb, void *userdata) {
-	int rv = 0;
 	size_t byte_size;
-	struct SqshMapping *mapping = userdata;
+	size_t next_offset;
+	struct SqshCurlWriteInfo *info = userdata;
 
 	if (SQSH_MULT_OVERFLOW(size, nmemb, &byte_size)) {
-		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
-		goto out;
+		info->rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		return 0;
 	}
-	rv = sqsh__buffer_append(&mapping->data.cl.buffer, ptr, byte_size);
-	if (rv < 0) {
-		goto out;
+	if (SQSH_ADD_OVERFLOW(info->offset, byte_size, &next_offset)) {
+		info->rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		return 0;
 	}
 
-	rv = byte_size;
+	if (next_offset > info->size) {
+		info->rv = -SQSH_ERROR_MAPPER_MAP;
+		return 0;
+	}
 
-out:
-	return rv;
+	memcpy(&info->buffer[info->offset], ptr, byte_size);
+
+	info->offset = next_offset;
+
+	return byte_size;
 }
 
 static int
 get_total_size(CURL *handle, uint64_t *total) {
 	int rv = 0;
-	int dummy;
+	uint64_t dummy;
 	struct curl_header *header = NULL;
 	static const char *format = "bytes %" PRIu64 "-%" PRIu64 "/%" PRIu64;
 	int scanned_fields;
@@ -108,139 +121,57 @@ get_file_time(CURL *handle, uint64_t *file_time) {
 }
 
 static CURL *
-configure_handle(struct SqshMapping *mapping) {
-	CURL *handle = mapping->mapper->data.cl.handle;
-	pthread_mutex_lock(&mapping->mapper->data.cl.handle_lock);
+configure_handle(struct SqshMapper *mapper) {
+	CURL *handle = mapper->data.cl.handle;
 	curl_easy_reset(handle);
-	curl_easy_setopt(handle, CURLOPT_URL, mapping->mapper->data.cl.url);
+	curl_easy_setopt(handle, CURLOPT_URL, mapper->data.cl.url);
 	curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 1L);
 	curl_easy_setopt(handle, CURLOPT_TCP_KEEPALIVE, 1L);
 	curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1L);
 	curl_easy_setopt(handle, CURLOPT_FAILONERROR, 1L);
 	curl_easy_setopt(handle, CURLOPT_FILETIME, 1L);
+	curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_data);
 	return handle;
 }
 
-static void
-release_handle(struct SqshMapping *mapping, CURL *handle) {
-	if (handle == mapping->mapper->data.cl.handle) {
-		pthread_mutex_unlock(&mapping->mapper->data.cl.handle_lock);
-	}
-}
-
 static int
-sqsh_mapper_curl_init(
-		struct SqshMapper *mapper, const void *input, size_t size) {
-	(void)size;
-	int rv = 0;
-	struct SqshMapping mapping = {0};
-	curl_global_init(CURL_GLOBAL_ALL);
-
-	mapper->data.cl.url = input;
-	mapper->data.cl.handle = curl_easy_init();
-	mapper->data.cl.expected_size = UINT64_MAX;
-	mapper->data.cl.expected_time = UINT64_MAX;
-
-	rv = pthread_mutex_init(&mapper->data.cl.handle_lock, NULL);
-	if (rv != 0) {
-		rv = -SQSH_ERROR_MAPPER_INIT;
-		goto out;
-	}
-
-	rv = sqsh__mapper_map(&mapping, mapper, 0, SUPERBLOCK_REQUEST_SIZE);
-	if (rv < 0) {
-		goto out;
-	}
-	sqsh__mapping_unmap(&mapping);
-
-out:
-	return rv;
-}
-
-static int
-sqsh_mapper_curl_map(
-		struct SqshMapping *mapping, sqsh_index_t offset, size_t size) {
-	int rv = 0;
-
-	mapping->data.cl.offset = offset;
-	rv = sqsh__buffer_init(&mapping->data.cl.buffer);
-	if (rv < 0) {
-		goto out;
-	}
-
-	rv = sqsh__mapping_resize(mapping, size);
-	if (rv < 0) {
-		goto out;
-	}
-
-out:
-	if (rv < 0) {
-		sqsh__mapping_unmap(mapping);
-	}
-	return rv;
-}
-static size_t
-sqsh_mapper_curl_size(const struct SqshMapper *mapper) {
-	return mapper->data.cl.expected_size;
-}
-
-static int
-sqsh_mapper_curl_cleanup(struct SqshMapper *mapper) {
-	pthread_mutex_destroy(&mapper->data.cl.handle_lock);
-	curl_easy_cleanup(mapper->data.cl.handle);
-	return 0;
-}
-
-static int
-sqsh_mapping_curl_unmap(struct SqshMapping *mapping) {
-	sqsh__buffer_cleanup(&mapping->data.cl.buffer);
-	return 0;
-}
-
-static const uint8_t *
-sqsh_mapping_curl_data(const struct SqshMapping *mapping) {
-	return sqsh__buffer_data(&mapping->data.cl.buffer);
-}
-
-static int
-sqsh_mapping_curl_resize(struct SqshMapping *mapping, size_t new_size) {
+curl_download(
+		struct SqshMapper *mapper, sqsh_index_t offset, size_t size,
+		uint8_t **data) {
 	// TODO: Declutter the initialisation of this function. Also check for
 	// integer overflows.
-	const uint64_t expected_size = mapping->mapper->data.cl.expected_size;
-	const uint64_t expected_time = mapping->mapper->data.cl.expected_time;
+	const uint64_t expected_size = mapper->data.cl.expected_size;
+	const uint64_t expected_time = mapper->data.cl.expected_time;
+	*data = calloc(size, sizeof(uint8_t));
+	if (*data == NULL) {
+		return -SQSH_ERROR_MALLOC_FAILED;
+	}
 
-	new_size = SQSH_PADDING(new_size, 512);
+	struct SqshCurlWriteInfo write_info = {
+			.size = size,
+			.buffer = *data,
+	};
 
 	int rv = 0;
 	// The actual max-size this string should ever use is 42, but we
 	// add some padding to be a nice number. Not that 42 isn't nice.
 	char range_buffer[64] = {0};
 	CURL *handle = NULL;
-	size_t current_size = sqsh__mapping_size(mapping);
-	const uint64_t new_offset = mapping->data.cl.offset + current_size;
-	// The end offset is capped at the expected size. That's the size
-	// we expect the file to have.
-	const uint64_t end_offset =
-			SQSH_MIN(new_offset + new_size - current_size, expected_size) - 1;
+	const uint64_t end_offset = offset + size - 1;
 	uint64_t total_size = UINT64_MAX;
 	uint64_t file_time = UINT64_MAX;
 	long http_code = 0;
 
-	if (new_size <= current_size) {
-		return 0;
-	}
-
 	rv = snprintf(
-			range_buffer, sizeof(range_buffer), "%" PRIu64 "-%" PRIu64,
-			new_offset, end_offset);
+			range_buffer, sizeof(range_buffer), "%" PRIu64 "-%" PRIu64, offset,
+			end_offset);
 	if (rv >= (int)sizeof(range_buffer)) {
 		rv = -SQSH_ERROR_MAPPER_MAP;
 		goto out;
 	}
-	handle = configure_handle(mapping);
+	handle = configure_handle(mapper);
 	curl_easy_setopt(handle, CURLOPT_RANGE, range_buffer);
-	curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_data);
-	curl_easy_setopt(handle, CURLOPT_WRITEDATA, mapping);
+	curl_easy_setopt(handle, CURLOPT_WRITEDATA, &write_info);
 
 	rv = curl_easy_perform(handle);
 	if (rv != CURLE_OK) {
@@ -273,26 +204,100 @@ sqsh_mapping_curl_resize(struct SqshMapping *mapping, size_t new_size) {
 	}
 
 	if (expected_time == UINT64_MAX) {
-		mapping->mapper->data.cl.expected_time = file_time;
+		mapper->data.cl.expected_time = file_time;
 	} else if (file_time != expected_time) {
 		rv = -SQSH_ERROR_MAPPER_MAP;
 		goto out;
 	}
 
 	if (expected_size == UINT64_MAX) {
-		mapping->mapper->data.cl.expected_size = total_size;
+		mapper->data.cl.expected_size = total_size;
 	} else if (total_size != expected_size) {
 		rv = -SQSH_ERROR_MAPPER_MAP;
 		goto out;
 	}
 out:
-	release_handle(mapping, handle);
 	return rv;
+}
+
+static int
+sqsh_mapper_curl_init(
+		struct SqshMapper *mapper, const void *input, size_t size) {
+	(void)size;
+	int rv = 0;
+	curl_global_init(CURL_GLOBAL_ALL);
+
+	mapper->data.cl.url = input;
+	mapper->data.cl.handle = curl_easy_init();
+	mapper->data.cl.expected_size = UINT64_MAX;
+	mapper->data.cl.expected_time = UINT64_MAX;
+
+	rv = pthread_mutex_init(&mapper->data.cl.lock, NULL);
+	if (rv != 0) {
+		rv = -SQSH_ERROR_MAPPER_INIT;
+		goto out;
+	}
+
+	size_t block_size = sqsh__mapper_block_size(mapper);
+	rv = curl_download(mapper, 0, block_size, &mapper->data.cl.header_cache);
+	if (rv < 0) {
+		goto out;
+	}
+
+out:
+	return rv;
+}
+
+static int
+sqsh_mapper_curl_map(
+		struct SqshMapping *mapping, sqsh_index_t offset, size_t size) {
+	int rv = 0;
+
+	pthread_mutex_lock(&mapping->mapper->data.cl.lock);
+	if (offset == 0 && mapping->mapper->data.cl.header_cache != NULL) {
+		mapping->data.cl.data = mapping->mapper->data.cl.header_cache;
+	} else {
+		rv = curl_download(
+				mapping->mapper, offset, size, &mapping->data.cl.data);
+		if (rv < 0) {
+			goto out;
+		}
+	}
+	mapping->data.cl.size = size;
+
+out:
+	if (rv < 0) {
+		sqsh__mapping_unmap(mapping);
+	}
+	pthread_mutex_unlock(&mapping->mapper->data.cl.lock);
+	return rv;
+}
+static size_t
+sqsh_mapper_curl_size(const struct SqshMapper *mapper) {
+	return mapper->data.cl.expected_size;
+}
+
+static int
+sqsh_mapper_curl_cleanup(struct SqshMapper *mapper) {
+	pthread_mutex_destroy(&mapper->data.cl.lock);
+	curl_easy_cleanup(mapper->data.cl.handle);
+	return 0;
+}
+
+static int
+sqsh_mapping_curl_unmap(struct SqshMapping *mapping) {
+	free(mapping->data.cl.data);
+	return 0;
+}
+
+static const uint8_t *
+sqsh_mapping_curl_data(const struct SqshMapping *mapping) {
+	return mapping->data.cl.data;
 }
 
 static size_t
 sqsh_mapping_curl_size(const struct SqshMapping *mapping) {
-	return sqsh__buffer_size(&mapping->data.cl.buffer);
+	return mapping->data.cl.size;
 }
 
 static const struct SqshMemoryMapperImpl impl = {
@@ -302,7 +307,6 @@ static const struct SqshMemoryMapperImpl impl = {
 		.size = sqsh_mapper_curl_size,
 		.cleanup = sqsh_mapper_curl_cleanup,
 		.map_data = sqsh_mapping_curl_data,
-		.map_resize = sqsh_mapping_curl_resize,
 		.map_size = sqsh_mapping_curl_size,
 		.unmap = sqsh_mapping_curl_unmap,
 };

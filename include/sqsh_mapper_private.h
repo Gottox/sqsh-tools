@@ -76,15 +76,16 @@ struct SqshCurlMapper {
 	uint64_t expected_time;
 	uint64_t expected_size;
 	void *handle;
-	pthread_mutex_t handle_lock;
+	uint8_t *header_cache;
+	pthread_mutex_t lock;
 };
 
 struct SqshCurlMap {
 	/**
 	 * @privatesection
 	 */
-	struct SqshBuffer buffer;
-	uint64_t offset;
+	uint8_t *data;
+	size_t size;
 };
 
 ////////////////////////////////////////
@@ -176,7 +177,6 @@ struct SqshMemoryMapperImpl {
 	size_t (*size)(const struct SqshMapper *mapper);
 	int (*cleanup)(struct SqshMapper *mapper);
 	const uint8_t *(*map_data)(const struct SqshMapping *mapping);
-	int (*map_resize)(struct SqshMapping *mapping, size_t new_size);
 	size_t (*map_size)(const struct SqshMapping *mapping);
 	int (*unmap)(struct SqshMapping *mapping);
 };
@@ -274,18 +274,6 @@ size_t sqsh__mapping_size(const struct SqshMapping *mapping);
 /**
  * @internal
  * @memberof SqshMapping
- * @brief Resizes a mapping to a new size.
- *
- * @param[in] mapping The mapping to resize.
- * @param[in] new_size The new size of the mapping.
- *
- * @return 0 on success, a negative value on error.
- */
-int sqsh__mapping_resize(struct SqshMapping *mapping, size_t new_size);
-
-/**
- * @internal
- * @memberof SqshMapping
  * @brief Retrieves the data in a mapping.
  *
  * @param[in] mapping The mapping to retrieve the data from.
@@ -345,7 +333,7 @@ uint64_t sqsh__map_manager_size(const struct SqshMapManager *manager);
  *
  * @return Returns the size of a chunk.
  */
-size_t sqsh__map_manager_chunk_size(const struct SqshMapManager *manager);
+size_t sqsh__map_manager_block_size(const struct SqshMapManager *manager);
 
 /**
  * Gets the number of chunks in the file.
@@ -354,7 +342,7 @@ size_t sqsh__map_manager_chunk_size(const struct SqshMapManager *manager);
  *
  * @return Returns the number of chunks in the file.
  */
-size_t sqsh__map_manager_chunk_count(const struct SqshMapManager *manager);
+size_t sqsh__map_manager_block_count(const struct SqshMapManager *manager);
 
 /**
  * Gets a map for a chunk.
