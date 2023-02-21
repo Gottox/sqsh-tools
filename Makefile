@@ -14,9 +14,9 @@ MESON_FLAGS += -Dtest=true
 MESON_FLAGS += -Ddoc=internal
 MESON_FLAGS += -Db_coverage=true
 
-SANATIZE = 0
+SANATIZE = 1
 
-CC = clang
+CC = gcc
 
 ifeq ($(PODMAN), 1)
 	W = podman run --rm -ti -v .:/host gottox/sqsh-build:$(ARCH) env
