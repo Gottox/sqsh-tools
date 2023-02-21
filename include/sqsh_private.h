@@ -51,7 +51,6 @@ struct Sqsh {
 	/**
 	 * @privatesection
 	 */
-	struct SqshMapper mapper;
 	struct SqshMapManager map_manager;
 	struct SqshCompression data_compression;
 	struct SqshCompression metablock_compression;

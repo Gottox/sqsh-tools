@@ -74,7 +74,7 @@ sqsh__init(
 
 	// Initialize struct to 0, so in an error case we have a clean state that
 	// we can call sqsh_mapper_cleanup on.
-	memset(&sqsh->mapper, 0, sizeof(struct SqshMapper));
+	memset(&sqsh->map_manager, 0, sizeof(struct SqshMapManager));
 
 	if (config != NULL) {
 		config = memcpy(&sqsh->config, config, sizeof(struct SqshConfig));
@@ -85,11 +85,6 @@ sqsh__init(
 	config = sqsh_config(sqsh);
 
 	rv = sqsh__map_manager_init(&sqsh->map_manager, source, config);
-	if (rv < 0) {
-		goto out;
-	}
-
-	rv = sqsh__mapper_init(&sqsh->mapper, source, config);
 	if (rv < 0) {
 		goto out;
 	}
@@ -229,11 +224,6 @@ sqsh_compression_metablock(const struct Sqsh *sqsh) {
 	return &sqsh->metablock_compression;
 }
 
-struct SqshMapper *
-sqsh_mapper(struct Sqsh *sqsh) {
-	return &sqsh->mapper;
-}
-
 struct SqshMapManager *
 sqsh_map_manager(struct Sqsh *sqsh) {
 	return &sqsh->map_manager;
@@ -258,7 +248,6 @@ sqsh__cleanup(struct Sqsh *sqsh) {
 	sqsh__compression_cleanup(&sqsh->data_compression);
 	sqsh__compression_cleanup(&sqsh->metablock_compression);
 	sqsh__superblock_cleanup(&sqsh->superblock);
-	sqsh__mapper_cleanup(&sqsh->mapper);
 	sqsh__map_manager_cleanup(&sqsh->map_manager);
 
 	return rv;
