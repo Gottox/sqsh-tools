@@ -50,8 +50,7 @@ map_cleanup_cb(void *data) {
 int
 sqsh__map_manager_init(
 		struct SqshMapManager *manager, const void *input,
-		const struct Sqsh *sqsh) {
-	const struct SqshConfig *config = sqsh_config(sqsh);
+		const struct SqshConfig *config) {
 	int rv;
 	size_t map_size;
 

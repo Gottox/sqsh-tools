@@ -84,6 +84,11 @@ sqsh__init(
 
 	config = sqsh_config(sqsh);
 
+	rv = sqsh__map_manager_init(&sqsh->map_manager, source, config);
+	if (rv < 0) {
+		goto out;
+	}
+
 	rv = sqsh__mapper_init(&sqsh->mapper, source, config);
 	if (rv < 0) {
 		goto out;
@@ -254,6 +259,7 @@ sqsh__cleanup(struct Sqsh *sqsh) {
 	sqsh__compression_cleanup(&sqsh->metablock_compression);
 	sqsh__superblock_cleanup(&sqsh->superblock);
 	sqsh__mapper_cleanup(&sqsh->mapper);
+	sqsh__map_manager_cleanup(&sqsh->map_manager);
 
 	return rv;
 }

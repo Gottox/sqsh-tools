@@ -321,13 +321,13 @@ struct SqshMapManager {
  *
  * @param[out] manager The SqshMapManager instance to initialize.
  * @param[in] input The input to use.
- * @param[in] sqsh The Sqsh instance to use.
+ * @param[in] config The configuration of this sqsh instance.
  *
  * @return Returns 0 on success, a negative value on error.
  */
 int sqsh__map_manager_init(
 		struct SqshMapManager *manager, const void *input,
-		const struct Sqsh *sqsh);
+		const struct SqshConfig *config);
 
 /**
  * Gets the size of the backing archive.
