@@ -301,7 +301,7 @@ sqsh_inode_file_block_count(const struct SqshInodeContext *context) {
 	} else if (sqsh_inode_file_has_fragment(context)) {
 		return file_size / block_size;
 	} else {
-		return SQSH_DEVIDE_CEIL(file_size, block_size);
+		return SQSH_DIVIDE_CEIL(file_size, block_size);
 	}
 }
 

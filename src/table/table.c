@@ -66,7 +66,7 @@ sqsh__table_init(
 	}
 
 	lookup_table_count =
-			SQSH_DEVIDE_CEIL(table_size, SQSH_METABLOCK_BLOCK_SIZE);
+			SQSH_DIVIDE_CEIL(table_size, SQSH_METABLOCK_BLOCK_SIZE);
 
 	if (SQSH_MULT_OVERFLOW(
 				lookup_table_count, sizeof(uint64_t), &lookup_table_size)) {
