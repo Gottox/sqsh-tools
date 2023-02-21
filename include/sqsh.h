@@ -47,18 +47,17 @@ extern "C" {
  * @brief The SqshConfig struct contains all the configuration options for
  * a sqsh session.
  */
-struct SqshConfig {
-	uint64_t source_size;
-	const struct SqshMemoryMapperImpl *source_mapper;
-	size_t mapper_block_size;
-#if UINTPTR_MAX >= UINT64_MAX
-	uint8_t _reserved[104];
-#else
-	uint8_t _reserved[112];
-#endif
-};
 
-SQSH_STATIC_ASSERT(sizeof(struct SqshConfig) == 128);
+struct SqshConfig {
+#define SQSH_CONFIG_FIELDS \
+	uint64_t source_size; \
+	const struct SqshMemoryMapperImpl *source_mapper; \
+	size_t mapper_block_size;
+
+	SQSH_CONFIG_FIELDS
+	uint8_t _reserved[128 - sizeof(struct {SQSH_CONFIG_FIELDS})];
+#undef SQSH_CONFIG_FIELDS
+};
 
 struct Sqsh;
 struct SqshXattrTable;
