@@ -7,14 +7,19 @@
 NINJA_TARGETS := test benchmark install dist scan-build clang-format uninstall \
 	all tidy doc coverage-html
 
-MESON_FLAGS = -Dtest=true -Ddoc=internal -Db_coverage=true
+ARCH = x86_64
+#ARCH = i386
+
+MESON_FLAGS += -Dtest=true
+MESON_FLAGS += -Ddoc=internal
+MESON_FLAGS += -Db_coverage=true
 
 SANATIZE = 0
 
 CC = clang
 
 ifeq ($(PODMAN), 1)
-	W = podman run --rm -ti -v .:/host gottox/sqsh-build:i386 env
+	W = podman run --rm -ti -v .:/host gottox/sqsh-build:$(ARCH) env
 	BUILD_DIR = ./build_dir-podman
 else
 	W =
