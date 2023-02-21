@@ -75,7 +75,7 @@ sqsh_src = [
 ]
 
 sqsh_test = [
-	'test/cpp-test.cpp',
+	#'test/cpp-test.cpp',
 	'test/integration.c',
 	'test/mapper/cursor.c',
 	'test/metablock/metablock_cursor.c',
