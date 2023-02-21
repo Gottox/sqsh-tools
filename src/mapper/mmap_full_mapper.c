@@ -31,7 +31,7 @@
  * @file         mmap_full_mapper.c
  */
 
-#include "../../include/sqsh_mapper.h"
+#include "../../include/sqsh_mapper_private.h"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -82,7 +82,7 @@ sqsh_mapper_mmap_complete_map(
 static int
 sqsh_mapper_mmap_complete_cleanup(struct SqshMapper *mapper) {
 	int rv;
-	size_t size = sqsh_mapper_size(mapper);
+	size_t size = sqsh__mapper_size(mapper);
 
 	rv = munmap(mapper->data.mc.data, size);
 	return rv;

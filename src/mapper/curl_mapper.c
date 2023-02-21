@@ -31,7 +31,7 @@
  * @file         curl_mapper.c
  */
 
-#include "../../include/sqsh_mapper.h"
+#include "../../include/sqsh_mapper_private.h"
 
 #include "../../include/sqsh_data.h"
 #include "../../include/sqsh_error.h"
@@ -147,11 +147,11 @@ sqsh_mapper_curl_init(
 		goto out;
 	}
 
-	rv = sqsh_mapper_map(&mapping, mapper, 0, SUPERBLOCK_REQUEST_SIZE);
+	rv = sqsh__mapper_map(&mapping, mapper, 0, SUPERBLOCK_REQUEST_SIZE);
 	if (rv < 0) {
 		goto out;
 	}
-	sqsh_mapping_unmap(&mapping);
+	sqsh__mapping_unmap(&mapping);
 
 out:
 	return rv;
@@ -168,14 +168,14 @@ sqsh_mapper_curl_map(
 		goto out;
 	}
 
-	rv = sqsh_mapping_resize(mapping, size);
+	rv = sqsh__mapping_resize(mapping, size);
 	if (rv < 0) {
 		goto out;
 	}
 
 out:
 	if (rv < 0) {
-		sqsh_mapping_unmap(mapping);
+		sqsh__mapping_unmap(mapping);
 	}
 	return rv;
 }
@@ -216,7 +216,7 @@ sqsh_mapping_curl_resize(struct SqshMapping *mapping, size_t new_size) {
 	// add some padding to be a nice number. Not that 42 isn't nice.
 	char range_buffer[64] = {0};
 	CURL *handle = NULL;
-	size_t current_size = sqsh_mapping_size(mapping);
+	size_t current_size = sqsh__mapping_size(mapping);
 	const uint64_t new_offset = mapping->data.cl.offset + current_size;
 	// The end offset is capped at the expected size. That's the size
 	// we expect the file to have.

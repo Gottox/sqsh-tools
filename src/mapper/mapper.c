@@ -31,14 +31,14 @@
  * @file         mapper.c
  */
 
-#include "../../include/sqsh_mapper.h"
+#include "../../include/sqsh_mapper_private.h"
 
 #include "../../include/sqsh.h"
 #include "../../include/sqsh_error.h"
 #include "../utils.h"
 
 int
-sqsh_mapper_init(
+sqsh__mapper_init(
 		struct SqshMapper *mapper, const void *input,
 		const struct SqshConfig *config) {
 	if (config->source_mapper) {
@@ -56,11 +56,11 @@ sqsh_mapper_init(
 }
 
 int
-sqsh_mapper_map(
+sqsh__mapper_map(
 		struct SqshMapping *mapping, struct SqshMapper *mapper,
 		sqsh_index_t offset, size_t size) {
 	size_t end_offset;
-	size_t archive_size = sqsh_mapper_size(mapper);
+	size_t archive_size = sqsh__mapper_size(mapper);
 	if (offset > archive_size) {
 		return -SQSH_ERROR_SIZE_MISSMATCH;
 	}
@@ -75,16 +75,16 @@ sqsh_mapper_map(
 }
 
 size_t
-sqsh_mapper_block_size(const struct SqshMapper *mapper) {
+sqsh__mapper_block_size(const struct SqshMapper *mapper) {
 	return mapper->block_size;
 }
 size_t
-sqsh_mapper_size(const struct SqshMapper *mapper) {
+sqsh__mapper_size(const struct SqshMapper *mapper) {
 	return mapper->impl->size(mapper);
 }
 
 int
-sqsh_mapper_cleanup(struct SqshMapper *mapper) {
+sqsh__mapper_cleanup(struct SqshMapper *mapper) {
 	int rv = 0;
 	if (mapper->impl != NULL) {
 		rv = mapper->impl->cleanup(mapper);
@@ -94,8 +94,8 @@ sqsh_mapper_cleanup(struct SqshMapper *mapper) {
 }
 
 int
-sqsh_mapping_resize(struct SqshMapping *mapping, size_t new_size) {
-	if (new_size <= sqsh_mapping_size(mapping)) {
+sqsh__mapping_resize(struct SqshMapping *mapping, size_t new_size) {
+	if (new_size <= sqsh__mapping_size(mapping)) {
 		return 0;
 	} else {
 		return mapping->mapper->impl->map_resize(mapping, new_size);
@@ -103,17 +103,17 @@ sqsh_mapping_resize(struct SqshMapping *mapping, size_t new_size) {
 }
 
 size_t
-sqsh_mapping_size(const struct SqshMapping *mapping) {
+sqsh__mapping_size(const struct SqshMapping *mapping) {
 	return mapping->mapper->impl->map_size(mapping);
 }
 
 const uint8_t *
-sqsh_mapping_data(const struct SqshMapping *mapping) {
+sqsh__mapping_data(const struct SqshMapping *mapping) {
 	return mapping->mapper->impl->map_data(mapping);
 }
 
 int
-sqsh_mapping_unmap(struct SqshMapping *mapping) {
+sqsh__mapping_unmap(struct SqshMapping *mapping) {
 	int rv = 0;
 	if (mapping->mapper) {
 		rv = mapping->mapper->impl->unmap(mapping);

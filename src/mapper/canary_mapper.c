@@ -31,7 +31,7 @@
  * @file         canary_mapper.c
  */
 
-#include "../../include/sqsh_mapper.h"
+#include "../../include/sqsh_mapper_private.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -81,11 +81,11 @@ sqsh_mapping_canary_resize(struct SqshMapping *mapping, size_t new_size) {
 	uint64_t offset = mapping->data.cn.offset;
 	struct SqshMapper *mapper = mapping->mapper;
 
-	rv = sqsh_mapping_unmap(mapping);
+	rv = sqsh__mapping_unmap(mapping);
 	if (rv < 0) {
 		return rv;
 	}
-	return sqsh_mapper_map(mapping, mapper, offset, new_size);
+	return sqsh__mapper_map(mapping, mapper, offset, new_size);
 }
 
 static size_t

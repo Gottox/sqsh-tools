@@ -34,7 +34,7 @@
 #ifndef SQSH_METABLOCK_PRIVATE_H
 #define SQSH_METABLOCK_PRIVATE_H
 
-#include "sqsh_mapper.h"
+#include "sqsh_mapper_private.h"
 
 #ifdef __cplusplus
 extern "C" {

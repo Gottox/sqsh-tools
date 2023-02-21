@@ -31,7 +31,7 @@
  * @file         cursor.c
  */
 
-#include "../../include/sqsh_mapper.h"
+#include "../../include/sqsh_mapper_private.h"
 
 #include "../../include/sqsh_error.h"
 #include "../utils.h"
@@ -43,7 +43,7 @@ sqsh__map_cursor_init(
 	cursor->offset = 0;
 	cursor->upper_limit = upper_limit;
 	cursor->mapper = mapper;
-	return sqsh_mapper_map(
+	return sqsh__mapper_map(
 			&cursor->mapping, mapper, start_address,
 			SQSH_MIN(4096, upper_limit - start_address));
 }
@@ -62,7 +62,7 @@ sqsh__map_cursor_advance(
 	if (new_size > cursor->upper_limit) {
 		return SQSH_ERROR_INTEGER_OVERFLOW;
 	}
-	return sqsh_mapping_resize(&cursor->mapping, new_size);
+	return sqsh__mapping_resize(&cursor->mapping, new_size);
 }
 
 int
@@ -72,16 +72,16 @@ sqsh__map_cursor_all(struct SqshMapCursor *cursor) {
 
 const uint8_t *
 sqsh__map_cursor_data(const struct SqshMapCursor *cursor) {
-	return &sqsh_mapping_data(&cursor->mapping)[cursor->offset];
+	return &sqsh__mapping_data(&cursor->mapping)[cursor->offset];
 }
 
 size_t
 sqsh__map_cursor_size(const struct SqshMapCursor *cursor) {
-	return sqsh_mapping_size(&cursor->mapping) - cursor->offset;
+	return sqsh__mapping_size(&cursor->mapping) - cursor->offset;
 }
 
 int
 sqsh__map_cursor_cleanup(struct SqshMapCursor *cursor) {
-	sqsh_mapping_unmap(&cursor->mapping);
+	sqsh__mapping_unmap(&cursor->mapping);
 	return 0;
 }

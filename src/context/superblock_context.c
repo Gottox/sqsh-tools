@@ -70,7 +70,7 @@ sqsh__superblock_init(
 		struct SqshSuperblockContext *context, struct SqshMapper *mapper) {
 	int rv = 0;
 
-	if (sqsh_mapper_size(mapper) < SQSH_SIZEOF_SUPERBLOCK) {
+	if (sqsh__mapper_size(mapper) < SQSH_SIZEOF_SUPERBLOCK) {
 		rv = -SQSH_ERROR_SUPERBLOCK_TOO_SMALL;
 		goto out;
 	}
@@ -103,7 +103,7 @@ sqsh__superblock_init(
 	}
 
 	if (sqsh_data_superblock_bytes_used(superblock) >
-		sqsh_mapper_size(mapper)) {
+		sqsh__mapper_size(mapper)) {
 		rv = -SQSH_ERROR_SIZE_MISSMATCH;
 		goto out;
 	}

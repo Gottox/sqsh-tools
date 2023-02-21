@@ -31,7 +31,6 @@
  * @file         cpp-test.c
  */
 
-#include "sqsh_mapper.h"
 #ifndef __cplusplus
 #	error "This file is C++ only"
 #endif
@@ -42,6 +41,7 @@ extern "C" {
 }
 #include <sqsh_context.h>
 #include <sqsh_directory.h>
+#include <sqsh_mapper.h>
 #include <sqsh_private.h>
 #include <squashfs_image.h>
 #include <stdint.h>

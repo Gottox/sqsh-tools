@@ -33,7 +33,7 @@
 
 #define _GNU_SOURCE
 
-#include "../../include/sqsh_mapper.h"
+#include "../../include/sqsh_mapper_private.h"
 
 #include <errno.h>
 #include <fcntl.h>

@@ -31,7 +31,7 @@
  * @file         static_mapper.c
  */
 
-#include "../../include/sqsh_mapper.h"
+#include "../../include/sqsh_mapper_private.h"
 
 static int
 sqsh_mapper_static_mem_init(
