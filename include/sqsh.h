@@ -34,7 +34,10 @@
 #ifndef SQSH_H
 #define SQSH_H
 
-#include "sqsh_table.h"
+#include "sqsh_common.h"
+
+struct SqshTable;
+struct SqshFragmentTable;
 
 #ifdef __cplusplus
 extern "C" {

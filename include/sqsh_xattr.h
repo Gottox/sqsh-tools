@@ -34,11 +34,13 @@
 #ifndef SQSH_XATTR_H
 #define SQSH_XATTR_H
 
-#include "sqsh_inode.h"
+#include "sqsh_common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+struct SqshInodeContext;
 
 ////////////////////////////////////////
 // xattr/xattr_iterator.c
