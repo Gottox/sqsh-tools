@@ -55,6 +55,7 @@ sqsh__ref_count_array_init(
 	rv = pthread_mutex_init(&array->mutex, NULL);
 	array->size = size;
 	array->cleanup = cleanup;
+	array->element_size = element_size;
 out:
 	if (rv < 0) {
 		sqsh__ref_count_array_cleanup(array);
@@ -119,11 +120,10 @@ sqsh__ref_count_array_retain(struct SqshRefCountArray *array, int *index) {
 
 	if (array->ref_count[*index] < 0) {
 		*index = array->ref_count[*index] * -1;
+	} else if (array->ref_count[*index] != 0) {
+		array->ref_count[*index] += 1;
+		data = get_element(array, *index);
 	}
-
-	array->ref_count[*index] += 1;
-
-	data = get_element(array, *index);
 
 	pthread_mutex_unlock(&array->mutex);
 	return data;
@@ -165,8 +165,8 @@ sqsh__ref_count_array_size(const struct SqshRefCountArray *array) {
 int
 sqsh__ref_count_array_cleanup(struct SqshRefCountArray *array) {
 	void *data;
-	for (size_t i = 0; i < array->size; ++i) {
-		if (array->ref_count[i] != 0) {
+	if (array->data != NULL) {
+		for (size_t i = 0; i < array->size; ++i) {
 			data = get_element(array, i);
 			array->cleanup(data);
 		}

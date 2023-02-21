@@ -371,6 +371,16 @@ int sqsh__map_manager_get(
 		const struct SqshMapping **target);
 
 /**
+ * Releases a map for a chunk.
+ *
+ * @param[in] manager The SqshMapManager instance.
+ * @param[in] mapping The mapping to release.
+ *
+ * @return Returns 0 on success, a negative value on error.
+ */
+int sqsh__map_manager_release(
+		struct SqshMapManager *manager, const struct SqshMapping *mapping);
+/**
  * Cleans up the resources used by a SqshMapManager instance.
  *
  * @param[in] manager The SqshMapManager instance to cleanup.
@@ -386,10 +396,12 @@ struct SqshMapCursor {
 	/**
 	 * @privatesection
 	 */
-	sqsh_index_t offset;
+	uint64_t address;
+	uint64_t end_address;
 	uint64_t upper_limit;
-	struct SqshMapping mapping;
-	struct SqshMapper *mapper;
+	struct SqshMapManager *map_manager;
+	const struct SqshMapping *current_mapping;
+	struct SqshBuffer buffer;
 };
 
 /**

@@ -41,8 +41,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "sqsh_primitive_private.h"
-
 static void
 map_cleanup_cb(void *data) {
 	struct SqshMapping *mapping = data;
@@ -105,8 +103,8 @@ load_mapping(
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
-	if (index == sqsh__mapper_size(&manager->mapper) - 1) {
-		size = sqsh__mapper_size(&manager->mapper) % size;
+	if (index == sqsh__map_manager_chunk_count(manager) - 1) {
+		size = sqsh__map_manager_size(manager) % size;
 	}
 
 	rv = sqsh__mapper_map(&mapping, &manager->mapper, offset, size);
@@ -136,8 +134,8 @@ sqsh__map_manager_get(
 }
 
 int
-sqsh__map_mananger_release(
-		struct SqshMapManager *manager, struct SqshMapping *mapping) {
+sqsh__map_manager_release(
+		struct SqshMapManager *manager, const struct SqshMapping *mapping) {
 	return sqsh__ref_count_array_release(&manager->maps, mapping);
 }
 
