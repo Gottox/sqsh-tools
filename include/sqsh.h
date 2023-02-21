@@ -48,7 +48,10 @@ struct SqshConfig {
 	size_t source_size;
 	const struct SqshMemoryMapperImpl *source_mapper;
 	size_t mapper_block_size;
+	uint8_t _reserved[104];
 };
+
+SQSH_STATIC_ASSERT(sizeof(struct SqshConfig) == 128);
 
 struct Sqsh;
 struct SqshXattrTable;

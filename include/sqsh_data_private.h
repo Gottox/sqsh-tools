@@ -36,8 +36,6 @@
 
 #include "sqsh_data.h"
 
-#define SQSH_STATIC_ASSERT(cond) _Static_assert(cond, #cond)
-
 #ifdef __cplusplus
 extern "C" {
 #endif
