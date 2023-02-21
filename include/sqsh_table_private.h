@@ -95,7 +95,7 @@ struct SqshFragmentTable {
 	 */
 	const struct SqshSuperblockContext *superblock;
 	struct SqshTable table;
-	struct SqshMapper *mapper;
+	struct SqshMapManager *map_manager;
 	const struct SqshCompression *compression;
 };
 

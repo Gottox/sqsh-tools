@@ -38,13 +38,13 @@
 
 int
 sqsh__map_cursor_init(
-		struct SqshMapCursor *cursor, struct SqshMapper *mapper,
+		struct SqshMapCursor *cursor, struct SqshMapManager *map_manager,
 		const uint64_t start_address, const uint64_t upper_limit) {
 	cursor->offset = 0;
 	cursor->upper_limit = upper_limit;
-	cursor->mapper = mapper;
+	cursor->mapper = &map_manager->mapper;
 	return sqsh__mapper_map(
-			&cursor->mapping, mapper, start_address,
+			&cursor->mapping, &map_manager->mapper, start_address,
 			SQSH_MIN(4096, upper_limit - start_address));
 }
 

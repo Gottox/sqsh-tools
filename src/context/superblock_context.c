@@ -67,16 +67,17 @@ check_flag(
 
 int
 sqsh__superblock_init(
-		struct SqshSuperblockContext *context, struct SqshMapper *mapper) {
+		struct SqshSuperblockContext *context,
+		struct SqshMapManager *map_manager) {
 	int rv = 0;
 
-	if (sqsh__mapper_size(mapper) < SQSH_SIZEOF_SUPERBLOCK) {
+	if (sqsh__map_manager_size(map_manager) < SQSH_SIZEOF_SUPERBLOCK) {
 		rv = -SQSH_ERROR_SUPERBLOCK_TOO_SMALL;
 		goto out;
 	}
 
 	rv = sqsh__map_cursor_init(
-			&context->cursor, mapper, 0, SQSH_SIZEOF_SUPERBLOCK);
+			&context->cursor, map_manager, 0, SQSH_SIZEOF_SUPERBLOCK);
 	if (rv < 0) {
 		goto out;
 	}
@@ -103,7 +104,7 @@ sqsh__superblock_init(
 	}
 
 	if (sqsh_data_superblock_bytes_used(superblock) >
-		sqsh__mapper_size(mapper)) {
+		sqsh__map_manager_size(map_manager)) {
 		rv = -SQSH_ERROR_SIZE_MISSMATCH;
 		goto out;
 	}

@@ -94,7 +94,7 @@ sqsh__init(
 		goto out;
 	}
 
-	rv = sqsh__superblock_init(&sqsh->superblock, &sqsh->mapper);
+	rv = sqsh__superblock_init(&sqsh->superblock, sqsh_map_manager(sqsh));
 	if (rv < 0) {
 		goto out;
 	}

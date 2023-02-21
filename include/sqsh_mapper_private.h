@@ -400,7 +400,7 @@ struct SqshMapCursor {
  * @return 0 on success, negative on error
  */
 int sqsh__map_cursor_init(
-		struct SqshMapCursor *cursor, struct SqshMapper *mapper,
+		struct SqshMapCursor *cursor, struct SqshMapManager *mapper,
 		const uint64_t start_address, uint64_t upper_limit);
 
 /**

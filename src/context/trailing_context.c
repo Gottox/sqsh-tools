@@ -42,8 +42,8 @@ sqsh__trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh) {
 	int rv = 0;
 	const struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
 	uint64_t trailing_start = sqsh_superblock_bytes_used(superblock);
-	struct SqshMapper *mapper = sqsh_mapper(sqsh);
-	size_t archive_size = sqsh__mapper_size(mapper);
+	struct SqshMapManager *map_manager = sqsh_map_manager(sqsh);
+	size_t archive_size = sqsh__map_manager_size(map_manager);
 	uint64_t trailing_size;
 
 	if (archive_size <= trailing_start) {
@@ -57,7 +57,7 @@ sqsh__trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh) {
 	}
 
 	rv = sqsh__map_cursor_init(
-			&context->cursor, mapper, trailing_start, trailing_size);
+			&context->cursor, map_manager, trailing_start, trailing_size);
 	if (rv < 0) {
 		goto out;
 	}

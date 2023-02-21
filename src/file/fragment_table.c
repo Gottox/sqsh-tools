@@ -52,7 +52,7 @@ sqsh__fragment_table_init(struct SqshFragmentTable *table, struct Sqsh *sqsh) {
 	uint32_t count = sqsh_superblock_fragment_entry_count(superblock);
 
 	table->compression = sqsh_compression_data(sqsh);
-	table->mapper = sqsh_mapper(sqsh);
+	table->map_manager = sqsh_map_manager(sqsh);
 	rv = sqsh__table_init(
 			&table->table, sqsh, start, SQSH_SIZEOF_FRAGMENT, count);
 	if (rv < 0) {
@@ -88,7 +88,8 @@ read_fragment_data(
 	size = sqsh_data_datablock_size(size_info);
 	is_compressed = sqsh_data_datablock_is_compressed(size_info);
 
-	rv = sqsh__map_cursor_init(&fragment_mapping, table->mapper, start, size);
+	rv = sqsh__map_cursor_init(
+			&fragment_mapping, table->map_manager, start, size);
 	if (rv < 0) {
 		goto out;
 	}

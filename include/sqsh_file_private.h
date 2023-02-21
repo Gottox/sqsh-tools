@@ -56,7 +56,7 @@ struct SqshFileContext {
 	/**
 	 * @privatesection
 	 */
-	struct SqshMapper *mapper;
+	struct SqshMapManager *map_manager;
 	struct SqshFragmentTable *fragment_table;
 	const struct SqshInodeContext *inode;
 	struct SqshBuffer buffer;

@@ -48,7 +48,7 @@ int
 sqsh__xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh) {
 	int rv = 0;
 	const struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
-	struct SqshMapper *mapper = sqsh_mapper(sqsh);
+	struct SqshMapManager *map_manager = sqsh_map_manager(sqsh);
 	const uint64_t xattr_address =
 			sqsh_superblock_xattr_id_table_start(superblock);
 	uint64_t upper_limit;
@@ -57,7 +57,7 @@ sqsh__xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	rv = sqsh__map_cursor_init(
-			&context->header, mapper, xattr_address, upper_limit);
+			&context->header, map_manager, xattr_address, upper_limit);
 	if (rv < 0) {
 		goto out;
 	}

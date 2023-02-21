@@ -64,7 +64,7 @@ struct SqshSuperblockContext {
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_UNUSED int sqsh__superblock_init(
-		struct SqshSuperblockContext *context, struct SqshMapper *mapper);
+		struct SqshSuperblockContext *context, struct SqshMapManager *mapper);
 
 /**
  * @internal

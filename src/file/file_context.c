@@ -69,7 +69,7 @@ sqsh__file_init(
 
 	context->inode = inode;
 	context->block_size = sqsh_superblock_block_size(superblock);
-	context->mapper = sqsh_mapper(sqsh);
+	context->map_manager = sqsh_map_manager(sqsh);
 	context->compression = sqsh_compression_data(sqsh);
 
 	if (sqsh_inode_file_has_fragment(inode)) {
@@ -153,7 +153,7 @@ sqsh_file_read(struct SqshFileContext *context, const uint64_t size) {
 
 	// TODO: check for a sane upper limit.
 	rv = sqsh__map_cursor_init(
-			&cursor, context->mapper, start_block, UINT64_MAX);
+			&cursor, context->map_manager, start_block, UINT64_MAX);
 	if (rv < 0) {
 		goto out;
 	}
