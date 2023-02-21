@@ -108,20 +108,12 @@ sqsh_table_get(
 	uint64_t lookup_index =
 			index * table->element_size / SQSH_METABLOCK_BLOCK_SIZE;
 	uint64_t metablock_address = lookup_table_get(table, lookup_index);
-	uint64_t element_index =
+	uint64_t element_offset =
 			(index * table->element_size) % SQSH_METABLOCK_BLOCK_SIZE;
 
-	uint64_t upper_limit;
-	if (SQSH_MULT_OVERFLOW(
-				table->element_size, table->element_count, &upper_limit)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
+	uint64_t upper_limit = SQSH_METABLOCK_BLOCK_SIZE;
 	if (SQSH_ADD_OVERFLOW(metablock_address, upper_limit, &upper_limit)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
-
-	if (rv < 0) {
-		goto out;
 	}
 
 	rv = sqsh__metablock_cursor_init(
@@ -131,7 +123,7 @@ sqsh_table_get(
 	}
 
 	rv = sqsh__metablock_cursor_advance(
-			&metablock, element_index, table->element_size);
+			&metablock, element_offset, table->element_size);
 	if (rv < 0) {
 		goto out;
 	}
