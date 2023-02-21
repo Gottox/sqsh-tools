@@ -35,6 +35,7 @@
 
 #include "../../include/sqsh_error.h"
 #include "../utils.h"
+#include <stdint.h>
 
 int
 sqsh__ref_count_array_init(
@@ -61,40 +62,6 @@ out:
 	return rv;
 }
 
-int
-sqsh__ref_count_array_set(
-		struct SqshRefCountArray *array, int index, void *data, int span) {
-	int rv;
-	sqsh_index_t offset;
-
-	rv = pthread_mutex_lock(&array->mutex);
-	if (rv < 0) {
-		// return -SQSH_ERROR_MUTEX_LOCK_FAILED;
-		return -SQSH_ERROR_TODO;
-	}
-
-	if (array->data != NULL) {
-		goto out;
-	}
-
-	if (SQSH_MULT_OVERFLOW(index, array->element_size, &offset)) {
-		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
-		goto out;
-	}
-
-	memcpy(&array->data[offset], data, array->element_size);
-	for (int i = 1; i < span; ++i) {
-		if (array->ref_count[index + i] == 0) {
-			array->ref_count[index + i] = index * -1;
-		}
-	}
-
-out:
-	pthread_mutex_unlock(&array->mutex);
-
-	return rv;
-}
-
 static void *
 get_element(struct SqshRefCountArray *array, int index) {
 	sqsh_index_t offset;
@@ -105,6 +72,41 @@ get_element(struct SqshRefCountArray *array, int index) {
 
 	return (void *)&array->data[offset];
 }
+
+const void *
+sqsh__ref_count_array_set(
+		struct SqshRefCountArray *array, int index, void *data, int span) {
+	int rv;
+	void *target = NULL;
+
+	rv = pthread_mutex_lock(&array->mutex);
+	if (rv < 0) {
+		array->cleanup(data);
+		goto out;
+	}
+
+	target = get_element(array, index);
+
+	if (array->ref_count[index] != 0) {
+		array->cleanup(data);
+		goto out;
+	}
+
+	memcpy(target, data, array->element_size);
+	for (int i = 1; i < span; ++i) {
+		if (array->ref_count[index + i] == 0) {
+			array->ref_count[index + i] = index * -1;
+		}
+	}
+
+	array->ref_count[index] = 1;
+
+out:
+	pthread_mutex_unlock(&array->mutex);
+
+	return target;
+}
+
 const void *
 sqsh__ref_count_array_retain(struct SqshRefCountArray *array, int *index) {
 	int rv;
@@ -128,9 +130,11 @@ sqsh__ref_count_array_retain(struct SqshRefCountArray *array, int *index) {
 }
 
 int
-sqsh__ref_count_array_release(struct SqshRefCountArray *array, int index) {
+sqsh__ref_count_array_release(
+		struct SqshRefCountArray *array, const void *element) {
 	int rv;
 
+	int index = ((uint8_t *)element - array->data) / array->element_size;
 	rv = pthread_mutex_lock(&array->mutex);
 	if (rv < 0) {
 		// return -SQSH_ERROR_MUTEX_LOCK_FAILED;
@@ -158,11 +162,16 @@ int
 sqsh__ref_count_array_cleanup(struct SqshRefCountArray *array) {
 	void *data;
 	for (size_t i = 0; i < array->size; ++i) {
-		data = get_element(array, i);
-		array->cleanup(data);
+		if (array->ref_count[i] != 0) {
+			data = get_element(array, i);
+			array->cleanup(data);
+		}
 	}
 	free(array->data);
+	array->data = NULL;
 	free(array->ref_count);
+	array->ref_count = NULL;
+	array->size = 0;
 	pthread_mutex_destroy(&array->mutex);
 
 	return 0;

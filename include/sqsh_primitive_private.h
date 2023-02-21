@@ -199,7 +199,7 @@ int sqsh__ref_count_array_init(
  * @param span The number of indices to span. (Use 1 for a single index.)
  * @return 0 on success, a negative value on error.
  */
-int sqsh__ref_count_array_set(
+const void *sqsh__ref_count_array_set(
 		struct SqshRefCountArray *array, int index, void *data, int span);
 
 /**
@@ -231,10 +231,11 @@ sqsh__ref_count_array_retain(struct SqshRefCountArray *array, int *index);
  * reference-counted array.
  *
  * @param array The array containing the data.
- * @param index The index of the data.
+ * @param element The element to release.
  * @return 0 on success, a negative value on error.
  */
-int sqsh__ref_count_array_release(struct SqshRefCountArray *array, int index);
+int sqsh__ref_count_array_release(
+		struct SqshRefCountArray *array, const void *element);
 
 /**
  * @internal

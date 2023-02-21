@@ -37,6 +37,7 @@
 #include "../../include/sqsh_error.h"
 #include "../utils.h"
 
+#include <assert.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -44,7 +45,8 @@
 
 static void
 map_cleanup_cb(void *data) {
-	(void)data;
+	struct SqshMapping *mapping = data;
+	sqsh__mapping_unmap(mapping);
 }
 
 int
@@ -81,25 +83,68 @@ sqsh__map_manager_size(const struct SqshMapManager *manager) {
 
 size_t
 sqsh__map_manager_chunk_size(const struct SqshMapManager *manager) {
-	(void)manager;
 	return sqsh__mapper_block_size(&manager->mapper);
 }
 
 size_t
 sqsh__map_manager_chunk_count(const struct SqshMapManager *manager) {
-	(void)manager;
 	return sqsh__ref_count_array_size(&manager->maps);
 }
 
+static int
+load_mapping(
+		struct SqshMapManager *manager, const struct SqshMapping **target,
+		sqsh_index_t index, int span) {
+	int rv = 0;
+	struct SqshMapping mapping = {0};
+	assert(span == 1);
+
+	sqsh_index_t offset;
+	size_t size = sqsh__mapper_block_size(&manager->mapper);
+	if (SQSH_MULT_OVERFLOW(index, size, &offset)) {
+		return SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+
+	if (index == sqsh__mapper_size(&manager->mapper) - 1) {
+		size = sqsh__mapper_size(&manager->mapper) % size;
+	}
+
+	rv = sqsh__mapper_map(&mapping, &manager->mapper, offset, size);
+	if (rv < 0) {
+		goto out;
+	}
+
+	*target = sqsh__ref_count_array_set(&manager->maps, index, &mapping, span);
+
+out:
+	return rv;
+}
+
 int
-sqsh__map_manager_get(struct SqshMapManager *manager, sqsh_index_t index) {
-	(void)manager;
-	(void)index;
-	return 0;
+sqsh__map_manager_get(
+		struct SqshMapManager *manager, sqsh_index_t index, int span,
+		const struct SqshMapping **target) {
+	int rv = 0;
+	assert(span == 1);
+	int real_index = index;
+	*target = sqsh__ref_count_array_retain(&manager->maps, &real_index);
+
+	if (*target == NULL) {
+		rv = load_mapping(manager, target, index, span);
+	}
+	return rv;
+}
+
+int
+sqsh__map_mananger_release(
+		struct SqshMapManager *manager, struct SqshMapping *mapping) {
+	return sqsh__ref_count_array_release(&manager->maps, mapping);
 }
 
 int
 sqsh__map_manager_cleanup(struct SqshMapManager *manager) {
-	(void)manager;
+	sqsh__ref_count_array_cleanup(&manager->maps);
+	sqsh__mapper_cleanup(&manager->mapper);
+
 	return 0;
 }
