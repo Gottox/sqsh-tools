@@ -34,12 +34,13 @@
 #ifndef SQSH_TABLE_H
 #define SQSH_TABLE_H
 
-#include "sqsh_mapper.h"
+#include "sqsh_common.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+struct SqshBuffer;
 struct SqshInodeContext;
 
 ////////////////////////////////////////

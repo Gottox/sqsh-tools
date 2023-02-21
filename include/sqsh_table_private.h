@@ -34,6 +34,7 @@
 #ifndef SQSH_TABLE_PRIVATE_H
 #define SQSH_TABLE_PRIVATE_H
 
+#include "sqsh_mapper.h"
 #include "sqsh_table.h"
 
 #ifdef __cplusplus

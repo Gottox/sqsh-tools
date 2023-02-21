@@ -34,7 +34,7 @@
 #ifndef SQSH_FILE_H
 #define SQSH_FILE_H
 
-#include "sqsh_primitive_private.h"
+#include "sqsh_common.h"
 
 #ifdef __cplusplus
 extern "C" {
