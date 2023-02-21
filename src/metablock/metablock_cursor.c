@@ -69,13 +69,13 @@ sqsh__metablock_cursor_advance(
 	size_t new_size;
 
 	if (SQSH_ADD_OVERFLOW(offset, cursor->offset, &new_offset)) {
-		return SQSH_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	if (SQSH_ADD_OVERFLOW(new_offset, size, &new_size)) {
-		return SQSH_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	if (SQSH_ADD_OVERFLOW(new_offset, size, &end_offset)) {
-		return SQSH_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
 	while (sqsh__buffer_size(&cursor->buffer) < end_offset) {

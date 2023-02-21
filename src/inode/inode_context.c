@@ -128,7 +128,7 @@ sqsh__inode_init(
 			sqsh_superblock_inode_table_start(superblock);
 
 	if (SQSH_ADD_OVERFLOW(inode_table_start, address_outer, &address_outer)) {
-		return SQSH_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	rv = sqsh__metablock_cursor_init(
 			&inode->metablock, sqsh, address_outer, ~0);

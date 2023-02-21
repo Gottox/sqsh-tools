@@ -102,7 +102,7 @@ load_mapping(
 	sqsh_index_t offset;
 	size_t size = sqsh__mapper_block_size(&manager->mapper);
 	if (SQSH_MULT_OVERFLOW(index, size, &offset)) {
-		return SQSH_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
 	if (index == sqsh__mapper_size(&manager->mapper) - 1) {

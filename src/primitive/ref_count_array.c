@@ -134,6 +134,10 @@ sqsh__ref_count_array_release(
 		struct SqshRefCountArray *array, const void *element) {
 	int rv;
 
+	if (element == NULL) {
+		return 0;
+	}
+
 	int index = ((uint8_t *)element - array->data) / array->element_size;
 	rv = pthread_mutex_lock(&array->mutex);
 	if (rv < 0) {

@@ -150,7 +150,7 @@ sqsh_fragment_table_to_buffer(
 	}
 out:
 	sqsh__buffer_cleanup(&intermediate_buffer);
-	return 0;
+	return rv;
 }
 
 int

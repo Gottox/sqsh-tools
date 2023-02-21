@@ -277,7 +277,7 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator) {
 	// Make sure next entry has its name populated
 	if (SQSH_ADD_OVERFLOW(
 				size, sqsh_directory_iterator_name_size(iterator), &size)) {
-		return SQSH_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	// May invalidate pointers into directory entries. that's why the
 	// get_entry() call is repeated below.
