@@ -41,7 +41,7 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 	rv = sqsh__init(
 			&sqsh, (uint8_t *)data,
 			&(struct SqshConfig){
-					.source_mapper = &sqsh_mapper_impl_static,
+					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = size,
 			});
 	if (rv < 0) {

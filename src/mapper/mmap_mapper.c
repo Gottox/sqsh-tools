@@ -155,7 +155,7 @@ sqsh_mapping_mmap_size(const struct SqshMapping *mapping) {
 	return mapping->data.mm.size;
 }
 
-const struct SqshMemoryMapperImpl sqsh_mapper_impl_mmap = {
+static const struct SqshMemoryMapperImpl impl = {
 #if UINTPTR_MAX >= UINT64_MAX
 		// 1 GiB
 		.block_size_hint = 1 * 1024 * 1024 * 1024,
@@ -172,3 +172,4 @@ const struct SqshMemoryMapperImpl sqsh_mapper_impl_mmap = {
 		.map_resize = sqsh_mapping_mmap_resize,
 		.unmap = sqsh_mapping_mmap_unmap,
 };
+const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_mmap = &impl;

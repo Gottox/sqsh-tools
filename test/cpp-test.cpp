@@ -51,7 +51,7 @@ sqsh_empty() {
 	int rv;
 	struct Sqsh sqsh = {};
 	struct SqshConfig config = {};
-	config.source_mapper = &sqsh_mapper_impl_static;
+	config.source_mapper = sqsh_mapper_impl_static;
 	config.source_size = 0;
 	rv = sqsh__init(&sqsh, NULL, &config);
 	assert(rv == -SQSH_ERROR_SUPERBLOCK_TOO_SMALL);

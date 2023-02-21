@@ -47,7 +47,7 @@ init_cursor(void) {
 	rv = sqsh__mapper_init(
 			&mapper, buffer,
 			&(struct SqshConfig){
-					.source_mapper = &sqsh_mapper_impl_static,
+					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = sizeof(buffer) - 1});
 	assert(rv == 0);
 
@@ -66,7 +66,7 @@ advance_once(void) {
 	rv = sqsh__mapper_init(
 			&mapper, buffer,
 			&(struct SqshConfig){
-					.source_mapper = &sqsh_mapper_impl_static,
+					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = sizeof(buffer) - 1});
 	assert(rv == 0);
 
@@ -92,7 +92,7 @@ advance_once_with_offset(void) {
 	rv = sqsh__mapper_init(
 			&mapper, buffer,
 			&(struct SqshConfig){
-					.source_mapper = &sqsh_mapper_impl_static,
+					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = sizeof(buffer) - 1});
 	assert(rv == 0);
 
@@ -118,7 +118,7 @@ advance_twice_with_offset(void) {
 	rv = sqsh__mapper_init(
 			&mapper, buffer,
 			&(struct SqshConfig){
-					.source_mapper = &sqsh_mapper_impl_static,
+					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = sizeof(buffer) - 1});
 	assert(rv == 0);
 
@@ -150,7 +150,7 @@ advance_to_out_of_bounds(void) {
 	rv = sqsh__mapper_init(
 			&mapper, buffer,
 			&(struct SqshConfig){
-					.source_mapper = &sqsh_mapper_impl_static,
+					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = sizeof(buffer) - 1});
 	assert(rv == 0);
 

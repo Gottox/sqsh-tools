@@ -28,7 +28,7 @@ open_archive(const char *image_path, int *err) {
 	for (i = 0; isalnum(image_path[i]); i++) {
 	}
 	if (strncmp(&image_path[i], "://", 3) == 0) {
-		config.source_mapper = &sqsh_mapper_impl_curl;
+		config.source_mapper = sqsh_mapper_impl_curl;
 	}
 #endif
 

@@ -93,7 +93,7 @@ sqsh_mapping_canary_size(const struct SqshMapping *mapping) {
 	return mapping->data.cn.size;
 }
 
-const struct SqshMemoryMapperImpl sqsh_mapper_impl_canary = {
+static const struct SqshMemoryMapperImpl impl = {
 		.block_size_hint = 1,
 		.init = sqsh_mapper_canary_init,
 		.mapping = sqsh_mapper_canary_map,
@@ -104,3 +104,4 @@ const struct SqshMemoryMapperImpl sqsh_mapper_impl_canary = {
 		.map_size = sqsh_mapping_canary_size,
 		.unmap = sqsh_mapping_canary_unmap,
 };
+const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_canary = &impl;

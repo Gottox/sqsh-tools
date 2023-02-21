@@ -41,27 +41,27 @@ extern "C" {
 ////////////////////////////////////////
 // mapper/canary_mapper.c
 
-extern const struct SqshMemoryMapperImpl sqsh_mapper_impl_canary;
+extern const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_canary;
 
 ////////////////////////////////////////
 // mapper/curl_mapper.c
 
-extern const struct SqshMemoryMapperImpl sqsh_mapper_impl_curl;
+extern const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_curl;
 
 ////////////////////////////////////////
 // mapper/mmap_full_mapper.c
 
-extern const struct SqshMemoryMapperImpl sqsh_mapper_impl_mmap_full;
+extern const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_mmap_full;
 
 ////////////////////////////////////////
 // mapper/mmap_mapper.c
 
-extern const struct SqshMemoryMapperImpl sqsh_mapper_impl_mmap;
+extern const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_mmap;
 
 ////////////////////////////////////////
 // mapper/static_mapper.c
 
-extern const struct SqshMemoryMapperImpl sqsh_mapper_impl_static;
+extern const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_static;
 
 #ifdef __cplusplus
 }
