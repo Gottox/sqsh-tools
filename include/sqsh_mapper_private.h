@@ -60,9 +60,7 @@ struct SqshCanaryMap {
 	/**
 	 * @privatesection
 	 */
-	uint64_t offset;
 	uint8_t *data;
-	size_t size;
 };
 
 ////////////////////////////////////////
@@ -104,7 +102,6 @@ struct SqshMmapFullMap {
 	 * @privatesection
 	 */
 	uint8_t *data;
-	size_t size;
 };
 
 ////////////////////////////////////////
@@ -145,7 +142,6 @@ struct SqshStaticMap {
 	 * @privatesection
 	 */
 	const uint8_t *data;
-	size_t size;
 };
 
 ////////////////////////////////////////

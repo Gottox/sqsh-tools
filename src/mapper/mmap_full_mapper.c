@@ -75,8 +75,8 @@ out:
 static int
 sqsh_mapper_mmap_complete_map(
 		struct SqshMapping *mapping, sqsh_index_t offset, size_t size) {
+	(void)size;
 	mapping->data.mc.data = &mapping->mapper->data.mc.data[offset];
-	mapping->data.mc.size = size;
 	return 0;
 }
 static int
@@ -94,7 +94,6 @@ sqsh_mapper_mmap_complete_size(const struct SqshMapper *mapper) {
 static int
 sqsh_mapping_mmap_complete_unmap(struct SqshMapping *mapping) {
 	mapping->data.mc.data = NULL;
-	mapping->data.mc.size = 0;
 	return 0;
 }
 static const uint8_t *

@@ -43,8 +43,8 @@ sqsh_mapper_static_mem_init(
 static int
 sqsh_mapper_static_mem_map(
 		struct SqshMapping *mapping, sqsh_index_t offset, size_t size) {
+	(void)size;
 	mapping->data.sm.data = &mapping->mapper->data.sm.data[offset];
-	mapping->data.sm.size = size;
 	return 0;
 }
 static size_t
@@ -59,7 +59,6 @@ sqsh_mapper_static_mem_cleanup(struct SqshMapper *mapper) {
 static int
 sqsh_mapping_static_mem_unmap(struct SqshMapping *mapping) {
 	mapping->data.sm.data = NULL;
-	mapping->data.sm.size = 0;
 	return 0;
 }
 static const uint8_t *

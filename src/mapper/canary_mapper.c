@@ -49,9 +49,7 @@ sqsh_mapper_canary_map(
 	uint8_t *data = calloc(size, sizeof(uint8_t));
 
 	memcpy(data, &mapping->mapper->data.cn.data[offset], size);
-	mapping->data.cn.offset = offset;
 	mapping->data.cn.data = data;
-	mapping->data.cn.size = size;
 	return 0;
 }
 static size_t
@@ -67,7 +65,6 @@ static int
 sqsh_mapping_canary_unmap(struct SqshMapping *mapping) {
 	free(mapping->data.cn.data);
 	mapping->data.cn.data = NULL;
-	mapping->data.cn.size = 0;
 	return 0;
 }
 static const uint8_t *
