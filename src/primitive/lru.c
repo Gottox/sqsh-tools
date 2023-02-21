@@ -28,86 +28,71 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         mmap_full_mapper.c
+ * @file         lru.c
  */
 
-#include "../../include/sqsh_mapper_private.h"
+#include "../../include/sqsh_primitive_private.h"
 
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#include "../../include/sqsh_error.h"
+#include "../utils.h"
 
-static int
-sqsh_mapper_mmap_complete_init(
-		struct SqshMapper *mapper, const void *input, size_t size) {
-	(void)size;
-	int rv = 0;
-	int fd = -1;
-	uint8_t *file_map = MAP_FAILED;
-	struct stat st = {0};
-
-	fd = open(input, 0);
-	if (fd < 0) {
-		rv = -errno;
-		goto out;
-	}
-
-	if (fstat(fd, &st) < 0) {
-		rv = -errno;
-		goto out;
-	}
-
-	file_map = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-	if (file_map == MAP_FAILED) {
-		rv = -errno;
-	}
-	mapper->data.mc.data = file_map;
-	mapper->data.mc.size = st.st_size;
-
-out:
-	if (fd >= 0) {
-		close(fd);
-	}
-	return rv;
-}
-static int
-sqsh_mapper_mmap_complete_map(
-		struct SqshMapping *mapping, sqsh_index_t offset, size_t size) {
-	(void)size;
-	mapping->data.mc.data = &mapping->mapper->data.mc.data[offset];
-	return 0;
-}
-static int
-sqsh_mapper_mmap_complete_cleanup(struct SqshMapper *mapper) {
+int
+sqsh__lru_init(
+		struct SqshLru *lru, size_t size, struct SqshRefCountArray *backend) {
 	int rv;
-	size_t size = sqsh__mapper_size(mapper);
+	lru->backend = backend;
+	lru->size = size;
+	lru->items = calloc(size, sizeof(sqsh_index_t));
+	if (lru->items == NULL) {
+		return -SQSH_ERROR_MALLOC_FAILED;
+	}
+	lru->ring_index = 0;
+	rv = pthread_mutex_init(&lru->lock, NULL);
+	if (rv != 0) {
+		return -SQSH_ERROR_TODO;
+	}
 
-	rv = munmap(mapper->data.mc.data, size);
-	return rv;
-}
-static size_t
-sqsh_mapper_mmap_complete_size(const struct SqshMapper *mapper) {
-	return mapper->data.mc.size;
-}
-static int
-sqsh_mapping_mmap_complete_unmap(struct SqshMapping *mapping) {
-	mapping->data.mc.data = NULL;
 	return 0;
 }
-static const uint8_t *
-sqsh_mapping_mmap_complete_data(const struct SqshMapping *mapping) {
-	return mapping->data.mc.data;
+
+int
+sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t index) {
+	pthread_mutex_lock(&lru->lock);
+
+	if (lru->ring_index == lru->size) {
+		lru->ring_index = 0;
+	}
+
+	if (index + 1 == lru->items[lru->ring_index]) {
+		goto out;
+	}
+
+	if (lru->items[lru->ring_index] > 0) {
+		int old_index = lru->items[lru->ring_index] - 1;
+		sqsh__ref_count_array_release_index(lru->backend, old_index);
+	}
+
+	lru->items[lru->ring_index] = index + 1;
+	int real_index = index;
+	sqsh__ref_count_array_retain(lru->backend, &real_index);
+
+	lru->ring_index++;
+out:
+	pthread_mutex_unlock(&lru->lock);
+	return 0;
 }
 
-const struct SqshMemoryMapperImpl impl = {
-		.block_size_hint = SIZE_MAX,
-		.init = sqsh_mapper_mmap_complete_init,
-		.mapping = sqsh_mapper_mmap_complete_map,
-		.size = sqsh_mapper_mmap_complete_size,
-		.cleanup = sqsh_mapper_mmap_complete_cleanup,
-		.map_data = sqsh_mapping_mmap_complete_data,
-		.unmap = sqsh_mapping_mmap_complete_unmap,
-};
-const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_mmap_full = &impl;
+int
+sqsh__lru_cleanup(struct SqshLru *lru) {
+	for (size_t i = 0; i < lru->size; i++) {
+		if (lru->items[i]) {
+			int index = lru->items[i] - 1;
+			sqsh__ref_count_array_release_index(lru->backend, index);
+		}
+	}
+	free(lru->items);
+	pthread_mutex_destroy(&lru->lock);
+	lru->size = 0;
+	lru->items = NULL;
+	return 0;
+}

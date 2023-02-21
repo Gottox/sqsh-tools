@@ -46,24 +46,6 @@ struct Sqsh;
 struct SqshConfig;
 
 ////////////////////////////////////////
-// mapper/canary_mapper.c
-
-struct SqshCanaryMapper {
-	/**
-	 * @privatesection
-	 */
-	const uint8_t *data;
-	size_t size;
-};
-
-struct SqshCanaryMap {
-	/**
-	 * @privatesection
-	 */
-	uint8_t *data;
-};
-
-////////////////////////////////////////
 // mapper/curl_mapper.c
 
 struct SqshCurlMapper {
@@ -84,24 +66,6 @@ struct SqshCurlMap {
 	 */
 	uint8_t *data;
 	size_t size;
-};
-
-////////////////////////////////////////
-// mapper/mmap_full_mapper.c
-
-struct SqshMmapFullMapper {
-	/**
-	 * @privatesection
-	 */
-	uint8_t *data;
-	size_t size;
-};
-
-struct SqshMmapFullMap {
-	/**
-	 * @privatesection
-	 */
-	uint8_t *data;
 };
 
 ////////////////////////////////////////
@@ -155,10 +119,8 @@ struct SqshMapping {
 	 */
 	struct SqshMapper *mapper;
 	union {
-		struct SqshMmapFullMap mc;
 		struct SqshMmapMap mm;
 		struct SqshStaticMap sm;
-		struct SqshCanaryMap cn;
 		struct SqshCurlMap cl;
 	} data;
 };
@@ -183,10 +145,8 @@ struct SqshMapper {
 	const struct SqshMemoryMapperImpl *impl;
 	size_t block_size;
 	union {
-		struct SqshMmapFullMapper mc;
 		struct SqshMmapMapper mm;
 		struct SqshStaticMapper sm;
-		struct SqshCanaryMapper cn;
 		struct SqshCurlMapper cl;
 	} data;
 };
@@ -285,6 +245,7 @@ struct SqshMapManager {
 	 * @privatesection
 	 */
 	struct SqshMapper mapper;
+	struct SqshLru lru;
 	struct SqshRefCountArray maps;
 };
 

@@ -240,12 +240,70 @@ int sqsh__ref_count_array_release(
 /**
  * @internal
  * @memberof SqshRefCountArray
+ * @brief Releases the reference to the data at a specified index in a
+ * reference-counted array.
+ *
+ * @param array The array containing the data.
+ * @param index The index of the data to release.
+ * @return 0 on success, a negative value on error.
+ */
+int
+sqsh__ref_count_array_release_index(struct SqshRefCountArray *array, int index);
+
+/**
+ * @internal
+ * @memberof SqshRefCountArray
  * @brief Cleans up a reference-counted array.
  *
  * @param array The array to cleanup.
  * @return 0 on success, a negative value on error.
  */
 int sqsh__ref_count_array_cleanup(struct SqshRefCountArray *array);
+
+////////////////////////////////////////
+// primitive/lru.c
+
+struct SqshLru {
+	/**
+	 * @privatesection
+	 */
+	struct SqshRefCountArray *backend;
+
+	sqsh_index_t *items;
+	sqsh_index_t ring_index;
+	size_t size;
+	pthread_mutex_t lock;
+};
+
+/**
+ * @internal
+ * @memberof SqshLru
+ * @brief Initializes an LRU cache.
+ *
+ * @param lru The LRU cache to initialize.
+ * @param size The size of the LRU cache.
+ * @param backend The backend to use for the LRU cache.
+ * @return 0 on success, a negative value on error.
+ */
+int sqsh__lru_init(
+		struct SqshLru *lru, size_t size, struct SqshRefCountArray *backend);
+
+/**
+ * @internal
+ * @memberof SqshLru
+ * @brief marks an item as recently used.
+ * @param lru The LRU cache to mark the item in.
+ * @param index The index of the item to mark.
+ * @return 0 on success, a negative value on error.
+ */
+int sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t index);
+
+/**
+ * @internal
+ * @memberof SqshLru
+ * @brief Cleans up an LRU cache.
+ */
+int sqsh__lru_cleanup(struct SqshLru *lru);
 
 #ifdef __cplusplus
 }
