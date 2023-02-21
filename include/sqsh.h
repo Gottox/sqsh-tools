@@ -48,10 +48,14 @@ extern "C" {
  * a sqsh session.
  */
 struct SqshConfig {
-	size_t source_size;
+	uint64_t source_size;
 	const struct SqshMemoryMapperImpl *source_mapper;
 	size_t mapper_block_size;
+#if UINTPTR_MAX >= UINT64_MAX
 	uint8_t _reserved[104];
+#else
+	uint8_t _reserved[112];
+#endif
 };
 
 SQSH_STATIC_ASSERT(sizeof(struct SqshConfig) == 128);
