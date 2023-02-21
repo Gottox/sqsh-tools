@@ -210,7 +210,7 @@ int sqsh__ref_count_array_set(
  * @param array The array to get the size of.
  * @return The size of the array.
  */
-size_t sqsh__ref_count_array_size(struct SqshRefCountArray *array);
+size_t sqsh__ref_count_array_size(const struct SqshRefCountArray *array);
 
 /**
  * @internal

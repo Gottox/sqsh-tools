@@ -150,7 +150,7 @@ sqsh__ref_count_array_release(struct SqshRefCountArray *array, int index) {
 }
 
 size_t
-sqsh__ref_count_array_size(struct SqshRefCountArray *array) {
+sqsh__ref_count_array_size(const struct SqshRefCountArray *array) {
 	return array->size;
 }
 
