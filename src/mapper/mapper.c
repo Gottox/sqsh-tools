@@ -78,6 +78,7 @@ size_t
 sqsh__mapper_block_size(const struct SqshMapper *mapper) {
 	return mapper->block_size;
 }
+
 size_t
 sqsh__mapper_size(const struct SqshMapper *mapper) {
 	return mapper->impl->size(mapper);
@@ -91,11 +92,6 @@ sqsh__mapper_cleanup(struct SqshMapper *mapper) {
 		mapper->impl = NULL;
 	}
 	return rv;
-}
-
-size_t
-sqsh__mapping_size(const struct SqshMapping *mapping) {
-	return mapping->mapper->impl->map_size(mapping);
 }
 
 const uint8_t *

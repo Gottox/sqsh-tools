@@ -120,11 +120,6 @@ sqsh_mapping_mmap_data(const struct SqshMapping *mapping) {
 	return &mapping->data.mm.data[mapping->data.mm.page_offset];
 }
 
-static size_t
-sqsh_mapping_mmap_size(const struct SqshMapping *mapping) {
-	return mapping->data.mm.size;
-}
-
 static const struct SqshMemoryMapperImpl impl = {
 #if UINTPTR_MAX >= UINT64_MAX
 		// 1 GiB
@@ -138,7 +133,6 @@ static const struct SqshMemoryMapperImpl impl = {
 		.size = sqsh_mapper_mmap_size,
 		.cleanup = sqsh_mapper_mmap_cleanup,
 		.map_data = sqsh_mapping_mmap_data,
-		.map_size = sqsh_mapping_mmap_size,
 		.unmap = sqsh_mapping_mmap_unmap,
 };
 const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_mmap = &impl;

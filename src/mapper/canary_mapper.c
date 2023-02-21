@@ -75,11 +75,6 @@ sqsh_mapping_canary_data(const struct SqshMapping *mapping) {
 	return mapping->data.cn.data;
 }
 
-static size_t
-sqsh_mapping_canary_size(const struct SqshMapping *mapping) {
-	return mapping->data.cn.size;
-}
-
 static const struct SqshMemoryMapperImpl impl = {
 		.block_size_hint = 1,
 		.init = sqsh_mapper_canary_init,
@@ -87,7 +82,6 @@ static const struct SqshMemoryMapperImpl impl = {
 		.size = sqsh_mapper_canary_size,
 		.cleanup = sqsh_mapper_canary_cleanup,
 		.map_data = sqsh_mapping_canary_data,
-		.map_size = sqsh_mapping_canary_size,
 		.unmap = sqsh_mapping_canary_unmap,
 };
 const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_canary = &impl;

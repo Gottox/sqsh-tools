@@ -295,11 +295,6 @@ sqsh_mapping_curl_data(const struct SqshMapping *mapping) {
 	return mapping->data.cl.data;
 }
 
-static size_t
-sqsh_mapping_curl_size(const struct SqshMapping *mapping) {
-	return mapping->data.cl.size;
-}
-
 static const struct SqshMemoryMapperImpl impl = {
 		.block_size_hint = 4096,
 		.init = sqsh_mapper_curl_init,
@@ -307,7 +302,6 @@ static const struct SqshMemoryMapperImpl impl = {
 		.size = sqsh_mapper_curl_size,
 		.cleanup = sqsh_mapper_curl_cleanup,
 		.map_data = sqsh_mapping_curl_data,
-		.map_size = sqsh_mapping_curl_size,
 		.unmap = sqsh_mapping_curl_unmap,
 };
 const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_curl = &impl;

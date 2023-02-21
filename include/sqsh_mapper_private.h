@@ -177,7 +177,6 @@ struct SqshMemoryMapperImpl {
 	size_t (*size)(const struct SqshMapper *mapper);
 	int (*cleanup)(struct SqshMapper *mapper);
 	const uint8_t *(*map_data)(const struct SqshMapping *mapping);
-	size_t (*map_size)(const struct SqshMapping *mapping);
 	int (*unmap)(struct SqshMapping *mapping);
 };
 
@@ -259,17 +258,6 @@ size_t sqsh__mapper_block_size(const struct SqshMapper *mapper);
  * @return 0 on success, a negative value on error.
  */
 int sqsh__mapper_cleanup(struct SqshMapper *mapper);
-
-/**
- * @internal
- * @memberof SqshMapping
- * @brief Retrieves the size of a mapping.
- *
- * @param[in] mapping The mapping to retrieve the size from.
- *
- * @return The size of the mapping.
- */
-size_t sqsh__mapping_size(const struct SqshMapping *mapping);
 
 /**
  * @internal
