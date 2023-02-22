@@ -36,6 +36,35 @@
 #include "../../include/sqsh_error.h"
 #include "../utils.h"
 
+#if 0
+#	include <stdio.h>
+
+static void
+debug_print(struct SqshRefCountArray *array, int index, char msg) {
+	fprintf(stderr, "ref_count_array: %p %lu\n", (void *)array, array->size);
+	putc('[', stderr);
+	for (sqsh_index_t i = 0; i < array->size; ++i) {
+		if (array->ref_count[i] == 0)
+			putc('_', stderr);
+		else if (array->ref_count[i] >= 10)
+			putc('+', stderr);
+		else if (array->ref_count[i] < 0)
+			putc('<', stderr);
+		else
+			putc('0' + array->ref_count[i], stderr);
+	}
+	fputs("]\n", stderr);
+	putc(msg, stderr);
+
+	for (sqsh_index_t i = 0; i < (size_t)index; ++i) {
+		putc(' ', stderr);
+	}
+	fputs("^\n", stderr);
+}
+#else
+#	define debug_print(a, i, m)
+#endif
+
 int
 sqsh__ref_count_array_init(
 		struct SqshRefCountArray *array, size_t size, size_t element_size,
@@ -101,6 +130,7 @@ sqsh__ref_count_array_set(
 	}
 
 	array->ref_count[index] = 1;
+	debug_print(array, index, 'c');
 
 out:
 	pthread_mutex_unlock(&array->mutex);
@@ -122,6 +152,7 @@ sqsh__ref_count_array_retain(struct SqshRefCountArray *array, int *index) {
 		*index = array->ref_count[*index] * -1;
 	} else if (array->ref_count[*index] != 0) {
 		array->ref_count[*index] += 1;
+		debug_print(array, *index, '+');
 		data = get_element(array, *index);
 	}
 
@@ -153,6 +184,7 @@ sqsh__ref_count_array_release_index(
 	}
 
 	array->ref_count[index] -= 1;
+	debug_print(array, index, '-');
 
 	if (array->ref_count[index] == 0) {
 		void *data = get_element(array, index);
