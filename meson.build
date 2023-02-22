@@ -2,7 +2,7 @@ project(
 	'libsqsh',
 	['c', 'cpp'],
 	default_options : [
-		'c_std=c18',
+		'c_std=c99',
 		'optimization=0',
 		'werror=true',
 		'warning_level=3'
@@ -89,7 +89,8 @@ sqsh_test_util = [
 libsqsh_deps = [ ]
 
 build_args = [
-	'-pthread'
+	'-pthread',
+	'-pedantic',
 ]
 
 link_args = [
