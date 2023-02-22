@@ -50,9 +50,9 @@ int
 sqsh__map_cursor_init(
 		struct SqshMapCursor *cursor, struct SqshMapManager *map_manager,
 		const uint64_t start_address, const uint64_t upper_limit) {
+	cursor->map_manager = map_manager;
 	cursor->address = start_address;
 	cursor->upper_limit = upper_limit;
-	cursor->map_manager = map_manager;
 	cursor->current_mapping = NULL;
 	cursor->target = NULL;
 
@@ -60,14 +60,27 @@ sqsh__map_cursor_init(
 }
 
 static int
+replace_mapping(
+		struct SqshMapCursor *cursor, const struct SqshMapping *mapping) {
+	sqsh__map_manager_release(cursor->map_manager, cursor->current_mapping);
+	cursor->current_mapping = mapping;
+
+	return 0;
+}
+
+static int
 setup_direct(struct SqshMapCursor *cursor) {
 	int rv = 0;
+	const struct SqshMapping *mapping = NULL;
+
 	rv = sqsh__map_manager_get(
 			cursor->map_manager, get_index(cursor, cursor->address), 1,
-			&cursor->current_mapping);
+			&mapping);
 	if (rv < 0) {
 		goto out;
 	}
+
+	replace_mapping(cursor, mapping);
 
 	const uint8_t *data = sqsh__mapping_data(cursor->current_mapping);
 	cursor->target = &data[get_offset(cursor, cursor->address)];
@@ -122,6 +135,8 @@ setup_buffered(struct SqshMapCursor *cursor) {
 		add_buffered(cursor, index, offset, size);
 	}
 
+	replace_mapping(cursor, NULL);
+
 	const uint8_t *data = sqsh__buffer_data(&cursor->buffer);
 	cursor->target = data;
 out:
@@ -132,24 +147,30 @@ int
 sqsh__map_cursor_advance(
 		struct SqshMapCursor *cursor, sqsh_index_t offset, size_t size) {
 	int rv = 0;
+	uint64_t address;
+	uint64_t end_address;
 
-	sqsh__map_manager_release(cursor->map_manager, cursor->current_mapping);
-	cursor->current_mapping = NULL;
+	if (SQSH_ADD_OVERFLOW(cursor->address, offset, &address)) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+	if (SQSH_ADD_OVERFLOW(address, size, &end_address)) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+	if (end_address > cursor->upper_limit) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
 
-	if (SQSH_ADD_OVERFLOW(cursor->address, offset, &cursor->address)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
-	if (SQSH_ADD_OVERFLOW(cursor->address, size, &cursor->end_address)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
-	if (cursor->end_address > cursor->upper_limit) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
+	cursor->address = address;
+	cursor->end_address = end_address;
 
 	if (get_index(cursor, cursor->address) ==
 		get_index(cursor, cursor->end_address)) {
+		// If both addresses point to the same index they are in the same block
+		// so we can access the data directly as there are no gaps.
 		rv = setup_direct(cursor);
 	} else {
+		// If the addresses point to different indices there are gaps in the
+		// data so we need to copy the data into a buffer.
 		rv = setup_buffered(cursor);
 	}
 
@@ -174,10 +195,7 @@ sqsh__map_cursor_size(const struct SqshMapCursor *cursor) {
 
 int
 sqsh__map_cursor_cleanup(struct SqshMapCursor *cursor) {
-	if (cursor->map_manager) {
-		sqsh__map_manager_release(cursor->map_manager, cursor->current_mapping);
-	}
-	cursor->current_mapping = NULL;
 	sqsh__buffer_cleanup(&cursor->buffer);
+	replace_mapping(cursor, NULL);
 	return 0;
 }
