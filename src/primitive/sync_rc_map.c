@@ -63,7 +63,7 @@ debug_print(struct SqshSyncRcMap *array, int index, char msg) {
 	fputs("^\n", stderr);
 }
 #else
-#	define debug_print(a, i, m)
+#	define debug_print(...)
 #endif
 
 int
@@ -127,8 +127,9 @@ int
 release_rc(struct SqshSyncRcMap *array, int index) {
 	int ref_count = --array->ref_count[index];
 
-	assert(ref_count >= 0);
 	debug_print(array, index, '-');
+
+	assert(ref_count >= 0);
 
 	return ref_count;
 }
