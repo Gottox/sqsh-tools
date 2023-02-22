@@ -106,14 +106,19 @@ load_mapping(
 	struct SqshMapping mapping = {0};
 	assert(span == 1);
 
+	size_t block_size = sqsh__mapper_block_size(&manager->mapper);
+	size_t block_count = sqsh__map_manager_block_count(manager);
+	size_t file_size = sqsh__map_manager_size(manager);
+	size_t size = block_size;
 	sqsh_index_t offset;
-	size_t size = sqsh__mapper_block_size(&manager->mapper);
-	if (SQSH_MULT_OVERFLOW(index, size, &offset)) {
+	if (SQSH_MULT_OVERFLOW(index, block_size, &offset)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
-	if (index == sqsh__map_manager_block_count(manager) - 1) {
-		size = sqsh__map_manager_size(manager) % size;
+	// If we're retrieving the last block, we need to make sure that we don't
+	// read past the end of the file, so cap the size to the remaining bytes.
+	if (index == block_count - 1 && file_size % block_size != 0) {
+		size = file_size % block_size;
 	}
 
 	rv = sqsh__mapper_map(&mapping, &manager->mapper, offset, size);

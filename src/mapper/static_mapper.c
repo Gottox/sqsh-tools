@@ -35,9 +35,9 @@
 
 static int
 sqsh_mapper_static_mem_init(
-		struct SqshMapper *mapper, const void *input, size_t size) {
+		struct SqshMapper *mapper, const void *input, size_t *size) {
+	(void)size;
 	mapper->data.sm.data = input;
-	mapper->data.sm.size = size;
 	return 0;
 }
 static int
@@ -46,10 +46,6 @@ sqsh_mapper_static_mem_map(
 	(void)size;
 	mapping->data.sm.data = &mapping->mapper->data.sm.data[offset];
 	return 0;
-}
-static size_t
-sqsh_mapper_static_mem_size(const struct SqshMapper *mapper) {
-	return mapper->data.sm.size;
 }
 static int
 sqsh_mapper_static_mem_cleanup(struct SqshMapper *mapper) {
@@ -70,7 +66,6 @@ static const struct SqshMemoryMapperImpl impl = {
 		.block_size_hint = SIZE_MAX,
 		.init = sqsh_mapper_static_mem_init,
 		.mapping = sqsh_mapper_static_mem_map,
-		.size = sqsh_mapper_static_mem_size,
 		.cleanup = sqsh_mapper_static_mem_cleanup,
 		.map_data = sqsh_mapping_static_mem_data,
 		.unmap = sqsh_mapping_static_mem_unmap,

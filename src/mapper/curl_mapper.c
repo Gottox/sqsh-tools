@@ -222,7 +222,7 @@ out:
 
 static int
 sqsh_mapper_curl_init(
-		struct SqshMapper *mapper, const void *input, size_t size) {
+		struct SqshMapper *mapper, const void *input, size_t *size) {
 	(void)size;
 	int rv = 0;
 	curl_global_init(CURL_GLOBAL_ALL);
@@ -243,6 +243,7 @@ sqsh_mapper_curl_init(
 	if (rv < 0) {
 		goto out;
 	}
+	*size = mapper->data.cl.expected_size;
 
 out:
 	return rv;
@@ -253,7 +254,8 @@ sqsh_mapper_curl_map(
 		struct SqshMapping *mapping, sqsh_index_t offset, size_t size) {
 	int rv = 0;
 
-	pthread_mutex_lock(&mapping->mapper->data.cl.lock);
+	pthread_mutex_t *lock = &mapping->mapper->data.cl.lock;
+	pthread_mutex_lock(lock);
 	if (offset == 0 && mapping->mapper->data.cl.header_cache != NULL) {
 		mapping->data.cl.data = mapping->mapper->data.cl.header_cache;
 	} else {
@@ -263,18 +265,13 @@ sqsh_mapper_curl_map(
 			goto out;
 		}
 	}
-	mapping->data.cl.size = size;
 
 out:
 	if (rv < 0) {
 		sqsh__mapping_unmap(mapping);
 	}
-	pthread_mutex_unlock(&mapping->mapper->data.cl.lock);
+	pthread_mutex_unlock(lock);
 	return rv;
-}
-static size_t
-sqsh_mapper_curl_size(const struct SqshMapper *mapper) {
-	return mapper->data.cl.expected_size;
 }
 
 static int
@@ -296,12 +293,9 @@ sqsh_mapping_curl_data(const struct SqshMapping *mapping) {
 }
 
 static const struct SqshMemoryMapperImpl impl = {
-		.block_size_hint = 4096,
-		.init = sqsh_mapper_curl_init,
-		.mapping = sqsh_mapper_curl_map,
-		.size = sqsh_mapper_curl_size,
-		.cleanup = sqsh_mapper_curl_cleanup,
-		.map_data = sqsh_mapping_curl_data,
-		.unmap = sqsh_mapping_curl_unmap,
+		// 40kb
+		.block_size_hint = 40 * 1024,       .init = sqsh_mapper_curl_init,
+		.mapping = sqsh_mapper_curl_map,    .cleanup = sqsh_mapper_curl_cleanup,
+		.map_data = sqsh_mapping_curl_data, .unmap = sqsh_mapping_curl_unmap,
 };
 const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_curl = &impl;

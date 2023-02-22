@@ -43,7 +43,7 @@
 
 static int
 sqsh_mapper_mmap_init(
-		struct SqshMapper *mapper, const void *input, size_t size) {
+		struct SqshMapper *mapper, const void *input, size_t *size) {
 	(void)size;
 	int rv = 0;
 	int fd = -1;
@@ -59,8 +59,8 @@ sqsh_mapper_mmap_init(
 		rv = -errno;
 		goto out;
 	}
+	*size = st.st_size;
 	mapper->data.mm.fd = fd;
-	mapper->data.mm.size = st.st_size;
 	mapper->data.mm.page_size = sysconf(_SC_PAGESIZE);
 	fd = -1;
 
@@ -87,32 +87,25 @@ sqsh_mapper_mmap_map(
 	}
 
 	mapping->data.mm.data = file_map;
-	mapping->data.mm.size = size;
-	mapping->data.mm.offset = offset;
 	mapping->data.mm.page_offset = page_offset;
 	return 0;
 }
+
 static int
 sqsh_mapper_mmap_cleanup(struct SqshMapper *mapper) {
 	close(mapper->data.mm.fd);
 	return 0;
 }
-static size_t
-sqsh_mapper_mmap_size(const struct SqshMapper *mapper) {
-	return mapper->data.mm.size;
-}
 
 static int
 sqsh_mapping_mmap_unmap(struct SqshMapping *mapping) {
 	int rv;
-	rv =
-			munmap(mapping->data.mm.data,
-				   mapping->data.mm.size + mapping->data.mm.page_offset);
+	rv = munmap(
+			mapping->data.mm.data,
+			sqsh__mapper_size(mapping->mapper) + mapping->data.mm.page_offset);
 
 	mapping->data.mm.data = NULL;
-	mapping->data.mm.size = 0;
 	mapping->data.mm.page_offset = 0;
-	mapping->data.mm.offset = 0;
 	return rv;
 }
 static const uint8_t *
@@ -130,7 +123,6 @@ static const struct SqshMemoryMapperImpl impl = {
 #endif
 		.init = sqsh_mapper_mmap_init,
 		.mapping = sqsh_mapper_mmap_map,
-		.size = sqsh_mapper_mmap_size,
 		.cleanup = sqsh_mapper_mmap_cleanup,
 		.map_data = sqsh_mapping_mmap_data,
 		.unmap = sqsh_mapping_mmap_unmap,

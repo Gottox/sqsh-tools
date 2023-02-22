@@ -65,7 +65,6 @@ struct SqshCurlMap {
 	 * @privatesection
 	 */
 	uint8_t *data;
-	size_t size;
 };
 
 ////////////////////////////////////////
@@ -77,7 +76,6 @@ struct SqshMmapMapper {
 	 */
 	int fd;
 	long page_size;
-	size_t size;
 };
 
 struct SqshMmapMap {
@@ -85,9 +83,7 @@ struct SqshMmapMap {
 	 * @privatesection
 	 */
 	uint8_t *data;
-	size_t offset;
 	size_t page_offset;
-	size_t size;
 };
 
 ////////////////////////////////////////
@@ -98,7 +94,6 @@ struct SqshStaticMapper {
 	 * @privatesection
 	 */
 	const uint8_t *data;
-	size_t size;
 };
 
 struct SqshStaticMap {
@@ -130,9 +125,8 @@ struct SqshMemoryMapperImpl {
 	 * @privatesection
 	 */
 	size_t block_size_hint;
-	int (*init)(struct SqshMapper *mapper, const void *input, size_t size);
+	int (*init)(struct SqshMapper *mapper, const void *input, size_t *size);
 	int (*mapping)(struct SqshMapping *map, sqsh_index_t offset, size_t size);
-	size_t (*size)(const struct SqshMapper *mapper);
 	int (*cleanup)(struct SqshMapper *mapper);
 	const uint8_t *(*map_data)(const struct SqshMapping *mapping);
 	int (*unmap)(struct SqshMapping *mapping);
@@ -144,6 +138,7 @@ struct SqshMapper {
 	 */
 	const struct SqshMemoryMapperImpl *impl;
 	size_t block_size;
+	size_t archive_size;
 	union {
 		struct SqshMmapMapper mm;
 		struct SqshStaticMapper sm;

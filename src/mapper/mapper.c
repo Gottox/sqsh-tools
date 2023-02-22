@@ -41,6 +41,8 @@ int
 sqsh__mapper_init(
 		struct SqshMapper *mapper, const void *input,
 		const struct SqshConfig *config) {
+	int rv = 0;
+	size_t size = config->source_size;
 	if (config->source_mapper) {
 		mapper->impl = config->source_mapper;
 	} else {
@@ -52,7 +54,15 @@ sqsh__mapper_init(
 	} else {
 		mapper->block_size = mapper->impl->block_size_hint;
 	}
-	return mapper->impl->init(mapper, input, config->source_size);
+
+	rv = mapper->impl->init(mapper, input, &size);
+	if (rv < 0) {
+		return rv;
+	}
+
+	mapper->archive_size = size;
+
+	return rv;
 }
 
 int
@@ -81,7 +91,7 @@ sqsh__mapper_block_size(const struct SqshMapper *mapper) {
 
 size_t
 sqsh__mapper_size(const struct SqshMapper *mapper) {
-	return mapper->impl->size(mapper);
+	return mapper->archive_size;
 }
 
 int
