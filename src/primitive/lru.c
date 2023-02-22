@@ -59,29 +59,44 @@ sqsh__lru_init(
 	return 0;
 }
 
+void
+advance(struct SqshLru *lru) {
+	lru->ring_index = (lru->ring_index + 1) % lru->size;
+}
+
+void
+retain_backend(const struct SqshLru *lru, sqsh_index_t backend_index) {
+	int real_backend_index = (int)backend_index;
+	sqsh__sync_rc_map_retain(lru->backend, &real_backend_index);
+	lru->items[lru->ring_index] = backend_index + 1;
+}
+
+void
+release_backend(const struct SqshLru *lru) {
+	int index = lru->items[lru->ring_index];
+	if (index == 0) {
+		return;
+	}
+
+	int backend_index = lru->items[lru->ring_index] - 1;
+	lru->items[lru->ring_index] = 0;
+	sqsh__sync_rc_map_release_index(lru->backend, backend_index);
+}
+
 int
 sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t index) {
+	if (lru->size == 0) {
+		return 0;
+	}
 	pthread_mutex_lock(&lru->lock);
 
-	if (lru->ring_index == lru->size) {
-		lru->ring_index = 0;
+	advance(lru);
+
+	if (lru->items[lru->ring_index] != index + 1) {
+		release_backend(lru);
+		retain_backend(lru, index);
 	}
 
-	if (index + 1 == lru->items[lru->ring_index]) {
-		goto out;
-	}
-
-	if (lru->items[lru->ring_index] > 0) {
-		int old_index = lru->items[lru->ring_index] - 1;
-		sqsh__sync_rc_map_release_index(lru->backend, old_index);
-	}
-
-	lru->items[lru->ring_index] = index + 1;
-	int real_index = index;
-	sqsh__sync_rc_map_retain(lru->backend, &real_index);
-
-	lru->ring_index++;
-out:
 	pthread_mutex_unlock(&lru->lock);
 	return 0;
 }
@@ -89,10 +104,8 @@ out:
 int
 sqsh__lru_cleanup(struct SqshLru *lru) {
 	for (size_t i = 0; i < lru->size; i++) {
-		if (lru->items[i]) {
-			int index = lru->items[i] - 1;
-			sqsh__sync_rc_map_release_index(lru->backend, index);
-		}
+		advance(lru);
+		release_backend(lru);
 	}
 	free(lru->items);
 	pthread_mutex_destroy(&lru->lock);

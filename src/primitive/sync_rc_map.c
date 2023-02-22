@@ -35,6 +35,7 @@
 
 #include "../../include/sqsh_error.h"
 #include "../utils.h"
+#include <assert.h>
 
 #if 0
 #	include <stdio.h>
@@ -103,13 +104,46 @@ get_element(struct SqshSyncRcMap *array, int index) {
 	return (void *)&array->data[offset];
 }
 
+int
+create_rc(struct SqshSyncRcMap *array, int index) {
+	array->ref_count[index] = 1;
+
+	debug_print(array, index, 'c');
+
+	return 1;
+}
+
+int
+retain_rc(struct SqshSyncRcMap *array, int index) {
+	int ref_count = ++array->ref_count[index];
+
+	assert(ref_count > 1);
+	debug_print(array, index, '+');
+
+	return ref_count;
+}
+
+int
+release_rc(struct SqshSyncRcMap *array, int index) {
+	int ref_count = --array->ref_count[index];
+
+	assert(ref_count >= 0);
+	debug_print(array, index, '-');
+
+	return ref_count;
+}
+
 const void *
 sqsh__sync_rc_map_set(
 		struct SqshSyncRcMap *array, int index, void *data, int span) {
+	(void)span;
 	int rv;
 	void *target = NULL;
 
+	assert(span == 1);
+
 	rv = pthread_mutex_lock(&array->lock);
+
 	if (rv < 0) {
 		array->cleanup(data);
 		goto out;
@@ -123,14 +157,8 @@ sqsh__sync_rc_map_set(
 	}
 
 	memcpy(target, data, array->element_size);
-	for (int i = 1; i < span; ++i) {
-		if (array->ref_count[index + i] == 0) {
-			array->ref_count[index + i] = index * -1;
-		}
-	}
 
-	array->ref_count[index] = 1;
-	debug_print(array, index, 'c');
+	create_rc(array, index);
 
 out:
 	pthread_mutex_unlock(&array->lock);
@@ -148,10 +176,8 @@ sqsh__sync_rc_map_retain(struct SqshSyncRcMap *array, int *index) {
 		return NULL;
 	}
 
-	if (array->ref_count[*index] < 0) {
-		*index = array->ref_count[*index] * -1;
-	} else if (array->ref_count[*index] != 0) {
-		array->ref_count[*index] += 1;
+	if (array->ref_count[*index] != 0) {
+		retain_rc(array, *index);
 		debug_print(array, *index, '+');
 		data = get_element(array, *index);
 	}
@@ -181,10 +207,9 @@ sqsh__sync_rc_map_release_index(struct SqshSyncRcMap *array, int index) {
 		return -SQSH_ERROR_TODO;
 	}
 
-	array->ref_count[index] -= 1;
-	debug_print(array, index, '-');
+	int ref_count = release_rc(array, index);
 
-	if (array->ref_count[index] == 0) {
+	if (ref_count == 0) {
 		void *data = get_element(array, index);
 		array->cleanup(data);
 	}
