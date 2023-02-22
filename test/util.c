@@ -16,6 +16,7 @@
 uint8_t *
 mk_stub(struct Sqsh *sqsh, uint8_t *payload, size_t payload_size,
 		size_t *target_size) {
+	int rv;
 	struct SqshDataSuperblock superblock = {
 			.magic = SQSH_SUPERBLOCK_MAGIC,
 			.inode_count = 0,
@@ -47,6 +48,8 @@ mk_stub(struct Sqsh *sqsh, uint8_t *payload, size_t payload_size,
 			.source_size = *target_size,
 			.source_mapper = sqsh_mapper_impl_static,
 	};
-	assert(0 == sqsh__init(sqsh, data, &config));
+	rv = sqsh__init(sqsh, data, &config);
+	assert(0 == rv);
+	(void)rv;
 	return data;
 }
