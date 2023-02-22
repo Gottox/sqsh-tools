@@ -54,15 +54,26 @@ sqsh__map_cursor_init(
 	cursor->upper_limit = upper_limit;
 	cursor->map_manager = map_manager;
 	cursor->current_mapping = NULL;
+	cursor->target = NULL;
 
 	return sqsh__buffer_init(&cursor->buffer);
 }
 
 static int
 setup_direct(struct SqshMapCursor *cursor) {
-	return sqsh__map_manager_get(
+	int rv = 0;
+	rv = sqsh__map_manager_get(
 			cursor->map_manager, get_index(cursor, cursor->address), 1,
 			&cursor->current_mapping);
+	if (rv < 0) {
+		goto out;
+	}
+
+	const uint8_t *data = sqsh__mapping_data(cursor->current_mapping);
+	cursor->target = &data[get_offset(cursor, cursor->address)];
+
+out:
+	return rv;
 }
 
 static int
@@ -111,6 +122,8 @@ setup_buffered(struct SqshMapCursor *cursor) {
 		add_buffered(cursor, index, offset, size);
 	}
 
+	const uint8_t *data = sqsh__buffer_data(&cursor->buffer);
+	cursor->target = data;
 out:
 	return rv;
 }
@@ -151,12 +164,7 @@ sqsh__map_cursor_all(struct SqshMapCursor *cursor) {
 
 const uint8_t *
 sqsh__map_cursor_data(const struct SqshMapCursor *cursor) {
-	if (cursor->current_mapping != NULL) {
-		sqsh_index_t offset = get_offset(cursor, cursor->address);
-		return &sqsh__mapping_data(cursor->current_mapping)[offset];
-	} else {
-		return sqsh__buffer_data(&cursor->buffer);
-	}
+	return cursor->target;
 }
 
 size_t

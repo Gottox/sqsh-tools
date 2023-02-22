@@ -335,6 +335,7 @@ struct SqshMapCursor {
 	struct SqshMapManager *map_manager;
 	const struct SqshMapping *current_mapping;
 	struct SqshBuffer buffer;
+	const uint8_t *target;
 };
 
 /**
