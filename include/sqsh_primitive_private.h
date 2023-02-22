@@ -169,7 +169,7 @@ struct SqshSyncRcMap {
 	size_t size;
 	size_t element_size;
 	int *ref_count;
-	pthread_mutex_t mutex;
+	pthread_mutex_t lock;
 	sqsh_sync_rc_map_cleanup_t cleanup;
 };
 

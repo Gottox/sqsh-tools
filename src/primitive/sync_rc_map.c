@@ -81,7 +81,7 @@ sqsh__sync_rc_map_init(
 		goto out;
 	}
 
-	rv = pthread_mutex_init(&array->mutex, NULL);
+	rv = pthread_mutex_init(&array->lock, NULL);
 	array->size = size;
 	array->cleanup = cleanup;
 	array->element_size = element_size;
@@ -109,7 +109,7 @@ sqsh__sync_rc_map_set(
 	int rv;
 	void *target = NULL;
 
-	rv = pthread_mutex_lock(&array->mutex);
+	rv = pthread_mutex_lock(&array->lock);
 	if (rv < 0) {
 		array->cleanup(data);
 		goto out;
@@ -133,7 +133,7 @@ sqsh__sync_rc_map_set(
 	debug_print(array, index, 'c');
 
 out:
-	pthread_mutex_unlock(&array->mutex);
+	pthread_mutex_unlock(&array->lock);
 
 	return target;
 }
@@ -143,7 +143,7 @@ sqsh__sync_rc_map_retain(struct SqshSyncRcMap *array, int *index) {
 	int rv;
 	void *data = NULL;
 
-	rv = pthread_mutex_lock(&array->mutex);
+	rv = pthread_mutex_lock(&array->lock);
 	if (rv < 0) {
 		return NULL;
 	}
@@ -156,7 +156,7 @@ sqsh__sync_rc_map_retain(struct SqshSyncRcMap *array, int *index) {
 		data = get_element(array, *index);
 	}
 
-	pthread_mutex_unlock(&array->mutex);
+	pthread_mutex_unlock(&array->lock);
 	return data;
 }
 
@@ -175,7 +175,7 @@ int
 sqsh__sync_rc_map_release_index(struct SqshSyncRcMap *array, int index) {
 	int rv;
 
-	rv = pthread_mutex_lock(&array->mutex);
+	rv = pthread_mutex_lock(&array->lock);
 	if (rv < 0) {
 		// return -SQSH_ERROR_MUTEX_LOCK_FAILED;
 		return -SQSH_ERROR_TODO;
@@ -189,7 +189,7 @@ sqsh__sync_rc_map_release_index(struct SqshSyncRcMap *array, int index) {
 		array->cleanup(data);
 	}
 
-	pthread_mutex_unlock(&array->mutex);
+	pthread_mutex_unlock(&array->lock);
 
 	return 0;
 }
@@ -213,7 +213,7 @@ sqsh__sync_rc_map_cleanup(struct SqshSyncRcMap *array) {
 	free(array->ref_count);
 	array->ref_count = NULL;
 	array->size = 0;
-	pthread_mutex_destroy(&array->mutex);
+	pthread_mutex_destroy(&array->lock);
 
 	return 0;
 }
