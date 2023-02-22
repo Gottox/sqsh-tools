@@ -136,12 +136,8 @@ configure_handle(struct SqshMapper *mapper) {
 
 static int
 curl_download(
-		struct SqshMapper *mapper, sqsh_index_t offset, size_t size,
-		uint8_t **data) {
-	// TODO: Declutter the initialisation of this function. Also check for
-	// integer overflows.
-	const uint64_t expected_size = mapper->data.cl.expected_size;
-	const uint64_t expected_time = mapper->data.cl.expected_time;
+		CURL *handle, sqsh_index_t offset, size_t size, uint8_t **data,
+		uint64_t *file_size, uint64_t *file_time) {
 	*data = calloc(size, sizeof(uint8_t));
 	if (*data == NULL) {
 		return -SQSH_ERROR_MALLOC_FAILED;
@@ -156,10 +152,7 @@ curl_download(
 	// The actual max-size this string should ever use is 42, but we
 	// add some padding to be a nice number. Not that 42 isn't nice.
 	char range_buffer[64] = {0};
-	CURL *handle = NULL;
 	const uint64_t end_offset = offset + size - 1;
-	uint64_t total_size = UINT64_MAX;
-	uint64_t file_time = UINT64_MAX;
 	long http_code = 0;
 
 	rv = snprintf(
@@ -169,7 +162,6 @@ curl_download(
 		rv = -SQSH_ERROR_MAPPER_MAP;
 		goto out;
 	}
-	handle = configure_handle(mapper);
 	curl_easy_setopt(handle, CURLOPT_RANGE, range_buffer);
 	curl_easy_setopt(handle, CURLOPT_WRITEDATA, &write_info);
 
@@ -185,37 +177,16 @@ curl_download(
 		goto out;
 	}
 
-	rv = get_total_size(handle, &total_size);
+	rv = get_total_size(handle, file_size);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = get_file_time(handle, &file_time);
+	rv = get_file_time(handle, file_time);
 	if (rv < 0) {
 		goto out;
 	}
 
-	// UINT64_MAX is used to indicate, that expected_time or expected_size
-	// has not been set yet. If the server reports UINT64_MAX, something fishy
-	// is going on, so we bail out here.
-	if (total_size == UINT64_MAX || file_time == UINT64_MAX) {
-		rv = -SQSH_ERROR_MAPPER_MAP;
-		goto out;
-	}
-
-	if (expected_time == UINT64_MAX) {
-		mapper->data.cl.expected_time = file_time;
-	} else if (file_time != expected_time) {
-		rv = -SQSH_ERROR_MAPPER_MAP;
-		goto out;
-	}
-
-	if (expected_size == UINT64_MAX) {
-		mapper->data.cl.expected_size = total_size;
-	} else if (total_size != expected_size) {
-		rv = -SQSH_ERROR_MAPPER_MAP;
-		goto out;
-	}
 out:
 	return rv;
 }
@@ -229,8 +200,6 @@ sqsh_mapper_curl_init(
 
 	mapper->data.cl.url = input;
 	mapper->data.cl.handle = curl_easy_init();
-	mapper->data.cl.expected_size = UINT64_MAX;
-	mapper->data.cl.expected_time = UINT64_MAX;
 
 	rv = pthread_mutex_init(&mapper->data.cl.lock, NULL);
 	if (rv != 0) {
@@ -239,11 +208,14 @@ sqsh_mapper_curl_init(
 	}
 
 	size_t block_size = sqsh__mapper_block_size(mapper);
-	rv = curl_download(mapper, 0, block_size, &mapper->data.cl.header_cache);
+	CURL *handle = configure_handle(mapper);
+
+	rv = curl_download(
+			handle, 0, block_size, &mapper->data.cl.header_cache, size,
+			&mapper->data.cl.expected_time);
 	if (rv < 0) {
 		goto out;
 	}
-	*size = mapper->data.cl.expected_size;
 
 out:
 	return rv;
@@ -253,15 +225,31 @@ static int
 sqsh_mapper_curl_map(
 		struct SqshMapping *mapping, sqsh_index_t offset, size_t size) {
 	int rv = 0;
+	uint64_t file_size = 0;
+	uint64_t file_time = 0;
 
 	pthread_mutex_t *lock = &mapping->mapper->data.cl.lock;
 	pthread_mutex_lock(lock);
 	if (offset == 0 && mapping->mapper->data.cl.header_cache != NULL) {
 		mapping->data.cl.data = mapping->mapper->data.cl.header_cache;
+		mapping->mapper->data.cl.header_cache = NULL;
 	} else {
+		CURL *handle = configure_handle(mapping->mapper);
+
 		rv = curl_download(
-				mapping->mapper, offset, size, &mapping->data.cl.data);
+				handle, offset, size, &mapping->data.cl.data, &file_size,
+				&file_time);
 		if (rv < 0) {
+			goto out;
+		}
+
+		if (file_time != mapping->mapper->data.cl.expected_time) {
+			rv = -SQSH_ERROR_MAPPER_MAP;
+			goto out;
+		}
+
+		if (file_size != sqsh__mapper_size(mapping->mapper)) {
+			rv = -SQSH_ERROR_MAPPER_MAP;
 			goto out;
 		}
 	}

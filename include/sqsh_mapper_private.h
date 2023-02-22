@@ -54,7 +54,6 @@ struct SqshCurlMapper {
 	 */
 	const char *url;
 	uint64_t expected_time;
-	uint64_t expected_size;
 	void *handle;
 	uint8_t *header_cache;
 	pthread_mutex_t lock;
