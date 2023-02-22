@@ -53,6 +53,10 @@ sqsh__map_manager_init(
 		const struct SqshConfig *config) {
 	int rv;
 	size_t map_size;
+	size_t lru_size = config->mapper_lru_size;
+	if (lru_size == 0) {
+		lru_size = 32;
+	}
 
 	rv = sqsh__mapper_init(&manager->mapper, input, config);
 	if (rv < 0) {
@@ -66,6 +70,11 @@ sqsh__map_manager_init(
 	rv = sqsh__ref_count_array_init(
 			&manager->maps, map_size, sizeof(struct SqshMapping),
 			map_cleanup_cb);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = sqsh__lru_init(&manager->lru, lru_size, &manager->maps);
 
 out:
 	if (rv < 0) {
@@ -130,6 +139,7 @@ sqsh__map_manager_get(
 	if (*target == NULL) {
 		rv = load_mapping(manager, target, index, span);
 	}
+	sqsh__lru_touch(&manager->lru, real_index);
 	return rv;
 }
 
@@ -141,6 +151,7 @@ sqsh__map_manager_release(
 
 int
 sqsh__map_manager_cleanup(struct SqshMapManager *manager) {
+	sqsh__lru_cleanup(&manager->lru);
 	sqsh__ref_count_array_cleanup(&manager->maps);
 	sqsh__mapper_cleanup(&manager->mapper);
 

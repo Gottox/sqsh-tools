@@ -51,6 +51,7 @@ sqsh__ref_count_array_init(
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
+
 	rv = pthread_mutex_init(&array->mutex, NULL);
 	array->size = size;
 	array->cleanup = cleanup;
@@ -131,13 +132,20 @@ sqsh__ref_count_array_retain(struct SqshRefCountArray *array, int *index) {
 int
 sqsh__ref_count_array_release(
 		struct SqshRefCountArray *array, const void *element) {
-	int rv;
-
 	if (element == NULL) {
 		return 0;
 	}
 
 	int index = ((uint8_t *)element - array->data) / array->element_size;
+
+	return sqsh__ref_count_array_release_index(array, index);
+}
+
+int
+sqsh__ref_count_array_release_index(
+		struct SqshRefCountArray *array, int index) {
+	int rv;
+
 	rv = pthread_mutex_lock(&array->mutex);
 	if (rv < 0) {
 		// return -SQSH_ERROR_MUTEX_LOCK_FAILED;
