@@ -67,7 +67,7 @@ sqsh_src = [
 	'src/metablock/metablock_iterator.c',
 	'src/primitive/buffer.c',
 	'src/primitive/lru.c',
-	'src/primitive/ref_count_array.c',
+	'src/primitive/sync_rc_map.c',
 	'src/sqsh.c',
 	'src/table/table.c',
 	'src/xattr/xattr_iterator.c',

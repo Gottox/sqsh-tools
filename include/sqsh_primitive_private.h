@@ -157,11 +157,11 @@ size_t sqsh__buffer_size(const struct SqshBuffer *buffer);
 int sqsh__buffer_cleanup(struct SqshBuffer *buffer);
 
 ////////////////////////////////////////
-// primitive/ref_count_array.c
+// primitive/sync_rc_map.c
 
-typedef void (*sqsh_ref_count_array_cleanup_t)(void *data);
+typedef void (*sqsh_sync_rc_map_cleanup_t)(void *data);
 
-struct SqshRefCountArray {
+struct SqshSyncRcMap {
 	/**
 	 * @privatesection
 	 */
@@ -170,12 +170,12 @@ struct SqshRefCountArray {
 	size_t element_size;
 	int *ref_count;
 	pthread_mutex_t mutex;
-	sqsh_ref_count_array_cleanup_t cleanup;
+	sqsh_sync_rc_map_cleanup_t cleanup;
 };
 
 /**
  * @internal
- * @memberof SqshRefCountArray
+ * @memberof SqshSyncRcMap
  * @brief Initializes a reference-counted array.
  *
  * @param array The array to initialize.
@@ -184,13 +184,13 @@ struct SqshRefCountArray {
  * @param cleanup The cleanup function.
  * @return 0 on success, a negative value on error.
  */
-int sqsh__ref_count_array_init(
-		struct SqshRefCountArray *array, size_t size, size_t element_size,
-		sqsh_ref_count_array_cleanup_t cleanup);
+int sqsh__sync_rc_map_init(
+		struct SqshSyncRcMap *array, size_t size, size_t element_size,
+		sqsh_sync_rc_map_cleanup_t cleanup);
 
 /**
  * @internal
- * @memberof SqshRefCountArray
+ * @memberof SqshSyncRcMap
  * @brief Sets a value in a reference-counted array.
  *
  * @param array The array to set the value in.
@@ -199,34 +199,33 @@ int sqsh__ref_count_array_init(
  * @param span The number of indices to span. (Use 1 for a single index.)
  * @return 0 on success, a negative value on error.
  */
-const void *sqsh__ref_count_array_set(
-		struct SqshRefCountArray *array, int index, void *data, int span);
+const void *sqsh__sync_rc_map_set(
+		struct SqshSyncRcMap *array, int index, void *data, int span);
 
 /**
  * @internal
- * @memberof SqshRefCountArray
+ * @memberof SqshSyncRcMap
  * @brief Gets the size of a reference-counted array.
  *
  * @param array The array to get the size of.
  * @return The size of the array.
  */
-size_t sqsh__ref_count_array_size(const struct SqshRefCountArray *array);
+size_t sqsh__sync_rc_map_size(const struct SqshSyncRcMap *array);
 
 /**
  * @internal
- * @memberof SqshRefCountArray
+ * @memberof SqshSyncRcMap
  * @brief Retains the data at a specified index in a reference-counted array.
  *
  * @param array The array containing the data.
  * @param index The index of the data.
  * @return A pointer to the retained data.
  */
-const void *
-sqsh__ref_count_array_retain(struct SqshRefCountArray *array, int *index);
+const void *sqsh__sync_rc_map_retain(struct SqshSyncRcMap *array, int *index);
 
 /**
  * @internal
- * @memberof SqshRefCountArray
+ * @memberof SqshSyncRcMap
  * @brief Releases the reference to the data at a specified index in a
  * reference-counted array.
  *
@@ -234,12 +233,11 @@ sqsh__ref_count_array_retain(struct SqshRefCountArray *array, int *index);
  * @param element The element to release.
  * @return 0 on success, a negative value on error.
  */
-int sqsh__ref_count_array_release(
-		struct SqshRefCountArray *array, const void *element);
+int sqsh__sync_rc_map_release(struct SqshSyncRcMap *array, const void *element);
 
 /**
  * @internal
- * @memberof SqshRefCountArray
+ * @memberof SqshSyncRcMap
  * @brief Releases the reference to the data at a specified index in a
  * reference-counted array.
  *
@@ -247,18 +245,17 @@ int sqsh__ref_count_array_release(
  * @param index The index of the data to release.
  * @return 0 on success, a negative value on error.
  */
-int
-sqsh__ref_count_array_release_index(struct SqshRefCountArray *array, int index);
+int sqsh__sync_rc_map_release_index(struct SqshSyncRcMap *array, int index);
 
 /**
  * @internal
- * @memberof SqshRefCountArray
+ * @memberof SqshSyncRcMap
  * @brief Cleans up a reference-counted array.
  *
  * @param array The array to cleanup.
  * @return 0 on success, a negative value on error.
  */
-int sqsh__ref_count_array_cleanup(struct SqshRefCountArray *array);
+int sqsh__sync_rc_map_cleanup(struct SqshSyncRcMap *array);
 
 ////////////////////////////////////////
 // primitive/lru.c
@@ -267,7 +264,7 @@ struct SqshLru {
 	/**
 	 * @privatesection
 	 */
-	struct SqshRefCountArray *backend;
+	struct SqshSyncRcMap *backend;
 
 	sqsh_index_t *items;
 	sqsh_index_t ring_index;
@@ -285,8 +282,8 @@ struct SqshLru {
  * @param backend The backend to use for the LRU cache.
  * @return 0 on success, a negative value on error.
  */
-int sqsh__lru_init(
-		struct SqshLru *lru, size_t size, struct SqshRefCountArray *backend);
+int
+sqsh__lru_init(struct SqshLru *lru, size_t size, struct SqshSyncRcMap *backend);
 
 /**
  * @internal

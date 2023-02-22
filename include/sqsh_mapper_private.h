@@ -246,7 +246,7 @@ struct SqshMapManager {
 	 */
 	struct SqshMapper mapper;
 	struct SqshLru lru;
-	struct SqshRefCountArray maps;
+	struct SqshSyncRcMap maps;
 };
 
 /**

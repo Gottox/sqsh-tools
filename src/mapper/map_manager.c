@@ -67,7 +67,7 @@ sqsh__map_manager_init(
 			sqsh__mapper_size(&manager->mapper),
 			sqsh__mapper_block_size(&manager->mapper));
 
-	rv = sqsh__ref_count_array_init(
+	rv = sqsh__sync_rc_map_init(
 			&manager->maps, map_size, sizeof(struct SqshMapping),
 			map_cleanup_cb);
 	if (rv < 0) {
@@ -95,7 +95,7 @@ sqsh__map_manager_block_size(const struct SqshMapManager *manager) {
 
 size_t
 sqsh__map_manager_block_count(const struct SqshMapManager *manager) {
-	return sqsh__ref_count_array_size(&manager->maps);
+	return sqsh__sync_rc_map_size(&manager->maps);
 }
 
 static int
@@ -121,7 +121,7 @@ load_mapping(
 		goto out;
 	}
 
-	*target = sqsh__ref_count_array_set(&manager->maps, index, &mapping, span);
+	*target = sqsh__sync_rc_map_set(&manager->maps, index, &mapping, span);
 
 out:
 	return rv;
@@ -134,7 +134,7 @@ sqsh__map_manager_get(
 	int rv = 0;
 	assert(span == 1);
 	int real_index = index;
-	*target = sqsh__ref_count_array_retain(&manager->maps, &real_index);
+	*target = sqsh__sync_rc_map_retain(&manager->maps, &real_index);
 
 	if (*target == NULL) {
 		rv = load_mapping(manager, target, index, span);
@@ -146,13 +146,13 @@ sqsh__map_manager_get(
 int
 sqsh__map_manager_release(
 		struct SqshMapManager *manager, const struct SqshMapping *mapping) {
-	return sqsh__ref_count_array_release(&manager->maps, mapping);
+	return sqsh__sync_rc_map_release(&manager->maps, mapping);
 }
 
 int
 sqsh__map_manager_cleanup(struct SqshMapManager *manager) {
 	sqsh__lru_cleanup(&manager->lru);
-	sqsh__ref_count_array_cleanup(&manager->maps);
+	sqsh__sync_rc_map_cleanup(&manager->maps);
 	sqsh__mapper_cleanup(&manager->mapper);
 
 	return 0;

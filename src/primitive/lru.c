@@ -38,7 +38,7 @@
 
 int
 sqsh__lru_init(
-		struct SqshLru *lru, size_t size, struct SqshRefCountArray *backend) {
+		struct SqshLru *lru, size_t size, struct SqshSyncRcMap *backend) {
 	int rv;
 	lru->backend = backend;
 	lru->size = size;
@@ -69,12 +69,12 @@ sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t index) {
 
 	if (lru->items[lru->ring_index] > 0) {
 		int old_index = lru->items[lru->ring_index] - 1;
-		sqsh__ref_count_array_release_index(lru->backend, old_index);
+		sqsh__sync_rc_map_release_index(lru->backend, old_index);
 	}
 
 	lru->items[lru->ring_index] = index + 1;
 	int real_index = index;
-	sqsh__ref_count_array_retain(lru->backend, &real_index);
+	sqsh__sync_rc_map_retain(lru->backend, &real_index);
 
 	lru->ring_index++;
 out:
@@ -87,7 +87,7 @@ sqsh__lru_cleanup(struct SqshLru *lru) {
 	for (size_t i = 0; i < lru->size; i++) {
 		if (lru->items[i]) {
 			int index = lru->items[i] - 1;
-			sqsh__ref_count_array_release_index(lru->backend, index);
+			sqsh__sync_rc_map_release_index(lru->backend, index);
 		}
 	}
 	free(lru->items);
