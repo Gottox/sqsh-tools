@@ -55,6 +55,8 @@ extern "C" {
 #define SQSH_DIVIDE_CEIL(x, y) ((((x)-1) / (y)) + 1)
 #define SQSH_PADDING(x, p) SQSH_DIVIDE_CEIL(x, p) * p
 
+#define SQSH_CONFIG_DEFAULT(x, d) (size_t)(x == 0 ? (d) : SQSH_MAX(x, 0))
+
 SQSH_NO_UNUSED static inline void *
 sqsh_memdup(const void *source, size_t size) {
 	void *target = calloc(size + 1, sizeof(uint8_t));

@@ -42,6 +42,10 @@ sqsh__lru_init(
 	int rv;
 	lru->backend = backend;
 	lru->size = size;
+	if (size == 0) {
+		return 0;
+	}
+
 	lru->items = calloc(size, sizeof(sqsh_index_t));
 	if (lru->items == NULL) {
 		return -SQSH_ERROR_MALLOC_FAILED;

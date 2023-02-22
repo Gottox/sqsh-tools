@@ -52,8 +52,8 @@ struct SqshConfig {
 #define SQSH_CONFIG_FIELDS \
 	uint64_t source_size; \
 	const struct SqshMemoryMapperImpl *source_mapper; \
-	size_t mapper_block_size; \
-	size_t mapper_lru_size;
+	int mapper_block_size; \
+	int mapper_lru_size;
 
 	SQSH_CONFIG_FIELDS
 	uint8_t _reserved[128 - sizeof(struct {SQSH_CONFIG_FIELDS})];

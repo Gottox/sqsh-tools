@@ -53,10 +53,7 @@ sqsh__map_manager_init(
 		const struct SqshConfig *config) {
 	int rv;
 	size_t map_size;
-	size_t lru_size = config->mapper_lru_size;
-	if (lru_size == 0) {
-		lru_size = 32;
-	}
+	size_t lru_size = SQSH_CONFIG_DEFAULT(config->mapper_lru_size, 32);
 
 	rv = sqsh__mapper_init(&manager->mapper, input, config);
 	if (rv < 0) {
