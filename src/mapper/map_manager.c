@@ -38,8 +38,6 @@
 #include "../utils.h"
 
 #include <assert.h>
-#include <stdint.h>
-#include <string.h>
 
 static void
 map_cleanup_cb(void *data) {
