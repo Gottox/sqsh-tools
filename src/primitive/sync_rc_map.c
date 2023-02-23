@@ -44,7 +44,7 @@
 
 static void
 debug_print(struct SqshSyncRcMap *array, int index, char msg) {
-	fprintf(stderr, "ref_count_array: %p %lu\n", (void *)array, array->size);
+	fprintf(stderr, "ref_count_array: %i\n", index);
 	putc('[', stderr);
 	for (sqsh_index_t i = 0; i < array->size; ++i) {
 		if (array->ref_count[i] == 0)
