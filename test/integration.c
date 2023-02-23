@@ -813,5 +813,5 @@ TEST_OFF(fuzz_crash_6);
 TEST_OFF(fuzz_crash_7);
 TEST(fuzz_crash_8);
 TEST(free_null_crash_1);
-TEST_OFF(multithreaded);
+TEST(multithreaded);
 DEFINE_END
