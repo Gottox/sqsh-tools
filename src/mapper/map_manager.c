@@ -53,6 +53,12 @@ sqsh__map_manager_init(
 	size_t map_size;
 	size_t lru_size = SQSH_CONFIG_DEFAULT(config->mapper_lru_size, 32);
 
+	rv = pthread_mutex_init(&manager->lock, NULL);
+	if (rv != 0) {
+		// rv = -SQSH_ERROR_MUTEX_INIT;
+		rv = -SQSH_ERROR_TODO;
+		goto out;
+	}
 	rv = sqsh__mapper_init(&manager->mapper, input, config);
 	if (rv < 0) {
 		goto out;
@@ -134,19 +140,44 @@ sqsh__map_manager_get(
 	int rv = 0;
 	assert(span == 1);
 	int real_index = index;
+
+	rv = pthread_mutex_lock(&manager->lock);
+	if (rv != 0) {
+		// rv = -SQSH_ERROR_MUTEX_LOCK;
+		rv = -SQSH_ERROR_TODO;
+		goto out;
+	}
+
 	*target = sqsh__sync_rc_map_retain(&manager->maps, &real_index);
 
 	if (*target == NULL) {
 		rv = load_mapping(manager, target, index, span);
 	}
 	sqsh__lru_touch(&manager->lru, real_index);
+
+out:
+	pthread_mutex_unlock(&manager->lock);
 	return rv;
 }
 
 int
 sqsh__map_manager_release(
 		struct SqshMapManager *manager, const struct SqshMapping *mapping) {
-	return sqsh__sync_rc_map_release(&manager->maps, mapping);
+	int rv = pthread_mutex_lock(&manager->lock);
+	if (rv != 0) {
+		// rv = -SQSH_ERROR_MUTEX_LOCK;
+		rv = -SQSH_ERROR_TODO;
+		goto out;
+	}
+
+	sqsh__sync_rc_map_release(&manager->maps, mapping);
+	if (rv < 0) {
+		goto out;
+	}
+
+	pthread_mutex_unlock(&manager->lock);
+out:
+	return rv;
 }
 
 int
@@ -154,6 +185,8 @@ sqsh__map_manager_cleanup(struct SqshMapManager *manager) {
 	sqsh__lru_cleanup(&manager->lru);
 	sqsh__sync_rc_map_cleanup(&manager->maps);
 	sqsh__mapper_cleanup(&manager->mapper);
+
+	pthread_mutex_destroy(&manager->lock);
 
 	return 0;
 }

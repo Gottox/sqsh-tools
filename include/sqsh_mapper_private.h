@@ -36,6 +36,8 @@
 
 #include "sqsh_mapper.h"
 
+#include <pthread.h>
+
 #include "sqsh_primitive_private.h"
 
 #ifdef __cplusplus
@@ -241,6 +243,7 @@ struct SqshMapManager {
 	struct SqshMapper mapper;
 	struct SqshLru lru;
 	struct SqshSyncRcMap maps;
+	pthread_mutex_t lock;
 };
 
 /**
