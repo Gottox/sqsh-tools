@@ -33,6 +33,7 @@
 
 #include "common.h"
 #include "test.h"
+#include <pthread.h>
 #include <sqsh_context_private.h>
 #include <sqsh_directory_private.h>
 #include <sqsh_file_private.h>
@@ -750,6 +751,74 @@ free_null_crash_1(void) {
 	assert(rv == 0);
 }
 
+struct Walker {
+	struct Sqsh *sqsh;
+	uint64_t inode_number;
+};
+
+#define LENGTH(x) (sizeof(x) / sizeof(x[0]))
+
+static void *
+multithreaded_walker(void *arg) {
+	int rv;
+	struct Walker *walker = arg;
+	struct Walker my_walker = {
+			.sqsh = walker->sqsh,
+	};
+
+	struct SqshInodeContext *inode =
+			sqsh_inode_new(walker->sqsh, walker->inode_number, &rv);
+
+	if (sqsh_inode_type(inode) == SQSH_INODE_TYPE_DIRECTORY) {
+		struct SqshDirectoryIterator *iter =
+				sqsh_directory_iterator_new(inode, &rv);
+		while (sqsh_directory_iterator_next(iter) > 0) {
+			multithreaded_walker(&my_walker);
+		}
+	} else {
+		struct SqshFileContext *file = sqsh_file_new(inode, &rv);
+		size_t size = sqsh_file_size(file);
+		sqsh_file_read(file, size);
+		sqsh_file_free(file);
+	}
+
+	sqsh_inode_free(inode);
+
+	return 0;
+}
+static void
+multithreaded(void) {
+	int rv;
+	pthread_t threads[16] = {0};
+	struct Sqsh sqsh = {0};
+
+	const struct SqshConfig config = {
+			.source_mapper = sqsh_mapper_impl_static,
+			.source_size = sizeof(squash_image),
+	};
+	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
+	assert(rv == 0);
+
+	const struct SqshSuperblockContext *superblock = sqsh_superblock(&sqsh);
+	struct Walker walker = {
+			.sqsh = &sqsh,
+			.inode_number = sqsh_superblock_inode_root_ref(superblock),
+	};
+	for (unsigned long i = 0; i < LENGTH(threads); i++) {
+		printf("Creating thread\n");
+		rv = pthread_create(&threads[i], NULL, multithreaded_walker, &walker);
+		assert(rv == 0);
+	}
+
+	for (unsigned long i = 0; i < LENGTH(threads); i++) {
+		rv = pthread_join(threads[i], NULL);
+		assert(rv == 0);
+	}
+
+	rv = sqsh__cleanup(&sqsh);
+	assert(rv == 0);
+}
+
 DEFINE
 TEST(sqsh_empty);
 TEST(sqsh_ls);
@@ -769,4 +838,5 @@ TEST_OFF(fuzz_crash_6);
 TEST_OFF(fuzz_crash_7);
 TEST(fuzz_crash_8);
 TEST(free_null_crash_1);
+TEST_OFF(multithreaded);
 DEFINE_END
