@@ -52,6 +52,7 @@ init_cursor(void) {
 	assert(rv == 0);
 
 	rv = sqsh__map_cursor_init(&cursor, &map_manager, 0, sizeof(buffer) - 1);
+	assert(rv == 0);
 
 	sqsh__map_cursor_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&map_manager);

@@ -60,10 +60,13 @@ init_lru(void) {
 	assert(rv == 0);
 
 	rv = sqsh__lru_init(&lru, 10, &map);
+	assert(rv == 0);
 
 	rv = sqsh__lru_cleanup(&lru);
+	assert(rv == 0);
 
 	rv = sqsh__sync_rc_map_cleanup(&map);
+	assert(rv == 0);
 }
 
 static void *
@@ -72,7 +75,7 @@ multithreaded_concurrent_touch_worker(void *arg) {
 	struct SqshSyncRcMap *map = lru->backend;
 	size_t size = sqsh__sync_rc_map_size(map);
 	int rv;
-	const static int repeat_count = 10000;
+	static const size_t repeat_count = 10000;
 
 	for (sqsh_index_t i = 0; i < repeat_count; i++) {
 		struct timespec ts = {.tv_sec = 0, .tv_nsec = rand() % 100000};
@@ -91,7 +94,7 @@ multithreaded_concurrent_touch_worker(void *arg) {
 static void
 multithreaded_concurrent_touch(void) {
 	int rv;
-	const int element_count = 2048;
+	const size_t element_count = 2048;
 	struct SqshSyncRcMap map;
 	pthread_t threads[16] = {0};
 	struct SqshLru lru = {0};
@@ -123,6 +126,7 @@ multithreaded_concurrent_touch(void) {
 	}
 
 	rv = sqsh__lru_cleanup(&lru);
+	assert(rv == 0);
 
 	rv = sqsh__sync_rc_map_cleanup(&map);
 	assert(rv == 0);

@@ -54,7 +54,7 @@
 #include <time.h>
 #include <unistd.h>
 
-static char T_progname[PATH_MAX] = {0};
+static char T_progname[4096] = {0};
 static const char *T_current = NULL;
 static const char *T_color_bad = "";
 static const char *T_color_status = "";
