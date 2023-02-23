@@ -10,13 +10,15 @@ NINJA_TARGETS := test benchmark install dist scan-build clang-format uninstall \
 ARCH = x86_64
 #ARCH = i386
 
+MESON_FLAGS += -Ddefault_library=static
+MESON_FLAGS += -Db_lundef=false
 MESON_FLAGS += -Dtest=true
 MESON_FLAGS += -Ddoc=internal
-MESON_FLAGS += -Db_coverage=true
+#MESON_FLAGS += -Db_coverage=true
 
-SANATIZE = 1
+SANATIZE = 0
 
-CC = gcc
+CC = clang
 
 ifeq ($(PODMAN), 1)
 	W = podman run --rm -ti -v .:/host gottox/sqsh-build:$(ARCH) env
@@ -24,12 +26,12 @@ ifeq ($(PODMAN), 1)
 else
 	W =
 	BUILD_DIR = ./build_dir
-	ifeq ($(SANATIZE),1)
-		MESON_FLAGS += -Db_sanitize=address,undefined
+	ifeq ($(SANATIZE), 1)
+		MESON_FLAGS += -Db_sanitize=thread
 	endif
 endif
 ifeq ($(CC),clang)
-	MESON_FLAGS += -Dfuzzer=true
+	#MESON_FLAGS += -Dfuzzer=true
 endif
 ifeq ($(OPTIMIZE),1)
 	MESON_FLAGS += --optimization=2
