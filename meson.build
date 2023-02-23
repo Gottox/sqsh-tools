@@ -2,9 +2,9 @@ project(
 	'libsqsh',
 	['c', 'cpp'],
 	default_options : [
-		'c_std=c99',
+		'c_std=c11',
 		'optimization=0',
-		'werror=true',
+		#'werror=true',
 		'warning_level=3'
 	],
 	version: '0.2.0',
@@ -81,6 +81,8 @@ sqsh_test = [
 	'test/metablock/metablock_cursor.c',
 	'test/metablock/metablock_iterator.c',
 	'test/primitive/buffer.c',
+	'test/primitive/lru.c',
+	'test/primitive/sync_rc_map.c',
 ]
 sqsh_test_util = [
 	'test/util.c',
