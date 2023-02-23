@@ -781,7 +781,6 @@ multithreaded(void) {
 			.inode_number = sqsh_superblock_inode_root_ref(superblock),
 	};
 	for (unsigned long i = 0; i < LENGTH(threads); i++) {
-		printf("Creating thread\n");
 		rv = pthread_create(&threads[i], NULL, multithreaded_walker, &walker);
 		assert(rv == 0);
 	}
