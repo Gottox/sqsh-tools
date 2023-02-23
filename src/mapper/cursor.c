@@ -62,7 +62,9 @@ sqsh__map_cursor_init(
 static int
 replace_mapping(
 		struct SqshMapCursor *cursor, const struct SqshMapping *mapping) {
-	sqsh__map_manager_release(cursor->map_manager, cursor->current_mapping);
+	if (cursor->current_mapping != NULL) {
+		sqsh__map_manager_release(cursor->map_manager, cursor->current_mapping);
+	}
 	cursor->current_mapping = mapping;
 
 	return 0;
