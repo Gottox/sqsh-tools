@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         ref_count_array.c
+ * @file         rc_map.c
  */
 
 #define _GNU_SOURCE
@@ -69,11 +69,10 @@ debug_print(struct SqshSyncRcMap *array, int index, char msg) {
 #endif
 
 int
-sqsh__sync_rc_map_init(
+sqsh__rc_map_init(
 		struct SqshSyncRcMap *array, size_t size, size_t element_size,
-		sqsh_sync_rc_map_cleanup_t cleanup) {
+		sqsh_rc_map_cleanup_t cleanup) {
 	int rv = 0;
-	pthread_mutexattr_t attr;
 	array->data = calloc(size, element_size);
 	if (array->data == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
@@ -85,15 +84,12 @@ sqsh__sync_rc_map_init(
 		goto out;
 	}
 
-	pthread_mutexattr_init(&attr);
-	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-	rv = pthread_mutex_init(&array->lock, &attr);
 	array->size = size;
 	array->cleanup = cleanup;
 	array->element_size = element_size;
 out:
 	if (rv < 0) {
-		sqsh__sync_rc_map_cleanup(array);
+		sqsh__rc_map_cleanup(array);
 	}
 	return rv;
 }
@@ -140,47 +136,29 @@ release_rc(struct SqshSyncRcMap *array, int index) {
 }
 
 const void *
-sqsh__sync_rc_map_set(
-		struct SqshSyncRcMap *array, int index, void *data, int span) {
+sqsh__rc_map_set(struct SqshSyncRcMap *array, int index, void *data, int span) {
 	(void)span;
-	int rv;
-	void *target = NULL;
+	void *target;
 
 	assert(span == 1);
-
-	rv = pthread_mutex_lock(&array->lock);
-
-	if (rv < 0) {
-		array->cleanup(data);
-		goto out;
-	}
 
 	target = get_element(array, index);
 
 	if (array->ref_count[index] != 0) {
 		array->cleanup(data);
-		goto out;
+		return NULL;
 	}
 
 	memcpy(target, data, array->element_size);
 
 	create_rc(array, index);
 
-out:
-	pthread_mutex_unlock(&array->lock);
-
 	return target;
 }
 
 const void *
-sqsh__sync_rc_map_retain(struct SqshSyncRcMap *array, int *index) {
-	int rv;
+sqsh__rc_map_retain(struct SqshSyncRcMap *array, int *index) {
 	void *data = NULL;
-
-	rv = pthread_mutex_lock(&array->lock);
-	if (rv < 0) {
-		return NULL;
-	}
 
 	if (array->ref_count[*index] != 0) {
 		retain_rc(array, *index);
@@ -188,31 +166,22 @@ sqsh__sync_rc_map_retain(struct SqshSyncRcMap *array, int *index) {
 		data = get_element(array, *index);
 	}
 
-	pthread_mutex_unlock(&array->lock);
 	return data;
 }
 
 int
-sqsh__sync_rc_map_release(struct SqshSyncRcMap *array, const void *element) {
+sqsh__rc_map_release(struct SqshSyncRcMap *array, const void *element) {
 	if (element == NULL) {
 		return 0;
 	}
 
 	int index = ((uint8_t *)element - array->data) / array->element_size;
 
-	return sqsh__sync_rc_map_release_index(array, index);
+	return sqsh__rc_map_release_index(array, index);
 }
 
 int
-sqsh__sync_rc_map_release_index(struct SqshSyncRcMap *array, int index) {
-	int rv;
-
-	rv = pthread_mutex_lock(&array->lock);
-	if (rv < 0) {
-		// return -SQSH_ERROR_MUTEX_LOCK_FAILED;
-		return -SQSH_ERROR_TODO;
-	}
-
+sqsh__rc_map_release_index(struct SqshSyncRcMap *array, int index) {
 	int ref_count = release_rc(array, index);
 
 	if (ref_count == 0) {
@@ -220,18 +189,16 @@ sqsh__sync_rc_map_release_index(struct SqshSyncRcMap *array, int index) {
 		array->cleanup(data);
 	}
 
-	pthread_mutex_unlock(&array->lock);
-
 	return 0;
 }
 
 size_t
-sqsh__sync_rc_map_size(const struct SqshSyncRcMap *array) {
+sqsh__rc_map_size(const struct SqshSyncRcMap *array) {
 	return array->size;
 }
 
 int
-sqsh__sync_rc_map_cleanup(struct SqshSyncRcMap *array) {
+sqsh__rc_map_cleanup(struct SqshSyncRcMap *array) {
 	void *data;
 	if (array->data != NULL) {
 		for (size_t i = 0; i < array->size; ++i) {
@@ -244,7 +211,6 @@ sqsh__sync_rc_map_cleanup(struct SqshSyncRcMap *array) {
 	free(array->ref_count);
 	array->ref_count = NULL;
 	array->size = 0;
-	pthread_mutex_destroy(&array->lock);
 
 	return 0;
 }

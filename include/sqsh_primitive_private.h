@@ -36,7 +36,6 @@
 
 #include "sqsh_common.h"
 
-#include <pthread.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -157,9 +156,9 @@ size_t sqsh__buffer_size(const struct SqshBuffer *buffer);
 int sqsh__buffer_cleanup(struct SqshBuffer *buffer);
 
 ////////////////////////////////////////
-// primitive/sync_rc_map.c
+// primitive/rc_map.c
 
-typedef void (*sqsh_sync_rc_map_cleanup_t)(void *data);
+typedef void (*sqsh_rc_map_cleanup_t)(void *data);
 
 struct SqshSyncRcMap {
 	/**
@@ -169,8 +168,7 @@ struct SqshSyncRcMap {
 	size_t size;
 	size_t element_size;
 	int *ref_count;
-	pthread_mutex_t lock;
-	sqsh_sync_rc_map_cleanup_t cleanup;
+	sqsh_rc_map_cleanup_t cleanup;
 };
 
 /**
@@ -184,9 +182,9 @@ struct SqshSyncRcMap {
  * @param cleanup The cleanup function.
  * @return 0 on success, a negative value on error.
  */
-int sqsh__sync_rc_map_init(
+int sqsh__rc_map_init(
 		struct SqshSyncRcMap *array, size_t size, size_t element_size,
-		sqsh_sync_rc_map_cleanup_t cleanup);
+		sqsh_rc_map_cleanup_t cleanup);
 
 /**
  * @internal
@@ -199,8 +197,8 @@ int sqsh__sync_rc_map_init(
  * @param span The number of indices to span. (Use 1 for a single index.)
  * @return 0 on success, a negative value on error.
  */
-const void *sqsh__sync_rc_map_set(
-		struct SqshSyncRcMap *array, int index, void *data, int span);
+const void *
+sqsh__rc_map_set(struct SqshSyncRcMap *array, int index, void *data, int span);
 
 /**
  * @internal
@@ -210,7 +208,7 @@ const void *sqsh__sync_rc_map_set(
  * @param array The array to get the size of.
  * @return The size of the array.
  */
-size_t sqsh__sync_rc_map_size(const struct SqshSyncRcMap *array);
+size_t sqsh__rc_map_size(const struct SqshSyncRcMap *array);
 
 /**
  * @internal
@@ -221,7 +219,7 @@ size_t sqsh__sync_rc_map_size(const struct SqshSyncRcMap *array);
  * @param index The index of the data.
  * @return A pointer to the retained data.
  */
-const void *sqsh__sync_rc_map_retain(struct SqshSyncRcMap *array, int *index);
+const void *sqsh__rc_map_retain(struct SqshSyncRcMap *array, int *index);
 
 /**
  * @internal
@@ -233,7 +231,7 @@ const void *sqsh__sync_rc_map_retain(struct SqshSyncRcMap *array, int *index);
  * @param element The element to release.
  * @return 0 on success, a negative value on error.
  */
-int sqsh__sync_rc_map_release(struct SqshSyncRcMap *array, const void *element);
+int sqsh__rc_map_release(struct SqshSyncRcMap *array, const void *element);
 
 /**
  * @internal
@@ -245,7 +243,7 @@ int sqsh__sync_rc_map_release(struct SqshSyncRcMap *array, const void *element);
  * @param index The index of the data to release.
  * @return 0 on success, a negative value on error.
  */
-int sqsh__sync_rc_map_release_index(struct SqshSyncRcMap *array, int index);
+int sqsh__rc_map_release_index(struct SqshSyncRcMap *array, int index);
 
 /**
  * @internal
@@ -255,7 +253,7 @@ int sqsh__sync_rc_map_release_index(struct SqshSyncRcMap *array, int index);
  * @param array The array to cleanup.
  * @return 0 on success, a negative value on error.
  */
-int sqsh__sync_rc_map_cleanup(struct SqshSyncRcMap *array);
+int sqsh__rc_map_cleanup(struct SqshSyncRcMap *array);
 
 ////////////////////////////////////////
 // primitive/lru.c
@@ -269,7 +267,6 @@ struct SqshLru {
 	sqsh_index_t *items;
 	sqsh_index_t ring_index;
 	size_t size;
-	pthread_mutex_t *lock;
 };
 
 /**

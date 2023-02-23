@@ -68,7 +68,7 @@ sqsh__map_manager_init(
 			sqsh__mapper_size(&manager->mapper),
 			sqsh__mapper_block_size(&manager->mapper));
 
-	rv = sqsh__sync_rc_map_init(
+	rv = sqsh__rc_map_init(
 			&manager->maps, map_size, sizeof(struct SqshMapping),
 			map_cleanup_cb);
 	if (rv < 0) {
@@ -96,7 +96,7 @@ sqsh__map_manager_block_size(const struct SqshMapManager *manager) {
 
 size_t
 sqsh__map_manager_block_count(const struct SqshMapManager *manager) {
-	return sqsh__sync_rc_map_size(&manager->maps);
+	return sqsh__rc_map_size(&manager->maps);
 }
 
 static int
@@ -127,7 +127,7 @@ load_mapping(
 		goto out;
 	}
 
-	*target = sqsh__sync_rc_map_set(&manager->maps, index, &mapping, span);
+	*target = sqsh__rc_map_set(&manager->maps, index, &mapping, span);
 
 out:
 	return rv;
@@ -148,7 +148,7 @@ sqsh__map_manager_get(
 		goto out;
 	}
 
-	*target = sqsh__sync_rc_map_retain(&manager->maps, &real_index);
+	*target = sqsh__rc_map_retain(&manager->maps, &real_index);
 
 	if (*target == NULL) {
 		rv = load_mapping(manager, target, index, span);
@@ -170,7 +170,7 @@ sqsh__map_manager_release(
 		goto out;
 	}
 
-	sqsh__sync_rc_map_release(&manager->maps, mapping);
+	sqsh__rc_map_release(&manager->maps, mapping);
 	if (rv < 0) {
 		goto out;
 	}
@@ -183,7 +183,7 @@ out:
 int
 sqsh__map_manager_cleanup(struct SqshMapManager *manager) {
 	sqsh__lru_cleanup(&manager->lru);
-	sqsh__sync_rc_map_cleanup(&manager->maps);
+	sqsh__rc_map_cleanup(&manager->maps);
 	sqsh__mapper_cleanup(&manager->mapper);
 
 	pthread_mutex_destroy(&manager->lock);

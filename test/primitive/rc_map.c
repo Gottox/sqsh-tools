@@ -29,7 +29,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sync_rc_map.c
+ * @file         rc_map.c
  */
 
 #include "../common.h"
@@ -55,10 +55,10 @@ init_rc_map(void) {
 	int rv;
 	struct SqshSyncRcMap map;
 
-	rv = sqsh__sync_rc_map_init(&map, 128, sizeof(uint8_t), rc_map_deinit);
+	rv = sqsh__rc_map_init(&map, 128, sizeof(uint8_t), rc_map_deinit);
 	assert(rv == 0);
 
-	rv = sqsh__sync_rc_map_cleanup(&map);
+	rv = sqsh__rc_map_cleanup(&map);
 	assert(rv == 0);
 }
 
@@ -68,81 +68,24 @@ set_and_get_element(void) {
 	struct SqshSyncRcMap map;
 	uint8_t data = 23;
 
-	rv = sqsh__sync_rc_map_init(&map, 128, sizeof(uint8_t), rc_map_deinit);
+	rv = sqsh__rc_map_init(&map, 128, sizeof(uint8_t), rc_map_deinit);
 	assert(rv == 0);
 
 	int index = 42;
-	const uint8_t *set_ptr = sqsh__sync_rc_map_set(&map, index, &data, 1);
+	const uint8_t *set_ptr = sqsh__rc_map_set(&map, index, &data, 1);
 	assert(rv == 0);
 	assert(set_ptr != &data);
 
-	const uint8_t *get_ptr = sqsh__sync_rc_map_retain(&map, &index);
+	const uint8_t *get_ptr = sqsh__rc_map_retain(&map, &index);
 	assert(rv == 0);
 	assert(get_ptr != &data);
 	assert(get_ptr == get_ptr);
 
-	rv = sqsh__sync_rc_map_cleanup(&map);
-	assert(rv == 0);
-}
-
-static void *
-multithreaded_concurrent_get_worker(void *arg) {
-	struct SqshSyncRcMap *map = arg;
-	size_t size = sqsh__sync_rc_map_size(map);
-	int rv;
-	static const size_t repeat_count = 10000;
-
-	for (sqsh_index_t i = 0; i < repeat_count; i++) {
-		struct timespec ts = {.tv_sec = 0, .tv_nsec = rand() % 100000};
-		int index = rand() % size;
-		const uint64_t *get_ptr = sqsh__sync_rc_map_retain(map, &index);
-		assert(get_ptr != NULL);
-		assert(*get_ptr == (uint64_t)index);
-		nanosleep(&ts, NULL);
-		rv = sqsh__sync_rc_map_release(map, get_ptr);
-		assert(rv == 0);
-	}
-	return NULL;
-}
-
-static void
-multithreaded_concurrent_get(void) {
-	int rv;
-	const size_t element_count = 2048;
-	struct SqshSyncRcMap map;
-	pthread_t threads[16] = {0};
-
-	rv = sqsh__sync_rc_map_init(
-			&map, element_count, sizeof(uint64_t), rc_map_deinit);
-	assert(rv == 0);
-
-	for (sqsh_index_t i = 0; i < element_count; i++) {
-		int index = i;
-		uint64_t data = i;
-		const uint64_t *set_ptr = sqsh__sync_rc_map_set(&map, index, &data, 1);
-		assert(rv == 0);
-		assert(set_ptr != &data);
-
-		assert(rv == 0);
-	}
-
-	for (unsigned long i = 0; i < LENGTH(threads); i++) {
-		rv = pthread_create(
-				&threads[i], NULL, multithreaded_concurrent_get_worker, &map);
-		assert(rv == 0);
-	}
-
-	for (unsigned long i = 0; i < LENGTH(threads); i++) {
-		rv = pthread_join(threads[i], NULL);
-		assert(rv == 0);
-	}
-
-	rv = sqsh__sync_rc_map_cleanup(&map);
+	rv = sqsh__rc_map_cleanup(&map);
 	assert(rv == 0);
 }
 
 DEFINE
 TEST(init_rc_map);
 TEST(set_and_get_element);
-TEST(multithreaded_concurrent_get);
 DEFINE_END

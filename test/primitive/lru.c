@@ -29,7 +29,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sync_rc_map.c
+ * @file         rc_map.c
  */
 
 #include "../common.h"
@@ -56,7 +56,7 @@ init_lru(void) {
 	struct SqshLru lru = {0};
 	struct SqshSyncRcMap map = {0};
 
-	rv = sqsh__sync_rc_map_init(&map, 128, sizeof(uint8_t), rc_map_deinit);
+	rv = sqsh__rc_map_init(&map, 128, sizeof(uint8_t), rc_map_deinit);
 	assert(rv == 0);
 
 	rv = sqsh__lru_init(&lru, 10, &map);
@@ -65,74 +65,10 @@ init_lru(void) {
 	rv = sqsh__lru_cleanup(&lru);
 	assert(rv == 0);
 
-	rv = sqsh__sync_rc_map_cleanup(&map);
-	assert(rv == 0);
-}
-
-static void *
-multithreaded_concurrent_touch_worker(void *arg) {
-	struct SqshLru *lru = arg;
-	struct SqshSyncRcMap *map = lru->backend;
-	size_t size = sqsh__sync_rc_map_size(map);
-	int rv;
-	static const size_t repeat_count = 10000;
-
-	for (sqsh_index_t i = 0; i < repeat_count; i++) {
-		struct timespec ts = {.tv_sec = 0, .tv_nsec = rand() % 100000};
-		int index = rand() % size;
-		const uint64_t *get_ptr = sqsh__sync_rc_map_retain(map, &index);
-		sqsh__lru_touch(lru, index);
-		assert(get_ptr != NULL);
-		assert(*get_ptr == (uint64_t)index);
-		nanosleep(&ts, NULL);
-		rv = sqsh__sync_rc_map_release(map, get_ptr);
-		assert(rv == 0);
-	}
-	return NULL;
-}
-
-static void
-multithreaded_concurrent_touch(void) {
-	int rv;
-	const size_t element_count = 2048;
-	struct SqshSyncRcMap map;
-	pthread_t threads[16] = {0};
-	struct SqshLru lru = {0};
-
-	rv = sqsh__sync_rc_map_init(
-			&map, element_count, sizeof(uint64_t), rc_map_deinit);
-	assert(rv == 0);
-	rv = sqsh__lru_init(&lru, 10, &map);
-
-	for (sqsh_index_t i = 0; i < element_count; i++) {
-		int index = i;
-		uint64_t data = i;
-		const uint64_t *set_ptr = sqsh__sync_rc_map_set(&map, index, &data, 1);
-		assert(rv == 0);
-		assert(set_ptr != &data);
-
-		assert(rv == 0);
-	}
-
-	for (unsigned long i = 0; i < LENGTH(threads); i++) {
-		rv = pthread_create(
-				&threads[i], NULL, multithreaded_concurrent_touch_worker, &lru);
-		assert(rv == 0);
-	}
-
-	for (unsigned long i = 0; i < LENGTH(threads); i++) {
-		rv = pthread_join(threads[i], NULL);
-		assert(rv == 0);
-	}
-
-	rv = sqsh__lru_cleanup(&lru);
-	assert(rv == 0);
-
-	rv = sqsh__sync_rc_map_cleanup(&map);
+	rv = sqsh__rc_map_cleanup(&map);
 	assert(rv == 0);
 }
 
 DEFINE
 TEST(init_lru);
-TEST(multithreaded_concurrent_touch);
 DEFINE_END

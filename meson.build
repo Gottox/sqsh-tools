@@ -67,7 +67,7 @@ sqsh_src = [
 	'src/metablock/metablock_iterator.c',
 	'src/primitive/buffer.c',
 	'src/primitive/lru.c',
-	'src/primitive/sync_rc_map.c',
+	'src/primitive/rc_map.c',
 	'src/sqsh.c',
 	'src/table/table.c',
 	'src/xattr/xattr_iterator.c',
@@ -82,7 +82,7 @@ sqsh_test = [
 	'test/metablock/metablock_iterator.c',
 	'test/primitive/buffer.c',
 	'test/primitive/lru.c',
-	'test/primitive/sync_rc_map.c',
+	'test/primitive/rc_map.c',
 ]
 sqsh_test_util = [
 	'test/util.c',

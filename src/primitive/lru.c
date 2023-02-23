@@ -81,7 +81,6 @@ sqsh__lru_init(
 		lru->items[i] = EMPTY_MARKER;
 	}
 	lru->ring_index = 0;
-	lru->lock = &backend->lock;
 
 	return 0;
 }
@@ -91,7 +90,6 @@ sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t index) {
 	if (lru->size == 0) {
 		return 0;
 	}
-	pthread_mutex_lock(lru->lock);
 
 	sqsh_index_t ring_index = lru->ring_index;
 	size_t size = lru->size;
@@ -103,23 +101,21 @@ sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t index) {
 	sqsh_index_t old_index = lru->items[ring_index];
 
 	if (old_index == index || last_index == index) {
-		goto out;
+		return 0;
 	}
 
 	debug_print(lru, '-', ring_index);
 	if (old_index != EMPTY_MARKER) {
-		sqsh__sync_rc_map_release_index(backend, old_index);
+		sqsh__rc_map_release_index(backend, old_index);
 	}
 
 	lru->items[ring_index] = index;
 	debug_print(lru, '+', ring_index);
 	int real_index = index;
-	sqsh__sync_rc_map_retain(backend, &real_index);
+	sqsh__rc_map_retain(backend, &real_index);
 
 	lru->ring_index = ring_index;
 
-out:
-	pthread_mutex_unlock(lru->lock);
 	return 0;
 }
 
@@ -128,7 +124,7 @@ sqsh__lru_cleanup(struct SqshLru *lru) {
 	for (size_t i = 0; i < lru->size; i++) {
 		sqsh_index_t index = lru->items[i];
 		if (index != EMPTY_MARKER) {
-			sqsh__sync_rc_map_release_index(lru->backend, index);
+			sqsh__rc_map_release_index(lru->backend, index);
 		}
 	}
 	free(lru->items);
