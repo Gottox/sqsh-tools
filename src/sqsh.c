@@ -77,9 +77,9 @@ sqsh__init(
 	memset(&sqsh->map_manager, 0, sizeof(struct SqshMapManager));
 
 	if (config != NULL) {
-		config = memcpy(&sqsh->config, config, sizeof(struct SqshConfig));
+		memcpy(&sqsh->config, config, sizeof(struct SqshConfig));
 	} else {
-		config = memset(&sqsh->config, 0, sizeof(struct SqshConfig));
+		memset(&sqsh->config, 0, sizeof(struct SqshConfig));
 	}
 
 	config = sqsh_config(sqsh);
