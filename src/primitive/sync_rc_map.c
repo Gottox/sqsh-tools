@@ -79,7 +79,7 @@ sqsh__sync_rc_map_init(
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
-	array->ref_count = calloc(size, sizeof(size_t));
+	array->ref_count = calloc(size, sizeof(*array->ref_count));
 	if (array->ref_count == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
