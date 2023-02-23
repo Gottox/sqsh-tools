@@ -44,10 +44,7 @@ mk_stub(struct Sqsh *sqsh, uint8_t *payload, size_t payload_size,
 	memcpy(&data[SQSH_SIZEOF_SUPERBLOCK], payload, payload_size);
 
 	*target_size = SQSH_SIZEOF_SUPERBLOCK + payload_size;
-	const struct SqshConfig config = {
-			.source_size = *target_size,
-			.source_mapper = sqsh_mapper_impl_static,
-	};
+	const struct SqshConfig config = DEFAULT_CONFIG(*target_size);
 	rv = sqsh__init(sqsh, data, &config);
 	assert(0 == rv);
 	(void)rv;

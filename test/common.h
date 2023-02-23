@@ -62,6 +62,19 @@
 
 #define CHUNK_SIZE(...) sizeof((uint8_t[]){__VA_ARGS__})
 
+#define DEFAULT_MAPPER sqsh_mapper_impl_static
+// We're using a ridiculously small block size to
+// test the mappers ability to handle small blocks.
+#define DEFAULT_BLOCK_SIZE 1
+
+#define DEFAULT_CONFIG(s) \
+	(struct SqshConfig) { \
+		.source_size = (s), .source_mapper = DEFAULT_MAPPER, \
+		.mapper_block_size = DEFAULT_BLOCK_SIZE, \
+	}
+
+#define LENGTH(x) (sizeof(x) / sizeof(x[0]))
+
 uint8_t *
 mk_stub(struct Sqsh *sqsh, uint8_t *payload, size_t payload_size,
 		size_t *target_size);

@@ -46,10 +46,7 @@ static void
 sqsh_empty(void) {
 	int rv;
 	struct Sqsh sqsh = {0};
-	const struct SqshConfig config = {
-			.source_mapper = sqsh_mapper_impl_static,
-			.source_size = 0,
-	};
+	const struct SqshConfig config = DEFAULT_CONFIG(0);
 	rv = sqsh__init(&sqsh, NULL, &config);
 	assert(rv == -SQSH_ERROR_SUPERBLOCK_TOO_SMALL);
 }
@@ -61,10 +58,7 @@ sqsh_get_nonexistant(void) {
 	struct Sqsh sqsh = {0};
 	struct SqshPathResolverContext resolver = {0};
 
-	const struct SqshConfig config = {
-			.source_mapper = sqsh_mapper_impl_static,
-			.source_size = sizeof(squash_image),
-	};
+	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(squash_image));
 	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
@@ -90,10 +84,7 @@ sqsh_ls(void) {
 	struct SqshDirectoryIterator *iter = NULL;
 	struct Sqsh sqsh = {0};
 	const struct SqshSuperblockContext *superblock;
-	const struct SqshConfig config = {
-			.source_mapper = sqsh_mapper_impl_static,
-			.source_size = sizeof(squash_image),
-	};
+	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(squash_image));
 	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
@@ -150,10 +141,7 @@ sqsh_cat_fragment(void) {
 	struct SqshFileContext file = {0};
 	struct Sqsh sqsh = {0};
 	struct SqshPathResolverContext resolver = {0};
-	const struct SqshConfig config = {
-			.source_mapper = sqsh_mapper_impl_static,
-			.source_size = sizeof(squash_image),
-	};
+	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(squash_image));
 	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
@@ -699,10 +687,7 @@ fuzz_crash_7(void) {
 
 	struct SqshTable *id_table = NULL;
 	struct Sqsh sqsh = {0};
-	const struct SqshConfig config = {
-			.source_mapper = sqsh_mapper_impl_static,
-			.source_size = sizeof(input),
-	};
+	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(input));
 	rv = sqsh__init(&sqsh, input, &config);
 	assert(rv == 0);
 	rv = sqsh_id_table(&sqsh, &id_table);
@@ -723,14 +708,10 @@ fuzz_crash_8(void) {
 			0x0, 0x0, 0x0,  0x0,  0x0,  0x0,  0x0, 0x0,  0x0, 0x0, 0x0,
 			0x0, 0x0, 0x0,  0x0,  0x0,  0x0,  0x0, 0x0,  0x0, 0x0, 0x0,
 			0x0, 0x0, 0xff, 0xff, 0xff, 0xff, 0x0, 0xe4, 0x0,
-
 	};
 
 	struct Sqsh sqsh = {0};
-	const struct SqshConfig config = {
-			.source_mapper = sqsh_mapper_impl_static,
-			.source_size = sizeof(input),
-	};
+	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(input));
 	rv = sqsh__init(&sqsh, input, &config);
 	assert(rv != 0);
 	sqsh__cleanup(&sqsh);
@@ -755,8 +736,6 @@ struct Walker {
 	struct Sqsh *sqsh;
 	uint64_t inode_number;
 };
-
-#define LENGTH(x) (sizeof(x) / sizeof(x[0]))
 
 static void *
 multithreaded_walker(void *arg) {
@@ -792,10 +771,7 @@ multithreaded(void) {
 	pthread_t threads[16] = {0};
 	struct Sqsh sqsh = {0};
 
-	const struct SqshConfig config = {
-			.source_mapper = sqsh_mapper_impl_static,
-			.source_size = sizeof(squash_image),
-	};
+	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(squash_image));
 	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
