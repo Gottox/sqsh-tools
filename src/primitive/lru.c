@@ -66,7 +66,6 @@ debug_print(const struct SqshLru *lru, const char msg) {
 int
 sqsh__lru_init(
 		struct SqshLru *lru, size_t size, struct SqshSyncRcMap *backend) {
-	int rv;
 	lru->backend = backend;
 	lru->size = size;
 	if (size == 0) {
@@ -78,10 +77,7 @@ sqsh__lru_init(
 		return -SQSH_ERROR_MALLOC_FAILED;
 	}
 	lru->ring_index = 0;
-	rv = pthread_mutex_init(&lru->lock, NULL);
-	if (rv != 0) {
-		return -SQSH_ERROR_TODO;
-	}
+	lru->lock = &backend->lock;
 
 	return 0;
 }
@@ -118,7 +114,7 @@ sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t index) {
 	if (lru->size == 0) {
 		return 0;
 	}
-	pthread_mutex_lock(&lru->lock);
+	pthread_mutex_lock(lru->lock);
 
 	advance(lru);
 
@@ -127,7 +123,7 @@ sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t index) {
 		release_backend(lru, old_id);
 	}
 
-	pthread_mutex_unlock(&lru->lock);
+	pthread_mutex_unlock(lru->lock);
 	return 0;
 }
 
@@ -138,7 +134,6 @@ sqsh__lru_cleanup(struct SqshLru *lru) {
 		release_backend(lru, lru->items[lru->ring_index]);
 	}
 	free(lru->items);
-	pthread_mutex_destroy(&lru->lock);
 	lru->size = 0;
 	lru->items = NULL;
 	return 0;

@@ -269,7 +269,7 @@ struct SqshLru {
 	sqsh_index_t *items;
 	sqsh_index_t ring_index;
 	size_t size;
-	pthread_mutex_t lock;
+	pthread_mutex_t *lock;
 };
 
 /**

@@ -31,6 +31,8 @@
  * @file         ref_count_array.c
  */
 
+#define _GNU_SOURCE
+
 #include "../../include/sqsh_primitive_private.h"
 
 #include "../../include/sqsh_error.h"
@@ -71,6 +73,7 @@ sqsh__sync_rc_map_init(
 		struct SqshSyncRcMap *array, size_t size, size_t element_size,
 		sqsh_sync_rc_map_cleanup_t cleanup) {
 	int rv = 0;
+	pthread_mutexattr_t attr;
 	array->data = calloc(size, element_size);
 	if (array->data == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
@@ -82,7 +85,9 @@ sqsh__sync_rc_map_init(
 		goto out;
 	}
 
-	rv = pthread_mutex_init(&array->lock, NULL);
+	pthread_mutexattr_init(&attr);
+	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+	rv = pthread_mutex_init(&array->lock, &attr);
 	array->size = size;
 	array->cleanup = cleanup;
 	array->element_size = element_size;
