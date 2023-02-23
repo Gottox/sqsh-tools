@@ -31,36 +31,37 @@
  * @file         lru.c
  */
 
+#include <stdint.h>
+#define _GNU_SOURCE
+
 #include "../../include/sqsh_primitive_private.h"
 
 #include "../../include/sqsh_error.h"
 #include "../utils.h"
 
 #include <assert.h>
+#include <stdio.h>
 
-#if 1
-#	include <stdio.h>
+#define EMPTY_MARKER SIZE_MAX
 
+#if 0
 static void
-debug_print(const struct SqshLru *lru, const char msg) {
-	int backend_index = lru->items[lru->ring_index] - 1;
+debug_print(const struct SqshLru *lru, const char msg, sqsh_index_t ring_index) {
+	sqsh_index_t backend_index = lru->items[ring_index];
 
-	fprintf(stderr, "%clru %p %lu:", msg, (void *)lru, lru->ring_index);
-	if (backend_index < 0) {
-		fputs("empty\n", stderr);
-	} else {
-		size_t sum = 0;
-		for (size_t i = 0; i < lru->size; i++) {
-			int index = lru->items[i] - 1;
-			if (index == backend_index) {
-				sum++;
-			}
+	fprintf(stderr, "%clru %lu: ", msg, ring_index);
+	size_t sum = 0;
+	for (size_t i = 0; i < lru->size; i++) {
+		sqsh_index_t cur_index = lru->items[i];
+		if (cur_index == backend_index) {
+			sum++;
 		}
-		fprintf(stderr, "%d refs: %lu\n", backend_index, sum);
 	}
+	fprintf(stderr, "idx: %lu refs: %lu\n", backend_index, sum);
+	fflush(stderr);
 }
 #else
-#	define debug_info(...)
+#	define debug_print(...)
 #endif
 
 int
@@ -76,37 +77,13 @@ sqsh__lru_init(
 	if (lru->items == NULL) {
 		return -SQSH_ERROR_MALLOC_FAILED;
 	}
+	for (size_t i = 0; i < lru->size; i++) {
+		lru->items[i] = EMPTY_MARKER;
+	}
 	lru->ring_index = 0;
 	lru->lock = &backend->lock;
 
 	return 0;
-}
-
-void
-advance(struct SqshLru *lru) {
-	lru->ring_index = (lru->ring_index + 1) % lru->size;
-}
-
-int
-retain_backend(const struct SqshLru *lru, sqsh_index_t backend_index) {
-	int real_backend_index = (int)backend_index;
-	sqsh__sync_rc_map_retain(lru->backend, &real_backend_index);
-	int old_index = lru->items[lru->ring_index];
-	lru->items[lru->ring_index] = backend_index + 1;
-
-	debug_print(lru, '+');
-	return old_index;
-}
-
-void
-release_backend(const struct SqshLru *lru, int id) {
-	if (id == 0) {
-		return;
-	}
-
-	int backend_index = id - 1;
-	sqsh__sync_rc_map_release_index(lru->backend, backend_index);
-	debug_print(lru, '-');
 }
 
 int
@@ -116,13 +93,32 @@ sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t index) {
 	}
 	pthread_mutex_lock(lru->lock);
 
-	advance(lru);
+	sqsh_index_t ring_index = lru->ring_index;
+	size_t size = lru->size;
+	struct SqshSyncRcMap *backend = lru->backend;
+	sqsh_index_t last_index = lru->items[ring_index];
 
-	if (lru->items[lru->ring_index] != index + 1) {
-		int old_id = retain_backend(lru, index);
-		release_backend(lru, old_id);
+	ring_index = (ring_index + 1) % size;
+
+	sqsh_index_t old_index = lru->items[ring_index];
+
+	if (old_index == index || last_index == index) {
+		goto out;
 	}
 
+	debug_print(lru, '-', ring_index);
+	if (old_index != EMPTY_MARKER) {
+		sqsh__sync_rc_map_release_index(backend, old_index);
+	}
+
+	lru->items[ring_index] = index;
+	debug_print(lru, '+', ring_index);
+	int real_index = index;
+	sqsh__sync_rc_map_retain(backend, &real_index);
+
+	lru->ring_index = ring_index;
+
+out:
 	pthread_mutex_unlock(lru->lock);
 	return 0;
 }
@@ -130,8 +126,10 @@ sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t index) {
 int
 sqsh__lru_cleanup(struct SqshLru *lru) {
 	for (size_t i = 0; i < lru->size; i++) {
-		advance(lru);
-		release_backend(lru, lru->items[lru->ring_index]);
+		sqsh_index_t index = lru->items[i];
+		if (index != EMPTY_MARKER) {
+			sqsh__sync_rc_map_release_index(lru->backend, index);
+		}
 	}
 	free(lru->items);
 	lru->size = 0;
