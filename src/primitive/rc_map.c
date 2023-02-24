@@ -106,19 +106,10 @@ get_element(struct SqshSyncRcMap *array, int index) {
 }
 
 int
-create_rc(struct SqshSyncRcMap *array, int index) {
-	array->ref_count[index] = 1;
-
-	debug_print(array, index, 'c');
-
-	return 1;
-}
-
-int
 retain_rc(struct SqshSyncRcMap *array, int index) {
 	int ref_count = ++array->ref_count[index];
 
-	assert(ref_count > 1);
+	assert(ref_count >= 1);
 	debug_print(array, index, '+');
 
 	return ref_count;
@@ -151,7 +142,7 @@ sqsh__rc_map_set(struct SqshSyncRcMap *array, int index, void *data, int span) {
 
 	memcpy(target, data, array->element_size);
 
-	create_rc(array, index);
+	retain_rc(array, index);
 
 	return target;
 }
