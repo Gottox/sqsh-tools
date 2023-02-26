@@ -43,6 +43,43 @@
 extern "C" {
 #endif
 
+////////////////////////////////////////
+// archive/superblock_context.c
+
+struct SqshSuperblockContext {
+	/**
+	 * @privatesection
+	 */
+	struct SqshMapCursor cursor;
+};
+
+/**
+ * @internal
+ * @memberof SqshSuperblockContext
+ * @brief Initializes a superblock context.
+ *
+ * @param[out] context The context to initialize.
+ * @param[in]  mapper  The mapper to use for the superblock.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+SQSH_NO_UNUSED int sqsh__superblock_init(
+		struct SqshSuperblockContext *context, struct SqshMapManager *mapper);
+
+/**
+ * @internal
+ * @memberof SqshSuperblockContext
+ * @brief Cleans up a superblock context.
+ *
+ * @param[in] superblock The context to clean up.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+int sqsh__superblock_cleanup(struct SqshSuperblockContext *superblock);
+
+////////////////////////////////////////
+// archive/archive.c
+
 /**
  * @brief The Sqsh struct contains all information about the current
  * sqsh session.

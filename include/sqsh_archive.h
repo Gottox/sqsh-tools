@@ -197,6 +197,233 @@ SQSH_NO_UNUSED int sqsh_archive_xattr_table(
  */
 int sqsh_archive_free(struct SqshArchive *archive);
 
+////////////////////////////////////////
+// archive/superblock_context.c
+
+enum SqshSuperblockCompressionId {
+	SQSH_COMPRESSION_GZIP = 1,
+	SQSH_COMPRESSION_LZMA = 2,
+	SQSH_COMPRESSION_LZO = 3,
+	SQSH_COMPRESSION_XZ = 4,
+	SQSH_COMPRESSION_LZ4 = 5,
+	SQSH_COMPRESSION_ZSTD = 6,
+};
+
+enum SqshSuperblockFlags {
+	SQSH_SUPERBLOCK_UNCOMPRESSED_INODES = 0x0001,
+	SQSH_SUPERBLOCK_UNCOMPRESSED_DATA = 0x0002,
+	SQSH_SUPERBLOCK_CHECK = 0x0004,
+	SQSH_SUPERBLOCK_UNCOMPRESSED_FRAGMENTS = 0x0008,
+	SQSH_SUPERBLOCK_NO_FRAGMENTS = 0x0010,
+	SQSH_SUPERBLOCK_ALWAYS_FRAGMENTS = 0x0020,
+	SQSH_SUPERBLOCK_DUPLICATES = 0x0040,
+	SQSH_SUPERBLOCK_EXPORTABLE = 0x0080,
+	SQSH_SUPERBLOCK_UNCOMPRESSED_XATTRS = 0x0100,
+	SQSH_SUPERBLOCK_NO_XATTRS = 0x0200,
+	SQSH_SUPERBLOCK_COMPRESSOR_OPTIONS = 0x0400,
+	SQSH_SUPERBLOCK_UNCOMPRESSED_IDS = 0x0800,
+};
+
+struct SqshSuperblockContext;
+
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the compression id of a superblock context.
+ *
+ * @param[in] context The superblock context to retrieve the compression id
+ * from.
+ *
+ * @return The compression id of the superblock context.
+ */
+enum SqshSuperblockCompressionId
+sqsh_superblock_compression_id(const struct SqshSuperblockContext *context);
+
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the start offset of the directory table in a superblock
+ * context.
+ *
+ * @param[in] context The superblock context to retrieve the directory table
+ * start offset from.
+ *
+ * @return The start offset of the directory table in the superblock context.
+ */
+uint64_t sqsh_superblock_directory_table_start(
+		const struct SqshSuperblockContext *context);
+
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the start offset of the fragment table in a superblock
+ * context.
+ *
+ * @param[in] context The superblock context to retrieve the fragment table
+ * start offset from.
+ *
+ * @return The start offset of the fragment table in the superblock context.
+ */
+uint64_t sqsh_superblock_fragment_table_start(
+		const struct SqshSuperblockContext *context);
+
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the number of inodes in an archive.
+ *
+ * @param[in] context The superblock context to retrieve the inode count from.
+ *
+ * @return The number of inodes in the superblock context.
+ */
+uint32_t
+sqsh_superblock_inode_count(const struct SqshSuperblockContext *context);
+
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the start offset of the inode table in an archive.
+ *
+ * @param[in] context The superblock context to retrieve the inode table start
+ * offset from.
+ *
+ * @return The start offset of the inode table in the superblock context.
+ */
+uint64_t
+sqsh_superblock_inode_table_start(const struct SqshSuperblockContext *context);
+
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the start offset of the id table in an archive.
+ *
+ * @param[in] context The superblock context to retrieve the id table start
+ * offset from.
+ *
+ * @return The start offset of the id table in the superblock context.
+ */
+uint64_t
+sqsh_superblock_id_table_start(const struct SqshSuperblockContext *context);
+
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the number of ids in an archive.
+ *
+ * @param[in] context The superblock context to retrieve the ids count from.
+ *
+ * @return The number of inodes in the superblock context.
+ */
+uint16_t sqsh_superblock_id_count(const struct SqshSuperblockContext *context);
+
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the start offset of the export table in an archive.
+ *
+ * @param[in] context The superblock context to retrieve the export table start
+ * offset from.
+ *
+ * @return The start offset of the export table in the superblock context.
+ */
+uint64_t
+sqsh_superblock_export_table_start(const struct SqshSuperblockContext *context);
+
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the start offset of the xattr id table in an archive.
+ *
+ * @param[in] context The superblock context to retrieve the xattr id table
+ * start offset from.
+ *
+ * @return The start offset of the xattr id table in the superblock context.
+ */
+uint64_t sqsh_superblock_xattr_id_table_start(
+		const struct SqshSuperblockContext *context);
+
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the reference of the root inode in a superblock context.
+ *
+ * @param[in] context The superblock context to retrieve the root inode
+ * reference from.
+ *
+ * @return The reference of the root inode in the superblock context.
+ */
+uint64_t
+sqsh_superblock_inode_root_ref(const struct SqshSuperblockContext *context);
+
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Checks if a superblock context has fragment table.
+ *
+ * @param[in] context The superblock context to check.
+ *
+ * @return True if the superblock context has a fragment table, false otherwise.
+ */
+bool sqsh_superblock_has_fragments(const struct SqshSuperblockContext *context);
+
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Checks if a superblock context has an export table.
+ *
+ * @param[in] context The superblock context to check.
+ *
+ * @return True if the superblock context has an export table, false otherwise.
+ */
+bool
+sqsh_superblock_has_export_table(const struct SqshSuperblockContext *context);
+
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Checks if a superblock context has compression options.
+ *
+ * @param[in] context The superblock context to check.
+ *
+ * @return True if the superblock context has compression options, false
+ * otherwise.
+ */
+bool sqsh_superblock_has_compression_options(
+		const struct SqshSuperblockContext *context);
+
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the block size of a superblock context.
+ *
+ * @param[in] context The superblock context to retrieve the block size from.
+ *
+ * @return The block size of the superblock context.
+ */
+uint32_t
+sqsh_superblock_block_size(const struct SqshSuperblockContext *context);
+
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the modification time of a superblock context.
+ *
+ * @param[in] context The superblock context to retrieve the modification time
+ * from.
+ *
+ * @return The modification time of the superblock context.
+ */
+uint32_t
+sqsh_superblock_modification_time(const struct SqshSuperblockContext *context);
+
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the number of fragment entries in a superblock context.
+ *
+ * @param[in] context The superblock context to retrieve the fragment entry
+ * count from.
+ *
+ * @return The number of fragment entries in the superblock context.
+ */
+uint32_t sqsh_superblock_fragment_entry_count(
+		const struct SqshSuperblockContext *context);
+
+/**
+ * @memberof SqshSuperblockContext
+ * @brief Retrieves the number of bytes used in a superblock context.
+ *
+ * @param[in] context The superblock context to retrieve the bytes used from.
+ *
+ * @return The number of bytes used in the superblock context.
+ */
+uint64_t
+sqsh_superblock_bytes_used(const struct SqshSuperblockContext *context);
+
 #ifdef __cplusplus
 }
 #endif

@@ -33,7 +33,7 @@
 
 #include "../../include/sqsh_compression_private.h"
 
-#include "../../include/sqsh_context.h"
+#include "../../include/sqsh_archive.h"
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_primitive_private.h"
 
