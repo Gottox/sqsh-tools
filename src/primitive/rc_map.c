@@ -68,7 +68,7 @@ debug_print(struct SqshSyncRcMap *array, int index, char msg) {
 
 int
 sqsh__rc_map_init(
-		struct SqshSyncRcMap *array, size_t size, size_t element_size,
+		struct SqshRcMap *array, size_t size, size_t element_size,
 		sqsh_rc_map_cleanup_t cleanup) {
 	int rv = 0;
 	array->data = calloc(size, element_size);
@@ -93,7 +93,7 @@ out:
 }
 
 static void *
-get_element(struct SqshSyncRcMap *array, int index) {
+get_element(struct SqshRcMap *array, int index) {
 	sqsh_index_t offset;
 
 	if (SQSH_MULT_OVERFLOW(index, array->element_size, &offset)) {
@@ -104,7 +104,7 @@ get_element(struct SqshSyncRcMap *array, int index) {
 }
 
 int
-retain_rc(struct SqshSyncRcMap *array, int index) {
+retain_rc(struct SqshRcMap *array, int index) {
 	int ref_count = ++array->ref_count[index];
 
 	assert(ref_count >= 1);
@@ -114,7 +114,7 @@ retain_rc(struct SqshSyncRcMap *array, int index) {
 }
 
 int
-release_rc(struct SqshSyncRcMap *array, int index) {
+release_rc(struct SqshRcMap *array, int index) {
 	int ref_count = --array->ref_count[index];
 
 	debug_print(array, index, '-');
@@ -125,7 +125,7 @@ release_rc(struct SqshSyncRcMap *array, int index) {
 }
 
 const void *
-sqsh__rc_map_set(struct SqshSyncRcMap *array, int index, void *data, int span) {
+sqsh__rc_map_set(struct SqshRcMap *array, int index, void *data, int span) {
 	(void)span;
 	void *target;
 
@@ -146,7 +146,7 @@ sqsh__rc_map_set(struct SqshSyncRcMap *array, int index, void *data, int span) {
 }
 
 const void *
-sqsh__rc_map_retain(struct SqshSyncRcMap *array, int *index) {
+sqsh__rc_map_retain(struct SqshRcMap *array, int *index) {
 	void *data = NULL;
 
 	if (array->ref_count[*index] != 0) {
@@ -159,7 +159,7 @@ sqsh__rc_map_retain(struct SqshSyncRcMap *array, int *index) {
 }
 
 int
-sqsh__rc_map_release(struct SqshSyncRcMap *array, const void *element) {
+sqsh__rc_map_release(struct SqshRcMap *array, const void *element) {
 	if (element == NULL) {
 		return 0;
 	}
@@ -170,7 +170,7 @@ sqsh__rc_map_release(struct SqshSyncRcMap *array, const void *element) {
 }
 
 int
-sqsh__rc_map_release_index(struct SqshSyncRcMap *array, int index) {
+sqsh__rc_map_release_index(struct SqshRcMap *array, int index) {
 	int ref_count = release_rc(array, index);
 
 	if (ref_count == 0) {
@@ -182,12 +182,12 @@ sqsh__rc_map_release_index(struct SqshSyncRcMap *array, int index) {
 }
 
 size_t
-sqsh__rc_map_size(const struct SqshSyncRcMap *array) {
+sqsh__rc_map_size(const struct SqshRcMap *array) {
 	return array->size;
 }
 
 int
-sqsh__rc_map_cleanup(struct SqshSyncRcMap *array) {
+sqsh__rc_map_cleanup(struct SqshRcMap *array) {
 	void *data;
 	if (array->data != NULL) {
 		for (size_t i = 0; i < array->size; ++i) {

@@ -53,7 +53,7 @@ rc_map_deinit(void *data) {
 static void
 init_rc_map(void) {
 	int rv;
-	struct SqshSyncRcMap map;
+	struct SqshRcMap map;
 
 	rv = sqsh__rc_map_init(&map, 128, sizeof(uint8_t), rc_map_deinit);
 	assert(rv == 0);
@@ -65,7 +65,7 @@ init_rc_map(void) {
 static void
 set_and_get_element(void) {
 	int rv;
-	struct SqshSyncRcMap map;
+	struct SqshRcMap map;
 	uint8_t data = 23;
 
 	rv = sqsh__rc_map_init(&map, 128, sizeof(uint8_t), rc_map_deinit);

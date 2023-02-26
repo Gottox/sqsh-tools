@@ -54,7 +54,7 @@ static void
 init_lru(void) {
 	int rv;
 	struct SqshLru lru = {0};
-	struct SqshSyncRcMap map = {0};
+	struct SqshRcMap map = {0};
 
 	rv = sqsh__rc_map_init(&map, 128, sizeof(uint8_t), rc_map_deinit);
 	assert(rv == 0);

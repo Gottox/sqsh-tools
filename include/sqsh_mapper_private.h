@@ -219,7 +219,7 @@ struct SqshMapManager {
 	 */
 	struct SqshMapper mapper;
 	struct SqshLru lru;
-	struct SqshSyncRcMap maps;
+	struct SqshRcMap maps;
 	pthread_mutex_t lock;
 };
 

@@ -63,8 +63,7 @@ debug_print(const struct SqshLru *lru, const char msg, sqsh_index_t ring_index) 
 #endif
 
 int
-sqsh__lru_init(
-		struct SqshLru *lru, size_t size, struct SqshSyncRcMap *backend) {
+sqsh__lru_init(struct SqshLru *lru, size_t size, struct SqshRcMap *backend) {
 	lru->backend = backend;
 	lru->size = size;
 	if (size == 0) {
@@ -91,7 +90,7 @@ sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t index) {
 
 	sqsh_index_t ring_index = lru->ring_index;
 	size_t size = lru->size;
-	struct SqshSyncRcMap *backend = lru->backend;
+	struct SqshRcMap *backend = lru->backend;
 	sqsh_index_t last_index = lru->items[ring_index];
 
 	ring_index = (ring_index + 1) % size;
