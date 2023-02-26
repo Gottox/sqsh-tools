@@ -754,6 +754,7 @@ multithreaded_walker(void *arg) {
 		while (sqsh_directory_iterator_next(iter) > 0) {
 			multithreaded_walker(&my_walker);
 		}
+		sqsh_directory_iterator_free(iter);
 	} else {
 		struct SqshFileContext *file = sqsh_file_new(inode, &rv);
 		size_t size = sqsh_file_size(file);
