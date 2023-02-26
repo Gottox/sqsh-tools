@@ -153,7 +153,7 @@ sqsh__map_manager_get(
 	if (*target == NULL) {
 		rv = load_mapping(manager, target, index, span);
 	}
-	sqsh__lru_touch(&manager->lru, real_index);
+	rv = sqsh__lru_touch(&manager->lru, real_index);
 
 out:
 	pthread_mutex_unlock(&manager->lock);
@@ -170,10 +170,7 @@ sqsh__map_manager_release(
 		goto out;
 	}
 
-	sqsh__rc_map_release(&manager->maps, mapping);
-	if (rv < 0) {
-		goto out;
-	}
+	rv = sqsh__rc_map_release(&manager->maps, mapping);
 
 	pthread_mutex_unlock(&manager->lock);
 out:
