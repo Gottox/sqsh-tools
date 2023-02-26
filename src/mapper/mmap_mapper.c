@@ -53,7 +53,7 @@ mmap_page_size(const struct SqshMapping *mapping) {
 	const sqsh_index_t offset = mapping->offset;
 	const size_t size = mapping->size;
 
-	return SQSH_PADDING(offset + size, mapping->mapper->data.mm.page_size);
+	return offset + size;
 }
 
 static int
