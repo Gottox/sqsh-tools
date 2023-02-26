@@ -256,7 +256,7 @@ sqsh_mapper_curl_map(
 
 out:
 	if (rv < 0) {
-		sqsh__mapping_unmap(mapping);
+		sqsh__mapping_cleanup(mapping);
 	}
 	pthread_mutex_unlock(lock);
 	return rv;

@@ -174,7 +174,7 @@ int sqsh__mapper_init(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__mapper_map(
+int sqsh__mapping_init(
 		struct SqshMapping *mapping, struct SqshMapper *mapper,
 		sqsh_index_t offset, size_t size);
 
@@ -231,7 +231,7 @@ const uint8_t *sqsh__mapping_data(const struct SqshMapping *mapping);
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__mapping_unmap(struct SqshMapping *mapping);
+int sqsh__mapping_cleanup(struct SqshMapping *mapping);
 
 ////////////////////////////////////////
 // mapper/map_manager.c

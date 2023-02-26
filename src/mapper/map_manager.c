@@ -42,7 +42,7 @@
 static void
 map_cleanup_cb(void *data) {
 	struct SqshMapping *mapping = data;
-	sqsh__mapping_unmap(mapping);
+	sqsh__mapping_cleanup(mapping);
 }
 
 int
@@ -122,7 +122,7 @@ load_mapping(
 		size = file_size % block_size;
 	}
 
-	rv = sqsh__mapper_map(&mapping, &manager->mapper, offset, size);
+	rv = sqsh__mapping_init(&mapping, &manager->mapper, offset, size);
 	if (rv < 0) {
 		goto out;
 	}

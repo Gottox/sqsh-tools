@@ -66,7 +66,7 @@ sqsh__mapper_init(
 }
 
 int
-sqsh__mapper_map(
+sqsh__mapping_init(
 		struct SqshMapping *mapping, struct SqshMapper *mapper,
 		sqsh_index_t offset, size_t size) {
 	size_t end_offset;
@@ -110,7 +110,7 @@ sqsh__mapping_data(const struct SqshMapping *mapping) {
 }
 
 int
-sqsh__mapping_unmap(struct SqshMapping *mapping) {
+sqsh__mapping_cleanup(struct SqshMapping *mapping) {
 	int rv = 0;
 	if (mapping->mapper) {
 		rv = mapping->mapper->impl->unmap(mapping);
