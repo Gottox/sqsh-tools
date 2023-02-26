@@ -143,7 +143,8 @@ next_compressed(void) {
 
 	assert(sqsh__metablock_iterator_size(&iter) == CHUNK_SIZE(ZLIB_ABCD));
 
-	sqsh__metablock_iterator_append_to_buffer(&iter, &buffer);
+	rv = sqsh__metablock_iterator_append_to_buffer(&iter, &buffer);
+	assert(rv == 0);
 
 	assert(sqsh__buffer_size(&buffer) == 4);
 
@@ -157,7 +158,8 @@ next_compressed(void) {
 
 	assert(sqsh__metablock_iterator_size(&iter) == CHUNK_SIZE(ZLIB_EFGH));
 
-	sqsh__metablock_iterator_append_to_buffer(&iter, &buffer);
+	rv = sqsh__metablock_iterator_append_to_buffer(&iter, &buffer);
+	assert(rv == 0);
 
 	assert(sqsh__buffer_size(&buffer) == 4);
 
