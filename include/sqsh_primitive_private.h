@@ -265,7 +265,7 @@ struct SqshRcHashMap {
 	 * @privatesection
 	 */
 	sqsh_rc_map_key_t *keys;
-	struct SqshRcMap *values;
+	struct SqshRcMap values;
 };
 
 /**

@@ -40,12 +40,9 @@ int
 sqsh__rc_hash_map_init(
 		struct SqshRcHashMap *hash_map, size_t size, size_t element_size,
 		sqsh_rc_map_cleanup_t cleanup) {
-	(void)hash_map;
-	(void)size;
-	(void)element_size;
-	(void)cleanup;
+	hash_map->keys = calloc(size, sizeof(sqsh_rc_map_key_t));
 
-	return 0;
+	return sqsh__rc_map_init(&hash_map->values, size, element_size, cleanup);
 }
 
 const void *
@@ -60,9 +57,7 @@ sqsh__rc_hash_map_put(
 
 size_t
 sqsh__rc_hash_map_size(const struct SqshRcHashMap *hash_map) {
-	(void)hash_map;
-
-	return 0;
+	return sqsh__rc_map_size(&hash_map->values);
 }
 
 const void *
@@ -93,7 +88,7 @@ sqsh__rc_hash_map_release_key(
 
 int
 sqsh__rc_hash_map_cleanup(struct SqshRcHashMap *hash_map) {
-	(void)hash_map;
+	free(hash_map->keys);
 
-	return 0;
+	return sqsh__rc_map_cleanup(&hash_map->values);
 }
