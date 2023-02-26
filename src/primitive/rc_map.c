@@ -31,8 +31,6 @@
  * @file         rc_map.c
  */
 
-#define _GNU_SOURCE
-
 #include "../../include/sqsh_primitive_private.h"
 
 #include "../../include/sqsh_error.h"

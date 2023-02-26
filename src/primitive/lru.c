@@ -32,7 +32,6 @@
  */
 
 #include <stdint.h>
-#define _GNU_SOURCE
 
 #include "../../include/sqsh_primitive_private.h"
 
