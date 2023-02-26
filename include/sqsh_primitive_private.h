@@ -182,7 +182,7 @@ struct SqshSyncRcMap {
  * @param cleanup The cleanup function.
  * @return 0 on success, a negative value on error.
  */
-int sqsh__rc_map_init(
+SQSH_NO_UNUSED int sqsh__rc_map_init(
 		struct SqshSyncRcMap *array, size_t size, size_t element_size,
 		sqsh_rc_map_cleanup_t cleanup);
 
@@ -231,7 +231,8 @@ const void *sqsh__rc_map_retain(struct SqshSyncRcMap *array, int *index);
  * @param element The element to release.
  * @return 0 on success, a negative value on error.
  */
-int sqsh__rc_map_release(struct SqshSyncRcMap *array, const void *element);
+SQSH_NO_UNUSED int
+sqsh__rc_map_release(struct SqshSyncRcMap *array, const void *element);
 
 /**
  * @internal
@@ -279,7 +280,7 @@ struct SqshLru {
  * @param backend The backend to use for the LRU cache.
  * @return 0 on success, a negative value on error.
  */
-int
+SQSH_NO_UNUSED int
 sqsh__lru_init(struct SqshLru *lru, size_t size, struct SqshSyncRcMap *backend);
 
 /**
@@ -290,7 +291,7 @@ sqsh__lru_init(struct SqshLru *lru, size_t size, struct SqshSyncRcMap *backend);
  * @param index The index of the item to mark.
  * @return 0 on success, a negative value on error.
  */
-int sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t index);
+SQSH_NO_UNUSED int sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t index);
 
 /**
  * @internal
