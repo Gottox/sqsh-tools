@@ -222,8 +222,9 @@ out:
 }
 
 static int
-sqsh_mapper_curl_map(
-		struct SqshMapping *mapping, sqsh_index_t offset, size_t size) {
+sqsh_mapper_curl_map(struct SqshMapping *mapping) {
+	const sqsh_index_t offset = mapping->offset;
+	const size_t size = mapping->size;
 	int rv = 0;
 	uint64_t file_size = 0;
 	uint64_t file_time = 0;

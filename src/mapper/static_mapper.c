@@ -41,9 +41,8 @@ sqsh_mapper_static_mem_init(
 	return 0;
 }
 static int
-sqsh_mapper_static_mem_map(
-		struct SqshMapping *mapping, sqsh_index_t offset, size_t size) {
-	(void)size;
+sqsh_mapper_static_mem_map(struct SqshMapping *mapping) {
+	size_t offset = mapping->offset;
 	mapping->data.sm.data = &mapping->mapper->data.sm.data[offset];
 	return 0;
 }

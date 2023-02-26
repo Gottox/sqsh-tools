@@ -81,7 +81,9 @@ sqsh__mapping_init(
 		return -SQSH_ERROR_SIZE_MISSMATCH;
 	}
 	mapping->mapper = mapper;
-	return mapper->impl->mapping(mapping, offset, size);
+	mapping->offset = offset;
+	mapping->size = size;
+	return mapper->impl->mapping(mapping);
 }
 
 size_t
