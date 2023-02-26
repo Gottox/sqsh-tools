@@ -139,7 +139,7 @@ static const struct SqshMemoryMapperImpl impl = {
 		.block_size_hint = 100 * 1024 * 1024,
 #endif
 		.init = sqsh_mapper_mmap_init,
-		.mapping = sqsh_mapping_mmap_map,
+		.map = sqsh_mapping_mmap_map,
 		.map_data = sqsh_mapping_mmap_data,
 		.unmap = sqsh_mapping_mmap_unmap,
 		.cleanup = sqsh_mapper_mmap_cleanup,

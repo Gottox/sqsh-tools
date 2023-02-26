@@ -83,7 +83,7 @@ sqsh__mapping_init(
 	mapping->mapper = mapper;
 	mapping->offset = offset;
 	mapping->size = size;
-	return mapper->impl->mapping(mapping);
+	return mapper->impl->map(mapping);
 }
 
 size_t

@@ -64,7 +64,7 @@ sqsh_mapping_static_mem_data(const struct SqshMapping *mapping) {
 static const struct SqshMemoryMapperImpl impl = {
 		.block_size_hint = SIZE_MAX,
 		.init = sqsh_mapper_static_mem_init,
-		.mapping = sqsh_mapper_static_mem_map,
+		.map = sqsh_mapper_static_mem_map,
 		.cleanup = sqsh_mapper_static_mem_cleanup,
 		.map_data = sqsh_mapping_static_mem_data,
 		.unmap = sqsh_mapping_static_mem_unmap,

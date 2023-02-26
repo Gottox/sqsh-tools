@@ -128,10 +128,10 @@ struct SqshMemoryMapperImpl {
 	 */
 	size_t block_size_hint;
 	int (*init)(struct SqshMapper *mapper, const void *input, size_t *size);
-	int (*mapping)(struct SqshMapping *map);
-	int (*cleanup)(struct SqshMapper *mapper);
+	int (*map)(struct SqshMapping *map);
 	const uint8_t *(*map_data)(const struct SqshMapping *mapping);
 	int (*unmap)(struct SqshMapping *mapping);
+	int (*cleanup)(struct SqshMapper *mapper);
 };
 
 struct SqshMapper {
