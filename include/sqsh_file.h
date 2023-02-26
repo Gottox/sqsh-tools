@@ -83,7 +83,8 @@ sqsh_file_seek(struct SqshFileContext *context, uint64_t seek_pos);
  *
  * @return The number of bytes read on success, less than 0 on error.
  */
-int sqsh_file_read(struct SqshFileContext *context, uint64_t size);
+SQSH_NO_UNUSED int
+sqsh_file_read(struct SqshFileContext *context, uint64_t size);
 
 /**
  * @memberof SqshFileContext

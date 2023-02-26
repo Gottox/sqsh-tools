@@ -67,7 +67,7 @@ sqsh_xattr_iterator_new(const struct SqshInodeContext *inode, int *err);
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator);
+SQSH_NO_UNUSED int sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator);
 
 /**
  * @memberof SqshXattrIterator
@@ -140,7 +140,7 @@ uint16_t sqsh_xattr_iterator_name_size(struct SqshXattrIterator *iterator);
  *         is less than the given name, a positive value if the current xattr's
  *         name is greater than the given name.
  */
-int sqsh_xattr_iterator_fullname_cmp(
+SQSH_NO_UNUSED int sqsh_xattr_iterator_fullname_cmp(
 		struct SqshXattrIterator *iterator, const char *name);
 
 /**
@@ -153,7 +153,7 @@ int sqsh_xattr_iterator_fullname_cmp(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh_xattr_iterator_fullname_dup(
+SQSH_NO_UNUSED int sqsh_xattr_iterator_fullname_dup(
 		struct SqshXattrIterator *iterator, char **fullname_buffer);
 
 /**
@@ -166,7 +166,7 @@ int sqsh_xattr_iterator_fullname_dup(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh_xattr_iterator_value_dup(
+SQSH_NO_UNUSED int sqsh_xattr_iterator_value_dup(
 		struct SqshXattrIterator *iterator, char **value_buffer);
 
 /**
@@ -234,7 +234,7 @@ uint64_t sqsh_xattr_table_start(struct SqshXattrTable *table);
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh_xattr_table_get(
+SQSH_NO_UNUSED int sqsh_xattr_table_get(
 		const struct SqshXattrTable *table, sqsh_index_t index,
 		struct SqshDataXattrLookupTable *target);
 

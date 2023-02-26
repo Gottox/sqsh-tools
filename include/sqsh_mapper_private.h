@@ -34,6 +34,7 @@
 #ifndef SQSH_PRIVATE_MAPPER_H
 #define SQSH_PRIVATE_MAPPER_H
 
+#include "sqsh_common.h"
 #include "sqsh_mapper.h"
 
 #include <pthread.h>
@@ -134,7 +135,7 @@ struct SqshMapper {
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__mapper_init(
+SQSH_NO_UNUSED int sqsh__mapper_init(
 		struct SqshMapper *mapper, const void *input,
 		const struct SqshConfig *config);
 
@@ -150,7 +151,7 @@ int sqsh__mapper_init(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__mapping_init(
+SQSH_NO_UNUSED int sqsh__mapping_init(
 		struct SqshMapping *mapping, struct SqshMapper *mapper,
 		sqsh_index_t offset, size_t size);
 
@@ -231,7 +232,7 @@ struct SqshMapManager {
  *
  * @return Returns 0 on success, a negative value on error.
  */
-int sqsh__map_manager_init(
+SQSH_NO_UNUSED int sqsh__map_manager_init(
 		struct SqshMapManager *manager, const void *input,
 		const struct SqshConfig *config);
 
@@ -272,7 +273,7 @@ size_t sqsh__map_manager_block_count(const struct SqshMapManager *manager);
  *
  * @return Returns 0 on success, a negative value on error.
  */
-int sqsh__map_manager_get(
+SQSH_NO_UNUSED int sqsh__map_manager_get(
 		struct SqshMapManager *manager, sqsh_index_t index, int span,
 		const struct SqshMapping **target);
 
@@ -322,7 +323,7 @@ struct SqshMapCursor {
  * @param upper_limit The upper limit of the cursor
  * @return 0 on success, negative on error
  */
-int sqsh__map_cursor_init(
+SQSH_NO_UNUSED int sqsh__map_cursor_init(
 		struct SqshMapCursor *cursor, struct SqshMapManager *mapper,
 		const uint64_t start_address, uint64_t upper_limit);
 
@@ -336,7 +337,7 @@ int sqsh__map_cursor_init(
  * @param size The size to advance
  * @return 0 on success, negative on error
  */
-int sqsh__map_cursor_advance(
+SQSH_NO_UNUSED int sqsh__map_cursor_advance(
 		struct SqshMapCursor *cursor, sqsh_index_t offset, size_t size);
 
 /**
@@ -348,7 +349,7 @@ int sqsh__map_cursor_advance(
  * @param cursor The cursor to advance
  * @return 0 on success, negative on error
  */
-int sqsh__map_cursor_all(struct SqshMapCursor *cursor);
+SQSH_NO_UNUSED int sqsh__map_cursor_all(struct SqshMapCursor *cursor);
 
 /**
  * @internal

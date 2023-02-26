@@ -34,6 +34,7 @@
 #ifndef SQSH_CONTEXT_PRIVATE_H
 #define SQSH_CONTEXT_PRIVATE_H
 
+#include "sqsh_common.h"
 #include "sqsh_context.h"
 #include "sqsh_metablock_private.h"
 
@@ -165,7 +166,8 @@ struct SqshTrailingContext {
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh);
+SQSH_NO_UNUSED int
+sqsh__trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh);
 
 /**
  * @internal

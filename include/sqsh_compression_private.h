@@ -65,7 +65,7 @@ struct SqshCompression {
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__compression_init(
+SQSH_NO_UNUSED int sqsh__compression_init(
 		struct SqshCompression *compression, int compression_id,
 		size_t block_size);
 
@@ -81,7 +81,7 @@ int sqsh__compression_init(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__compression_decompress_to_buffer(
+SQSH_NO_UNUSED int sqsh__compression_decompress_to_buffer(
 		const struct SqshCompression *compression, struct SqshBuffer *buffer,
 		const uint8_t *compressed, const size_t compressed_size);
 

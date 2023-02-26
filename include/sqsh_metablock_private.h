@@ -66,7 +66,7 @@ struct SqshMetablockIterator {
  * @param[in] upper_limit The maximum address the iterator is allowed to read.
  * @return 0 on success, or a negative value on error.
  */
-int sqsh__metablock_iterator_init(
+SQSH_NO_UNUSED int sqsh__metablock_iterator_init(
 		struct SqshMetablockIterator *iterator, struct Sqsh *sqsh,
 		uint64_t start_address, uint64_t upper_limit);
 
@@ -80,7 +80,7 @@ int sqsh__metablock_iterator_init(
  * @param[in] amount The number of metablocks to skip.
  * @return 0 on success, or a negative value on error.
  */
-int sqsh__metablock_iterator_skip(
+SQSH_NO_UNUSED int sqsh__metablock_iterator_skip(
 		struct SqshMetablockIterator *iterator, uint64_t amount);
 
 /**
@@ -91,7 +91,8 @@ int sqsh__metablock_iterator_skip(
  * @param[in,out] iterator The iterator to advance.
  * @return 0 on success, or a negative value on error.
  */
-int sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator);
+SQSH_NO_UNUSED int
+sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator);
 
 /**
  * @internal
@@ -135,7 +136,7 @@ sqsh__metablock_iterator_size(const struct SqshMetablockIterator *iterator);
  * @param[out] buffer The buffer to append the data to.
  * @return 0 on success, or a negative value on error.
  */
-int sqsh__metablock_iterator_append_to_buffer(
+SQSH_NO_UNUSED int sqsh__metablock_iterator_append_to_buffer(
 		const struct SqshMetablockIterator *iterator,
 		struct SqshBuffer *buffer);
 
@@ -174,7 +175,7 @@ struct SqshMetablockCursor {
  *
  * @return 0 on success, less than zero on error.
  */
-int sqsh__metablock_cursor_init(
+SQSH_NO_UNUSED int sqsh__metablock_cursor_init(
 		struct SqshMetablockCursor *cursor, struct Sqsh *sqsh,
 		const uint64_t start_address, const uint64_t upper_limit);
 
@@ -189,7 +190,7 @@ int sqsh__metablock_cursor_init(
  *
  * @return 0 on success, less than zero on error.
  */
-int sqsh__metablock_cursor_advance(
+SQSH_NO_UNUSED int sqsh__metablock_cursor_advance(
 		struct SqshMetablockCursor *cursor, sqsh_index_t offset, size_t size);
 
 /**

@@ -231,8 +231,7 @@ const void *sqsh__rc_map_retain(struct SqshSyncRcMap *array, int *index);
  * @param element The element to release.
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int
-sqsh__rc_map_release(struct SqshSyncRcMap *array, const void *element);
+int sqsh__rc_map_release(struct SqshSyncRcMap *array, const void *element);
 
 /**
  * @internal
