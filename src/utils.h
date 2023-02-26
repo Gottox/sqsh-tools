@@ -35,8 +35,6 @@
 #ifndef SQSH_UTILS_H
 #define SQSH_UTILS_H
 
-#include "../include/sqsh_common.h"
-
 #include <stdlib.h>
 #include <string.h>
 

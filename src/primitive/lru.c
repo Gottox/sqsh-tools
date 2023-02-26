@@ -31,19 +31,18 @@
  * @file         lru.c
  */
 
-#include <stdint.h>
-
 #include "../../include/sqsh_primitive_private.h"
 
 #include "../../include/sqsh_error.h"
 #include "../utils.h"
 
 #include <assert.h>
-#include <stdio.h>
 
 #define EMPTY_MARKER SIZE_MAX
 
 #if 0
+#	include <stdio.h>
+
 static void
 debug_print(const struct SqshLru *lru, const char msg, sqsh_index_t ring_index) {
 	sqsh_index_t backend_index = lru->items[ring_index];
