@@ -758,7 +758,8 @@ multithreaded_walker(void *arg) {
 	} else {
 		struct SqshFileContext *file = sqsh_file_new(inode, &rv);
 		size_t size = sqsh_file_size(file);
-		sqsh_file_read(file, size);
+		rv = sqsh_file_read(file, size);
+		assert(rv == 0);
 		sqsh_file_free(file);
 	}
 
