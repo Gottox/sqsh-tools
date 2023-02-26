@@ -48,9 +48,9 @@ sqsh_zlib_init(void *context, uint8_t *target, size_t target_size) {
 
 	if (inflateInit(stream) != Z_OK) {
 		return -SQSH_ERROR_COMPRESSION_INIT;
-	} else {
-		return 0;
 	}
+
+	return 0;
 }
 
 static int
@@ -84,19 +84,19 @@ int
 sqsh_extract_zlib(
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
-	z_stream stream;
+	z_stream stream = {0};
 	int rv = 0;
 
-	if ((rv = sqsh_zlib_init(&stream, target, *target_size)) != Z_OK) {
+	if ((rv = sqsh_zlib_init(&stream, target, *target_size)) < 0) {
 		return rv;
 	}
 
 	if ((rv = sqsh_zlib_decompress(
-				 &stream, compressed, compressed_size, true)) != 0) {
+				 &stream, compressed, compressed_size, true)) < 0) {
 		return rv;
 	}
 
-	if ((rv = sqsh_zlib_finish(&stream, target_size)) != 0) {
+	if ((rv = sqsh_zlib_finish(&stream, target_size)) < 0) {
 		return rv;
 	}
 
