@@ -71,18 +71,15 @@ sqsh_mapper_mmap_init(
 	}
 
 	if (fstat(fd, &st) < 0) {
+		close(fd);
 		rv = -errno;
 		goto out;
 	}
 	*size = st.st_size;
 	mapper->data.mm.fd = fd;
 	mapper->data.mm.page_size = sysconf(_SC_PAGESIZE);
-	fd = -1;
 
 out:
-	if (fd >= 0) {
-		close(fd);
-	}
 	return rv;
 }
 static int
