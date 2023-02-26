@@ -256,6 +256,105 @@ int sqsh__rc_map_release_index(struct SqshRcMap *array, int index);
 int sqsh__rc_map_cleanup(struct SqshRcMap *array);
 
 ////////////////////////////////////////
+// primitive/rc_hash_map.c
+
+typedef uint64_t sqsh_rc_map_key_t;
+
+struct SqshRcHashMap {
+	/**
+	 * @privatesection
+	 */
+	sqsh_rc_map_key_t *keys;
+	struct SqshRcMap *values;
+};
+
+/**
+ * @internal
+ * @memberof SqshRcMap
+ * @brief Initializes a reference-counted array.
+ *
+ * @param hash_map The array to initialize.
+ * @param size The size of the array.
+ * @param element_size The size of each element.
+ * @param cleanup The cleanup function.
+ * @return 0 on success, a negative value on error.
+ */
+SQSH_NO_UNUSED int sqsh__rc_hash_map_init(
+		struct SqshRcHashMap *hash_map, size_t size, size_t element_size,
+		sqsh_rc_map_cleanup_t cleanup);
+
+/**
+ * @internal
+ * @memberof SqshRcHashMap
+ * @brief Sets a value in a reference-counted array.
+ *
+ * @param hash_map The hash map to set the value in.
+ * @param key The key to set the value at.
+ * @param data The data to set.
+ * @return 0 on success, a negative value on error.
+ */
+const void *sqsh__rc_hash_map_put(
+		struct SqshRcHashMap *hash_map, sqsh_rc_map_key_t key, void *data);
+
+/**
+ * @internal
+ * @memberof SqshRcHashMap
+ * @brief Gets the size of a reference-counted hash map.
+ *
+ * @param hash_map The hash map to get the size of.
+ * @return The size of the hash map.
+ */
+size_t sqsh__rc_hash_map_size(const struct SqshRcHashMap *hash_map);
+
+/**
+ * @internal
+ * @memberof SqshRcHashMap
+ * @brief Retains the data at a specified key in a reference-counted hash map.
+ *
+ * @param hash_map The hash map containing the data.
+ * @param key The key of the data.
+ * @return A pointer to the retained data.
+ */
+const void *
+sqsh__rc_hash_map_retain(struct SqshRcHashMap *hash_map, sqsh_rc_map_key_t key);
+
+/**
+ * @internal
+ * @memberof SqshRcHashMap
+ * @brief Releases the reference to the data at a specified index in a
+ * reference-counted hash map.
+ *
+ * @param hash_map The hash map containing the data.
+ * @param element The element to release.
+ * @return 0 on success, a negative value on error.
+ */
+int
+sqsh__rc_hash_map_release(struct SqshRcHashMap *hash_map, const void *element);
+
+/**
+ * @internal
+ * @memberof SqshRcHashMap
+ * @brief Releases the reference to the data at a specified index in a
+ * reference-counted hash map.
+ *
+ * @param hash_map The hash map containing the data.
+ * @param key The key of the data to release.
+ * @return 0 on success, a negative value on error.
+ */
+int sqsh__rc_hash_map_release_key(
+		struct SqshRcHashMap *hash_map, sqsh_rc_map_key_t key);
+
+/**
+ * @internal
+ * @memberof SqshRcHashMap
+ * @brief Cleans up a reference-counted hash map.
+ *
+ * @param hash_map The hash map to cleanup.
+ * @return 0 on success, a negative value on error.
+ */
+int sqsh__rc_hash_map_cleanup(struct SqshRcHashMap *hash_map);
+
+////////////////////////////////////////
 // primitive/lru.c
 
 struct SqshLru {

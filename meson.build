@@ -68,6 +68,7 @@ sqsh_src = [
 	'src/metablock/metablock_iterator.c',
 	'src/primitive/buffer.c',
 	'src/primitive/lru.c',
+	'src/primitive/rc_hash_map.c',
 	'src/primitive/rc_map.c',
 	'src/table/table.c',
 	'src/xattr/xattr_iterator.c',
