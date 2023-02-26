@@ -31,7 +31,7 @@
  * @file         compression_option_context.c
  */
 
-#include "../../include/sqsh_context_private.h"
+#include "../../include/sqsh_archive_private.h"
 
 #include "../../include/sqsh_archive.h"
 #include "../../include/sqsh_data.h"
