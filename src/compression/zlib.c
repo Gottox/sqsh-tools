@@ -37,23 +37,68 @@
 
 #include <zlib.h>
 
+static int
+sqsh_zlib_init(void *context, uint8_t *target, size_t target_size) {
+	z_stream *stream = context;
+	stream->zalloc = Z_NULL;
+	stream->zfree = Z_NULL;
+	stream->opaque = Z_NULL;
+	stream->next_out = target;
+	stream->avail_out = target_size;
+
+	if (inflateInit(stream) != Z_OK) {
+		return -SQSH_ERROR_COMPRESSION_INIT;
+	} else {
+		return 0;
+	}
+}
+
+static int
+sqsh_zlib_decompress(
+		void *context, const uint8_t *compressed, const size_t compressed_size,
+		bool end) {
+	int rv = 0;
+	z_stream *stream = context;
+	stream->next_in = (Bytef *)compressed;
+	stream->avail_in = compressed_size;
+	rv = inflate(stream, end ? Z_FINISH : Z_NO_FLUSH);
+
+	if (end && rv != Z_STREAM_END) {
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+	} else if (!end && rv != Z_OK) {
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+	} else {
+		return 0;
+	}
+}
+
+static int
+sqsh_zlib_finish(void *context, size_t *written_size) {
+	z_stream *stream = context;
+
+	*written_size = stream->total_out;
+	return 0;
+}
+
 int
 sqsh_extract_zlib(
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
-	// Needed for 32-bit: *target_size is a size_t, but zlib wants a
-	// pointer to an unsigned long.
-	uLongf long_target_size = *target_size;
+	z_stream stream;
+	int rv = 0;
 
-	int rv = uncompress(target, &long_target_size, compressed, compressed_size);
-
-	// This casts to a smaller type. But it's safe, because long_target_size
-	// originates from a the content of *target_size and uncompress() only
-	// decreases it.
-	*target_size = long_target_size;
-
-	if (rv != Z_OK) {
-		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+	if ((rv = sqsh_zlib_init(&stream, target, *target_size)) != Z_OK) {
+		return rv;
 	}
+
+	if ((rv = sqsh_zlib_decompress(
+				 &stream, compressed, compressed_size, true)) != 0) {
+		return rv;
+	}
+
+	if ((rv = sqsh_zlib_finish(&stream, target_size)) != 0) {
+		return rv;
+	}
+
 	return rv;
 }
