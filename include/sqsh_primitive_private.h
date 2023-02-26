@@ -189,6 +189,16 @@ SQSH_NO_UNUSED int sqsh__rc_map_init(
 /**
  * @internal
  * @memberof SqshRcMap
+ * @brief Tests if a reference-counted array is empty.
+ * @param array The array to test.
+ * @param index The index to test.
+ * @return True if the array is empty, false otherwise.
+ */
+bool sqsh__rc_map_is_empty(struct SqshRcMap *array, int index);
+
+/**
+ * @internal
+ * @memberof SqshRcMap
  * @brief Sets a value in a reference-counted array.
  *
  * @param array The array to set the value in.

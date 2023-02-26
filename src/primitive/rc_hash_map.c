@@ -35,6 +35,28 @@
 
 #include "../../include/sqsh_error.h"
 #include "../utils.h"
+#include <stdint.h>
+
+#define COLLISION_RESERVE_BITS 2
+
+static uint64_t
+djb2_hash(const void *data, const size_t size) {
+	uint64_t hash = 5381;
+	const uint8_t *p = data;
+	for (size_t i = 0; i < size; i++) {
+		hash = ((hash << 5) + hash) + p[i];
+	}
+	return hash;
+}
+
+static sqsh_index_t
+key_to_index(const sqsh_rc_map_key_t key, const size_t size) {
+	sqsh_index_t hash = djb2_hash(&key, sizeof(uint64_t));
+
+	// reserve the lower COLLISION_RESERVE_BITS bits for collisions.
+	hash <<= COLLISION_RESERVE_BITS;
+	return hash % size;
+}
 
 int
 sqsh__rc_hash_map_init(
@@ -48,9 +70,19 @@ sqsh__rc_hash_map_init(
 const void *
 sqsh__rc_hash_map_put(
 		struct SqshRcHashMap *hash_map, sqsh_rc_map_key_t key, void *data) {
-	(void)hash_map;
-	(void)key;
-	(void)data;
+	sqsh_index_t index = key_to_index(key, hash_map->values.size);
+	struct SqshRcMap *values = &hash_map->values;
+
+	const size_t size = sqsh__rc_map_size(values);
+	for (sqsh_index_t i = 0; i < size; i++, index++) {
+		index = index % size;
+
+		if (sqsh__rc_map_is_empty(values, index) ||
+			hash_map->keys[index] == key) {
+			hash_map->keys[index] = key;
+			return sqsh__rc_map_set(values, index, data, 1);
+		}
+	}
 
 	return NULL;
 }
@@ -63,25 +95,41 @@ sqsh__rc_hash_map_size(const struct SqshRcHashMap *hash_map) {
 const void *
 sqsh__rc_hash_map_retain(
 		struct SqshRcHashMap *hash_map, sqsh_rc_map_key_t key) {
-	(void)hash_map;
-	(void)key;
+	struct SqshRcMap *values = &hash_map->values;
+	sqsh_index_t index = key_to_index(key, hash_map->values.size);
+
+	const size_t size = sqsh__rc_map_size(values);
+	for (sqsh_index_t i = 0; i < size; i++, index++) {
+		index = index % size;
+
+		if (hash_map->keys[index] == key) {
+			int real_index = index;
+			return sqsh__rc_map_retain(values, &real_index);
+		}
+	}
 
 	return NULL;
 }
 
 int
 sqsh__rc_hash_map_release(struct SqshRcHashMap *hash_map, const void *element) {
-	(void)hash_map;
-	(void)element;
-
-	return 0;
+	return sqsh__rc_map_release(&hash_map->values, element);
 }
 
 int
 sqsh__rc_hash_map_release_key(
 		struct SqshRcHashMap *hash_map, sqsh_rc_map_key_t key) {
-	(void)hash_map;
-	(void)key;
+	struct SqshRcMap *values = &hash_map->values;
+	sqsh_index_t index = key_to_index(key, hash_map->values.size);
+
+	const size_t size = sqsh__rc_map_size(values);
+	for (sqsh_index_t i = 0; i < size; i++, index++) {
+		index = index % size;
+
+		if (hash_map->keys[index] == key) {
+			return sqsh__rc_map_release_index(values, index);
+		}
+	}
 
 	return 0;
 }

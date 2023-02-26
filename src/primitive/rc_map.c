@@ -124,6 +124,11 @@ release_rc(struct SqshRcMap *array, int index) {
 	return ref_count;
 }
 
+bool
+sqsh__rc_map_is_empty(struct SqshRcMap *array, int index) {
+	return array->ref_count[index] == 0;
+}
+
 const void *
 sqsh__rc_map_set(struct SqshRcMap *array, int index, void *data, int span) {
 	(void)span;
@@ -133,7 +138,7 @@ sqsh__rc_map_set(struct SqshRcMap *array, int index, void *data, int span) {
 
 	target = get_element(array, index);
 
-	if (array->ref_count[index] != 0) {
+	if (sqsh__rc_map_is_empty(array, index) == false) {
 		array->cleanup(data);
 		return NULL;
 	}
@@ -149,7 +154,7 @@ const void *
 sqsh__rc_map_retain(struct SqshRcMap *array, int *index) {
 	void *data = NULL;
 
-	if (array->ref_count[*index] != 0) {
+	if (sqsh__rc_map_is_empty(array, *index) == false) {
 		retain_rc(array, *index);
 		debug_print(array, *index, '+');
 		data = get_element(array, *index);
@@ -164,7 +169,7 @@ sqsh__rc_map_release(struct SqshRcMap *array, const void *element) {
 		return 0;
 	}
 
-	int index = ((uint8_t *)element - array->data) / array->element_size;
+	const int index = ((uint8_t *)element - array->data) / array->element_size;
 
 	return sqsh__rc_map_release_index(array, index);
 }
