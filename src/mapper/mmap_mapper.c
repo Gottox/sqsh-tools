@@ -105,7 +105,7 @@ sqsh_mapping_mmap_map(struct SqshMapping *mapping) {
 		}
 	}
 
-	mapping->data.mm.data = file_map;
+	mapping->data = file_map;
 	return 0;
 }
 
@@ -119,13 +119,14 @@ static int
 sqsh_mapping_mmap_unmap(struct SqshMapping *mapping) {
 	const size_t mmap_size = mmap_page_size(mapping);
 
-	return munmap(mapping->data.mm.data, mmap_size);
+	return munmap(mapping->data, mmap_size);
 }
 static const uint8_t *
 sqsh_mapping_mmap_data(const struct SqshMapping *mapping) {
 	const size_t page_offset = mmap_page_offset(mapping);
+	const uint8_t *data = mapping->data;
 
-	return &mapping->data.mm.data[page_offset];
+	return &data[page_offset];
 }
 
 static const struct SqshMemoryMapperImpl impl = {

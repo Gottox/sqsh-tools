@@ -61,13 +61,6 @@ struct SqshCurlMapper {
 	pthread_mutex_t lock;
 };
 
-struct SqshCurlMap {
-	/**
-	 * @privatesection
-	 */
-	uint8_t *data;
-};
-
 ////////////////////////////////////////
 // mapper/mmap_mapper.c
 
@@ -79,24 +72,10 @@ struct SqshMmapMapper {
 	long page_size;
 };
 
-struct SqshMmapMap {
-	/**
-	 * @privatesection
-	 */
-	uint8_t *data;
-};
-
 ////////////////////////////////////////
 // mapper/static_mapper.c
 
 struct SqshStaticMapper {
-	/**
-	 * @privatesection
-	 */
-	const uint8_t *data;
-};
-
-struct SqshStaticMap {
 	/**
 	 * @privatesection
 	 */
@@ -115,11 +94,7 @@ struct SqshMapping {
 	struct SqshMapper *mapper;
 	sqsh_index_t offset;
 	size_t size;
-	union {
-		struct SqshMmapMap mm;
-		struct SqshStaticMap sm;
-		struct SqshCurlMap cl;
-	} data;
+	void *data;
 };
 
 struct SqshMemoryMapperImpl {

@@ -39,6 +39,7 @@
 
 #include <curl/curl.h>
 #include <inttypes.h>
+#include <stdint.h>
 
 #define SUPERBLOCK_REQUEST_SIZE \
 	(SQSH_SIZEOF_SUPERBLOCK + SQSH_SIZEOF_COMPRESSION_OPTIONS)
@@ -232,13 +233,13 @@ sqsh_mapper_curl_map(struct SqshMapping *mapping) {
 	pthread_mutex_t *lock = &mapping->mapper->data.cl.lock;
 	pthread_mutex_lock(lock);
 	if (offset == 0 && mapping->mapper->data.cl.header_cache != NULL) {
-		mapping->data.cl.data = mapping->mapper->data.cl.header_cache;
+		mapping->data = mapping->mapper->data.cl.header_cache;
 		mapping->mapper->data.cl.header_cache = NULL;
 	} else {
 		CURL *handle = configure_handle(mapping->mapper);
 
 		rv = curl_download(
-				handle, offset, size, &mapping->data.cl.data, &file_size,
+				handle, offset, size, (uint8_t **)&mapping->data, &file_size,
 				&file_time);
 		if (rv < 0) {
 			goto out;
@@ -272,13 +273,13 @@ sqsh_mapper_curl_cleanup(struct SqshMapper *mapper) {
 
 static int
 sqsh_mapping_curl_unmap(struct SqshMapping *mapping) {
-	free(mapping->data.cl.data);
+	free(mapping->data);
 	return 0;
 }
 
 static const uint8_t *
 sqsh_mapping_curl_data(const struct SqshMapping *mapping) {
-	return mapping->data.cl.data;
+	return mapping->data;
 }
 
 static const struct SqshMemoryMapperImpl impl = {
