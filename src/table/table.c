@@ -51,7 +51,7 @@ lookup_table_get(const struct SqshTable *table, sqsh_index_t index) {
 
 int
 sqsh__table_init(
-		struct SqshTable *table, struct Sqsh *sqsh, uint64_t start_block,
+		struct SqshTable *table, struct SqshArchive *sqsh, uint64_t start_block,
 		size_t element_size, size_t element_count) {
 	int rv = 0;
 	size_t byte_size;
@@ -59,7 +59,7 @@ sqsh__table_init(
 	size_t lookup_table_size;
 	size_t lookup_table_count;
 	uint64_t upper_limit;
-	struct SqshMapManager *map_manager = sqsh_map_manager(sqsh);
+	struct SqshMapManager *map_manager = sqsh_archive_map_manager(sqsh);
 
 	if (SQSH_MULT_OVERFLOW(element_size, element_count, &table_size)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
@@ -103,7 +103,7 @@ int
 sqsh_table_get(
 		const struct SqshTable *table, sqsh_index_t index, void *target) {
 	int rv = 0;
-	struct Sqsh *sqsh = table->sqsh;
+	struct SqshArchive *sqsh = table->sqsh;
 	struct SqshMetablockCursor metablock = {0};
 	uint64_t lookup_index =
 			index * table->element_size / SQSH_METABLOCK_BLOCK_SIZE;

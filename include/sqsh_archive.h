@@ -60,139 +60,142 @@ struct SqshConfig {
 #undef SQSH_CONFIG_FIELDS
 };
 
-struct Sqsh;
+struct SqshArchive;
 struct SqshXattrTable;
 
 /**
- * @memberof Sqsh
- * @brief sqsh_new initializes a sqsh context in heap.
+ * @memberof SqshArchive
+ * @brief initializes a archive context in heap.
  *
  * @param[in] source the source to retrieve the archive from
- * @param[in] config the configuration for the sqsh context.
+ * @param[in] config the configuration for the archive context.
  * @param[out] err   Pointer to an int where the error code will be stored.
  *
- * @return a pointer to the sqsh context or NULL if an error occurred.
+ * @return a pointer to the archive context or NULL if an error occurred.
  */
-SQSH_NO_UNUSED struct Sqsh *
-sqsh_new(const void *source, const struct SqshConfig *config, int *err);
+SQSH_NO_UNUSED struct SqshArchive *
+sqsh_archive_new(const void *source, const struct SqshConfig *config, int *err);
 
 /**
- * @memberof Sqsh
- * @brief sqsh_superblock returns the configuration object of the sqsh context.
+ * @memberof SqshArchive
+ * @brief sqsh_superblock returns the configuration object of the archive
+ * context.
  *
- * @param[in] sqsh the Sqsh structure.
+ * @param[in] archive the SqshArchive structure.
  *
  * @return the superblock context.
  */
-const struct SqshConfig *sqsh_config(const struct Sqsh *sqsh);
+const struct SqshConfig *sqsh_archive_config(const struct SqshArchive *archive);
 
 /**
- * @memberof Sqsh
+ * @memberof SqshArchive
  * @brief sqsh_superblock returns the superblock context.
  *
- * @param[in] sqsh the Sqsh structure.
+ * @param[in] archive the Sqsh structure.
  *
  * @return the superblock context.
  */
-const struct SqshSuperblockContext *sqsh_superblock(const struct Sqsh *sqsh);
+const struct SqshSuperblockContext *
+sqsh_archive_superblock(const struct SqshArchive *archive);
 
 /**
- * @memberof Sqsh
- * @brief sqsh_mapper returns the map manager to retrieve chunks of the sqsh
+ * @memberof SqshArchive
+ * @brief sqsh_mapper returns the map manager to retrieve chunks of the archive
  * file.
  *
- * @param[in] sqsh the Sqsh structure.
+ * @param[in] archive the Sqsh structure.
  *
  * @return the mapper context.
  */
-struct SqshMapManager *sqsh_map_manager(struct Sqsh *sqsh);
+struct SqshMapManager *sqsh_archive_map_manager(struct SqshArchive *archive);
 
 /**
- * @memberof Sqsh
+ * @memberof SqshArchive
  * @brief sqsh_compression_data returns the compression context for data blocks
  *
- * @param[in] sqsh the Sqsh structure.
- *
- * @return the compression context.
- */
-const struct SqshCompression *sqsh_compression_data(const struct Sqsh *sqsh);
-
-/**
- * @memberof Sqsh
- * @brief sqsh_compression_data returns the compression context for metadata
- * blocks.
- *
- * @param[in] sqsh the Sqsh structure.
+ * @param[in] archive the Sqsh structure.
  *
  * @return the compression context.
  */
 const struct SqshCompression *
-sqsh_compression_metablock(const struct Sqsh *sqsh);
+sqsh_archive_compression_data(const struct SqshArchive *archive);
 
 /**
- * @memberof Sqsh
+ * @memberof SqshArchive
+ * @brief sqsh_compression_data returns the compression context for metadata
+ * blocks.
+ *
+ * @param[in] archive the Sqsh structure.
+ *
+ * @return the compression context.
+ */
+const struct SqshCompression *
+sqsh_archive_compression_metablock(const struct SqshArchive *archive);
+
+/**
+ * @memberof SqshArchive
  * @brief Retrieves the id table of a Sqsh instance.
  *
- * @param[in]  sqsh       The Sqsh instance to retrieve the id table from.
+ * @param[in]  archive    The Sqsh instance to retrieve the id table from.
  * @param[out] id_table   Pointer to a struct SqshTable where the id table will
  * be stored.
  *
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_UNUSED int
-sqsh_id_table(struct Sqsh *sqsh, struct SqshTable **id_table);
+sqsh_archive_id_table(struct SqshArchive *archive, struct SqshTable **id_table);
 
 /**
- * @memberof Sqsh
+ * @memberof SqshArchive
  * @brief Retrieves the export table of a Sqsh instance.
  *
- * @param[in]  sqsh           The Sqsh instance to retrieve the export table
+ * @param[in]  archive           The Sqsh instance to retrieve the export table
  *                            from.
  * @param[out] export_table   Pointer to a struct SqshTable where the export
  *                            table will be stored.
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int
-sqsh_export_table(struct Sqsh *sqsh, struct SqshTable **export_table);
+SQSH_NO_UNUSED int sqsh_archive_export_table(
+		struct SqshArchive *archive, struct SqshTable **export_table);
 
 /**
- * @memberof Sqsh
+ * @memberof SqshArchive
  * @brief Retrieves the fragment table of a Sqsh instance.
  *
- * @param[in]  sqsh             The Sqsh instance to retrieve the fragment table
+ * @param[in]  archive          The Sqsh instance to retrieve the fragment table
  *                              from.
  * @param[out] fragment_table   Pointer to a struct SqshTable where the export
  *                              table will be stored.
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh_fragment_table(
-		struct Sqsh *sqsh, struct SqshFragmentTable **fragment_table);
+SQSH_NO_UNUSED int sqsh_archive_fragment_table(
+		struct SqshArchive *archive, struct SqshFragmentTable **fragment_table);
 
 /**
- * @memberof Sqsh
+ * @memberof SqshArchive
  * @brief Retrieves the xattr table of a Sqsh instance.
  *
- * @param[in]  sqsh          The Sqsh instance to retrieve the xattr table
+ * @param[in]  archive       The Sqsh instance to retrieve the xattr table
  *                           from.
  * @param[out] xattr_table   Pointer to a struct SqshTable where the export
  *                           table will be stored.
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int
-sqsh_xattr_table(struct Sqsh *sqsh, struct SqshXattrTable **xattr_table);
+SQSH_NO_UNUSED int sqsh_archive_xattr_table(
+		struct SqshArchive *archive, struct SqshXattrTable **xattr_table);
 
 /**
- * @memberof Sqsh
+ * @memberof SqshArchive
  * @brief Frees the resources used by a Sqsh instance.
  *
- * @param[in] sqsh The Sqsh instance to free.
+ * @param[in] archive The Sqsh instance to free.
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh_free(struct Sqsh *sqsh);
+int sqsh_archive_free(struct SqshArchive *archive);
 
 #ifdef __cplusplus
 }

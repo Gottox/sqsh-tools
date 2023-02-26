@@ -38,7 +38,7 @@
 
 int
 sqsh__metablock_cursor_init(
-		struct SqshMetablockCursor *cursor, struct Sqsh *sqsh,
+		struct SqshMetablockCursor *cursor, struct SqshArchive *sqsh,
 		const uint64_t start_address, const uint64_t upper_limit) {
 	int rv;
 	rv = sqsh__metablock_iterator_init(

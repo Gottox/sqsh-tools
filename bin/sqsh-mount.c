@@ -48,7 +48,7 @@
 #include <sys/stat.h>
 
 static struct {
-	struct Sqsh *sqsh;
+	struct SqshArchive *sqsh;
 	struct SqshPathResolverContext *resolver;
 } data = {0};
 
@@ -104,7 +104,8 @@ sqshfuse_getattr(
 	memset(stbuf, 0, sizeof(struct stat));
 
 	struct SqshInodeContext *inode = NULL;
-	const struct SqshSuperblockContext *superblock = sqsh_superblock(data.sqsh);
+	const struct SqshSuperblockContext *superblock =
+			sqsh_archive_superblock(data.sqsh);
 
 	inode = sqsh_path_resolver_resolve(data.resolver, path, &rv);
 	if (rv < 0) {
@@ -404,7 +405,7 @@ static void
 sqshfuse_destroy(void *private_data) {
 	(void)private_data;
 	sqsh_path_resolver_free(data.resolver);
-	sqsh_free(data.sqsh);
+	sqsh_archive_free(data.sqsh);
 }
 
 static const struct fuse_operations sqshfuse_operations = {

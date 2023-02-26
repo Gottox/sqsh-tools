@@ -46,7 +46,7 @@ compression_options(const struct SqshCompressionOptionsContext *context) {
 }
 
 struct SqshCompressionOptionsContext *
-sqsh_compression_options_new(struct Sqsh *sqsh, int *err) {
+sqsh_compression_options_new(struct SqshArchive *sqsh, int *err) {
 	struct SqshCompressionOptionsContext *context =
 			calloc(1, sizeof(struct SqshCompressionOptionsContext));
 	if (context == NULL) {
@@ -62,9 +62,11 @@ sqsh_compression_options_new(struct Sqsh *sqsh, int *err) {
 
 int
 sqsh__compression_options_init(
-		struct SqshCompressionOptionsContext *context, struct Sqsh *sqsh) {
+		struct SqshCompressionOptionsContext *context,
+		struct SqshArchive *sqsh) {
 	int rv = 0;
-	const struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
+	const struct SqshSuperblockContext *superblock =
+			sqsh_archive_superblock(sqsh);
 
 	// TODO: sane limit
 	rv = sqsh__metablock_iterator_init(

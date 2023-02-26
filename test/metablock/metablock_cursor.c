@@ -43,7 +43,7 @@
 static void
 advance_once(void) {
 	int rv;
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	struct SqshMetablockCursor cursor = {0};
 	uint8_t payload[] = {
 			METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
@@ -68,14 +68,14 @@ advance_once(void) {
 	rv = sqsh__metablock_cursor_cleanup(&cursor);
 	assert(rv == 0);
 
-	sqsh__cleanup(&sqsh);
+	sqsh__archive_cleanup(&sqsh);
 	free(data);
 }
 
 static void
 advance_twice(void) {
 	int rv;
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	struct SqshMetablockCursor cursor = {0};
 	uint8_t payload[] = {
 			METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
@@ -110,14 +110,14 @@ advance_twice(void) {
 	rv = sqsh__metablock_cursor_cleanup(&cursor);
 	assert(rv == 0);
 
-	sqsh__cleanup(&sqsh);
+	sqsh__archive_cleanup(&sqsh);
 	free(data);
 }
 
 static void
 advance_overlapping(void) {
 	int rv;
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	struct SqshMetablockCursor cursor;
 	uint8_t payload[] = {
 			METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
@@ -143,7 +143,7 @@ advance_overlapping(void) {
 	rv = sqsh__metablock_cursor_cleanup(&cursor);
 	assert(rv == 0);
 
-	sqsh__cleanup(&sqsh);
+	sqsh__archive_cleanup(&sqsh);
 	free(data);
 }
 

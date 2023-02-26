@@ -39,7 +39,7 @@ sqsh_hdr_priv = [
 ]
 
 sqsh_src = [
-	'src/archive/sqsh.c',
+	'src/archive/archive.c',
 	'src/archive/superblock_context.c',
 	'src/compression/compression.c',
 	'src/context/compression_options_context.c',

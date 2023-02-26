@@ -74,8 +74,8 @@ path_segments_count(const char *path) {
 
 static int
 path_find_inode_ref(
-		uint64_t *target, uint64_t dir_ref, struct Sqsh *sqsh, const char *name,
-		const size_t name_len) {
+		uint64_t *target, uint64_t dir_ref, struct SqshArchive *sqsh,
+		const char *name, const size_t name_len) {
 	struct SqshInodeContext inode = {0};
 	struct SqshDirectoryIterator iter = {0};
 	int rv = 0;
@@ -101,7 +101,7 @@ out:
 }
 
 struct SqshPathResolverContext *
-sqsh_path_resolver_new(struct Sqsh *sqsh, int *err) {
+sqsh_path_resolver_new(struct SqshArchive *sqsh, int *err) {
 	struct SqshPathResolverContext *context =
 			calloc(1, sizeof(struct SqshPathResolverContext));
 	if (context == NULL) {
@@ -117,7 +117,7 @@ sqsh_path_resolver_new(struct Sqsh *sqsh, int *err) {
 
 int
 sqsh__path_resolver_init(
-		struct SqshPathResolverContext *context, struct Sqsh *sqsh) {
+		struct SqshPathResolverContext *context, struct SqshArchive *sqsh) {
 	context->sqsh = sqsh;
 	return 0;
 }
@@ -130,7 +130,7 @@ sqsh_path_resolver_resolve(
 	struct SqshInodeContext *inode = NULL;
 	int segment_count = path_segments_count(path) + 1;
 	const struct SqshSuperblockContext *superblock =
-			sqsh_superblock(context->sqsh);
+			sqsh_archive_superblock(context->sqsh);
 	const char *segment = path;
 	uint64_t *inode_refs = calloc(segment_count, sizeof(uint64_t));
 	if (inode_refs == NULL) {

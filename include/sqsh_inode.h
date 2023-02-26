@@ -40,7 +40,7 @@
 extern "C" {
 #endif
 
-struct Sqsh;
+struct SqshArchive;
 
 ////////////////////////////////////////
 // inode/inode_context.c
@@ -88,7 +88,7 @@ enum SqshInodeContextType {
  * @return a pointer to the sqsh context or NULL if an error occurred.
  */
 SQSH_NO_UNUSED struct SqshInodeContext *
-sqsh_inode_new(struct Sqsh *sqsh, uint64_t inode_ref, int *err);
+sqsh_inode_new(struct SqshArchive *sqsh, uint64_t inode_ref, int *err);
 
 /**
  * @memberof SqshInodeContext

@@ -40,7 +40,7 @@
 extern "C" {
 #endif
 
-struct Sqsh;
+struct SqshArchive;
 
 ////////////////////////////////////////
 // metablock/metablock_iterator.c
@@ -67,7 +67,7 @@ struct SqshMetablockIterator {
  * @return 0 on success, or a negative value on error.
  */
 SQSH_NO_UNUSED int sqsh__metablock_iterator_init(
-		struct SqshMetablockIterator *iterator, struct Sqsh *sqsh,
+		struct SqshMetablockIterator *iterator, struct SqshArchive *sqsh,
 		uint64_t start_address, uint64_t upper_limit);
 
 /**
@@ -176,7 +176,7 @@ struct SqshMetablockCursor {
  * @return 0 on success, less than zero on error.
  */
 SQSH_NO_UNUSED int sqsh__metablock_cursor_init(
-		struct SqshMetablockCursor *cursor, struct Sqsh *sqsh,
+		struct SqshMetablockCursor *cursor, struct SqshArchive *sqsh,
 		const uint64_t start_address, const uint64_t upper_limit);
 
 /**

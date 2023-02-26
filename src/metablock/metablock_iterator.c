@@ -44,11 +44,11 @@
 
 int
 sqsh__metablock_iterator_init(
-		struct SqshMetablockIterator *iterator, struct Sqsh *sqsh,
+		struct SqshMetablockIterator *iterator, struct SqshArchive *sqsh,
 		uint64_t start_address, uint64_t upper_limit) {
-	struct SqshMapManager *map_manager = sqsh_map_manager(sqsh);
+	struct SqshMapManager *map_manager = sqsh_archive_map_manager(sqsh);
 	const struct SqshCompression *compression =
-			sqsh_compression_metablock(sqsh);
+			sqsh_archive_compression_metablock(sqsh);
 
 	iterator->size = 0;
 	iterator->is_compressed = false;

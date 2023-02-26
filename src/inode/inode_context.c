@@ -113,7 +113,8 @@ get_size_info(const struct SqshInodeContext *context, int index) {
 
 int
 sqsh__inode_init(
-		struct SqshInodeContext *inode, struct Sqsh *sqsh, uint64_t inode_ref) {
+		struct SqshInodeContext *inode, struct SqshArchive *sqsh,
+		uint64_t inode_ref) {
 	uint32_t address_outer;
 	uint16_t address_inner;
 
@@ -122,7 +123,8 @@ sqsh__inode_init(
 	inode->inode_ref = inode_ref;
 
 	int rv = 0;
-	const struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
+	const struct SqshSuperblockContext *superblock =
+			sqsh_archive_superblock(sqsh);
 
 	const uint64_t inode_table_start =
 			sqsh_superblock_inode_table_start(superblock);
@@ -152,7 +154,7 @@ sqsh__inode_init(
 }
 
 struct SqshInodeContext *
-sqsh_inode_new(struct Sqsh *sqsh, uint64_t inode_ref, int *err) {
+sqsh_inode_new(struct SqshArchive *sqsh, uint64_t inode_ref, int *err) {
 	struct SqshInodeContext *context =
 			calloc(1, sizeof(struct SqshInodeContext));
 	if (context == NULL) {
@@ -291,7 +293,7 @@ sqsh_inode_file_blocks_start(const struct SqshInodeContext *context) {
 uint32_t
 sqsh_inode_file_block_count(const struct SqshInodeContext *context) {
 	const struct SqshSuperblockContext *superblock =
-			sqsh_superblock(context->sqsh);
+			sqsh_archive_superblock(context->sqsh);
 	uint64_t file_size = sqsh_inode_file_size(context);
 	uint32_t block_size = sqsh_superblock_block_size(superblock);
 
@@ -499,7 +501,7 @@ inode_get_id(const struct SqshInodeContext *context, sqsh_index_t idx) {
 	struct SqshTable *id_table;
 	uint32_t id;
 
-	rv = sqsh_id_table(context->sqsh, &id_table);
+	rv = sqsh_archive_id_table(context->sqsh, &id_table);
 	if (rv < 0) {
 		return UINT32_MAX;
 	}

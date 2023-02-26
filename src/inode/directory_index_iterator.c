@@ -57,7 +57,7 @@ get_inode(const struct SqshDirectoryIndexIterator *iterator) {
 
 int
 sqsh__directory_index_iterator_init(
-		struct SqshDirectoryIndexIterator *iterator, struct Sqsh *sqsh,
+		struct SqshDirectoryIndexIterator *iterator, struct SqshArchive *sqsh,
 		uint64_t inode_ref) {
 	int rv;
 	struct SqshInodeContext *inode = &iterator->inode;
@@ -91,7 +91,7 @@ out:
 SQSH_NO_UNUSED
 struct SqshDirectoryIndexIterator *
 sqsh__directory_index_iterator_new(
-		uint64_t inode_ref, struct Sqsh *sqsh, int *err) {
+		uint64_t inode_ref, struct SqshArchive *sqsh, int *err) {
 	struct SqshDirectoryIndexIterator *iterator =
 			calloc(1, sizeof(struct SqshDirectoryIndexIterator));
 	if (iterator == NULL) {

@@ -43,7 +43,7 @@
 static void
 next_once(void) {
 	int rv;
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
 	uint8_t payload[] = {
 			METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
@@ -68,14 +68,14 @@ next_once(void) {
 	rv = sqsh__metablock_iterator_cleanup(&iter);
 	assert(rv == 0);
 
-	sqsh__cleanup(&sqsh);
+	sqsh__archive_cleanup(&sqsh);
 	free(data);
 }
 
 static void
 next_twice(void) {
 	int rv;
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
 	uint8_t payload[] = {
 			METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
@@ -110,14 +110,14 @@ next_twice(void) {
 	rv = sqsh__metablock_iterator_cleanup(&iter);
 	assert(rv == 0);
 
-	sqsh__cleanup(&sqsh);
+	sqsh__archive_cleanup(&sqsh);
 	free(data);
 }
 
 static void
 next_compressed(void) {
 	int rv;
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
 	uint8_t payload[] = {
 			METABLOCK_HEADER(1, CHUNK_SIZE(ZLIB_ABCD)),
@@ -171,7 +171,7 @@ next_compressed(void) {
 	assert(rv == 0);
 
 	sqsh__buffer_cleanup(&buffer);
-	sqsh__cleanup(&sqsh);
+	sqsh__archive_cleanup(&sqsh);
 	free(data);
 }
 

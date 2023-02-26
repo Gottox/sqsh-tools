@@ -60,8 +60,9 @@ int
 sqsh__file_init(
 		struct SqshFileContext *context, const struct SqshInodeContext *inode) {
 	int rv = 0;
-	struct Sqsh *sqsh = inode->sqsh;
-	const struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
+	struct SqshArchive *sqsh = inode->sqsh;
+	const struct SqshSuperblockContext *superblock =
+			sqsh_archive_superblock(sqsh);
 
 	if (sqsh_inode_type(inode) != SQSH_INODE_TYPE_FILE) {
 		return -SQSH_ERROR_NOT_A_FILE;
@@ -69,11 +70,11 @@ sqsh__file_init(
 
 	context->inode = inode;
 	context->block_size = sqsh_superblock_block_size(superblock);
-	context->map_manager = sqsh_map_manager(sqsh);
-	context->compression = sqsh_compression_data(sqsh);
+	context->map_manager = sqsh_archive_map_manager(sqsh);
+	context->compression = sqsh_archive_compression_data(sqsh);
 
 	if (sqsh_inode_file_has_fragment(inode)) {
-		rv = sqsh_fragment_table(sqsh, &context->fragment_table);
+		rv = sqsh_archive_fragment_table(sqsh, &context->fragment_table);
 		if (rv < 0) {
 			return rv;
 		}

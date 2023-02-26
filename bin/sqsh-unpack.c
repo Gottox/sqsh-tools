@@ -317,7 +317,7 @@ main(int argc, char *argv[]) {
 	const char *image_path;
 	char *src_path = "/";
 	char *target_path = NULL;
-	struct Sqsh *sqsh;
+	struct SqshArchive *sqsh;
 	struct SqshPathResolverContext *resolver = NULL;
 	struct SqshInodeContext *inode = NULL;
 
@@ -405,6 +405,6 @@ main(int argc, char *argv[]) {
 out:
 	sqsh_inode_free(inode);
 	sqsh_path_resolver_free(resolver);
-	sqsh_free(sqsh);
+	sqsh_archive_free(sqsh);
 	return rv;
 }

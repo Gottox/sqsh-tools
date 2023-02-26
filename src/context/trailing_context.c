@@ -38,11 +38,13 @@
 #include "../utils.h"
 
 int
-sqsh__trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh) {
+sqsh__trailing_init(
+		struct SqshTrailingContext *context, struct SqshArchive *sqsh) {
 	int rv = 0;
-	const struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
+	const struct SqshSuperblockContext *superblock =
+			sqsh_archive_superblock(sqsh);
 	uint64_t trailing_start = sqsh_superblock_bytes_used(superblock);
-	struct SqshMapManager *map_manager = sqsh_map_manager(sqsh);
+	struct SqshMapManager *map_manager = sqsh_archive_map_manager(sqsh);
 	size_t archive_size = sqsh__map_manager_size(map_manager);
 	uint64_t trailing_size;
 

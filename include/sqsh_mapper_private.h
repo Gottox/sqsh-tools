@@ -45,7 +45,7 @@
 extern "C" {
 #endif
 
-struct Sqsh;
+struct SqshArchive;
 struct SqshConfig;
 
 ////////////////////////////////////////

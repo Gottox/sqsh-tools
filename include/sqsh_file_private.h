@@ -42,7 +42,7 @@
 extern "C" {
 #endif
 
-struct Sqsh;
+struct SqshArchive;
 
 ////////////////////////////////////////
 // context/file_context.c

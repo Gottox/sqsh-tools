@@ -50,7 +50,7 @@ struct SqshInodeContext {
 	 */
 	uint64_t inode_ref;
 	struct SqshMetablockCursor metablock;
-	struct Sqsh *sqsh;
+	struct SqshArchive *sqsh;
 };
 
 /**
@@ -66,7 +66,7 @@ struct SqshInodeContext {
  * @return int 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int sqsh__inode_init(
-		struct SqshInodeContext *context, struct Sqsh *sqsh,
+		struct SqshInodeContext *context, struct SqshArchive *sqsh,
 		uint64_t inode_ref);
 /**
  * @internal
@@ -101,7 +101,7 @@ struct SqshDirectoryIndexIterator {
  * @return 0 on success, negative value on error
  */
 SQSH_NO_UNUSED int sqsh__directory_index_iterator_init(
-		struct SqshDirectoryIndexIterator *iterator, struct Sqsh *sqsh,
+		struct SqshDirectoryIndexIterator *iterator, struct SqshArchive *sqsh,
 		uint64_t inode_ref);
 
 /**
@@ -117,7 +117,7 @@ SQSH_NO_UNUSED int sqsh__directory_index_iterator_init(
  */
 SQSH_NO_UNUSED
 struct SqshDirectoryIndexIterator *sqsh__directory_index_iterator_new(
-		uint64_t inode_ref, struct Sqsh *sqsh, int *err);
+		uint64_t inode_ref, struct SqshArchive *sqsh, int *err);
 
 /**
  * @internal

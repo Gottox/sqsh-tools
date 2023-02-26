@@ -45,14 +45,16 @@
 #include "../../include/sqsh_data_private.h"
 
 int
-sqsh__fragment_table_init(struct SqshFragmentTable *table, struct Sqsh *sqsh) {
+sqsh__fragment_table_init(
+		struct SqshFragmentTable *table, struct SqshArchive *sqsh) {
 	int rv = 0;
-	const struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
+	const struct SqshSuperblockContext *superblock =
+			sqsh_archive_superblock(sqsh);
 	uint64_t start = sqsh_superblock_fragment_table_start(superblock);
 	uint32_t count = sqsh_superblock_fragment_entry_count(superblock);
 
-	table->compression = sqsh_compression_data(sqsh);
-	table->map_manager = sqsh_map_manager(sqsh);
+	table->compression = sqsh_archive_compression_data(sqsh);
+	table->map_manager = sqsh_archive_map_manager(sqsh);
 	rv = sqsh__table_init(
 			&table->table, sqsh, start, SQSH_SIZEOF_FRAGMENT, count);
 	if (rv < 0) {

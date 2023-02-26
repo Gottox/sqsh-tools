@@ -49,7 +49,7 @@ struct SqshXattrIterator {
 	/**
 	 * @privatesection
 	 */
-	struct Sqsh *sqsh;
+	struct SqshArchive *sqsh;
 	struct SqshMetablockCursor metablock;
 	struct SqshMetablockCursor out_of_line_value;
 	struct SqshXattrTable *context;
@@ -105,8 +105,8 @@ struct SqshXattrTable {
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int
-sqsh__xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh);
+SQSH_NO_UNUSED int sqsh__xattr_table_init(
+		struct SqshXattrTable *context, struct SqshArchive *sqsh);
 
 /**
  * @internal

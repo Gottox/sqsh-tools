@@ -203,7 +203,7 @@ int sqsh_xattr_iterator_free(struct SqshXattrIterator *iterator);
 // xattr/xattr_table.c
 
 struct SqshDataXattrLookupTable;
-struct Sqsh;
+struct SqshArchive;
 struct SqshXattrTable;
 
 enum SqshXattrType {

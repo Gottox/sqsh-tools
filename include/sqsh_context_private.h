@@ -42,7 +42,7 @@
 extern "C" {
 #endif
 
-struct Sqsh;
+struct SqshArchive;
 
 ////////////////////////////////////////
 // context/superblock_context.c
@@ -101,7 +101,8 @@ struct SqshCompressionOptionsContext {
  * @param sqsh the Sqsh struct
  */
 SQSH_NO_UNUSED int sqsh__compression_options_init(
-		struct SqshCompressionOptionsContext *context, struct Sqsh *sqsh);
+		struct SqshCompressionOptionsContext *context,
+		struct SqshArchive *sqsh);
 
 /**
  * @internal
@@ -119,7 +120,7 @@ struct SqshPathResolverContext {
 	/**
 	 * @privatesection
 	 */
-	struct Sqsh *sqsh;
+	struct SqshArchive *sqsh;
 };
 
 /**
@@ -133,7 +134,7 @@ struct SqshPathResolverContext {
  * @return int 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int sqsh__path_resolver_init(
-		struct SqshPathResolverContext *context, struct Sqsh *sqsh);
+		struct SqshPathResolverContext *context, struct SqshArchive *sqsh);
 
 /**
  * @internal
@@ -166,8 +167,8 @@ struct SqshTrailingContext {
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int
-sqsh__trailing_init(struct SqshTrailingContext *context, struct Sqsh *sqsh);
+SQSH_NO_UNUSED int sqsh__trailing_init(
+		struct SqshTrailingContext *context, struct SqshArchive *sqsh);
 
 /**
  * @internal

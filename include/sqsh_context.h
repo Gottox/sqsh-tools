@@ -40,7 +40,7 @@
 extern "C" {
 #endif
 
-struct Sqsh;
+struct SqshArchive;
 
 ////////////////////////////////////////
 // context/compression_options_context.c
@@ -97,7 +97,7 @@ enum SqshLzoAlgorithm {
  */
 SQSH_NO_UNUSED
 struct SqshCompressionOptionsContext *
-sqsh_compression_options_new(struct Sqsh *sqsh, int *err);
+sqsh_compression_options_new(struct SqshArchive *sqsh, int *err);
 
 /**
  * @memberof SqshCompressionOptionsContext
@@ -208,7 +208,7 @@ struct SqshPathResolverContext;
  * @return The Initialized path resolver context
  */
 struct SqshPathResolverContext *
-sqsh_path_resolver_new(struct Sqsh *sqsh, int *err);
+sqsh_path_resolver_new(struct SqshArchive *sqsh, int *err);
 
 /**
  * @memberof SqshPathResolverContext

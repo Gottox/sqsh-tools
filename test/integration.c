@@ -45,9 +45,9 @@
 static void
 sqsh_empty(void) {
 	int rv;
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	const struct SqshConfig config = DEFAULT_CONFIG(0);
-	rv = sqsh__init(&sqsh, NULL, &config);
+	rv = sqsh__archive_init(&sqsh, NULL, &config);
 	assert(rv == -SQSH_ERROR_SUPERBLOCK_TOO_SMALL);
 }
 
@@ -55,11 +55,11 @@ static void
 sqsh_get_nonexistant(void) {
 	int rv;
 	struct SqshInodeContext *inode = NULL;
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	struct SqshPathResolverContext resolver = {0};
 
 	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(squash_image));
-	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
@@ -72,7 +72,7 @@ sqsh_get_nonexistant(void) {
 	rv = sqsh_path_resolver_cleanup(&resolver);
 	assert(rv == 0);
 
-	rv = sqsh__cleanup(&sqsh);
+	rv = sqsh__archive_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -82,13 +82,13 @@ sqsh_ls(void) {
 	char *name;
 	struct SqshInodeContext inode = {0};
 	struct SqshDirectoryIterator *iter = NULL;
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	const struct SqshSuperblockContext *superblock;
 	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(squash_image));
-	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
-	superblock = sqsh_superblock(&sqsh);
+	superblock = sqsh_archive_superblock(&sqsh);
 	rv = sqsh__inode_init(
 			&inode, &sqsh, sqsh_superblock_inode_root_ref(superblock));
 	assert(rv == 0);
@@ -128,7 +128,7 @@ sqsh_ls(void) {
 	rv = sqsh__inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = sqsh__cleanup(&sqsh);
+	rv = sqsh__archive_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -139,10 +139,10 @@ sqsh_cat_fragment(void) {
 	size_t size;
 	struct SqshInodeContext *inode = NULL;
 	struct SqshFileContext file = {0};
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	struct SqshPathResolverContext resolver = {0};
 	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(squash_image));
-	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
@@ -172,7 +172,7 @@ sqsh_cat_fragment(void) {
 	rv = sqsh_path_resolver_cleanup(&resolver);
 	assert(rv == 0);
 
-	rv = sqsh__cleanup(&sqsh);
+	rv = sqsh__archive_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -183,13 +183,13 @@ sqsh_cat_datablock_and_fragment(void) {
 	size_t size;
 	struct SqshInodeContext *inode = NULL;
 	struct SqshFileContext file = {0};
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	struct SqshPathResolverContext resolver = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(squash_image),
 	};
-	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
@@ -222,7 +222,7 @@ sqsh_cat_datablock_and_fragment(void) {
 	rv = sqsh_path_resolver_cleanup(&resolver);
 	assert(rv == 0);
 
-	rv = sqsh__cleanup(&sqsh);
+	rv = sqsh__archive_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -233,13 +233,13 @@ sqsh_cat_size_overflow(void) {
 	size_t size;
 	struct SqshInodeContext *inode = NULL;
 	struct SqshFileContext file = {0};
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	struct SqshPathResolverContext resolver = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(squash_image),
 	};
-	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
@@ -272,7 +272,7 @@ sqsh_cat_size_overflow(void) {
 	rv = sqsh_path_resolver_cleanup(&resolver);
 	assert(rv == 0);
 
-	rv = sqsh__cleanup(&sqsh);
+	rv = sqsh__archive_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -281,16 +281,16 @@ sqsh_test_uid_and_gid(void) {
 	int rv;
 	uint32_t uid, gid;
 	struct SqshInodeContext inode = {0};
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	const struct SqshSuperblockContext *superblock;
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(squash_image),
 	};
-	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
-	superblock = sqsh_superblock(&sqsh);
+	superblock = sqsh_archive_superblock(&sqsh);
 	rv = sqsh__inode_init(
 			&inode, &sqsh, sqsh_superblock_inode_root_ref(superblock));
 	assert(rv == 0);
@@ -303,7 +303,7 @@ sqsh_test_uid_and_gid(void) {
 	rv = sqsh__inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = sqsh__cleanup(&sqsh);
+	rv = sqsh__archive_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -311,13 +311,13 @@ static void
 sqsh_test_extended_dir(void) {
 	int rv;
 	struct SqshInodeContext *inode = NULL;
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	struct SqshPathResolverContext resolver = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(squash_image),
 	};
-	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
@@ -329,7 +329,7 @@ sqsh_test_extended_dir(void) {
 	rv = sqsh_inode_free(inode);
 	assert(rv == 0);
 
-	rv = sqsh__cleanup(&sqsh);
+	rv = sqsh__archive_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -342,16 +342,16 @@ sqsh_test_xattr(void) {
 	struct SqshInodeContext *entry_inode = NULL;
 	struct SqshDirectoryIterator *dir_iter = NULL;
 	struct SqshXattrIterator *xattr_iter = NULL;
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	const struct SqshSuperblockContext *superblock;
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(squash_image),
 	};
-	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
-	superblock = sqsh_superblock(&sqsh);
+	superblock = sqsh_archive_superblock(&sqsh);
 	rv = sqsh__inode_init(
 			&inode, &sqsh, sqsh_superblock_inode_root_ref(superblock));
 	assert(rv == 0);
@@ -432,7 +432,7 @@ sqsh_test_xattr(void) {
 	rv = sqsh__inode_cleanup(&inode);
 	assert(rv == 0);
 
-	rv = sqsh__cleanup(&sqsh);
+	rv = sqsh__archive_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -460,13 +460,13 @@ fuzz_crash_1(void) {
 			0x62, 0x62, 0x29, 0x62, 0x62, 0x62, 0x62, 0xff, 0xff, 0x62, 0x62};
 
 	struct SqshInodeContext *inode;
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	struct SqshPathResolverContext resolver = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(input),
 	};
-	rv = sqsh__init(&sqsh, input, &config);
+	rv = sqsh__archive_init(&sqsh, input, &config);
 	assert(rv == 0);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
@@ -478,7 +478,7 @@ fuzz_crash_1(void) {
 	rv = sqsh_inode_free(inode);
 	assert(rv == 0);
 
-	rv = sqsh__cleanup(&sqsh);
+	rv = sqsh__archive_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -499,13 +499,13 @@ fuzz_crash_2(void) {
 	};
 
 	struct SqshInodeContext *inode = NULL;
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	struct SqshPathResolverContext resolver = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(input),
 	};
-	rv = sqsh__init(&sqsh, input, &config);
+	rv = sqsh__archive_init(&sqsh, input, &config);
 	assert(rv == 0);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
@@ -517,7 +517,7 @@ fuzz_crash_2(void) {
 	rv = sqsh_inode_free(inode);
 	assert(rv == 0);
 
-	rv = sqsh__cleanup(&sqsh);
+	rv = sqsh__archive_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -539,13 +539,13 @@ fuzz_crash_3(void) {
 	};
 
 	struct SqshInodeContext *inode = NULL;
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	struct SqshPathResolverContext resolver = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(input),
 	};
-	rv = sqsh__init(&sqsh, input, &config);
+	rv = sqsh__archive_init(&sqsh, input, &config);
 	assert(rv == 0);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
@@ -557,7 +557,7 @@ fuzz_crash_3(void) {
 	rv = sqsh_inode_free(inode);
 	assert(rv == 0);
 
-	rv = sqsh__cleanup(&sqsh);
+	rv = sqsh__archive_cleanup(&sqsh);
 	assert(rv == 0);
 }
 
@@ -590,16 +590,16 @@ fuzz_crash_4(void) {
 	};
 
 	struct SqshTable *id_table = NULL;
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(input),
 	};
-	rv = sqsh__init(&sqsh, input, &config);
+	rv = sqsh__archive_init(&sqsh, input, &config);
 	assert(rv == 0);
-	rv = sqsh_id_table(&sqsh, &id_table);
+	rv = sqsh_archive_id_table(&sqsh, &id_table);
 	assert(rv == -SQSH_ERROR_SIZE_MISSMATCH);
-	sqsh__cleanup(&sqsh);
+	sqsh__archive_cleanup(&sqsh);
 }
 
 static void
@@ -631,16 +631,16 @@ fuzz_crash_5(void) {
 	};
 
 	struct SqshTable *id_table = NULL;
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(input),
 	};
-	rv = sqsh__init(&sqsh, input, &config);
+	rv = sqsh__archive_init(&sqsh, input, &config);
 	assert(rv == 0);
-	rv = sqsh_id_table(&sqsh, &id_table);
+	rv = sqsh_archive_id_table(&sqsh, &id_table);
 	assert(rv == -SQSH_ERROR_SIZE_MISSMATCH);
-	sqsh__cleanup(&sqsh);
+	sqsh__archive_cleanup(&sqsh);
 }
 
 static void
@@ -658,16 +658,16 @@ fuzz_crash_6(void) {
 	};
 
 	struct SqshTable *id_table = NULL;
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(input),
 	};
-	rv = sqsh__init(&sqsh, input, &config);
+	rv = sqsh__archive_init(&sqsh, input, &config);
 	assert(rv == 0);
-	rv = sqsh_id_table(&sqsh, &id_table);
+	rv = sqsh_archive_id_table(&sqsh, &id_table);
 	assert(rv == -SQSH_ERROR_SIZE_MISSMATCH);
-	sqsh__cleanup(&sqsh);
+	sqsh__archive_cleanup(&sqsh);
 }
 
 static void
@@ -686,13 +686,13 @@ fuzz_crash_7(void) {
 	};
 
 	struct SqshTable *id_table = NULL;
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(input));
-	rv = sqsh__init(&sqsh, input, &config);
+	rv = sqsh__archive_init(&sqsh, input, &config);
 	assert(rv == 0);
-	rv = sqsh_id_table(&sqsh, &id_table);
+	rv = sqsh_archive_id_table(&sqsh, &id_table);
 	assert(rv == -SQSH_ERROR_SIZE_MISSMATCH);
-	sqsh__cleanup(&sqsh);
+	sqsh__archive_cleanup(&sqsh);
 }
 
 static void
@@ -710,17 +710,17 @@ fuzz_crash_8(void) {
 			0x0, 0x0, 0xff, 0xff, 0xff, 0xff, 0x0, 0xe4, 0x0,
 	};
 
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(input));
-	rv = sqsh__init(&sqsh, input, &config);
+	rv = sqsh__archive_init(&sqsh, input, &config);
 	assert(rv != 0);
-	sqsh__cleanup(&sqsh);
+	sqsh__archive_cleanup(&sqsh);
 }
 
 static void
 free_null_crash_1(void) {
 	int rv;
-	rv = sqsh_free(NULL);
+	rv = sqsh_archive_free(NULL);
 	assert(rv == 0);
 	rv = sqsh_file_free(NULL);
 	assert(rv == 0);
@@ -733,7 +733,7 @@ free_null_crash_1(void) {
 }
 
 struct Walker {
-	struct Sqsh *sqsh;
+	struct SqshArchive *sqsh;
 	uint64_t inode_number;
 };
 
@@ -771,13 +771,14 @@ static void
 multithreaded(void) {
 	int rv;
 	pthread_t threads[16] = {0};
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 
 	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(squash_image));
-	rv = sqsh__init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
 
-	const struct SqshSuperblockContext *superblock = sqsh_superblock(&sqsh);
+	const struct SqshSuperblockContext *superblock =
+			sqsh_archive_superblock(&sqsh);
 	struct Walker walker = {
 			.sqsh = &sqsh,
 			.inode_number = sqsh_superblock_inode_root_ref(superblock),
@@ -792,7 +793,7 @@ multithreaded(void) {
 		assert(rv == 0);
 	}
 
-	rv = sqsh__cleanup(&sqsh);
+	rv = sqsh__archive_cleanup(&sqsh);
 	assert(rv == 0);
 }
 

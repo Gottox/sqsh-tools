@@ -187,8 +187,9 @@ stat_lzo_options(
 }
 
 static int
-stat_image(struct Sqsh *sqsh) {
-	const struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
+stat_image(struct SqshArchive *sqsh) {
+	const struct SqshSuperblockContext *superblock =
+			sqsh_archive_superblock(sqsh);
 	struct SqshCompressionOptionsContext *compression_options;
 	int compression_id = sqsh_superblock_compression_id(superblock);
 	int rv = 0;
@@ -327,7 +328,7 @@ main(int argc, char *argv[]) {
 	int rv = 0;
 	int opt = 0;
 	const char *image_path;
-	struct Sqsh *sqsh;
+	struct SqshArchive *sqsh;
 	struct SqshPathResolverContext *resolver = NULL;
 
 	while ((opt = getopt(argc, argv, "vh")) != -1) {
@@ -370,6 +371,6 @@ main(int argc, char *argv[]) {
 
 out:
 	sqsh_path_resolver_free(resolver);
-	sqsh_free(sqsh);
+	sqsh_archive_free(sqsh);
 	return rv;
 }

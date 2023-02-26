@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static struct Sqsh *
+static struct SqshArchive *
 open_archive(const char *image_path, int *err) {
 	struct SqshConfig config = {
 			.source_mapper = NULL,
@@ -32,7 +32,7 @@ open_archive(const char *image_path, int *err) {
 	}
 #endif
 
-	return sqsh_new(image_path, &config, err);
+	return sqsh_archive_new(image_path, &config, err);
 }
 
 #endif /* end of include guard COMMON_H */

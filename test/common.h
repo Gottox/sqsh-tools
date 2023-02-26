@@ -76,7 +76,7 @@
 #define LENGTH(x) (sizeof(x) / sizeof(x[0]))
 
 uint8_t *
-mk_stub(struct Sqsh *sqsh, uint8_t *payload, size_t payload_size,
+mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size,
 		size_t *target_size);
 
 #endif /* !COMMON_H */

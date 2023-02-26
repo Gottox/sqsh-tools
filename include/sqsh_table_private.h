@@ -50,7 +50,7 @@ struct SqshTable {
 	/**
 	 * @privatesection
 	 */
-	struct Sqsh *sqsh;
+	struct SqshArchive *sqsh;
 	struct SqshMapper *mapper;
 	struct SqshMapCursor lookup_table;
 	uint64_t start_block;
@@ -72,7 +72,7 @@ struct SqshTable {
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_UNUSED int sqsh__table_init(
-		struct SqshTable *table, struct Sqsh *sqsh, uint64_t start_block,
+		struct SqshTable *table, struct SqshArchive *sqsh, uint64_t start_block,
 		size_t element_size, size_t element_count);
 
 /**
@@ -109,8 +109,8 @@ struct SqshFragmentTable {
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int
-sqsh__fragment_table_init(struct SqshFragmentTable *context, struct Sqsh *sqsh);
+SQSH_NO_UNUSED int sqsh__fragment_table_init(
+		struct SqshFragmentTable *context, struct SqshArchive *sqsh);
 
 /**
  * @internal

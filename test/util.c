@@ -14,7 +14,7 @@
 #include <assert.h>
 
 uint8_t *
-mk_stub(struct Sqsh *sqsh, uint8_t *payload, size_t payload_size,
+mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size,
 		size_t *target_size) {
 	int rv;
 	struct SqshDataSuperblock superblock = {
@@ -45,7 +45,7 @@ mk_stub(struct Sqsh *sqsh, uint8_t *payload, size_t payload_size,
 
 	*target_size = SQSH_SIZEOF_SUPERBLOCK + payload_size;
 	const struct SqshConfig config = DEFAULT_CONFIG(*target_size);
-	rv = sqsh__init(sqsh, data, &config);
+	rv = sqsh__archive_init(sqsh, data, &config);
 	assert(0 == rv);
 	(void)rv;
 	return data;

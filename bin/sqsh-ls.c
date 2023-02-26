@@ -262,7 +262,7 @@ main(int argc, char *argv[]) {
 	int rv = 0;
 	int opt = 0;
 	const char *image_path;
-	struct Sqsh *sqsh;
+	struct SqshArchive *sqsh;
 	struct SqshPathResolverContext *resolver = NULL;
 
 	while ((opt = getopt(argc, argv, "vrhl")) != -1) {
@@ -318,6 +318,6 @@ main(int argc, char *argv[]) {
 
 out:
 	sqsh_path_resolver_free(resolver);
-	sqsh_free(sqsh);
+	sqsh_archive_free(sqsh);
 	return rv;
 }

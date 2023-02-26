@@ -47,7 +47,7 @@ extern "C" {
  * @brief The Sqsh struct contains all information about the current
  * sqsh session.
  */
-struct Sqsh {
+struct SqshArchive {
 	/**
 	 * @privatesection
 	 */
@@ -66,7 +66,7 @@ struct Sqsh {
 /**
  * @internal
  * @brief sqsh__init initializes the Sqsh structure.
- * @memberof Sqsh
+ * @memberof SqshArchive
  *
  * @param sqsh the Sqsh structure to initialize.
  * @param source the source to retrieve the archive from
@@ -74,20 +74,20 @@ struct Sqsh {
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh__init(
-		struct Sqsh *sqsh, const void *source, const struct SqshConfig *config);
+SQSH_NO_UNUSED int sqsh__archive_init(
+		struct SqshArchive *sqsh, const void *source,
+		const struct SqshConfig *config);
 
 /**
  * @internal
  * @brief sqsh__cleanup frees all resources allocated by the Sqsh structure and
  * cleans up the structure.
- *
- * @memberof Sqsh
+ * @memberof SqshArchive
  *
  * @param sqsh the Sqsh structure to cleanup.
  * @return 0 on success, less than 0 on error.
  */
-int sqsh__cleanup(struct Sqsh *sqsh);
+int sqsh__archive_cleanup(struct SqshArchive *sqsh);
 
 #ifdef __cplusplus
 }

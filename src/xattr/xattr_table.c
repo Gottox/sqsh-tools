@@ -45,10 +45,12 @@ get_header(const struct SqshXattrTable *context) {
 }
 
 int
-sqsh__xattr_table_init(struct SqshXattrTable *context, struct Sqsh *sqsh) {
+sqsh__xattr_table_init(
+		struct SqshXattrTable *context, struct SqshArchive *sqsh) {
 	int rv = 0;
-	const struct SqshSuperblockContext *superblock = sqsh_superblock(sqsh);
-	struct SqshMapManager *map_manager = sqsh_map_manager(sqsh);
+	const struct SqshSuperblockContext *superblock =
+			sqsh_archive_superblock(sqsh);
+	struct SqshMapManager *map_manager = sqsh_archive_map_manager(sqsh);
 	const uint64_t xattr_address =
 			sqsh_superblock_xattr_id_table_start(superblock);
 	uint64_t upper_limit;
