@@ -39,10 +39,6 @@
 #	define _NDEBUG
 #endif
 
-#ifndef _GNU_SOURCE
-#	define _GNU_SOURCE
-#endif
-
 #include <assert.h>
 #include <libgen.h>
 #include <limits.h>
