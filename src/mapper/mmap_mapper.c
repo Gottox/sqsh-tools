@@ -31,8 +31,6 @@
  * @file         mmap_mapper.c
  */
 
-#define _GNU_SOURCE
-
 #include "../../include/sqsh_mapper_private.h"
 #include "../utils.h"
 
