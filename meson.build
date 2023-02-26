@@ -12,7 +12,7 @@ project(
 )
 
 sqsh_hdr = [
-	'include/sqsh.h',
+	'include/sqsh_archive.h',
 	'include/sqsh_common.h',
 	'include/sqsh_compression_private.h',
 	'include/sqsh_context.h',
@@ -39,10 +39,11 @@ sqsh_hdr_priv = [
 ]
 
 sqsh_src = [
+	'src/archive/sqsh.c',
+	'src/archive/superblock_context.c',
 	'src/compression/compression.c',
 	'src/context/compression_options_context.c',
 	'src/context/path_resolver_context.c',
-	'src/context/superblock_context.c',
 	'src/context/trailing_context.c',
 	'src/data/compression_options_data.c',
 	'src/data/datablock_data.c',
@@ -68,7 +69,6 @@ sqsh_src = [
 	'src/primitive/buffer.c',
 	'src/primitive/lru.c',
 	'src/primitive/rc_map.c',
-	'src/sqsh.c',
 	'src/table/table.c',
 	'src/xattr/xattr_iterator.c',
 	'src/xattr/xattr_table.c',

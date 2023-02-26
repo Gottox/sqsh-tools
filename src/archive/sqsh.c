@@ -31,7 +31,7 @@
  * @file         sqsh.c
  */
 
-#include "../include/sqsh_private.h"
+#include "../include/sqsh_archive_private.h"
 
 #include "../include/sqsh_data.h"
 

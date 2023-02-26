@@ -28,13 +28,13 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_private.h
+ * @file         sqsh_archive_private.h
  */
 
-#ifndef SQSH_PRIVATE_H
-#define SQSH_PRIVATE_H
+#ifndef SQSH_ARCHIVE_PRIVATE_H
+#define SQSH_ARCHIVE_PRIVATE_H
 
-#include "sqsh.h"
+#include "sqsh_archive.h"
 #include "sqsh_compression_private.h"
 #include "sqsh_error.h"
 #include "sqsh_xattr_private.h"
@@ -92,4 +92,4 @@ int sqsh__cleanup(struct Sqsh *sqsh);
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_PRIVATE_H
+#endif // SQSH_ARCHIVE_PRIVATE_H

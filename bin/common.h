@@ -12,7 +12,7 @@
 #endif
 
 #include <ctype.h>
-#include <sqsh.h>
+#include <sqsh_archive.h>
 #include <sqsh_error.h>
 #include <sqsh_mapper.h>
 #include <stdlib.h>

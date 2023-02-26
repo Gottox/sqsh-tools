@@ -39,10 +39,10 @@ extern "C" {
 #include "common.h"
 #include "test.h"
 }
+#include <sqsh_archive_private.h>
 #include <sqsh_context.h>
 #include <sqsh_directory.h>
 #include <sqsh_mapper.h>
-#include <sqsh_private.h>
 #include <squashfs_image.h>
 #include <stdint.h>
 
