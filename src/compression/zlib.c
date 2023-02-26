@@ -55,26 +55,32 @@ sqsh_zlib_init(void *context, uint8_t *target, size_t target_size) {
 
 static int
 sqsh_zlib_decompress(
-		void *context, const uint8_t *compressed, const size_t compressed_size,
-		bool end) {
-	int rv = 0;
+		void *context, const uint8_t *compressed,
+		const size_t compressed_size) {
+	int rv;
 	z_stream *stream = context;
 	stream->next_in = (Bytef *)compressed;
 	stream->avail_in = compressed_size;
-	rv = inflate(stream, end ? Z_FINISH : Z_NO_FLUSH);
+	rv = inflate(stream, Z_NO_FLUSH);
 
-	if (end && rv != Z_STREAM_END) {
+	if (rv != Z_STREAM_END && rv != Z_OK) {
 		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
-	} else if (!end && rv != Z_OK) {
-		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
-	} else {
-		return 0;
 	}
+	return 0;
 }
 
 static int
 sqsh_zlib_finish(void *context, size_t *written_size) {
+	int rv;
 	z_stream *stream = context;
+	stream->next_in = Z_NULL;
+	stream->avail_in = 0;
+
+	rv = inflate(stream, Z_FINISH);
+
+	if (rv != Z_STREAM_END) {
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+	}
 
 	*written_size = stream->total_out;
 	return 0;
@@ -91,8 +97,7 @@ sqsh_extract_zlib(
 		return rv;
 	}
 
-	if ((rv = sqsh_zlib_decompress(
-				 &stream, compressed, compressed_size, true)) < 0) {
+	if ((rv = sqsh_zlib_decompress(&stream, compressed, compressed_size)) < 0) {
 		return rv;
 	}
 
