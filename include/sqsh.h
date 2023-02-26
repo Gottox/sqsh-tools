@@ -139,7 +139,8 @@ sqsh_compression_metablock(const struct Sqsh *sqsh);
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh_id_table(struct Sqsh *sqsh, struct SqshTable **id_table);
+SQSH_NO_UNUSED int
+sqsh_id_table(struct Sqsh *sqsh, struct SqshTable **id_table);
 
 /**
  * @memberof Sqsh
@@ -152,7 +153,8 @@ int sqsh_id_table(struct Sqsh *sqsh, struct SqshTable **id_table);
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh_export_table(struct Sqsh *sqsh, struct SqshTable **export_table);
+SQSH_NO_UNUSED int
+sqsh_export_table(struct Sqsh *sqsh, struct SqshTable **export_table);
 
 /**
  * @memberof Sqsh
@@ -165,7 +167,7 @@ int sqsh_export_table(struct Sqsh *sqsh, struct SqshTable **export_table);
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh_fragment_table(
+SQSH_NO_UNUSED int sqsh_fragment_table(
 		struct Sqsh *sqsh, struct SqshFragmentTable **fragment_table);
 
 /**
@@ -179,7 +181,8 @@ int sqsh_fragment_table(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh_xattr_table(struct Sqsh *sqsh, struct SqshXattrTable **xattr_table);
+SQSH_NO_UNUSED int
+sqsh_xattr_table(struct Sqsh *sqsh, struct SqshXattrTable **xattr_table);
 
 /**
  * @memberof Sqsh
