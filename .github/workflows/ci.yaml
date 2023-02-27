@@ -17,10 +17,10 @@ jobs:
         CC=clang meson setup /tmp/build \
           -Dcurl=false  \
           -Dzlib=true \
-          -Dlz4=false \
-          -Dlzma=false  \
-          -Dlzo2=false  \
-          -Dzstd=false  \
+          -Dlz4=true \
+          -Dlzma=true  \
+          -Dlzo2=true  \
+          -Dzstd=true  \
           -Dtest=true \
           -Ddoc=false
     - name: test
