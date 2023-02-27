@@ -84,6 +84,7 @@ sqsh_test = [
 	'test/primitive/buffer.c',
 	'test/primitive/lru.c',
 	'test/primitive/rc_map.c',
+	'test/primitive/rc_hash_map.c',
 	'test/compression/compression.c',
 ]
 sqsh_test_util = [
