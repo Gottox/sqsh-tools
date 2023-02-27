@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         null.c
+ * @file         comression.c
  */
 
 #include "../../include/sqsh_compression_private.h"
