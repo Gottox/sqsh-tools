@@ -41,10 +41,8 @@
 #include <inttypes.h>
 #include <stdint.h>
 
-#define SUPERBLOCK_REQUEST_SIZE \
-	(SQSH_SIZEOF_SUPERBLOCK + SQSH_SIZEOF_COMPRESSION_OPTIONS)
-#define CONTENT_RANGE "Content-Range: "
-#define CONTENT_RANGE_LENGTH (sizeof(CONTENT_RANGE) - 1)
+#define CONTENT_RANGE "Content-Range"
+#define CONTENT_RANGE_FORMAT "bytes %" PRIu64 "-%" PRIu64 "/%" PRIu64
 
 struct SqshCurlWriteInfo {
 	uint8_t *buffer;
@@ -82,14 +80,14 @@ write_data(void *ptr, size_t size, size_t nmemb, void *userdata) {
 
 static int
 get_total_size(CURL *handle, uint64_t *total) {
+	static const char *format = CONTENT_RANGE_FORMAT;
+
 	int rv = 0;
 	uint64_t dummy;
 	struct curl_header *header = NULL;
-	static const char *format = "bytes %" PRIu64 "-%" PRIu64 "/%" PRIu64;
 	int scanned_fields;
 
-	rv = curl_easy_header(
-			handle, "Content-Range", 0, CURLH_HEADER, -1, &header);
+	rv = curl_easy_header(handle, CONTENT_RANGE, 0, CURLH_HEADER, -1, &header);
 	if (rv != CURLE_OK) {
 		return -SQSH_ERROR_CURL_INVALID_RANGE_HEADER;
 	}
