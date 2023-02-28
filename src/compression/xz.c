@@ -36,28 +36,78 @@
 #include "../../include/sqsh_error.h"
 
 #include <lzma.h>
+#include <string.h>
+
+static lzma_stream proto_stream = LZMA_STREAM_INIT;
+
+static int
+sqsh_xz_init(void *context, uint8_t *target, size_t target_size) {
+	lzma_stream *stream = context;
+	memcpy(stream, &proto_stream, sizeof(lzma_stream));
+
+	lzma_ret ret = lzma_stream_decoder(stream, UINT64_MAX, 0);
+
+	if (ret != LZMA_OK) {
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+	}
+
+	stream->next_out = target;
+	stream->avail_out = target_size;
+
+	return 0;
+}
+
+static int
+sqsh_xz_decompress(
+		void *context, const uint8_t *compressed,
+		const size_t compressed_size) {
+	lzma_stream *stream = context;
+
+	stream->next_in = compressed;
+	stream->avail_in = compressed_size;
+
+	lzma_ret ret = lzma_code(stream, LZMA_RUN);
+	if (ret != LZMA_OK && ret != LZMA_STREAM_END) {
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+	}
+
+	return 0;
+}
+
+static int
+sqsh_xz_finish(void *context, size_t *written_size) {
+	lzma_stream *stream = context;
+	stream->next_in = NULL;
+	stream->avail_in = 0;
+
+	lzma_ret ret = lzma_code(stream, LZMA_FINISH);
+
+	if (ret != LZMA_STREAM_END) {
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+	}
+
+	*written_size = stream->total_out;
+	return 0;
+}
 
 int
 sqsh_extract_xz(
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
+	lzma_stream stream = {0};
 	int rv = 0;
-	size_t compressed_pos = 0;
-	size_t target_pos = 0;
-	uint64_t memlimit = UINT64_MAX;
 
-	rv = lzma_stream_buffer_decode(
-			&memlimit, 0, NULL, compressed, &compressed_pos, compressed_size,
-			target, &target_pos, *target_size);
-
-	*target_size = target_pos;
-
-	if (rv != LZMA_OK) {
-		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+	if ((rv = sqsh_xz_init(&stream, target, *target_size)) < 0) {
+		return rv;
 	}
 
-	if (compressed_pos != compressed_size) {
-		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+	if ((rv = sqsh_xz_decompress(&stream, compressed, compressed_size)) < 0) {
+		return rv;
 	}
+
+	if ((rv = sqsh_xz_finish(&stream, target_size)) < 0) {
+		return rv;
+	}
+
 	return rv;
 }

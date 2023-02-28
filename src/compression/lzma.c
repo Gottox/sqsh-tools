@@ -36,36 +36,78 @@
 #include "../../include/sqsh_error.h"
 
 #include <lzma.h>
+#include <string.h>
+
+static lzma_stream proto_stream = LZMA_STREAM_INIT;
+
+static int
+sqsh_lzma_init(void *context, uint8_t *target, size_t target_size) {
+	lzma_stream *stream = context;
+	memcpy(stream, &proto_stream, sizeof(lzma_stream));
+
+	lzma_ret ret = lzma_alone_decoder(stream, UINT64_MAX);
+
+	if (ret != LZMA_OK) {
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+	}
+
+	stream->next_out = target;
+	stream->avail_out = target_size;
+
+	return 0;
+}
+
+static int
+sqsh_lzma_decompress(
+		void *context, const uint8_t *compressed,
+		const size_t compressed_size) {
+	lzma_stream *stream = context;
+
+	stream->next_in = compressed;
+	stream->avail_in = compressed_size;
+
+	lzma_ret ret = lzma_code(stream, LZMA_RUN);
+	if (ret != LZMA_OK && ret != LZMA_STREAM_END) {
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+	}
+
+	return 0;
+}
+
+static int
+sqsh_lzma_finish(void *context, size_t *written_size) {
+	lzma_stream *stream = context;
+	stream->next_in = NULL;
+	stream->avail_in = 0;
+
+	lzma_ret ret = lzma_code(stream, LZMA_FINISH);
+
+	if (ret != LZMA_STREAM_END) {
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+	}
+
+	*written_size = stream->total_out;
+	return 0;
+}
 
 int
 sqsh_extract_lzma(
 		uint8_t *target, size_t *target_size, const uint8_t *compressed,
 		const size_t compressed_size) {
-	lzma_ret rv = LZMA_OK;
-	lzma_stream strm = LZMA_STREAM_INIT;
+	lzma_stream stream = {0};
+	int rv = 0;
 
-	rv = lzma_alone_decoder(&strm, UINT64_MAX);
-	if (rv != LZMA_OK) {
-		lzma_end(&strm);
-		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+	if ((rv = sqsh_lzma_init(&stream, target, *target_size)) < 0) {
+		return rv;
 	}
 
-	lzma_action action = LZMA_RUN;
-
-	strm.next_in = compressed;
-	strm.avail_in = compressed_size;
-
-	strm.next_out = target;
-	strm.avail_out = *target_size;
-
-	action = LZMA_FINISH;
-
-	if (lzma_code(&strm, action) != LZMA_OK) {
-		rv = -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+	if ((rv = sqsh_lzma_decompress(&stream, compressed, compressed_size)) < 0) {
+		return rv;
 	}
 
-	*target_size = strm.avail_out;
-	lzma_end(&strm);
+	if ((rv = sqsh_lzma_finish(&stream, target_size)) < 0) {
+		return rv;
+	}
 
 	return rv;
 }
