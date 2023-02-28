@@ -45,6 +45,40 @@ map_cleanup_cb(void *data) {
 	sqsh__mapping_cleanup(mapping);
 }
 
+SQSH_NO_UNUSED static int
+load_mapping(
+		struct SqshMapManager *manager, const struct SqshMapping **target,
+		sqsh_index_t index, int span) {
+	int rv = 0;
+	struct SqshMapping mapping = {0};
+	assert(span == 1);
+
+	size_t block_size = sqsh__mapper_block_size(&manager->mapper);
+	size_t block_count = sqsh__map_manager_block_count(manager);
+	size_t file_size = sqsh__map_manager_size(manager);
+	size_t size = block_size;
+	sqsh_index_t offset;
+	if (SQSH_MULT_OVERFLOW(index, block_size, &offset)) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+
+	// If we're retrieving the last block, we need to make sure that we don't
+	// read past the end of the file, so cap the size to the remaining bytes.
+	if (index == block_count - 1 && file_size % block_size != 0) {
+		size = file_size % block_size;
+	}
+
+	rv = sqsh__mapping_init(&mapping, &manager->mapper, offset, size);
+	if (rv < 0) {
+		goto out;
+	}
+
+	*target = sqsh__rc_map_set(&manager->maps, index, &mapping, span);
+
+out:
+	return rv;
+}
+
 int
 sqsh__map_manager_init(
 		struct SqshMapManager *manager, const void *input,
@@ -99,40 +133,6 @@ sqsh__map_manager_block_count(const struct SqshMapManager *manager) {
 	return sqsh__rc_map_size(&manager->maps);
 }
 
-static int
-load_mapping(
-		struct SqshMapManager *manager, const struct SqshMapping **target,
-		sqsh_index_t index, int span) {
-	int rv = 0;
-	struct SqshMapping mapping = {0};
-	assert(span == 1);
-
-	size_t block_size = sqsh__mapper_block_size(&manager->mapper);
-	size_t block_count = sqsh__map_manager_block_count(manager);
-	size_t file_size = sqsh__map_manager_size(manager);
-	size_t size = block_size;
-	sqsh_index_t offset;
-	if (SQSH_MULT_OVERFLOW(index, block_size, &offset)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
-
-	// If we're retrieving the last block, we need to make sure that we don't
-	// read past the end of the file, so cap the size to the remaining bytes.
-	if (index == block_count - 1 && file_size % block_size != 0) {
-		size = file_size % block_size;
-	}
-
-	rv = sqsh__mapping_init(&mapping, &manager->mapper, offset, size);
-	if (rv < 0) {
-		goto out;
-	}
-
-	*target = sqsh__rc_map_set(&manager->maps, index, &mapping, span);
-
-out:
-	return rv;
-}
-
 int
 sqsh__map_manager_get(
 		struct SqshMapManager *manager, sqsh_index_t index, int span,
@@ -152,6 +152,9 @@ sqsh__map_manager_get(
 
 	if (*target == NULL) {
 		rv = load_mapping(manager, target, index, span);
+		if (rv < 0) {
+			goto out;
+		}
 	}
 	rv = sqsh__lru_touch(&manager->lru, real_index);
 
