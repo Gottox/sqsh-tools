@@ -43,6 +43,7 @@ sqsh_src = [
 	'src/archive/compression_options_context.c',
 	'src/archive/superblock_context.c',
 	'src/compression/compression.c',
+	'src/compression/compression_manager.c',
 	'src/context/path_resolver_context.c',
 	'src/context/trailing_context.c',
 	'src/data/compression_options_data.c',

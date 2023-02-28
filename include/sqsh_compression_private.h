@@ -34,11 +34,16 @@
 #ifndef SQSH_COMPRESSION_PRIVATE_H
 #define SQSH_COMPRESSION_PRIVATE_H
 
-#include "sqsh_common.h"
+#include "sqsh_primitive_private.h"
+
+#include <pthread.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+////////////////////////////////////////
+// compression/compression.c
 
 struct SqshBuffer;
 
@@ -95,6 +100,33 @@ SQSH_NO_UNUSED int sqsh__compression_decompress_to_buffer(
  * @return 0 on success, a negative value on error.
  */
 int sqsh__compression_cleanup(struct SqshCompression *compression);
+
+////////////////////////////////////////
+// compression/compression_manager.c
+
+struct SqshCompressionManager {
+	struct SqshCompression *compression;
+	struct SqshRcHashMap *hash_map;
+	struct SqshLru lru;
+	pthread_mutex_t lock;
+};
+
+SQSH_NO_UNUSED int sqsh__compression_manager_init(
+		struct SqshCompressionManager *compression_manager, size_t size);
+
+size_t sqsh__compression_manager_size(
+		struct SqshCompressionManager *compression_manager);
+
+SQSH_NO_UNUSED int sqsh__compression_manager_get(
+		struct SqshCompressionManager *compression_manager, uint64_t offset,
+		size_t size, struct SqshBuffer **target);
+
+int sqsh__compression_manager_release(
+		struct SqshCompressionManager *compression_manager,
+		struct SqshBuffer *buffer);
+
+int sqsh__compression_manager_cleanup(
+		struct SqshCompressionManager *compression_manager);
 
 #ifdef __cplusplus
 }
