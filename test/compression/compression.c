@@ -145,7 +145,7 @@ decompress_zstd(void) {
 }
 
 DEFINE
-TEST_OFF(decompress_lzma);
+TEST(decompress_lzma);
 TEST(decompress_xz);
 TEST_OFF(decompress_lz4);
 TEST_OFF(decompress_lzo2);
