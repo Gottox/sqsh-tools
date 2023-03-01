@@ -41,7 +41,8 @@
 
 static int
 sqsh_lz4_finish(void *context, uint8_t *target, size_t *target_size) {
-	const char *compressed = (const char *)sqsh__buffering_compression_data(context);
+	const char *compressed =
+			(const char *)sqsh__buffering_compression_data(context);
 	const size_t compressed_size = sqsh__buffering_compression_size(context);
 
 	int rv = LZ4_decompress_safe(
@@ -50,6 +51,7 @@ sqsh_lz4_finish(void *context, uint8_t *target, size_t *target_size) {
 		rv = -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 		goto out;
 	}
+	*target_size = rv;
 
 out:
 	sqsh__buffering_compression_cleanup(context);
