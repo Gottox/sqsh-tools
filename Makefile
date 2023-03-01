@@ -14,6 +14,7 @@ MESON_FLAGS += -Ddefault_library=static
 MESON_FLAGS += -Db_lundef=false
 MESON_FLAGS += -Dtest=true
 MESON_FLAGS += -Ddoc=internal
+MESON_FLAGS += -Dlzo2=true
 #MESON_FLAGS += -Db_coverage=true
 
 SANATIZE = 0

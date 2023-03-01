@@ -131,8 +131,18 @@ if get_option('lzma')
 endif
 
 if get_option('lzo2')
-	libsqsh_deps += dependency('lzo2')
 	build_args += '-DCONFIG_LZO'
+	build_args += '-DCONFIG_LZO_HELPER_PATH="@0@/@1@/sqsh-lzo-helper"'.format(get_option('prefix'), get_option('libexecdir'))
+	lzo_helper = executable('sqsh-lzo-helper',
+		'bin/sqsh-lzo-helper.c',
+		install: true,
+		install_dir: get_option('libexecdir'),
+		c_args : build_args,
+		dependencies: dependency('lzo2'),
+	)
+	lzo_helper_path = lzo_helper.full_path()
+else
+	lzo_helper_path = ''
 endif
 
 if get_option('zstd')
@@ -214,7 +224,7 @@ if get_option('test')
 			include_directories : 'include',
 			link_with : libsqsh
 		)
-		test(p, t)
+		test(p, t, env: { 'SQSH_LZO_HELPER_PATH': lzo_helper_path })
 	endforeach
 endif
 

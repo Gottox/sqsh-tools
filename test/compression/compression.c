@@ -91,8 +91,7 @@ decompress_lz4(void) {
 
 static void
 decompress_lzo2(void) {
-	uint8_t input[] = {0xf0, 0x00, 0x00, 0x00, 0x04, 0x15, 0x61,
-					   0x62, 0x63, 0x64, 0x11, 0x00, 0x00};
+	uint8_t input[] = {0x15, 0x61, 0x62, 0x63, 0x64, 0x11, 0x00, 0x00};
 
 	decompress_test(sqsh__lzo2_impl, input, sizeof(input));
 }
@@ -118,7 +117,7 @@ DEFINE
 TEST(decompress_lzma);
 TEST(decompress_xz);
 TEST_OFF(decompress_lz4);
-TEST_OFF(decompress_lzo2);
+TEST(decompress_lzo2);
 TEST(decompress_zlib);
 TEST(decompress_zstd);
 DEFINE_END

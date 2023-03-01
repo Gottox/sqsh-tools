@@ -104,3 +104,9 @@ sqsh_inode_cleanup(&inode);
 
 The user is supposed to interact with structures of *src/context* and *src/iterator*
 modules. 
+
+## License
+
+The library is licensed under Simplified BSD License (BSD-2-Clause). The one
+exception is `bin/sqsh-lzo-helper.c`, which is licensed under GPL-2.0-only.
+This is done to comply with lzo's licence terms.
