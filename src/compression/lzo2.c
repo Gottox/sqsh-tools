@@ -129,7 +129,7 @@ init_helper_subprocess(struct SqshLzoHelper *helper) {
 }
 
 static void
-init_helper() {
+init_helper(void) {
 	worker_count = get_nprocs();
 	if (worker_count < 1) {
 		worker_count = 1;

@@ -28,7 +28,7 @@
 #include <stdlib.h>
 
 static int
-sqsh_uncompress() {
+sqsh_uncompress(void) {
 	int rv = 0;
 	uint64_t compressed_size = 0;
 	uint64_t target_size = 0;
