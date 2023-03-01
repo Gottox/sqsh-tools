@@ -94,6 +94,9 @@ sqsh__compression_decompress_to_buffer(
 	// TODO: check return value of decompress
 	impl->decompress(&compression_context, compressed, compressed_size);
 	rv = impl->finish(&compression_context, decompressed, &size);
+	if (rv < 0) {
+		return rv;
+	}
 
 	rv = sqsh__buffer_add_size(buffer, size);
 	return rv;
