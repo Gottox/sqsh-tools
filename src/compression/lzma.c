@@ -34,18 +34,35 @@
 #include "../../include/sqsh_compression_private.h"
 
 #include "../../include/sqsh_error.h"
+#include "sqsh_common.h"
 
-#include <lzma.h>
-#include <string.h>
+#ifdef CONFIG_LZMA
+
+#	include <lzma.h>
+#	include <string.h>
+
+SQSH_STATIC_ASSERT(sizeof(sqsh__compression_context_t) >= sizeof(lzma_stream));
 
 static lzma_stream proto_stream = LZMA_STREAM_INIT;
 
+enum SqshLzmaType {
+	LZMA_TYPE_ALONE,
+	LZMA_TYPE_XZ,
+};
+
 static int
-sqsh_lzma_init(void *context, uint8_t *target, size_t target_size) {
+sqsh_lzma_init(
+		void *context, uint8_t *target, size_t target_size,
+		enum SqshLzmaType type) {
 	lzma_stream *stream = context;
 	memcpy(stream, &proto_stream, sizeof(lzma_stream));
 
-	lzma_ret ret = lzma_alone_decoder(stream, UINT64_MAX);
+	lzma_ret ret;
+	if (type == LZMA_TYPE_ALONE) {
+		ret = lzma_alone_decoder(stream, UINT64_MAX);
+	} else {
+		ret = lzma_stream_decoder(stream, UINT64_MAX, 0);
+	}
 
 	if (ret != LZMA_OK) {
 		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
@@ -55,6 +72,16 @@ sqsh_lzma_init(void *context, uint8_t *target, size_t target_size) {
 	stream->avail_out = target_size;
 
 	return 0;
+}
+
+static int
+sqsh_lzma_init_xz(void *context, uint8_t *target, size_t target_size) {
+	return sqsh_lzma_init(context, target, target_size, LZMA_TYPE_XZ);
+}
+
+static int
+sqsh_lzma_init_alone(void *context, uint8_t *target, size_t target_size) {
+	return sqsh_lzma_init(context, target, target_size, LZMA_TYPE_ALONE);
 }
 
 static int
@@ -75,7 +102,8 @@ sqsh_lzma_decompress(
 }
 
 static int
-sqsh_lzma_finish(void *context, size_t *written_size) {
+sqsh_lzma_finish(void *context, uint8_t *target, size_t *target_size) {
+	(void)target;
 	lzma_stream *stream = context;
 	stream->next_in = NULL;
 	stream->avail_in = 0;
@@ -86,28 +114,26 @@ sqsh_lzma_finish(void *context, size_t *written_size) {
 		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
-	*written_size = stream->total_out;
+	*target_size = stream->total_out;
 	return 0;
 }
 
-int
-sqsh_extract_lzma(
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size) {
-	lzma_stream stream = {0};
-	int rv = 0;
+const static struct SqshCompressionImpl impl_xz = {
+		.init = sqsh_lzma_init_xz,
+		.decompress = sqsh_lzma_decompress,
+		.finish = sqsh_lzma_finish,
+};
 
-	if ((rv = sqsh_lzma_init(&stream, target, *target_size)) < 0) {
-		return rv;
-	}
+const struct SqshCompressionImpl *sqsh__xz_impl = &impl_xz;
 
-	if ((rv = sqsh_lzma_decompress(&stream, compressed, compressed_size)) < 0) {
-		return rv;
-	}
+const static struct SqshCompressionImpl impl_lzma = {
+		.init = sqsh_lzma_init_alone,
+		.decompress = sqsh_lzma_decompress,
+		.finish = sqsh_lzma_finish,
+};
 
-	if ((rv = sqsh_lzma_finish(&stream, target_size)) < 0) {
-		return rv;
-	}
-
-	return rv;
-}
+const struct SqshCompressionImpl *sqsh__lzma_impl = &impl_lzma;
+#else
+const struct SqshCompressionImpl *sqsh__lzma_impl = NULL;
+const struct SqshCompressionImpl *sqsh__xz_impl = NULL;
+#endif

@@ -35,7 +35,11 @@
 
 #include "../../include/sqsh_error.h"
 
-#include <zlib.h>
+#ifdef CONFIG_ZLIB
+
+#	include <zlib.h>
+
+SQSH_STATIC_ASSERT(sizeof(sqsh__compression_context_t) >= sizeof(z_stream));
 
 static int
 sqsh_zlib_init(void *context, uint8_t *target, size_t target_size) {
@@ -70,7 +74,9 @@ sqsh_zlib_decompress(
 }
 
 static int
-sqsh_zlib_finish(void *context, size_t *written_size) {
+sqsh_zlib_finish(void *context, uint8_t *target, size_t *target_size) {
+	(void)target;
+
 	int rv;
 	z_stream *stream = context;
 	stream->next_in = Z_NULL;
@@ -82,28 +88,17 @@ sqsh_zlib_finish(void *context, size_t *written_size) {
 		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
-	*written_size = stream->total_out;
+	*target_size = stream->total_out;
 	return 0;
 }
 
-int
-sqsh_extract_zlib(
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size) {
-	z_stream stream = {0};
-	int rv = 0;
+const static struct SqshCompressionImpl impl = {
+		.init = sqsh_zlib_init,
+		.decompress = sqsh_zlib_decompress,
+		.finish = sqsh_zlib_finish,
+};
 
-	if ((rv = sqsh_zlib_init(&stream, target, *target_size)) < 0) {
-		return rv;
-	}
-
-	if ((rv = sqsh_zlib_decompress(&stream, compressed, compressed_size)) < 0) {
-		return rv;
-	}
-
-	if ((rv = sqsh_zlib_finish(&stream, target_size)) < 0) {
-		return rv;
-	}
-
-	return rv;
-}
+const struct SqshCompressionImpl *sqsh__zlib_impl = &impl;
+#else
+const struct SqshCompressionImpl *sqsh__zlib_impl = NULL;
+#endif

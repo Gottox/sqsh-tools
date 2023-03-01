@@ -35,17 +35,37 @@
 
 #include "../../include/sqsh_error.h"
 
-#include <lzo/lzo1x.h>
+#ifdef CONFIG_LZO
 
-int
-sqsh_extract_lzo2(
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size) {
+#	include <lzo/lzo1x.h>
+
+static int
+sqsh_lzo2_finish(void *context, uint8_t *target, size_t *target_size) {
+	struct SqshBufferingCompression *lzo = context;
+
+	const uint8_t *compressed = lzo->compressed;
+	const size_t compressed_size = lzo->compressed_size;
+
 	int rv = lzo1x_decompress_safe(
 			compressed, compressed_size, target, target_size, NULL);
 
 	if (rv != LZO_E_OK) {
-		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+		rv = -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+		goto out;
 	}
-	return 0;
+
+out:
+	sqsh__buffering_compression_cleanup(context);
+	return rv;
 }
+
+const static struct SqshCompressionImpl impl = {
+		.init = sqsh__buffering_compression_init,
+		.decompress = sqsh__buffering_compression_decompress,
+		.finish = sqsh_lzo2_finish,
+};
+
+const struct SqshCompressionImpl *sqsh__lzo2_impl = &impl;
+#else
+const struct SqshCompressionImpl *sqsh__lzo2_impl = NULL;
+#endif

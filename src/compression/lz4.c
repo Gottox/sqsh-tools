@@ -35,18 +35,36 @@
 
 #include "../../include/sqsh_error.h"
 
-#include <lz4.h>
+#ifdef CONFIG_LZ4
 
-int
-sqsh_extract_lz4(
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size) {
+#	include <lz4.h>
+
+static int
+sqsh_lz4_finish(void *context, uint8_t *target, size_t *target_size) {
+	struct SqshBufferingCompression *lzo = context;
+
+	const char *compressed = (const char *)lzo->compressed;
+	const size_t compressed_size = lzo->compressed_size;
+
 	int rv = LZ4_decompress_safe(
-			(char *)compressed, (char *)target, compressed_size, *target_size);
+			compressed, (char *)target, compressed_size, *target_size);
 	if (rv < 0) {
-		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+		rv = -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+		goto out;
 	}
-	*target_size = rv;
 
-	return 0;
+out:
+	sqsh__buffering_compression_cleanup(context);
+	return rv;
 }
+
+const static struct SqshCompressionImpl impl = {
+		.init = sqsh__buffering_compression_init,
+		.decompress = sqsh__buffering_compression_decompress,
+		.finish = sqsh_lz4_finish,
+};
+
+const struct SqshCompressionImpl *sqsh__lz4_impl = &impl;
+#else
+const struct SqshCompressionImpl *sqsh__lz4_impl = NULL;
+#endif

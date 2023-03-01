@@ -38,37 +38,33 @@
 #include <sqsh_compression_private.h>
 #include <stdint.h>
 
-int sqsh_extract_lzma(
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size);
-int sqsh_extract_xz(
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size);
-int sqsh_extract_lz4(
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size);
-int sqsh_extract_lzo2(
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size);
-int sqsh_extract_zlib(
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size);
-int sqsh_extract_zstd(
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size);
+static void
+decompress_test(
+		const struct SqshCompressionImpl *impl, uint8_t *input,
+		size_t input_size) {
+	int rv;
+	uint8_t output[16];
+	size_t output_size = sizeof(output);
+	sqsh__compression_context_t context = {0};
+
+	rv = impl->init(context, output, output_size);
+	assert(rv >= 0);
+	rv = impl->decompress(context, input, input_size);
+	assert(rv >= 0);
+	rv = impl->finish(context, output, &output_size);
+	assert(rv >= 0);
+
+	assert(output_size == 4);
+	assert(memcmp(output, "abcd", 4) == 0);
+}
 
 static void
 decompress_lzma(void) {
 	uint8_t input[] = {0x5d, 0x00, 0x00, 0x80, 0x00, 0xff, 0xff, 0xff, 0xff,
 					   0xff, 0xff, 0xff, 0xff, 0x00, 0x30, 0x98, 0x88, 0x98,
 					   0x46, 0x7e, 0x1e, 0xb2, 0xff, 0xfa, 0x1c, 0x80, 0x00};
-	size_t target_size = 4;
-	uint8_t output[4];
 
-	int rv = sqsh_extract_lzma(output, &target_size, input, sizeof(input));
-	assert(rv >= 0);
-	assert(target_size == 4);
-	assert(memcmp(output, "abcd", 4) == 0);
+	decompress_test(sqsh__lzma_impl, input, sizeof(input));
 }
 
 static void
@@ -80,13 +76,8 @@ decompress_xz(void) {
 					   0x59, 0x28, 0x9d, 0x3c, 0x00, 0x01, 0x1c, 0x04, 0x6f,
 					   0x2c, 0x9c, 0xc1, 0x1f, 0xb6, 0xf3, 0x7d, 0x01, 0x00,
 					   0x00, 0x00, 0x00, 0x04, 0x59, 0x5a};
-	size_t target_size = 4;
-	uint8_t output[4];
 
-	int rv = sqsh_extract_xz(output, &target_size, input, sizeof(input));
-	assert(rv >= 0);
-	assert(target_size == 4);
-	assert(memcmp(output, "abcd", 4) == 0);
+	decompress_test(sqsh__xz_impl, input, sizeof(input));
 }
 
 static void
@@ -94,27 +85,16 @@ decompress_lz4(void) {
 	uint8_t input[] = {0x04, 0x22, 0x4d, 0x18, 0x68, 0x40, 0x04, 0x00, 0x00,
 					   0x00, 0x00, 0x00, 0x00, 0x00, 0xcd, 0x04, 0x00, 0x00,
 					   0x80, 0x61, 0x62, 0x63, 0x64, 0x00, 0x00, 0x00, 0x00};
-	size_t target_size = 4;
-	uint8_t output[4];
 
-	int rv = sqsh_extract_lz4(output, &target_size, input, sizeof(input));
-	assert(rv >= 0);
-	assert(target_size == 4);
-	assert(memcmp(output, "abcd", 4) == 0);
+	decompress_test(sqsh__lz4_impl, input, sizeof(input));
 }
 
 static void
 decompress_lzo2(void) {
-	uint8_t input[] = {
-			ZLIB_ABCD,
-	};
-	size_t target_size = 4;
-	uint8_t output[4];
+	uint8_t input[] = {0xf0, 0x00, 0x00, 0x00, 0x04, 0x15, 0x61,
+					   0x62, 0x63, 0x64, 0x11, 0x00, 0x00};
 
-	int rv = sqsh_extract_lzo2(output, &target_size, input, sizeof(input));
-	assert(rv >= 0);
-	assert(target_size == 4);
-	assert(memcmp(output, "abcd", 4) == 0);
+	decompress_test(sqsh__lzo2_impl, input, sizeof(input));
 }
 
 static void
@@ -122,26 +102,16 @@ decompress_zlib(void) {
 	uint8_t input[] = {
 			ZLIB_ABCD,
 	};
-	size_t target_size = 4;
-	uint8_t output[4];
 
-	int rv = sqsh_extract_zlib(output, &target_size, input, sizeof(input));
-	assert(rv >= 0);
-	assert(target_size == 4);
-	assert(memcmp(output, "abcd", 4) == 0);
+	decompress_test(sqsh__zlib_impl, input, sizeof(input));
 }
 
 static void
 decompress_zstd(void) {
 	uint8_t input[] = {0x28, 0xb5, 0x2f, 0xfd, 0x20, 0x04, 0x21,
 					   0x00, 0x00, 0x61, 0x62, 0x63, 0x64};
-	size_t target_size = 4;
-	uint8_t output[4];
 
-	int rv = sqsh_extract_zstd(output, &target_size, input, sizeof(input));
-	assert(rv >= 0);
-	assert(target_size == 4);
-	assert(memcmp(output, "abcd", 4) == 0);
+	decompress_test(sqsh__zstd_impl, input, sizeof(input));
 }
 
 DEFINE

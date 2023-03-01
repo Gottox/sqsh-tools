@@ -42,8 +42,14 @@ sqsh_src = [
 	'src/archive/archive.c',
 	'src/archive/compression_options_context.c',
 	'src/archive/superblock_context.c',
+	'src/compression/buffering_compression.c',
 	'src/compression/compression.c',
 	'src/compression/compression_manager.c',
+	'src/compression/lz4.c',
+	'src/compression/lzma.c',
+	'src/compression/lzo2.c',
+	'src/compression/zlib.c',
+	'src/compression/zstd.c',
 	'src/context/path_resolver_context.c',
 	'src/context/trailing_context.c',
 	'src/data/compression_options_data.c',
@@ -111,32 +117,26 @@ endif
 
 if get_option('zlib')
 	libsqsh_deps += dependency('zlib')
-	sqsh_src += 'src/compression/zlib.c'
 	build_args += '-DCONFIG_ZLIB'
 endif
 
 if get_option('lz4')
 	libsqsh_deps += dependency('liblz4')
-	sqsh_src += 'src/compression/lz4.c'
 	build_args += '-DCONFIG_LZ4'
 endif
 
 if get_option('lzma')
 	libsqsh_deps += dependency('liblzma')
-	sqsh_src += 'src/compression/lzma.c'
-	sqsh_src += 'src/compression/xz.c'
 	build_args += '-DCONFIG_LZMA'
 endif
 
 if get_option('lzo2')
 	libsqsh_deps += dependency('lzo2')
-	sqsh_src += 'src/compression/lzo2.c'
 	build_args += '-DCONFIG_LZO'
 endif
 
 if get_option('zstd')
 	libsqsh_deps += dependency('libzstd')
-	sqsh_src += 'src/compression/zstd.c'
 	build_args += '-DCONFIG_ZSTD'
 endif
 

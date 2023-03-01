@@ -42,20 +42,26 @@
 extern "C" {
 #endif
 
+struct SqshBuffer;
+
 ////////////////////////////////////////
 // compression/compression.c
 
-struct SqshBuffer;
+typedef uint8_t sqsh__compression_context_t[256];
 
-typedef int (*sqsh_extract_func_t)(
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size);
+struct SqshCompressionImpl {
+	int (*init)(void *context, uint8_t *target, size_t target_size);
+	int (*decompress)(
+			void *context, const uint8_t *compressed,
+			const size_t compressed_size);
+	int (*finish)(void *context, uint8_t *target, size_t *target_size);
+};
 
 struct SqshCompression {
 	/**
 	 * @privatesection
 	 */
-	sqsh_extract_func_t impl;
+	const struct SqshCompressionImpl *impl;
 	size_t block_size;
 };
 
@@ -102,6 +108,21 @@ SQSH_NO_UNUSED int sqsh__compression_decompress_to_buffer(
 int sqsh__compression_cleanup(struct SqshCompression *compression);
 
 ////////////////////////////////////////
+// compression/buffering_compression.c
+
+struct SqshBufferingCompression {
+	struct SqshBuffer buffer;
+	const uint8_t *compressed;
+	size_t compressed_size;
+};
+
+int sqsh__buffering_compression_init(
+		void *context, uint8_t *target, size_t target_size);
+int sqsh__buffering_compression_decompress(
+		void *context, const uint8_t *compressed, const size_t compressed_size);
+int sqsh__buffering_compression_cleanup(void *context);
+
+////////////////////////////////////////
 // compression/compression_manager.c
 
 struct SqshCompressionManager {
@@ -127,6 +148,31 @@ int sqsh__compression_manager_release(
 
 int sqsh__compression_manager_cleanup(
 		struct SqshCompressionManager *compression_manager);
+
+////////////////////////////////////////
+// compression/lz4.c
+
+extern const struct SqshCompressionImpl *sqsh__lz4_impl;
+////////////////////////////////////////
+// compression/lzma.c
+
+extern const struct SqshCompressionImpl *sqsh__lzma_impl;
+extern const struct SqshCompressionImpl *sqsh__xz_impl;
+
+////////////////////////////////////////
+// compression/lzo2.c
+
+extern const struct SqshCompressionImpl *sqsh__lzo2_impl;
+
+////////////////////////////////////////
+// compression/zlib.c
+
+extern const struct SqshCompressionImpl *sqsh__zlib_impl;
+
+////////////////////////////////////////
+// compression/zstd.c
+
+extern const struct SqshCompressionImpl *sqsh__zstd_impl;
 
 #ifdef __cplusplus
 }

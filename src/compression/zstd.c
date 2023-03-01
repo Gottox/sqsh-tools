@@ -35,16 +35,37 @@
 
 #include "../../include/sqsh_error.h"
 
-#include <zstd.h>
+#ifdef CONFIG_ZSTD
 
-int
-sqsh_extract_zstd(
-		uint8_t *target, size_t *target_size, const uint8_t *compressed,
-		const size_t compressed_size) {
+#	include <zstd.h>
+
+static int
+sqsh_zstd_finish(void *context, uint8_t *target, size_t *target_size) {
+	struct SqshBufferingCompression *lzo = context;
+
+	const uint8_t *compressed = lzo->compressed;
+	const size_t compressed_size = lzo->compressed_size;
+
 	int rv = ZSTD_decompress(target, *target_size, compressed, compressed_size);
+	*target_size = rv;
 
 	if (ZSTD_isError(rv)) {
-		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+		rv = -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+		goto out;
 	}
+
+out:
+	sqsh__buffering_compression_cleanup(context);
 	return rv;
 }
+
+const static struct SqshCompressionImpl impl = {
+		.init = sqsh__buffering_compression_init,
+		.decompress = sqsh__buffering_compression_decompress,
+		.finish = sqsh_zstd_finish,
+};
+
+const struct SqshCompressionImpl *sqsh__zstd_impl = &impl;
+#else
+const struct SqshCompressionImpl *sqsh__zstd_impl = NULL;
+#endif
