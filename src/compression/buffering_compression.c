@@ -5,7 +5,6 @@
  */
 
 #include "../../include/sqsh_compression_private.h"
-#include "sqsh_primitive_private.h"
 
 SQSH_STATIC_ASSERT(
 		sizeof(sqsh__compression_context_t) >=
@@ -58,6 +57,17 @@ sqsh__buffering_compression_decompress(
 
 	return rv;
 }
+
+const uint8_t *
+sqsh__buffering_compression_data(void *context) {
+	return ((struct SqshBufferingCompression *)context)->compressed;
+}
+
+size_t
+sqsh__buffering_compression_size(void *context) {
+	return ((struct SqshBufferingCompression *)context)->compressed_size;
+}
+
 int
 sqsh__buffering_compression_cleanup(void *context) {
 	struct SqshBufferingCompression *buffering = context;

@@ -155,15 +155,14 @@ sqsh_lzo2_finish(void *context, uint8_t *target, size_t *target_size) {
 	current_worker %= worker_count;
 
 	struct SqshLzoHelper *hlp = &helper[current_worker];
-	struct SqshBufferingCompression *ctx =
-			(struct SqshBufferingCompression *)context;
 
 	if (pthread_mutex_lock(&hlp->mutex) != 0) {
 		rv = -SQSH_ERROR_TODO;
 		goto out;
 	}
-	const uint8_t *compressed = ctx->compressed;
-	uint64_t compressed_size = ctx->compressed_size;
+	const uint8_t *compressed = sqsh__buffering_compression_data(context);
+	const uint64_t compressed_size = sqsh__buffering_compression_size(context);
+
 	uint64_t target_size_64 = *target_size;
 	rv = fwrite(&target_size_64, sizeof(uint64_t), 1, hlp->compressed_fd);
 	if (rv != 1) {
@@ -206,7 +205,7 @@ sqsh_lzo2_finish(void *context, uint8_t *target, size_t *target_size) {
 	pthread_mutex_unlock(&hlp->mutex);
 
 out:
-	sqsh__buffering_compression_cleanup(ctx);
+	sqsh__buffering_compression_cleanup(context);
 	return rv;
 }
 

@@ -41,10 +41,8 @@
 
 static int
 sqsh_zstd_finish(void *context, uint8_t *target, size_t *target_size) {
-	struct SqshBufferingCompression *lzo = context;
-
-	const uint8_t *compressed = lzo->compressed;
-	const size_t compressed_size = lzo->compressed_size;
+	const uint8_t *compressed = sqsh__buffering_compression_data(context);
+	const size_t compressed_size = sqsh__buffering_compression_size(context);
 
 	int rv = ZSTD_decompress(target, *target_size, compressed, compressed_size);
 	*target_size = rv;

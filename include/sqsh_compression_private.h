@@ -120,6 +120,8 @@ int sqsh__buffering_compression_init(
 		void *context, uint8_t *target, size_t target_size);
 int sqsh__buffering_compression_decompress(
 		void *context, const uint8_t *compressed, const size_t compressed_size);
+size_t sqsh__buffering_compression_size(void *context);
+const uint8_t *sqsh__buffering_compression_data(void *context);
 int sqsh__buffering_compression_cleanup(void *context);
 
 ////////////////////////////////////////

@@ -41,10 +41,8 @@
 
 static int
 sqsh_lz4_finish(void *context, uint8_t *target, size_t *target_size) {
-	struct SqshBufferingCompression *lzo = context;
-
-	const char *compressed = (const char *)lzo->compressed;
-	const size_t compressed_size = lzo->compressed_size;
+	const char *compressed = (const char *)sqsh__buffering_compression_data(context);
+	const size_t compressed_size = sqsh__buffering_compression_size(context);
 
 	int rv = LZ4_decompress_safe(
 			compressed, (char *)target, compressed_size, *target_size);
