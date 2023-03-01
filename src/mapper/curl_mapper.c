@@ -37,12 +37,14 @@
 #include "../../include/sqsh_error.h"
 #include "../utils.h"
 
-#include <curl/curl.h>
-#include <inttypes.h>
-#include <stdint.h>
+#ifdef CONFIG_CURL
 
-#define CONTENT_RANGE "Content-Range"
-#define CONTENT_RANGE_FORMAT "bytes %" PRIu64 "-%" PRIu64 "/%" PRIu64
+#	include <curl/curl.h>
+#	include <inttypes.h>
+#	include <stdint.h>
+
+#	define CONTENT_RANGE "Content-Range"
+#	define CONTENT_RANGE_FORMAT "bytes %" PRIu64 "-%" PRIu64 "/%" PRIu64
 
 struct SqshCurlWriteInfo {
 	uint8_t *buffer;
@@ -287,3 +289,6 @@ static const struct SqshMemoryMapperImpl impl = {
 		.map_data = sqsh_mapping_curl_data, .unmap = sqsh_mapping_curl_unmap,
 };
 const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_curl = &impl;
+#else
+const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_curl = NULL;
+#endif

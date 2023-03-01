@@ -66,6 +66,7 @@ sqsh_src = [
 	'src/file/fragment_table.c',
 	'src/inode/directory_index_iterator.c',
 	'src/inode/inode_context.c',
+	'src/mapper/curl_mapper.c',
 	'src/mapper/cursor.c',
 	'src/mapper/map_manager.c',
 	'src/mapper/mapper.c',
@@ -111,7 +112,6 @@ link_args = [
 
 if get_option('curl')
 	libsqsh_deps += dependency('libcurl')
-	sqsh_src += 'src/mapper/curl_mapper.c'
 	build_args += '-DCONFIG_CURL'
 endif
 
