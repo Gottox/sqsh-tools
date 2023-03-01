@@ -118,7 +118,7 @@ sqsh_lzma_finish(void *context, uint8_t *target, size_t *target_size) {
 	return 0;
 }
 
-const static struct SqshCompressionImpl impl_xz = {
+static const struct SqshCompressionImpl impl_xz = {
 		.init = sqsh_lzma_init_xz,
 		.decompress = sqsh_lzma_decompress,
 		.finish = sqsh_lzma_finish,
@@ -126,7 +126,7 @@ const static struct SqshCompressionImpl impl_xz = {
 
 const struct SqshCompressionImpl *sqsh__xz_impl = &impl_xz;
 
-const static struct SqshCompressionImpl impl_lzma = {
+static const struct SqshCompressionImpl impl_lzma = {
 		.init = sqsh_lzma_init_alone,
 		.decompress = sqsh_lzma_decompress,
 		.finish = sqsh_lzma_finish,

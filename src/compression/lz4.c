@@ -58,7 +58,7 @@ out:
 	return rv;
 }
 
-const static struct SqshCompressionImpl impl = {
+static const struct SqshCompressionImpl impl = {
 		.init = sqsh__buffering_compression_init,
 		.decompress = sqsh__buffering_compression_decompress,
 		.finish = sqsh_lz4_finish,
