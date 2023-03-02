@@ -162,9 +162,9 @@ extern const struct SqshCompressionImpl *sqsh__lzma_impl;
 extern const struct SqshCompressionImpl *sqsh__xz_impl;
 
 ////////////////////////////////////////
-// compression/lzo2.c
+// compression/lzo.c
 
-extern const struct SqshCompressionImpl *sqsh__lzo2_impl;
+extern const struct SqshCompressionImpl *sqsh__lzo_impl;
 
 ////////////////////////////////////////
 // compression/zlib.c

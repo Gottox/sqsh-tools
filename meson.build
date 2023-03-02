@@ -47,7 +47,7 @@ sqsh_src = [
 	'src/compression/compression_manager.c',
 	'src/compression/lz4.c',
 	'src/compression/lzma.c',
-	'src/compression/lzo2.c',
+	'src/compression/lzo.c',
 	'src/compression/zlib.c',
 	'src/compression/zstd.c',
 	'src/context/path_resolver_context.c',
@@ -130,7 +130,7 @@ if get_option('lzma')
 	build_args += '-DCONFIG_LZMA'
 endif
 
-if get_option('lzo2')
+if get_option('lzo')
 	build_args += '-DCONFIG_LZO'
 	build_args += '-DCONFIG_LZO_HELPER_PATH="@0@/@1@/sqsh-lzo-helper"'.format(get_option('prefix'), get_option('libexecdir'))
 	lzo_helper = executable('sqsh-lzo-helper',

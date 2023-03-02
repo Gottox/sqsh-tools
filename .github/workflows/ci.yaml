@@ -19,7 +19,7 @@ jobs:
           -Dzlib=true \
           -Dlz4=true \
           -Dlzma=true  \
-          -Dlzo2=true  \
+          -Dlzo=true  \
           -Dzstd=true  \
           -Dtest=true \
           -Ddoc=false
@@ -49,7 +49,7 @@ jobs:
           -Dzlib=${{ matrix.feature }} \
           -Dlz4=${{ matrix.feature }} \
           -Dlzma=${{ matrix.feature }} \
-          -Dlzo2=${{ matrix.feature }} \
+          -Dlzo=${{ matrix.feature }} \
           -Dzstd=${{ matrix.feature }} \
           -Dtest=false \
           -Ddoc=false
@@ -74,7 +74,7 @@ jobs:
           -Dzlib=true \
           -Dlz4=false\
           -Dlzma=false \
-          -Dlzo2=false \
+          -Dlzo=false \
           -Dzstd=false \
           -Dtest=false \
           -Ddoc=true

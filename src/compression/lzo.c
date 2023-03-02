@@ -143,7 +143,7 @@ init_helper(void) {
 }
 
 static int
-sqsh_lzo2_finish(void *context, uint8_t *target, size_t *target_size) {
+sqsh_lzo_finish(void *context, uint8_t *target, size_t *target_size) {
 	int rv = 0;
 	if (pthread_once(&helper_initialized, init_helper) != 0) {
 		rv = -SQSH_ERROR_TODO;
@@ -212,10 +212,10 @@ out:
 static const struct SqshCompressionImpl impl = {
 		.init = sqsh__buffering_compression_init,
 		.decompress = sqsh__buffering_compression_decompress,
-		.finish = sqsh_lzo2_finish,
+		.finish = sqsh_lzo_finish,
 };
 
-const struct SqshCompressionImpl *sqsh__lzo2_impl = &impl;
+const struct SqshCompressionImpl *sqsh__lzo_impl = &impl;
 #else
-const struct SqshCompressionImpl *sqsh__lzo2_impl = NULL;
+const struct SqshCompressionImpl *sqsh__lzo_impl = NULL;
 #endif

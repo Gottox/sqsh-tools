@@ -47,7 +47,7 @@ compression_by_id(int id) {
 	case SQSH_COMPRESSION_XZ:
 		return sqsh__xz_impl;
 	case SQSH_COMPRESSION_LZO:
-		return sqsh__lzo2_impl;
+		return sqsh__lzo_impl;
 	case SQSH_COMPRESSION_LZ4:
 		return sqsh__lz4_impl;
 	case SQSH_COMPRESSION_ZSTD:

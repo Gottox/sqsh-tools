@@ -18,7 +18,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh-lzo2-helper.c
+ * @file         sqsh-lzo-helper.c
  */
 
 #include <alloca.h>

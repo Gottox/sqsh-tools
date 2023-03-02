@@ -6,8 +6,8 @@ option('lz4',   type : 'boolean',
 	description: 'Support LZ4 compression.')
 option('lzma',  type : 'boolean',
 	description: 'Support LZMA compression.')
-option('lzo2',  type : 'boolean', value : false,
-	description: 'Support LZO2 compression. (WARNING: this will break the GPL license!)')
+option('lzo',  type : 'boolean', value : false,
+	description: 'Support LZO compression.')
 option('zstd',  type : 'boolean',
 	description: 'Support ZSTD compression.')
 option('fuse',  type : 'boolean',
