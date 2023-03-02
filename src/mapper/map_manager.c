@@ -53,9 +53,9 @@ load_mapping(
 	struct SqshMapping mapping = {0};
 	assert(span == 1);
 
-	size_t block_size = sqsh__mapper_block_size(&manager->mapper);
-	size_t block_count = sqsh__map_manager_block_count(manager);
-	size_t file_size = sqsh__map_manager_size(manager);
+	const size_t block_size = sqsh__mapper_block_size(&manager->mapper);
+	const size_t block_count = sqsh__map_manager_block_count(manager);
+	const size_t file_size = sqsh__map_manager_size(manager);
 	size_t size = block_size;
 	sqsh_index_t offset;
 	if (SQSH_MULT_OVERFLOW(index, block_size, &offset)) {
