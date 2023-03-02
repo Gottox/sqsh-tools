@@ -96,7 +96,7 @@ main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	while (rv == 0 && feof(stdin) == 0) {
+	while (rv >= 0 && feof(stdin) == 0) {
 		rv = sqsh_uncompress();
 	}
 
