@@ -34,7 +34,6 @@
 #include "../../include/sqsh_compression_private.h"
 
 #include "../../include/sqsh_error.h"
-#include "sqsh_common.h"
 
 #ifdef CONFIG_LZMA
 
