@@ -229,6 +229,33 @@ size_t sqsh__metablock_cursor_size(const struct SqshMetablockCursor *cursor);
  */
 int sqsh__metablock_cursor_cleanup(struct SqshMetablockCursor *cursor);
 
+////////////////////////////////////////
+// metablock/metablock_manager.c
+
+struct SqshMetablockManager {
+	struct SqshCompression *compression;
+	struct SqshRcHashMap *hash_map;
+	struct SqshLru lru;
+	pthread_mutex_t lock;
+};
+
+SQSH_NO_UNUSED int sqsh__metablock_manager_init(
+		struct SqshMetablockManager *metablock_manager, size_t size);
+
+size_t
+sqsh__metablock_manager_size(struct SqshMetablockManager *metablock_manager);
+
+SQSH_NO_UNUSED int sqsh__metablock_manager_get(
+		struct SqshMetablockManager *metablock_manager, uint64_t offset,
+		size_t size, struct SqshBuffer **target);
+
+int sqsh__metablock_manager_release(
+		struct SqshMetablockManager *metablock_manager,
+		struct SqshBuffer *buffer);
+
+int
+sqsh__metablock_manager_cleanup(struct SqshMetablockManager *metablock_manager);
+
 #ifdef __cplusplus
 }
 #endif
