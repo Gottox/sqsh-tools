@@ -28,10 +28,10 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         metablock_manager.c
+ * @file         compression_manager.c
  */
 
-#include "../../include/sqsh_metablock_private.h"
+#include "../../include/sqsh_compression_private.h"
 
 #include "../../include/sqsh_error.h"
 
@@ -74,46 +74,48 @@ buffer_cleanup(void *buffer) {
 }
 
 SQSH_NO_UNUSED int
-sqsh__metablock_manager_init(
-		struct SqshMetablockManager *metablock_manager, size_t size) {
+sqsh__compression_manager_init(
+		struct SqshCompressionManager *compression_manager, size_t size) {
 	int rv;
 	// Give a bit of room to avoid too many key hash collisions
 	size = find_next_maybe_prime(2 * size);
 
-	rv = pthread_mutex_init(&metablock_manager->lock, NULL);
+	rv = pthread_mutex_init(&compression_manager->lock, NULL);
 	if (rv != 0) {
 		rv = -SQSH_ERROR_TODO;
 		goto out;
 	}
 	rv = sqsh__rc_hash_map_init(
-			metablock_manager->hash_map, size, sizeof(struct SqshBuffer),
+			compression_manager->hash_map, size, sizeof(struct SqshBuffer),
 			buffer_cleanup);
 	if (rv < 0) {
 		goto out;
 	}
 	rv = sqsh__lru_init(
-			&metablock_manager->lru, 128, &metablock_manager->hash_map->values);
+			&compression_manager->lru, 128,
+			&compression_manager->hash_map->values);
 	if (rv < 0) {
 		goto out;
 	}
 
 out:
 	if (rv < 0) {
-		sqsh__metablock_manager_cleanup(metablock_manager);
+		sqsh__compression_manager_cleanup(compression_manager);
 	}
 	return rv;
 }
 
 size_t
-sqsh__metablock_manager_size(struct SqshMetablockManager *metablock_manager) {
-	return sqsh__rc_hash_map_size(metablock_manager->hash_map);
+sqsh__compression_manager_size(
+		struct SqshCompressionManager *compression_manager) {
+	return sqsh__rc_hash_map_size(compression_manager->hash_map);
 }
 
 SQSH_NO_UNUSED int
-sqsh__metablock_manager_get(
-		struct SqshMetablockManager *metablock_manager, uint64_t offset,
+sqsh__compression_manager_get(
+		struct SqshCompressionManager *compression_manager, uint64_t offset,
 		size_t size, struct SqshBuffer **target) {
-	(void)metablock_manager;
+	(void)compression_manager;
 	(void)offset;
 	(void)size;
 	(void)target;
@@ -121,20 +123,20 @@ sqsh__metablock_manager_get(
 }
 
 int
-sqsh__metablock_manager_release(
-		struct SqshMetablockManager *metablock_manager,
+sqsh__compression_manager_release(
+		struct SqshCompressionManager *compression_manager,
 		struct SqshBuffer *buffer) {
-	(void)metablock_manager;
+	(void)compression_manager;
 	(void)buffer;
 	return -SQSH_ERROR_TODO;
 }
 
 int
-sqsh__metablock_manager_cleanup(
-		struct SqshMetablockManager *metablock_manager) {
-	sqsh__lru_cleanup(&metablock_manager->lru);
-	sqsh__rc_hash_map_cleanup(metablock_manager->hash_map);
-	pthread_mutex_destroy(&metablock_manager->lock);
+sqsh__compression_manager_cleanup(
+		struct SqshCompressionManager *compression_manager) {
+	sqsh__lru_cleanup(&compression_manager->lru);
+	sqsh__rc_hash_map_cleanup(compression_manager->hash_map);
+	pthread_mutex_destroy(&compression_manager->lock);
 
 	return 0;
 }
