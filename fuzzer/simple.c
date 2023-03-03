@@ -34,11 +34,11 @@ out:
 int
 LLVMFuzzerTestOneInput(char *data, size_t size) {
 	int rv = 0;
-	struct Sqsh sqsh = {0};
+	struct SqshArchive sqsh = {0};
 	struct SqshInodeContext inode = {0};
 	struct SqshDirectoryIterator iter = {0};
 	const struct SqshSuperblockContext *superblock;
-	rv = sqsh__init(
+	rv = sqsh__archive_init(
 			&sqsh, (uint8_t *)data,
 			&(struct SqshConfig){
 					.source_mapper = sqsh_mapper_impl_static,
@@ -48,7 +48,7 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 		goto out;
 	}
 
-	superblock = sqsh_superblock(&sqsh);
+	superblock = sqsh_archive_superblock(&sqsh);
 	uint64_t inode_ref = sqsh_superblock_inode_root_ref(superblock);
 	rv = sqsh__inode_init(&inode, &sqsh, inode_ref);
 	if (rv < 0) {
@@ -68,7 +68,7 @@ out:
 
 	sqsh__directory_iterator_cleanup(&iter);
 	sqsh__inode_cleanup(&inode);
-	sqsh__cleanup(&sqsh);
+	sqsh__archive_cleanup(&sqsh);
 
 	return rv; // Non-zero return values are reserved for future use.
 }
