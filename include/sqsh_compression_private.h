@@ -42,7 +42,7 @@
 extern "C" {
 #endif
 
-struct SqshBuffer;
+struct SqshArchive;
 
 ////////////////////////////////////////
 // compression/compression.c
@@ -128,28 +128,27 @@ int sqsh__buffering_compression_cleanup(void *context);
 // compression/compression_manager.c
 
 struct SqshCompressionManager {
+	struct SqshRcHashMap hash_map;
 	struct SqshCompression *compression;
-	struct SqshRcHashMap *hash_map;
+	struct SqshMapManager *map_manager;
 	struct SqshLru lru;
 	pthread_mutex_t lock;
 };
 
 SQSH_NO_UNUSED int sqsh__compression_manager_init(
-		struct SqshCompressionManager *compression_manager, size_t size);
+		struct SqshCompressionManager *manager, struct SqshArchive *archive,
+		size_t size);
 
-size_t sqsh__compression_manager_size(
-		struct SqshCompressionManager *compression_manager);
+size_t sqsh__compression_manager_size(struct SqshCompressionManager *manager);
 
 SQSH_NO_UNUSED int sqsh__compression_manager_get(
-		struct SqshCompressionManager *compression_manager, uint64_t offset,
-		size_t size, struct SqshBuffer **target);
+		struct SqshCompressionManager *manager, uint64_t offset, size_t size,
+		const struct SqshBuffer **target);
 
 int sqsh__compression_manager_release(
-		struct SqshCompressionManager *compression_manager,
-		struct SqshBuffer *buffer);
+		struct SqshCompressionManager *manager, struct SqshBuffer *buffer);
 
-int sqsh__compression_manager_cleanup(
-		struct SqshCompressionManager *compression_manager);
+int sqsh__compression_manager_cleanup(struct SqshCompressionManager *manager);
 
 ////////////////////////////////////////
 // compression/lz4.c
