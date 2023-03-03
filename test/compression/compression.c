@@ -35,7 +35,7 @@
 #include "../common.h"
 #include "../test.h"
 
-#include <sqsh_compression_private.h>
+#include "../../include/sqsh_compression_private.h"
 #include <stdint.h>
 
 static void
@@ -115,10 +115,12 @@ decompress_zlib(void) {
 
 static void
 decompress_zstd(void) {
+#ifdef CONFIG_ZSTD
 	uint8_t input[] = {0x28, 0xb5, 0x2f, 0xfd, 0x20, 0x04, 0x21,
 					   0x00, 0x00, 0x61, 0x62, 0x63, 0x64};
 
 	decompress_test(sqsh__zstd_impl, input, sizeof(input));
+#endif
 }
 
 static void *
@@ -131,8 +133,10 @@ multithreaded_lzo_worker(void *arg) {
 	}
 	return 0;
 }
+
 static void
 multithreaded_lzo(void) {
+	(void)multithreaded_lzo_worker;
 #ifdef CONFIG_LZO
 	int rv;
 	pthread_t threads[16] = {0};
