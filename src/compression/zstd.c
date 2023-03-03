@@ -39,27 +39,63 @@
 
 #	include <zstd.h>
 
+struct SqshZstdContext {
+	ZSTD_DCtx *stream;
+	ZSTD_outBuffer output;
+};
+
+SQSH_STATIC_ASSERT(
+		sizeof(sqsh__compression_context_t) >= sizeof(struct SqshZstdContext));
+
+static int
+sqsh_zstd_init(void *context, uint8_t *target, size_t target_size) {
+	(void)target;
+	(void)target_size;
+	struct SqshZstdContext *ctx = context;
+	ctx->stream = ZSTD_createDCtx();
+	if (ctx->stream == NULL) {
+		return -SQSH_ERROR_COMPRESSION_INIT;
+	}
+	ctx->output.dst = target;
+	ctx->output.size = target_size;
+	ctx->output.pos = 0;
+
+	return 0;
+}
+
+static int
+sqsh_zstd_decompress(
+		void *context, const uint8_t *compressed,
+		const size_t compressed_size) {
+	struct SqshZstdContext *ctx = context;
+	ZSTD_inBuffer input = {
+			.src = compressed,
+			.size = compressed_size,
+			.pos = 0,
+	};
+
+	while (input.pos < input.size) {
+		size_t rv = ZSTD_decompressStream(ctx->stream, &ctx->output, &input);
+		if (ZSTD_isError(rv)) {
+			return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+		}
+	}
+	return 0;
+}
+
 static int
 sqsh_zstd_finish(void *context, uint8_t *target, size_t *target_size) {
-	const uint8_t *compressed = sqsh__buffering_compression_data(context);
-	const size_t compressed_size = sqsh__buffering_compression_size(context);
-
-	int rv = ZSTD_decompress(target, *target_size, compressed, compressed_size);
-	*target_size = rv;
-
-	if (ZSTD_isError(rv)) {
-		rv = -SQSH_ERROR_COMPRESSION_DECOMPRESS;
-		goto out;
-	}
-
-out:
-	sqsh__buffering_compression_cleanup(context);
-	return rv;
+	(void)target;
+	(void)target_size;
+	struct SqshZstdContext *ctx = context;
+	ZSTD_freeDCtx(ctx->stream);
+	*target_size = ctx->output.pos;
+	return 0;
 }
 
 static const struct SqshCompressionImpl impl = {
-		.init = sqsh__buffering_compression_init,
-		.decompress = sqsh__buffering_compression_decompress,
+		.init = sqsh_zstd_init,
+		.decompress = sqsh_zstd_decompress,
 		.finish = sqsh_zstd_finish,
 };
 
