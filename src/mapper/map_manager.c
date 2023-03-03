@@ -47,10 +47,9 @@ map_cleanup_cb(void *data) {
 
 SQSH_NO_UNUSED static int
 load_mapping(
-		struct SqshMapManager *manager, const struct SqshMapping **target,
+		struct SqshMapping *mapping, struct SqshMapManager *manager,
 		sqsh_index_t index, int span) {
 	int rv = 0;
-	struct SqshMapping mapping = {0};
 	assert(span == 1);
 
 	const size_t block_size = sqsh__mapper_block_size(&manager->mapper);
@@ -68,12 +67,10 @@ load_mapping(
 		size = file_size % block_size;
 	}
 
-	rv = sqsh__mapping_init(&mapping, &manager->mapper, offset, size);
+	rv = sqsh__mapping_init(mapping, &manager->mapper, offset, size);
 	if (rv < 0) {
 		goto out;
 	}
-
-	*target = sqsh__rc_map_set(&manager->maps, index, &mapping, span);
 
 out:
 	return rv;
@@ -151,10 +148,13 @@ sqsh__map_manager_get(
 	*target = sqsh__rc_map_retain(&manager->maps, &real_index);
 
 	if (*target == NULL) {
-		rv = load_mapping(manager, target, index, span);
+		struct SqshMapping mapping = {0};
+		rv = load_mapping(&mapping, manager, index, span);
 		if (rv < 0) {
 			goto out;
 		}
+
+		*target = sqsh__rc_map_set(&manager->maps, index, &mapping, span);
 	}
 	rv = sqsh__lru_touch(&manager->lru, real_index);
 
