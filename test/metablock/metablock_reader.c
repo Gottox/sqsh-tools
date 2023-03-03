@@ -52,20 +52,20 @@ advance_once(void) {
 	size_t target_size;
 	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload), &target_size);
 
-	rv = sqsh__metablock_cursor_init(
+	rv = sqsh__metablock_reader_init(
 			&cursor, &sqsh, SQSH_SIZEOF_SUPERBLOCK, target_size);
 	assert(rv == 0);
 
-	rv = sqsh__metablock_cursor_advance(&cursor, 0, 4);
+	rv = sqsh__metablock_reader_advance(&cursor, 0, 4);
 	assert(rv == 0);
 
-	assert(sqsh__metablock_cursor_size(&cursor) == 4);
+	assert(sqsh__metablock_reader_size(&cursor) == 4);
 
-	p = sqsh__metablock_cursor_data(&cursor);
+	p = sqsh__metablock_reader_data(&cursor);
 	assert(p != NULL);
 	assert(memcmp(p, "abcd", 4) == 0);
 
-	rv = sqsh__metablock_cursor_cleanup(&cursor);
+	rv = sqsh__metablock_reader_cleanup(&cursor);
 	assert(rv == 0);
 
 	sqsh__archive_cleanup(&sqsh);
@@ -85,29 +85,29 @@ advance_twice(void) {
 	size_t target_size;
 	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload), &target_size);
 
-	rv = sqsh__metablock_cursor_init(
+	rv = sqsh__metablock_reader_init(
 			&cursor, &sqsh, SQSH_SIZEOF_SUPERBLOCK, target_size);
 	assert(rv == 0);
 
-	rv = sqsh__metablock_cursor_advance(&cursor, 0, 4);
+	rv = sqsh__metablock_reader_advance(&cursor, 0, 4);
 	assert(rv == 0);
 
-	assert(sqsh__metablock_cursor_size(&cursor) == 4);
+	assert(sqsh__metablock_reader_size(&cursor) == 4);
 
-	p = sqsh__metablock_cursor_data(&cursor);
+	p = sqsh__metablock_reader_data(&cursor);
 	assert(p != NULL);
 	assert(memcmp(p, "abcd", 4) == 0);
 
-	rv = sqsh__metablock_cursor_advance(&cursor, 4, 4);
+	rv = sqsh__metablock_reader_advance(&cursor, 4, 4);
 	assert(rv == 0);
 
-	assert(sqsh__metablock_cursor_size(&cursor) == 4);
+	assert(sqsh__metablock_reader_size(&cursor) == 4);
 
-	p = sqsh__metablock_cursor_data(&cursor);
+	p = sqsh__metablock_reader_data(&cursor);
 	assert(p != NULL);
 	assert(memcmp(p, "efgh", 4) == 0);
 
-	rv = sqsh__metablock_cursor_cleanup(&cursor);
+	rv = sqsh__metablock_reader_cleanup(&cursor);
 	assert(rv == 0);
 
 	sqsh__archive_cleanup(&sqsh);
@@ -127,20 +127,20 @@ advance_overlapping(void) {
 	size_t target_size;
 	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload), &target_size);
 
-	rv = sqsh__metablock_cursor_init(
+	rv = sqsh__metablock_reader_init(
 			&cursor, &sqsh, SQSH_SIZEOF_SUPERBLOCK, target_size);
 	assert(rv == 0);
 
-	rv = sqsh__metablock_cursor_advance(&cursor, 2, 4);
+	rv = sqsh__metablock_reader_advance(&cursor, 2, 4);
 	assert(rv == 0);
 
-	assert(sqsh__metablock_cursor_size(&cursor) == 4);
+	assert(sqsh__metablock_reader_size(&cursor) == 4);
 
-	p = sqsh__metablock_cursor_data(&cursor);
+	p = sqsh__metablock_reader_data(&cursor);
 	assert(p != NULL);
 	assert(memcmp(p, "cdef", 4) == 0);
 
-	rv = sqsh__metablock_cursor_cleanup(&cursor);
+	rv = sqsh__metablock_reader_cleanup(&cursor);
 	assert(rv == 0);
 
 	sqsh__archive_cleanup(&sqsh);

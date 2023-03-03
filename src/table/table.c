@@ -116,23 +116,23 @@ sqsh_table_get(
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
-	rv = sqsh__metablock_cursor_init(
+	rv = sqsh__metablock_reader_init(
 			&metablock, sqsh, metablock_address, upper_limit);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = sqsh__metablock_cursor_advance(
+	rv = sqsh__metablock_reader_advance(
 			&metablock, element_offset, table->element_size);
 	if (rv < 0) {
 		goto out;
 	}
 
-	memcpy(target, sqsh__metablock_cursor_data(&metablock),
+	memcpy(target, sqsh__metablock_reader_data(&metablock),
 		   table->element_size);
 
 out:
-	sqsh__metablock_cursor_cleanup(&metablock);
+	sqsh__metablock_reader_cleanup(&metablock);
 	return rv;
 }
 

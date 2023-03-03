@@ -151,7 +151,7 @@ SQSH_NO_UNUSED int sqsh__metablock_iterator_append_to_buffer(
 int sqsh__metablock_iterator_cleanup(struct SqshMetablockIterator *iterator);
 
 ////////////////////////////////////////
-// metablock/metablock_cursor.c
+// metablock/metablock_reader.c
 
 struct SqshMetablockCursor {
 	/**
@@ -175,7 +175,7 @@ struct SqshMetablockCursor {
  *
  * @return 0 on success, less than zero on error.
  */
-SQSH_NO_UNUSED int sqsh__metablock_cursor_init(
+SQSH_NO_UNUSED int sqsh__metablock_reader_init(
 		struct SqshMetablockCursor *cursor, struct SqshArchive *sqsh,
 		const uint64_t start_address, const uint64_t upper_limit);
 
@@ -190,7 +190,7 @@ SQSH_NO_UNUSED int sqsh__metablock_cursor_init(
  *
  * @return 0 on success, less than zero on error.
  */
-SQSH_NO_UNUSED int sqsh__metablock_cursor_advance(
+SQSH_NO_UNUSED int sqsh__metablock_reader_advance(
 		struct SqshMetablockCursor *cursor, sqsh_index_t offset, size_t size);
 
 /**
@@ -204,7 +204,7 @@ SQSH_NO_UNUSED int sqsh__metablock_cursor_advance(
  * @return Pointer to the data at the current position of the metablock cursor.
  */
 const uint8_t *
-sqsh__metablock_cursor_data(const struct SqshMetablockCursor *cursor);
+sqsh__metablock_reader_data(const struct SqshMetablockCursor *cursor);
 
 /**
  * @internal
@@ -216,7 +216,7 @@ sqsh__metablock_cursor_data(const struct SqshMetablockCursor *cursor);
  *
  * @return Size of the data at the current position of the metablock cursor.
  */
-size_t sqsh__metablock_cursor_size(const struct SqshMetablockCursor *cursor);
+size_t sqsh__metablock_reader_size(const struct SqshMetablockCursor *cursor);
 
 /**
  * @internal
@@ -227,7 +227,7 @@ size_t sqsh__metablock_cursor_size(const struct SqshMetablockCursor *cursor);
  *
  * @return 0 on success, less than zero on error.
  */
-int sqsh__metablock_cursor_cleanup(struct SqshMetablockCursor *cursor);
+int sqsh__metablock_reader_cleanup(struct SqshMetablockCursor *cursor);
 
 ////////////////////////////////////////
 // metablock/metablock_manager.c

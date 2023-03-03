@@ -43,7 +43,7 @@
 
 static const struct SqshDataInode *
 get_inode(const struct SqshInodeContext *inode) {
-	return (const struct SqshDataInode *)sqsh__metablock_cursor_data(
+	return (const struct SqshDataInode *)sqsh__metablock_reader_data(
 			&inode->metablock);
 }
 
@@ -89,7 +89,7 @@ inode_load(struct SqshInodeContext *context) {
 		size += SQSH_SIZEOF_INODE_IPC_EXT;
 		break;
 	}
-	rv = sqsh__metablock_cursor_advance(&context->metablock, 0, size);
+	rv = sqsh__metablock_reader_advance(&context->metablock, 0, size);
 	return rv;
 }
 
@@ -132,12 +132,12 @@ sqsh__inode_init(
 	if (SQSH_ADD_OVERFLOW(inode_table_start, address_outer, &address_outer)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
-	rv = sqsh__metablock_cursor_init(
+	rv = sqsh__metablock_reader_init(
 			&inode->metablock, sqsh, address_outer, ~0);
 	if (rv < 0) {
 		return rv;
 	}
-	rv = sqsh__metablock_cursor_advance(
+	rv = sqsh__metablock_reader_advance(
 			&inode->metablock, address_inner, SQSH_SIZEOF_INODE_HEADER);
 	if (rv < 0) {
 		return rv;
@@ -550,7 +550,7 @@ sqsh_inode_xattr_index(const struct SqshInodeContext *context) {
 
 int
 sqsh__inode_cleanup(struct SqshInodeContext *inode) {
-	return sqsh__metablock_cursor_cleanup(&inode->metablock);
+	return sqsh__metablock_reader_cleanup(&inode->metablock);
 }
 
 int

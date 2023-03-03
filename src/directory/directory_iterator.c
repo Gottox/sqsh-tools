@@ -83,13 +83,13 @@ directory_iterator_index_lookup(
 
 static struct SqshDataDirectoryEntry *
 get_entry(const struct SqshDirectoryIterator *iterator) {
-	const uint8_t *data = sqsh__metablock_cursor_data(&iterator->metablock);
+	const uint8_t *data = sqsh__metablock_reader_data(&iterator->metablock);
 	return (struct SqshDataDirectoryEntry *)data;
 }
 
 static struct SqshDataDirectoryFragment *
 get_fragment(const struct SqshDirectoryIterator *iterator) {
-	const uint8_t *data = sqsh__metablock_cursor_data(&iterator->metablock);
+	const uint8_t *data = sqsh__metablock_reader_data(&iterator->metablock);
 	return (struct SqshDataDirectoryFragment *)data;
 }
 
@@ -149,7 +149,7 @@ sqsh__directory_iterator_init(
 	}
 	iterator->inode = inode;
 
-	rv = sqsh__metablock_cursor_init(
+	rv = sqsh__metablock_reader_init(
 			&iterator->metablock, sqsh, start_address, upper_limit);
 	if (rv < 0) {
 		return rv;
@@ -227,7 +227,7 @@ static int
 process_fragment(struct SqshDirectoryIterator *iterator) {
 	int rv = 0;
 
-	rv = sqsh__metablock_cursor_advance(
+	rv = sqsh__metablock_reader_advance(
 			&iterator->metablock, iterator->next_offset,
 			SQSH_SIZEOF_DIRECTORY_FRAGMENT);
 	if (rv < 0) {
@@ -269,7 +269,7 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator) {
 
 	// Make sure next entry is loaded:
 	size = SQSH_SIZEOF_DIRECTORY_ENTRY;
-	rv = sqsh__metablock_cursor_advance(
+	rv = sqsh__metablock_reader_advance(
 			&iterator->metablock, iterator->next_offset, size);
 	if (rv < 0) {
 		return rv;
@@ -282,7 +282,7 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator) {
 	}
 	// May invalidate pointers into directory entries. that's why the
 	// get_entry() call is repeated below.
-	rv = sqsh__metablock_cursor_advance(&iterator->metablock, 0, size);
+	rv = sqsh__metablock_reader_advance(&iterator->metablock, 0, size);
 	if (rv < 0) {
 		return rv;
 	}
@@ -318,7 +318,7 @@ sqsh_directory_iterator_name_dup(
 int
 sqsh__directory_iterator_cleanup(struct SqshDirectoryIterator *iterator) {
 	int rv = 0;
-	rv = sqsh__metablock_cursor_cleanup(&iterator->metablock);
+	rv = sqsh__metablock_reader_cleanup(&iterator->metablock);
 	return rv;
 }
 

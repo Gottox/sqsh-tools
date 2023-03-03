@@ -44,14 +44,14 @@ static const uint64_t INODE_HEADER_SIZE =
 static const struct SqshDataInodeDirectoryIndex *
 get_directory_index(const struct SqshDirectoryIndexIterator *iterator) {
 	const uint8_t *data =
-			sqsh__metablock_cursor_data(&iterator->inode.metablock);
+			sqsh__metablock_reader_data(&iterator->inode.metablock);
 	return (const struct SqshDataInodeDirectoryIndex *)data;
 }
 
 static const struct SqshDataInode *
 get_inode(const struct SqshDirectoryIndexIterator *iterator) {
 	const uint8_t *data =
-			sqsh__metablock_cursor_data(&iterator->inode.metablock);
+			sqsh__metablock_reader_data(&iterator->inode.metablock);
 	return (const struct SqshDataInode *)data;
 }
 
@@ -115,7 +115,7 @@ sqsh__directory_index_iterator_next(
 
 	// Make sure next entry is loaded:
 	size = SQSH_SIZEOF_INODE_DIRECTORY_INDEX;
-	rv = sqsh__metablock_cursor_advance(
+	rv = sqsh__metablock_reader_advance(
 			&iterator->inode.metablock, iterator->next_offset, size);
 	if (rv < 0) {
 		return rv;
@@ -123,7 +123,7 @@ sqsh__directory_index_iterator_next(
 
 	// Make sure current index has its name populated
 	size += sqsh__directory_index_iterator_name_size(iterator);
-	rv = sqsh__metablock_cursor_advance(&iterator->inode.metablock, 0, size);
+	rv = sqsh__metablock_reader_advance(&iterator->inode.metablock, 0, size);
 	if (rv < 0) {
 		return rv;
 	}

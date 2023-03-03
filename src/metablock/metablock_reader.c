@@ -37,7 +37,7 @@
 #include "../utils.h"
 
 int
-sqsh__metablock_cursor_init(
+sqsh__metablock_reader_init(
 		struct SqshMetablockCursor *cursor, struct SqshArchive *sqsh,
 		const uint64_t start_address, const uint64_t upper_limit) {
 	int rv;
@@ -55,13 +55,13 @@ sqsh__metablock_cursor_init(
 
 out:
 	if (rv < 0) {
-		sqsh__metablock_cursor_cleanup(cursor);
+		sqsh__metablock_reader_cleanup(cursor);
 	}
 	return rv;
 }
 
 int
-sqsh__metablock_cursor_advance(
+sqsh__metablock_reader_advance(
 		struct SqshMetablockCursor *cursor, sqsh_index_t offset, size_t size) {
 	int rv;
 	sqsh_index_t new_offset;
@@ -96,19 +96,19 @@ sqsh__metablock_cursor_advance(
 }
 
 const uint8_t *
-sqsh__metablock_cursor_data(const struct SqshMetablockCursor *cursor) {
+sqsh__metablock_reader_data(const struct SqshMetablockCursor *cursor) {
 	const uint8_t *data = sqsh__buffer_data(&cursor->buffer);
 
 	return &data[cursor->offset];
 }
 
 size_t
-sqsh__metablock_cursor_size(const struct SqshMetablockCursor *cursor) {
+sqsh__metablock_reader_size(const struct SqshMetablockCursor *cursor) {
 	return cursor->size;
 }
 
 int
-sqsh__metablock_cursor_cleanup(struct SqshMetablockCursor *cursor) {
+sqsh__metablock_reader_cleanup(struct SqshMetablockCursor *cursor) {
 	sqsh__metablock_iterator_cleanup(&cursor->iterator);
 	sqsh__buffer_cleanup(&cursor->buffer);
 

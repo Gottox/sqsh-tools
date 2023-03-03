@@ -85,7 +85,7 @@ sqsh__xattr_iterator_init(
 		goto out;
 	}
 
-	rv = sqsh__metablock_cursor_init(
+	rv = sqsh__metablock_reader_init(
 			&iterator->metablock, sqsh, start_block, archive_size);
 	if (rv < 0) {
 		goto out;
@@ -130,13 +130,13 @@ get_value(struct SqshXattrIterator *iterator) {
 		source = &iterator->metablock;
 	}
 
-	const uint8_t *data = sqsh__metablock_cursor_data(source);
+	const uint8_t *data = sqsh__metablock_reader_data(source);
 	return (const struct SqshDataXattrValue *)&data[iterator->value_index];
 }
 
 static const struct SqshDataXattrKey *
 get_key(struct SqshXattrIterator *iterator) {
-	const uint8_t *data = sqsh__metablock_cursor_data(&iterator->metablock);
+	const uint8_t *data = sqsh__metablock_reader_data(&iterator->metablock);
 
 	return (const struct SqshDataXattrKey *)data;
 }
@@ -157,13 +157,13 @@ xattr_value_indirect_load(struct SqshXattrIterator *iterator) {
 	if (SQSH_ADD_OVERFLOW(start_block, outer_offset, &start_block)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
-	rv = sqsh__metablock_cursor_init(
+	rv = sqsh__metablock_reader_init(
 			&iterator->out_of_line_value, iterator->sqsh, start_block,
 			iterator->upper_limit);
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__metablock_cursor_advance(
+	rv = sqsh__metablock_reader_advance(
 			&iterator->out_of_line_value, inner_offset, size);
 	if (rv < 0) {
 		goto out;
@@ -173,7 +173,7 @@ xattr_value_indirect_load(struct SqshXattrIterator *iterator) {
 	iterator->value_index = 0;
 	value = get_value(iterator);
 	size += sqsh_data_xattr_value_size(value);
-	rv = sqsh__metablock_cursor_advance(&iterator->out_of_line_value, 0, size);
+	rv = sqsh__metablock_reader_advance(&iterator->out_of_line_value, 0, size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -187,14 +187,14 @@ sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator) {
 	int rv = 0;
 	size_t size = SQSH_SIZEOF_XATTR_KEY + SQSH_SIZEOF_XATTR_VALUE;
 
-	sqsh__metablock_cursor_cleanup(&iterator->out_of_line_value);
+	sqsh__metablock_reader_cleanup(&iterator->out_of_line_value);
 
 	if (iterator->remaining_entries == 0) {
 		return 0;
 	}
 
 	// Load Key Header
-	rv = sqsh__metablock_cursor_advance(
+	rv = sqsh__metablock_reader_advance(
 			&iterator->metablock, iterator->next_offset, SQSH_SIZEOF_XATTR_KEY);
 	if (rv < 0) {
 		goto out;
@@ -203,7 +203,7 @@ sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator) {
 	// Load Key Name
 	const uint16_t name_size = sqsh_xattr_iterator_name_size(iterator);
 	size += name_size;
-	rv = sqsh__metablock_cursor_advance(&iterator->metablock, 0, size);
+	rv = sqsh__metablock_reader_advance(&iterator->metablock, 0, size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -214,7 +214,7 @@ sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator) {
 	// Load Value
 	const uint16_t value_size = sqsh_xattr_iterator_value_size(iterator);
 	size += value_size;
-	rv = sqsh__metablock_cursor_advance(&iterator->metablock, 0, size);
+	rv = sqsh__metablock_reader_advance(&iterator->metablock, 0, size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -339,8 +339,8 @@ sqsh_xattr_iterator_value_size(struct SqshXattrIterator *iterator) {
 
 int
 sqsh__xattr_iterator_cleanup(struct SqshXattrIterator *iterator) {
-	sqsh__metablock_cursor_cleanup(&iterator->out_of_line_value);
-	sqsh__metablock_cursor_cleanup(&iterator->metablock);
+	sqsh__metablock_reader_cleanup(&iterator->out_of_line_value);
+	sqsh__metablock_reader_cleanup(&iterator->metablock);
 	return 0;
 }
 
