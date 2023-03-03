@@ -42,7 +42,7 @@ static void
 init_cursor(void) {
 	int rv;
 	struct SqshMapManager map_manager = {0};
-	struct SqshMapCursor cursor = {0};
+	struct SqshMapReader cursor = {0};
 	const char buffer[] = "SELECT * FROM table";
 	rv = sqsh__map_manager_init(
 			&map_manager, buffer,
@@ -62,7 +62,7 @@ static void
 advance_once(void) {
 	int rv;
 	struct SqshMapManager mapper = {0};
-	struct SqshMapCursor cursor = {0};
+	struct SqshMapReader cursor = {0};
 	const uint8_t buffer[] = "THIS IS A TEST STRING";
 	rv = sqsh__map_manager_init(
 			&mapper, buffer,
@@ -88,7 +88,7 @@ static void
 advance_once_with_offset(void) {
 	int rv;
 	struct SqshMapManager mapper = {0};
-	struct SqshMapCursor cursor = {0};
+	struct SqshMapReader cursor = {0};
 	const uint8_t buffer[] = "THIS IS A TEST STRING";
 	rv = sqsh__map_manager_init(
 			&mapper, buffer,
@@ -114,7 +114,7 @@ static void
 advance_twice_with_offset(void) {
 	int rv;
 	struct SqshMapManager mapper = {0};
-	struct SqshMapCursor cursor = {0};
+	struct SqshMapReader cursor = {0};
 	const uint8_t buffer[] = "THIS IS A TEST STRING";
 	rv = sqsh__map_manager_init(
 			&mapper, buffer,
@@ -146,7 +146,7 @@ static void
 advance_to_out_of_bounds(void) {
 	int rv;
 	struct SqshMapManager mapper = {0};
-	struct SqshMapCursor cursor = {0};
+	struct SqshMapReader cursor = {0};
 	const uint8_t buffer[] = "THIS IS A TEST STRING";
 	rv = sqsh__map_manager_init(
 			&mapper, buffer,

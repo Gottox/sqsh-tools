@@ -49,7 +49,7 @@ struct SqshInodeContext {
 	 * @privatesection
 	 */
 	uint64_t inode_ref;
-	struct SqshMetablockCursor metablock;
+	struct SqshMetablockReader metablock;
 	struct SqshArchive *sqsh;
 };
 

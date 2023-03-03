@@ -122,7 +122,7 @@ sqsh_xattr_iterator_new(const struct SqshInodeContext *inode, int *err) {
 
 static const struct SqshDataXattrValue *
 get_value(struct SqshXattrIterator *iterator) {
-	const struct SqshMetablockCursor *source;
+	const struct SqshMetablockReader *source;
 
 	if (iterator->value_index == 0) {
 		source = &iterator->out_of_line_value;

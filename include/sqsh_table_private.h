@@ -52,7 +52,7 @@ struct SqshTable {
 	 */
 	struct SqshArchive *sqsh;
 	struct SqshMapper *mapper;
-	struct SqshMapCursor lookup_table;
+	struct SqshMapReader lookup_table;
 	uint64_t start_block;
 	size_t element_size;
 	size_t element_count;

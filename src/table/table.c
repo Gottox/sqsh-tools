@@ -104,7 +104,7 @@ sqsh_table_get(
 		const struct SqshTable *table, sqsh_index_t index, void *target) {
 	int rv = 0;
 	struct SqshArchive *sqsh = table->sqsh;
-	struct SqshMetablockCursor metablock = {0};
+	struct SqshMetablockReader metablock = {0};
 	uint64_t lookup_index =
 			index * table->element_size / SQSH_METABLOCK_BLOCK_SIZE;
 	uint64_t metablock_address = lookup_table_get(table, lookup_index);

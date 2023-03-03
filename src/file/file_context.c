@@ -147,7 +147,7 @@ sqsh_file_read(struct SqshFileContext *context, const uint64_t size) {
 	const uint64_t start_block = sqsh_inode_file_blocks_start(context->inode);
 	const uint32_t block_count = sqsh_inode_file_block_count(context->inode);
 
-	struct SqshMapCursor cursor = {0};
+	struct SqshMapReader cursor = {0};
 	struct SqshBuffer *buffer = &context->buffer;
 	uint32_t block_index = context->seek_pos / context->block_size;
 	uint64_t block_offset = datablock_offset(context, block_index);

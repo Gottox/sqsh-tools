@@ -50,8 +50,8 @@ struct SqshXattrIterator {
 	 * @privatesection
 	 */
 	struct SqshArchive *sqsh;
-	struct SqshMetablockCursor metablock;
-	struct SqshMetablockCursor out_of_line_value;
+	struct SqshMetablockReader metablock;
+	struct SqshMetablockReader out_of_line_value;
 	struct SqshXattrTable *context;
 	size_t remaining_entries;
 	uint64_t upper_limit;
@@ -91,7 +91,7 @@ struct SqshXattrTable {
 	/**
 	 * @privatesection
 	 */
-	struct SqshMapCursor header;
+	struct SqshMapReader header;
 	struct SqshTable table;
 };
 

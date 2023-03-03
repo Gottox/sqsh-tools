@@ -73,7 +73,7 @@ read_fragment_data(
 		uint32_t index) {
 	int rv = 0;
 	struct SqshDataFragment fragment_info = {0};
-	struct SqshMapCursor fragment_mapping = {0};
+	struct SqshMapReader fragment_mapping = {0};
 	const uint8_t *data;
 
 	rv = sqsh_table_get(&table->table, index, &fragment_info);

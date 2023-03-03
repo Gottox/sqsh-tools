@@ -50,7 +50,7 @@ struct SqshSuperblockContext {
 	/**
 	 * @privatesection
 	 */
-	struct SqshMapCursor cursor;
+	struct SqshMapReader cursor;
 };
 
 /**

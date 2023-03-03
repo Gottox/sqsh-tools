@@ -51,7 +51,7 @@ struct SqshDirectoryIterator {
 	struct SqshInodeContext *inode;
 	uint32_t remaining_size;
 
-	struct SqshMetablockCursor metablock;
+	struct SqshMetablockReader metablock;
 	size_t remaining_entries;
 	sqsh_index_t next_offset;
 
