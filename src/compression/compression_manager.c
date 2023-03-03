@@ -158,9 +158,18 @@ out:
 int
 sqsh__compression_manager_release(
 		struct SqshCompressionManager *manager, struct SqshBuffer *buffer) {
-	(void)manager;
-	(void)buffer;
-	return -SQSH_ERROR_TODO;
+	int rv = pthread_mutex_lock(&manager->lock);
+	if (rv != 0) {
+		// rv = -SQSH_ERROR_MUTEX_LOCK;
+		rv = -SQSH_ERROR_TODO;
+		goto out;
+	}
+
+	rv = sqsh__rc_hash_map_release(&manager->hash_map, buffer);
+
+	pthread_mutex_unlock(&manager->lock);
+out:
+	return rv;
 }
 
 int
