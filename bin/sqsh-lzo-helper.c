@@ -21,7 +21,6 @@
  * @file         sqsh-lzo-helper.c
  */
 
-#include <alloca.h>
 #include <lzo/lzo1x.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -32,26 +31,22 @@ sqsh_uncompress(void) {
 	int rv = 0;
 	uint64_t compressed_size = 0;
 	uint64_t target_size = 0;
-	uint8_t *compressed = NULL;
-	uint8_t *target = NULL;
 	char wrkmem[LZO1X_1_MEM_COMPRESS] = {0};
 
 	rv = fread(&target_size, sizeof(uint64_t), 1, stdin);
 	if (rv != 1) {
-		rv = EXIT_FAILURE;
-		goto out;
+		return EXIT_FAILURE;
 	}
 	rv = fread(&compressed_size, sizeof(uint64_t), 1, stdin);
 	if (rv != 1) {
-		rv = EXIT_FAILURE;
-		goto out;
+		return EXIT_FAILURE;
 	}
-	compressed = calloc(compressed_size, sizeof(uint8_t));
-	target = calloc(target_size, sizeof(uint8_t));
+	uint8_t compressed[compressed_size];
+	uint8_t target[target_size];
+
 	rv = fread(compressed, sizeof(uint8_t), compressed_size, stdin);
 	if (rv < 0 || (uint64_t)rv != compressed_size) {
-		rv = EXIT_FAILURE;
-		goto out;
+		return EXIT_FAILURE;
 	}
 
 	const int64_t compress_rv = lzo1x_decompress_safe(
@@ -62,32 +57,23 @@ sqsh_uncompress(void) {
 
 	rv = fwrite(&compress_rv, sizeof(int64_t), 1, stdout);
 	if (rv != 1) {
-		rv = EXIT_FAILURE;
-		goto out;
+		return EXIT_FAILURE;
 	}
 	rv = fwrite(&target_size, sizeof(uint64_t), 1, stdout);
 	if (rv != 1) {
-		rv = EXIT_FAILURE;
-		goto out;
+		return EXIT_FAILURE;
 	}
 	rv = fwrite(target, sizeof(uint8_t), target_size, stdout);
 	if (rv < 0 || (uint64_t)rv != target_size) {
-		rv = EXIT_FAILURE;
-		goto out;
+		return EXIT_FAILURE;
 	}
 	fflush(stdout);
 
-out:
-	free(compressed);
-	free(target);
-	return rv;
+	return 0;
 }
 
 int
 main(int argc, char *argv[]) {
-	int rv = 0;
-	(void)argv;
-
 	if (argc != 1) {
 		fprintf(stderr,
 				"Usage: %s\n"
@@ -96,7 +82,7 @@ main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	while (rv >= 0 && feof(stdin) == 0) {
+	for (int rv = 0; rv >= 0 && feof(stdin) == 0;) {
 		rv = sqsh_uncompress();
 	}
 
