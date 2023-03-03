@@ -52,7 +52,7 @@
 #		error "CONFIG_LZO_HELPER_PATH not defined"
 #	endif
 
-#	define LZO_MAX_WORKER 16
+#	define SQSH_LZO_MAX_WORKER 16
 
 struct SqshLzoHelper {
 	pid_t pid;
@@ -62,24 +62,15 @@ struct SqshLzoHelper {
 };
 
 pthread_once_t helper_initialized = PTHREAD_ONCE_INIT;
-static size_t worker_count = 0;
-static sqsh_index_t next_worker = 0;
-static struct SqshLzoHelper helper[LZO_MAX_WORKER] = {0};
+static size_t max_worker_count = 0;
+static struct SqshLzoHelper helper[SQSH_LZO_MAX_WORKER] = {0};
+static const char *helper_path = CONFIG_LZO_HELPER_PATH;
 
 static void
-init_helper_subprocess(struct SqshLzoHelper *helper) {
+spawn_helper_subprocess(struct SqshLzoHelper *helper) {
 	int compressed_pipe[2];
 	int uncompressed_pipe[2];
-	const char *helper_path = secure_getenv("SQSH_LZO_HELPER_PATH");
 	posix_spawn_file_actions_t file_actions;
-
-	if (pthread_mutex_init(&helper->mutex, NULL) != 0) {
-		abort();
-	}
-
-	if (helper_path == NULL) {
-		helper_path = CONFIG_LZO_HELPER_PATH;
-	}
 
 	if (pipe(compressed_pipe) == -1) {
 		abort();
@@ -130,15 +121,22 @@ init_helper_subprocess(struct SqshLzoHelper *helper) {
 
 static void
 init_helper(void) {
-	worker_count = get_nprocs();
-	if (worker_count < 1) {
-		worker_count = 1;
-	} else if (worker_count > LZO_MAX_WORKER) {
-		worker_count = LZO_MAX_WORKER;
+	max_worker_count = get_nprocs();
+	if (max_worker_count < 1) {
+		max_worker_count = 1;
+	} else if (max_worker_count > SQSH_LZO_MAX_WORKER) {
+		max_worker_count = SQSH_LZO_MAX_WORKER;
 	}
 
-	for (sqsh_index_t i = 0; i < worker_count; i++) {
-		init_helper_subprocess(&helper[i]);
+	const char *env_helper_path = secure_getenv("SQSH_LZO_HELPER_PATH");
+	if (env_helper_path != NULL) {
+		helper_path = env_helper_path;
+	}
+
+	for (sqsh_index_t i = 0; i < max_worker_count; i++) {
+		if (pthread_mutex_init(&helper->mutex, NULL) != 0) {
+			abort();
+		}
 	}
 }
 
@@ -150,16 +148,26 @@ sqsh_lzo_finish(void *context, uint8_t *target, size_t *target_size) {
 		return rv;
 	}
 
-	sqsh_index_t current_worker =
-			__atomic_fetch_add(&next_worker, 1, __ATOMIC_SEQ_CST);
-	current_worker %= worker_count;
+	struct SqshLzoHelper *hlp = NULL;
 
-	struct SqshLzoHelper *hlp = &helper[current_worker];
-
-	if (pthread_mutex_lock(&hlp->mutex) != 0) {
-		rv = -SQSH_ERROR_TODO;
-		goto out;
+	for (sqsh_index_t i = 0; i < max_worker_count; i++) {
+		if (pthread_mutex_trylock(&helper[i].mutex) == 0) {
+			hlp = &helper[i];
+			break;
+		}
 	}
+	if (hlp == NULL) {
+		hlp = &helper[0];
+		if (pthread_mutex_lock(&hlp->mutex) != 0) {
+			rv = -SQSH_ERROR_TODO;
+			goto out;
+		}
+	}
+
+	if (hlp->pid == 0) {
+		spawn_helper_subprocess(hlp);
+	}
+
 	const uint8_t *compressed = sqsh__buffering_compression_data(context);
 	const uint64_t compressed_size = sqsh__buffering_compression_size(context);
 
