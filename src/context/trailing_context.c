@@ -58,13 +58,13 @@ sqsh__trailing_init(
 		goto out;
 	}
 
-	rv = sqsh__map_cursor_init(
+	rv = sqsh__map_reader_init(
 			&context->cursor, map_manager, trailing_start, trailing_size);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = sqsh__map_cursor_all(&context->cursor);
+	rv = sqsh__map_reader_all(&context->cursor);
 	if (rv < 0) {
 		goto out;
 	}
@@ -77,15 +77,15 @@ out:
 
 size_t
 sqsh_trailing_size(const struct SqshTrailingContext *context) {
-	return sqsh__map_cursor_size(&context->cursor);
+	return sqsh__map_reader_size(&context->cursor);
 }
 
 const uint8_t *
 sqsh_trailing_data(const struct SqshTrailingContext *context) {
-	return sqsh__map_cursor_data(&context->cursor);
+	return sqsh__map_reader_data(&context->cursor);
 }
 
 int
 sqsh__trailing_cleanup(struct SqshTrailingContext *context) {
-	return sqsh__map_cursor_cleanup(&context->cursor);
+	return sqsh__map_reader_cleanup(&context->cursor);
 }

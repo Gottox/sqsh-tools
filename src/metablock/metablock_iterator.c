@@ -53,7 +53,7 @@ sqsh__metablock_iterator_init(
 	iterator->size = 0;
 	iterator->is_compressed = false;
 	iterator->compression = compression;
-	return sqsh__map_cursor_init(
+	return sqsh__map_reader_init(
 			&iterator->cursor, map_manager, start_address, upper_limit);
 }
 
@@ -61,14 +61,14 @@ int
 sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator) {
 	int rv = 0;
 
-	rv = sqsh__map_cursor_advance(
+	rv = sqsh__map_reader_advance(
 			&iterator->cursor, iterator->size, SQSH_SIZEOF_METABLOCK);
 	if (rv < 0) {
 		goto out;
 	}
 
 	const struct SqshDataMetablock *metablock =
-			(struct SqshDataMetablock *)sqsh__map_cursor_data(
+			(struct SqshDataMetablock *)sqsh__map_reader_data(
 					&iterator->cursor);
 	iterator->size = sqsh_data_metablock_size(metablock);
 	iterator->is_compressed = sqsh_data_metablock_is_compressed(metablock);
@@ -78,7 +78,7 @@ sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator) {
 		goto out;
 	}
 
-	rv = sqsh__map_cursor_advance(
+	rv = sqsh__map_reader_advance(
 			&iterator->cursor, SQSH_SIZEOF_METABLOCK, iterator->size);
 
 out:
@@ -104,7 +104,7 @@ out:
 
 const uint8_t *
 sqsh__metablock_iterator_data(const struct SqshMetablockIterator *iterator) {
-	return sqsh__map_cursor_data(&iterator->cursor);
+	return sqsh__map_reader_data(&iterator->cursor);
 }
 
 bool
@@ -136,5 +136,5 @@ sqsh__metablock_iterator_append_to_buffer(
 
 int
 sqsh__metablock_iterator_cleanup(struct SqshMetablockIterator *iterator) {
-	return sqsh__map_cursor_cleanup(&iterator->cursor);
+	return sqsh__map_reader_cleanup(&iterator->cursor);
 }

@@ -66,7 +66,7 @@ sqsh_src = [
 	'src/inode/directory_index_iterator.c',
 	'src/inode/inode_context.c',
 	'src/mapper/curl_mapper.c',
-	'src/mapper/cursor.c',
+	'src/mapper/map_reader.c',
 	'src/mapper/map_manager.c',
 	'src/mapper/mapper.c',
 	'src/mapper/mmap_mapper.c',
@@ -86,7 +86,7 @@ sqsh_src = [
 sqsh_test = [
 	#'test/cpp-test.cpp',
 	'test/integration.c',
-	'test/mapper/cursor.c',
+	'test/mapper/map_reader.c',
 	'test/metablock/metablock_cursor.c',
 	'test/metablock/metablock_iterator.c',
 	'test/primitive/buffer.c',

@@ -323,7 +323,7 @@ struct SqshMapCursor {
  * @param upper_limit The upper limit of the cursor
  * @return 0 on success, negative on error
  */
-SQSH_NO_UNUSED int sqsh__map_cursor_init(
+SQSH_NO_UNUSED int sqsh__map_reader_init(
 		struct SqshMapCursor *cursor, struct SqshMapManager *mapper,
 		const uint64_t start_address, uint64_t upper_limit);
 
@@ -337,7 +337,7 @@ SQSH_NO_UNUSED int sqsh__map_cursor_init(
  * @param size The size to advance
  * @return 0 on success, negative on error
  */
-SQSH_NO_UNUSED int sqsh__map_cursor_advance(
+SQSH_NO_UNUSED int sqsh__map_reader_advance(
 		struct SqshMapCursor *cursor, sqsh_index_t offset, size_t size);
 
 /**
@@ -349,7 +349,7 @@ SQSH_NO_UNUSED int sqsh__map_cursor_advance(
  * @param cursor The cursor to advance
  * @return 0 on success, negative on error
  */
-SQSH_NO_UNUSED int sqsh__map_cursor_all(struct SqshMapCursor *cursor);
+SQSH_NO_UNUSED int sqsh__map_reader_all(struct SqshMapCursor *cursor);
 
 /**
  * @internal
@@ -359,7 +359,7 @@ SQSH_NO_UNUSED int sqsh__map_cursor_all(struct SqshMapCursor *cursor);
  * @param cursor The cursor to get the data from
  * @return The current data of the cursor
  */
-const uint8_t *sqsh__map_cursor_data(const struct SqshMapCursor *cursor);
+const uint8_t *sqsh__map_reader_data(const struct SqshMapCursor *cursor);
 
 /**
  * @internal
@@ -369,7 +369,7 @@ const uint8_t *sqsh__map_cursor_data(const struct SqshMapCursor *cursor);
  * @param cursor The cursor to get the size from
  * @return The current size of the cursor
  */
-size_t sqsh__map_cursor_size(const struct SqshMapCursor *cursor);
+size_t sqsh__map_reader_size(const struct SqshMapCursor *cursor);
 
 /**
  * @internal
@@ -379,7 +379,7 @@ size_t sqsh__map_cursor_size(const struct SqshMapCursor *cursor);
  * @param cursor The cursor to clean up
  * @return 0 on success, negative on error
  */
-int sqsh__map_cursor_cleanup(struct SqshMapCursor *cursor);
+int sqsh__map_reader_cleanup(struct SqshMapCursor *cursor);
 
 #ifdef __cplusplus
 }

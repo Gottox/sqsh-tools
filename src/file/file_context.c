@@ -153,7 +153,7 @@ sqsh_file_read(struct SqshFileContext *context, const uint64_t size) {
 	uint64_t block_offset = datablock_offset(context, block_index);
 
 	// TODO: check for a sane upper limit.
-	rv = sqsh__map_cursor_init(
+	rv = sqsh__map_reader_init(
 			&cursor, context->map_manager, start_block, UINT64_MAX);
 	if (rv < 0) {
 		goto out;
@@ -165,12 +165,12 @@ sqsh_file_read(struct SqshFileContext *context, const uint64_t size) {
 				sqsh_inode_file_block_size(context->inode, block_index);
 		const bool is_compressed = sqsh_inode_file_block_is_compressed(
 				context->inode, block_index);
-		rv = sqsh__map_cursor_advance(&cursor, block_offset, block_size);
+		rv = sqsh__map_reader_advance(&cursor, block_offset, block_size);
 		if (rv < 0) {
 			goto out;
 		}
 
-		const uint8_t *data = sqsh__map_cursor_data(&cursor);
+		const uint8_t *data = sqsh__map_reader_data(&cursor);
 		if (is_compressed) {
 			rv = sqsh__compression_decompress_to_buffer(
 					context->compression, buffer, data, block_size);
@@ -189,7 +189,7 @@ sqsh_file_read(struct SqshFileContext *context, const uint64_t size) {
 	}
 
 out:
-	sqsh__map_cursor_cleanup(&cursor);
+	sqsh__map_reader_cleanup(&cursor);
 	return rv;
 }
 

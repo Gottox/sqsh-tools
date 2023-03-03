@@ -54,7 +54,7 @@ log2_u32(uint32_t x) {
 
 static const struct SqshDataSuperblock *
 get_header(const struct SqshSuperblockContext *context) {
-	return (const struct SqshDataSuperblock *)sqsh__map_cursor_data(
+	return (const struct SqshDataSuperblock *)sqsh__map_reader_data(
 			&context->cursor);
 }
 
@@ -76,12 +76,12 @@ sqsh__superblock_init(
 		goto out;
 	}
 
-	rv = sqsh__map_cursor_init(
+	rv = sqsh__map_reader_init(
 			&context->cursor, map_manager, 0, SQSH_SIZEOF_SUPERBLOCK);
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__map_cursor_all(&context->cursor);
+	rv = sqsh__map_reader_all(&context->cursor);
 	if (rv < 0) {
 		goto out;
 	}
@@ -206,6 +206,6 @@ sqsh_superblock_bytes_used(const struct SqshSuperblockContext *context) {
 
 int
 sqsh__superblock_cleanup(struct SqshSuperblockContext *superblock) {
-	sqsh__map_cursor_cleanup(&superblock->cursor);
+	sqsh__map_reader_cleanup(&superblock->cursor);
 	return 0;
 }

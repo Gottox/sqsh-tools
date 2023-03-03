@@ -47,7 +47,7 @@ get_offset(const struct SqshMapCursor *cursor, uint64_t address) {
 }
 
 int
-sqsh__map_cursor_init(
+sqsh__map_reader_init(
 		struct SqshMapCursor *cursor, struct SqshMapManager *map_manager,
 		const uint64_t start_address, const uint64_t upper_limit) {
 	cursor->map_manager = map_manager;
@@ -146,7 +146,7 @@ out:
 }
 
 int
-sqsh__map_cursor_advance(
+sqsh__map_reader_advance(
 		struct SqshMapCursor *cursor, sqsh_index_t offset, size_t size) {
 	int rv = 0;
 	uint64_t address;
@@ -180,23 +180,23 @@ sqsh__map_cursor_advance(
 }
 
 int
-sqsh__map_cursor_all(struct SqshMapCursor *cursor) {
-	return sqsh__map_cursor_advance(
+sqsh__map_reader_all(struct SqshMapCursor *cursor) {
+	return sqsh__map_reader_advance(
 			cursor, 0, cursor->upper_limit - cursor->address);
 }
 
 const uint8_t *
-sqsh__map_cursor_data(const struct SqshMapCursor *cursor) {
+sqsh__map_reader_data(const struct SqshMapCursor *cursor) {
 	return cursor->target;
 }
 
 size_t
-sqsh__map_cursor_size(const struct SqshMapCursor *cursor) {
+sqsh__map_reader_size(const struct SqshMapCursor *cursor) {
 	return cursor->end_address - cursor->address;
 }
 
 int
-sqsh__map_cursor_cleanup(struct SqshMapCursor *cursor) {
+sqsh__map_reader_cleanup(struct SqshMapCursor *cursor) {
 	sqsh__buffer_cleanup(&cursor->buffer);
 	replace_mapping(cursor, NULL);
 	return 0;

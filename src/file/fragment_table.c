@@ -92,17 +92,17 @@ read_fragment_data(
 		goto out;
 	}
 
-	rv = sqsh__map_cursor_init(
+	rv = sqsh__map_reader_init(
 			&fragment_mapping, table->map_manager, start_address, upper_limit);
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__map_cursor_all(&fragment_mapping);
+	rv = sqsh__map_reader_all(&fragment_mapping);
 	if (rv < 0) {
 		goto out;
 	}
 
-	data = sqsh__map_cursor_data(&fragment_mapping);
+	data = sqsh__map_reader_data(&fragment_mapping);
 	if (is_compressed) {
 		rv = sqsh__compression_decompress_to_buffer(
 				table->compression, buffer, data, size);
@@ -113,7 +113,7 @@ read_fragment_data(
 		goto out;
 	}
 out:
-	sqsh__map_cursor_cleanup(&fragment_mapping);
+	sqsh__map_reader_cleanup(&fragment_mapping);
 	return rv;
 }
 

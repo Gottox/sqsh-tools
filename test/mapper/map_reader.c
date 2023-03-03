@@ -51,10 +51,10 @@ init_cursor(void) {
 					.source_size = sizeof(buffer) - 1});
 	assert(rv == 0);
 
-	rv = sqsh__map_cursor_init(&cursor, &map_manager, 0, sizeof(buffer) - 1);
+	rv = sqsh__map_reader_init(&cursor, &map_manager, 0, sizeof(buffer) - 1);
 	assert(rv == 0);
 
-	sqsh__map_cursor_cleanup(&cursor);
+	sqsh__map_reader_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&map_manager);
 }
 
@@ -71,16 +71,16 @@ advance_once(void) {
 					.source_size = sizeof(buffer) - 1});
 	assert(rv == 0);
 
-	rv = sqsh__map_cursor_init(&cursor, &mapper, 0, sizeof(buffer) - 1);
+	rv = sqsh__map_reader_init(&cursor, &mapper, 0, sizeof(buffer) - 1);
 	assert(rv == 0);
 
-	rv = sqsh__map_cursor_advance(&cursor, 0, 6);
+	rv = sqsh__map_reader_advance(&cursor, 0, 6);
 	assert(rv == 0);
 
-	const uint8_t *data = sqsh__map_cursor_data(&cursor);
+	const uint8_t *data = sqsh__map_reader_data(&cursor);
 	assert(data == buffer);
 
-	sqsh__map_cursor_cleanup(&cursor);
+	sqsh__map_reader_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);
 }
 
@@ -97,16 +97,16 @@ advance_once_with_offset(void) {
 					.source_size = sizeof(buffer) - 1});
 	assert(rv == 0);
 
-	rv = sqsh__map_cursor_init(&cursor, &mapper, 0, sizeof(buffer) - 1);
+	rv = sqsh__map_reader_init(&cursor, &mapper, 0, sizeof(buffer) - 1);
 	assert(rv == 0);
 
-	rv = sqsh__map_cursor_advance(&cursor, 4, 6);
+	rv = sqsh__map_reader_advance(&cursor, 4, 6);
 	assert(rv == 0);
 
-	const uint8_t *data = sqsh__map_cursor_data(&cursor);
+	const uint8_t *data = sqsh__map_reader_data(&cursor);
 	assert(data == &buffer[4]);
 
-	sqsh__map_cursor_cleanup(&cursor);
+	sqsh__map_reader_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);
 }
 
@@ -123,22 +123,22 @@ advance_twice_with_offset(void) {
 					.source_size = sizeof(buffer) - 1});
 	assert(rv == 0);
 
-	rv = sqsh__map_cursor_init(&cursor, &mapper, 0, sizeof(buffer) - 1);
+	rv = sqsh__map_reader_init(&cursor, &mapper, 0, sizeof(buffer) - 1);
 	assert(rv == 0);
 
-	rv = sqsh__map_cursor_advance(&cursor, 4, 6);
+	rv = sqsh__map_reader_advance(&cursor, 4, 6);
 	assert(rv == 0);
 
-	const uint8_t *data = sqsh__map_cursor_data(&cursor);
+	const uint8_t *data = sqsh__map_reader_data(&cursor);
 	assert(data == &buffer[4]);
 
-	rv = sqsh__map_cursor_advance(&cursor, 6, 2);
+	rv = sqsh__map_reader_advance(&cursor, 6, 2);
 	assert(rv == 0);
 
-	const uint8_t *data2 = sqsh__map_cursor_data(&cursor);
+	const uint8_t *data2 = sqsh__map_reader_data(&cursor);
 	assert(data2 == &buffer[10]);
 
-	sqsh__map_cursor_cleanup(&cursor);
+	sqsh__map_reader_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);
 }
 
@@ -155,13 +155,13 @@ advance_to_out_of_bounds(void) {
 					.source_size = sizeof(buffer) - 1});
 	assert(rv == 0);
 
-	rv = sqsh__map_cursor_init(&cursor, &mapper, 0, sizeof(buffer) - 1);
+	rv = sqsh__map_reader_init(&cursor, &mapper, 0, sizeof(buffer) - 1);
 	assert(rv == 0);
 
-	rv = sqsh__map_cursor_advance(&cursor, sizeof(buffer) - 1, 1);
+	rv = sqsh__map_reader_advance(&cursor, sizeof(buffer) - 1, 1);
 	assert(rv != 0);
 
-	sqsh__map_cursor_cleanup(&cursor);
+	sqsh__map_reader_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);
 }
 

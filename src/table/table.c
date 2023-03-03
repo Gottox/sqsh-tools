@@ -44,7 +44,7 @@ typedef const __attribute__((aligned(1))) uint64_t unaligned_uint64_t;
 static uint64_t
 lookup_table_get(const struct SqshTable *table, sqsh_index_t index) {
 	unaligned_uint64_t *lookup_table =
-			(unaligned_uint64_t *)sqsh__map_cursor_data(&table->lookup_table);
+			(unaligned_uint64_t *)sqsh__map_reader_data(&table->lookup_table);
 
 	return lookup_table[index];
 }
@@ -77,12 +77,12 @@ sqsh__table_init(
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
-	rv = sqsh__map_cursor_init(
+	rv = sqsh__map_reader_init(
 			&table->lookup_table, map_manager, start_block, upper_limit);
 	if (rv < 0) {
 		return rv;
 	}
-	rv = sqsh__map_cursor_all(&table->lookup_table);
+	rv = sqsh__map_reader_all(&table->lookup_table);
 	if (rv < 0) {
 		return rv;
 	}
@@ -138,6 +138,6 @@ out:
 
 int
 sqsh_table_cleanup(struct SqshTable *table) {
-	sqsh__map_cursor_cleanup(&table->lookup_table);
+	sqsh__map_reader_cleanup(&table->lookup_table);
 	return 0;
 }

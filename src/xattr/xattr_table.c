@@ -40,7 +40,7 @@
 
 static const struct SqshDataXattrIdTable *
 get_header(const struct SqshXattrTable *context) {
-	return (struct SqshDataXattrIdTable *)sqsh__map_cursor_data(
+	return (struct SqshDataXattrIdTable *)sqsh__map_reader_data(
 			&context->header);
 }
 
@@ -58,12 +58,12 @@ sqsh__xattr_table_init(
 				xattr_address, SQSH_SIZEOF_XATTR_ID_TABLE, &upper_limit)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
-	rv = sqsh__map_cursor_init(
+	rv = sqsh__map_reader_init(
 			&context->header, map_manager, xattr_address, upper_limit);
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__map_cursor_all(&context->header);
+	rv = sqsh__map_reader_all(&context->header);
 	if (rv < 0) {
 		goto out;
 	}
@@ -103,6 +103,6 @@ sqsh_xattr_table_get(
 int
 sqsh__xattr_table_cleanup(struct SqshXattrTable *context) {
 	sqsh_table_cleanup(&context->table);
-	sqsh__map_cursor_cleanup(&context->header);
+	sqsh__map_reader_cleanup(&context->header);
 	return 0;
 }
