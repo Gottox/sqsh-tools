@@ -396,10 +396,21 @@ sqsh__lru_init(struct SqshLru *lru, size_t size, struct SqshRcMap *backend);
  * @memberof SqshLru
  * @brief marks an item as recently used.
  * @param lru The LRU cache to mark the item in.
- * @param index The index of the item to mark.
+ * @param element The element to mark.
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t index);
+SQSH_NO_UNUSED int sqsh__lru_touch(struct SqshLru *lru, const void *element);
+
+/**
+ * @internal
+ * @memberof SqshLru
+ * @brief marks an item as recently used.
+ * @param lru The LRU cache to mark the item in.
+ * @param index The index of the element to mark.
+ * @return 0 on success, a negative value on error.
+ */
+SQSH_NO_UNUSED int
+sqsh__lru_touch_index(struct SqshLru *lru, sqsh_index_t index);
 
 /**
  * @internal

@@ -83,7 +83,19 @@ sqsh__lru_init(struct SqshLru *lru, size_t size, struct SqshRcMap *backend) {
 }
 
 int
-sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t index) {
+sqsh__lru_touch(struct SqshLru *lru, const void *element) {
+	if (element == NULL) {
+		return 0;
+	}
+
+	const int index = ((uint8_t *)element - lru->backend->data) /
+			lru->backend->element_size;
+
+	return sqsh__lru_touch_index(lru, index);
+}
+
+int
+sqsh__lru_touch_index(struct SqshLru *lru, sqsh_index_t index) {
 	if (lru->size == 0) {
 		return 0;
 	}
