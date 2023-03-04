@@ -87,8 +87,8 @@ struct SqshFragmentTable;
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_UNUSED int sqsh_fragment_table_to_buffer(
-		const struct SqshFragmentTable *context,
-		const struct SqshInodeContext *inode, struct SqshBuffer *buffer);
+		struct SqshFragmentTable *context, const struct SqshInodeContext *inode,
+		struct SqshBuffer *buffer);
 
 #ifdef __cplusplus
 }

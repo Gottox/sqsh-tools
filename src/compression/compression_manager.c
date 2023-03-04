@@ -79,7 +79,7 @@ buffer_cleanup(void *buffer) {
 SQSH_NO_UNUSED int
 sqsh__compression_manager_init(
 		struct SqshCompressionManager *manager, struct SqshArchive *archive,
-		struct SqshCompression *compression, size_t size,
+		const struct SqshCompression *compression, size_t size,
 		uint64_t upper_limit) {
 	int rv;
 	// Give a bit of room to avoid too many key hash collisions
@@ -123,7 +123,7 @@ uncompress_block(
 	int rv = 0;
 	struct SqshMapReader reader = {0};
 	const uint64_t upper_limit = manager->upper_limit;
-	struct SqshCompression *compression = manager->compression;
+	const struct SqshCompression *compression = manager->compression;
 
 	rv = sqsh__map_reader_init(
 			&reader, manager->map_manager, offset, upper_limit);

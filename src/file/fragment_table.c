@@ -43,6 +43,14 @@
 
 // TODO: remove private header
 #include "../../include/sqsh_data_private.h"
+#include "../../include/sqsh_archive_private.h"
+
+static size_t
+predict_metablock_count(const struct SqshSuperblockContext *superblock) {
+	uint32_t count = sqsh_superblock_fragment_entry_count(superblock);
+
+	return SQSH_DIVIDE_CEIL(count, SQSH_SIZEOF_FRAGMENT);
+}
 
 int
 sqsh__fragment_table_init(
@@ -53,8 +61,18 @@ sqsh__fragment_table_init(
 	uint64_t start = sqsh_superblock_fragment_table_start(superblock);
 	uint32_t count = sqsh_superblock_fragment_entry_count(superblock);
 
-	table->compression = sqsh_archive_compression_data(sqsh);
+	const struct SqshCompression *compression =
+			sqsh_archive_compression_data(sqsh);
+	// TODO: sane upper limit
+	const uint64_t upper_limit = sqsh_superblock_bytes_used(superblock);
 	table->map_manager = sqsh_archive_map_manager(sqsh);
+	const size_t metablock_count = predict_metablock_count(superblock);
+	rv = sqsh__compression_manager_init(
+			&table->compression_manager, sqsh, compression, metablock_count,
+			upper_limit);
+	if (rv < 0) {
+		goto out;
+	}
 	rv = sqsh__table_init(
 			&table->table, sqsh, start, SQSH_SIZEOF_FRAGMENT, count);
 	if (rv < 0) {
@@ -68,13 +86,63 @@ out:
 }
 
 static int
+read_fragment_compressed(
+		struct SqshFragmentTable *table, struct SqshBuffer *buffer,
+		uint64_t start_address, uint32_t size) {
+	int rv = 0;
+	const struct SqshBuffer *uncompressed = NULL;
+	rv = sqsh__compression_manager_get(
+			&table->compression_manager, start_address, size, &uncompressed);
+	if (rv < 0) {
+		goto out;
+	}
+	const uint8_t *data = sqsh__buffer_data(uncompressed);
+	rv = sqsh__buffer_append(buffer, data, size);
+	if (rv < 0) {
+		goto out;
+	}
+
+out:
+	sqsh__compression_manager_release(
+			&table->compression_manager, uncompressed);
+	return rv;
+}
+
+static int
+read_fragment_uncompressed(
+		struct SqshFragmentTable *table, struct SqshBuffer *buffer,
+		uint64_t start_address, uint32_t size) {
+	int rv = 0;
+	const uint8_t *data;
+	uint64_t upper_limit;
+	struct SqshMapReader fragment_mapping = {0};
+	if (SQSH_ADD_OVERFLOW(start_address, size, &upper_limit)) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
+	rv = sqsh__map_reader_init(
+			&fragment_mapping, table->map_manager, start_address, upper_limit);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh__map_reader_all(&fragment_mapping);
+	if (rv < 0) {
+		goto out;
+	}
+	data = sqsh__map_reader_data(&fragment_mapping);
+	rv = sqsh__buffer_append(buffer, data, size);
+
+out:
+	sqsh__map_reader_cleanup(&fragment_mapping);
+	return rv;
+}
+
+static int
 read_fragment_data(
-		const struct SqshFragmentTable *table, struct SqshBuffer *buffer,
+		struct SqshFragmentTable *table, struct SqshBuffer *buffer,
 		uint32_t index) {
 	int rv = 0;
 	struct SqshDataFragment fragment_info = {0};
-	struct SqshMapReader fragment_mapping = {0};
-	const uint8_t *data;
 
 	rv = sqsh_table_get(&table->table, index, &fragment_info);
 	if (rv < 0) {
@@ -86,41 +154,23 @@ read_fragment_data(
 			sqsh_data_fragment_size_info(&fragment_info);
 	const uint32_t size = sqsh_data_datablock_size(size_info);
 	const bool is_compressed = sqsh_data_datablock_is_compressed(size_info);
-	uint64_t upper_limit;
-	if (SQSH_ADD_OVERFLOW(start_address, size, &upper_limit)) {
-		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
-		goto out;
-	}
 
-	rv = sqsh__map_reader_init(
-			&fragment_mapping, table->map_manager, start_address, upper_limit);
-	if (rv < 0) {
-		goto out;
-	}
-	rv = sqsh__map_reader_all(&fragment_mapping);
-	if (rv < 0) {
-		goto out;
-	}
-
-	data = sqsh__map_reader_data(&fragment_mapping);
 	if (is_compressed) {
-		rv = sqsh__compression_decompress_to_buffer(
-				table->compression, buffer, data, size);
+		rv = read_fragment_compressed(table, buffer, start_address, size);
 	} else {
-		rv = sqsh__buffer_append(buffer, data, size);
+		rv = read_fragment_uncompressed(table, buffer, start_address, size);
 	}
 	if (rv < 0) {
 		goto out;
 	}
 out:
-	sqsh__map_reader_cleanup(&fragment_mapping);
 	return rv;
 }
 
 int
 sqsh_fragment_table_to_buffer(
-		const struct SqshFragmentTable *table,
-		const struct SqshInodeContext *inode, struct SqshBuffer *buffer) {
+		struct SqshFragmentTable *table, const struct SqshInodeContext *inode,
+		struct SqshBuffer *buffer) {
 	int rv = 0;
 	struct SqshBuffer intermediate_buffer = {0};
 	const uint8_t *data;
@@ -160,5 +210,6 @@ out:
 int
 sqsh__fragment_table_cleanup(struct SqshFragmentTable *table) {
 	sqsh_table_cleanup(&table->table);
+	sqsh__compression_manager_cleanup(&table->compression_manager);
 	return 0;
 }

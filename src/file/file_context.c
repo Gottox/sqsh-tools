@@ -116,7 +116,7 @@ sqsh_file_seek(struct SqshFileContext *context, uint64_t seek_pos) {
 
 static int
 attach_fragment(struct SqshFileContext *context, const uint64_t size) {
-	const struct SqshFragmentTable *table = context->fragment_table;
+	struct SqshFragmentTable *table = context->fragment_table;
 	const struct SqshInodeContext *inode = context->inode;
 	struct SqshBuffer *buffer = &context->buffer;
 	int rv = 0;

@@ -129,7 +129,7 @@ int sqsh__buffering_compression_cleanup(void *context);
 
 struct SqshCompressionManager {
 	struct SqshRcHashMap hash_map;
-	struct SqshCompression *compression;
+	const struct SqshCompression *compression;
 	struct SqshMapManager *map_manager;
 	struct SqshLru lru;
 	pthread_mutex_t lock;
@@ -138,7 +138,8 @@ struct SqshCompressionManager {
 
 SQSH_NO_UNUSED int sqsh__compression_manager_init(
 		struct SqshCompressionManager *manager, struct SqshArchive *archive,
-		struct SqshCompression *compression, size_t size, uint64_t upper_limit);
+		const struct SqshCompression *compression, size_t size,
+		uint64_t upper_limit);
 
 size_t sqsh__compression_manager_size(struct SqshCompressionManager *manager);
 
