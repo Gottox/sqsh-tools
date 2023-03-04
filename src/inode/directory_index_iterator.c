@@ -111,6 +111,10 @@ sqsh__directory_index_iterator_next(
 	int rv = 0;
 	size_t size;
 
+	if (iterator->remaining_entries == 0) {
+		return 0;
+	}
+
 	iterator->remaining_entries--;
 
 	// Make sure next entry is loaded:
