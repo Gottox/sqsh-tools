@@ -86,9 +86,33 @@ out:
 }
 
 static int
+append_fragment(
+		struct SqshFragmentTable *table, const struct SqshInodeContext *inode,
+		struct SqshBuffer *buffer, const uint8_t *data, size_t data_size) {
+	uint32_t block_size = sqsh_superblock_block_size(table->superblock);
+	uint32_t offset = sqsh_inode_file_fragment_block_offset(inode);
+	uint32_t size = sqsh_inode_file_size(inode) % block_size;
+	uint32_t end_offset;
+	if (SQSH_ADD_OVERFLOW(offset, size, &end_offset)) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+	if (end_offset > data_size) {
+		return -SQSH_ERROR_SIZE_MISSMATCH;
+	}
+
+	int rv = 0;
+	rv = sqsh__buffer_append(buffer, &data[offset], size);
+	if (rv < 0) {
+		goto out;
+	}
+out:
+	return rv;
+}
+
+static int
 read_fragment_compressed(
-		struct SqshFragmentTable *table, struct SqshBuffer *buffer,
-		uint64_t start_address, uint32_t size) {
+		struct SqshFragmentTable *table, const struct SqshInodeContext *inode,
+		struct SqshBuffer *buffer, uint64_t start_address, uint32_t size) {
 	int rv = 0;
 	const struct SqshBuffer *uncompressed = NULL;
 	rv = sqsh__compression_manager_get(
@@ -98,7 +122,9 @@ read_fragment_compressed(
 	}
 	const uint8_t *data = sqsh__buffer_data(uncompressed);
 	const size_t data_size = sqsh__buffer_size(uncompressed);
-	rv = sqsh__buffer_append(buffer, data, data_size);
+
+	rv = append_fragment(table, inode, buffer, data, data_size);
+
 	if (rv < 0) {
 		goto out;
 	}
@@ -111,37 +137,43 @@ out:
 
 static int
 read_fragment_uncompressed(
-		struct SqshFragmentTable *table, struct SqshBuffer *buffer,
-		uint64_t start_address, uint32_t size) {
+		struct SqshFragmentTable *table, const struct SqshInodeContext *inode,
+		struct SqshBuffer *buffer, uint64_t start_address, uint32_t size) {
 	int rv = 0;
 	const uint8_t *data;
 	uint64_t upper_limit;
-	struct SqshMapReader fragment_mapping = {0};
+	struct SqshMapReader reader = {0};
+
 	if (SQSH_ADD_OVERFLOW(start_address, size, &upper_limit)) {
 		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
 	rv = sqsh__map_reader_init(
-			&fragment_mapping, table->map_manager, start_address, upper_limit);
+			&reader, table->map_manager, start_address, upper_limit);
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__map_reader_all(&fragment_mapping);
+	rv = sqsh__map_reader_all(&reader);
 	if (rv < 0) {
 		goto out;
 	}
-	data = sqsh__map_reader_data(&fragment_mapping);
-	rv = sqsh__buffer_append(buffer, data, size);
+	data = sqsh__map_reader_data(&reader);
+	rv = append_fragment(table, inode, buffer, data, size);
+	if (rv < 0) {
+		goto out;
+	}
 
 out:
-	sqsh__map_reader_cleanup(&fragment_mapping);
+	sqsh__map_reader_cleanup(&reader);
 	return rv;
 }
 
-static int
-read_fragment_data(
-		struct SqshFragmentTable *table, struct SqshBuffer *buffer,
-		uint32_t index) {
+int
+sqsh_fragment_table_to_buffer(
+		struct SqshFragmentTable *table, const struct SqshInodeContext *inode,
+		struct SqshBuffer *buffer) {
+	uint32_t index = sqsh_inode_file_fragment_block_index(inode);
+
 	int rv = 0;
 	struct SqshDataFragment fragment_info = {0};
 
@@ -157,54 +189,16 @@ read_fragment_data(
 	const bool is_compressed = sqsh_data_datablock_is_compressed(size_info);
 
 	if (is_compressed) {
-		rv = read_fragment_compressed(table, buffer, start_address, size);
+		rv = read_fragment_compressed(
+				table, inode, buffer, start_address, size);
 	} else {
-		rv = read_fragment_uncompressed(table, buffer, start_address, size);
+		rv = read_fragment_uncompressed(
+				table, inode, buffer, start_address, size);
 	}
 	if (rv < 0) {
 		goto out;
 	}
 out:
-	return rv;
-}
-
-int
-sqsh_fragment_table_to_buffer(
-		struct SqshFragmentTable *table, const struct SqshInodeContext *inode,
-		struct SqshBuffer *buffer) {
-	int rv = 0;
-	struct SqshBuffer intermediate_buffer = {0};
-	const uint8_t *data;
-	uint32_t block_size = sqsh_superblock_block_size(table->superblock);
-	uint32_t index = sqsh_inode_file_fragment_block_index(inode);
-	uint32_t offset = sqsh_inode_file_fragment_block_offset(inode);
-	uint32_t size = sqsh_inode_file_size(inode) % block_size;
-	uint32_t end_offset;
-	if (SQSH_ADD_OVERFLOW(offset, size, &end_offset)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
-	rv = sqsh__buffer_init(&intermediate_buffer);
-	if (rv < 0) {
-		goto out;
-	}
-
-	rv = read_fragment_data(table, &intermediate_buffer, index);
-	if (rv < 0) {
-		goto out;
-	}
-
-	if (end_offset > sqsh__buffer_size(&intermediate_buffer)) {
-		return -SQSH_ERROR_SIZE_MISSMATCH;
-	}
-
-	data = sqsh__buffer_data(&intermediate_buffer);
-
-	rv = sqsh__buffer_append(buffer, &data[offset], size);
-	if (rv < 0) {
-		goto out;
-	}
-out:
-	sqsh__buffer_cleanup(&intermediate_buffer);
 	return rv;
 }
 
