@@ -36,6 +36,8 @@
 #include "../../include/sqsh_archive.h"
 #include "../../include/sqsh_error.h"
 
+#include "../../include/sqsh_mapper.h"
+#include "../../include/sqsh_mapper_private.h"
 #include "../../include/sqsh_primitive_private.h"
 
 // Calculates pow(x,y) % mod
@@ -77,7 +79,8 @@ buffer_cleanup(void *buffer) {
 SQSH_NO_UNUSED int
 sqsh__compression_manager_init(
 		struct SqshCompressionManager *manager, struct SqshArchive *archive,
-		size_t size) {
+		struct SqshCompression *compression, size_t size,
+		uint64_t upper_limit) {
 	int rv;
 	// Give a bit of room to avoid too many key hash collisions
 	size = find_next_maybe_prime(2 * size);
@@ -98,6 +101,8 @@ sqsh__compression_manager_init(
 		goto out;
 	}
 	manager->map_manager = sqsh_archive_map_manager(archive);
+	manager->compression = compression;
+	manager->upper_limit = upper_limit;
 
 out:
 	if (rv < 0) {
@@ -115,11 +120,33 @@ SQSH_NO_UNUSED int
 uncompress_block(
 		struct SqshBuffer *buffer, struct SqshCompressionManager *manager,
 		uint64_t offset, size_t size) {
-	(void)manager;
-	(void)offset;
-	(void)size;
-	(void)buffer;
-	return -SQSH_ERROR_TODO;
+	int rv = 0;
+	struct SqshMapReader reader = {0};
+	const uint64_t upper_limit = manager->upper_limit;
+	struct SqshCompression *compression = manager->compression;
+
+	rv = sqsh__map_reader_init(
+			&reader, manager->map_manager, offset, upper_limit);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = sqsh__map_reader_advance(&reader, 0, size);
+	if (rv < 0) {
+		goto out;
+	}
+
+	const uint8_t *data = sqsh__map_reader_data(&reader);
+
+	rv = sqsh__compression_decompress_to_buffer(
+			compression, buffer, data, size);
+	if (rv < 0) {
+		goto out;
+	}
+
+out:
+	sqsh__map_reader_cleanup(&reader);
+	return rv;
 }
 
 int
@@ -139,6 +166,10 @@ sqsh__compression_manager_get(
 
 	if (*target == NULL) {
 		struct SqshBuffer buffer = {0};
+		rv = sqsh__buffer_init(&buffer);
+		if (rv < 0) {
+			goto out;
+		}
 		rv = uncompress_block(&buffer, manager, offset, size);
 		if (rv < 0) {
 			goto out;
@@ -157,7 +188,8 @@ out:
 
 int
 sqsh__compression_manager_release(
-		struct SqshCompressionManager *manager, struct SqshBuffer *buffer) {
+		struct SqshCompressionManager *manager,
+		const struct SqshBuffer *buffer) {
 	int rv = pthread_mutex_lock(&manager->lock);
 	if (rv != 0) {
 		// rv = -SQSH_ERROR_MUTEX_LOCK;

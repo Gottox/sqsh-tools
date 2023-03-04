@@ -94,6 +94,7 @@ sqsh_test = [
 	'test/primitive/rc_map.c',
 	'test/primitive/rc_hash_map.c',
 	'test/compression/compression.c',
+	'test/compression/compression_manager.c',
 ]
 sqsh_test_util = [
 	'test/util.c',

@@ -133,11 +133,12 @@ struct SqshCompressionManager {
 	struct SqshMapManager *map_manager;
 	struct SqshLru lru;
 	pthread_mutex_t lock;
+	uint64_t upper_limit;
 };
 
 SQSH_NO_UNUSED int sqsh__compression_manager_init(
 		struct SqshCompressionManager *manager, struct SqshArchive *archive,
-		size_t size);
+		struct SqshCompression *compression, size_t size, uint64_t upper_limit);
 
 size_t sqsh__compression_manager_size(struct SqshCompressionManager *manager);
 
@@ -146,7 +147,8 @@ SQSH_NO_UNUSED int sqsh__compression_manager_get(
 		const struct SqshBuffer **target);
 
 int sqsh__compression_manager_release(
-		struct SqshCompressionManager *manager, struct SqshBuffer *buffer);
+		struct SqshCompressionManager *manager,
+		const struct SqshBuffer *buffer);
 
 int sqsh__compression_manager_cleanup(struct SqshCompressionManager *manager);
 
