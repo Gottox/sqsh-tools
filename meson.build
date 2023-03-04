@@ -263,13 +263,3 @@ pkg_mod.generate(
 )
 
 subdir('doc')
-
-clangtidy = find_program('clang-tidy', required: false)
-if clangtidy.found()
-    run_target(
-        'tidy',
-        command: [
-            clangtidy,
-            '-p', meson.project_build_root()
-        ] + files(sqsh_src + sqsh_hdr + sqsh_hdr_priv))
-endif
