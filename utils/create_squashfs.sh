@@ -13,7 +13,6 @@ $SETFATTR -n user.foo -v 1234567891234567891234567890001234567890 "$tmp/a"
 $SETFATTR -n user.bar -v 1234567891234567891234567890001234567890 "$tmp/b"
 [ -e "$out" ] && rm "$out"
 $MKSQUASHFS "$tmp" "$out" \
-	-noI -noId -noD -noF -noX \
 	-nopad \
 	-force-uid 2020 \
 	-force-gid 202020 \
