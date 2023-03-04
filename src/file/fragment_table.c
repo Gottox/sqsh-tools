@@ -42,8 +42,8 @@
 #include "../../include/sqsh_compression_private.h"
 
 // TODO: remove private header
-#include "../../include/sqsh_data_private.h"
 #include "../../include/sqsh_archive_private.h"
+#include "../../include/sqsh_data_private.h"
 
 static size_t
 predict_metablock_count(const struct SqshSuperblockContext *superblock) {
@@ -97,7 +97,8 @@ read_fragment_compressed(
 		goto out;
 	}
 	const uint8_t *data = sqsh__buffer_data(uncompressed);
-	rv = sqsh__buffer_append(buffer, data, size);
+	const size_t data_size = sqsh__buffer_size(uncompressed);
+	rv = sqsh__buffer_append(buffer, data, data_size);
 	if (rv < 0) {
 		goto out;
 	}
