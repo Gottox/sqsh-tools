@@ -45,11 +45,27 @@
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_data_private.h"
 
-static size_t
-predict_metablock_count(const struct SqshSuperblockContext *superblock) {
-	uint32_t count = sqsh_superblock_fragment_entry_count(superblock);
+static int
+init_compression_manager(
+		struct SqshFragmentTable *table, struct SqshArchive *archive) {
+	const struct SqshSuperblockContext *superblock =
+			sqsh_archive_superblock(archive);
+	const struct SqshCompression *compression =
+			sqsh_archive_compression_data(archive);
 
-	return SQSH_DIVIDE_CEIL(count, SQSH_SIZEOF_FRAGMENT);
+	// we ignore the fact, that the datablock may begin at a different
+	// address when compression options are present.
+	uint64_t start_address = SQSH_SIZEOF_SUPERBLOCK;
+	const uint64_t upper_limit = sqsh_superblock_inode_table_start(superblock);
+
+	table->map_manager = sqsh_archive_map_manager(archive);
+	// TODO: Is it safe to assume, that every fragment has at least 2 entries?
+	// (except when ther is only one packed file)
+	// Be safe and assume it is not for now:
+	size_t size = sqsh_superblock_fragment_entry_count(superblock);
+	return sqsh__compression_manager_init(
+			&table->compression_manager, archive, compression, start_address,
+			upper_limit, size);
 }
 
 int
@@ -61,15 +77,7 @@ sqsh__fragment_table_init(
 	uint64_t start = sqsh_superblock_fragment_table_start(superblock);
 	uint32_t count = sqsh_superblock_fragment_entry_count(superblock);
 
-	const struct SqshCompression *compression =
-			sqsh_archive_compression_data(sqsh);
-	// TODO: sane upper limit
-	const uint64_t upper_limit = sqsh_superblock_bytes_used(superblock);
-	table->map_manager = sqsh_archive_map_manager(sqsh);
-	const size_t metablock_count = predict_metablock_count(superblock);
-	rv = sqsh__compression_manager_init(
-			&table->compression_manager, sqsh, compression, metablock_count,
-			upper_limit);
+	rv = init_compression_manager(table, sqsh);
 	if (rv < 0) {
 		goto out;
 	}

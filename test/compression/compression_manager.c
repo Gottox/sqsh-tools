@@ -54,7 +54,7 @@ decompress(void) {
 	uint8_t *data = mk_stub(&archive, payload, sizeof(payload), &target_size);
 
 	rv = sqsh__compression_manager_init(
-			&manager, &archive, &compression, 1000, target_size);
+			&manager, &archive, &compression, 0, target_size, 0);
 	assert(rv == 0);
 
 	rv = sqsh__compression_manager_get(

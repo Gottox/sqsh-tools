@@ -149,8 +149,8 @@ struct SqshCompressionManager {
 
 SQSH_NO_UNUSED int sqsh__compression_manager_init(
 		struct SqshCompressionManager *manager, struct SqshArchive *archive,
-		const struct SqshCompression *compression, size_t size,
-		uint64_t upper_limit);
+		const struct SqshCompression *compression, uint64_t start_address,
+		uint64_t upper_limit, size_t size);
 
 size_t sqsh__compression_manager_size(struct SqshCompressionManager *manager);
 

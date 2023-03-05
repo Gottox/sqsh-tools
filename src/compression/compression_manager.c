@@ -35,6 +35,7 @@
 
 #include "../../include/sqsh_archive.h"
 #include "../../include/sqsh_error.h"
+#include "../utils.h"
 
 #include "../../include/sqsh_mapper.h"
 #include "../../include/sqsh_mapper_private.h"
@@ -79,9 +80,18 @@ buffer_cleanup(void *buffer) {
 SQSH_NO_UNUSED int
 sqsh__compression_manager_init(
 		struct SqshCompressionManager *manager, struct SqshArchive *archive,
-		const struct SqshCompression *compression, size_t size,
-		uint64_t upper_limit) {
+		const struct SqshCompression *compression, uint64_t start_address,
+		uint64_t upper_limit, size_t size) {
 	int rv;
+
+	if (start_address > upper_limit) {
+		return -SQSH_ERROR_TODO;
+	}
+
+	if (size == 0) {
+		size_t block_size = sqsh__compression_block_size(compression);
+		size = SQSH_DIVIDE_CEIL(upper_limit - start_address, block_size);
+	}
 	// Give a bit of room to avoid too many key hash collisions
 	size = find_next_maybe_prime(2 * size);
 
