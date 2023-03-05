@@ -8,7 +8,7 @@ tool_sources = [
 
 c_args = [ '-DVERSION="@0@"'.format(meson.project_version()) ]
 
-tools = []
+tools = {}
 foreach src : tool_sources
 	tool_name = 'sqsh-' + src.split('.')[0]
 	tool = executable(
