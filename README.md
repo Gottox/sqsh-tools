@@ -88,23 +88,6 @@ sqsh_inode_cleanup(&inode);
 * Stack located structures
 * usable in multithreaded applications
 
-## organisation of source
-
-* *src/primitive*: basic building blocks like buffer management or reference
-  counting
-* *src/mapper*: implementations that load segments of squashfs file into
-  memory. Most notably the mmap management happens here.
-* *src/data*: The actual model of a squashfs archive.
-* *src/context*: Implements the high level logic on how to retrieve informations
-  from the squashfs archive
-* *src/iterator*: Implementations of squashfs structures that are read linear.
-* *src/table*: Implementation of squashfs structures that can be accessed by
-  an index.
-* *src/compression*: Gluecode for the different compression algorithms.
-
-The user is supposed to interact with structures of *src/context* and *src/iterator*
-modules. 
-
 ## License
 
 The library is licensed under Simplified BSD License (BSD-2-Clause). The one
