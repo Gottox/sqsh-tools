@@ -33,7 +33,6 @@
 
 #include "common.h"
 
-#include "../src/utils.h"
 #include <sqsh_context.h>
 #include <sqsh_directory.h>
 #include <sqsh_file.h>
@@ -353,7 +352,9 @@ sqshfuse_read(
 		goto out;
 	}
 
-	size = SQSH_MIN(size, sqsh_inode_file_size(inode));
+	if (size < sqsh_inode_file_size(inode)) {
+		size = sqsh_inode_file_size(inode);
+	}
 	rv = sqsh_file_seek(file, offset);
 	if (rv < 0) {
 		// TODO: Better return type
@@ -391,7 +392,11 @@ sqshfuse_readlink(const char *path, char *buf, size_t size) {
 
 	const char *symlink = sqsh_inode_symlink(inode);
 	size_t symlink_size = sqsh_inode_symlink_size(inode);
-	size_t cpy_size = SQSH_MIN(symlink_size, size - 1);
+	size_t cpy_size = size - 1;
+
+	if (cpy_size < symlink_size) {
+		cpy_size = symlink_size;
+	}
 
 	memcpy(buf, symlink, cpy_size);
 	buf[cpy_size] = 0;
