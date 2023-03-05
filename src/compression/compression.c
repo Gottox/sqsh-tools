@@ -102,6 +102,11 @@ sqsh__compression_decompress_to_buffer(
 	return rv;
 }
 
+size_t
+sqsh__compression_block_size(const struct SqshCompression *compression) {
+	return compression->block_size;
+}
+
 int
 sqsh__compression_cleanup(struct SqshCompression *compression) {
 	compression->impl = NULL;

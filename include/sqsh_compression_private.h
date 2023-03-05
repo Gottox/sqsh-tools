@@ -99,6 +99,17 @@ SQSH_NO_UNUSED int sqsh__compression_decompress_to_buffer(
 /**
  * @internal
  * @memberof SqshCompression
+ * @brief Decompresses data to a buffer.
+ *
+ * @param[in]     compression     The compression context to use.
+ *
+ * @return the block size of the compression context.
+ */
+size_t sqsh__compression_block_size(const struct SqshCompression *compression);
+
+/**
+ * @internal
+ * @memberof SqshCompression
  * @brief Cleans up a compression context.
  *
  * @param[in] compression The context to clean up.
