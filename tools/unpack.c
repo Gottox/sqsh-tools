@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh-unpack.c
+ * @file         unpack.c
  */
 
 #include "common.h"

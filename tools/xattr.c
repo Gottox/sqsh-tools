@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh-xattr.c
+ * @file         xattr.c
  */
 
 #include "common.h"

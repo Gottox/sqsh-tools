@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh-cat.c
+ * @file         cat.c
  */
 
 #include "common.h"

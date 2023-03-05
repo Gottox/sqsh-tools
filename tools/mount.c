@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh-mount.c
+ * @file         mount.c
  */
 
 #include "common.h"
