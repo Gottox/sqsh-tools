@@ -1,0 +1,18 @@
+digraph G {
+	mapper -> map_manager
+	map_manager -> trailing_context
+	map_manager -> table
+	map_manager -> metablock_iterator
+	metablock_iterator -> metablock_reader
+	metablock_iterator -> compression_options_context
+
+	compression -> compression_manager
+
+	metablock_reader -> compression
+
+	compression_manager -> table
+
+	table -> CONSUMER
+	map_manager -> CONSUMER
+	compression_manager -> CONSUMER
+}
