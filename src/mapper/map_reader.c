@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         cursor.c
+ * @file         map_reader.c
  */
 
 #include "../../include/sqsh_mapper_private.h"

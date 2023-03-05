@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         path_resolver_context.c
+ * @file         path_resolver.c
  */
 
 #include "../../include/sqsh_context_private.h"

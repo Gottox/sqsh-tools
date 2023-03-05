@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         directory.c
+ * @file         directory_iterator.c
  */
 
 #include "../../include/sqsh_directory_private.h"

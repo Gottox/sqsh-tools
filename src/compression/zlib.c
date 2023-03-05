@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         gzip.c
+ * @file         zlib.c
  */
 
 #include "../../include/sqsh_compression_private.h"

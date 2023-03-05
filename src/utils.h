@@ -1,4 +1,3 @@
-// utils.c
 /******************************************************************************
  *                                                                            *
  * Copyright (c) 2023, Enno Boland <g@s01.de>                                 *
@@ -29,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_utils.h
+ * @file         utils.h
  */
 
 #ifndef SQSH_UTILS_H
