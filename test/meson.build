@@ -1,5 +1,5 @@
 sqsh_test = [
-	#'test/cpp-test.cpp',
+	#'cpp-test.cpp',
 	'integration.c',
 	'mapper/map_reader.c',
 	'metablock/metablock_reader.c',
@@ -46,7 +46,7 @@ endforeach
 
 if get_option('test') == 'extended'
 	test('selftest',
-		files('test/selftest.sh'),
+		files('selftest.sh'),
 		timeout: 60,
 		env: {
 			'SQSH_LZO_HELPER_PATH': lzo_helper_path,

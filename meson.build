@@ -13,7 +13,7 @@ project(
 
 subdir('include')
 
-subdir('src')
+subdir('lib')
 
 if get_option('default_library') == 'both'
 	libsqsh = libsqsh.get_static_lib()
@@ -25,7 +25,7 @@ libsqsh_dependency = declare_dependency(
 )
 
 if get_option('tools')
-	subdir('bin')
+	subdir('tools')
 endif
 
 if get_option('test') != 'false'
