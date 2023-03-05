@@ -3,12 +3,12 @@
 ### [archive](./archive)
 
 This directory contains the general sqsh archive handling. It contains 
-functionality to open/instantiate and close squashfs images
+functionality to open/instantiate and close squashfs images.
 
 ### [compression](./compression)
 
 This directory contains the glue code to the different compression algorithms
-as well as buffer and cache handling for decompressed data
+as well as buffer and cache handling for decompressed data.
 
 ### [context](./context)
 
