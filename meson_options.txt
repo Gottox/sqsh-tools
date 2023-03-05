@@ -12,7 +12,8 @@ option('zstd',  type : 'boolean',
 	description: 'Support ZSTD compression.')
 option('fuse',  type : 'boolean',
 	description: 'Support FUSE filesystem.')
-option('test',  type : 'boolean', value : false,
+option('test',  type : 'combo', choices: ['true', 'false', 'extended'],
+	value : 'false',
 	description: 'Run tests.')
 option('doc',   type : 'combo', choices: ['true', 'false', 'internal'],
 	value : 'false',

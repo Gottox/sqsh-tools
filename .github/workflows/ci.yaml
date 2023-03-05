@@ -21,7 +21,7 @@ jobs:
           -Dlzma=true  \
           -Dlzo=true  \
           -Dzstd=true  \
-          -Dtest=true \
+          -Dtest=extended \
           -Ddoc=false
     - name: test
       run: |

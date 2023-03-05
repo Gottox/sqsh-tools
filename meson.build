@@ -173,15 +173,17 @@ if get_option('default_library') == 'both'
 	libsqsh = libsqsh.get_static_lib()
 endif
 
+tools = {}
 if get_option('tools')
 	tool_build_args = build_args + ['-DVERSION="' + meson.project_version() + '"']
 	foreach p : [ 'sqsh-cat', 'sqsh-ls', 'sqsh-stat', 'sqsh-xattr', 'sqsh-unpack' ]
-		executable(p, 'bin/'+p+'.c',
+		tool = executable(p, 'bin/'+p+'.c',
 			install: not meson.is_subproject(),
 			c_args : tool_build_args,
 			include_directories : 'include',
 			link_with : libsqsh
 		)
+		tools += { p : tool }
 	endforeach
 
 	if get_option('fuse')
@@ -196,7 +198,7 @@ if get_option('tools')
 	endif
 endif
 
-if get_option('test')
+if get_option('test') != 'false'
 	if get_option('zlib') == false
 		error('zlib is needed to run tests')
 	endif
@@ -228,6 +230,16 @@ if get_option('test')
 		)
 		test(p, t, env: { 'SQSH_LZO_HELPER_PATH': lzo_helper_path })
 	endforeach
+	if get_option('test') == 'extended'
+	test('selftest', files('test/selftest.sh'), env: {
+			'SQSH_LZO_HELPER_PATH': lzo_helper_path,
+			'SQSH_LS': tools['sqsh-ls'].full_path(),
+			'SQSH_CAT': tools['sqsh-cat'].full_path(),
+			'SOURCE_ROOT': meson.project_source_root(),
+		},
+		timeout: 60,
+	)
+	endif
 endif
 
 if get_option('fuzzer')
