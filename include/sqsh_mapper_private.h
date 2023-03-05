@@ -34,7 +34,6 @@
 #ifndef SQSH_PRIVATE_MAPPER_H
 #define SQSH_PRIVATE_MAPPER_H
 
-#include "sqsh_common.h"
 #include "sqsh_mapper.h"
 
 #include <pthread.h>

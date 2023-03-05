@@ -34,7 +34,6 @@
 #ifndef SQSH_CONTEXT_PRIVATE_H
 #define SQSH_CONTEXT_PRIVATE_H
 
-#include "sqsh_common.h"
 #include "sqsh_context.h"
 #include "sqsh_metablock_private.h"
 
