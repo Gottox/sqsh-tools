@@ -39,28 +39,52 @@
 
 #	include <lz4.h>
 
+struct SqshLz4Context {
+	LZ4_streamDecode_t *stream;
+	uint8_t *target;
+	size_t target_size;
+	sqsh_index_t offset;
+};
+
+SQSH_STATIC_ASSERT(
+		sizeof(sqsh__compression_context_t) >= sizeof(LZ4_streamDecode_t));
+
+static int
+sqsh_lz4_init(void *context, uint8_t *target, size_t target_size) {
+	struct SqshLz4Context *ctx = context;
+	ctx->stream = LZ4_createStreamDecode();
+	ctx->target = target;
+	ctx->target_size = target_size;
+	ctx->offset = 0;
+
+	return 0;
+}
+
+static int
+sqsh_lz4_decompress(
+		void *context, const uint8_t *compressed,
+		const size_t compressed_size) {
+	struct SqshLz4Context *ctx = context;
+
+	int size = LZ4_decompress_safe_continue(
+			ctx->stream, (const char *)compressed, (char *)ctx->target,
+			compressed_size, ctx->target_size - ctx->offset);
+	ctx->offset += size;
+	return 0;
+}
+
 static int
 sqsh_lz4_finish(void *context, uint8_t *target, size_t *target_size) {
-	const char *compressed =
-			(const char *)sqsh__buffering_compression_data(context);
-	const size_t compressed_size = sqsh__buffering_compression_size(context);
-
-	int rv = LZ4_decompress_safe(
-			compressed, (char *)target, compressed_size, *target_size);
-	if (rv < 0) {
-		rv = -SQSH_ERROR_COMPRESSION_DECOMPRESS;
-		goto out;
-	}
-	*target_size = rv;
-
-out:
-	sqsh__buffering_compression_cleanup(context);
-	return rv;
+	(void)target;
+	(void)target_size;
+	struct SqshLz4Context *ctx = context;
+	LZ4_freeStreamDecode(ctx->stream);
+	return 0;
 }
 
 static const struct SqshCompressionImpl impl = {
-		.init = sqsh__buffering_compression_init,
-		.decompress = sqsh__buffering_compression_decompress,
+		.init = sqsh_lz4_init,
+		.decompress = sqsh_lz4_decompress,
 		.finish = sqsh_lz4_finish,
 };
 
