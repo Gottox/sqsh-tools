@@ -18,7 +18,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh-lzo-helper.c
+ * @file         lzo-helper.c
  */
 
 #include <lzo/lzo1x.h>
