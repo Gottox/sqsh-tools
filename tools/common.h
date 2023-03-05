@@ -22,6 +22,7 @@ static struct SqshArchive *
 open_archive(const char *image_path, int *err) {
 	struct SqshConfig config = {
 			.source_mapper = NULL,
+			.mapper_block_size = 1024 * 256,
 	};
 #ifdef CONFIG_CURL
 	int i;

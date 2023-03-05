@@ -217,13 +217,13 @@ out:
 	return rv;
 }
 
-static const struct SqshCompressionImpl impl = {
+static const struct SqshCompressionImpl impl_lzo = {
 		.init = sqsh__buffering_compression_init,
 		.decompress = sqsh__buffering_compression_decompress,
 		.finish = sqsh_lzo_finish,
 };
 
-const struct SqshCompressionImpl *sqsh__lzo_impl = &impl;
+const struct SqshCompressionImpl *const sqsh__impl_lzo = &impl_lzo;
 #else
-const struct SqshCompressionImpl *sqsh__lzo_impl = NULL;
+const struct SqshCompressionImpl *const sqsh__impl_lzo = NULL;
 #endif

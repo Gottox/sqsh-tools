@@ -123,7 +123,7 @@ static const struct SqshCompressionImpl impl_xz = {
 		.finish = sqsh_lzma_finish,
 };
 
-const struct SqshCompressionImpl *sqsh__xz_impl = &impl_xz;
+const struct SqshCompressionImpl *const sqsh__impl_xz = &impl_xz;
 
 static const struct SqshCompressionImpl impl_lzma = {
 		.init = sqsh_lzma_init_alone,
@@ -131,8 +131,8 @@ static const struct SqshCompressionImpl impl_lzma = {
 		.finish = sqsh_lzma_finish,
 };
 
-const struct SqshCompressionImpl *sqsh__lzma_impl = &impl_lzma;
+const struct SqshCompressionImpl *const sqsh__impl_lzma = &impl_lzma;
 #else
-const struct SqshCompressionImpl *sqsh__lzma_impl = NULL;
-const struct SqshCompressionImpl *sqsh__xz_impl = NULL;
+const struct SqshCompressionImpl *const sqsh__impl_lzma = NULL;
+const struct SqshCompressionImpl *const sqsh__impl_xz = NULL;
 #endif

@@ -41,17 +41,17 @@ const struct SqshCompressionImpl *
 compression_by_id(int id) {
 	switch ((enum SqshSuperblockCompressionId)id) {
 	case SQSH_COMPRESSION_GZIP:
-		return sqsh__zlib_impl;
+		return sqsh__impl_zlib;
 	case SQSH_COMPRESSION_LZMA:
-		return sqsh__lzma_impl;
+		return sqsh__impl_lzma;
 	case SQSH_COMPRESSION_XZ:
-		return sqsh__xz_impl;
+		return sqsh__impl_xz;
 	case SQSH_COMPRESSION_LZO:
-		return sqsh__lzo_impl;
+		return sqsh__impl_lzo;
 	case SQSH_COMPRESSION_LZ4:
-		return sqsh__lz4_impl;
+		return sqsh__impl_lz4;
 	case SQSH_COMPRESSION_ZSTD:
-		return sqsh__zstd_impl;
+		return sqsh__impl_zstd;
 	default:
 		return NULL;
 	}

@@ -82,13 +82,13 @@ sqsh_lz4_finish(void *context, uint8_t *target, size_t *target_size) {
 	return 0;
 }
 
-static const struct SqshCompressionImpl impl = {
+static const struct SqshCompressionImpl impl_lz4 = {
 		.init = sqsh_lz4_init,
 		.decompress = sqsh_lz4_decompress,
 		.finish = sqsh_lz4_finish,
 };
 
-const struct SqshCompressionImpl *sqsh__lz4_impl = &impl;
+const struct SqshCompressionImpl *const sqsh__impl_lz4 = &impl_lz4;
 #else
-const struct SqshCompressionImpl *sqsh__lz4_impl = NULL;
+const struct SqshCompressionImpl *const sqsh__impl_lz4 = NULL;
 #endif

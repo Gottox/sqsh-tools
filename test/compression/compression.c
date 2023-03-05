@@ -65,7 +65,7 @@ decompress_lzma(void) {
 					   0xff, 0xff, 0xff, 0xff, 0x00, 0x30, 0x98, 0x88, 0x98,
 					   0x46, 0x7e, 0x1e, 0xb2, 0xff, 0xfa, 0x1c, 0x80, 0x00};
 
-	decompress_test(sqsh__lzma_impl, input, sizeof(input));
+	decompress_test(sqsh__impl_lzma, input, sizeof(input));
 #endif
 }
 
@@ -80,7 +80,7 @@ decompress_xz(void) {
 					   0x2c, 0x9c, 0xc1, 0x1f, 0xb6, 0xf3, 0x7d, 0x01, 0x00,
 					   0x00, 0x00, 0x00, 0x04, 0x59, 0x5a};
 
-	decompress_test(sqsh__xz_impl, input, sizeof(input));
+	decompress_test(sqsh__impl_xz, input, sizeof(input));
 #endif
 }
 
@@ -129,7 +129,7 @@ multithreaded_lzo_worker(void *arg) {
 	uint8_t input[] = {0x15, 0x61, 0x62, 0x63, 0x64, 0x11, 0x00, 0x00};
 
 	for (int i = 0; i < 10000; i++) {
-		decompress_test(sqsh__lzo_impl, input, sizeof(input));
+		decompress_test(sqsh__impl_lzo, input, sizeof(input));
 	}
 	return 0;
 }

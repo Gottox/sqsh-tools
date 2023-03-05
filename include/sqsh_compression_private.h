@@ -167,27 +167,27 @@ int sqsh__compression_manager_cleanup(struct SqshCompressionManager *manager);
 ////////////////////////////////////////
 // compression/lz4.c
 
-extern const struct SqshCompressionImpl *sqsh__lz4_impl;
+extern const struct SqshCompressionImpl *const sqsh__impl_lz4;
 ////////////////////////////////////////
 // compression/lzma.c
 
-extern const struct SqshCompressionImpl *sqsh__lzma_impl;
-extern const struct SqshCompressionImpl *sqsh__xz_impl;
+extern const struct SqshCompressionImpl *const sqsh__impl_lzma;
+extern const struct SqshCompressionImpl *const sqsh__impl_xz;
 
 ////////////////////////////////////////
 // compression/lzo.c
 
-extern const struct SqshCompressionImpl *sqsh__lzo_impl;
+extern const struct SqshCompressionImpl *const sqsh__impl_lzo;
 
 ////////////////////////////////////////
 // compression/zlib.c
 
-extern const struct SqshCompressionImpl *sqsh__zlib_impl;
+extern const struct SqshCompressionImpl *const sqsh__impl_zlib;
 
 ////////////////////////////////////////
 // compression/zstd.c
 
-extern const struct SqshCompressionImpl *sqsh__zstd_impl;
+extern const struct SqshCompressionImpl *const sqsh__impl_zstd;
 
 #ifdef __cplusplus
 }
