@@ -318,7 +318,7 @@ main(int argc, char *argv[]) {
 	char *src_path = "/";
 	char *target_path = NULL;
 	struct SqshArchive *sqsh;
-	struct SqshPathResolverContext *resolver = NULL;
+	struct SqshPathResolver *resolver = NULL;
 	struct SqshInodeContext *inode = NULL;
 
 	while ((opt = getopt(argc, argv, "cvVh")) != -1) {

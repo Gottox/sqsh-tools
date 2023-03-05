@@ -49,7 +49,7 @@
 
 static struct {
 	struct SqshArchive *sqsh;
-	struct SqshPathResolverContext *resolver;
+	struct SqshPathResolver *resolver;
 } data = {0};
 
 static struct SqshfuseOptions {

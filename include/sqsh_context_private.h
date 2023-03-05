@@ -44,9 +44,9 @@ extern "C" {
 struct SqshArchive;
 
 ////////////////////////////////////////
-// context/path_resolver_context.c
+// context/path_resolver.c
 
-struct SqshPathResolverContext {
+struct SqshPathResolver {
 	/**
 	 * @privatesection
 	 */
@@ -55,27 +55,27 @@ struct SqshPathResolverContext {
 
 /**
  * @internal
- * @memberof SqshPathResolverContext
+ * @memberof SqshPathResolver
  * @brief initializes a path resolver context.
  *
- * @param[out] context The path resolver context.
+ * @param[out] resolver The path resolver context.
  * @param[in] sqsh The sqsh context.
  *
  * @return int 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int sqsh__path_resolver_init(
-		struct SqshPathResolverContext *context, struct SqshArchive *sqsh);
+		struct SqshPathResolver *resolver, struct SqshArchive *sqsh);
 
 /**
  * @internal
- * @memberof SqshPathResolverContext
+ * @memberof SqshPathResolver
  * @brief cleans up a path resolver context.
  *
- * @param[in] context The path resolver context.
+ * @param[in] resolver The path resolver context.
  *
  * @return int 0 on success, less than 0 on error.
  */
-int sqsh_path_resolver_cleanup(struct SqshPathResolverContext *context);
+int sqsh_path_resolver_cleanup(struct SqshPathResolver *resolver);
 
 ////////////////////////////////////////
 // context/trailing_context.c

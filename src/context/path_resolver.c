@@ -100,37 +100,37 @@ out:
 	return rv;
 }
 
-struct SqshPathResolverContext *
+struct SqshPathResolver *
 sqsh_path_resolver_new(struct SqshArchive *sqsh, int *err) {
-	struct SqshPathResolverContext *context =
-			calloc(1, sizeof(struct SqshPathResolverContext));
-	if (context == NULL) {
+	struct SqshPathResolver *resolver =
+			calloc(1, sizeof(struct SqshPathResolver));
+	if (resolver == NULL) {
 		return NULL;
 	}
-	*err = sqsh__path_resolver_init(context, sqsh);
+	*err = sqsh__path_resolver_init(resolver, sqsh);
 	if (*err < 0) {
-		free(context);
+		free(resolver);
 		return NULL;
 	}
-	return context;
+	return resolver;
 }
 
 int
 sqsh__path_resolver_init(
-		struct SqshPathResolverContext *context, struct SqshArchive *sqsh) {
-	context->sqsh = sqsh;
+		struct SqshPathResolver *resolver, struct SqshArchive *sqsh) {
+	resolver->sqsh = sqsh;
 	return 0;
 }
 
 struct SqshInodeContext *
 sqsh_path_resolver_resolve(
-		struct SqshPathResolverContext *context, const char *path, int *err) {
+		struct SqshPathResolver *resolver, const char *path, int *err) {
 	int i;
 	int rv = 0;
 	struct SqshInodeContext *inode = NULL;
 	int segment_count = path_segments_count(path) + 1;
 	const struct SqshSuperblockContext *superblock =
-			sqsh_archive_superblock(context->sqsh);
+			sqsh_archive_superblock(resolver->sqsh);
 	const char *segment = path;
 	uint64_t *inode_refs = calloc(segment_count, sizeof(uint64_t));
 	if (inode_refs == NULL) {
@@ -151,14 +151,14 @@ sqsh_path_resolver_resolve(
 		uint64_t parent_inode_ref = inode_refs[i];
 		i++;
 		rv = path_find_inode_ref(
-				&inode_refs[i], parent_inode_ref, context->sqsh, segment,
+				&inode_refs[i], parent_inode_ref, resolver->sqsh, segment,
 				segment_len);
 		if (rv < 0) {
 			goto out;
 		}
 	}
 
-	inode = sqsh_inode_new(context->sqsh, inode_refs[i], &rv);
+	inode = sqsh_inode_new(resolver->sqsh, inode_refs[i], &rv);
 
 out:
 	free(inode_refs);
@@ -167,17 +167,17 @@ out:
 }
 
 int
-sqsh_path_resolver_cleanup(struct SqshPathResolverContext *context) {
-	(void)context;
+sqsh_path_resolver_cleanup(struct SqshPathResolver *resolver) {
+	(void)resolver;
 	return 0;
 }
 
 int
-sqsh_path_resolver_free(struct SqshPathResolverContext *context) {
-	if (context == NULL) {
+sqsh_path_resolver_free(struct SqshPathResolver *resolver) {
+	if (resolver == NULL) {
 		return 0;
 	}
-	int rv = sqsh_path_resolver_cleanup(context);
-	free(context);
+	int rv = sqsh_path_resolver_cleanup(resolver);
+	free(resolver);
 	return rv;
 }

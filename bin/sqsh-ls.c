@@ -54,7 +54,7 @@ static int (*print_item)(const struct SqshDirectoryIterator *, const char *) =
 		print_simple;
 
 static int
-ls(struct SqshPathResolverContext *resolver, const char *path,
+ls(struct SqshPathResolver *resolver, const char *path,
    struct SqshInodeContext *inode);
 
 static int
@@ -152,7 +152,7 @@ out:
 }
 
 static int
-ls_item(struct SqshPathResolverContext *resolver, const char *path,
+ls_item(struct SqshPathResolver *resolver, const char *path,
 		struct SqshDirectoryIterator *iter) {
 	int rv = 0;
 	int len = 0;
@@ -195,7 +195,7 @@ out:
 }
 
 static int
-ls(struct SqshPathResolverContext *resolver, const char *path,
+ls(struct SqshPathResolver *resolver, const char *path,
    struct SqshInodeContext *inode) {
 	int rv = 0;
 	struct SqshDirectoryIterator *iter = NULL;
@@ -222,7 +222,7 @@ out:
 }
 
 static int
-ls_path(struct SqshPathResolverContext *resolver, char *path) {
+ls_path(struct SqshPathResolver *resolver, char *path) {
 	struct SqshInodeContext *inode = NULL;
 	int rv = 0;
 
@@ -263,7 +263,7 @@ main(int argc, char *argv[]) {
 	int opt = 0;
 	const char *image_path;
 	struct SqshArchive *sqsh;
-	struct SqshPathResolverContext *resolver = NULL;
+	struct SqshPathResolver *resolver = NULL;
 
 	while ((opt = getopt(argc, argv, "vrhl")) != -1) {
 		switch (opt) {

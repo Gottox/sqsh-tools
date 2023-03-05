@@ -268,7 +268,7 @@ inode_type_name(int type) {
 }
 
 static int
-stat_file(struct SqshPathResolverContext *resolver, const char *path) {
+stat_file(struct SqshPathResolver *resolver, const char *path) {
 	int rv = 0;
 	struct SqshInodeContext *inode = NULL;
 	bool has_fragment = false;
@@ -329,7 +329,7 @@ main(int argc, char *argv[]) {
 	int opt = 0;
 	const char *image_path;
 	struct SqshArchive *sqsh;
-	struct SqshPathResolverContext *resolver = NULL;
+	struct SqshPathResolver *resolver = NULL;
 
 	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {

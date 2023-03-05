@@ -67,7 +67,7 @@ print_value(const char *value, size_t size) {
 	return 0;
 }
 static int
-fattr_path(struct SqshPathResolverContext *resolver, char *path) {
+fattr_path(struct SqshPathResolver *resolver, char *path) {
 	struct SqshInodeContext *inode = NULL;
 	struct SqshXattrIterator *iter = NULL;
 
@@ -113,7 +113,7 @@ main(int argc, char *argv[]) {
 	int opt = 0;
 	const char *image_path;
 	struct SqshArchive *sqsh;
-	struct SqshPathResolverContext *resolver = NULL;
+	struct SqshPathResolver *resolver = NULL;
 
 	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {

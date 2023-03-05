@@ -50,7 +50,7 @@ sqsh_src = [
 	'src/compression/lzo.c',
 	'src/compression/zlib.c',
 	'src/compression/zstd.c',
-	'src/context/path_resolver_context.c',
+	'src/context/path_resolver.c',
 	'src/context/trailing_context.c',
 	'src/data/compression_options_data.c',
 	'src/data/datablock_data.c',

@@ -43,12 +43,12 @@ extern "C" {
 struct SqshArchive;
 
 ////////////////////////////////////////
-// context/path_resolver_context.c
+// context/path_resolver.c
 
-struct SqshPathResolverContext;
+struct SqshPathResolver;
 
 /**
- * @memberof SqshPathResolverContext
+ * @memberof SqshPathResolver
  * @brief initializes a path resolver context in heap
  *
  * @param[in]  sqsh The sqsh context.
@@ -56,31 +56,31 @@ struct SqshPathResolverContext;
  *
  * @return The Initialized path resolver context
  */
-struct SqshPathResolverContext *
+struct SqshPathResolver *
 sqsh_path_resolver_new(struct SqshArchive *sqsh, int *err);
 
 /**
- * @memberof SqshPathResolverContext
+ * @memberof SqshPathResolver
  * @brief Initialize the inode context from a path.
  *
- * @param[in] context The path resolver context.
+ * @param[in] resolver The path resolver context.
  * @param[in] path The path the file or directory.
  * @param[out] err Pointer to an int where the error code will be stored.
  *
  * @return an inode context on success, NULL on error
  */
 SQSH_NO_UNUSED struct SqshInodeContext *sqsh_path_resolver_resolve(
-		struct SqshPathResolverContext *context, const char *path, int *err);
+		struct SqshPathResolver *resolver, const char *path, int *err);
 
 /**
- * @memberof SqshPathResolverContext
+ * @memberof SqshPathResolver
  * @brief cleans up a path resolver context and frees the memory.
  *
- * @param[in] context The path resolver context.
+ * @param[in] resolver The path resolver context.
  *
  * @return int 0 on success, less than 0 on error.
  */
-int sqsh_path_resolver_free(struct SqshPathResolverContext *context);
+int sqsh_path_resolver_free(struct SqshPathResolver *resolver);
 
 ////////////////////////////////////////
 // context/trailing_context.c

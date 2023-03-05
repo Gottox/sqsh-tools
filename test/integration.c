@@ -56,7 +56,7 @@ sqsh_get_nonexistant(void) {
 	int rv;
 	struct SqshInodeContext *inode = NULL;
 	struct SqshArchive sqsh = {0};
-	struct SqshPathResolverContext resolver = {0};
+	struct SqshPathResolver resolver = {0};
 
 	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(squash_image));
 	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
@@ -140,7 +140,7 @@ sqsh_cat_fragment(void) {
 	struct SqshInodeContext *inode = NULL;
 	struct SqshFileContext file = {0};
 	struct SqshArchive sqsh = {0};
-	struct SqshPathResolverContext resolver = {0};
+	struct SqshPathResolver resolver = {0};
 	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(squash_image));
 	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
 	assert(rv == 0);
@@ -184,7 +184,7 @@ sqsh_cat_datablock_and_fragment(void) {
 	struct SqshInodeContext *inode = NULL;
 	struct SqshFileContext file = {0};
 	struct SqshArchive sqsh = {0};
-	struct SqshPathResolverContext resolver = {0};
+	struct SqshPathResolver resolver = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(squash_image),
@@ -234,7 +234,7 @@ sqsh_cat_size_overflow(void) {
 	struct SqshInodeContext *inode = NULL;
 	struct SqshFileContext file = {0};
 	struct SqshArchive sqsh = {0};
-	struct SqshPathResolverContext resolver = {0};
+	struct SqshPathResolver resolver = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(squash_image),
@@ -312,7 +312,7 @@ sqsh_test_extended_dir(void) {
 	int rv;
 	struct SqshInodeContext *inode = NULL;
 	struct SqshArchive sqsh = {0};
-	struct SqshPathResolverContext resolver = {0};
+	struct SqshPathResolver resolver = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(squash_image),
@@ -461,7 +461,7 @@ fuzz_crash_1(void) {
 
 	struct SqshInodeContext *inode;
 	struct SqshArchive sqsh = {0};
-	struct SqshPathResolverContext resolver = {0};
+	struct SqshPathResolver resolver = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(input),
@@ -500,7 +500,7 @@ fuzz_crash_2(void) {
 
 	struct SqshInodeContext *inode = NULL;
 	struct SqshArchive sqsh = {0};
-	struct SqshPathResolverContext resolver = {0};
+	struct SqshPathResolver resolver = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(input),
@@ -540,7 +540,7 @@ fuzz_crash_3(void) {
 
 	struct SqshInodeContext *inode = NULL;
 	struct SqshArchive sqsh = {0};
-	struct SqshPathResolverContext resolver = {0};
+	struct SqshPathResolver resolver = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(input),

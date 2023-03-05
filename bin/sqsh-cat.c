@@ -52,7 +52,7 @@ usage(char *arg0) {
 }
 
 static int
-cat_path(struct SqshPathResolverContext *resolver, char *path) {
+cat_path(struct SqshPathResolver *resolver, char *path) {
 	struct SqshInodeContext *inode = NULL;
 	struct SqshFileContext *file = NULL;
 
@@ -91,7 +91,7 @@ main(int argc, char *argv[]) {
 	int opt = 0;
 	const char *image_path;
 	struct SqshArchive *sqsh = NULL;
-	struct SqshPathResolverContext *resolver = NULL;
+	struct SqshPathResolver *resolver = NULL;
 
 	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {
