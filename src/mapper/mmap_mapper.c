@@ -41,7 +41,7 @@
 #include <unistd.h>
 
 static sqsh_index_t
-mmap_page_offset(const struct SqshMapping *mapping) {
+mmap_page_offset(const struct SqshMapSlice *mapping) {
 	const size_t offset = mapping->offset;
 	const struct SqshMapper *mapper = mapping->mapper;
 
@@ -49,7 +49,7 @@ mmap_page_offset(const struct SqshMapping *mapping) {
 }
 
 static sqsh_index_t
-mmap_page_size(const struct SqshMapping *mapping) {
+mmap_page_size(const struct SqshMapSlice *mapping) {
 	const sqsh_index_t offset = mapping->offset;
 	const size_t size = mapping->size;
 
@@ -83,7 +83,7 @@ out:
 	return rv;
 }
 static int
-sqsh_mapping_mmap_map(struct SqshMapping *mapping) {
+sqsh_mapping_mmap_map(struct SqshMapSlice *mapping) {
 	const size_t offset = mapping->offset;
 	const size_t size = mapping->size;
 	const struct SqshMapper *mapper = mapping->mapper;
@@ -113,13 +113,13 @@ sqsh_mapper_mmap_cleanup(struct SqshMapper *mapper) {
 }
 
 static int
-sqsh_mapping_mmap_unmap(struct SqshMapping *mapping) {
+sqsh_mapping_mmap_unmap(struct SqshMapSlice *mapping) {
 	const size_t mmap_size = mmap_page_size(mapping);
 
 	return munmap(mapping->data, mmap_size);
 }
 static const uint8_t *
-sqsh_mapping_mmap_data(const struct SqshMapping *mapping) {
+sqsh_mapping_mmap_data(const struct SqshMapSlice *mapping) {
 	const size_t page_offset = mmap_page_offset(mapping);
 	const uint8_t *data = mapping->data;
 

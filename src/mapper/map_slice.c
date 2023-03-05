@@ -28,47 +28,47 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         static_mapper.c
+ * @file         map_slice.c
  */
 
 #include "../../include/sqsh_mapper_private.h"
 
-static int
-sqsh_mapper_static_mem_init(
-		struct SqshMapper *mapper, const void *input, size_t *size) {
-	(void)size;
-	mapper->data.sm.data = input;
-	return 0;
-}
-static int
-sqsh_mapper_static_mem_map(struct SqshMapSlice *mapping) {
-	size_t offset = mapping->offset;
-	// Cast to remove const qualifier.
-	uint8_t *data = (uint8_t *)mapping->mapper->data.sm.data;
-	mapping->data = &data[offset];
-	return 0;
-}
-static int
-sqsh_mapper_static_mem_cleanup(struct SqshMapper *mapper) {
-	(void)mapper;
-	return 0;
-}
-static int
-sqsh_mapping_static_mem_unmap(struct SqshMapSlice *mapping) {
-	mapping->data = NULL;
-	return 0;
-}
-static const uint8_t *
-sqsh_mapping_static_mem_data(const struct SqshMapSlice *mapping) {
-	return mapping->data;
+#include "../../include/sqsh_archive.h"
+#include "../../include/sqsh_error.h"
+#include "../utils.h"
+
+int
+sqsh__map_slice_init(
+		struct SqshMapSlice *mapping, struct SqshMapper *mapper,
+		sqsh_index_t offset, size_t size) {
+	size_t end_offset;
+	size_t archive_size = sqsh__mapper_size(mapper);
+	if (offset > archive_size) {
+		return -SQSH_ERROR_SIZE_MISSMATCH;
+	}
+	if (SQSH_ADD_OVERFLOW(offset, size, &end_offset)) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+	if (end_offset > archive_size) {
+		return -SQSH_ERROR_SIZE_MISSMATCH;
+	}
+	mapping->mapper = mapper;
+	mapping->offset = offset;
+	mapping->size = size;
+	return mapper->impl->map(mapping);
 }
 
-static const struct SqshMemoryMapperImpl impl = {
-		.block_size_hint = SIZE_MAX,
-		.init = sqsh_mapper_static_mem_init,
-		.map = sqsh_mapper_static_mem_map,
-		.cleanup = sqsh_mapper_static_mem_cleanup,
-		.map_data = sqsh_mapping_static_mem_data,
-		.unmap = sqsh_mapping_static_mem_unmap,
-};
-const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_static = &impl;
+const uint8_t *
+sqsh__map_slice_data(const struct SqshMapSlice *mapping) {
+	return mapping->mapper->impl->map_data(mapping);
+}
+
+int
+sqsh__map_slice_cleanup(struct SqshMapSlice *mapping) {
+	int rv = 0;
+	if (mapping->mapper) {
+		rv = mapping->mapper->impl->unmap(mapping);
+	}
+	mapping->mapper = NULL;
+	return rv;
+}

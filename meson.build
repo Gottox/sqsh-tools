@@ -70,6 +70,7 @@ sqsh_src = [
 	'src/mapper/map_reader.c',
 	'src/mapper/map_manager.c',
 	'src/mapper/mapper.c',
+	'src/mapper/map_slice.c',
 	'src/mapper/mmap_mapper.c',
 	'src/mapper/static_mapper.c',
 	'src/metablock/metablock_reader.c',

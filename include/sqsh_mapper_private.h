@@ -85,29 +85,7 @@ struct SqshStaticMapper {
 ////////////////////////////////////////
 // mapper/mapper.c
 
-struct SqshMapper;
-
-struct SqshMapping {
-	/**
-	 * @privatesection
-	 */
-	struct SqshMapper *mapper;
-	sqsh_index_t offset;
-	size_t size;
-	void *data;
-};
-
-struct SqshMemoryMapperImpl {
-	/**
-	 * @privatesection
-	 */
-	size_t block_size_hint;
-	int (*init)(struct SqshMapper *mapper, const void *input, size_t *size);
-	int (*map)(struct SqshMapping *map);
-	const uint8_t *(*map_data)(const struct SqshMapping *mapping);
-	int (*unmap)(struct SqshMapping *mapping);
-	int (*cleanup)(struct SqshMapper *mapper);
-};
+struct SqshMapSlice;
 
 struct SqshMapper {
 	/**
@@ -121,6 +99,18 @@ struct SqshMapper {
 		struct SqshStaticMapper sm;
 		struct SqshCurlMapper cl;
 	} data;
+};
+
+struct SqshMemoryMapperImpl {
+	/**
+	 * @privatesection
+	 */
+	size_t block_size_hint;
+	int (*init)(struct SqshMapper *mapper, const void *input, size_t *size);
+	int (*map)(struct SqshMapSlice *map);
+	const uint8_t *(*map_data)(const struct SqshMapSlice *mapping);
+	int (*unmap)(struct SqshMapSlice *mapping);
+	int (*cleanup)(struct SqshMapper *mapper);
 };
 
 /**
@@ -137,22 +127,6 @@ struct SqshMapper {
 SQSH_NO_UNUSED int sqsh__mapper_init(
 		struct SqshMapper *mapper, const void *input,
 		const struct SqshConfig *config);
-
-/**
- * @internal
- * @memberof SqshMapper
- * @brief Maps a portion of the input data to a mapping.
- *
- * @param[out] mapping The mapping to store the mapped data.
- * @param[in]  mapper The mapper to use for the mapping.
- * @param[in]  offset The offset in the input data to start the mapping.
- * @param[in]  size The size of the mapped data.
- *
- * @return 0 on success, a negative value on error.
- */
-SQSH_NO_UNUSED int sqsh__mapping_init(
-		struct SqshMapping *mapping, struct SqshMapper *mapper,
-		sqsh_index_t offset, size_t size);
 
 /**
  * @internal
@@ -187,27 +161,55 @@ size_t sqsh__mapper_block_size(const struct SqshMapper *mapper);
  */
 int sqsh__mapper_cleanup(struct SqshMapper *mapper);
 
+////////////////////////////////////////
+// mapper/map_slice.c
+
+struct SqshMapSlice {
+	/**
+	 * @privatesection
+	 */
+	struct SqshMapper *mapper;
+	sqsh_index_t offset;
+	size_t size;
+	void *data;
+};
+
 /**
  * @internal
- * @memberof SqshMapping
+ * @memberof SqshMapSlice
  * @brief Retrieves the data in a mapping.
  *
  * @param[in] mapping The mapping to retrieve the data from.
  *
  * @return The data in the mapping.
  */
-const uint8_t *sqsh__mapping_data(const struct SqshMapping *mapping);
+const uint8_t *sqsh__map_slice_data(const struct SqshMapSlice *mapping);
 
 /**
  * @internal
- * @memberof SqshMapping
+ * @memberof SqshMapSlice
  * @brief Unmaps a mapping.
  *
  * @param[in] mapping The mapping to unmap.
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__mapping_cleanup(struct SqshMapping *mapping);
+int sqsh__map_slice_cleanup(struct SqshMapSlice *mapping);
+/**
+ * @internal
+ * @memberof SqshMapper
+ * @brief Maps a portion of the input data to a mapping.
+ *
+ * @param[out] mapping The mapping to store the mapped data.
+ * @param[in]  mapper The mapper to use for the mapping.
+ * @param[in]  offset The offset in the input data to start the mapping.
+ * @param[in]  size The size of the mapped data.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+SQSH_NO_UNUSED int sqsh__map_slice_init(
+		struct SqshMapSlice *mapping, struct SqshMapper *mapper,
+		sqsh_index_t offset, size_t size);
 
 ////////////////////////////////////////
 // mapper/map_manager.c
@@ -274,7 +276,7 @@ size_t sqsh__map_manager_block_count(const struct SqshMapManager *manager);
  */
 SQSH_NO_UNUSED int sqsh__map_manager_get(
 		struct SqshMapManager *manager, sqsh_index_t index, int span,
-		const struct SqshMapping **target);
+		const struct SqshMapSlice **target);
 
 /**
  * Releases a map for a chunk.
@@ -285,7 +287,7 @@ SQSH_NO_UNUSED int sqsh__map_manager_get(
  * @return Returns 0 on success, a negative value on error.
  */
 int sqsh__map_manager_release(
-		struct SqshMapManager *manager, const struct SqshMapping *mapping);
+		struct SqshMapManager *manager, const struct SqshMapSlice *mapping);
 /**
  * Cleans up the resources used by a SqshMapManager instance.
  *
@@ -306,7 +308,7 @@ struct SqshMapReader {
 	uint64_t end_address;
 	uint64_t upper_limit;
 	struct SqshMapManager *map_manager;
-	const struct SqshMapping *current_mapping;
+	const struct SqshMapSlice *current_mapping;
 	struct SqshBuffer buffer;
 	const uint8_t *target;
 };

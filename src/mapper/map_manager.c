@@ -41,13 +41,13 @@
 
 static void
 map_cleanup_cb(void *data) {
-	struct SqshMapping *mapping = data;
-	sqsh__mapping_cleanup(mapping);
+	struct SqshMapSlice *mapping = data;
+	sqsh__map_slice_cleanup(mapping);
 }
 
 SQSH_NO_UNUSED static int
 load_mapping(
-		struct SqshMapping *mapping, struct SqshMapManager *manager,
+		struct SqshMapSlice *mapping, struct SqshMapManager *manager,
 		sqsh_index_t index, int span) {
 	int rv = 0;
 	assert(span == 1);
@@ -67,7 +67,7 @@ load_mapping(
 		size = file_size % block_size;
 	}
 
-	rv = sqsh__mapping_init(mapping, &manager->mapper, offset, size);
+	rv = sqsh__map_slice_init(mapping, &manager->mapper, offset, size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -100,7 +100,7 @@ sqsh__map_manager_init(
 			sqsh__mapper_block_size(&manager->mapper));
 
 	rv = sqsh__rc_map_init(
-			&manager->maps, map_size, sizeof(struct SqshMapping),
+			&manager->maps, map_size, sizeof(struct SqshMapSlice),
 			map_cleanup_cb);
 	if (rv < 0) {
 		goto out;
@@ -133,7 +133,7 @@ sqsh__map_manager_block_count(const struct SqshMapManager *manager) {
 int
 sqsh__map_manager_get(
 		struct SqshMapManager *manager, sqsh_index_t index, int span,
-		const struct SqshMapping **target) {
+		const struct SqshMapSlice **target) {
 	int rv = 0;
 	assert(span == 1);
 	int real_index = index;
@@ -148,7 +148,7 @@ sqsh__map_manager_get(
 	*target = sqsh__rc_map_retain(&manager->maps, &real_index);
 
 	if (*target == NULL) {
-		struct SqshMapping mapping = {0};
+		struct SqshMapSlice mapping = {0};
 		rv = load_mapping(&mapping, manager, index, span);
 		if (rv < 0) {
 			goto out;
@@ -165,7 +165,7 @@ out:
 
 int
 sqsh__map_manager_release(
-		struct SqshMapManager *manager, const struct SqshMapping *mapping) {
+		struct SqshMapManager *manager, const struct SqshMapSlice *mapping) {
 	int rv = pthread_mutex_lock(&manager->lock);
 	if (rv != 0) {
 		// rv = -SQSH_ERROR_MUTEX_LOCK;

@@ -61,7 +61,7 @@ sqsh__map_reader_init(
 
 static int
 replace_mapping(
-		struct SqshMapReader *cursor, const struct SqshMapping *mapping) {
+		struct SqshMapReader *cursor, const struct SqshMapSlice *mapping) {
 	if (cursor->current_mapping != NULL) {
 		sqsh__map_manager_release(cursor->map_manager, cursor->current_mapping);
 	}
@@ -73,7 +73,7 @@ replace_mapping(
 static int
 setup_direct(struct SqshMapReader *cursor) {
 	int rv = 0;
-	const struct SqshMapping *mapping = NULL;
+	const struct SqshMapSlice *mapping = NULL;
 
 	rv = sqsh__map_manager_get(
 			cursor->map_manager, get_index(cursor, cursor->address), 1,
@@ -84,7 +84,7 @@ setup_direct(struct SqshMapReader *cursor) {
 
 	replace_mapping(cursor, mapping);
 
-	const uint8_t *data = sqsh__mapping_data(cursor->current_mapping);
+	const uint8_t *data = sqsh__map_slice_data(cursor->current_mapping);
 	cursor->target = &data[get_offset(cursor, cursor->address)];
 
 out:
@@ -95,13 +95,13 @@ static int
 add_buffered(
 		struct SqshMapReader *cursor, sqsh_index_t index, sqsh_index_t offset,
 		size_t size) {
-	const struct SqshMapping *mapping = NULL;
+	const struct SqshMapSlice *mapping = NULL;
 	int rv = sqsh__map_manager_get(cursor->map_manager, index, 1, &mapping);
 	if (rv < 0) {
 		goto out;
 	}
 
-	const uint8_t *data = sqsh__mapping_data(mapping);
+	const uint8_t *data = sqsh__map_slice_data(mapping);
 	rv = sqsh__buffer_append(&cursor->buffer, &data[offset], size - offset);
 	if (rv < 0) {
 		goto out;

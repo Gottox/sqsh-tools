@@ -223,7 +223,7 @@ out:
 }
 
 static int
-sqsh_mapper_curl_map(struct SqshMapping *mapping) {
+sqsh_mapper_curl_map(struct SqshMapSlice *mapping) {
 	const sqsh_index_t offset = mapping->offset;
 	const size_t size = mapping->size;
 	int rv = 0;
@@ -258,7 +258,7 @@ sqsh_mapper_curl_map(struct SqshMapping *mapping) {
 
 out:
 	if (rv < 0) {
-		sqsh__mapping_cleanup(mapping);
+		sqsh__map_slice_cleanup(mapping);
 	}
 	pthread_mutex_unlock(lock);
 	return rv;
@@ -272,13 +272,13 @@ sqsh_mapper_curl_cleanup(struct SqshMapper *mapper) {
 }
 
 static int
-sqsh_mapping_curl_unmap(struct SqshMapping *mapping) {
+sqsh_mapping_curl_unmap(struct SqshMapSlice *mapping) {
 	free(mapping->data);
 	return 0;
 }
 
 static const uint8_t *
-sqsh_mapping_curl_data(const struct SqshMapping *mapping) {
+sqsh_mapping_curl_data(const struct SqshMapSlice *mapping) {
 	return mapping->data;
 }
 

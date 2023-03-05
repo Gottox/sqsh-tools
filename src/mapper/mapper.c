@@ -65,27 +65,6 @@ sqsh__mapper_init(
 	return rv;
 }
 
-int
-sqsh__mapping_init(
-		struct SqshMapping *mapping, struct SqshMapper *mapper,
-		sqsh_index_t offset, size_t size) {
-	size_t end_offset;
-	size_t archive_size = sqsh__mapper_size(mapper);
-	if (offset > archive_size) {
-		return -SQSH_ERROR_SIZE_MISSMATCH;
-	}
-	if (SQSH_ADD_OVERFLOW(offset, size, &end_offset)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
-	if (end_offset > archive_size) {
-		return -SQSH_ERROR_SIZE_MISSMATCH;
-	}
-	mapping->mapper = mapper;
-	mapping->offset = offset;
-	mapping->size = size;
-	return mapper->impl->map(mapping);
-}
-
 size_t
 sqsh__mapper_block_size(const struct SqshMapper *mapper) {
 	return mapper->block_size;
@@ -103,20 +82,5 @@ sqsh__mapper_cleanup(struct SqshMapper *mapper) {
 		rv = mapper->impl->cleanup(mapper);
 		mapper->impl = NULL;
 	}
-	return rv;
-}
-
-const uint8_t *
-sqsh__mapping_data(const struct SqshMapping *mapping) {
-	return mapping->mapper->impl->map_data(mapping);
-}
-
-int
-sqsh__mapping_cleanup(struct SqshMapping *mapping) {
-	int rv = 0;
-	if (mapping->mapper) {
-		rv = mapping->mapper->impl->unmap(mapping);
-	}
-	mapping->mapper = NULL;
 	return rv;
 }
