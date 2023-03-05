@@ -1,0 +1,58 @@
+sqsh_test = [
+	#'test/cpp-test.cpp',
+	'integration.c',
+	'mapper/map_reader.c',
+	'metablock/metablock_reader.c',
+	'metablock/metablock_iterator.c',
+	'primitive/buffer.c',
+	'primitive/lru.c',
+	'primitive/rc_map.c',
+	'primitive/rc_hash_map.c',
+	'compression/compression.c',
+	'compression/compression_manager.c',
+]
+sqsh_test_util = [
+	'util.c',
+]
+
+mksquashfs = find_program('mksquashfs')
+mktemp = find_program('mktemp')
+setfattr = find_program('setfattr')
+squashfs = custom_target(
+	'squashfs.image',
+	output : 'squashfs.image',
+	env: {
+		'MKSQUASHFS': mksquashfs.full_path(),
+		'SETFATTR': setfattr.full_path(),
+	},
+	command : ['../utils/create_squashfs.sh', '', '@OUTPUT@', '@PRIVATE_DIR@'],
+)
+
+squashfs_h = custom_target(
+	'squashfs_image.h',
+	input: squashfs,
+	output : 'squashfs_image.h',
+	command : ['../utils/header_from_bin.sh','@INPUT@', '@OUTPUT@', '@PRIVATE_DIR@'],
+)
+
+foreach p : sqsh_test
+	t = executable(p.underscorify(),
+		[ p, squashfs_h, sqsh_test_util ],
+		install : false,
+		dependencies : libsqsh_dependency,
+	)
+	test(p, t, env: { 'SQSH_LZO_HELPER_PATH': lzo_helper_path })
+endforeach
+
+if get_option('test') == 'extended'
+	test('selftest',
+		files('test/selftest.sh'),
+		timeout: 60,
+		env: {
+			'SQSH_LZO_HELPER_PATH': lzo_helper_path,
+			'SQSH_LS': tools['sqsh-ls'].full_path(),
+			'SQSH_CAT': tools['sqsh-cat'].full_path(),
+			'SOURCE_ROOT': meson.project_source_root(),
+		},
+	)
+endif
