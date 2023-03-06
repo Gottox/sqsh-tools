@@ -31,7 +31,7 @@
  * @file         path_resolver.c
  */
 
-#include "../../include/sqsh_context_private.h"
+#include "../../include/sqsh_chrome_private.h"
 
 #include "../../include/sqsh_archive.h"
 #include "../../include/sqsh_error.h"

@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Copyright (c) 2021, Enno Boland <g@s01.de>                                 *
+ * Copyright (c) 2023, Enno Boland <g@s01.de>                                 *
  *                                                                            *
  * Redistribution and use in source and binary forms, with or without         *
  * modification, are permitted provided that the following conditions are     *
@@ -28,110 +28,61 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         cat.c
+ * @file         sqsh_chrome.h
  */
 
-#include "common.h"
+#ifndef SQSH_CHROME_H
+#define SQSH_CHROME_H
 
-#include <sqsh_chrome.h>
-#include <sqsh_file.h>
-#include <sqsh_inode.h>
+#include "sqsh_common.h"
 
-#include <assert.h>
-#include <limits.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-static int
-usage(char *arg0) {
-	printf("usage: %s FILESYSTEM PATH [PATH ...]\n", arg0);
-	printf("       %s -v\n", arg0);
-	return EXIT_FAILURE;
+struct SqshArchive;
+
+////////////////////////////////////////
+// chrome/path_resolver.c
+
+struct SqshPathResolver;
+
+/**
+ * @memberof SqshPathResolver
+ * @brief initializes a path resolver context in heap
+ *
+ * @param[in]  sqsh The sqsh context.
+ * @param[out] err  Pointer to an int where the error code will be stored.
+ *
+ * @return The Initialized path resolver context
+ */
+struct SqshPathResolver *
+sqsh_path_resolver_new(struct SqshArchive *sqsh, int *err);
+
+/**
+ * @memberof SqshPathResolver
+ * @brief Initialize the inode context from a path.
+ *
+ * @param[in] resolver The path resolver context.
+ * @param[in] path The path the file or directory.
+ * @param[out] err Pointer to an int where the error code will be stored.
+ *
+ * @return an inode context on success, NULL on error
+ */
+SQSH_NO_UNUSED struct SqshInodeContext *sqsh_path_resolver_resolve(
+		struct SqshPathResolver *resolver, const char *path, int *err);
+
+/**
+ * @memberof SqshPathResolver
+ * @brief cleans up a path resolver context and frees the memory.
+ *
+ * @param[in] resolver The path resolver context.
+ *
+ * @return int 0 on success, less than 0 on error.
+ */
+int sqsh_path_resolver_free(struct SqshPathResolver *resolver);
+
+#ifdef __cplusplus
 }
-
-static int
-cat_path(struct SqshPathResolver *resolver, char *path) {
-	struct SqshInodeContext *inode = NULL;
-	struct SqshFileContext *file = NULL;
-
-	int rv = 0;
-	inode = sqsh_path_resolver_resolve(resolver, path, &rv);
-	if (rv < 0) {
-		sqsh_perror(rv, path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-	file = sqsh_file_new(inode, &rv);
-	if (rv < 0) {
-		sqsh_perror(rv, path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-	rv = sqsh_file_read(file, sqsh_inode_file_size(inode));
-	if (rv < 0) {
-		sqsh_perror(rv, path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-	fwrite(sqsh_file_data(file), sizeof(uint8_t), sqsh_file_size(file), stdout);
-out:
-	sqsh_file_free(file);
-	sqsh_inode_free(inode);
-	return rv;
-}
-
-int
-main(int argc, char *argv[]) {
-	int rv = 0;
-	int opt = 0;
-	const char *image_path;
-	struct SqshArchive *sqsh = NULL;
-	struct SqshPathResolver *resolver = NULL;
-
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
-		switch (opt) {
-		case 'v':
-			puts("sqsh-cat-" VERSION);
-			return 0;
-		default:
-			return usage(argv[0]);
-		}
-	}
-
-	if (optind + 1 >= argc) {
-		return usage(argv[0]);
-	}
-
-	image_path = argv[optind];
-	optind++;
-
-	sqsh = open_archive(image_path, &rv);
-	if (rv < 0) {
-		sqsh_perror(rv, image_path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-	resolver = sqsh_path_resolver_new(sqsh, &rv);
-	if (rv < 0) {
-		sqsh_perror(rv, image_path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-	for (; optind < argc; optind++) {
-		rv = cat_path(resolver, argv[optind]);
-		if (rv < 0) {
-			goto out;
-		}
-	}
-
-out:
-	sqsh_path_resolver_free(resolver);
-	sqsh_archive_free(sqsh);
-	return rv;
-}
+#endif
+#endif // SQSH_CHROME_H

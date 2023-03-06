@@ -44,40 +44,6 @@ extern "C" {
 struct SqshArchive;
 
 ////////////////////////////////////////
-// context/path_resolver.c
-
-struct SqshPathResolver {
-	/**
-	 * @privatesection
-	 */
-	struct SqshArchive *sqsh;
-};
-
-/**
- * @internal
- * @memberof SqshPathResolver
- * @brief initializes a path resolver context.
- *
- * @param[out] resolver The path resolver context.
- * @param[in] sqsh The sqsh context.
- *
- * @return int 0 on success, less than 0 on error.
- */
-SQSH_NO_UNUSED int sqsh__path_resolver_init(
-		struct SqshPathResolver *resolver, struct SqshArchive *sqsh);
-
-/**
- * @internal
- * @memberof SqshPathResolver
- * @brief cleans up a path resolver context.
- *
- * @param[in] resolver The path resolver context.
- *
- * @return int 0 on success, less than 0 on error.
- */
-int sqsh_path_resolver_cleanup(struct SqshPathResolver *resolver);
-
-////////////////////////////////////////
 // context/trailing_context.c
 
 struct SqshTrailingContext {

@@ -1,5 +1,7 @@
 headers = [
 	'sqsh_archive.h',
+	'sqsh_chrome.h',
+	'sqsh_chrome_private.h',
 	'sqsh_common.h',
 	'sqsh_compression_private.h',
 	'sqsh_context.h',

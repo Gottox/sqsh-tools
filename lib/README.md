@@ -5,6 +5,11 @@
 This directory contains the general sqsh archive handling. It contains 
 functionality to open/instantiate and close squashfs images.
 
+### [chrome](./chrome)
+
+This directory contains code that eases the usage of this library. It wraps
+functionality like opening file contents by path.
+
 ### [compression](./compression)
 
 This directory contains the glue code to the different compression algorithms
