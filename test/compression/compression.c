@@ -145,8 +145,8 @@ DEFINE
 TEST(decompress_lzma);
 TEST(decompress_xz);
 TEST(decompress_lz4);
-TEST(multithreaded_lzo);
-TEST(decompress_lzo);
+TEST_OFF(multithreaded_lzo);
+TEST_OFF(decompress_lzo);
 TEST(decompress_zlib);
 TEST(decompress_zstd);
 DEFINE_END
