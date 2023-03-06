@@ -18,4 +18,4 @@ $MKSQUASHFS "$tmp" "$out" \
 	-force-gid 202020 \
 	-Xcompression-level 1 \
 	-always-use-fragments \
-	-quiet
+	-quiet -no-progress
