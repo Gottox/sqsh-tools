@@ -47,6 +47,8 @@ decompress_test(
 	size_t output_size = sizeof(output);
 	sqsh__compression_context_t context = {0};
 
+	assert (impl != NULL);
+
 	rv = impl->init(context, output, output_size);
 	assert(rv >= 0);
 	rv = impl->decompress(context, input, input_size);
@@ -60,18 +62,15 @@ decompress_test(
 
 static void
 decompress_lzma(void) {
-#ifdef CONFIG_LZMA
 	uint8_t input[] = {0x5d, 0x00, 0x00, 0x80, 0x00, 0xff, 0xff, 0xff, 0xff,
 					   0xff, 0xff, 0xff, 0xff, 0x00, 0x30, 0x98, 0x88, 0x98,
 					   0x46, 0x7e, 0x1e, 0xb2, 0xff, 0xfa, 0x1c, 0x80, 0x00};
 
 	decompress_test(sqsh__impl_lzma, input, sizeof(input));
-#endif
 }
 
 static void
 decompress_xz(void) {
-#ifdef CONFIG_LZMA
 	uint8_t input[] = {0xfd, 0x37, 0x7a, 0x58, 0x5a, 0x00, 0x00, 0x04, 0xe6,
 					   0xd6, 0xb4, 0x46, 0x02, 0x00, 0x21, 0x01, 0x16, 0x00,
 					   0x00, 0x00, 0x74, 0x2f, 0xe5, 0xa3, 0x01, 0x00, 0x03,
@@ -81,46 +80,37 @@ decompress_xz(void) {
 					   0x00, 0x00, 0x00, 0x04, 0x59, 0x5a};
 
 	decompress_test(sqsh__impl_xz, input, sizeof(input));
-#endif
 }
 
 static void
 decompress_lz4(void) {
-#ifdef CONFIG_LZ4
 	uint8_t input[] = {0x40, 0x61, 0x62, 0x63, 0x64};
 
-	decompress_test(sqsh__lz4_impl, input, sizeof(input));
-#endif
+	decompress_test(sqsh__impl_lz4, input, sizeof(input));
 }
 
 static void
 decompress_lzo(void) {
-#ifdef CONFIG_LZO
 	uint8_t input[] = {0x15, 0x61, 0x62, 0x63, 0x64, 0x11, 0x00, 0x00};
 
-	decompress_test(sqsh__lzo_impl, input, sizeof(input));
-#endif
+	decompress_test(sqsh__impl_lzo, input, sizeof(input));
 }
 
 static void
 decompress_zlib(void) {
-#ifdef CONFIG_ZLIB
 	uint8_t input[] = {
 			ZLIB_ABCD,
 	};
 
-	decompress_test(sqsh__zlib_impl, input, sizeof(input));
-#endif
+	decompress_test(sqsh__impl_zlib, input, sizeof(input));
 }
 
 static void
 decompress_zstd(void) {
-#ifdef CONFIG_ZSTD
 	uint8_t input[] = {0x28, 0xb5, 0x2f, 0xfd, 0x20, 0x04, 0x21,
 					   0x00, 0x00, 0x61, 0x62, 0x63, 0x64};
 
-	decompress_test(sqsh__zstd_impl, input, sizeof(input));
-#endif
+	decompress_test(sqsh__impl_zstd, input, sizeof(input));
 }
 
 static void *
@@ -137,7 +127,6 @@ multithreaded_lzo_worker(void *arg) {
 static void
 multithreaded_lzo(void) {
 	(void)multithreaded_lzo_worker;
-#ifdef CONFIG_LZO
 	int rv;
 	pthread_t threads[16] = {0};
 
@@ -150,7 +139,6 @@ multithreaded_lzo(void) {
 		rv = pthread_join(threads[i], NULL);
 		assert(rv == 0);
 	}
-#endif
 }
 
 DEFINE
