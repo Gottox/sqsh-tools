@@ -79,6 +79,7 @@ sqsh_lz4_finish(void *context, uint8_t *target, size_t *target_size) {
 	(void)target_size;
 	struct SqshLz4Context *ctx = context;
 	LZ4_freeStreamDecode(ctx->stream);
+	*target_size = ctx->offset;
 	return 0;
 }
 
