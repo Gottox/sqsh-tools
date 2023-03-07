@@ -87,43 +87,6 @@ SQSH_NO_UNUSED int sqsh__table_init(
  */
 int sqsh__table_cleanup(struct SqshTable *table);
 
-////////////////////////////////////////
-// table/fragment_table.c
-
-struct SqshFragmentTable {
-	/**
-	 * @privatesection
-	 */
-	const struct SqshSuperblockContext *superblock;
-	struct SqshTable table;
-	struct SqshMapManager *map_manager;
-	struct SqshCompressionManager compression_manager;
-};
-
-/**
- * @internal
- * @memberof SqshFragmentTable
- * @brief Initializes a fragment table with a SQSH context.
- *
- * @param[out] context The fragment table to initialize.
- * @param[in]  sqsh The SQSH context to use for the fragment table.
- *
- * @return 0 on success, a negative value on error.
- */
-SQSH_NO_UNUSED int sqsh__fragment_table_init(
-		struct SqshFragmentTable *context, struct SqshArchive *sqsh);
-
-/**
- * @internal
- * @memberof SqshFragmentTable
- * @brief Cleans up a fragment table.
- *
- * @param[in] context The fragment table to clean up.
- *
- * @return 0 on success, a negative value on error.
- */
-int sqsh__fragment_table_cleanup(struct SqshFragmentTable *context);
-
 #ifdef __cplusplus
 }
 #endif

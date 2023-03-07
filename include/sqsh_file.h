@@ -34,13 +34,32 @@
 #ifndef SQSH_FILE_H
 #define SQSH_FILE_H
 
-#include "sqsh_common.h"
+#include "sqsh_table_private.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 struct SqshInodeContext;
+
+////////////////////////////////////////
+// file/fragment_table.c
+
+struct SqshFragmentTable;
+
+/**
+ * @memberof SqshFragmentTable
+ * @brief Writes the fragments of an inode to a buffer.
+ *
+ * @param[in]  context The fragment table to use.
+ * @param[in]  inode The inode to retrieve the fragments from.
+ * @param[out] buffer The buffer to write the fragments to.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+SQSH_NO_UNUSED int sqsh_fragment_table_to_buffer(
+		struct SqshFragmentTable *context, const struct SqshInodeContext *inode,
+		struct SqshBuffer *buffer);
 
 ////////////////////////////////////////
 // context/file_context.c

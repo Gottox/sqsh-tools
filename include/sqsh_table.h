@@ -71,25 +71,6 @@ sqsh_table_get(const struct SqshTable *table, sqsh_index_t index, void *target);
  */
 int sqsh_table_cleanup(struct SqshTable *table);
 
-////////////////////////////////////////
-// table/fragment_table.c
-
-struct SqshFragmentTable;
-
-/**
- * @memberof SqshFragmentTable
- * @brief Writes the fragments of an inode to a buffer.
- *
- * @param[in]  context The fragment table to use.
- * @param[in]  inode The inode to retrieve the fragments from.
- * @param[out] buffer The buffer to write the fragments to.
- *
- * @return 0 on success, a negative value on error.
- */
-SQSH_NO_UNUSED int sqsh_fragment_table_to_buffer(
-		struct SqshFragmentTable *context, const struct SqshInodeContext *inode,
-		struct SqshBuffer *buffer);
-
 #ifdef __cplusplus
 }
 #endif

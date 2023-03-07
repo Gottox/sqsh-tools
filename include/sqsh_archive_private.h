@@ -35,8 +35,10 @@
 #define SQSH_ARCHIVE_PRIVATE_H
 
 #include "sqsh_archive.h"
+
 #include "sqsh_error.h"
 #include "sqsh_xattr_private.h"
+#include "sqsh_file_private.h"
 
 #ifdef __cplusplus
 extern "C" {
