@@ -122,12 +122,12 @@ sqsh__path_resolver_init(
 	return 0;
 }
 
-struct SqshInodeContext *
-sqsh_path_resolver_resolve(
-		struct SqshPathResolver *resolver, const char *path, int *err) {
+static int
+resolve_path(
+		struct SqshPathResolver *resolver, uint64_t *inode_ref,
+		const char *path) {
 	int i;
 	int rv = 0;
-	struct SqshInodeContext *inode = NULL;
 	int segment_count = path_segments_count(path) + 1;
 	const struct SqshSuperblockContext *superblock =
 			sqsh_archive_superblock(resolver->sqsh);
@@ -158,12 +158,41 @@ sqsh_path_resolver_resolve(
 		}
 	}
 
-	inode = sqsh_inode_new(resolver->sqsh, inode_refs[i], &rv);
+	*inode_ref = inode_refs[i];
 
 out:
 	free(inode_refs);
-	*err = rv;
-	return inode;
+	return rv;
+}
+
+int
+sqsh__path_resolver_resolve(
+		struct SqshPathResolver *resolver, struct SqshInodeContext *inode,
+		const char *path) {
+	uint64_t inode_ref = 0;
+
+	int rv = resolve_path(resolver, &inode_ref, path);
+
+	if (rv < 0) {
+		return rv;
+	}
+	return sqsh__inode_init(inode, resolver->sqsh, inode_ref);
+}
+
+struct SqshInodeContext *
+sqsh_path_resolver_resolve(
+		struct SqshPathResolver *resolver, const char *path, int *err) {
+	uint64_t inode_ref = 0;
+
+	int rv = resolve_path(resolver, &inode_ref, path);
+
+	if (rv < 0) {
+		if (err != NULL) {
+			*err = rv;
+		}
+		return NULL;
+	}
+	return sqsh_inode_new(resolver->sqsh, inode_ref, &rv);
 }
 
 int

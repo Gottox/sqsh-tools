@@ -65,6 +65,21 @@ struct SqshPathResolver {
  */
 SQSH_NO_UNUSED int sqsh__path_resolver_init(
 		struct SqshPathResolver *resolver, struct SqshArchive *sqsh);
+/**
+ * @internal
+ * @memberof SqshPathResolver
+ * @brief Initialize the inode context from a path.
+ *
+ * @param[in] resolver The path resolver context.
+ * @param[out] inode The inode context.
+ * @param[in] path The path to resolve.
+ *
+ * @return int 0 on success, less than 0 on error.
+ */
+int sqsh__path_resolver_resolve(
+		struct SqshPathResolver *resolver, struct SqshInodeContext *inode,
+		const char *path);
+
 
 /**
  * @internal
