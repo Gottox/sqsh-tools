@@ -34,7 +34,8 @@ squashfs_h = custom_target(
 	'squashfs_image.h',
 	input: squashfs,
 	output: 'squashfs_image.h',
-	command: [xxd, '-i', '@INPUT@', '@OUTPUT@'],
+	capture: true,
+	command: [xxd, '-i', '@INPUT@'],
 )
 
 foreach p : sqsh_test
