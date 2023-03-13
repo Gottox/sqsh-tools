@@ -82,6 +82,30 @@ SQSH_NO_UNUSED struct SqshInodeContext *sqsh_path_resolver_resolve(
  */
 int sqsh_path_resolver_free(struct SqshPathResolver *resolver);
 
+////////////////////////////////////////
+// chrome/inode.c
+
+/**
+ * @brief Initialize the inode context from a path.
+ *
+ * @param[in] archive The sqsh archive context.
+ * @param[in] path The path the file or directory.
+ * @param[out] err Pointer to an int where the error code will be stored.
+ *
+ * @return int 0 on success, less than 0 on error.
+ */
+struct SqshInodeContext *
+sqsh_open(struct SqshArchive *archive, const char *path, int *err);
+
+/**
+ * @brief cleans up a the inode context.
+ *
+ * @param[in] inode The inode context.
+ *
+ * @return int 0 on success, less than 0 on error.
+ */
+int sqsh_close(struct SqshInodeContext *inode);
+
 #ifdef __cplusplus
 }
 #endif

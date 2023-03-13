@@ -28,72 +28,38 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_chrome.h
+ * @file         file.c
  */
 
-#ifndef SQSH_CHROME_PRIVATE_H
-#define SQSH_CHROME_PRIVATE_H
+#include "../../include/sqsh_chrome_private.h"
 
-#include "sqsh_chrome.h"
-#include "sqsh_metablock_private.h"
+#include "../../include/sqsh_file.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "../../include/sqsh_inode_private.h"
 
-struct SqshArchive;
+struct SqshInodeContext *
+sqsh_open(struct SqshArchive *archive, const char *path, int *err) {
+	int rv;
+	struct SqshPathResolver resolver = {0};
+	struct SqshInodeContext *inode = NULL;
+	rv = sqsh__path_resolver_init(&resolver, archive);
+	if (rv < 0) {
+		goto out;
+	}
 
-////////////////////////////////////////
-// chrome/path_resolver.c
+	inode = sqsh_path_resolver_resolve(&resolver, path, &rv);
+	if (rv < 0) {
+		goto out;
+	}
 
-struct SqshPathResolver {
-	/**
-	 * @privatesection
-	 */
-	struct SqshArchive *sqsh;
-};
-
-/**
- * @internal
- * @memberof SqshPathResolver
- * @brief initializes a path resolver context.
- *
- * @param[out] resolver The path resolver context.
- * @param[in] sqsh The sqsh context.
- *
- * @return int 0 on success, less than 0 on error.
- */
-SQSH_NO_UNUSED int sqsh__path_resolver_init(
-		struct SqshPathResolver *resolver, struct SqshArchive *sqsh);
-
-/**
- * @internal
- * @memberof SqshPathResolver
- * @brief Initialize the inode context from a path.
- *
- * @param[in] resolver The path resolver context.
- * @param[out] inode The inode context.
- * @param[in] path The path to resolve.
- *
- * @return int 0 on success, less than 0 on error.
- */
-int sqsh__path_resolver_resolve(
-		struct SqshPathResolver *resolver, struct SqshInodeContext *inode,
-		const char *path);
-
-
-/**
- * @internal
- * @memberof SqshPathResolver
- * @brief cleans up a path resolver context.
- *
- * @param[in] resolver The path resolver context.
- *
- * @return int 0 on success, less than 0 on error.
- */
-int sqsh_path_resolver_cleanup(struct SqshPathResolver *resolver);
-
-#ifdef __cplusplus
+out:
+	if (err != NULL) {
+		*err = rv;
+	}
+	sqsh_path_resolver_cleanup(&resolver);
+	return inode;
 }
-#endif
-#endif // SQSH_CHROME_PRIVATE_H
+
+int sqsh_close(struct SqshInodeContext *inode) {
+	return sqsh_inode_free(inode);
+}
