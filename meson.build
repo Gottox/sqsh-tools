@@ -1,6 +1,6 @@
 project(
 	'libsqsh',
-	['c', 'cpp'],
+	['c'],
 	default_options : [
 		'c_std=c11',
 		'optimization=0',
