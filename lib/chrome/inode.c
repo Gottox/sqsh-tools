@@ -60,6 +60,7 @@ out:
 	return inode;
 }
 
-int sqsh_close(struct SqshInodeContext *inode) {
+int
+sqsh_close(struct SqshInodeContext *inode) {
 	return sqsh_inode_free(inode);
 }

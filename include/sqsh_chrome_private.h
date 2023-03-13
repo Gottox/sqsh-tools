@@ -81,7 +81,6 @@ int sqsh__path_resolver_resolve(
 		struct SqshPathResolver *resolver, struct SqshInodeContext *inode,
 		const char *path);
 
-
 /**
  * @internal
  * @memberof SqshPathResolver
