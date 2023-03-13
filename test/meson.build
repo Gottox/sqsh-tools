@@ -18,6 +18,8 @@ sqsh_test_util = [
 mksquashfs = find_program('mksquashfs')
 mktemp = find_program('mktemp')
 setfattr = find_program('setfattr')
+xxd = find_program('xxd')
+
 squashfs = custom_target(
 	'squashfs.image',
 	output : 'squashfs.image',
@@ -31,8 +33,8 @@ squashfs = custom_target(
 squashfs_h = custom_target(
 	'squashfs_image.h',
 	input: squashfs,
-	output : 'squashfs_image.h',
-	command : ['../utils/header_from_bin.sh','@INPUT@', '@OUTPUT@', '@PRIVATE_DIR@'],
+	output: 'squashfs_image.h',
+	command: [xxd, '-i', '@INPUT@', '@OUTPUT@'],
 )
 
 foreach p : sqsh_test

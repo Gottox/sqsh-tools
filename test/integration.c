@@ -58,8 +58,8 @@ sqsh_get_nonexistant(void) {
 	struct SqshArchive sqsh = {0};
 	struct SqshPathResolver resolver = {0};
 
-	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(squash_image));
-	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
+	const struct SqshConfig config = DEFAULT_CONFIG(test_squashfs_image_len);
+	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
@@ -84,8 +84,8 @@ sqsh_ls(void) {
 	struct SqshDirectoryIterator *iter = NULL;
 	struct SqshArchive sqsh = {0};
 	const struct SqshSuperblockContext *superblock;
-	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(squash_image));
-	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
+	const struct SqshConfig config = DEFAULT_CONFIG(test_squashfs_image_len);
+	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
 	assert(rv == 0);
 
 	superblock = sqsh_archive_superblock(&sqsh);
@@ -141,8 +141,8 @@ sqsh_cat_fragment(void) {
 	struct SqshFileContext file = {0};
 	struct SqshArchive sqsh = {0};
 	struct SqshPathResolver resolver = {0};
-	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(squash_image));
-	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
+	const struct SqshConfig config = DEFAULT_CONFIG(test_squashfs_image_len);
+	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
@@ -187,9 +187,9 @@ sqsh_cat_datablock_and_fragment(void) {
 	struct SqshPathResolver resolver = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
-			.source_size = sizeof(squash_image),
+			.source_size = test_squashfs_image_len,
 	};
-	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
@@ -237,9 +237,9 @@ sqsh_cat_size_overflow(void) {
 	struct SqshPathResolver resolver = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
-			.source_size = sizeof(squash_image),
+			.source_size = test_squashfs_image_len,
 	};
-	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
@@ -285,9 +285,9 @@ sqsh_test_uid_and_gid(void) {
 	const struct SqshSuperblockContext *superblock;
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
-			.source_size = sizeof(squash_image),
+			.source_size = test_squashfs_image_len,
 	};
-	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
 	assert(rv == 0);
 
 	superblock = sqsh_archive_superblock(&sqsh);
@@ -315,9 +315,9 @@ sqsh_test_extended_dir(void) {
 	struct SqshPathResolver resolver = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
-			.source_size = sizeof(squash_image),
+			.source_size = test_squashfs_image_len,
 	};
-	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
 	assert(rv == 0);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
@@ -346,9 +346,9 @@ sqsh_test_xattr(void) {
 	const struct SqshSuperblockContext *superblock;
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
-			.source_size = sizeof(squash_image),
+			.source_size = test_squashfs_image_len,
 	};
-	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
+	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
 	assert(rv == 0);
 
 	superblock = sqsh_archive_superblock(&sqsh);
@@ -773,8 +773,8 @@ multithreaded(void) {
 	pthread_t threads[16] = {0};
 	struct SqshArchive sqsh = {0};
 
-	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(squash_image));
-	rv = sqsh__archive_init(&sqsh, (char *)squash_image, &config);
+	const struct SqshConfig config = DEFAULT_CONFIG(test_squashfs_image_len);
+	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
 	assert(rv == 0);
 
 	const struct SqshSuperblockContext *superblock =
