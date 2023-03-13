@@ -32,6 +32,7 @@
  */
 
 #include "common.h"
+#include "sqsh_file.h"
 #include "test.h"
 #include <pthread.h>
 #include <sqsh_archive_private.h>
@@ -138,7 +139,7 @@ sqsh_cat_fragment(void) {
 	const uint8_t *data;
 	size_t size;
 	struct SqshInodeContext *inode = NULL;
-	struct SqshFileContext file = {0};
+	struct SqshFileReader reader = {0};
 	struct SqshArchive sqsh = {0};
 	struct SqshPathResolver resolver = {0};
 	const struct SqshConfig config = DEFAULT_CONFIG(test_squashfs_image_len);
@@ -151,19 +152,19 @@ sqsh_cat_fragment(void) {
 	inode = sqsh_path_resolver_resolve(&resolver, "a", &rv);
 	assert(rv == 0);
 
-	rv = sqsh__file_init(&file, inode);
+	rv = sqsh__file_reader_init(&reader, inode);
 	assert(rv == 0);
 
 	size = sqsh_inode_file_size(inode);
 	assert(size == 2);
 
-	rv = sqsh_file_read(&file, size);
+	rv = sqsh_file_reader_advance(&reader, 0, size);
 	assert(rv == 0);
 
-	data = sqsh_file_data(&file);
+	data = sqsh_file_reader_data(&reader);
 	assert(memcmp(data, "a\n", size) == 0);
 
-	rv = sqsh__file_cleanup(&file);
+	rv = sqsh__file_reader_cleanup(&reader);
 	assert(rv == 0);
 
 	rv = sqsh_inode_free(inode);
@@ -182,7 +183,7 @@ sqsh_cat_datablock_and_fragment(void) {
 	const uint8_t *data;
 	size_t size;
 	struct SqshInodeContext *inode = NULL;
-	struct SqshFileContext file = {0};
+	struct SqshFileReader reader = {0};
 	struct SqshArchive sqsh = {0};
 	struct SqshPathResolver resolver = {0};
 	const struct SqshConfig config = {
@@ -198,22 +199,22 @@ sqsh_cat_datablock_and_fragment(void) {
 	inode = sqsh_path_resolver_resolve(&resolver, "b", &rv);
 	assert(rv == 0);
 
-	rv = sqsh__file_init(&file, inode);
+	rv = sqsh__file_reader_init(&reader, inode);
 	assert(rv == 0);
 
 	size = sqsh_inode_file_size(inode);
 	assert(size == 1050000);
 
-	rv = sqsh_file_read(&file, size);
+	rv = sqsh_file_reader_advance(&reader, 0, size);
 	assert(rv == 0);
-	assert(size == sqsh_file_size(&file));
+	assert(size == sqsh_file_reader_size(&reader));
 
-	data = sqsh_file_data(&file);
+	data = sqsh_file_reader_data(&reader);
 	for (sqsh_index_t i = 0; i < size; i++) {
 		assert(data[i] == 'b');
 	}
 
-	rv = sqsh__file_cleanup(&file);
+	rv = sqsh__file_reader_cleanup(&reader);
 	assert(rv == 0);
 
 	rv = sqsh_inode_free(inode);
@@ -229,10 +230,9 @@ sqsh_cat_datablock_and_fragment(void) {
 static void
 sqsh_cat_size_overflow(void) {
 	int rv;
-	const uint8_t *data;
 	size_t size;
 	struct SqshInodeContext *inode = NULL;
-	struct SqshFileContext file = {0};
+	struct SqshFileReader reader = {0};
 	struct SqshArchive sqsh = {0};
 	struct SqshPathResolver resolver = {0};
 	const struct SqshConfig config = {
@@ -248,22 +248,19 @@ sqsh_cat_size_overflow(void) {
 	inode = sqsh_path_resolver_resolve(&resolver, "b", &rv);
 	assert(rv == 0);
 
-	rv = sqsh__file_init(&file, inode);
+	rv = sqsh__file_reader_init(&reader, inode);
 	assert(rv == 0);
 	size = sqsh_inode_file_size(inode);
 	assert(size == 1050000);
 
-	rv = sqsh_file_read(&file, size + 4096);
+	rv = sqsh_file_reader_advance(&reader, 0, size + 4096);
 	assert(rv != 0); // TODO: check for correct error code
 
-	assert(sqsh_file_size(&file) == size);
+	assert(sqsh_file_reader_size(&reader) == 0);
 
-	data = sqsh_file_data(&file);
-	for (sqsh_index_t i = 0; i < size; i++) {
-		assert(data[i] == 'b');
-	}
+	assert(sqsh_file_reader_data(&reader) == NULL);
 
-	rv = sqsh__file_cleanup(&file);
+	rv = sqsh__file_reader_cleanup(&reader);
 	assert(rv == 0);
 
 	rv = sqsh_inode_free(inode);

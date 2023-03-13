@@ -24,6 +24,7 @@ libsqsh_sources = [
 	'directory/directory_iterator.c',
 	'error.c',
 	'file/file_context.c',
+	'file/file_reader.c',
 	'file/fragment_table.c',
 	'inode/directory_index_iterator.c',
 	'inode/inode_context.c',

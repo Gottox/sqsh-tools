@@ -35,6 +35,7 @@
 #define SQSH_FILE_PRIVATE_H
 
 #include "sqsh_file.h"
+#include "sqsh_mapper_private.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -78,6 +79,49 @@ SQSH_NO_UNUSED int sqsh__fragment_table_init(
  * @return 0 on success, a negative value on error.
  */
 int sqsh__fragment_table_cleanup(struct SqshFragmentTable *context);
+
+////////////////////////////////////////
+// context/file_reader.c
+
+struct SqshFileReader {
+	/**
+	 * @privatesection
+	 */
+	struct SqshFragmentTable *fragment_table;
+	const struct SqshCompression *compression;
+	const struct SqshSuperblockContext *superblock;
+	struct SqshMapManager *map_manager;
+	sqsh_index_t datablock_index;
+	sqsh_index_t datablock_offset;
+	struct SqshBuffer buffer;
+	struct SqshMapReader map_reader;
+	const uint8_t *data;
+	size_t data_size;
+	const struct SqshInodeContext *inode;
+};
+
+/**
+ * @internal
+ * @brief Initializes a SqshFileContext struct.
+ * @memberof SqshFileContext
+ *
+ * @param[out] reader The file reader to initialize.
+ * @param[in] inode    The inode context to retrieve the file contents from.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int sqsh__file_reader_init(
+		struct SqshFileReader *reader, const struct SqshInodeContext *inode);
+
+/**
+ * @internal
+ * @brief Frees the resources used by the file reader.
+ *
+ * @memberof SqshFileContext
+ *
+ * @param reader The file reader to clean up.
+ */
+int sqsh__file_reader_cleanup(struct SqshFileReader *reader);
 
 ////////////////////////////////////////
 // context/file_context.c

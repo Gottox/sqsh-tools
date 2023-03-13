@@ -62,6 +62,25 @@ SQSH_NO_UNUSED int sqsh_fragment_table_to_buffer(
 		struct SqshBuffer *buffer);
 
 ////////////////////////////////////////
+// context/file_reader.c
+
+struct SqshFileReader;
+
+struct SqshFileReader *
+sqsh_file_reader_new(const struct SqshInodeContext *inode, int *err);
+
+int sqsh_file_reader_advance(
+		struct SqshFileReader *reader, sqsh_index_t offset, size_t size);
+
+const uint8_t* sqsh_file_reader_data(
+		struct SqshFileReader *reader);
+
+size_t sqsh_file_reader_size(
+		struct SqshFileReader *reader);
+
+int sqsh_file_reader_free(struct SqshFileReader *context);
+
+////////////////////////////////////////
 // context/file_context.c
 
 struct SqshFileContext;
