@@ -192,7 +192,7 @@ SQSH_NO_UNUSED int sqsh__rc_map_init(
  * @param index The index to test.
  * @return True if the array is empty, false otherwise.
  */
-bool sqsh__rc_map_is_empty(struct SqshRcMap *array, int index);
+bool sqsh__rc_map_is_empty(struct SqshRcMap *array, sqsh_index_t index);
 
 /**
  * @internal
@@ -206,7 +206,7 @@ bool sqsh__rc_map_is_empty(struct SqshRcMap *array, int index);
  * @return 0 on success, a negative value on error.
  */
 const void *
-sqsh__rc_map_set(struct SqshRcMap *array, int index, void *data, int span);
+sqsh__rc_map_set(struct SqshRcMap *array, sqsh_index_t index, void *data, int span);
 
 /**
  * @internal
@@ -227,7 +227,7 @@ size_t sqsh__rc_map_size(const struct SqshRcMap *array);
  * @param index The index of the data.
  * @return A pointer to the retained data.
  */
-const void *sqsh__rc_map_retain(struct SqshRcMap *array, int *index);
+const void *sqsh__rc_map_retain(struct SqshRcMap *array, sqsh_index_t *index);
 
 /**
  * @internal
@@ -251,7 +251,7 @@ int sqsh__rc_map_release(struct SqshRcMap *array, const void *element);
  * @param index The index of the data to release.
  * @return 0 on success, a negative value on error.
  */
-int sqsh__rc_map_release_index(struct SqshRcMap *array, int index);
+int sqsh__rc_map_release_index(struct SqshRcMap *array, sqsh_index_t index);
 
 /**
  * @internal

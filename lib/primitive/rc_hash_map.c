@@ -103,7 +103,7 @@ sqsh__rc_hash_map_retain(
 		index = index % size;
 
 		if (hash_map->keys[index] == key) {
-			int real_index = index;
+			sqsh_index_t real_index = index;
 			return sqsh__rc_map_retain(values, &real_index);
 		}
 	}

@@ -71,7 +71,7 @@ set_and_get_element(void) {
 	rv = sqsh__rc_map_init(&map, 128, sizeof(uint8_t), rc_map_deinit);
 	assert(rv == 0);
 
-	int index = 42;
+	sqsh_index_t index = 42;
 	const uint8_t *set_ptr = sqsh__rc_map_set(&map, index, &data, 1);
 	assert(rv == 0);
 	assert(set_ptr != &data);

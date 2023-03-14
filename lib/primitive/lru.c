@@ -120,7 +120,7 @@ sqsh__lru_touch_index(struct SqshLru *lru, sqsh_index_t index) {
 
 	lru->items[ring_index] = index;
 	debug_print(lru, '+', ring_index);
-	int real_index = index;
+	sqsh_index_t real_index = index;
 	sqsh__rc_map_retain(backend, &real_index);
 
 	lru->ring_index = ring_index;

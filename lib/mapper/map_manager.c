@@ -136,7 +136,7 @@ sqsh__map_manager_get(
 		const struct SqshMapSlice **target) {
 	int rv = 0;
 	assert(span == 1);
-	int real_index = index;
+	sqsh_index_t real_index = index;
 
 	rv = pthread_mutex_lock(&manager->lock);
 	if (rv != 0) {
