@@ -106,7 +106,8 @@ sqsh__compression_manager_init(
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__lru_init(&manager->lru, 128, &manager->hash_map.values);
+	rv = sqsh__lru_init(
+			&manager->lru, 128, &sqsh__lru_rc_hash_map, &manager->hash_map);
 	if (rv < 0) {
 		goto out;
 	}
@@ -187,7 +188,7 @@ sqsh__compression_manager_get(
 
 		*target = sqsh__rc_hash_map_put(&manager->hash_map, offset, &buffer);
 	}
-	rv = sqsh__lru_touch(&manager->lru, *target);
+	rv = sqsh__lru_touch(&manager->lru, offset);
 
 out:
 	pthread_mutex_unlock(&manager->lock);

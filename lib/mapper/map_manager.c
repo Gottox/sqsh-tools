@@ -106,7 +106,8 @@ sqsh__map_manager_init(
 		goto out;
 	}
 
-	rv = sqsh__lru_init(&manager->lru, lru_size, &manager->maps);
+	rv = sqsh__lru_init(
+			&manager->lru, lru_size, &sqsh__lru_rc_map, &manager->maps);
 
 out:
 	if (rv < 0) {
@@ -156,7 +157,7 @@ sqsh__map_manager_get(
 
 		*target = sqsh__rc_map_set(&manager->maps, index, &mapping, span);
 	}
-	rv = sqsh__lru_touch_index(&manager->lru, real_index);
+	rv = sqsh__lru_touch(&manager->lru, real_index);
 
 out:
 	pthread_mutex_unlock(&manager->lock);

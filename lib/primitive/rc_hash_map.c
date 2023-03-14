@@ -140,3 +140,18 @@ sqsh__rc_hash_map_cleanup(struct SqshRcHashMap *hash_map) {
 
 	return sqsh__rc_map_cleanup(&hash_map->values);
 }
+
+static const void *
+lru_rc_hash_map_retain(void *backend, sqsh_index_t index) {
+	return sqsh__rc_hash_map_retain(backend, index);
+}
+
+static int
+lru_rc_hash_map_release(void *backend, sqsh_index_t index) {
+	return sqsh__rc_hash_map_release_key(backend, index);
+}
+
+const struct SqshLruBackendImpl sqsh__lru_rc_hash_map = {
+		.retain = lru_rc_hash_map_retain,
+		.release = lru_rc_hash_map_release,
+};

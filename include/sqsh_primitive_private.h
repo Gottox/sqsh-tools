@@ -205,8 +205,8 @@ bool sqsh__rc_map_is_empty(struct SqshRcMap *array, sqsh_index_t index);
  * @param span The number of indices to span. (Use 1 for a single index.)
  * @return 0 on success, a negative value on error.
  */
-const void *
-sqsh__rc_map_set(struct SqshRcMap *array, sqsh_index_t index, void *data, int span);
+const void *sqsh__rc_map_set(
+		struct SqshRcMap *array, sqsh_index_t index, void *data, int span);
 
 /**
  * @internal
@@ -262,6 +262,8 @@ int sqsh__rc_map_release_index(struct SqshRcMap *array, sqsh_index_t index);
  * @return 0 on success, a negative value on error.
  */
 int sqsh__rc_map_cleanup(struct SqshRcMap *array);
+
+extern const struct SqshLruBackendImpl sqsh__lru_rc_map;
 
 ////////////////////////////////////////
 // primitive/rc_hash_map.c
@@ -362,15 +364,22 @@ int sqsh__rc_hash_map_release_key(
  */
 int sqsh__rc_hash_map_cleanup(struct SqshRcHashMap *hash_map);
 
+extern const struct SqshLruBackendImpl sqsh__lru_rc_hash_map;
+
 ////////////////////////////////////////
 // primitive/lru.c
+
+struct SqshLruBackendImpl {
+	const void *(*retain)(void *backend, sqsh_index_t id);
+	int (*release)(void *backend, sqsh_index_t id);
+};
 
 struct SqshLru {
 	/**
 	 * @privatesection
 	 */
-	struct SqshRcMap *backend;
-
+	void *backend;
+	const struct SqshLruBackendImpl *impl;
 	sqsh_index_t *items;
 	sqsh_index_t ring_index;
 	size_t size;
@@ -383,32 +392,23 @@ struct SqshLru {
  *
  * @param lru The LRU cache to initialize.
  * @param size The size of the LRU cache.
+ * @param impl The implementation of the backend data structure.
  * @param backend The backend to use for the LRU cache.
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int
-sqsh__lru_init(struct SqshLru *lru, size_t size, struct SqshRcMap *backend);
+SQSH_NO_UNUSED int sqsh__lru_init(
+		struct SqshLru *lru, size_t size, const struct SqshLruBackendImpl *impl,
+		void *backend);
 
 /**
  * @internal
  * @memberof SqshLru
  * @brief marks an item as recently used.
  * @param lru The LRU cache to mark the item in.
- * @param element The element to mark.
+ * @param id The id of the item to touch
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__lru_touch(struct SqshLru *lru, const void *element);
-
-/**
- * @internal
- * @memberof SqshLru
- * @brief marks an item as recently used.
- * @param lru The LRU cache to mark the item in.
- * @param index The index of the element to mark.
- * @return 0 on success, a negative value on error.
- */
-SQSH_NO_UNUSED int
-sqsh__lru_touch_index(struct SqshLru *lru, sqsh_index_t index);
+SQSH_NO_UNUSED int sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t id);
 
 /**
  * @internal

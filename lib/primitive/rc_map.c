@@ -130,7 +130,8 @@ sqsh__rc_map_is_empty(struct SqshRcMap *array, sqsh_index_t index) {
 }
 
 const void *
-sqsh__rc_map_set(struct SqshRcMap *array, sqsh_index_t index, void *data, int span) {
+sqsh__rc_map_set(
+		struct SqshRcMap *array, sqsh_index_t index, void *data, int span) {
 	(void)span;
 	void *target;
 
@@ -208,3 +209,18 @@ sqsh__rc_map_cleanup(struct SqshRcMap *array) {
 
 	return 0;
 }
+
+static const void *
+lru_rc_map_retain(void *backend, sqsh_index_t index) {
+	return sqsh__rc_map_retain(backend, &index);
+}
+
+static int
+lru_rc_map_release(void *backend, sqsh_index_t index) {
+	return sqsh__rc_map_release_index(backend, index);
+}
+
+const struct SqshLruBackendImpl sqsh__lru_rc_map = {
+		.retain = lru_rc_map_retain,
+		.release = lru_rc_map_release,
+};

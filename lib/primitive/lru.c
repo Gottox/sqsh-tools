@@ -63,7 +63,10 @@ debug_print(const struct SqshLru *lru, const char msg, sqsh_index_t ring_index) 
 #endif
 
 int
-sqsh__lru_init(struct SqshLru *lru, size_t size, struct SqshRcMap *backend) {
+sqsh__lru_init(
+		struct SqshLru *lru, size_t size, const struct SqshLruBackendImpl *impl,
+		void *backend) {
+	lru->impl = impl;
 	lru->backend = backend;
 	lru->size = size;
 	if (size == 0) {
@@ -83,26 +86,15 @@ sqsh__lru_init(struct SqshLru *lru, size_t size, struct SqshRcMap *backend) {
 }
 
 int
-sqsh__lru_touch(struct SqshLru *lru, const void *element) {
-	if (element == NULL) {
-		return 0;
-	}
-
-	const int index = ((uint8_t *)element - lru->backend->data) /
-			lru->backend->element_size;
-
-	return sqsh__lru_touch_index(lru, index);
-}
-
-int
-sqsh__lru_touch_index(struct SqshLru *lru, sqsh_index_t index) {
+sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t index) {
 	if (lru->size == 0) {
 		return 0;
 	}
 
 	sqsh_index_t ring_index = lru->ring_index;
 	size_t size = lru->size;
-	struct SqshRcMap *backend = lru->backend;
+	void *backend = lru->backend;
+	const struct SqshLruBackendImpl *impl = lru->impl;
 	sqsh_index_t last_index = lru->items[ring_index];
 
 	ring_index = (ring_index + 1) % size;
@@ -115,13 +107,12 @@ sqsh__lru_touch_index(struct SqshLru *lru, sqsh_index_t index) {
 
 	debug_print(lru, '-', ring_index);
 	if (old_index != EMPTY_MARKER) {
-		sqsh__rc_map_release_index(backend, old_index);
+		impl->release(backend, old_index);
 	}
 
 	lru->items[ring_index] = index;
 	debug_print(lru, '+', ring_index);
-	sqsh_index_t real_index = index;
-	sqsh__rc_map_retain(backend, &real_index);
+	impl->retain(backend, index);
 
 	lru->ring_index = ring_index;
 
@@ -130,10 +121,12 @@ sqsh__lru_touch_index(struct SqshLru *lru, sqsh_index_t index) {
 
 int
 sqsh__lru_cleanup(struct SqshLru *lru) {
+	const struct SqshLruBackendImpl *impl = lru->impl;
+
 	for (size_t i = 0; i < lru->size; i++) {
 		sqsh_index_t index = lru->items[i];
 		if (index != EMPTY_MARKER) {
-			sqsh__rc_map_release_index(lru->backend, index);
+			impl->release(lru->backend, index);
 		}
 	}
 	free(lru->items);

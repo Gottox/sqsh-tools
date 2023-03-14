@@ -59,7 +59,7 @@ init_lru(void) {
 	rv = sqsh__rc_map_init(&map, 128, sizeof(uint8_t), rc_map_deinit);
 	assert(rv == 0);
 
-	rv = sqsh__lru_init(&lru, 10, &map);
+	rv = sqsh__lru_init(&lru, 10, &sqsh__lru_rc_map, &map);
 	assert(rv == 0);
 
 	rv = sqsh__lru_cleanup(&lru);
