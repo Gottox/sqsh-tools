@@ -256,6 +256,17 @@ int sqsh__rc_map_release_index(struct SqshRcMap *array, sqsh_index_t index);
 /**
  * @internal
  * @memberof SqshRcMap
+ * @brief Checks if the element is contained in the array.
+ *
+ * @param array The array containing the data.
+ * @param element The element to check.
+ * @return True if the element is contained in the array, false otherwise.
+ */
+bool sqsh__rc_map_contains(struct SqshRcMap *array, const void *element);
+
+/**
+ * @internal
+ * @memberof SqshRcMap
  * @brief Cleans up a reference-counted array.
  *
  * @param array The array to cleanup.

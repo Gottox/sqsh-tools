@@ -187,6 +187,25 @@ sqsh__rc_map_release_index(struct SqshRcMap *array, sqsh_index_t index) {
 	return 0;
 }
 
+bool
+sqsh__rc_map_contains(struct SqshRcMap *array, const void *element) {
+	const uint8_t *needle = (uint8_t *)element;
+
+	if (needle == NULL) {
+		return false;
+	}
+
+	if (needle < array->data) {
+		return false;
+	}
+
+	if (needle >= &array->data[array->size * array->element_size]) {
+		return false;
+	}
+
+	return true;
+}
+
 size_t
 sqsh__rc_map_size(const struct SqshRcMap *array) {
 	return array->size;
