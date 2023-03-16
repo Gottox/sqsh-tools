@@ -34,6 +34,7 @@
 #ifndef SQSH_METABLOCK_PRIVATE_H
 #define SQSH_METABLOCK_PRIVATE_H
 
+#include "sqsh_compression_private.h"
 #include "sqsh_mapper_private.h"
 
 #ifdef __cplusplus
@@ -51,7 +52,6 @@ struct SqshMetablockIterator {
 	 */
 	struct SqshMapReader cursor;
 	bool is_compressed;
-	const struct SqshCompression *compression;
 	uint16_t size;
 };
 
@@ -108,6 +108,17 @@ sqsh__metablock_iterator_data(const struct SqshMetablockIterator *iterator);
 /**
  * @internal
  * @memberof SqshMetablockIterator
+ * @brief Returns a pointer to the data of the current metablock.
+ *
+ * @param[in] iterator The iterator.
+ * @return Returns the address of the data of the current metablock.
+ */
+uint64_t sqsh__metablock_iterator_data_address(
+		const struct SqshMetablockIterator *iterator);
+
+/**
+ * @internal
+ * @memberof SqshMetablockIterator
  * @brief Returns whether the current metablock is compressed.
  *
  * @param[in] iterator The iterator.
@@ -130,19 +141,6 @@ sqsh__metablock_iterator_size(const struct SqshMetablockIterator *iterator);
 /**
  * @internal
  * @memberof SqshMetablockIterator
- * @brief Appends the data of the current metablock to a buffer.
- *
- * @param[in] iterator The iterator.
- * @param[out] buffer The buffer to append the data to.
- * @return 0 on success, or a negative value on error.
- */
-SQSH_NO_UNUSED int sqsh__metablock_iterator_append_to_buffer(
-		const struct SqshMetablockIterator *iterator,
-		struct SqshBuffer *buffer);
-
-/**
- * @internal
- * @memberof SqshMetablockIterator
  * @brief Cleans up an iterator for reading metablocks.
  *
  * @param[in,out] iterator The iterator to clean up.
@@ -159,6 +157,10 @@ struct SqshMetablockReader {
 	 */
 	struct SqshMetablockIterator iterator;
 	struct SqshBuffer buffer;
+	// TODO: remove the compression field and use the compression_manager
+	// instead
+	const struct SqshCompression *compression;
+	struct SqshCompressionManager *compression_manager;
 	sqsh_index_t offset;
 	size_t size;
 };
@@ -170,6 +172,7 @@ struct SqshMetablockReader {
  *
  * @param[out] cursor Pointer to the metablock cursor to be initialized.
  * @param[in] sqsh Pointer to the Sqsh struct.
+ * @param[in] compression_manager compression manager to use.
  * @param[in] start_address Start address of the metablock.
  * @param[in] upper_limit Upper limit of the metablock.
  *
@@ -177,6 +180,7 @@ struct SqshMetablockReader {
  */
 SQSH_NO_UNUSED int sqsh__metablock_reader_init(
 		struct SqshMetablockReader *cursor, struct SqshArchive *sqsh,
+		struct SqshCompressionManager *compression_manager,
 		const uint64_t start_address, const uint64_t upper_limit);
 
 /**

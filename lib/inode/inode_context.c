@@ -131,7 +131,7 @@ sqsh__inode_init(
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	rv = sqsh__metablock_reader_init(
-			&inode->metablock, sqsh, address_outer, ~0);
+			&inode->metablock, sqsh, NULL, address_outer, ~0);
 	if (rv < 0) {
 		return rv;
 	}

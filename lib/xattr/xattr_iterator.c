@@ -86,7 +86,7 @@ sqsh__xattr_iterator_init(
 	}
 
 	rv = sqsh__metablock_reader_init(
-			&iterator->metablock, sqsh, start_block, archive_size);
+			&iterator->metablock, sqsh, NULL, start_block, archive_size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -158,7 +158,7 @@ xattr_value_indirect_load(struct SqshXattrIterator *iterator) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	rv = sqsh__metablock_reader_init(
-			&iterator->out_of_line_value, iterator->sqsh, start_block,
+			&iterator->out_of_line_value, iterator->sqsh, NULL, start_block,
 			iterator->upper_limit);
 	if (rv < 0) {
 		goto out;

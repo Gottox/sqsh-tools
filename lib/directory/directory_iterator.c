@@ -149,7 +149,7 @@ sqsh__directory_iterator_init(
 	iterator->inode = inode;
 
 	rv = sqsh__metablock_reader_init(
-			&iterator->metablock, sqsh, start_address, upper_limit);
+			&iterator->metablock, sqsh, NULL, start_address, upper_limit);
 	if (rv < 0) {
 		return rv;
 	}

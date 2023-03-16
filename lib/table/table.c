@@ -117,7 +117,7 @@ sqsh_table_get(
 	}
 
 	rv = sqsh__metablock_reader_init(
-			&metablock, sqsh, metablock_address, upper_limit);
+			&metablock, sqsh, NULL, metablock_address, upper_limit);
 	if (rv < 0) {
 		goto out;
 	}

@@ -37,6 +37,7 @@
 #include "../../include/sqsh_data.h"
 #include "../../include/sqsh_error.h"
 
+#include <stdint.h>
 #include <string.h>
 
 #include "../../include/sqsh_archive_private.h"
@@ -47,12 +48,9 @@ sqsh__metablock_iterator_init(
 		struct SqshMetablockIterator *iterator, struct SqshArchive *sqsh,
 		uint64_t start_address, uint64_t upper_limit) {
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(sqsh);
-	const struct SqshCompression *compression =
-			sqsh_archive_compression_metablock(sqsh);
 
 	iterator->size = 0;
 	iterator->is_compressed = false;
-	iterator->compression = compression;
 	return sqsh__map_reader_init(
 			&iterator->cursor, map_manager, start_address, upper_limit);
 }
@@ -107,6 +105,14 @@ sqsh__metablock_iterator_data(const struct SqshMetablockIterator *iterator) {
 	return sqsh__map_reader_data(&iterator->cursor);
 }
 
+uint64_t
+sqsh__metablock_iterator_data_address(
+		const struct SqshMetablockIterator *iterator) {
+	// TODO: do not access the cursor directly, implement functions to get its
+	// address
+	return iterator->cursor.address + SQSH_SIZEOF_METABLOCK;
+}
+
 bool
 sqsh__metablock_iterator_is_compressed(
 		const struct SqshMetablockIterator *iterator) {
@@ -116,22 +122,6 @@ sqsh__metablock_iterator_is_compressed(
 size_t
 sqsh__metablock_iterator_size(const struct SqshMetablockIterator *iterator) {
 	return iterator->size;
-}
-
-int
-sqsh__metablock_iterator_append_to_buffer(
-		const struct SqshMetablockIterator *iterator,
-		struct SqshBuffer *buffer) {
-	const uint8_t *data = sqsh__metablock_iterator_data(iterator);
-	size_t size = sqsh__metablock_iterator_size(iterator);
-	bool is_compressed = sqsh__metablock_iterator_is_compressed(iterator);
-
-	if (is_compressed) {
-		return sqsh__compression_decompress_to_buffer(
-				iterator->compression, buffer, data, size);
-	} else {
-		return sqsh__buffer_append(buffer, data, size);
-	}
 }
 
 int
