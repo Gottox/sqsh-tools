@@ -15,11 +15,6 @@ functionality like opening file contents by path.
 This directory contains the glue code to the different compression algorithms
 as well as buffer and cache handling for decompressed data.
 
-### [context](./context)
-
-This directory is deprecated and will go away soon. Its contents will be moved
-to other modules.
-
 ### [data](./data)
 
 This directory contains on-disk structures for squashfs. It does not contain 

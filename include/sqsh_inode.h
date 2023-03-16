@@ -355,28 +355,6 @@ uint32_t sqsh_inode_xattr_index(const struct SqshInodeContext *context);
  */
 int sqsh_inode_free(struct SqshInodeContext *context);
 
-/**
- * @memberof SqshInodeContext
- * @brief converts an inode reference into a block index and a block offset
- *
- * @param ref The inode reference.
- * @param block_index a pointer where the block index will be stored.
- * @param offset a pointer where the block offset will be stored.
- */
-void
-sqsh_inode_ref_to_block(uint64_t ref, uint32_t *block_index, uint16_t *offset);
-
-/**
- * @brief converts a block index and a block offset into an inode reference.
- *
- * @param block_index The block index.
- * @param offset The block offset.
- *
- * @return the inode reference.
- */
-SQSH_NO_UNUSED uint64_t
-sqsh_inode_ref_from_block(uint32_t block_index, uint16_t offset);
-
 #ifdef __cplusplus
 }
 #endif

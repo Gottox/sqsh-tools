@@ -34,7 +34,7 @@
 #ifndef SQSH_XATTR_PRIVATE_H
 #define SQSH_XATTR_PRIVATE_H
 
-#include "sqsh_context_private.h"
+#include "sqsh_metablock_private.h"
 #include "sqsh_table_private.h"
 #include "sqsh_xattr.h"
 

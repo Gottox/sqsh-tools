@@ -38,7 +38,7 @@
 #include "../../include/sqsh_error.h"
 #include "../utils.h"
 
-#include "../../include/sqsh_context_private.h"
+#include "../../include/sqsh_metablock_private.h"
 
 typedef const __attribute__((aligned(1))) uint64_t unaligned_uint64_t;
 static uint64_t

@@ -45,6 +45,31 @@ struct SqshTable;
 struct SqshFragmentTable;
 
 ////////////////////////////////////////
+// archive/trailing_context.c
+
+struct SqshTrailingContext;
+
+/**
+ * @memberof SqshTrailingContext
+ * @brief Retrieves the size of the trailing data in a context.
+ *
+ * @param[in] context The context to retrieve the size from.
+ *
+ * @return The size of the trailing data in the context.
+ */
+size_t sqsh_trailing_size(const struct SqshTrailingContext *context);
+
+/**
+ * @memberof SqshTrailingContext
+ * @brief Retrieves the trailing data in a context.
+ *
+ * @param[in] context The context to retrieve the data from.
+ *
+ * @return The trailing data in the context.
+ */
+const uint8_t *sqsh_trailing_data(const struct SqshTrailingContext *context);
+
+////////////////////////////////////////
 // archive/superblock_context.c
 
 enum SqshSuperblockCompressionId {

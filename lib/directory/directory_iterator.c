@@ -34,7 +34,6 @@
 #include "../../include/sqsh_directory_private.h"
 
 #include "../../include/sqsh_archive.h"
-#include "../../include/sqsh_context.h"
 #include "../../include/sqsh_data.h"
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_inode_private.h"

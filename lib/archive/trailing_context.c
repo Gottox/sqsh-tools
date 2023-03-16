@@ -27,45 +27,64 @@
  ******************************************************************************/
 
 /**
- * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_context.h
+ * @author      : Enno Boland (mail@eboland.de)
+ * @file        : trailing_context.c
  */
 
-#ifndef SQSH_CONTEXT_H
-#define SQSH_CONTEXT_H
+#include "../../include/sqsh_archive_private.h"
 
-#include "sqsh_common.h"
+#include "../../include/sqsh_error.h"
+#include "../utils.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+int
+sqsh__trailing_init(
+		struct SqshTrailingContext *context, struct SqshArchive *sqsh) {
+	int rv = 0;
+	const struct SqshSuperblockContext *superblock =
+			sqsh_archive_superblock(sqsh);
+	uint64_t trailing_start = sqsh_superblock_bytes_used(superblock);
+	struct SqshMapManager *map_manager = sqsh_archive_map_manager(sqsh);
+	size_t archive_size = sqsh__map_manager_size(map_manager);
+	uint64_t trailing_size;
 
-////////////////////////////////////////
-// context/trailing_context.c
+	if (archive_size <= trailing_start) {
+		rv = -SQSH_ERROR_TODO;
+		goto out;
+	}
 
-struct SqshTrailingContext;
+	if (SQSH_SUB_OVERFLOW(archive_size, trailing_start, &trailing_size)) {
+		rv = -SQSH_ERROR_TODO;
+		goto out;
+	}
 
-/**
- * @memberof SqshTrailingContext
- * @brief Retrieves the size of the trailing data in a context.
- *
- * @param[in] context The context to retrieve the size from.
- *
- * @return The size of the trailing data in the context.
- */
-size_t sqsh_trailing_size(const struct SqshTrailingContext *context);
+	rv = sqsh__map_reader_init(
+			&context->cursor, map_manager, trailing_start, trailing_size);
+	if (rv < 0) {
+		goto out;
+	}
 
-/**
- * @memberof SqshTrailingContext
- * @brief Retrieves the trailing data in a context.
- *
- * @param[in] context The context to retrieve the data from.
- *
- * @return The trailing data in the context.
- */
-const uint8_t *sqsh_trailing_data(const struct SqshTrailingContext *context);
-
-#ifdef __cplusplus
+	rv = sqsh__map_reader_all(&context->cursor);
+	if (rv < 0) {
+		goto out;
+	}
+out:
+	if (rv < 0) {
+		sqsh__trailing_cleanup(context);
+	}
+	return rv;
 }
-#endif
-#endif // SQSH_CONTEXT_H
+
+size_t
+sqsh_trailing_size(const struct SqshTrailingContext *context) {
+	return sqsh__map_reader_size(&context->cursor);
+}
+
+const uint8_t *
+sqsh_trailing_data(const struct SqshTrailingContext *context) {
+	return sqsh__map_reader_data(&context->cursor);
+}
+
+int
+sqsh__trailing_cleanup(struct SqshTrailingContext *context) {
+	return sqsh__map_reader_cleanup(&context->cursor);
+}

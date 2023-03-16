@@ -45,6 +45,40 @@ extern "C" {
 #endif
 
 ////////////////////////////////////////
+// archive/trailing_context.c
+
+struct SqshTrailingContext {
+	/**
+	 * @privatesection
+	 */
+	struct SqshMapReader cursor;
+};
+
+/**
+ * @internal
+ * @memberof SqshTrailingContext
+ * @brief Initializes a trailing context.
+ *
+ * @param[out] context The context to initialize.
+ * @param[in]  sqsh The Sqsh instance to use for the context.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+SQSH_NO_UNUSED int sqsh__trailing_init(
+		struct SqshTrailingContext *context, struct SqshArchive *sqsh);
+
+/**
+ * @internal
+ * @memberof SqshTrailingContext
+ * @brief Cleans up a trailing context.
+ *
+ * @param[in] context The context to clean up.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+int sqsh__trailing_cleanup(struct SqshTrailingContext *context);
+
+////////////////////////////////////////
 // archive/superblock_context.c
 
 struct SqshSuperblockContext {
