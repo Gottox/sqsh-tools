@@ -281,12 +281,17 @@ extern const struct SqshLruBackendImpl sqsh__lru_rc_map;
 
 typedef uint64_t sqsh_rc_map_key_t;
 
+struct SqshRcHashMapInner;
+
 struct SqshRcHashMap {
 	/**
 	 * @privatesection
 	 */
-	sqsh_rc_map_key_t *keys;
-	struct SqshRcMap values;
+	struct SqshRcHashMapInner *hash_maps;
+	size_t hash_map_count;
+	size_t map_size;
+	size_t element_size;
+	sqsh_rc_map_cleanup_t cleanup;
 };
 
 /**

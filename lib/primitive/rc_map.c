@@ -170,7 +170,8 @@ sqsh__rc_map_release(struct SqshRcMap *array, const void *element) {
 		return 0;
 	}
 
-	const int index = ((uint8_t *)element - array->data) / array->element_size;
+	const sqsh_index_t index =
+			((uint8_t *)element - array->data) / array->element_size;
 
 	return sqsh__rc_map_release_index(array, index);
 }

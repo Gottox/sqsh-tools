@@ -39,6 +39,12 @@
 
 #define COLLISION_RESERVE_BITS 2
 
+struct SqshRcHashMapInner {
+	sqsh_rc_map_key_t *keys;
+	struct SqshRcMap values;
+	size_t count;
+};
+
 static uint64_t
 djb2_hash(const void *data, const size_t size) {
 	uint64_t hash = 5381;
@@ -58,53 +64,103 @@ key_to_index(const sqsh_rc_map_key_t key, const size_t size) {
 	return hash % size;
 }
 
+static int
+extend_hash_map(struct SqshRcHashMap *hash_map) {
+	size_t new_size;
+	const sqsh_index_t last_index = hash_map->hash_map_count;
+	struct SqshRcHashMapInner *hash_maps;
+
+	if (SQSH_ADD_OVERFLOW(hash_map->hash_map_count, 1, &new_size)) {
+		return SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+	hash_map->hash_map_count = new_size;
+	if (SQSH_MULT_OVERFLOW(
+				new_size, sizeof(struct SqshRcHashMapInner), &new_size)) {
+		return SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+
+	hash_map->hash_maps = realloc(hash_map->hash_maps, new_size);
+	hash_maps = &hash_map->hash_maps[last_index];
+
+	hash_maps->keys = calloc(hash_map->map_size, sizeof(sqsh_rc_map_key_t));
+	if (hash_maps->keys == NULL) {
+		return SQSH_ERROR_MALLOC_FAILED;
+	}
+
+	return sqsh__rc_map_init(
+			&hash_maps->values, hash_map->map_size, hash_map->element_size,
+			hash_map->cleanup);
+}
+
 int
 sqsh__rc_hash_map_init(
 		struct SqshRcHashMap *hash_map, size_t size, size_t element_size,
 		sqsh_rc_map_cleanup_t cleanup) {
-	hash_map->keys = calloc(size, sizeof(sqsh_rc_map_key_t));
-
-	return sqsh__rc_map_init(&hash_map->values, size, element_size, cleanup);
+	hash_map->hash_maps = NULL;
+	hash_map->hash_map_count = 0;
+	hash_map->map_size = size;
+	hash_map->element_size = element_size;
+	hash_map->cleanup = cleanup;
+	return extend_hash_map(hash_map);
 }
 
 const void *
 sqsh__rc_hash_map_put(
 		struct SqshRcHashMap *hash_map, sqsh_rc_map_key_t key, void *data) {
-	sqsh_index_t index = key_to_index(key, hash_map->values.size);
-	struct SqshRcMap *values = &hash_map->values;
+	int rv = 0;
+	const size_t size = sqsh__rc_map_size(&hash_map->hash_maps[0].values);
+	const sqsh_index_t orig_index = key_to_index(key, size);
+	sqsh_index_t index = orig_index;
+	struct SqshRcMap *values = NULL;
+	sqsh_rc_map_key_t *keys = NULL;
 
-	const size_t size = sqsh__rc_map_size(values);
 	for (sqsh_index_t i = 0; i < size; i++, index++) {
 		index = index % size;
 
-		if (sqsh__rc_map_is_empty(values, index) ||
-			hash_map->keys[index] == key) {
-			hash_map->keys[index] = key;
-			return sqsh__rc_map_set(values, index, data, 1);
+		for (sqsh_index_t j = 0; j < hash_map->hash_map_count; j++) {
+			values = &hash_map->hash_maps[j].values;
+			keys = hash_map->hash_maps[j].keys;
+			if (sqsh__rc_map_is_empty(values, index) || keys[index] == key) {
+				goto found;
+			}
 		}
 	}
 
-	return NULL;
+	index = orig_index;
+	rv = extend_hash_map(hash_map);
+	if (rv < 0) {
+		return NULL;
+	}
+	values = &hash_map->hash_maps[hash_map->hash_map_count - 1].values;
+	keys = hash_map->hash_maps[hash_map->hash_map_count - 1].keys;
+
+found:
+	keys[index] = key;
+	return sqsh__rc_map_set(values, index, data, 1);
 }
 
 size_t
 sqsh__rc_hash_map_size(const struct SqshRcHashMap *hash_map) {
-	return sqsh__rc_map_size(&hash_map->values);
+	return sqsh__rc_map_size(&hash_map->hash_maps[0].values) *
+			hash_map->hash_map_count;
 }
 
 const void *
 sqsh__rc_hash_map_retain(
 		struct SqshRcHashMap *hash_map, sqsh_rc_map_key_t key) {
-	struct SqshRcMap *values = &hash_map->values;
-	sqsh_index_t index = key_to_index(key, hash_map->values.size);
+	const size_t size = sqsh__rc_map_size(&hash_map->hash_maps[0].values);
+	sqsh_index_t index = key_to_index(key, size);
 
-	const size_t size = sqsh__rc_map_size(values);
 	for (sqsh_index_t i = 0; i < size; i++, index++) {
 		index = index % size;
 
-		if (hash_map->keys[index] == key) {
-			sqsh_index_t real_index = index;
-			return sqsh__rc_map_retain(values, &real_index);
+		for (sqsh_index_t j = 0; j < hash_map->hash_map_count; j++) {
+			struct SqshRcMap *values = &hash_map->hash_maps[j].values;
+			sqsh_rc_map_key_t *keys = hash_map->hash_maps[j].keys;
+			if (keys[index] == key) {
+				sqsh_index_t real_index = index;
+				return sqsh__rc_map_retain(values, &real_index);
+			}
 		}
 	}
 
@@ -113,21 +169,31 @@ sqsh__rc_hash_map_retain(
 
 int
 sqsh__rc_hash_map_release(struct SqshRcHashMap *hash_map, const void *element) {
-	return sqsh__rc_map_release(&hash_map->values, element);
+	for (sqsh_index_t i = 0; i < hash_map->hash_map_count; i++) {
+		struct SqshRcMap *values = &hash_map->hash_maps[i].values;
+
+		if (sqsh__rc_map_contains(values, element)) {
+			return sqsh__rc_map_release(values, element);
+		}
+	}
+	return SQSH_ERROR_TODO;
 }
 
 int
 sqsh__rc_hash_map_release_key(
 		struct SqshRcHashMap *hash_map, sqsh_rc_map_key_t key) {
-	struct SqshRcMap *values = &hash_map->values;
-	sqsh_index_t index = key_to_index(key, hash_map->values.size);
+	const size_t size = sqsh__rc_map_size(&hash_map->hash_maps[0].values);
+	sqsh_index_t index = key_to_index(key, size);
 
-	const size_t size = sqsh__rc_map_size(values);
 	for (sqsh_index_t i = 0; i < size; i++, index++) {
 		index = index % size;
 
-		if (hash_map->keys[index] == key) {
-			return sqsh__rc_map_release_index(values, index);
+		for (sqsh_index_t j = 0; j < hash_map->hash_map_count; j++) {
+			struct SqshRcMap *values = &hash_map->hash_maps[j].values;
+			sqsh_rc_map_key_t *keys = hash_map->hash_maps[j].keys;
+			if (keys[index] == key) {
+				return sqsh__rc_map_release_index(values, index);
+			}
 		}
 	}
 
@@ -136,9 +202,13 @@ sqsh__rc_hash_map_release_key(
 
 int
 sqsh__rc_hash_map_cleanup(struct SqshRcHashMap *hash_map) {
-	free(hash_map->keys);
+	for (sqsh_index_t i = 0; i < hash_map->hash_map_count; i++) {
+		free(hash_map->hash_maps[i].keys);
+		sqsh__rc_map_cleanup(&hash_map->hash_maps[i].values);
+	}
+	free(hash_map->hash_maps);
 
-	return sqsh__rc_map_cleanup(&hash_map->values);
+	return 0;
 }
 
 static const void *

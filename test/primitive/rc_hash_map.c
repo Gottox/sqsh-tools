@@ -85,7 +85,37 @@ set_and_get_element(void) {
 	assert(rv == 0);
 }
 
+static void
+check_overflow(void) {
+	int rv;
+	struct SqshRcHashMap map;
+	uint8_t data = 1;
+
+	rv = sqsh__rc_hash_map_init(&map, 4, sizeof(uint8_t), rc_hash_map_deinit);
+	assert(rv == 0);
+
+	sqsh__rc_hash_map_put(&map, 1, &data);
+	assert(rv == 0);
+	sqsh__rc_hash_map_put(&map, 2, &data);
+	assert(rv == 0);
+	sqsh__rc_hash_map_put(&map, 3, &data);
+	assert(rv == 0);
+	sqsh__rc_hash_map_put(&map, 4, &data);
+	assert(rv == 0);
+	data = 42;
+	sqsh__rc_hash_map_put(&map, 5, &data);
+	assert(rv == 0);
+
+	const uint8_t *get_ptr = sqsh__rc_hash_map_retain(&map, 5);
+	assert(rv == 0);
+	assert(*get_ptr == 42);
+
+	rv = sqsh__rc_hash_map_cleanup(&map);
+	assert(rv == 0);
+}
+
 DEFINE
 TEST(init_rc_hash_map);
 TEST(set_and_get_element);
+TEST(check_overflow);
 DEFINE_END
