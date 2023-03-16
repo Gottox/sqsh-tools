@@ -189,7 +189,7 @@ sqsh_directory_iterator_inode_ref(
 	const uint16_t block_offset =
 			sqsh_data_directory_entry_offset(get_entry(iterator));
 
-	return sqsh_inode_ref_from_block(block_index, block_offset);
+	return sqsh_address_ref_create(block_index, block_offset);
 }
 
 enum SqshInodeContextType

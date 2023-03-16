@@ -115,10 +115,9 @@ int
 sqsh__inode_init(
 		struct SqshInodeContext *inode, struct SqshArchive *sqsh,
 		uint64_t inode_ref) {
-	uint32_t address_outer;
-	uint16_t address_inner;
-
-	sqsh_inode_ref_to_block(inode_ref, &address_outer, &address_inner);
+	const uint32_t outer_offset = sqsh_address_ref_outer_offset(inode_ref);
+	const uint16_t inner_offset = sqsh_address_ref_inner_offset(inode_ref);
+	uint64_t address_outer;
 
 	inode->inode_ref = inode_ref;
 
@@ -129,7 +128,7 @@ sqsh__inode_init(
 	const uint64_t inode_table_start =
 			sqsh_superblock_inode_table_start(superblock);
 
-	if (SQSH_ADD_OVERFLOW(inode_table_start, address_outer, &address_outer)) {
+	if (SQSH_ADD_OVERFLOW(inode_table_start, outer_offset, &address_outer)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	rv = sqsh__metablock_reader_init(
@@ -138,7 +137,7 @@ sqsh__inode_init(
 		return rv;
 	}
 	rv = sqsh__metablock_reader_advance(
-			&inode->metablock, address_inner, SQSH_SIZEOF_INODE_HEADER);
+			&inode->metablock, inner_offset, SQSH_SIZEOF_INODE_HEADER);
 	if (rv < 0) {
 		return rv;
 	}
@@ -561,14 +560,4 @@ sqsh_inode_free(struct SqshInodeContext *context) {
 	int rv = sqsh__inode_cleanup(context);
 	free(context);
 	return rv;
-}
-
-void
-sqsh_inode_ref_to_block(uint64_t ref, uint32_t *block_index, uint16_t *offset) {
-	*block_index = (ref & 0x0000FFFFFFFF0000) >> 16;
-	*offset = ref & 0x000000000000FFFF;
-}
-uint64_t
-sqsh_inode_ref_from_block(uint32_t block_index, uint16_t offset) {
-	return ((uint64_t)block_index << 16) | offset;
 }

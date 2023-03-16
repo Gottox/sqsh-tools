@@ -75,6 +75,11 @@ sqsh_address_ref_inner_offset(uint64_t ref) {
 	return ref & 0xFFFF;
 }
 
+SQSH_NO_UNUSED static inline uint64_t
+sqsh_address_ref_create(uint32_t outer_offset, uint16_t inner_offset) {
+	return ((uint64_t)outer_offset << 16) | inner_offset;
+}
+
 #ifdef __cplusplus
 }
 #endif
