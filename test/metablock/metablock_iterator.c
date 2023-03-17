@@ -114,8 +114,8 @@ next_twice(void) {
 	free(data);
 }
 
-//static void
-//next_compressed(void) {
+// static void
+// next_compressed(void) {
 //	int rv;
 //	struct SqshArchive sqsh = {0};
 //	struct SqshMetablockIterator iter;
@@ -178,5 +178,5 @@ next_twice(void) {
 DEFINE
 TEST(next_once);
 TEST(next_twice);
-//TEST(next_compressed);
+// TEST(next_compressed);
 DEFINE_END

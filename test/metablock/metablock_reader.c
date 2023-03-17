@@ -128,7 +128,7 @@ advance_overlapping(void) {
 	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload), &target_size);
 
 	rv = sqsh__metablock_reader_init(
-			&cursor, &sqsh,NULL, SQSH_SIZEOF_SUPERBLOCK, target_size);
+			&cursor, &sqsh, NULL, SQSH_SIZEOF_SUPERBLOCK, target_size);
 	assert(rv == 0);
 
 	rv = sqsh__metablock_reader_advance(&cursor, 2, 4);
