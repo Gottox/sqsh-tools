@@ -1,0 +1,4 @@
+# git mailmap (see git-shortlog(1))
+# format: New Name <new@address> Old Name <old@address>
+
+Enno Boland <g@s01.de> Enno T. Boland <g@s01.de>
