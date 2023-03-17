@@ -76,7 +76,10 @@ endif
 
 if get_option('lzo')
 	c_args += '-DCONFIG_LZO'
-	c_args += '-DCONFIG_LZO_HELPER_PATH="@0@/@1@/sqsh-lzo-helper"'.format(get_option('prefix'), get_option('libexecdir'))
+	c_args += '-DCONFIG_LZO_HELPER_PATH="@0@/@1@/sqsh-lzo-helper"'.format(
+		get_option('prefix'),
+		get_option('libexecdir')
+	)
 	lzo_helper = executable('sqsh-lzo-helper',
 		'compression/lzo-helper.c',
 		install: true,
