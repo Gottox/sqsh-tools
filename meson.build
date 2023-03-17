@@ -15,6 +15,8 @@ subdir('include')
 
 subdir('lib')
 
+subdir('man')
+
 if get_option('default_library') == 'both'
 	libsqsh = libsqsh.get_static_lib()
 endif

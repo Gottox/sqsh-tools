@@ -1,0 +1,73 @@
+.TH sqsh-cat 1 "March 17, 2023" "Version @VERSION@" "User Commands"
+
+.SH NAME
+sqsh-cat - print the contents of one or more files of a squashfs 
+archive.
+
+.SH SYNOPSIS
+.B sqsh-cat
+[\fIFILESYSTEM\fR]
+[\fIPATH ...\fR]
+.br
+.B sqsh-cat
+[\fB-v\fR]
+
+.SH DESCRIPTION
+.B sqsh-cat
+is a tool that reads one or more files from a squashfs archive and 
+prints their contents to standard output.
+
+The first form of the command takes one or more file paths relative to 
+the root of the filesystem in the squashfs archive specified by 
+\fIFILESYSTEM\fR, and prints their contents to standard output.
+
+The second form of the command prints version information to standard 
+output.
+
+.SH OPTIONS
+.TP
+.BR -v
+Print the version of \fBsqsh-cat\fR and exit.
+
+.SH ARGUMENTS
+.TP
+.BR FILESYSTEM
+The path to the squashfs archive containing the files to be printed.
+
+.TP
+.BR PATH
+The path(s) to the file(s) within the squashfs archive to be printed. 
+Multiple paths may be specified.
+
+.SH EXIT STATUS
+The \fBsqsh-cat\fR command exits with 0 on success, and non-zero on 
+failure.
+
+.SH EXAMPLES
+To print the contents of a single file within a squashfs archive:
+
+.BR sqsh-cat " " /path/to/filesystem.sqsh " " /path/to/file.txt
+
+To print the contents of multiple files within a squashfs archive:
+
+.BR sqsh-cat " " /path/to/filesystem.sqsh " " /path/to/file1.txt " " /path/to/file2.txt
+
+To print the version of \fBsqsh-cat\fR:
+
+.BR sqsh-cat " -v "
+
+.SH SEE ALSO
+.BR sqsh-ls (1),
+.BR sqsh-mount (1),
+.BR sqsh-stat (1),
+.BR sqsh-unpack (1),
+.BR sqsh-xattr (1),
+.BR squashfs (5)
+
+.SH AUTHOR
+Written by Enno Boland.
+
+.SH COPYRIGHT
+Copyright (C) 2023 Enno Boland. This is free software; see the source 
+for copying conditions. There is NO warranty; not even for 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

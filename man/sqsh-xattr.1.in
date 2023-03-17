@@ -1,0 +1,61 @@
+.TH sqsh-xattr 1 "March 17, 2023" "Version @VERSION@" "User Commands"
+
+.SH NAME
+sqsh-xattr \- list extended attributes of files in a squashfs archive.
+
+.SH SYNOPSIS
+.B sqsh-xattr
+[\fB-v\fR]
+\fIFILESYSTEM\fR \fIPATH...\fR
+
+.SH DESCRIPTION
+.B sqsh-xattr
+is a tool to list extended attributes of files in a squashfs archive.
+
+The command operates in read-only mode.
+
+.SH OPTIONS
+.TP
+.BR \-v
+Print the version of \fBsqsh-xattr\fR.
+
+.SH ARGUMENTS
+.TP
+.BR FILESYSTEM
+The path to the squashfs archive to list extended attributes from.
+
+.TP
+.BR PATH
+The path(s) of the file(s) to list extended attributes from. Multiple 
+paths can be specified.
+
+.SH EXIT STATUS
+The \fBsqsh-xattr\fR command exits with 0 on success, and non-zero on 
+failure.
+
+.SH EXAMPLES
+To list extended attributes of a file at 
+/path/to/filesystem.sqsh:/path/to/file:
+.BR sqsh-xattr " " /path/to/filesystem.sqsh /path/to/file
+
+To list extended attributes of multiple files at once:
+.BR sqsh-xattr " " /path/to/filesystem.sqsh /path/to/file1 /path/to/file2
+
+To print the version of \fBsqsh-xattr\fR:
+.BR sqsh-xattr " " -v
+
+.SH SEE ALSO
+.BR sqsh-cat (1),
+.BR sqsh-ls (1),
+.BR sqsh-mount (1),
+.BR sqsh-stat (1),
+.BR sqsh-unpack (1),
+.BR squashfs (5)
+
+.SH AUTHOR
+Written by Enno Boland.
+
+.SH COPYRIGHT
+Copyright (C) 2023 Enno Boland. This is free software; see the source 
+for copying conditions. There is NO warranty; not even for 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

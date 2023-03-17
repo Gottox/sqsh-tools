@@ -1,0 +1,90 @@
+.TH sqsh-ls 1 "March 17, 2023" "Version @VERSION@" "User Commands"
+
+.SH NAME
+sqsh-ls \- list files and directories in a squashfs archive.
+
+.SH SYNOPSIS
+.B sqsh-ls
+[\fB-r\fR]
+[\fB-l\fR]
+\fIFILESYSTEM\fR
+[\fIPATH\fR]
+.br
+.B sqsh-ls
+[\fB-v\fR]
+
+.SH DESCRIPTION
+.B sqsh-ls
+is a tool that lists the contents of a squashfs archive. By default, it 
+lists the files and directories in the root directory of the archive.
+
+If a \fIPATH\fR is specified, it lists the contents of that directory 
+within the archive.
+
+.SH OPTIONS
+.TP
+.BR \-r
+Recursively list the contents of all subdirectories within the 
+specified path.
+
+.TP
+.BR \-l
+Print a long format listing of files and directories, similar to the 
+output of the \fBls -l\fR command.
+
+.TP
+.BR \-v
+Print the version of \fBsqsh-ls\fR and exit.
+
+.SH ARGUMENTS
+.TP
+.BR FILESYSTEM
+The path to the squashfs archive to list the contents of.
+
+.TP
+.BR PATH
+Optional. The path to the directory within the archive to list the 
+contents of.
+
+.SH EXIT STATUS
+The \fBsqsh-ls\fR command exits with 0 on success, and non-zero on 
+failure.
+
+.SH EXAMPLES
+To list the contents of the root directory of a squashfs archive:
+
+.BR sqsh-ls " " /path/to/filesystem.sqsh
+
+To list the contents of a directory within a squashfs archive:
+
+.BR sqsh-ls " " /path/to/filesystem.sqsh " " /path/to/directory/
+
+To recursively list the contents of a directory within a squashfs 
+archive:
+
+.BR sqsh-ls " " -r " " /path/to/filesystem.sqsh " " /path/to/directory/
+
+To list the contents of a directory within a squashfs archive in long 
+format:
+
+.BR sqsh-ls " " -l " " /path/to/filesystem.sqsh " " /path/to/directory/
+
+To print the version of \fBsqsh-ls\fR:
+
+.BR sqsh-ls " " -v
+
+.SH SEE ALSO
+.BR sqsh-cat (1),
+.BR sqsh-mount (1),
+.BR sqsh-stat (1),
+.BR sqsh-unpack (1),
+.BR sqsh-xattr (1),
+.BR squashfs (5)
+
+.SH AUTHOR
+Written by Enno Boland.
+
+.SH COPYRIGHT
+Copyright (C) 2023 Enno Boland. This is free software; see the source 
+for copying conditions. There is NO warranty; not even for 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

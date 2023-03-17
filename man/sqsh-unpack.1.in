@@ -1,0 +1,94 @@
+.TH sqsh-unpack 1 "March 17, 2023" "Version @VERSION@" "User Commands"
+
+.SH NAME
+sqsh-unpack \- extract files and directories from a squashfs archive.
+
+.SH SYNOPSIS
+.B sqsh-unpack
+[\fB-cV\fR]
+\fIFILESYSTEM\fR
+[\fIPATH\fR]
+[\fITARGET DIR\fR]
+.br
+.B sqsh-unpack
+[\fB-v\fR]
+
+.SH DESCRIPTION
+.B sqsh-unpack
+is a tool to extract files and directories from a squashfs archive.
+
+The extracted files and directories are written to the \fITARGET 
+DIR\fR, or the current directory if no \fITARGET DIR\fR is specified. 
+
+If no \fIPATH\fR is specified, it extracts all files and directories in 
+the archive.
+
+.SH OPTIONS
+.TP
+.BR \-c
+Change the owner and group of extracted files to match the user and 
+group ID of the current user.
+
+.TP
+.BR \-V
+Print more verbose output during unpacking.
+
+.SH ARGUMENTS
+.TP
+.BR FILESYSTEM
+The path to the squashfs archive to extract files from.
+
+.TP
+.BR PATH
+Optional. The path within the archive to extract. If not specified, all 
+files and directories in the archive will be extracted.
+
+.TP
+.BR TARGET DIR
+Optional. The directory to extract files to. If not specified, files 
+and directories will be extracted to the current directory.
+
+.SH EXIT STATUS
+The \fBsqsh-unpack\fR command exits with 0 on success, and non-zero on 
+failure.
+
+.SH EXAMPLES
+To extract all files and directories from a squashfs archive to the 
+current directory:
+
+.BR sqsh-unpack " " /path/to/filesystem.sqsh
+
+To extract a specific file or directory from a squashfs archive to the 
+current directory:
+
+.BR sqsh-unpack " " /path/to/filesystem.sqsh " " /path/to/file
+
+To extract a specific file or directory from a squashfs archive to a 
+target directory:
+
+.BR sqsh-unpack " " /path/to/filesystem.sqsh " " /path/to/file " " /path/to/target/directory/
+
+To extract all files and directories from a squashfs archive and change 
+the owner and group to match the current user:
+
+.BR sqsh-unpack " " -c " " /path/to/filesystem.sqsh 
+
+To print the version of \fBsqsh-unpack\fR:
+
+.BR sqsh-unpack " " -v
+
+.SH SEE ALSO
+.BR sqsh-cat (1),
+.BR sqsh-ls (1),
+.BR sqsh-mount (1),
+.BR sqsh-stat (1),
+.BR sqsh-xattr (1),
+.BR squashfs (5)
+
+.SH AUTHOR
+Written by Enno Boland.
+
+.SH COPYRIGHT
+Copyright (C) 2023 Enno Boland. This is free software; see the source 
+for copying conditions. There is NO warranty; not even for 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
