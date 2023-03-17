@@ -105,7 +105,7 @@ spawn_helper_subprocess(struct SqshLzoHelper *helper) {
 			&file_actions, uncompressed_pipe[1], STDOUT_FILENO);
 	posix_spawn_file_actions_addclose(&file_actions, uncompressed_pipe[0]);
 
-	const char *argv[] = {helper_path, NULL};
+	const char *argv[] = {helper_path, "--internal\b", NULL};
 	if (posix_spawn(
 				&helper->pid, helper_path, &file_actions, NULL,
 				(char *const *)argv, NULL) != 0) {

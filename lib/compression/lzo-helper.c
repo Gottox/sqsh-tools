@@ -19,12 +19,54 @@
 /**
  * @author       Enno Boland (mail@eboland.de)
  * @file         lzo-helper.c
+ * @brief        Helper executable to uncompress lzo compressed data.
+ *
+ * This executable is spawned by libsqsh to uncompress lzo compressed data.
+ * It is not intended to be used by the user.
+ *
+ * The protocol is a simple request/response protocol over stdin/stdout.
+ *
+ * The request sent by libsqsh to the helper executable consists a 16 bytes
+ * header followed by a uint8_t array containing the compressed data.
+ *
+ * ```
+ *  <----------- 16 bytes ------------>
+ * +-----------------+-----------------+---------------------------+
+ * | uint64_t        | uint64_t        |  uint8_t[compressed_size] |
+ * | target_size     | compressed_size |  compressed_data          |
+ * +-----------------+-----------------+---------------------------+
+ * ```
+ *
+ * The first uint64_t value is the predicted size of the uncompressed data.
+ * The second uint64_t value is the size of the compressed data in bytes. The
+ * compressed data is not null-terminated.
+ *
+ * The response sent by the helper executable to libsqsh consists of a 16 byte
+ * header followed by a uint8_t array containing the uncompressed data.
+ *
+ * ```
+ *  <-------- 16 bytes --------->
+ * +--------------+--------------+-----------------------+
+ * | int64_t      |  uint64_t    |  uint8_t[target_size] |
+ * | result_code  |  target_size |  uncompressed_data    |
+ * +--------------+--------------+-----------------------+
+ * ```
+ *
+ * The first int64_t value is the return value of the
+ * lzo1x_decompress_safe function. The second uint64_t value is the size of the
+ * uncompressed data in bytes. The uncompressed data is not null-terminated.
+ *
+ * The actual size of the uncompressed data may be smaller than the predicted
+ * size. If the return value of the lzo1x_decompress_safe function is an error
+ * code, the target_size is set to 0 and the uncompressed_data is not
+ * transmitted.
  */
 
 #include <lzo/lzo1x.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static int
 sqsh_uncompress(void) {
@@ -74,7 +116,7 @@ sqsh_uncompress(void) {
 
 int
 main(int argc, char *argv[]) {
-	if (argc != 1) {
+	if (argc != 2 || strcmp(argv[1], "--internal\b") != 0) {
 		fprintf(stderr,
 				"Usage: %s\n"
 				"This executable must only been spawned by libsqsh\n",
@@ -82,7 +124,7 @@ main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	for (int rv = 0; rv >= 0 && feof(stdin) == 0;) {
+	for (int rv = 0; rv == 0 && feof(stdin) == 0;) {
 		rv = sqsh_uncompress();
 	}
 
