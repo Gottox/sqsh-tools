@@ -52,6 +52,7 @@ decompress(void) {
 
 	rv = sqsh__compression_init(&compression, SQSH_COMPRESSION_GZIP, 4096);
 	uint8_t *data = mk_stub(&archive, payload, sizeof(payload), &target_size);
+	assert(rv == 0);
 
 	rv = sqsh__compression_manager_init(
 			&manager, &archive, &compression, 0, target_size, 0);
