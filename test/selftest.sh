@@ -13,8 +13,8 @@ tmpdir=$(mktemp -d)
 PACKED="$tmpdir/squashfs-packed.img"
 UNPACKED="$tmpdir/squashfs-unpacked.img"
 
-mksquashfs .git "$PACKED" -noappend -keep-as-directory
-mksquashfs .git "$UNPACKED" -noappend -keep-as-directory -noI -noId -noD -noF -noX
+$MKSQUASHFS .git "$PACKED" -noappend -keep-as-directory
+$MKSQUASHFS .git "$UNPACKED" -noappend -keep-as-directory -noI -noId -noD -noF -noX
 
 $SQSH_LS -r "$PACKED" . > "$tmpdir"/packed.list
 $SQSH_LS -r "$UNPACKED" . > "$tmpdir"/unpacked.list

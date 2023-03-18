@@ -335,6 +335,7 @@ sqshfuse_read(
 		const char *path, char *buf, size_t size, off_t offset,
 		struct fuse_file_info *fi) {
 	(void)fi;
+	printf("sqshfuse_read: %s\n", path);
 	int rv = 0;
 	struct SqshInodeContext *inode = NULL;
 	struct SqshFileContext *file = NULL;
@@ -352,8 +353,9 @@ sqshfuse_read(
 		goto out;
 	}
 
-	if (size < sqsh_inode_file_size(inode)) {
-		size = sqsh_inode_file_size(inode);
+	uint64_t file_size = sqsh_inode_file_size(inode);
+	if (size > file_size) {
+		size = file_size;
 	}
 	rv = sqsh_file_seek(file, offset);
 	if (rv < 0) {
