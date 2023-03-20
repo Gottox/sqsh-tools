@@ -29,48 +29,50 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         compression_manager.c
+ * @file         inode.c
  */
 
 #include "../common.h"
 #include "../test.h"
 
 #include "../../include/sqsh_archive_private.h"
-#include "../../include/sqsh_compression_private.h"
 #include "../../include/sqsh_data.h"
-#include "../../include/sqsh_mapper_private.h"
+#include "../../include/sqsh_inode_private.h"
+#include "../../lib/utils.h"
+#include "sqsh_inode.h"
+#include <stdint.h>
 
 static void
-decompress(void) {
+load_inode() {
 	int rv;
 	struct SqshArchive archive = {0};
-	struct SqshCompression compression = {0};
-	struct SqshCompressionManager manager = {0};
-	const struct SqshBuffer *buffer = NULL;
-	uint8_t payload[] = {SQSH_HEADER, ZLIB_ABCD};
+	struct SqshInodeContext inode = {0};
+	uint8_t payload[2048] = {
+			SQSH_HEADER,
+			/* inode */
+			[1024] = METABLOCK_HEADER(0, 128),
+			0,
+			0,
+			0,
+			INODE_HEADER(2, 0, 0, 0, 0, 1),
+			INODE_BASIC_FILE(1024, 0xFFFFFFFF, 0, 1),
+			UINT32_BYTES(42),
 
-	rv = sqsh__compression_init(&compression, SQSH_COMPRESSION_GZIP, 4096);
+	};
 	mk_stub(&archive, payload, sizeof(payload));
+
+	uint64_t inode_ref = sqsh_address_ref_create(1024, 3);
+	rv = sqsh__inode_init(&inode, &archive, inode_ref);
 	assert(rv == 0);
 
-	rv = sqsh__compression_manager_init(
-			&manager, &archive, &compression, 0, sizeof(payload), 10);
-	assert(rv == 0);
+	assert(sqsh_inode_type(&inode) == SQSH_INODE_TYPE_FILE);
+	assert(sqsh_inode_file_blocks_start(&inode) == 1024);
+	assert(sqsh_inode_file_has_fragment(&inode) == false);
 
-	rv = sqsh__compression_manager_get(
-			&manager, SQSH_SIZEOF_SUPERBLOCK,
-			sizeof(payload) - SQSH_SIZEOF_SUPERBLOCK, &buffer);
-	assert(rv == 0);
-	assert(buffer != NULL);
-	assert(sqsh__buffer_size(buffer) == 4);
-	assert(memcmp(sqsh__buffer_data(buffer), "abcd", 4) == 0);
-
-	sqsh__compression_manager_release(&manager, buffer);
-	sqsh__compression_manager_cleanup(&manager);
-	sqsh__compression_cleanup(&compression);
-	sqsh__archive_cleanup(&archive);
+	assert(sqsh_inode_file_block_count(&inode) == 1);
+	assert(sqsh_inode_file_block_size(&inode, 0) == 42);
 }
 
 DEFINE
-TEST(decompress);
+TEST(load_inode);
 DEFINE_END

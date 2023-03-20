@@ -46,14 +46,13 @@ next_once(void) {
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
 	uint8_t payload[] = {
-			METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
+			SQSH_HEADER, METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
 	};
 	const uint8_t *p;
-	size_t target_size;
-	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload), &target_size);
+	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_iterator_init(
-			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, target_size);
+			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
 	assert(rv == 0);
 
 	rv = sqsh__metablock_iterator_next(&iter);
@@ -69,7 +68,6 @@ next_once(void) {
 	assert(rv == 0);
 
 	sqsh__archive_cleanup(&sqsh);
-	free(data);
 }
 
 static void
@@ -78,15 +76,15 @@ next_twice(void) {
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
 	uint8_t payload[] = {
-			METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
-			METABLOCK_HEADER(0, 4), 'e', 'f', 'g', 'h',
+			SQSH_HEADER, METABLOCK_HEADER(0, 4), 'a', 'b', 'c',
+			'd',         METABLOCK_HEADER(0, 4), 'e', 'f', 'g',
+			'h',
 	};
 	const uint8_t *p;
-	size_t target_size;
-	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload), &target_size);
+	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_iterator_init(
-			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, target_size);
+			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
 	assert(rv == 0);
 
 	rv = sqsh__metablock_iterator_next(&iter);
@@ -111,7 +109,6 @@ next_twice(void) {
 	assert(rv == 0);
 
 	sqsh__archive_cleanup(&sqsh);
-	free(data);
 }
 
 // static void
@@ -120,6 +117,7 @@ next_twice(void) {
 //	struct SqshArchive sqsh = {0};
 //	struct SqshMetablockIterator iter;
 //	uint8_t payload[] = {
+//		SQSH_HEADER,
 //			METABLOCK_HEADER(1, CHUNK_SIZE(ZLIB_ABCD)),
 //			ZLIB_ABCD,
 //			METABLOCK_HEADER(1, CHUNK_SIZE(ZLIB_EFGH)),

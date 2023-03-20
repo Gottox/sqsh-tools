@@ -42,18 +42,29 @@
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 #	define UINT16_BYTES(x) (uint8_t)(x), (uint8_t)((x) >> 8)
 #	define UINT32_BYTES(x) \
-		UINT16_BYTES((uint16_t)(x)), UINT16_BYTES((uint16_t)((x) >> 8))
+		UINT16_BYTES((uint16_t)(x)), UINT16_BYTES((uint16_t)((x) >> 16))
 #	define UINT64_BYTES(x) \
-		UINT32_BYTES((uint32_t)(x)), UINT32_BYTES((uint32_t)((x) >> 8))
+		UINT32_BYTES((uint32_t)(x)), UINT32_BYTES((uint32_t)((x) >> 32))
 #else
 #	define UINT16_BYTES(x) (uint8_t)((x) >> 8), (uint8_t)(x)
 #	define UINT32_BYTES(x) \
-		UINT16_BYTES((uint16_t)((x) >> 8)), UINT16_BYTES((uint16_t)(x))
+		UINT16_BYTES((uint16_t)((x) >> 16)), UINT16_BYTES((uint16_t)(x))
 #	define UINT64_BYTES(x) \
-		UINT32_BYTES((uint16_t)((x) >> 8)), UINT16_BYTES((uint16_t)(x))
+		UINT32_BYTES((uint16_t)((x) >> 32)), UINT16_BYTES((uint16_t)(x))
 #endif
 
+#define SQSH_HEADER \
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+			0, 0, 0, 0, 0
 #define METABLOCK_HEADER(c, s) UINT16_BYTES(((c) ? 0 : 0x8000) + (s))
+#define INODE_HEADER(t, p, uid, gid, mtime, nbr) \
+	UINT16_BYTES(t), UINT16_BYTES(p), UINT16_BYTES(uid), UINT16_BYTES(gid), \
+			UINT32_BYTES(mtime), UINT32_BYTES(nbr)
+#define INODE_BASIC_FILE(bs, fi, bo, fs) \
+	UINT32_BYTES(bs), UINT32_BYTES(fi), UINT32_BYTES(bo), UINT32_BYTES(fs)
 
 #define ZLIB_ABCD \
 	0x78, 0x9c, 0x4b, 0x4c, 0x4a, 0x4e, 0x01, 0x00, 0x03, 0xd8, 0x01, 0x8b
@@ -75,8 +86,7 @@
 
 #define LENGTH(x) (sizeof(x) / sizeof(x[0]))
 
-uint8_t *
-mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size,
-		size_t *target_size);
+const uint8_t *
+mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size);
 
 #endif /* !COMMON_H */

@@ -4,6 +4,8 @@
  * @created     : Saturday Feb 18, 2023 14:06:14 CET
  */
 
+#define _DEFAULT_SOURCE
+
 #include "common.h"
 
 #include "../include/sqsh_archive_private.h"
@@ -12,10 +14,10 @@
 #include <sqsh_mapper.h>
 
 #include <assert.h>
+#include <endian.h>
 
-uint8_t *
-mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size,
-		size_t *target_size) {
+const uint8_t *
+mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size) {
 	int rv;
 	struct SqshDataSuperblock superblock = {
 			.magic = SQSH_SUPERBLOCK_MAGIC,
@@ -30,7 +32,7 @@ mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size,
 			.version_major = 4,
 			.version_minor = 0,
 			.root_inode_ref = 0,
-			.bytes_used = SQSH_SIZEOF_SUPERBLOCK + payload_size,
+			.bytes_used = htole64(payload_size),
 			.id_table_start = 0,
 			.xattr_id_table_start = 0,
 			.inode_table_start = 0,
@@ -39,14 +41,11 @@ mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size,
 			.export_table_start = 0,
 	};
 
-	uint8_t *data = (uint8_t *)malloc(SQSH_SIZEOF_SUPERBLOCK + payload_size);
-	memcpy(data, &superblock, SQSH_SIZEOF_SUPERBLOCK);
-	memcpy(&data[SQSH_SIZEOF_SUPERBLOCK], payload, payload_size);
+	memcpy(payload, &superblock, SQSH_SIZEOF_SUPERBLOCK);
 
-	*target_size = SQSH_SIZEOF_SUPERBLOCK + payload_size;
-	const struct SqshConfig config = DEFAULT_CONFIG(*target_size);
-	rv = sqsh__archive_init(sqsh, data, &config);
+	const struct SqshConfig config = DEFAULT_CONFIG(payload_size);
+	rv = sqsh__archive_init(sqsh, payload, &config);
 	assert(0 == rv);
 	(void)rv;
-	return data;
+	return payload;
 }

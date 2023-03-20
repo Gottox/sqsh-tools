@@ -46,14 +46,14 @@ advance_once(void) {
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor = {0};
 	uint8_t payload[] = {
+		SQSH_HEADER,
 			METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
 	};
 	const uint8_t *p;
-	size_t target_size;
-	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload), &target_size);
+	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_reader_init(
-			&cursor, &sqsh, NULL, SQSH_SIZEOF_SUPERBLOCK, target_size);
+			&cursor, &sqsh, NULL, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
 	assert(rv == 0);
 
 	rv = sqsh__metablock_reader_advance(&cursor, 0, 4);
@@ -69,7 +69,6 @@ advance_once(void) {
 	assert(rv == 0);
 
 	sqsh__archive_cleanup(&sqsh);
-	free(data);
 }
 
 static void
@@ -78,15 +77,15 @@ advance_twice(void) {
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor = {0};
 	uint8_t payload[] = {
+		SQSH_HEADER,
 			METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
 			METABLOCK_HEADER(0, 4), 'e', 'f', 'g', 'h',
 	};
 	const uint8_t *p;
-	size_t target_size;
-	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload), &target_size);
+	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_reader_init(
-			&cursor, &sqsh, NULL, SQSH_SIZEOF_SUPERBLOCK, target_size);
+			&cursor, &sqsh, NULL, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
 	assert(rv == 0);
 
 	rv = sqsh__metablock_reader_advance(&cursor, 0, 4);
@@ -111,7 +110,6 @@ advance_twice(void) {
 	assert(rv == 0);
 
 	sqsh__archive_cleanup(&sqsh);
-	free(data);
 }
 
 static void
@@ -120,15 +118,15 @@ advance_overlapping(void) {
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor;
 	uint8_t payload[] = {
+		SQSH_HEADER,
 			METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
 			METABLOCK_HEADER(0, 4), 'e', 'f', 'g', 'h',
 	};
 	const uint8_t *p;
-	size_t target_size;
-	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload), &target_size);
+	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_reader_init(
-			&cursor, &sqsh, NULL, SQSH_SIZEOF_SUPERBLOCK, target_size);
+			&cursor, &sqsh, NULL, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
 	assert(rv == 0);
 
 	rv = sqsh__metablock_reader_advance(&cursor, 2, 4);
@@ -144,7 +142,6 @@ advance_overlapping(void) {
 	assert(rv == 0);
 
 	sqsh__archive_cleanup(&sqsh);
-	free(data);
 }
 
 DEFINE
