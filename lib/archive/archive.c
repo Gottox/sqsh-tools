@@ -45,6 +45,7 @@ enum InitializedBitmap {
 	INITIALIZED_EXPORT_TABLE = 1 << 1,
 	INITIALIZED_XATTR_TABLE = 1 << 2,
 	INITIALIZED_FRAGMENT_TABLE = 1 << 3,
+	INITIALIZED_FILE_COMPRESSION_MANAGER = 1 << 4,
 };
 
 static bool
@@ -128,6 +129,32 @@ sqsh_archive_config(const struct SqshArchive *archive) {
 const struct SqshSuperblockContext *
 sqsh_archive_superblock(const struct SqshArchive *archive) {
 	return &archive->superblock;
+}
+
+int
+sqsh__archive_file_compression_manager(
+		struct SqshArchive *archive,
+		struct SqshCompressionManager **file_compression_manager) {
+	int rv = 0;
+
+	if (!is_initialized(archive, INITIALIZED_FILE_COMPRESSION_MANAGER)) {
+		const struct SqshSuperblockContext *superblock =
+				sqsh_archive_superblock(archive);
+		const uint64_t bytes_used = sqsh_superblock_bytes_used(superblock);
+		const size_t capacity =
+				bytes_used / sqsh_superblock_block_size(superblock);
+
+		rv = sqsh__compression_manager_init(
+				&archive->file_compression_manager, archive,
+				&archive->data_compression, 0, bytes_used, capacity);
+		if (rv < 0) {
+			goto out;
+		}
+		archive->initialized |= INITIALIZED_FILE_COMPRESSION_MANAGER;
+	}
+	*file_compression_manager = &archive->file_compression_manager;
+out:
+	return rv;
 }
 
 int
