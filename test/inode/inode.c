@@ -43,7 +43,7 @@
 #include <stdint.h>
 
 static void
-load_inode() {
+load_inode(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshInodeContext inode = {0};
