@@ -65,6 +65,8 @@
 			UINT32_BYTES(mtime), UINT32_BYTES(nbr)
 #define INODE_BASIC_FILE(bs, fi, bo, fs) \
 	UINT32_BYTES(bs), UINT32_BYTES(fi), UINT32_BYTES(bo), UINT32_BYTES(fs)
+#define DATA_BLOCK_REF(size, compressed) \
+	UINT32_BYTES(size | (compressed ? 0x0 : (1 << 24)))
 
 #define ZLIB_ABCD \
 	0x78, 0x9c, 0x4b, 0x4c, 0x4a, 0x4e, 0x01, 0x00, 0x03, 0xd8, 0x01, 0x8b

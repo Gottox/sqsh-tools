@@ -29,7 +29,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         inode.c
+ * @file         file_reader.c
  */
 
 #include "../common.h"
@@ -39,38 +39,87 @@
 #include "../../include/sqsh_data.h"
 #include "../../include/sqsh_inode_private.h"
 #include "../../lib/utils.h"
+#include "sqsh_file.h"
 
 static void
-load_inode(void) {
+load_file_from_compressed_data_block(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshInodeContext inode = {0};
-	uint8_t payload[2048] = {
+	uint8_t payload[4096] = {
 			SQSH_HEADER,
 			/* inode */
-			[1024] = METABLOCK_HEADER(0, 128),
-			0,
-			0,
-			0,
+			[256] = METABLOCK_HEADER(0, 128), 0, 0, 0,
 			INODE_HEADER(2, 0, 0, 0, 0, 1),
-			INODE_BASIC_FILE(1024, 0xFFFFFFFF, 0, 1),
-			UINT32_BYTES(42),
-
-	};
+			INODE_BASIC_FILE(512, 0xFFFFFFFF, 0, 4),
+			DATA_BLOCK_REF(sizeof((uint8_t[]){ZLIB_ABCD}), 1),
+			/* datablock */
+			[512] = ZLIB_ABCD};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	uint64_t inode_ref = sqsh_address_ref_create(1024, 3);
+	uint64_t inode_ref = sqsh_address_ref_create(256, 3);
 	rv = sqsh__inode_init(&inode, &archive, inode_ref);
 	assert(rv == 0);
 
 	assert(sqsh_inode_type(&inode) == SQSH_INODE_TYPE_FILE);
-	assert(sqsh_inode_file_blocks_start(&inode) == 1024);
 	assert(sqsh_inode_file_has_fragment(&inode) == false);
 
-	assert(sqsh_inode_file_block_count(&inode) == 1);
-	assert(sqsh_inode_file_block_size(&inode, 0) == 42);
+	struct SqshFileReader reader = {0};
+	rv = sqsh__file_reader_init(&reader, &inode);
+	assert(rv == 0);
+
+	rv = sqsh_file_reader_advance(&reader, 0, 4);
+	assert(rv == 0);
+
+	size_t size = sqsh_file_reader_size(&reader);
+	assert(size == 4);
+	const uint8_t *data = sqsh_file_reader_data(&reader);
+	assert(data[0] == 'a');
+	assert(data[1] == 'b');
+	assert(data[2] == 'c');
+	assert(data[3] == 'd');
+}
+
+static void
+load_file_from_uncompressed_data_block(void) {
+	int rv;
+	struct SqshArchive archive = {0};
+	struct SqshInodeContext inode = {0};
+	uint8_t payload[4096] = {
+			SQSH_HEADER,
+			/* inode */
+			[256] = METABLOCK_HEADER(0, 128), 0, 0, 0,
+			INODE_HEADER(2, 0, 0, 0, 0, 1),
+			INODE_BASIC_FILE(512, 0xFFFFFFFF, 0, 5), DATA_BLOCK_REF(5, 0),
+			/* datablock */
+			[512] = 1, 2, 3, 4, 5};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	uint64_t inode_ref = sqsh_address_ref_create(256, 3);
+	rv = sqsh__inode_init(&inode, &archive, inode_ref);
+	assert(rv == 0);
+
+	assert(sqsh_inode_type(&inode) == SQSH_INODE_TYPE_FILE);
+	assert(sqsh_inode_file_has_fragment(&inode) == false);
+
+	struct SqshFileReader reader = {0};
+	rv = sqsh__file_reader_init(&reader, &inode);
+	assert(rv == 0);
+
+	rv = sqsh_file_reader_advance(&reader, 0, 5);
+	assert(rv == 0);
+
+	size_t size = sqsh_file_reader_size(&reader);
+	assert(size == 5);
+	const uint8_t *data = sqsh_file_reader_data(&reader);
+	assert(data[0] == 1);
+	assert(data[1] == 2);
+	assert(data[2] == 3);
+	assert(data[3] == 4);
+	assert(data[4] == 5);
 }
 
 DEFINE
-TEST(load_inode);
+TEST(load_file_from_uncompressed_data_block);
+TEST(load_file_from_compressed_data_block);
 DEFINE_END
