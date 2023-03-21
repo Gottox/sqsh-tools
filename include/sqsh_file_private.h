@@ -87,7 +87,6 @@ struct SqshFileReader {
 	/**
 	 * @privatesection
 	 */
-	struct SqshFragmentTable *fragment_table;
 	const struct SqshCompression *compression;
 	const struct SqshSuperblockContext *superblock;
 	struct SqshMapManager *map_manager;

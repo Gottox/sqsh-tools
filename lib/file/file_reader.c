@@ -53,19 +53,12 @@ find_block_address(
 int
 sqsh__file_reader_init(
 		struct SqshFileReader *reader, const struct SqshInodeContext *inode) {
-	int rv = 0;
-	struct SqshArchive *archive = inode->sqsh;
 	reader->inode = inode;
 	reader->compression = sqsh_archive_compression_data(inode->sqsh);
 	reader->superblock = sqsh_archive_superblock(inode->sqsh);
 	reader->map_manager = sqsh_archive_map_manager(inode->sqsh);
-	rv = sqsh_archive_fragment_table(archive, &reader->fragment_table);
-	if (rv < 0) {
-		goto out;
-	}
 
-out:
-	return rv;
+	return 0;
 }
 
 struct SqshFileReader *
@@ -105,15 +98,27 @@ SQSH_NO_UNUSED static int
 file_map_fragment(
 		struct SqshFileReader *reader, sqsh_index_t block_offset, size_t size) {
 	const struct SqshInodeContext *inode = reader->inode;
+	struct SqshArchive *archive = inode->sqsh;
+	struct SqshFragmentTable *fragment_table;
 	sqsh_index_t end_offset;
 	int rv;
+
+	if (sqsh_inode_file_has_fragment(inode) == false) {
+		// rv = -SQSH_ERROR_INVALID_FILE;
+		rv = -SQSH_ERROR_TODO;
+		goto out;
+	}
+
+	rv = sqsh_archive_fragment_table(archive, &fragment_table);
+	if (rv < 0) {
+		goto out;
+	}
 
 	sqsh__buffer_drain(&reader->buffer);
 	sqsh__map_reader_cleanup(&reader->map_reader);
 
 	// TODO: implement direct mapping to the fragment table.
-	rv = sqsh_fragment_table_to_buffer(
-			reader->fragment_table, inode, &reader->buffer);
+	rv = sqsh_fragment_table_to_buffer(fragment_table, inode, &reader->buffer);
 	if (rv < 0) {
 		goto out;
 	}
@@ -236,8 +241,25 @@ file_map_buffered(
 	}
 
 	if (sqsh__buffer_size(&reader->buffer) < target_size) {
-		rv = sqsh_fragment_table_to_buffer(
-				reader->fragment_table, inode, &reader->buffer);
+		if (sqsh_inode_file_has_fragment(inode)) {
+			struct SqshArchive *archive = inode->sqsh;
+			struct SqshFragmentTable *fragment_table;
+
+			rv = sqsh_archive_fragment_table(archive, &fragment_table);
+			if (rv < 0) {
+				goto out;
+			}
+
+			rv = sqsh_fragment_table_to_buffer(
+					fragment_table, inode, &reader->buffer);
+			if (rv < 0) {
+				goto out;
+			}
+		} else {
+			// rv = -SQSH_ERROR_INVALID_FILE;
+			rv = -SQSH_ERROR_TODO;
+			goto out;
+		}
 	}
 
 	const uint8_t *buffer_data = sqsh__buffer_data(&reader->buffer);
@@ -266,8 +288,7 @@ check_bounds(
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
-	if (SQSH_ADD_OVERFLOW(
-				content_begin_offset, size, &content_end_offset)) {
+	if (SQSH_ADD_OVERFLOW(content_begin_offset, size, &content_end_offset)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
