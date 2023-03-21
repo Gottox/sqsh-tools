@@ -186,8 +186,7 @@ SQSH_NO_UNUSED int sqsh__archive_init(
 		struct SqshArchive *sqsh, const void *source,
 		const struct SqshConfig *config);
 
-int
-sqsh__archive_file_compression_manager(
+int sqsh__archive_file_compression_manager(
 		struct SqshArchive *archive,
 		struct SqshCompressionManager **file_compression_manager);
 

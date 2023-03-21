@@ -116,7 +116,7 @@ sqsh__rc_hash_map_put(
 	sqsh_rc_map_key_t *keys = NULL;
 
 	for (sqsh_index_t i = 0; i < size && i < MAX_COLLISIONS; i++) {
-		index = (index+1) % size;
+		index = (index + 1) % size;
 
 		for (sqsh_index_t j = 0; j < hash_map->hash_map_count; j++) {
 			values = &hash_map->hash_maps[j].values;
