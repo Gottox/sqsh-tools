@@ -81,6 +81,43 @@ load_file_from_compressed_data_block(void) {
 }
 
 static void
+load_file_from_compressed_data_block_with_offset(void) {
+	int rv;
+	struct SqshArchive archive = {0};
+	struct SqshInodeContext inode = {0};
+	uint8_t payload[4096] = {
+			SQSH_HEADER,
+			/* inode */
+			[256] = METABLOCK_HEADER(0, 128), 0, 0, 0,
+			INODE_HEADER(2, 0, 0, 0, 0, 1),
+			INODE_BASIC_FILE(512, 0xFFFFFFFF, 0, 4),
+			DATA_BLOCK_REF(sizeof((uint8_t[]){ZLIB_ABCD}), 1),
+			/* datablock */
+			[512] = ZLIB_ABCD};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	uint64_t inode_ref = sqsh_address_ref_create(256, 3);
+	rv = sqsh__inode_init(&inode, &archive, inode_ref);
+	assert(rv == 0);
+
+	assert(sqsh_inode_type(&inode) == SQSH_INODE_TYPE_FILE);
+	assert(sqsh_inode_file_has_fragment(&inode) == false);
+
+	struct SqshFileReader reader = {0};
+	rv = sqsh__file_reader_init(&reader, &inode);
+	assert(rv == 0);
+
+	rv = sqsh_file_reader_advance(&reader, 1, 2);
+	assert(rv == 0);
+
+	size_t size = sqsh_file_reader_size(&reader);
+	assert(size == 2);
+	const uint8_t *data = sqsh_file_reader_data(&reader);
+	assert(data[0] == 'b');
+	assert(data[1] == 'c');
+}
+
+static void
 load_file_from_uncompressed_data_block(void) {
 	int rv;
 	struct SqshArchive archive = {0};
@@ -122,4 +159,5 @@ load_file_from_uncompressed_data_block(void) {
 DEFINE
 TEST(load_file_from_uncompressed_data_block);
 TEST(load_file_from_compressed_data_block);
+TEST(load_file_from_compressed_data_block_with_offset);
 DEFINE_END
