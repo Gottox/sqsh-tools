@@ -24,7 +24,8 @@ fi
 
 cd "$SOURCE_ROOT"
 
-tmpdir=$(mktemp -p "$BUILD_DIR" -d)
+tmpdir="$BUILD_DIR/repacktest"
+mkdir -p "$tmpdir"
 
 ORIGINAL_IMAGE="$tmpdir/original.img"
 REPACKED_IMAGE="$tmpdir/repacked.img"

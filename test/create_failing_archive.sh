@@ -15,7 +15,8 @@
 
 cd "$SOURCE_ROOT"
 
-tmpdir=$(mktemp -p "$BUILD_DIR" -d)
+tmpdir="$BUILD_DIR/create_failing_archive"
+mkdir -p "$tmpdir"
 
 seq 1 8355841 | grep ".$" -o | tr -d '\n' > "$tmpdir/file"
 

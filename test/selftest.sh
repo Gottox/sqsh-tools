@@ -18,13 +18,15 @@
 
 cd "$SOURCE_ROOT"
 
-tmpdir=$(mktemp -p "$BUILD_DIR" -d)
+
+tmpdir="$BUILD_DIR/repacktest"
+mkdir -p "$tmpdir"
 
 PACKED="$tmpdir/squashfs-packed.img"
 UNPACKED="$tmpdir/squashfs-unpacked.img"
 
-$MKSQUASHFS .git "$PACKED" -noappend -keep-as-directory
-$MKSQUASHFS .git "$UNPACKED" -noappend -keep-as-directory -noI -noId -noD -noF -noX
+$MKSQUASHFS .git "$PACKED" -noappend -keep-as-directory -b 4096
+$MKSQUASHFS .git "$UNPACKED" -noappend -keep-as-directory -b 4096 -noI -noId -noD -noF -noX
 
 $SQSH_LS -r "$PACKED" . > "$tmpdir"/packed.list
 $SQSH_LS -r "$UNPACKED" . > "$tmpdir"/unpacked.list
