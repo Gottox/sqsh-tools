@@ -8,7 +8,11 @@ project(
 		'warning_level=3'
 	],
 	version: '0.2.0',
-	meson_version: '>=0.57'
+	meson_version: '>=0.57',
+	license: [
+		'BSD-2-Clause',
+		'GPL-2.0-only',
+	],
 )
 
 subdir('include')
