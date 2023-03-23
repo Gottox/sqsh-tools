@@ -55,11 +55,12 @@ if get_option('test') == 'extended'
 		files('selftest.sh'),
 		timeout: 60,
 		env: {
+			'BUILD_DIR': meson.current_build_dir(),
 			'MKSQUASHFS': mksquashfs.full_path(),
-			'SQSH_LZO_HELPER_PATH': lzo_helper_path,
-			'SQSH_LS': tools['sqsh-ls'].full_path(),
-			'SQSH_CAT': tools['sqsh-cat'].full_path(),
 			'SOURCE_ROOT': meson.project_source_root(),
+			'SQSH_CAT': tools['sqsh-cat'].full_path(),
+			'SQSH_LS': tools['sqsh-ls'].full_path(),
+			'SQSH_LZO_HELPER_PATH': lzo_helper_path,
 		},
 	)
 
@@ -68,10 +69,23 @@ if get_option('test') == 'extended'
 		timeout: 20,
 		should_fail: true,
 		env: {
+			'BUILD_DIR': meson.current_build_dir(),
 			'MKSQUASHFS': mksquashfs.full_path(),
+			'SOURCE_ROOT': meson.project_source_root(),
 			'SQSH_MOUNT': tools['sqsh-mount'].full_path(),
 			'UNSHARE': unshare.full_path(),
+		},
+	)
+
+	test('create_failing_archive',
+		files('create_failing_archive.sh'),
+		timeout: 20,
+		should_fail: true,
+		env: {
+			'BUILD_DIR': meson.current_build_dir(),
+			'MKSQUASHFS': mksquashfs.full_path(),
 			'SOURCE_ROOT': meson.project_source_root(),
+			'SQSH_CAT': tools['sqsh-cat'].full_path(),
 		},
 	)
 endif

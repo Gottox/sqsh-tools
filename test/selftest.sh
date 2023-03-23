@@ -1,14 +1,24 @@
-#!/bin/sh
+#!/bin/sh -ex
 
-set -ex
+######################################################################
+# @author      : Enno Boland (mail@eboland.de)
+# @file        : repacktest
+# @created     : Friday Mar 17, 2023 15:11:09 CET
+#
+# @description : This script creates a squashfs image, lists all
+#                files and cats them.
+######################################################################
 
-: "${SQSH_LS:?SQSH_LS not set}"
-: "${SQSH_CAT:?SQSH_CAT not set}"
-: "${SOURCE_ROOT:?SOURCE_ROOT not set}"
+: "${BUILD_DIR:?BUILD_DIR is not set}"
+: "${MKSQUASHFS:?MKSQUASHFS is not set}"
+: "${SOURCE_ROOT:?SOURCE_ROOT is not set}"
+: "${SQSH_CAT:?SQSH_CAT is not set}"
+: "${SQSH_LS:?SQSH_LS is not set}"
+: "${SQSH_LZO_HELPER_PATH:?SQSH_LZO_HELPER_PATH is not set}"
 
 cd "$SOURCE_ROOT"
 
-tmpdir=$(mktemp -d)
+tmpdir=$(mktemp -p "$BUILD_DIR" -d)
 
 PACKED="$tmpdir/squashfs-packed.img"
 UNPACKED="$tmpdir/squashfs-unpacked.img"

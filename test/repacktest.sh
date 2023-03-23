@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh -ex
 
 ######################################################################
 # @author      : Enno Boland (mail@eboland.de)
@@ -9,8 +9,11 @@
 #                repacks it from the mounted path.
 ######################################################################
 
-: "{SQSH_MOUNT:?SQSH_MOUNT is not set}"
-: "{UNSHARE:?UNSHARE is not set}"
+: "${BUILD_DIR:?BUILD_DIR is not set}"
+: "${MKSQUASHFS:?MKSQUASHFS is not set}"
+: "${SOURCE_ROOT:?SOURCE_ROOT is not set}"
+: "${SQSH_MOUNT:?SQSH_MOUNT is not set}"
+: "${UNSHARE:?UNSHARE is not set}"
 
 MKSQUASHFS_OPTS="-no-xattrs -noappend"
 
@@ -21,7 +24,7 @@ fi
 
 cd "$SOURCE_ROOT"
 
-tmpdir=$(mktemp -d)
+tmpdir=$(mktemp -p "$BUILD_DIR" -d)
 
 ORIGINAL_IMAGE="$tmpdir/original.img"
 REPACKED_IMAGE="$tmpdir/repacked.img"
