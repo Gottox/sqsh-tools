@@ -17,6 +17,15 @@ sqsh_test = [
 sqsh_test_util = [
 	'util.c',
 ]
+test_c_args = [
+]
+
+cc = meson.get_compiler('c')
+if cc.get_id() == 'gcc'
+	test_c_args += '-Wno-pedantic'
+elif cc.get_id() == 'clang'
+	test_c_args += '-Wno-gnu-designator'
+endif
 
 mksquashfs = find_program('mksquashfs')
 mktemp = find_program('mktemp')
@@ -46,6 +55,7 @@ foreach p : sqsh_test
 	t = executable(p.underscorify(),
 		[ p, squashfs_h, sqsh_test_util ],
 		install : false,
+		c_args: test_c_args,
 		dependencies : libsqsh_dependency,
 	)
 	test(p, t, env: { 'SQSH_LZO_HELPER_PATH': lzo_helper_path })
