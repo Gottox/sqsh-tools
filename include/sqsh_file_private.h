@@ -166,6 +166,34 @@ SQSH_NO_UNUSED int sqsh__file_init(
  */
 int sqsh__file_cleanup(struct SqshFileContext *context);
 
+////////////////////////////////////////
+// file/file_iterator.c
+
+struct SqshFileIterator {
+	/**
+	 * @privatesection
+	 */
+	const struct SqshInodeContext *inode;
+	const struct SqshSuperblockContext *superblock;
+	struct SqshCompressionManager *compression_manager;
+	struct SqshMapManager *map_manager;
+
+	const struct SqshMapSlice *current_uncompressed;
+	const struct SqshBuffer *current_compressed;
+
+	uint32_t block_index;
+	sqsh_index_t block_offset;
+
+	const uint8_t *data;
+	size_t data_size;
+};
+
+SQSH_NO_UNUSED int sqsh__file_iterator_init(
+		struct SqshFileIterator *iterator,
+		const struct SqshInodeContext *inode);
+
+SQSH_NO_UNUSED int sqsh__file_iterator_cleanup(struct SqshFileIterator *iterator);
+
 #ifdef __cplusplus
 }
 #endif

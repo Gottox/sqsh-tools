@@ -1,6 +1,7 @@
 sqsh_test = [
 	#'cpp-test.cpp',
 	'file/file_reader.c',
+	'file/file_iterator.c',
 	'inode/inode.c',
 	'integration.c',
 	'mapper/map_reader.c',

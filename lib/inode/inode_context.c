@@ -52,7 +52,8 @@ inode_load(struct SqshInodeContext *context) {
 	size_t size = SQSH_SIZEOF_INODE_HEADER;
 
 	const struct SqshDataInode *inode = get_inode(context);
-	switch (sqsh_data_inode_type(inode)) {
+	enum SqshInodeType type = sqsh_data_inode_type(inode);
+	switch (type) {
 	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
 		size += SQSH_SIZEOF_INODE_DIRECTORY;
 		break;
@@ -87,8 +88,36 @@ inode_load(struct SqshInodeContext *context) {
 	case SQSH_INODE_TYPE_EXTENDED_SOCKET:
 		size += SQSH_SIZEOF_INODE_IPC_EXT;
 		break;
+	default:
+		return SQSH_ERROR_UNKOWN_INODE_TYPE;
 	}
 	rv = sqsh__metablock_reader_advance(&context->metablock, 0, size);
+	if (rv < 0) {
+		return rv;
+	}
+
+	switch (type) {
+	case SQSH_INODE_TYPE_EXTENDED_FILE:
+	case SQSH_INODE_TYPE_BASIC_FILE:
+		size += sqsh_inode_file_block_count(context) * sizeof(uint32_t);
+		break;
+	case SQSH_INODE_TYPE_EXTENDED_DIRECTORY:
+		size += sqsh_data_inode_directory_ext_index_count(
+				sqsh_data_inode_directory_ext(inode));
+		break;
+	case SQSH_INODE_TYPE_BASIC_SYMLINK:
+		size += sqsh_inode_symlink_size(context);
+		break;
+	case SQSH_INODE_TYPE_EXTENDED_SYMLINK:
+		size += sqsh_inode_symlink_size(context);
+		// xattr index
+		size += sizeof(uint32_t);
+	default:
+		/* nop */
+		break;
+	}
+	rv = sqsh__metablock_reader_advance(&context->metablock, 0, size);
+
 	return rv;
 }
 
@@ -141,14 +170,9 @@ sqsh__inode_init(
 		return rv;
 	}
 
-	rv = inode_load(inode);
-	if (rv < 0) {
-		return rv;
-	}
-
 	inode->sqsh = sqsh;
 
-	return rv;
+	return inode_load(inode);
 }
 
 struct SqshInodeContext *

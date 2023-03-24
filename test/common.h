@@ -63,8 +63,9 @@
 #define INODE_HEADER(t, p, uid, gid, mtime, nbr) \
 	UINT16_BYTES(t), UINT16_BYTES(p), UINT16_BYTES(uid), UINT16_BYTES(gid), \
 			UINT32_BYTES(mtime), UINT32_BYTES(nbr)
-#define INODE_BASIC_FILE(bs, fi, bo, fs) \
-	UINT32_BYTES(bs), UINT32_BYTES(fi), UINT32_BYTES(bo), UINT32_BYTES(fs)
+#define INODE_BASIC_FILE(block_start, frag_index, block_offset, file_size) \
+	UINT32_BYTES(block_start), UINT32_BYTES(frag_index), \
+			UINT32_BYTES(block_offset), UINT32_BYTES(file_size)
 #define DATA_BLOCK_REF(size, compressed) \
 	UINT32_BYTES(size | (compressed ? 0x0 : (1 << 24)))
 

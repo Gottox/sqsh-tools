@@ -150,6 +150,31 @@ uint64_t sqsh_file_size(const struct SqshFileContext *context);
  */
 int sqsh_file_free(struct SqshFileContext *context);
 
+////////////////////////////////////////
+// file/file_iterator.c
+
+struct SqshFileIterator;
+
+SQSH_NO_UNUSED int sqsh__file_iterator_init(
+		struct SqshFileIterator *iterator,
+		const struct SqshInodeContext *inode);
+
+SQSH_NO_UNUSED int
+sqsh__file_iterator_cleanup(struct SqshFileIterator *iterator);
+
+SQSH_NO_UNUSED struct SqshFileIterator *
+sqsh_file_iterator_new(const struct SqshInodeContext *inode, int *err);
+
+SQSH_NO_UNUSED int sqsh_file_iterator_next(struct SqshFileIterator *iterator);
+
+SQSH_NO_UNUSED const uint8_t *
+sqsh_file_iterator_data(struct SqshFileIterator *iterator);
+
+SQSH_NO_UNUSED size_t
+sqsh_file_iterator_size(struct SqshFileIterator *iterator);
+
+int sqsh_file_iterator_free(struct SqshFileIterator *iterator);
+
 #ifdef __cplusplus
 }
 #endif
