@@ -38,7 +38,9 @@
 #include "../../include/sqsh_primitive_private.h"
 
 #include "../../include/sqsh_inode_private.h"
-#include "utils.h"
+#include "../utils.h"
+
+#define BLOCK_INDEX_FINISHED UINT32_MAX
 
 int
 sqsh__file_iterator_init(
@@ -55,7 +57,7 @@ sqsh__file_iterator_init(
 	}
 	iterator->map_manager = sqsh_archive_map_manager(archive);
 	iterator->block_index = 0;
-	iterator->block_offset = 0;
+	iterator->block_address = sqsh_inode_file_blocks_start(inode);
 
 	return rv;
 }
@@ -76,49 +78,25 @@ sqsh_file_iterator_new(const struct SqshInodeContext *inode, int *err) {
 }
 
 static int
-map_block(struct SqshFileIterator *iterator) {
+map_block_compressed(struct SqshFileIterator *iterator) {
 	int rv = 0;
 	struct SqshCompressionManager *compression_manager =
 			iterator->compression_manager;
-	struct SqshMapManager *map_manager = iterator->map_manager;
 	const struct SqshInodeContext *inode = iterator->inode;
 	const struct SqshBuffer *compressed = NULL;
-	const struct SqshMapSlice *uncompressed = NULL;
 
-	const uint64_t start_address = sqsh_inode_file_blocks_start(inode);
-	const sqsh_index_t block_offset = iterator->block_offset;
+	const sqsh_index_t block_address = iterator->block_address;
 	const sqsh_index_t block_index = iterator->block_index;
 	const uint32_t outer_size = sqsh_inode_file_block_size(inode, block_index);
-	const bool is_compressed =
-			sqsh_inode_file_block_is_compressed(inode, block_index);
-	uint64_t block_address;
-	if (SQSH_ADD_OVERFLOW(start_address, block_offset, &block_address)) {
-		return SQSH_ERROR_INTEGER_OVERFLOW;
+
+	rv = sqsh__compression_manager_get(
+			compression_manager, block_address, outer_size, &compressed);
+	if (rv < 0) {
+		goto out;
 	}
+	iterator->data = sqsh__buffer_data(compressed);
+	iterator->data_size = sqsh__buffer_size(compressed);
 
-	sqsh__map_manager_release(map_manager, iterator->current_uncompressed);
-	sqsh__compression_manager_release(
-			compression_manager, iterator->current_compressed);
-
-	if (is_compressed) {
-		rv = sqsh__compression_manager_get(
-				compression_manager, block_address, outer_size, &compressed);
-		if (rv < 0) {
-			goto out;
-		}
-		iterator->data = sqsh__buffer_data(compressed);
-		iterator->data_size = sqsh__buffer_size(compressed);
-
-	} else {
-		rv = sqsh__map_manager_get(
-				map_manager, block_address, 1, &uncompressed);
-		if (rv < 0) {
-			goto out;
-		}
-		iterator->data = sqsh__map_slice_data(uncompressed);
-		iterator->data_size = outer_size;
-	}
-	iterator->current_uncompressed = uncompressed;
 	iterator->current_compressed = compressed;
 
 	if (SQSH_ADD_OVERFLOW(block_index, 1, &iterator->block_index)) {
@@ -126,7 +104,8 @@ map_block(struct SqshFileIterator *iterator) {
 		goto out;
 	}
 
-	if (SQSH_ADD_OVERFLOW(block_offset, outer_size, &iterator->block_offset)) {
+	if (SQSH_ADD_OVERFLOW(
+				block_address, outer_size, &iterator->block_address)) {
 		rv = SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
@@ -136,24 +115,113 @@ out:
 }
 
 static int
-map_tail(struct SqshFileIterator *iterator) {
-	(void)iterator;
-	iterator->data = NULL;
-	iterator->data_size = 0;
-	return 0;
+map_block_uncompressed(struct SqshFileIterator *iterator, size_t desired_size) {
+	// TODO
+	(void)desired_size;
+	struct SqshMapReader *map_reader = &iterator->current_uncompressed;
+	int rv = 0;
+	struct SqshMapManager *map_manager = iterator->map_manager;
+	const struct SqshInodeContext *inode = iterator->inode;
+	const struct SqshSuperblockContext *superblock =
+			sqsh_archive_superblock(inode->sqsh);
+	const uint64_t upper_limit = sqsh_superblock_bytes_used(superblock);
+
+	const sqsh_index_t block_address = iterator->block_address;
+	const sqsh_index_t block_index = iterator->block_index;
+	const uint32_t outer_size = sqsh_inode_file_block_size(inode, block_index);
+	rv = sqsh__map_reader_init(
+			map_reader, map_manager, block_address, upper_limit);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh__map_reader_advance(map_reader, 0, outer_size);
+	iterator->data = sqsh__map_reader_data(map_reader);
+	iterator->data_size = outer_size;
+
+	if (SQSH_ADD_OVERFLOW(block_index, 1, &iterator->block_index)) {
+		rv = SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
+
+	if (SQSH_ADD_OVERFLOW(
+				block_address, outer_size, &iterator->block_address)) {
+		rv = SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
+out:
+	return 1;
+}
+
+static int
+map_block(struct SqshFileIterator *iterator, size_t desired_size) {
+	const struct SqshInodeContext *inode = iterator->inode;
+
+	const sqsh_index_t block_index = iterator->block_index;
+	const bool is_compressed =
+			sqsh_inode_file_block_is_compressed(inode, block_index);
+
+	if (is_compressed) {
+		return map_block_compressed(iterator);
+	} else {
+		return map_block_uncompressed(iterator, desired_size);
+	}
+}
+
+static int
+map_fragment(struct SqshFileIterator *iterator) {
+	int rv = 0;
+	const struct SqshInodeContext *inode = iterator->inode;
+	struct SqshArchive *archive = inode->sqsh;
+	struct SqshFragmentTable *fragment_table = NULL;
+	struct SqshBuffer *fragment_buffer = &iterator->fragment_buffer;
+	rv = sqsh_archive_fragment_table(archive, &fragment_table);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = sqsh__buffer_init(fragment_buffer);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh_fragment_table_to_buffer(fragment_table, inode, fragment_buffer);
+	if (rv < 0) {
+		goto out;
+	}
+	iterator->data = sqsh__buffer_data(fragment_buffer);
+	iterator->data_size = sqsh__buffer_size(fragment_buffer);
+	iterator->block_index = BLOCK_INDEX_FINISHED;
+out:
+	if (rv < 0) {
+		return rv;
+	} else {
+		return 1;
+	}
 }
 
 int
-sqsh_file_iterator_next(struct SqshFileIterator *iterator) {
-	size_t block_count = sqsh_inode_file_block_count(iterator->inode);
+sqsh_file_iterator_next(
+		struct SqshFileIterator *iterator, size_t desired_size) {
+	const struct SqshInodeContext *inode = iterator->inode;
+	size_t block_count = sqsh_inode_file_block_count(inode);
+	const bool has_fragment = sqsh_inode_file_has_fragment(inode);
+	struct SqshCompressionManager *compression_manager =
+			iterator->compression_manager;
+
+	sqsh__map_reader_cleanup(&iterator->current_uncompressed);
+	sqsh__compression_manager_release(
+			compression_manager, iterator->current_compressed);
+	iterator->current_compressed = NULL;
+	sqsh__buffer_cleanup(&iterator->fragment_buffer);
 
 	if (iterator->block_index < block_count) {
-		return map_block(iterator);
+		return map_block(iterator, desired_size);
+	} else if (has_fragment && iterator->block_index == block_count) {
+		return map_fragment(iterator);
 	} else {
-		return map_tail(iterator);
+		iterator->data = NULL;
+		iterator->data_size = 0;
+		return 0;
 	}
-
-	return 0;
 }
 
 const uint8_t *
@@ -168,9 +236,12 @@ sqsh_file_iterator_size(struct SqshFileIterator *iterator) {
 
 int
 sqsh__file_iterator_cleanup(struct SqshFileIterator *iterator) {
-	sqsh__map_manager_release(iterator->map_manager, iterator->current_uncompressed);
+	sqsh__map_reader_cleanup(&iterator->current_uncompressed);
 	sqsh__compression_manager_release(
 			iterator->compression_manager, iterator->current_compressed);
+
+	iterator->current_compressed = NULL;
+	sqsh__buffer_cleanup(&iterator->fragment_buffer);
 	return 0;
 }
 

@@ -41,11 +41,12 @@
 #include "../../lib/utils.h"
 
 static void
-load_file_from_compressed_data_block(void) {
+load_segment_from_compressed_data_block(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshInodeContext inode = {0};
-	uint8_t payload[4096] = {
+	uint8_t payload[] = {
+			/* clang-format off */
 			SQSH_HEADER,
 			/* inode */
 			[256] = METABLOCK_HEADER(0, 128), 0, 0, 0,
@@ -53,7 +54,9 @@ load_file_from_compressed_data_block(void) {
 			INODE_BASIC_FILE(512, 0xFFFFFFFF, 0, 4),
 			DATA_BLOCK_REF(sizeof((uint8_t[]){ZLIB_ABCD}), 1),
 			/* datablock */
-			[512] = ZLIB_ABCD};
+			[512] = ZLIB_ABCD
+			/* clang-format on */
+	};
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint64_t inode_ref = sqsh_address_ref_create(256, 3);
@@ -67,7 +70,7 @@ load_file_from_compressed_data_block(void) {
 	rv = sqsh__file_iterator_init(&iter, &inode);
 	assert(rv == 0);
 
-	rv = sqsh_file_iterator_next(&iter);
+	rv = sqsh_file_iterator_next(&iter, 1);
 	assert(rv > 0);
 
 	size_t size = sqsh_file_iterator_size(&iter);
@@ -78,7 +81,7 @@ load_file_from_compressed_data_block(void) {
 	assert(data[2] == 'c');
 	assert(data[3] == 'd');
 
-	rv = sqsh_file_iterator_next(&iter);
+	rv = sqsh_file_iterator_next(&iter, 1);
 	assert(rv == 0);
 
 	size = sqsh_file_iterator_size(&iter);
@@ -88,21 +91,27 @@ load_file_from_compressed_data_block(void) {
 }
 
 static void
-load_file_from_uncompressed_data_block(void) {
+load_two_segments_from_uncompressed_data_block(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshInodeContext inode = {0};
-	uint8_t payload[4096] = {
+	uint8_t payload[] = {
+			/* clang-format off */
 			SQSH_HEADER,
 			/* inode */
-			[256] = METABLOCK_HEADER(0, 128), 0, 0, 0,
+			[256] = METABLOCK_HEADER(0, 128),
 			INODE_HEADER(2, 0, 0, 0, 0, 1),
-			INODE_BASIC_FILE(512, 0xFFFFFFFF, 0, 5), DATA_BLOCK_REF(5, 0),
-			/* datablock */
-			[512] = 1, 2, 3, 4, 5};
+			INODE_BASIC_FILE(512, 0xFFFFFFFF, 0, 4096 + 5),
+			DATA_BLOCK_REF(4096, 0),
+			DATA_BLOCK_REF(5, 0),
+			/* datablocks */
+			[512 ... 512 + 4095] = 0xa1,
+			[512 + 4096] = 1, 2, 3, 4, 5
+			/* clang-format on */
+	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	uint64_t inode_ref = sqsh_address_ref_create(256, 3);
+	uint64_t inode_ref = sqsh_address_ref_create(256, 0);
 	rv = sqsh__inode_init(&inode, &archive, inode_ref);
 	assert(rv == 0);
 
@@ -113,7 +122,68 @@ load_file_from_uncompressed_data_block(void) {
 	rv = sqsh__file_iterator_init(&iter, &inode);
 	assert(rv == 0);
 
-	rv = sqsh_file_iterator_next(&iter);
+	rv = sqsh_file_iterator_next(&iter, 1);
+	assert(rv > 0);
+
+	size_t size = sqsh_file_iterator_size(&iter);
+	assert(size == 4096);
+	const uint8_t *data = sqsh_file_iterator_data(&iter);
+	for (size_t i = 0; i < size; i++) {
+		assert(data[i] == 0xa1);
+	}
+
+	rv = sqsh_file_iterator_next(&iter, 1);
+	assert(rv > 0);
+
+	size = sqsh_file_iterator_size(&iter);
+	assert(size == 5);
+	data = sqsh_file_iterator_data(&iter);
+	assert(data[0] == 1);
+	assert(data[1] == 2);
+	assert(data[2] == 3);
+	assert(data[3] == 4);
+	assert(data[4] == 5);
+
+	rv = sqsh_file_iterator_next(&iter, 1);
+	assert(rv == 0);
+
+	size = sqsh_file_iterator_size(&iter);
+	assert(size == 0);
+	data = sqsh_file_iterator_data(&iter);
+	assert(data == NULL);
+}
+
+static void
+load_segment_from_uncompressed_data_block(void) {
+	int rv;
+	struct SqshArchive archive = {0};
+	struct SqshInodeContext inode = {0};
+	uint8_t payload[] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* inode */
+			[256] = METABLOCK_HEADER(0, 128),
+			INODE_HEADER(2, 0, 0, 0, 0, 1),
+			INODE_BASIC_FILE(512, 0xFFFFFFFF, 0, 5),
+			DATA_BLOCK_REF(5, 0),
+			/* datablock */
+			[512] = 1, 2, 3, 4, 5
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	uint64_t inode_ref = sqsh_address_ref_create(256, 0);
+	rv = sqsh__inode_init(&inode, &archive, inode_ref);
+	assert(rv == 0);
+
+	assert(sqsh_inode_type(&inode) == SQSH_INODE_TYPE_FILE);
+	assert(sqsh_inode_file_has_fragment(&inode) == false);
+
+	struct SqshFileIterator iter = {0};
+	rv = sqsh__file_iterator_init(&iter, &inode);
+	assert(rv == 0);
+
+	rv = sqsh_file_iterator_next(&iter, 1);
 	assert(rv > 0);
 
 	size_t size = sqsh_file_iterator_size(&iter);
@@ -125,7 +195,7 @@ load_file_from_uncompressed_data_block(void) {
 	assert(data[3] == 4);
 	assert(data[4] == 5);
 
-	rv = sqsh_file_iterator_next(&iter);
+	rv = sqsh_file_iterator_next(&iter, 1);
 	assert(rv == 0);
 
 	size = sqsh_file_iterator_size(&iter);
@@ -135,6 +205,7 @@ load_file_from_uncompressed_data_block(void) {
 }
 
 DEFINE
-TEST(load_file_from_uncompressed_data_block);
-TEST(load_file_from_compressed_data_block);
+TEST(load_two_segments_from_uncompressed_data_block);
+TEST(load_segment_from_uncompressed_data_block);
+TEST(load_segment_from_compressed_data_block);
 DEFINE_END

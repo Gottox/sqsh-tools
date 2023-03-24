@@ -165,7 +165,7 @@ sqsh__file_iterator_cleanup(struct SqshFileIterator *iterator);
 SQSH_NO_UNUSED struct SqshFileIterator *
 sqsh_file_iterator_new(const struct SqshInodeContext *inode, int *err);
 
-SQSH_NO_UNUSED int sqsh_file_iterator_next(struct SqshFileIterator *iterator);
+SQSH_NO_UNUSED int sqsh_file_iterator_next(struct SqshFileIterator *iterator, size_t desired_size);
 
 SQSH_NO_UNUSED const uint8_t *
 sqsh_file_iterator_data(struct SqshFileIterator *iterator);

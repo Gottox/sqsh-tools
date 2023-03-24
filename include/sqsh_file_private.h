@@ -178,11 +178,12 @@ struct SqshFileIterator {
 	struct SqshCompressionManager *compression_manager;
 	struct SqshMapManager *map_manager;
 
-	const struct SqshMapSlice *current_uncompressed;
+	struct SqshMapReader current_uncompressed;
 	const struct SqshBuffer *current_compressed;
+	struct SqshBuffer fragment_buffer;
 
 	uint32_t block_index;
-	sqsh_index_t block_offset;
+	uint64_t block_address;
 
 	const uint8_t *data;
 	size_t data_size;
