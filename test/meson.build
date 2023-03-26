@@ -88,10 +88,9 @@ if get_option('test') == 'extended'
 		},
 	)
 
-	test('create_failing_archive',
-		files('create_failing_archive.sh'),
+	test('large_file',
+		files('large_file.sh'),
 		timeout: 20,
-		should_fail: true,
 		env: {
 			'BUILD_DIR': meson.current_build_dir(),
 			'MKSQUASHFS': mksquashfs.full_path(),

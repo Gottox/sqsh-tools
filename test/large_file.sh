@@ -28,4 +28,4 @@ $MKSQUASHFS "$tmpdir/file" "$tmpdir/image" \
 	-no-compression \
 	-noappend
 
-exec $SQSH_CAT "$tmpdir/image" "$tmpdir/file"
+exec $SQSH_CAT "$tmpdir/image" "file"
