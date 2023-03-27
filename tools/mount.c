@@ -338,7 +338,7 @@ sqshfuse_read(
 	printf("sqshfuse_read: %s\n", path);
 	int rv = 0;
 	struct SqshInodeContext *inode = NULL;
-	struct SqshFileContext *file = NULL;
+	struct SqshFileReader *reader = NULL;
 
 	inode = sqsh_path_resolver_resolve(data.resolver, path, &rv);
 	if (rv < 0) {
@@ -346,7 +346,7 @@ sqshfuse_read(
 		rv = -EINVAL;
 		goto out;
 	}
-	file = sqsh_file_new(inode, &rv);
+	reader = sqsh_file_reader_new(inode, &rv);
 	if (rv < 0) {
 		// TODO: Better return type
 		rv = -EINVAL;
@@ -357,13 +357,7 @@ sqshfuse_read(
 	if (size > file_size) {
 		size = file_size;
 	}
-	rv = sqsh_file_seek(file, offset);
-	if (rv < 0) {
-		// TODO: Better return type
-		rv = -EINVAL;
-		goto out;
-	}
-	rv = sqsh_file_read(file, size);
+	rv = sqsh_file_reader_advance(reader, offset, size);
 	if (rv < 0) {
 		// TODO: Better return type
 		rv = -EINVAL;
@@ -371,12 +365,12 @@ sqshfuse_read(
 	}
 
 	if (size != 0) {
-		memcpy(buf, sqsh_file_data(file), size);
+		memcpy(buf, sqsh_file_reader_data(reader), size);
 	}
 
 	rv = size;
 out:
-	sqsh_file_free(file);
+	sqsh_file_reader_free(reader);
 	sqsh_inode_free(inode);
 	return rv;
 }
