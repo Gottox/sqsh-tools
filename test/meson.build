@@ -88,6 +88,19 @@ if get_option('test') == 'extended'
 		},
 	)
 
+	test('unpack-test',
+		files('unpack-test.sh'),
+		timeout: 20,
+		#should_fail: true,
+		env: {
+			'BUILD_DIR': meson.current_build_dir(),
+			'MKSQUASHFS': mksquashfs.full_path(),
+			'SOURCE_ROOT': meson.project_source_root(),
+			'SQSH_UNPACK': tools['sqsh-unpack'].full_path(),
+			'UNSHARE': unshare.full_path(),
+		},
+	)
+
 	test('large_file',
 		files('large_file.sh'),
 		timeout: 20,
