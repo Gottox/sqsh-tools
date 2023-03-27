@@ -14,7 +14,7 @@
 : "${SOURCE_ROOT:?SOURCE_ROOT is not set}"
 : "${SQSH_UNPACK:?SQSH_UNPACK is not set}"
 
-MKSQUASHFS_OPTS="-no-xattrs -noappend -all-root -mkfs-time @0"
+MKSQUASHFS_OPTS="-no-xattrs -noappend -all-root -mkfs-time 0"
 
 cd "$SOURCE_ROOT"
 
