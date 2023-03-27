@@ -155,24 +155,100 @@ int sqsh_file_free(struct SqshFileContext *context);
 
 struct SqshFileIterator;
 
+/**
+ * @brief Initializes a SqshFileIterator struct.
+ *
+ * @param[in,out] iterator The file iterator struct to initialize.
+ * @param[in] inode The inode context to retrieve the file contents from.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
 SQSH_NO_UNUSED int sqsh__file_iterator_init(
 		struct SqshFileIterator *iterator,
 		const struct SqshInodeContext *inode);
 
-SQSH_NO_UNUSED int
-sqsh__file_iterator_cleanup(struct SqshFileIterator *iterator);
+/**
+ * @brief Cleans up resources used by a SqshFileIterator struct.
+ *
+ * @param[in,out] iterator The file iterator struct to clean up.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+int sqsh__file_iterator_cleanup(struct SqshFileIterator *iterator);
 
+/**
+ * @brief Creates a new SqshFileIterator struct and initializes it.
+ *
+ * @memberof SqshFileIterator
+ *
+ * @param[in] inode The inode context to retrieve the file contents from.
+ * @param[out] err Pointer to an int where the error code will be stored.
+ *
+ * @return A pointer to the newly created and initialized SqshFileIterator
+ * struct.
+ */
 SQSH_NO_UNUSED struct SqshFileIterator *
 sqsh_file_iterator_new(const struct SqshInodeContext *inode, int *err);
 
-SQSH_NO_UNUSED int sqsh_file_iterator_next(struct SqshFileIterator *iterator, size_t desired_size);
+/**
+ * @brief Skips a certain amount of data in the file iterator.
+ *
+ * @memberof SqshFileIterator
+ *
+ * @param[in,out] iterator The file iterator to skip data in.
+ * @param[in] amount The amount of data to skip.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int
+sqsh_file_iterator_skip(struct SqshFileIterator *iterator, sqsh_index_t amount);
 
+/**
+ * @brief Reads a certain amount of data from the file iterator.
+ *
+ * @memberof SqshFileIterator
+ *
+ * @param[in,out] iterator The file iterator to read data from.
+ * @param[in] desired_size The amount of data to read.
+ *
+ * @return The number of bytes read on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int
+sqsh_file_iterator_next(struct SqshFileIterator *iterator, size_t desired_size);
+
+/**
+ * @brief Gets a pointer to the current data in the file iterator.
+ *
+ * @memberof SqshFileIterator
+ *
+ * @param[in] iterator The file iterator to get data from.
+ *
+ * @return A pointer to the current data in the file iterator.
+ */
 SQSH_NO_UNUSED const uint8_t *
 sqsh_file_iterator_data(struct SqshFileIterator *iterator);
 
+/**
+ * @brief Gets the size of the data currently in the file iterator.
+ *
+ * @memberof SqshFileIterator
+ *
+ * @param[in] iterator The file iterator to get the size from.
+ *
+ * @return The size of the data currently in the file iterator.
+ */
 SQSH_NO_UNUSED size_t
 sqsh_file_iterator_size(struct SqshFileIterator *iterator);
 
+/**
+ * @brief Frees the resources used by a SqshFileIterator struct.
+ *
+ * @memberof SqshFileIterator
+ *
+ * @param[in,out] iterator The file iterator to free.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
 int sqsh_file_iterator_free(struct SqshFileIterator *iterator);
 
 #ifdef __cplusplus
