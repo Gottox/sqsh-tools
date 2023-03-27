@@ -25,7 +25,7 @@ $MKSQUASHFS "$tmpdir/file" "$tmpdir/image" \
 	-all-root \
 	-noappend \
 	-b 4096 \
-	-no-compression \
+	-noI -noD -noF -noX \
 	-noappend
 
 exec $SQSH_CAT "$tmpdir/image" "file"
