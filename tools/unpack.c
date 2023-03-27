@@ -45,6 +45,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <utime.h>
 
 bool do_chown = false;
 bool verbose = false;
@@ -165,7 +166,6 @@ extract_file(
 	int rv = 0;
 	FILE *file = NULL;
 	struct SqshFileIterator *iterator;
-	uint16_t mode = sqsh_inode_permission(inode);
 
 	iterator = sqsh_file_iterator_new(inode, &rv);
 	if (rv < 0) {
@@ -195,11 +195,6 @@ extract_file(
 		goto out;
 	}
 	fclose(file);
-	rv = chmod(filename, mode);
-	if (rv < 0) {
-		print_err(rv = -errno, "chmod", path_stack);
-		goto out;
-	}
 out:
 	sqsh_file_iterator_free(iterator);
 	return rv;
@@ -267,7 +262,9 @@ extract(const char *filename, struct SqshInodeContext *inode,
 			.segment = filename, .prev = path_stack};
 	int rv = 0;
 	uint32_t fuid, fgid;
-	enum SqshInodeContextType type = sqsh_inode_type(inode);
+	const enum SqshInodeContextType type = sqsh_inode_type(inode);
+	const uint16_t mode = sqsh_inode_permission(inode);
+	struct utimbuf times;
 
 	if (verbose) {
 		print_path(&new_path_stack, "\n", stderr);
@@ -301,6 +298,18 @@ extract(const char *filename, struct SqshInodeContext *inode,
 		}
 	}
 	if (rv < 0) {
+		goto out;
+	}
+
+	times.actime = times.modtime = sqsh_inode_modified_time(inode);
+	rv = utime(filename, &times);
+	if (rv < 0) {
+		print_err(rv = -errno, "utime", &new_path_stack);
+		goto out;
+	}
+	rv = chmod(filename, mode);
+	if (rv < 0) {
+		print_err(rv = -errno, "chmod", path_stack);
 		goto out;
 	}
 
