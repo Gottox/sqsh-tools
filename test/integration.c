@@ -32,7 +32,6 @@
  */
 
 #include "common.h"
-#include "sqsh_file.h"
 #include "test.h"
 #include <pthread.h>
 #include <sqsh_archive_private.h>
@@ -41,7 +40,6 @@
 #include <sqsh_file_private.h>
 #include <sqsh_inode_private.h>
 #include <squashfs_image.h>
-#include <stdint.h>
 
 static void
 sqsh_empty(void) {
@@ -719,7 +717,9 @@ free_null_crash_1(void) {
 	int rv;
 	rv = sqsh_archive_free(NULL);
 	assert(rv == 0);
-	rv = sqsh_file_free(NULL);
+	rv = sqsh_file_reader_free(NULL);
+	assert(rv == 0);
+	rv = sqsh_file_iterator_free(NULL);
 	assert(rv == 0);
 	rv = sqsh__directory_index_iterator_free(NULL);
 	assert(rv == 0);
@@ -753,11 +753,11 @@ multithreaded_walker(void *arg) {
 		}
 		sqsh_directory_iterator_free(iter);
 	} else {
-		struct SqshFileContext *file = sqsh_file_new(inode, &rv);
-		size_t size = sqsh_file_size(file);
-		rv = sqsh_file_read(file, size);
+		struct SqshFileReader *reader = sqsh_file_reader_new(inode, &rv);
+		size_t size = sqsh_inode_file_size(inode);
+		rv = sqsh_file_reader_advance(reader, 0, size);
 		assert(rv == 0);
-		sqsh_file_free(file);
+		sqsh_file_reader_free(reader);
 	}
 
 	sqsh_inode_free(inode);
