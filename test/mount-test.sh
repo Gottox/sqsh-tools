@@ -2,7 +2,7 @@
 
 ######################################################################
 # @author      : Enno Boland (mail@eboland.de)
-# @file        : repacktest
+# @file        : mount-test.sh
 # @created     : Friday Mar 17, 2023 15:11:09 CET
 #
 # @description : This script creates a squashfs image, mounts it, and
@@ -17,6 +17,8 @@
 
 MKSQUASHFS_OPTS="-no-xattrs -noappend"
 
+# unshares the mount namespace, so that sqsh-mount will be terminated
+# when this script exits
 if [ -z "$INTERNAL_UNSHARED" ]; then
 	export INTERNAL_UNSHARED=1
 	exec "$UNSHARE" -rm "$0" "$@"

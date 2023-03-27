@@ -75,8 +75,8 @@ if get_option('test') == 'extended'
 		},
 	)
 
-	test('repacktest',
-		files('repacktest.sh'),
+	test('mount-test',
+		files('mount-test.sh'),
 		timeout: 20,
 		should_fail: true,
 		env: {
