@@ -81,28 +81,71 @@ SQSH_NO_UNUSED int sqsh__fragment_table_init(
 int sqsh__fragment_table_cleanup(struct SqshFragmentTable *context);
 
 ////////////////////////////////////////
+// file/file_iterator.c
+
+struct SqshFileIterator {
+	/**
+	 * @privatesection
+	 */
+	const struct SqshInodeContext *inode;
+	const struct SqshSuperblockContext *superblock;
+	struct SqshCompressionManager *compression_manager;
+	struct SqshMapManager *map_manager;
+
+	struct SqshMapReader current_uncompressed;
+	const struct SqshBuffer *current_compressed;
+	struct SqshBuffer fragment_buffer;
+
+	uint32_t block_index;
+	uint64_t block_address;
+
+	const uint8_t *data;
+	size_t data_size;
+};
+
+/**
+ * @internal
+ * @memberof SqshFileIterator
+ * @brief Initializes a file iterator to iterate over the contents of a file.
+ *
+ * @param[in,out] iterator The file iterator to initialize.
+ * @param[in] inode The inode context containing the file to iterate over.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int sqsh__file_iterator_init(
+		struct SqshFileIterator *iterator,
+		const struct SqshInodeContext *inode);
+
+/**
+ * @internal
+ * @memberof SqshFileIterator
+ * @brief Cleans up resources used by a file iterator.
+ *
+ * @param[in] iterator The file iterator to clean up.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+int sqsh__file_iterator_cleanup(struct SqshFileIterator *iterator);
+
+////////////////////////////////////////
 // context/file_reader.c
 
 struct SqshFileReader {
 	/**
 	 * @privatesection
 	 */
-	const struct SqshCompression *compression;
-	const struct SqshSuperblockContext *superblock;
-	struct SqshMapManager *map_manager;
-	sqsh_index_t datablock_index;
-	sqsh_index_t datablock_offset;
+	struct SqshFileIterator iterator;
+	sqsh_index_t current_offset;
+	size_t current_size;
 	struct SqshBuffer buffer;
-	struct SqshMapReader map_reader;
 	const uint8_t *data;
-	size_t data_size;
-	const struct SqshInodeContext *inode;
 };
 
 /**
  * @internal
- * @brief Initializes a SqshFileContext struct.
- * @memberof SqshFileContext
+ * @brief Initializes a SqshFileReader struct.
+ * @memberof SqshFileReader
  *
  * @param[out] reader The file reader to initialize.
  * @param[in] inode    The inode context to retrieve the file contents from.
@@ -116,7 +159,7 @@ SQSH_NO_UNUSED int sqsh__file_reader_init(
  * @internal
  * @brief Frees the resources used by the file reader.
  *
- * @memberof SqshFileContext
+ * @memberof SqshFileReader
  *
  * @param reader The file reader to clean up.
  */
@@ -165,35 +208,6 @@ SQSH_NO_UNUSED int sqsh__file_init(
  * @param context The file context to clean up.
  */
 int sqsh__file_cleanup(struct SqshFileContext *context);
-
-////////////////////////////////////////
-// file/file_iterator.c
-
-struct SqshFileIterator {
-	/**
-	 * @privatesection
-	 */
-	const struct SqshInodeContext *inode;
-	const struct SqshSuperblockContext *superblock;
-	struct SqshCompressionManager *compression_manager;
-	struct SqshMapManager *map_manager;
-
-	struct SqshMapReader current_uncompressed;
-	const struct SqshBuffer *current_compressed;
-	struct SqshBuffer fragment_buffer;
-
-	uint32_t block_index;
-	uint64_t block_address;
-
-	const uint8_t *data;
-	size_t data_size;
-};
-
-SQSH_NO_UNUSED int sqsh__file_iterator_init(
-		struct SqshFileIterator *iterator,
-		const struct SqshInodeContext *inode);
-
-SQSH_NO_UNUSED int sqsh__file_iterator_cleanup(struct SqshFileIterator *iterator);
 
 #ifdef __cplusplus
 }

@@ -237,6 +237,22 @@ sqsh_file_iterator_next(
 	}
 }
 
+int
+sqsh_file_iterator_skip(
+		struct SqshFileIterator *iterator, uint64_t amount) {
+	int rv = 0;
+
+	// TODO: Do not actually map the data, just skip it.
+	for (uint64_t i = 0; i < amount; i++) {
+		rv = sqsh_file_iterator_next(iterator, 1);
+		if (rv < 0) {
+			goto out;
+		}
+	}
+out:
+	return rv;
+}
+
 const uint8_t *
 sqsh_file_iterator_data(struct SqshFileIterator *iterator) {
 	return iterator->data;

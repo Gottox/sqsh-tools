@@ -40,25 +40,12 @@
 #include "../../include/sqsh_inode_private.h"
 #include "utils.h"
 
-SQSH_NO_UNUSED static sqsh_index_t
-find_block_address(
-		const struct SqshInodeContext *inode, sqsh_index_t block_index) {
-	uint64_t block_address = sqsh_inode_file_blocks_start(inode);
-	for (sqsh_index_t i = 0; i < block_index; i++) {
-		block_address += sqsh_inode_file_block_size(inode, i);
-	}
-	return block_address;
-}
-
 int
 sqsh__file_reader_init(
 		struct SqshFileReader *reader, const struct SqshInodeContext *inode) {
-	reader->inode = inode;
-	reader->compression = sqsh_archive_compression_data(inode->sqsh);
-	reader->superblock = sqsh_archive_superblock(inode->sqsh);
-	reader->map_manager = sqsh_archive_map_manager(inode->sqsh);
-
-	return 0;
+	reader->current_offset = 0;
+	reader->current_size = 0;
+	return sqsh__file_iterator_init(&reader->iterator, inode);
 }
 
 struct SqshFileReader *
@@ -75,260 +62,86 @@ sqsh_file_reader_new(const struct SqshInodeContext *inode, int *err) {
 	return context;
 }
 
-static bool
-is_direct(
-		const sqsh_index_t block_index, const size_t size,
-		const struct SqshInodeContext *inode,
-		const struct SqshSuperblockContext *superblock) {
-	const uint64_t block_size = sqsh_superblock_block_size(superblock);
-
-	const size_t end_block_index = block_index + size / block_size;
-	if (end_block_index >= sqsh_inode_file_block_count(inode)) {
-		return false;
-	}
-	for (sqsh_index_t i = block_index; i <= end_block_index; i++) {
-		if (sqsh_inode_file_block_is_compressed(inode, i)) {
-			return false;
-		}
-	}
-	return true;
-}
-
-SQSH_NO_UNUSED static int
-file_map_fragment(
-		struct SqshFileReader *reader, sqsh_index_t block_offset, size_t size) {
-	const struct SqshInodeContext *inode = reader->inode;
-	struct SqshArchive *archive = inode->sqsh;
-	struct SqshFragmentTable *fragment_table;
-	sqsh_index_t end_offset;
-	int rv;
-
-	if (sqsh_inode_file_has_fragment(inode) == false) {
-		// rv = -SQSH_ERROR_INVALID_FILE;
-		rv = -SQSH_ERROR_TODO;
-		goto out;
-	}
-
-	rv = sqsh_archive_fragment_table(archive, &fragment_table);
-	if (rv < 0) {
-		goto out;
-	}
-
-	sqsh__buffer_drain(&reader->buffer);
-	sqsh__map_reader_cleanup(&reader->map_reader);
-
-	// TODO: implement direct mapping to the fragment table.
-	rv = sqsh_fragment_table_to_buffer(fragment_table, inode, &reader->buffer);
-	if (rv < 0) {
-		goto out;
-	}
-
-	if (SQSH_ADD_OVERFLOW(block_offset, size, &end_offset)) {
-		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
-		goto out;
-	}
-
-	reader->data = sqsh__buffer_data(&reader->buffer) + block_offset;
-	reader->data_size = end_offset - block_offset;
-
-out:
-	return rv;
-}
-
-SQSH_NO_UNUSED static int
-file_map_direct(
-		struct SqshFileReader *reader, sqsh_index_t block_index,
-		sqsh_index_t block_offset, size_t size) {
-	int rv;
-	struct SqshMapManager *map_manager = reader->map_manager;
-	const struct SqshInodeContext *inode = reader->inode;
-	const uint64_t block_address = find_block_address(inode, block_index);
-	const struct SqshSuperblockContext *superblock =
-			sqsh_archive_superblock(inode->sqsh);
-	const uint64_t upper_limit = sqsh_superblock_bytes_used(superblock);
-
-	sqsh__buffer_drain(&reader->buffer);
-	sqsh__map_reader_cleanup(&reader->map_reader);
-
-	rv = sqsh__map_reader_init(
-			&reader->map_reader, map_manager, block_address, upper_limit);
-	if (rv < 0) {
-		goto out;
-	}
-
-	rv = sqsh__map_reader_advance(&reader->map_reader, block_offset, size);
-	if (rv < 0) {
-		goto out;
-	}
-
-	reader->data = sqsh__map_reader_data(&reader->map_reader);
-	reader->data_size = size;
-
-out:
-	return rv;
-}
-
-SQSH_NO_UNUSED static int
-file_map_buffered(
-		struct SqshFileReader *reader, sqsh_index_t block_index,
-		sqsh_index_t block_offset, size_t size) {
-	int rv;
-	struct SqshMapManager *map_manager = reader->map_manager;
-	const struct SqshInodeContext *inode = reader->inode;
-
-	// TODO: use getter instead of accessing the field directly.
-	struct SqshCompressionManager *compression_manager;
-	rv = sqsh__archive_file_compression_manager(
-			inode->sqsh, &compression_manager);
-	if (rv < 0) {
-		goto out;
-	}
-
-	uint64_t block_address = find_block_address(inode, block_index);
-	const struct SqshSuperblockContext *superblock =
-			sqsh_archive_superblock(inode->sqsh);
-	// TODO: sane upper limit
-	const uint64_t upper_limit = sqsh_superblock_bytes_used(superblock);
-	const size_t target_size = size + block_offset;
-
-	sqsh__buffer_drain(&reader->buffer);
-	sqsh__map_reader_cleanup(&reader->map_reader);
-
-	rv = sqsh__map_reader_init(
-			&reader->map_reader, map_manager, block_address, upper_limit);
-	if (rv < 0) {
-		goto out;
-	}
-
-	const uint32_t block_count = sqsh_inode_file_block_count(inode);
-	for (; block_index < block_count &&
-		 sqsh__buffer_size(&reader->buffer) < target_size;
-		 block_index++) {
-		const bool is_compressed =
-				sqsh_inode_file_block_is_compressed(inode, block_index);
-		const uint32_t block_size =
-				sqsh_inode_file_block_size(inode, block_index);
-		rv = sqsh__map_reader_advance(
-				&reader->map_reader, block_offset, block_size);
-
-		if (is_compressed) {
-			const struct SqshBuffer *uncompressed;
-			rv = sqsh__compression_manager_get(
-					compression_manager, block_address, block_size,
-					&uncompressed);
-			if (rv < 0) {
-				goto out;
-			}
-
-			const uint8_t *buffer_data = sqsh__buffer_data(uncompressed);
-			const size_t buffer_size = sqsh__buffer_size(uncompressed);
-
-			rv = sqsh__buffer_append(&reader->buffer, buffer_data, buffer_size);
-			if (rv < 0) {
-				goto out;
-			}
-			sqsh__compression_manager_release(
-					compression_manager, uncompressed);
-		} else {
-			rv = sqsh__buffer_append(
-					&reader->buffer, sqsh__map_reader_data(&reader->map_reader),
-					block_size);
-			if (rv < 0) {
-				goto out;
-			}
-		}
-		block_address += block_size;
-	}
-
-	if (sqsh__buffer_size(&reader->buffer) < target_size) {
-		if (sqsh_inode_file_has_fragment(inode)) {
-			struct SqshArchive *archive = inode->sqsh;
-			struct SqshFragmentTable *fragment_table;
-
-			rv = sqsh_archive_fragment_table(archive, &fragment_table);
-			if (rv < 0) {
-				goto out;
-			}
-
-			rv = sqsh_fragment_table_to_buffer(
-					fragment_table, inode, &reader->buffer);
-			if (rv < 0) {
-				goto out;
-			}
-		} else {
-			// rv = -SQSH_ERROR_INVALID_FILE;
-			rv = -SQSH_ERROR_TODO;
-			goto out;
-		}
-	}
-
-	const uint8_t *buffer_data = sqsh__buffer_data(&reader->buffer);
-	reader->data = &buffer_data[block_offset];
-	reader->data_size = size;
-
-out:
-	return rv;
-}
-
-static int
-check_bounds(
-		sqsh_index_t block_index, uint64_t block_offset, size_t size,
-		const struct SqshInodeContext *inode,
-		const struct SqshSuperblockContext *superblock) {
-	const uint32_t block_size = sqsh_superblock_block_size(superblock);
-	const uint64_t file_size = sqsh_inode_file_size(inode);
-
-	uint64_t content_begin_offset;
-	uint64_t content_end_offset;
-	if (SQSH_MULT_OVERFLOW(block_index, block_size, &content_begin_offset)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
-	if (SQSH_ADD_OVERFLOW(
-				content_begin_offset, block_offset, &content_begin_offset)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
-
-	if (SQSH_ADD_OVERFLOW(content_begin_offset, size, &content_end_offset)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
-
-	if (content_end_offset > file_size) {
-		return -SQSH_ERROR_TODO;
-	}
-	return 0;
-}
-
 int
 sqsh_file_reader_advance(
 		struct SqshFileReader *reader, sqsh_index_t offset, size_t size) {
 	int rv = 0;
-	const struct SqshSuperblockContext *superblock = reader->superblock;
-	const struct SqshInodeContext *inode = reader->inode;
+	struct SqshFileIterator *iterator = &reader->iterator;
+	const struct SqshInodeContext *inode = iterator->inode;
+	const struct SqshArchive *archive = inode->sqsh;
+	const struct SqshSuperblockContext *superblock =
+			sqsh_archive_superblock(archive);
 	const uint32_t block_size = sqsh_superblock_block_size(superblock);
-	uint64_t block_offset = reader->datablock_offset;
-	uint64_t block_index = reader->datablock_index;
 
-	block_offset += offset;
-	block_index += block_offset / block_size;
-	block_offset %= block_size;
+	uint64_t current_offset = reader->current_offset;
+	if (SQSH_ADD_OVERFLOW(offset, current_offset, &current_offset)) {
+		return SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+	uint64_t end_offset;
+	if (SQSH_ADD_OVERFLOW(current_offset, size, &end_offset)) {
+		return SQSH_ERROR_INTEGER_OVERFLOW;
+	}
 
-	reader->datablock_index = block_index;
-	reader->datablock_offset = block_offset;
+	sqsh_index_t skip_blocks = current_offset / block_size;
+	uint32_t block_offset = current_offset % block_size;
 
-	rv = check_bounds(block_index, block_offset, size, inode, superblock);
+	if (skip_blocks > 0) {
+		rv = sqsh_file_iterator_skip(iterator, skip_blocks - 1);
+		if (rv < 0) {
+			goto out;
+		}
+	}
+	rv = sqsh_file_iterator_next(iterator, end_offset);
 	if (rv < 0) {
-		return rv;
+		goto out;
 	}
+	rv = 0;
 
-	if (block_index >= sqsh_inode_file_block_count(inode)) {
-		return file_map_fragment(reader, block_offset, size);
-	}
-
-	if (is_direct(block_index, size, inode, superblock)) {
-		return file_map_direct(reader, block_index, block_offset, size);
+	if (sqsh_file_iterator_size(iterator) >= end_offset) {
+		// Direct mapping works
+		reader->current_offset = current_offset;
+		reader->data = sqsh_file_iterator_data(iterator) + block_offset;
+		reader->current_size = size;
 	} else {
-		return file_map_buffered(reader, block_index, block_offset, size);
+		struct SqshBuffer *buffer = &reader->buffer;
+		// We need to copy the data;
+		sqsh__buffer_drain(&reader->buffer);
+		rv = sqsh__buffer_append(
+				buffer, sqsh_file_iterator_data(iterator) + block_offset,
+				sqsh_file_iterator_size(iterator) - block_offset);
+		if (rv < 0) {
+			goto out;
+		}
+		for (; (rv = sqsh_file_iterator_next(iterator, end_offset)) > 0;) {
+			rv = sqsh__buffer_append(
+					buffer, sqsh_file_iterator_data(iterator),
+					sqsh_file_iterator_size(iterator));
+			if (rv < 0) {
+				goto out;
+			}
+			if (sqsh__buffer_size(buffer) >= size) {
+				break;
+			};
+		}
+		if (rv < 0) {
+			goto out;
+		}
+		if (sqsh__buffer_size(buffer) < size) {
+			// Premature end of file
+			rv = -SQSH_ERROR_TODO;
+			goto out;
+		}
+		if (rv < 0) {
+			goto out;
+		}
+		rv = 0;
+		reader->current_offset = 0;
+		reader->data = sqsh__buffer_data(buffer);
+		reader->current_size = sqsh__buffer_size(buffer);
 	}
+
+out:
+	return rv;
 }
 
 const uint8_t *
@@ -338,16 +151,13 @@ sqsh_file_reader_data(struct SqshFileReader *reader) {
 
 size_t
 sqsh_file_reader_size(struct SqshFileReader *reader) {
-	return reader->data_size;
+	return reader->current_size;
 }
 
 int
 sqsh__file_reader_cleanup(struct SqshFileReader *context) {
 	sqsh__buffer_cleanup(&context->buffer);
-	sqsh__map_reader_cleanup(&context->map_reader);
-	context->data = NULL;
-	context->data_size = 0;
-	context->inode = NULL;
+	sqsh__file_iterator_cleanup(&context->iterator);
 	return 0;
 }
 
