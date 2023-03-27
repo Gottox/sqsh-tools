@@ -460,7 +460,8 @@ struct SqshConfig {
 	uint64_t source_size; \
 	const struct SqshMemoryMapperImpl *source_mapper; \
 	int mapper_block_size; \
-	int mapper_lru_size;
+	int mapper_lru_size; \
+	int compression_lru_size;
 
 	SQSH_CONFIG_FIELDS
 	uint8_t _reserved[128 - sizeof(struct {SQSH_CONFIG_FIELDS})];

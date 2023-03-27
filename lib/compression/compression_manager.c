@@ -83,6 +83,9 @@ sqsh__compression_manager_init(
 		const struct SqshCompression *compression, uint64_t start_address,
 		uint64_t upper_limit, size_t size) {
 	int rv;
+	const struct SqshConfig *config = sqsh_archive_config(archive);
+	const size_t lru_size =
+			SQSH_CONFIG_DEFAULT(config->compression_lru_size, 128);
 
 	if (start_address > upper_limit) {
 		return -SQSH_ERROR_TODO;
@@ -107,7 +110,8 @@ sqsh__compression_manager_init(
 		goto out;
 	}
 	rv = sqsh__lru_init(
-			&manager->lru, 128, &sqsh__lru_rc_hash_map, &manager->hash_map);
+			&manager->lru, lru_size, &sqsh__lru_rc_hash_map,
+			&manager->hash_map);
 	if (rv < 0) {
 		goto out;
 	}
