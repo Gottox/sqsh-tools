@@ -23,7 +23,6 @@ libsqsh_sources = [
 	'data/xattr_data.c',
 	'directory/directory_iterator.c',
 	'error.c',
-	'file/file_context.c',
 	'file/file_iterator.c',
 	'file/file_reader.c',
 	'file/fragment_table.c',
