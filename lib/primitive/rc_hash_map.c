@@ -152,8 +152,8 @@ sqsh__rc_hash_map_retain(
 	const size_t size = sqsh__rc_map_size(&hash_map->hash_maps[0].values);
 	sqsh_index_t index = key_to_index(key, size);
 
-	for (sqsh_index_t i = 0; i < size && i < MAX_COLLISIONS; i++, index++) {
-		index = index % size;
+	for (sqsh_index_t i = 0; i < size && i < MAX_COLLISIONS; i++) {
+		index = (index + 1) % size;
 
 		for (sqsh_index_t j = 0; j < hash_map->hash_map_count; j++) {
 			struct SqshRcMap *values = &hash_map->hash_maps[j].values;
