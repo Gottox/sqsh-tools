@@ -13,16 +13,8 @@
 : "${MKSQUASHFS:?MKSQUASHFS is not set}"
 : "${SOURCE_ROOT:?SOURCE_ROOT is not set}"
 : "${SQSH_UNPACK:?SQSH_UNPACK is not set}"
-: "${UNSHARE:?UNSHARE is not set}"
 
 MKSQUASHFS_OPTS="-no-xattrs -noappend -all-root -mkfs-time @0"
-
-# unshares the mount namespace, so that sqsh-mount will be terminated
-# when this script exits
-if [ -z "$INTERNAL_UNSHARED" ]; then
-	export INTERNAL_UNSHARED=1
-	exec "$UNSHARE" -rm "$0" "$@"
-fi
 
 cd "$SOURCE_ROOT"
 

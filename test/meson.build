@@ -97,7 +97,6 @@ if get_option('test') == 'extended'
 			'MKSQUASHFS': mksquashfs.full_path(),
 			'SOURCE_ROOT': meson.project_source_root(),
 			'SQSH_UNPACK': tools['sqsh-unpack'].full_path(),
-			'UNSHARE': unshare.full_path(),
 		},
 	)
 
