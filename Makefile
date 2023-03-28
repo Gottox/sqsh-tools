@@ -12,6 +12,7 @@ ARCH = x86_64
 
 MESON_FLAGS += -Ddefault_library=static
 MESON_FLAGS += -Db_lundef=false
+#MESON_FLAGS += -Dtest=extended
 MESON_FLAGS += -Dtest=true
 MESON_FLAGS += -Ddoc=internal
 MESON_FLAGS += -Dlzo=true
@@ -44,10 +45,10 @@ $(NINJA_TARGETS): $(BUILD_DIR)
 	$W ninja -C $< $@
 
 $(BUILD_DIR): meson.build Makefile
-	[ -d "$@" ] && rm -r "$@" || true
+	[ -d "$@" ] && rm -rf "$@" || true
 	$W CC=$(CC) meson setup "$@" $(MESON_FLAGS)
 
 .PHONY: clean
 
 clean:
-	[ -d "$(BUILD_DIR)" ] && rm -r $(BUILD_DIR) || true
+	[ -d "$(BUILD_DIR)" ] && rm -rf "$(BUILD_DIR)" || true
