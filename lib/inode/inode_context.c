@@ -147,8 +147,6 @@ sqsh__inode_init(
 	const uint16_t inner_offset = sqsh_address_ref_inner_offset(inode_ref);
 	uint64_t address_outer;
 
-	inode->inode_ref = inode_ref;
-
 	int rv = 0;
 	const struct SqshSuperblockContext *superblock =
 			sqsh_archive_superblock(sqsh);
@@ -171,6 +169,7 @@ sqsh__inode_init(
 	}
 
 	inode->sqsh = sqsh;
+	inode->inode_ref = inode_ref;
 
 	return inode_load(inode);
 }
@@ -543,6 +542,11 @@ sqsh_inode_uid(const struct SqshInodeContext *context) {
 uint32_t
 sqsh_inode_gid(const struct SqshInodeContext *context) {
 	return inode_get_id(context, sqsh_data_inode_gid_idx(get_inode(context)));
+}
+
+uint64_t
+sqsh_inode_ref(const struct SqshInodeContext *context) {
+	return context->inode_ref;
 }
 
 uint32_t

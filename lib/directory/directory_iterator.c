@@ -46,16 +46,17 @@ directory_iterator_index_lookup(
 	int rv = 0;
 	struct SqshDirectoryIndexIterator index_iterator = {0};
 	struct SqshInodeContext *inode = iterator->inode;
+	const uint64_t inode_ref = sqsh_inode_ref(inode);
 
 	rv = sqsh__directory_index_iterator_init(
-			&index_iterator, inode->sqsh, inode->inode_ref);
+			&index_iterator, inode->sqsh, inode_ref);
 	if (rv < 0) {
 		return rv;
 	}
 	while ((rv = sqsh__directory_index_iterator_next(&index_iterator)) > 0) {
 		const char *index_name =
 				sqsh__directory_index_iterator_name(&index_iterator);
-		uint32_t index_name_size =
+		const uint32_t index_name_size =
 				sqsh__directory_index_iterator_name_size(&index_iterator);
 
 		// BUG: the branch could be taken too early when the name is a prefix

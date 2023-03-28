@@ -279,6 +279,7 @@ stat_file(struct SqshPathResolver *resolver, const char *path) {
 	}
 
 	int inode_type = sqsh_inode_type(inode);
+	printf("          inode ref: %" PRIu64 "\n", sqsh_inode_ref(inode));
 	printf("         inode type: %s\n", inode_type_name(inode_type));
 	printf(" extended structure: %s\n",
 		   sqsh_inode_is_extended(inode) ? "yes" : "no");

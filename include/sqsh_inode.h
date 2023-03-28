@@ -337,14 +337,24 @@ uint32_t sqsh_inode_gid(const struct SqshInodeContext *context);
 
 /**
  * @memberof SqshInodeContext
+ * @brief returns the reference to this inode.
+ *
+ * @param[in] context The inode context.
+ *
+ * @return the reference to this inode.
+ */
+uint64_t sqsh_inode_ref(const struct SqshInodeContext *context);
+
+/**
+ * @memberof SqshInodeContext
  * @brief returns index of the extended attribute inside of the xattr table.
  *
  * @param[in] context The inode context.
  *
  * @return the index of the extended attribute inside of the xattr table.
  */
-
 uint32_t sqsh_inode_xattr_index(const struct SqshInodeContext *context);
+
 /**
  * @memberof SqshInodeContext
  * @brief cleans up an inode context and frees the memory.
