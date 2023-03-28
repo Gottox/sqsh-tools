@@ -119,7 +119,7 @@ int sqsh__superblock_cleanup(struct SqshSuperblock *superblock);
  * @brief The compression options context is used to store the
  * compression options for a specific compression algorithm.
  */
-struct SqshCompressionOptionsContext {
+struct SqshCompressionOptions {
 	/**
 	 * @privatesection
 	 */
@@ -129,23 +129,21 @@ struct SqshCompressionOptionsContext {
 
 /**
  * @internal
- * @memberof SqshCompressionOptionsContext
+ * @memberof SqshCompressionOptions
  * @brief Initialize the compression options context.
  * @param context the compression options context
  * @param sqsh the Sqsh struct
  */
 SQSH_NO_UNUSED int sqsh__compression_options_init(
-		struct SqshCompressionOptionsContext *context,
-		struct SqshArchive *sqsh);
+		struct SqshCompressionOptions *context, struct SqshArchive *sqsh);
 
 /**
  * @internal
- * @memberof SqshCompressionOptionsContext
+ * @memberof SqshCompressionOptions
  * @brief Frees the resources used by the compression options context.
  * @param context the compression options context
  */
-int sqsh__compression_options_cleanup(
-		struct SqshCompressionOptionsContext *context);
+int sqsh__compression_options_cleanup(struct SqshCompressionOptions *context);
 
 ////////////////////////////////////////
 // archive/archive.c

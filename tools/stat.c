@@ -72,8 +72,7 @@ usage(char *arg0) {
 }
 
 static int
-stat_gzip_options(
-		const struct SqshCompressionOptionsContext *compression_options) {
+stat_gzip_options(const struct SqshCompressionOptions *compression_options) {
 	printf("       compression level: %i\n",
 		   sqsh_compression_options_gzip_compression_level(
 				   compression_options));
@@ -102,8 +101,7 @@ stat_gzip_options(
 }
 
 static int
-stat_xz_options(
-		const struct SqshCompressionOptionsContext *compression_options) {
+stat_xz_options(const struct SqshCompressionOptions *compression_options) {
 	printf("         dictionary size: %i\n",
 		   sqsh_compression_options_xz_dictionary_size(compression_options));
 	const enum SqshXzFilters filters =
@@ -129,8 +127,7 @@ stat_xz_options(
 }
 
 static int
-stat_lz4_options(
-		const struct SqshCompressionOptionsContext *compression_options) {
+stat_lz4_options(const struct SqshCompressionOptions *compression_options) {
 	printf("                 version: %i\n",
 		   sqsh_compression_options_lz4_version(compression_options));
 	const enum SqshLz4Flags flags =
@@ -144,8 +141,7 @@ stat_lz4_options(
 }
 
 static int
-stat_zstd_options(
-		const struct SqshCompressionOptionsContext *compression_options) {
+stat_zstd_options(const struct SqshCompressionOptions *compression_options) {
 	printf("       compression level: %i\n",
 		   sqsh_compression_options_zstd_compression_level(
 				   compression_options));
@@ -154,8 +150,7 @@ stat_zstd_options(
 }
 
 static int
-stat_lzo_options(
-		const struct SqshCompressionOptionsContext *compression_options) {
+stat_lzo_options(const struct SqshCompressionOptions *compression_options) {
 	const enum SqshLzoAlgorithm algorithm =
 			sqsh_compression_options_lzo_algorithm(compression_options);
 	const char *algorithm_str;
@@ -189,7 +184,7 @@ stat_lzo_options(
 static int
 stat_image(struct SqshArchive *sqsh) {
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
-	struct SqshCompressionOptionsContext *compression_options;
+	struct SqshCompressionOptions *compression_options;
 	int compression_id = sqsh_superblock_compression_id(superblock);
 	int rv = 0;
 	printf("             compression: %s (%i)\n",

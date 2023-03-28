@@ -40,15 +40,15 @@
 #include <stdlib.h>
 
 static const union SqshDataCompressionOptions *
-compression_options(const struct SqshCompressionOptionsContext *context) {
+compression_options(const struct SqshCompressionOptions *context) {
 	return (union SqshDataCompressionOptions *)sqsh__metablock_iterator_data(
 			&context->metablock);
 }
 
-struct SqshCompressionOptionsContext *
+struct SqshCompressionOptions *
 sqsh_compression_options_new(struct SqshArchive *sqsh, int *err) {
-	struct SqshCompressionOptionsContext *context =
-			calloc(1, sizeof(struct SqshCompressionOptionsContext));
+	struct SqshCompressionOptions *context =
+			calloc(1, sizeof(struct SqshCompressionOptions));
 	if (context == NULL) {
 		return NULL;
 	}
@@ -62,8 +62,7 @@ sqsh_compression_options_new(struct SqshArchive *sqsh, int *err) {
 
 int
 sqsh__compression_options_init(
-		struct SqshCompressionOptionsContext *context,
-		struct SqshArchive *sqsh) {
+		struct SqshCompressionOptions *context, struct SqshArchive *sqsh) {
 	int rv = 0;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
 
@@ -96,7 +95,7 @@ out:
 
 uint32_t
 sqsh_compression_options_gzip_compression_level(
-		const struct SqshCompressionOptionsContext *context) {
+		const struct SqshCompressionOptions *context) {
 	if (context->compression_id != SQSH_COMPRESSION_GZIP) {
 		return UINT32_MAX;
 	}
@@ -105,7 +104,7 @@ sqsh_compression_options_gzip_compression_level(
 }
 uint16_t
 sqsh_compression_options_gzip_window_size(
-		const struct SqshCompressionOptionsContext *context) {
+		const struct SqshCompressionOptions *context) {
 	if (context->compression_id != SQSH_COMPRESSION_GZIP) {
 		return UINT16_MAX;
 	}
@@ -114,7 +113,7 @@ sqsh_compression_options_gzip_window_size(
 }
 enum SqshGzipStrategies
 sqsh_compression_options_gzip_strategies(
-		const struct SqshCompressionOptionsContext *context) {
+		const struct SqshCompressionOptions *context) {
 	if (context->compression_id != SQSH_COMPRESSION_GZIP) {
 		return UINT16_MAX;
 	}
@@ -124,7 +123,7 @@ sqsh_compression_options_gzip_strategies(
 
 uint32_t
 sqsh_compression_options_xz_dictionary_size(
-		const struct SqshCompressionOptionsContext *context) {
+		const struct SqshCompressionOptions *context) {
 	if (context->compression_id != SQSH_COMPRESSION_XZ) {
 		return UINT32_MAX;
 	}
@@ -133,7 +132,7 @@ sqsh_compression_options_xz_dictionary_size(
 }
 uint32_t
 sqsh_compression_options_xz_filters(
-		const struct SqshCompressionOptionsContext *context) {
+		const struct SqshCompressionOptions *context) {
 	if (context->compression_id != SQSH_COMPRESSION_XZ) {
 		return UINT32_MAX;
 	}
@@ -143,7 +142,7 @@ sqsh_compression_options_xz_filters(
 
 uint32_t
 sqsh_compression_options_lz4_version(
-		const struct SqshCompressionOptionsContext *context) {
+		const struct SqshCompressionOptions *context) {
 	if (context->compression_id != SQSH_COMPRESSION_LZ4) {
 		return UINT32_MAX;
 	}
@@ -152,7 +151,7 @@ sqsh_compression_options_lz4_version(
 }
 uint32_t
 sqsh_compression_options_lz4_flags(
-		const struct SqshCompressionOptionsContext *context) {
+		const struct SqshCompressionOptions *context) {
 	if (context->compression_id != SQSH_COMPRESSION_LZ4) {
 		return UINT32_MAX;
 	}
@@ -162,7 +161,7 @@ sqsh_compression_options_lz4_flags(
 
 uint32_t
 sqsh_compression_options_zstd_compression_level(
-		const struct SqshCompressionOptionsContext *context) {
+		const struct SqshCompressionOptions *context) {
 	if (context->compression_id != SQSH_COMPRESSION_ZSTD) {
 		return UINT32_MAX;
 	}
@@ -172,7 +171,7 @@ sqsh_compression_options_zstd_compression_level(
 
 enum SqshLzoAlgorithm
 sqsh_compression_options_lzo_algorithm(
-		const struct SqshCompressionOptionsContext *context) {
+		const struct SqshCompressionOptions *context) {
 	if (context->compression_id != SQSH_COMPRESSION_LZO) {
 		return UINT32_MAX;
 	}
@@ -181,7 +180,7 @@ sqsh_compression_options_lzo_algorithm(
 }
 uint32_t
 sqsh_compression_options_lzo_compression_level(
-		const struct SqshCompressionOptionsContext *context) {
+		const struct SqshCompressionOptions *context) {
 	if (context->compression_id != SQSH_COMPRESSION_LZO) {
 		return UINT32_MAX;
 	}
@@ -190,21 +189,19 @@ sqsh_compression_options_lzo_compression_level(
 }
 
 size_t
-sqsh_compression_options_size(
-		const struct SqshCompressionOptionsContext *context) {
+sqsh_compression_options_size(const struct SqshCompressionOptions *context) {
 	return sqsh__metablock_iterator_size(&context->metablock);
 }
 
 int
-sqsh__compression_options_cleanup(
-		struct SqshCompressionOptionsContext *context) {
+sqsh__compression_options_cleanup(struct SqshCompressionOptions *context) {
 	sqsh__metablock_iterator_cleanup(&context->metablock);
 
 	return 0;
 }
 
 int
-sqsh_compression_options_free(struct SqshCompressionOptionsContext *context) {
+sqsh_compression_options_free(struct SqshCompressionOptions *context) {
 	if (context == NULL) {
 		return 0;
 	}
