@@ -53,7 +53,7 @@
 
 #define dbg(...) fuse_log(FUSE_LOG_DEBUG, __VA_ARGS__)
 
-struct SqshfsContext {
+struct Sqshfs {
 	pthread_mutex_t lock;
 	struct SqshArchive *archive;
 	bool debug;
@@ -93,7 +93,7 @@ usage(const char *progname) {
 }
 
 static uint64_t
-sqshfs_context_inode_ref(struct SqshfsContext *context, fuse_ino_t inode) {
+sqshfs_context_inode_ref(struct Sqshfs *context, fuse_ino_t inode) {
 	int rv = 0;
 	uint64_t inode_ref = 0;
 	struct SqshArchive *archive = context->archive;
@@ -124,9 +124,7 @@ sqshfs_context_inode_ref(struct SqshfsContext *context, fuse_ino_t inode) {
 
 static void
 sqshfs_init(void *userdata, struct fuse_conn_info *conn) {
-	struct SqshfsContext *context = userdata;
-	(void)context;
-	(void)conn;
+	(void)userdata;
 	dbg("sqshfs_init\n");
 
 	if (conn->capable & FUSE_CAP_PARALLEL_DIROPS) {
@@ -136,8 +134,7 @@ sqshfs_init(void *userdata, struct fuse_conn_info *conn) {
 
 static void
 sqshfs_destroy(void *userdata) {
-	struct SqshfsContext *context = userdata;
-	(void)context;
+	(void)userdata;
 	dbg("sqshfs_destroy\n");
 }
 
@@ -191,7 +188,7 @@ sqshfs_inode_to_stat(
 }
 
 static struct SqshInode *
-sqshfs_inode_open(struct SqshfsContext *context, fuse_ino_t ino, int *err) {
+sqshfs_inode_open(struct Sqshfs *context, fuse_ino_t ino, int *err) {
 	const uint64_t inode_ref = sqshfs_context_inode_ref(context, ino);
 	return sqsh_inode_new(context->archive, inode_ref, err);
 }
@@ -202,7 +199,7 @@ sqshfs_getattr(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 	dbg("sqshfs_getattr\n");
 	int rv = 0;
 	struct SqshInode *inode = NULL;
-	struct SqshfsContext *context = fuse_req_userdata(req);
+	struct Sqshfs *context = fuse_req_userdata(req);
 	const struct SqshSuperblock *superblock =
 			sqsh_archive_superblock(context->archive);
 
@@ -228,7 +225,7 @@ sqshfs_lookup(fuse_req_t req, fuse_ino_t parent, const char *name) {
 	struct SqshDirectoryIterator *iterator = NULL;
 	struct SqshInode *parent_inode = NULL;
 	struct SqshInode *inode = NULL;
-	struct SqshfsContext *context = fuse_req_userdata(req);
+	struct Sqshfs *context = fuse_req_userdata(req);
 	const struct SqshSuperblock *superblock =
 			sqsh_archive_superblock(context->archive);
 
@@ -287,7 +284,7 @@ static void
 sqshfs_readlink(fuse_req_t req, fuse_ino_t ino) {
 	int rv = 0;
 	struct SqshInode *inode = NULL;
-	struct SqshfsContext *context = fuse_req_userdata(req);
+	struct Sqshfs *context = fuse_req_userdata(req);
 	dbg("sqshfs_readlink: %i\n", ino);
 
 	inode = sqshfs_inode_open(context, ino, &rv);
@@ -320,7 +317,7 @@ out:
 static void
 sqshfs_opendir(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 	int rv = 0;
-	struct SqshfsContext *context = fuse_req_userdata(req);
+	struct Sqshfs *context = fuse_req_userdata(req);
 	struct SqshfsDirHandle *handle = calloc(1, sizeof(*handle));
 	dbg("sqshfs_opendir\n");
 
@@ -363,7 +360,7 @@ sqshfs_readdir(
 
 	int rv = 0;
 	struct SqshInode *inode = NULL;
-	struct SqshfsContext *context = fuse_req_userdata(req);
+	struct Sqshfs *context = fuse_req_userdata(req);
 	struct SqshfsDirHandle *handle = (void *)fi->fh;
 	dbg("sqshfs_readdir\n");
 	char buf[size];
@@ -416,13 +413,10 @@ sqshfs_releasedir(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 
 static void
 sqshfs_open(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
-	(void)req;
-	(void)ino;
-	(void)fi;
 	dbg("sqshfs_open\n");
 
 	int rv = 0;
-	struct SqshfsContext *context = fuse_req_userdata(req);
+	struct Sqshfs *context = fuse_req_userdata(req);
 	struct SqshfsFileHandle *handle = calloc(1, sizeof(*handle));
 	if (handle == NULL) {
 		dbg("sqshfs_open: calloc failed\n");
@@ -471,8 +465,6 @@ static void
 sqshfs_read(
 		fuse_req_t req, fuse_ino_t ino, size_t size, off_t offset,
 		struct fuse_file_info *fi) {
-	(void)ino;
-	(void)offset;
 	int rv = 0;
 
 	dbg("sqshfs_read: %i %u %u\n", ino, offset, size);
@@ -496,7 +488,7 @@ sqshfs_getxattr(fuse_req_t req, fuse_ino_t ino, const char *name, size_t size) {
 	int rv = 0;
 	struct SqshInode *inode = NULL;
 	struct SqshXattrIterator *iterator = NULL;
-	struct SqshfsContext *context = fuse_req_userdata(req);
+	struct Sqshfs *context = fuse_req_userdata(req);
 	const char *value_ptr = NULL;
 	size_t value_size;
 	dbg("sqshfs_getxattr: %s\n", name);
@@ -583,7 +575,6 @@ static const struct fuse_lowlevel_ops sqshfs_oper = {
 static int
 sqshfs_process_options(
 		void *data, const char *arg, int key, struct fuse_args *outargs) {
-	(void)data;
 	(void)outargs;
 	struct SqshfsOptions *sqshfs_options = data;
 	if (key == FUSE_OPT_KEY_NONOPT && sqshfs_options->archive == NULL) {
@@ -600,7 +591,7 @@ main(int argc, char *argv[]) {
 	struct fuse_cmdline_opts fuse_options = {0};
 	struct SqshfsOptions sqshfs_options = {0};
 	struct fuse_loop_config config;
-	struct SqshfsContext sqshfs_context = {0};
+	struct Sqshfs sqshfs_context = {0};
 	int rv = EXIT_SUCCESS;
 
 	if (fuse_opt_parse(
