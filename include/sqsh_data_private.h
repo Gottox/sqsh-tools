@@ -83,7 +83,7 @@ SQSH_STATIC_ASSERT(
 		sizeof(struct SqshDataCompressionOptionsLzo) ==
 		SQSH_SIZEOF_COMPRESSION_OPTIONS_LZO);
 
-union SqshCompressionOptions {
+union SqshDataCompressionOptions {
 	struct SqshDataCompressionOptionsGzip gzip;
 	struct SqshDataCompressionOptionsXz xz;
 	struct SqshDataCompressionOptionsLz4 lz4;
@@ -91,7 +91,7 @@ union SqshCompressionOptions {
 	struct SqshDataCompressionOptionsLzo lzo;
 };
 SQSH_STATIC_ASSERT(
-		sizeof(union SqshCompressionOptions) ==
+		sizeof(union SqshDataCompressionOptions) ==
 		SQSH_SIZEOF_COMPRESSION_OPTIONS);
 
 ////////////////////////////////////////

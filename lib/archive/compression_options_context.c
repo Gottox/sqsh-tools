@@ -39,9 +39,9 @@
 
 #include <stdlib.h>
 
-static const union SqshCompressionOptions *
+static const union SqshDataCompressionOptions *
 compression_options(const struct SqshCompressionOptionsContext *context) {
-	return (union SqshCompressionOptions *)sqsh__metablock_iterator_data(
+	return (union SqshDataCompressionOptions *)sqsh__metablock_iterator_data(
 			&context->metablock);
 }
 
