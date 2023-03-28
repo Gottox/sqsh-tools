@@ -262,7 +262,7 @@ extract(const char *filename, struct SqshInode *inode,
 			.segment = filename, .prev = path_stack};
 	int rv = 0;
 	uint32_t fuid, fgid;
-	const enum SqshInodeContextType type = sqsh_inode_type(inode);
+	const enum SqshInodeType type = sqsh_inode_type(inode);
 	const uint16_t mode = sqsh_inode_permission(inode);
 	struct utimbuf times;
 

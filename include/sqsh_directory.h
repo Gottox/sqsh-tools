@@ -112,7 +112,7 @@ sqsh_directory_iterator_inode_ref(const struct SqshDirectoryIterator *iterator);
  *
  * @return The inode type on success, SqshInodeContextTypeInvalid on error.
  */
-enum SqshInodeContextType sqsh_directory_iterator_inode_type(
+enum SqshInodeType sqsh_directory_iterator_inode_type(
 		const struct SqshDirectoryIterator *iterator);
 
 /**

@@ -192,7 +192,7 @@ sqsh_directory_iterator_inode_ref(
 	return sqsh_address_ref_create(block_index, block_offset);
 }
 
-enum SqshInodeContextType
+enum SqshInodeType
 sqsh_directory_iterator_inode_type(
 		const struct SqshDirectoryIterator *iterator) {
 	switch (sqsh_data_directory_entry_type(get_entry(iterator))) {

@@ -419,7 +419,7 @@ sqsh_inode_file_has_fragment(const struct SqshInode *inode) {
 			SQSH_INODE_NO_FRAGMENT;
 }
 
-enum SqshInodeContextType
+enum SqshInodeType
 sqsh_inode_type(const struct SqshInode *context) {
 	const struct SqshDataInode *inode = get_inode(context);
 

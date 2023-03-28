@@ -48,7 +48,7 @@ struct SqshArchive;
 #define SQSH_INODE_NO_FRAGMENT 0xFFFFFFFF
 #define SQSH_INODE_NO_XATTR 0xFFFFFFFF
 
-enum SqshInodeContextType {
+enum SqshInodeType {
 	SQSH_INODE_TYPE_UNKNOWN = -1,
 	// avoid overlapping with the types in inode_data.h
 	SQSH_INODE_TYPE_DIRECTORY = 1 + (1 << 8),
@@ -248,7 +248,7 @@ bool sqsh_inode_file_has_fragment(const struct SqshInode *context);
  *
  * @return the type of the inode.
  */
-enum SqshInodeContextType
+enum SqshInodeType
 sqsh_inode_type(const struct SqshInode *context);
 
 /**
