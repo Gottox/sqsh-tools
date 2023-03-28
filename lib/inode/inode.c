@@ -52,7 +52,7 @@ inode_load(struct SqshInode *context) {
 	size_t size = SQSH_SIZEOF_INODE_HEADER;
 
 	const struct SqshDataInode *inode = get_inode(context);
-	enum SqshInodeType type = sqsh_data_inode_type(inode);
+	enum SqshDataInodeType type = sqsh_data_inode_type(inode);
 	switch (type) {
 	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
 		size += SQSH_SIZEOF_INODE_DIRECTORY;
