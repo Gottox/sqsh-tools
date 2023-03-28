@@ -79,7 +79,7 @@ SQSH_NO_UNUSED int sqsh__trailing_init(
 int sqsh__trailing_cleanup(struct SqshTrailingContext *context);
 
 ////////////////////////////////////////
-// archive/superblock_context.c
+// archive/superblock.c
 
 struct SqshSuperblock {
 	/**
@@ -93,13 +93,13 @@ struct SqshSuperblock {
  * @memberof SqshSuperblock
  * @brief Initializes a superblock context.
  *
- * @param[out] context The context to initialize.
- * @param[in]  mapper  The mapper to use for the superblock.
+ * @param[out] superblock The context to initialize.
+ * @param[in]  mapper     The mapper to use for the superblock.
  *
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_UNUSED int sqsh__superblock_init(
-		struct SqshSuperblock *context, struct SqshMapManager *mapper);
+		struct SqshSuperblock *superblock, struct SqshMapManager *mapper);
 
 /**
  * @internal
@@ -113,7 +113,7 @@ SQSH_NO_UNUSED int sqsh__superblock_init(
 int sqsh__superblock_cleanup(struct SqshSuperblock *superblock);
 
 ////////////////////////////////////////
-// archive/compression_options_context.c
+// archive/compression_options.c
 
 /**
  * @brief The compression options context is used to store the
@@ -131,19 +131,21 @@ struct SqshCompressionOptions {
  * @internal
  * @memberof SqshCompressionOptions
  * @brief Initialize the compression options context.
- * @param context the compression options context
+ * @param compression_options the compression options context
  * @param sqsh the Sqsh struct
  */
 SQSH_NO_UNUSED int sqsh__compression_options_init(
-		struct SqshCompressionOptions *context, struct SqshArchive *sqsh);
+		struct SqshCompressionOptions *compression_options,
+		struct SqshArchive *sqsh);
 
 /**
  * @internal
  * @memberof SqshCompressionOptions
  * @brief Frees the resources used by the compression options context.
- * @param context the compression options context
+ * @param compression_options the compression options context
  */
-int sqsh__compression_options_cleanup(struct SqshCompressionOptions *context);
+int sqsh__compression_options_cleanup(
+		struct SqshCompressionOptions *compression_options);
 
 ////////////////////////////////////////
 // archive/archive.c
