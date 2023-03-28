@@ -44,7 +44,7 @@ static void
 load_segment_from_compressed_data_block(void) {
 	int rv;
 	struct SqshArchive archive = {0};
-	struct SqshInodeContext inode = {0};
+	struct SqshInode inode = {0};
 	uint8_t payload[] = {
 			/* clang-format off */
 			SQSH_HEADER,
@@ -94,7 +94,7 @@ static void
 load_two_segments_from_uncompressed_data_block(void) {
 	int rv;
 	struct SqshArchive archive = {0};
-	struct SqshInodeContext inode = {0};
+	struct SqshInode inode = {0};
 	uint8_t payload[] = {
 			/* clang-format off */
 			SQSH_HEADER,
@@ -157,7 +157,7 @@ static void
 load_segment_from_uncompressed_data_block(void) {
 	int rv;
 	struct SqshArchive archive = {0};
-	struct SqshInodeContext inode = {0};
+	struct SqshInode inode = {0};
 	uint8_t payload[] = {
 			/* clang-format off */
 			SQSH_HEADER,

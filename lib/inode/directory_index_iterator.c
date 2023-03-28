@@ -60,7 +60,7 @@ sqsh__directory_index_iterator_init(
 		struct SqshDirectoryIndexIterator *iterator, struct SqshArchive *sqsh,
 		uint64_t inode_ref) {
 	int rv;
-	struct SqshInodeContext *inode = &iterator->inode;
+	struct SqshInode *inode = &iterator->inode;
 
 	rv = sqsh__inode_init(inode, sqsh, inode_ref);
 	if (rv < 0) {
@@ -75,7 +75,7 @@ sqsh__directory_index_iterator_init(
 
 	iterator->next_offset = INODE_HEADER_SIZE;
 
-	// TODO: Move this block to a method of SqshInodeContext
+	// TODO: Move this block to a method of SqshInode
 	const struct SqshDataInodeDirectoryExt *xdir =
 			sqsh_data_inode_directory_ext(get_inode(iterator));
 	iterator->remaining_entries =

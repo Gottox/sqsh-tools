@@ -66,7 +66,7 @@ sqsh_archive_free(archive);
 ### ... get metainformations about a file?
 
 ```c
-struct SqshInodeContext inode = { 0 };
+struct SqshInode inode = { 0 };
 int rv = sqsh_inode_load_by_path(&inode, &archive, "/path/to/file");
 if (rv < 0)
 	abort();

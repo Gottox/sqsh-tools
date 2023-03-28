@@ -43,7 +43,7 @@
 int
 sqsh__xattr_iterator_init(
 		struct SqshXattrIterator *iterator,
-		const struct SqshInodeContext *inode) {
+		const struct SqshInode *inode) {
 	int rv;
 	struct SqshDataXattrLookupTable ref = {0};
 	struct SqshXattrTable *xattr_table = NULL;
@@ -106,7 +106,7 @@ out:
 }
 
 struct SqshXattrIterator *
-sqsh_xattr_iterator_new(const struct SqshInodeContext *inode, int *err) {
+sqsh_xattr_iterator_new(const struct SqshInode *inode, int *err) {
 	struct SqshXattrIterator *iterator =
 			calloc(1, sizeof(struct SqshXattrIterator));
 	if (iterator == NULL) {

@@ -69,7 +69,7 @@ sqsh_path_resolver_new(struct SqshArchive *sqsh, int *err);
  *
  * @return an inode context on success, NULL on error
  */
-SQSH_NO_UNUSED struct SqshInodeContext *sqsh_path_resolver_resolve(
+SQSH_NO_UNUSED struct SqshInode *sqsh_path_resolver_resolve(
 		struct SqshPathResolver *resolver, const char *path, int *err);
 
 /**
@@ -94,7 +94,7 @@ int sqsh_path_resolver_free(struct SqshPathResolver *resolver);
  *
  * @return int 0 on success, less than 0 on error.
  */
-struct SqshInodeContext *
+struct SqshInode *
 sqsh_open(struct SqshArchive *archive, const char *path, int *err);
 
 /**
@@ -104,7 +104,7 @@ sqsh_open(struct SqshArchive *archive, const char *path, int *err);
  *
  * @return int 0 on success, less than 0 on error.
  */
-int sqsh_close(struct SqshInodeContext *inode);
+int sqsh_close(struct SqshInode *inode);
 
 #ifdef __cplusplus
 }

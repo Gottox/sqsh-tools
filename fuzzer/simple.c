@@ -13,7 +13,7 @@
 #include <stdint.h>
 
 static int
-read_file(struct SqshInodeContext *inode) {
+read_file(struct SqshInode *inode) {
 	struct SqshFileContext file = {0};
 	int rv;
 	rv = sqsh__file_init(&file, inode);
@@ -35,7 +35,7 @@ int
 LLVMFuzzerTestOneInput(char *data, size_t size) {
 	int rv = 0;
 	struct SqshArchive sqsh = {0};
-	struct SqshInodeContext inode = {0};
+	struct SqshInode inode = {0};
 	struct SqshDirectoryIterator iter = {0};
 	const struct SqshSuperblockContext *superblock;
 	rv = sqsh__archive_init(

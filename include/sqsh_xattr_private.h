@@ -71,7 +71,7 @@ struct SqshXattrIterator {
  */
 SQSH_NO_UNUSED int sqsh__xattr_iterator_init(
 		struct SqshXattrIterator *iterator,
-		const struct SqshInodeContext *inode);
+		const struct SqshInode *inode);
 
 /**
  * @internal

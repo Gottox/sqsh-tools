@@ -55,7 +55,7 @@ static int (*print_item)(const struct SqshDirectoryIterator *, const char *) =
 
 static int
 ls(struct SqshPathResolver *resolver, const char *path,
-   struct SqshInodeContext *inode);
+   struct SqshInode *inode);
 
 static int
 usage(char *arg0) {
@@ -72,7 +72,7 @@ print_simple(const struct SqshDirectoryIterator *iter, const char *path) {
 }
 
 void
-print_detail_inode(struct SqshInodeContext *inode, const char *path) {
+print_detail_inode(struct SqshInode *inode, const char *path) {
 	int mode;
 	char xchar, unxchar;
 
@@ -139,7 +139,7 @@ print_detail_inode(struct SqshInodeContext *inode, const char *path) {
 static int
 print_detail(const struct SqshDirectoryIterator *iter, const char *path) {
 	int rv = 0;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 
 	inode = sqsh_directory_iterator_inode_load(iter, &rv);
 	if (rv < 0) {
@@ -156,7 +156,7 @@ ls_item(struct SqshPathResolver *resolver, const char *path,
 		struct SqshDirectoryIterator *iter) {
 	int rv = 0;
 	int len = 0;
-	struct SqshInodeContext *entry_inode = NULL;
+	struct SqshInode *entry_inode = NULL;
 	const char *name = sqsh_directory_iterator_name(iter);
 	const int name_size = sqsh_directory_iterator_name_size(iter);
 	char *current_path =
@@ -196,7 +196,7 @@ out:
 
 static int
 ls(struct SqshPathResolver *resolver, const char *path,
-   struct SqshInodeContext *inode) {
+   struct SqshInode *inode) {
 	int rv = 0;
 	struct SqshDirectoryIterator *iter = NULL;
 
@@ -223,7 +223,7 @@ out:
 
 static int
 ls_path(struct SqshPathResolver *resolver, char *path) {
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	int rv = 0;
 
 	inode = sqsh_path_resolver_resolve(resolver, path, &rv);

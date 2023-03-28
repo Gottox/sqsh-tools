@@ -45,7 +45,7 @@ static void
 load_file_from_compressed_data_block(void) {
 	int rv;
 	struct SqshArchive archive = {0};
-	struct SqshInodeContext inode = {0};
+	struct SqshInode inode = {0};
 	uint8_t payload[4096] = {
 			SQSH_HEADER,
 			/* inode */
@@ -84,7 +84,7 @@ static void
 load_file_from_compressed_data_block_with_offset(void) {
 	int rv;
 	struct SqshArchive archive = {0};
-	struct SqshInodeContext inode = {0};
+	struct SqshInode inode = {0};
 	uint8_t payload[4096] = {
 			SQSH_HEADER,
 			/* inode */
@@ -121,7 +121,7 @@ static void
 load_file_from_uncompressed_data_block(void) {
 	int rv;
 	struct SqshArchive archive = {0};
-	struct SqshInodeContext inode = {0};
+	struct SqshInode inode = {0};
 	uint8_t payload[4096] = {
 			SQSH_HEADER,
 			/* inode */

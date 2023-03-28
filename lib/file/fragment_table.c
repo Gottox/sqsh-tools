@@ -90,7 +90,7 @@ out:
 
 static int
 append_fragment(
-		struct SqshFragmentTable *table, const struct SqshInodeContext *inode,
+		struct SqshFragmentTable *table, const struct SqshInode *inode,
 		struct SqshBuffer *buffer, const uint8_t *data, size_t data_size) {
 	uint32_t block_size = sqsh_superblock_block_size(table->superblock);
 	uint32_t offset = sqsh_inode_file_fragment_block_offset(inode);
@@ -114,7 +114,7 @@ out:
 
 static int
 read_fragment_compressed(
-		struct SqshFragmentTable *table, const struct SqshInodeContext *inode,
+		struct SqshFragmentTable *table, const struct SqshInode *inode,
 		struct SqshBuffer *buffer, uint64_t start_address, uint32_t size) {
 	int rv = 0;
 	const struct SqshBuffer *uncompressed = NULL;
@@ -140,7 +140,7 @@ out:
 
 static int
 read_fragment_uncompressed(
-		struct SqshFragmentTable *table, const struct SqshInodeContext *inode,
+		struct SqshFragmentTable *table, const struct SqshInode *inode,
 		struct SqshBuffer *buffer, uint64_t start_address, uint32_t size) {
 	int rv = 0;
 	const uint8_t *data;
@@ -173,7 +173,7 @@ out:
 
 int
 sqsh_fragment_table_to_buffer(
-		struct SqshFragmentTable *table, const struct SqshInodeContext *inode,
+		struct SqshFragmentTable *table, const struct SqshInode *inode,
 		struct SqshBuffer *buffer) {
 	uint32_t index = sqsh_inode_file_fragment_block_index(inode);
 

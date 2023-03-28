@@ -56,7 +56,7 @@ struct PathStack {
 };
 
 static int
-extract(const char *filename, struct SqshInodeContext *inode,
+extract(const char *filename, struct SqshInode *inode,
 		const struct PathStack *path_stack);
 
 static int
@@ -93,7 +93,7 @@ extract_directory_entry(
 		struct SqshDirectoryIterator *iter,
 		const struct PathStack *path_stack) {
 	int rv;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	const char *filename_ptr = sqsh_directory_iterator_name(iter);
 	size_t size = sqsh_directory_iterator_name_size(iter);
 	char filename[size + 1];
@@ -113,7 +113,7 @@ out:
 
 static int
 extract_directory(
-		const char *filename, struct SqshInodeContext *inode,
+		const char *filename, struct SqshInode *inode,
 		const struct PathStack *path_stack) {
 	int rv;
 	char cwd[PATH_MAX] = {0};
@@ -161,7 +161,7 @@ out:
 
 static int
 extract_file(
-		const char *filename, struct SqshInodeContext *inode,
+		const char *filename, struct SqshInode *inode,
 		const struct PathStack *path_stack) {
 	int rv = 0;
 	FILE *file = NULL;
@@ -202,7 +202,7 @@ out:
 
 static int
 extract_symlink(
-		const char *filename, struct SqshInodeContext *inode,
+		const char *filename, struct SqshInode *inode,
 		const struct PathStack *path_stack) {
 	int rv;
 	const char *target_ptr = sqsh_inode_symlink(inode);
@@ -223,7 +223,7 @@ out:
 
 static int
 extract_device(
-		const char *filename, struct SqshInodeContext *inode,
+		const char *filename, struct SqshInode *inode,
 		const struct PathStack *path_stack) {
 	int rv = 0;
 	uint16_t mode = sqsh_inode_permission(inode);
@@ -256,7 +256,7 @@ out:
 }
 
 static int
-extract(const char *filename, struct SqshInodeContext *inode,
+extract(const char *filename, struct SqshInode *inode,
 		const struct PathStack *path_stack) {
 	const struct PathStack new_path_stack = {
 			.segment = filename, .prev = path_stack};
@@ -336,7 +336,7 @@ main(int argc, char *argv[]) {
 	char *target_path = NULL;
 	struct SqshArchive *sqsh;
 	struct SqshPathResolver *resolver = NULL;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 
 	while ((opt = getopt(argc, argv, "cvVh")) != -1) {
 		switch (opt) {

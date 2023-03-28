@@ -102,7 +102,7 @@ sqshfuse_getattr(
 	int rv = 0;
 	memset(stbuf, 0, sizeof(struct stat));
 
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	const struct SqshSuperblockContext *superblock =
 			sqsh_archive_superblock(data.sqsh);
 
@@ -159,7 +159,7 @@ sqshfuse_getxattr(
 	int rv = 0;
 	const char *value_ptr = NULL;
 	size_t value_size;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	struct SqshXattrIterator *iter = NULL;
 
 	inode = sqsh_path_resolver_resolve(data.resolver, path, &rv);
@@ -208,7 +208,7 @@ sqshfuse_listxattr(const char *path, char *list, size_t size) {
 	size_t element_length, length;
 	const char *prefix, *name;
 	char *p;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	struct SqshXattrIterator *iter = NULL;
 
 	inode = sqsh_path_resolver_resolve(data.resolver, path, &rv);
@@ -273,7 +273,7 @@ sqshfuse_readdir(
 	(void)offset; // TODO
 	(void)flags; // TODO
 	int rv = 0;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	struct SqshDirectoryIterator *iter = NULL;
 	inode = sqsh_path_resolver_resolve(data.resolver, path, &rv);
 	if (rv < 0) {
@@ -313,7 +313,7 @@ out:
 static int
 sqshfuse_open(const char *path, struct fuse_file_info *fi) {
 	int rv = 0;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 
 	inode = sqsh_path_resolver_resolve(data.resolver, path, &rv);
 	if (rv < 0) {
@@ -337,7 +337,7 @@ sqshfuse_read(
 	(void)fi;
 	printf("sqshfuse_read: %s\n", path);
 	int rv = 0;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	struct SqshFileReader *reader = NULL;
 
 	inode = sqsh_path_resolver_resolve(data.resolver, path, &rv);
@@ -378,7 +378,7 @@ out:
 static int
 sqshfuse_readlink(const char *path, char *buf, size_t size) {
 	int rv = 0;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 
 	inode = sqsh_path_resolver_resolve(data.resolver, path, &rv);
 	if (rv < 0) {

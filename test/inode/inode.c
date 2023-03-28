@@ -44,7 +44,7 @@ static void
 load_inode(void) {
 	int rv;
 	struct SqshArchive archive = {0};
-	struct SqshInodeContext inode = {0};
+	struct SqshInode inode = {0};
 	uint8_t payload[2048] = {
 			SQSH_HEADER,
 			/* inode */

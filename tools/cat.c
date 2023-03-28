@@ -53,7 +53,7 @@ usage(char *arg0) {
 
 static int
 cat_path(struct SqshPathResolver *resolver, char *path) {
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	struct SqshFileIterator *iterator = NULL;
 
 	int rv = 0;

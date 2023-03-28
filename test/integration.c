@@ -53,7 +53,7 @@ sqsh_empty(void) {
 static void
 sqsh_get_nonexistant(void) {
 	int rv;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	struct SqshArchive sqsh = {0};
 	struct SqshPathResolver resolver = {0};
 
@@ -79,7 +79,7 @@ static void
 sqsh_ls(void) {
 	int rv;
 	char *name;
-	struct SqshInodeContext inode = {0};
+	struct SqshInode inode = {0};
 	struct SqshDirectoryIterator *iter = NULL;
 	struct SqshArchive sqsh = {0};
 	const struct SqshSuperblockContext *superblock;
@@ -136,7 +136,7 @@ sqsh_cat_fragment(void) {
 	int rv;
 	const uint8_t *data;
 	size_t size;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	struct SqshFileReader reader = {0};
 	struct SqshArchive sqsh = {0};
 	struct SqshPathResolver resolver = {0};
@@ -180,7 +180,7 @@ sqsh_cat_datablock_and_fragment(void) {
 	int rv;
 	const uint8_t *data;
 	size_t size;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	struct SqshFileReader reader = {0};
 	struct SqshArchive sqsh = {0};
 	struct SqshPathResolver resolver = {0};
@@ -229,7 +229,7 @@ static void
 sqsh_cat_size_overflow(void) {
 	int rv;
 	size_t size;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	struct SqshFileReader reader = {0};
 	struct SqshArchive sqsh = {0};
 	struct SqshPathResolver resolver = {0};
@@ -275,7 +275,7 @@ static void
 sqsh_test_uid_and_gid(void) {
 	int rv;
 	uint32_t uid, gid;
-	struct SqshInodeContext inode = {0};
+	struct SqshInode inode = {0};
 	struct SqshArchive sqsh = {0};
 	const struct SqshSuperblockContext *superblock;
 	const struct SqshConfig config = {
@@ -305,7 +305,7 @@ sqsh_test_uid_and_gid(void) {
 static void
 sqsh_test_extended_dir(void) {
 	int rv;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	struct SqshArchive sqsh = {0};
 	struct SqshPathResolver resolver = {0};
 	const struct SqshConfig config = {
@@ -333,8 +333,8 @@ sqsh_test_xattr(void) {
 	const char *expected_value = "1234567891234567891234567890001234567890";
 	int rv;
 	char *name, *value;
-	struct SqshInodeContext inode = {0};
-	struct SqshInodeContext *entry_inode = NULL;
+	struct SqshInode inode = {0};
+	struct SqshInode *entry_inode = NULL;
 	struct SqshDirectoryIterator *dir_iter = NULL;
 	struct SqshXattrIterator *xattr_iter = NULL;
 	struct SqshArchive sqsh = {0};
@@ -454,7 +454,7 @@ fuzz_crash_1(void) {
 			0xff, 0xff, 0xff, 0xff, 0xff, 0x36, 0x62, 0x62, 0x62, 0x62, 0x62,
 			0x62, 0x62, 0x29, 0x62, 0x62, 0x62, 0x62, 0xff, 0xff, 0x62, 0x62};
 
-	struct SqshInodeContext *inode;
+	struct SqshInode *inode;
 	struct SqshArchive sqsh = {0};
 	struct SqshPathResolver resolver = {0};
 	const struct SqshConfig config = {
@@ -493,7 +493,7 @@ fuzz_crash_2(void) {
 			0x62, 0x62, 0x0,  0x2,
 	};
 
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	struct SqshArchive sqsh = {0};
 	struct SqshPathResolver resolver = {0};
 	const struct SqshConfig config = {
@@ -533,7 +533,7 @@ fuzz_crash_3(void) {
 			0x61, 0x1,  0x0,  0x0,  0x2,  0x2,
 	};
 
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	struct SqshArchive sqsh = {0};
 	struct SqshPathResolver resolver = {0};
 	const struct SqshConfig config = {
@@ -742,7 +742,7 @@ multithreaded_walker(void *arg) {
 			.sqsh = walker->sqsh,
 	};
 
-	struct SqshInodeContext *inode =
+	struct SqshInode *inode =
 			sqsh_inode_new(walker->sqsh, walker->inode_number, &rv);
 
 	if (sqsh_inode_type(inode) == SQSH_INODE_TYPE_DIRECTORY) {

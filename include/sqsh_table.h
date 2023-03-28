@@ -41,7 +41,7 @@ extern "C" {
 #endif
 
 struct SqshBuffer;
-struct SqshInodeContext;
+struct SqshInode;
 
 ////////////////////////////////////////
 // table/table.c

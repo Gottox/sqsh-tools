@@ -68,7 +68,7 @@ print_value(const char *value, size_t size) {
 }
 static int
 fattr_path(struct SqshPathResolver *resolver, char *path) {
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	struct SqshXattrIterator *iter = NULL;
 
 	int rv = 0;

@@ -87,7 +87,7 @@ struct SqshFileIterator {
 	/**
 	 * @privatesection
 	 */
-	const struct SqshInodeContext *inode;
+	const struct SqshInode *inode;
 	const struct SqshSuperblockContext *superblock;
 	struct SqshCompressionManager *compression_manager;
 	struct SqshMapManager *map_manager;
@@ -115,7 +115,7 @@ struct SqshFileIterator {
  */
 SQSH_NO_UNUSED int sqsh__file_iterator_init(
 		struct SqshFileIterator *iterator,
-		const struct SqshInodeContext *inode);
+		const struct SqshInode *inode);
 
 /**
  * @internal
@@ -153,7 +153,7 @@ struct SqshFileReader {
  * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int sqsh__file_reader_init(
-		struct SqshFileReader *reader, const struct SqshInodeContext *inode);
+		struct SqshFileReader *reader, const struct SqshInode *inode);
 
 /**
  * @internal

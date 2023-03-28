@@ -55,7 +55,7 @@ struct SqshDirectoryIterator;
  * @return The new iterator on success, NULL on error.
  */
 SQSH_NO_UNUSED struct SqshDirectoryIterator *
-sqsh_directory_iterator_new(struct SqshInodeContext *inode, int *err);
+sqsh_directory_iterator_new(struct SqshInode *inode, int *err);
 
 /**
  * @memberof SqshDirectoryIterator
@@ -124,7 +124,7 @@ enum SqshInodeContextType sqsh_directory_iterator_inode_type(
  *
  * @return The loaded inode on success, NULL on error.
  */
-SQSH_NO_UNUSED struct SqshInodeContext *sqsh_directory_iterator_inode_load(
+SQSH_NO_UNUSED struct SqshInode *sqsh_directory_iterator_inode_load(
 		const struct SqshDirectoryIterator *iterator, int *err);
 
 /**

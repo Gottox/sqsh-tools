@@ -42,9 +42,9 @@ extern "C" {
 #endif
 
 ////////////////////////////////////////
-// context/inode_context.c
+// inode/inode.c
 
-struct SqshInodeContext {
+struct SqshInode {
 	/**
 	 * @privatesection
 	 */
@@ -56,7 +56,7 @@ struct SqshInodeContext {
 /**
  * @internal
  * @brief Initialize the inode context from a inode reference. inode references
- * @memberof SqshInodeContext
+ * @memberof SqshInode
  * are descriptors of the physical location of an inode inside the inode table.
  * They are diffrent from the inode number. In doubt use the inode number.
  *
@@ -66,16 +66,16 @@ struct SqshInodeContext {
  * @return int 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int sqsh__inode_init(
-		struct SqshInodeContext *context, struct SqshArchive *sqsh,
+		struct SqshInode *context, struct SqshArchive *sqsh,
 		uint64_t inode_ref);
 /**
  * @internal
  * @brief cleans up the inode context.
- * @memberof SqshInodeContext
+ * @memberof SqshInode
  * @param context The inode context.
  * @return int 0 on success, less than 0 on error.
  */
-int sqsh__inode_cleanup(struct SqshInodeContext *context);
+int sqsh__inode_cleanup(struct SqshInode *context);
 
 ////////////////////////////////////////
 // inode/directory_index_iterator.c
@@ -84,7 +84,7 @@ struct SqshDirectoryIndexIterator {
 	/**
 	 * @privatesection
 	 */
-	struct SqshInodeContext inode;
+	struct SqshInode inode;
 	size_t remaining_entries;
 	sqsh_index_t next_offset;
 };

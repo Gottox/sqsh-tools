@@ -65,13 +65,13 @@ struct SqshfsOptions {
 };
 
 struct SqshfsFileHandle {
-	struct SqshInodeContext *inode;
+	struct SqshInode *inode;
 	struct SqshFileReader *reader;
 	sqsh_index_t last_size;
 };
 
 struct SqshfsDirHandle {
-	struct SqshInodeContext *inode;
+	struct SqshInode *inode;
 	struct SqshDirectoryIterator *iterator;
 };
 
@@ -143,7 +143,7 @@ sqshfs_destroy(void *userdata) {
 }
 
 static __mode_t
-sqshfs_inode_mode(struct SqshInodeContext *inode) {
+sqshfs_inode_mode(struct SqshInode *inode) {
 	__mode_t mode = sqsh_inode_permission(inode);
 	switch (sqsh_inode_type(inode)) {
 	case SQSH_INODE_TYPE_DIRECTORY:
@@ -175,7 +175,7 @@ sqshfs_inode_mode(struct SqshInodeContext *inode) {
 
 static void
 sqshfs_inode_to_stat(
-		struct SqshInodeContext *inode,
+		struct SqshInode *inode,
 		const struct SqshSuperblockContext *superblock, struct stat *st) {
 	st->st_dev = 0;
 	st->st_ino = sqsh_inode_number(inode);
@@ -191,7 +191,7 @@ sqshfs_inode_to_stat(
 	}
 }
 
-static struct SqshInodeContext *
+static struct SqshInode *
 sqshfs_inode_open(struct SqshfsContext *context, fuse_ino_t ino, int *err) {
 	const uint64_t inode_ref = sqshfs_context_inode_ref(context, ino);
 	return sqsh_inode_new(context->archive, inode_ref, err);
@@ -202,7 +202,7 @@ sqshfs_getattr(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 	(void)fi;
 	dbg("sqshfs_getattr\n");
 	int rv = 0;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	struct SqshfsContext *context = fuse_req_userdata(req);
 	const struct SqshSuperblockContext *superblock =
 			sqsh_archive_superblock(context->archive);
@@ -227,8 +227,8 @@ static void
 sqshfs_lookup(fuse_req_t req, fuse_ino_t parent, const char *name) {
 	int rv = 0;
 	struct SqshDirectoryIterator *iterator = NULL;
-	struct SqshInodeContext *parent_inode = NULL;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *parent_inode = NULL;
+	struct SqshInode *inode = NULL;
 	struct SqshfsContext *context = fuse_req_userdata(req);
 	const struct SqshSuperblockContext *superblock =
 			sqsh_archive_superblock(context->archive);
@@ -287,7 +287,7 @@ out:
 static void
 sqshfs_readlink(fuse_req_t req, fuse_ino_t ino) {
 	int rv = 0;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	struct SqshfsContext *context = fuse_req_userdata(req);
 	dbg("sqshfs_readlink: %i\n", ino);
 
@@ -363,7 +363,7 @@ sqshfs_readdir(
 	(void)ino;
 
 	int rv = 0;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	struct SqshfsContext *context = fuse_req_userdata(req);
 	struct SqshfsDirHandle *handle = (void *)fi->fh;
 	dbg("sqshfs_readdir\n");
@@ -495,7 +495,7 @@ out:
 static void
 sqshfs_getxattr(fuse_req_t req, fuse_ino_t ino, const char *name, size_t size) {
 	int rv = 0;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	struct SqshXattrIterator *iterator = NULL;
 	struct SqshfsContext *context = fuse_req_userdata(req);
 	const char *value_ptr = NULL;

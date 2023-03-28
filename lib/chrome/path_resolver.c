@@ -76,7 +76,7 @@ static int
 path_find_inode_ref(
 		uint64_t *target, uint64_t dir_ref, struct SqshArchive *sqsh,
 		const char *name, const size_t name_len) {
-	struct SqshInodeContext inode = {0};
+	struct SqshInode inode = {0};
 	struct SqshDirectoryIterator iter = {0};
 	int rv = 0;
 	rv = sqsh__inode_init(&inode, sqsh, dir_ref);
@@ -167,7 +167,7 @@ out:
 
 int
 sqsh__path_resolver_resolve(
-		struct SqshPathResolver *resolver, struct SqshInodeContext *inode,
+		struct SqshPathResolver *resolver, struct SqshInode *inode,
 		const char *path) {
 	uint64_t inode_ref = 0;
 
@@ -179,7 +179,7 @@ sqsh__path_resolver_resolve(
 	return sqsh__inode_init(inode, resolver->sqsh, inode_ref);
 }
 
-struct SqshInodeContext *
+struct SqshInode *
 sqsh_path_resolver_resolve(
 		struct SqshPathResolver *resolver, const char *path, int *err) {
 	uint64_t inode_ref = 0;

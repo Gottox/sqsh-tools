@@ -40,7 +40,7 @@
 extern "C" {
 #endif
 
-struct SqshInodeContext;
+struct SqshInode;
 
 ////////////////////////////////////////
 // xattr/xattr_iterator.c
@@ -57,7 +57,7 @@ struct SqshXattrIterator;
  * @return The new iterator on success, NULL on error.
  */
 SQSH_NO_UNUSED struct SqshXattrIterator *
-sqsh_xattr_iterator_new(const struct SqshInodeContext *inode, int *err);
+sqsh_xattr_iterator_new(const struct SqshInode *inode, int *err);
 
 /**
  * @memberof SqshXattrIterator

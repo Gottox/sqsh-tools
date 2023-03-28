@@ -78,7 +78,7 @@ SQSH_NO_UNUSED int sqsh__path_resolver_init(
  * @return int 0 on success, less than 0 on error.
  */
 int sqsh__path_resolver_resolve(
-		struct SqshPathResolver *resolver, struct SqshInodeContext *inode,
+		struct SqshPathResolver *resolver, struct SqshInode *inode,
 		const char *path);
 
 /**

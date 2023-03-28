@@ -45,7 +45,7 @@ directory_iterator_index_lookup(
 		const size_t name_len) {
 	int rv = 0;
 	struct SqshDirectoryIndexIterator index_iterator = {0};
-	struct SqshInodeContext *inode = iterator->inode;
+	struct SqshInode *inode = iterator->inode;
 	const uint64_t inode_ref = sqsh_inode_ref(inode);
 
 	rv = sqsh__directory_index_iterator_init(
@@ -124,7 +124,7 @@ sqsh_directory_iterator_lookup(
 int
 sqsh__directory_iterator_init(
 		struct SqshDirectoryIterator *iterator,
-		struct SqshInodeContext *inode) {
+		struct SqshInode *inode) {
 	int rv = 0;
 	struct SqshArchive *sqsh = inode->sqsh;
 	const struct SqshSuperblockContext *superblock =
@@ -161,7 +161,7 @@ sqsh__directory_iterator_init(
 }
 
 struct SqshDirectoryIterator *
-sqsh_directory_iterator_new(struct SqshInodeContext *inode, int *err) {
+sqsh_directory_iterator_new(struct SqshInode *inode, int *err) {
 	struct SqshDirectoryIterator *iterator =
 			calloc(1, sizeof(struct SqshDirectoryIterator));
 	if (iterator == NULL) {
@@ -214,7 +214,7 @@ sqsh_directory_iterator_inode_type(
 	return SQSH_INODE_TYPE_UNKNOWN;
 }
 
-struct SqshInodeContext *
+struct SqshInode *
 sqsh_directory_iterator_inode_load(
 		const struct SqshDirectoryIterator *iterator, int *err) {
 	const uint64_t inode_ref = sqsh_directory_iterator_inode_ref(iterator);

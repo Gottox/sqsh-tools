@@ -42,7 +42,7 @@
 extern "C" {
 #endif
 
-struct SqshInodeContext;
+struct SqshInode;
 
 ////////////////////////////////////////
 // table/table.c

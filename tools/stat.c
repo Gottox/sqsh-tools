@@ -270,7 +270,7 @@ inode_type_name(int type) {
 static int
 stat_file(struct SqshPathResolver *resolver, const char *path) {
 	int rv = 0;
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	bool has_fragment = false;
 	inode = sqsh_path_resolver_resolve(resolver, path, &rv);
 	if (rv < 0) {

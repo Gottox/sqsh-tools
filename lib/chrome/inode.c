@@ -37,11 +37,11 @@
 
 #include "../../include/sqsh_inode_private.h"
 
-struct SqshInodeContext *
+struct SqshInode *
 sqsh_open(struct SqshArchive *archive, const char *path, int *err) {
 	int rv;
 	struct SqshPathResolver resolver = {0};
-	struct SqshInodeContext *inode = NULL;
+	struct SqshInode *inode = NULL;
 	rv = sqsh__path_resolver_init(&resolver, archive);
 	if (rv < 0) {
 		goto out;
@@ -61,6 +61,6 @@ out:
 }
 
 int
-sqsh_close(struct SqshInodeContext *inode) {
+sqsh_close(struct SqshInode *inode) {
 	return sqsh_inode_free(inode);
 }

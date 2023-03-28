@@ -42,14 +42,14 @@
 
 int
 sqsh__file_reader_init(
-		struct SqshFileReader *reader, const struct SqshInodeContext *inode) {
+		struct SqshFileReader *reader, const struct SqshInode *inode) {
 	reader->current_offset = 0;
 	reader->current_size = 0;
 	return sqsh__file_iterator_init(&reader->iterator, inode);
 }
 
 struct SqshFileReader *
-sqsh_file_reader_new(const struct SqshInodeContext *inode, int *err) {
+sqsh_file_reader_new(const struct SqshInode *inode, int *err) {
 	struct SqshFileReader *context = calloc(1, sizeof(struct SqshFileReader));
 	if (context == NULL) {
 		return NULL;
@@ -67,7 +67,7 @@ sqsh_file_reader_advance(
 		struct SqshFileReader *reader, sqsh_index_t offset, size_t size) {
 	int rv = 0;
 	struct SqshFileIterator *iterator = &reader->iterator;
-	const struct SqshInodeContext *inode = iterator->inode;
+	const struct SqshInode *inode = iterator->inode;
 	const struct SqshArchive *archive = inode->sqsh;
 	const struct SqshSuperblockContext *superblock =
 			sqsh_archive_superblock(archive);

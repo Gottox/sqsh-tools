@@ -45,7 +45,7 @@
 int
 sqsh__file_iterator_init(
 		struct SqshFileIterator *iterator,
-		const struct SqshInodeContext *inode) {
+		const struct SqshInode *inode) {
 	int rv = 0;
 	struct SqshArchive *archive = inode->sqsh;
 	iterator->inode = inode;
@@ -63,7 +63,7 @@ sqsh__file_iterator_init(
 }
 
 struct SqshFileIterator *
-sqsh_file_iterator_new(const struct SqshInodeContext *inode, int *err) {
+sqsh_file_iterator_new(const struct SqshInode *inode, int *err) {
 	struct SqshFileIterator *iterator =
 			calloc(1, sizeof(struct SqshFileIterator));
 	if (iterator == NULL) {
@@ -82,7 +82,7 @@ map_block_compressed(struct SqshFileIterator *iterator) {
 	int rv = 0;
 	struct SqshCompressionManager *compression_manager =
 			iterator->compression_manager;
-	const struct SqshInodeContext *inode = iterator->inode;
+	const struct SqshInode *inode = iterator->inode;
 	const struct SqshBuffer *compressed = NULL;
 
 	const sqsh_index_t block_address = iterator->block_address;
@@ -121,7 +121,7 @@ map_block_uncompressed(struct SqshFileIterator *iterator, size_t desired_size) {
 	struct SqshMapReader *map_reader = &iterator->current_uncompressed;
 	int rv = 0;
 	struct SqshMapManager *map_manager = iterator->map_manager;
-	const struct SqshInodeContext *inode = iterator->inode;
+	const struct SqshInode *inode = iterator->inode;
 	const struct SqshSuperblockContext *superblock =
 			sqsh_archive_superblock(inode->sqsh);
 	const uint64_t upper_limit = sqsh_superblock_bytes_used(superblock);
@@ -167,7 +167,7 @@ out:
 
 static int
 map_block(struct SqshFileIterator *iterator, size_t desired_size) {
-	const struct SqshInodeContext *inode = iterator->inode;
+	const struct SqshInode *inode = iterator->inode;
 
 	const sqsh_index_t block_index = iterator->block_index;
 	const bool is_compressed =
@@ -183,7 +183,7 @@ map_block(struct SqshFileIterator *iterator, size_t desired_size) {
 static int
 map_fragment(struct SqshFileIterator *iterator) {
 	int rv = 0;
-	const struct SqshInodeContext *inode = iterator->inode;
+	const struct SqshInode *inode = iterator->inode;
 	struct SqshArchive *archive = inode->sqsh;
 	struct SqshFragmentTable *fragment_table = NULL;
 	struct SqshBuffer *fragment_buffer = &iterator->fragment_buffer;
@@ -214,7 +214,7 @@ out:
 int
 sqsh_file_iterator_next(
 		struct SqshFileIterator *iterator, size_t desired_size) {
-	const struct SqshInodeContext *inode = iterator->inode;
+	const struct SqshInode *inode = iterator->inode;
 	size_t block_count = sqsh_inode_file_block_count(inode);
 	const bool has_fragment = sqsh_inode_file_has_fragment(inode);
 	struct SqshCompressionManager *compression_manager =

@@ -40,7 +40,7 @@
 extern "C" {
 #endif
 
-struct SqshInodeContext;
+struct SqshInode;
 
 ////////////////////////////////////////
 // file/fragment_table.c
@@ -58,7 +58,7 @@ struct SqshFragmentTable;
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_UNUSED int sqsh_fragment_table_to_buffer(
-		struct SqshFragmentTable *context, const struct SqshInodeContext *inode,
+		struct SqshFragmentTable *context, const struct SqshInode *inode,
 		struct SqshBuffer *buffer);
 
 ////////////////////////////////////////
@@ -67,7 +67,7 @@ SQSH_NO_UNUSED int sqsh_fragment_table_to_buffer(
 struct SqshFileReader;
 
 struct SqshFileReader *
-sqsh_file_reader_new(const struct SqshInodeContext *inode, int *err);
+sqsh_file_reader_new(const struct SqshInode *inode, int *err);
 
 int sqsh_file_reader_advance(
 		struct SqshFileReader *reader, sqsh_index_t offset, size_t size);
@@ -93,7 +93,7 @@ struct SqshFileIterator;
  */
 SQSH_NO_UNUSED int sqsh__file_iterator_init(
 		struct SqshFileIterator *iterator,
-		const struct SqshInodeContext *inode);
+		const struct SqshInode *inode);
 
 /**
  * @brief Cleans up resources used by a SqshFileIterator struct.
@@ -116,7 +116,7 @@ int sqsh__file_iterator_cleanup(struct SqshFileIterator *iterator);
  * struct.
  */
 SQSH_NO_UNUSED struct SqshFileIterator *
-sqsh_file_iterator_new(const struct SqshInodeContext *inode, int *err);
+sqsh_file_iterator_new(const struct SqshInode *inode, int *err);
 
 /**
  * @brief Skips a certain amount of data in the file iterator.
