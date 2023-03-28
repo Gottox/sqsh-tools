@@ -110,7 +110,7 @@ sqsh_directory_iterator_inode_ref(const struct SqshDirectoryIterator *iterator);
  *
  * @param[in] iterator The iterator to use.
  *
- * @return The inode type on success, SqshInodeContextTypeInvalid on error.
+ * @return The inode type on success, SQSH_INODE_TYPE_UNKNOWN on error.
  */
 enum SqshInodeType sqsh_directory_iterator_inode_type(
 		const struct SqshDirectoryIterator *iterator);
