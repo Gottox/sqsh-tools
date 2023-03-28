@@ -53,22 +53,20 @@ log2_u32(uint32_t x) {
 }
 
 static const struct SqshDataSuperblock *
-get_header(const struct SqshSuperblockContext *context) {
+get_header(const struct SqshSuperblock *context) {
 	return (const struct SqshDataSuperblock *)sqsh__map_reader_data(
 			&context->cursor);
 }
 
 static bool
 check_flag(
-		const struct SqshSuperblockContext *context,
-		enum SqshSuperblockFlags flag) {
+		const struct SqshSuperblock *context, enum SqshSuperblockFlags flag) {
 	return sqsh_data_superblock_flags(get_header(context)) & flag;
 }
 
 int
 sqsh__superblock_init(
-		struct SqshSuperblockContext *context,
-		struct SqshMapManager *map_manager) {
+		struct SqshSuperblock *context, struct SqshMapManager *map_manager) {
 	int rv = 0;
 
 	if (sqsh__map_manager_size(map_manager) < SQSH_SIZEOF_SUPERBLOCK) {
@@ -114,98 +112,92 @@ out:
 }
 
 enum SqshSuperblockCompressionId
-sqsh_superblock_compression_id(const struct SqshSuperblockContext *context) {
+sqsh_superblock_compression_id(const struct SqshSuperblock *context) {
 	return sqsh_data_superblock_compression_id(get_header(context));
 }
 
 uint64_t
-sqsh_superblock_directory_table_start(
-		const struct SqshSuperblockContext *context) {
+sqsh_superblock_directory_table_start(const struct SqshSuperblock *context) {
 	return sqsh_data_superblock_directory_table_start(get_header(context));
 }
 
 uint64_t
-sqsh_superblock_fragment_table_start(
-		const struct SqshSuperblockContext *context) {
+sqsh_superblock_fragment_table_start(const struct SqshSuperblock *context) {
 	return sqsh_data_superblock_fragment_table_start(get_header(context));
 }
 
 uint32_t
-sqsh_superblock_inode_count(const struct SqshSuperblockContext *context) {
+sqsh_superblock_inode_count(const struct SqshSuperblock *context) {
 	return sqsh_data_superblock_inode_count(get_header(context));
 }
 
 uint64_t
-sqsh_superblock_inode_table_start(const struct SqshSuperblockContext *context) {
+sqsh_superblock_inode_table_start(const struct SqshSuperblock *context) {
 	return sqsh_data_superblock_inode_table_start(get_header(context));
 }
 
 uint64_t
-sqsh_superblock_id_table_start(const struct SqshSuperblockContext *context) {
+sqsh_superblock_id_table_start(const struct SqshSuperblock *context) {
 	return sqsh_data_superblock_id_table_start(get_header(context));
 }
 
 uint16_t
-sqsh_superblock_id_count(const struct SqshSuperblockContext *context) {
+sqsh_superblock_id_count(const struct SqshSuperblock *context) {
 	return sqsh_data_superblock_id_count(get_header(context));
 }
 
 uint64_t
-sqsh_superblock_export_table_start(
-		const struct SqshSuperblockContext *context) {
+sqsh_superblock_export_table_start(const struct SqshSuperblock *context) {
 	return sqsh_data_superblock_export_table_start(get_header(context));
 }
 
 uint64_t
-sqsh_superblock_xattr_id_table_start(
-		const struct SqshSuperblockContext *context) {
+sqsh_superblock_xattr_id_table_start(const struct SqshSuperblock *context) {
 	return sqsh_data_superblock_xattr_id_table_start(get_header(context));
 }
 
 uint64_t
-sqsh_superblock_inode_root_ref(const struct SqshSuperblockContext *context) {
+sqsh_superblock_inode_root_ref(const struct SqshSuperblock *context) {
 	return sqsh_data_superblock_root_inode_ref(get_header(context));
 }
 
 bool
-sqsh_superblock_has_compression_options(
-		const struct SqshSuperblockContext *context) {
+sqsh_superblock_has_compression_options(const struct SqshSuperblock *context) {
 	return check_flag(context, SQSH_SUPERBLOCK_COMPRESSOR_OPTIONS);
 }
 
 bool
-sqsh_superblock_has_fragments(const struct SqshSuperblockContext *context) {
+sqsh_superblock_has_fragments(const struct SqshSuperblock *context) {
 	return !check_flag(context, SQSH_SUPERBLOCK_NO_FRAGMENTS);
 }
 
 bool
-sqsh_superblock_has_export_table(const struct SqshSuperblockContext *context) {
+sqsh_superblock_has_export_table(const struct SqshSuperblock *context) {
 	return check_flag(context, SQSH_SUPERBLOCK_EXPORTABLE);
 }
 
 uint32_t
-sqsh_superblock_block_size(const struct SqshSuperblockContext *context) {
+sqsh_superblock_block_size(const struct SqshSuperblock *context) {
 	return sqsh_data_superblock_block_size(get_header(context));
 }
 
 uint32_t
-sqsh_superblock_modification_time(const struct SqshSuperblockContext *context) {
+sqsh_superblock_modification_time(const struct SqshSuperblock *context) {
 	return sqsh_data_superblock_modification_time(get_header(context));
 }
 
 uint32_t
-sqsh_superblock_fragment_entry_count(
-		const struct SqshSuperblockContext *context) {
+sqsh_superblock_fragment_entry_count(const struct SqshSuperblock *context) {
 	return sqsh_data_superblock_fragment_entry_count(get_header(context));
 }
 
 uint64_t
-sqsh_superblock_bytes_used(const struct SqshSuperblockContext *context) {
+sqsh_superblock_bytes_used(const struct SqshSuperblock *context) {
 	return sqsh_data_superblock_bytes_used(get_header(context));
 }
 
 int
-sqsh__superblock_cleanup(struct SqshSuperblockContext *superblock) {
+sqsh__superblock_cleanup(struct SqshSuperblock *superblock) {
 	sqsh__map_reader_cleanup(&superblock->cursor);
 	return 0;
 }

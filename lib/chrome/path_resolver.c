@@ -129,7 +129,7 @@ resolve_path(
 	int i;
 	int rv = 0;
 	int segment_count = path_segments_count(path) + 1;
-	const struct SqshSuperblockContext *superblock =
+	const struct SqshSuperblock *superblock =
 			sqsh_archive_superblock(resolver->sqsh);
 	const char *segment = path;
 	uint64_t *inode_refs = calloc(segment_count, sizeof(uint64_t));

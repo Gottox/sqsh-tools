@@ -147,8 +147,7 @@ sqsh__inode_init(
 	uint64_t address_outer;
 
 	int rv = 0;
-	const struct SqshSuperblockContext *superblock =
-			sqsh_archive_superblock(sqsh);
+	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
 
 	const uint64_t inode_table_start =
 			sqsh_superblock_inode_table_start(superblock);
@@ -311,7 +310,7 @@ sqsh_inode_file_blocks_start(const struct SqshInode *context) {
 
 uint32_t
 sqsh_inode_file_block_count(const struct SqshInode *context) {
-	const struct SqshSuperblockContext *superblock =
+	const struct SqshSuperblock *superblock =
 			sqsh_archive_superblock(context->sqsh);
 	uint64_t file_size = sqsh_inode_file_size(context);
 	uint32_t block_size = sqsh_superblock_block_size(superblock);

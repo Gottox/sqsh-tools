@@ -126,7 +126,7 @@ sqsh_archive_config(const struct SqshArchive *archive) {
 	return &archive->config;
 }
 
-const struct SqshSuperblockContext *
+const struct SqshSuperblock *
 sqsh_archive_superblock(const struct SqshArchive *archive) {
 	return &archive->superblock;
 }
@@ -138,7 +138,7 @@ sqsh__archive_file_compression_manager(
 	int rv = 0;
 
 	if (!is_initialized(archive, INITIALIZED_FILE_COMPRESSION_MANAGER)) {
-		const struct SqshSuperblockContext *superblock =
+		const struct SqshSuperblock *superblock =
 				sqsh_archive_superblock(archive);
 		const uint64_t bytes_used = sqsh_superblock_bytes_used(superblock);
 		const size_t capacity =

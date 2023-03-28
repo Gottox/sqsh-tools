@@ -126,8 +126,7 @@ sqsh__directory_iterator_init(
 		struct SqshDirectoryIterator *iterator, struct SqshInode *inode) {
 	int rv = 0;
 	struct SqshArchive *sqsh = inode->sqsh;
-	const struct SqshSuperblockContext *superblock =
-			sqsh_archive_superblock(sqsh);
+	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
 
 	if (sqsh_inode_type(inode) != SQSH_INODE_TYPE_DIRECTORY) {
 		return -SQSH_ERROR_NOT_A_DIRECTORY;

@@ -82,7 +82,7 @@ sqsh_ls(void) {
 	struct SqshInode inode = {0};
 	struct SqshDirectoryIterator *iter = NULL;
 	struct SqshArchive sqsh = {0};
-	const struct SqshSuperblockContext *superblock;
+	const struct SqshSuperblock *superblock;
 	const struct SqshConfig config = DEFAULT_CONFIG(test_squashfs_image_len);
 	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
 	assert(rv == 0);
@@ -277,7 +277,7 @@ sqsh_test_uid_and_gid(void) {
 	uint32_t uid, gid;
 	struct SqshInode inode = {0};
 	struct SqshArchive sqsh = {0};
-	const struct SqshSuperblockContext *superblock;
+	const struct SqshSuperblock *superblock;
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = test_squashfs_image_len,
@@ -338,7 +338,7 @@ sqsh_test_xattr(void) {
 	struct SqshDirectoryIterator *dir_iter = NULL;
 	struct SqshXattrIterator *xattr_iter = NULL;
 	struct SqshArchive sqsh = {0};
-	const struct SqshSuperblockContext *superblock;
+	const struct SqshSuperblock *superblock;
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = test_squashfs_image_len,
@@ -774,8 +774,7 @@ multithreaded(void) {
 	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
 	assert(rv == 0);
 
-	const struct SqshSuperblockContext *superblock =
-			sqsh_archive_superblock(&sqsh);
+	const struct SqshSuperblock *superblock = sqsh_archive_superblock(&sqsh);
 	struct Walker walker = {
 			.sqsh = &sqsh,
 			.inode_number = sqsh_superblock_inode_root_ref(superblock),

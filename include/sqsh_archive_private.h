@@ -81,7 +81,7 @@ int sqsh__trailing_cleanup(struct SqshTrailingContext *context);
 ////////////////////////////////////////
 // archive/superblock_context.c
 
-struct SqshSuperblockContext {
+struct SqshSuperblock {
 	/**
 	 * @privatesection
 	 */
@@ -90,7 +90,7 @@ struct SqshSuperblockContext {
 
 /**
  * @internal
- * @memberof SqshSuperblockContext
+ * @memberof SqshSuperblock
  * @brief Initializes a superblock context.
  *
  * @param[out] context The context to initialize.
@@ -99,18 +99,18 @@ struct SqshSuperblockContext {
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_UNUSED int sqsh__superblock_init(
-		struct SqshSuperblockContext *context, struct SqshMapManager *mapper);
+		struct SqshSuperblock *context, struct SqshMapManager *mapper);
 
 /**
  * @internal
- * @memberof SqshSuperblockContext
+ * @memberof SqshSuperblock
  * @brief Cleans up a superblock context.
  *
  * @param[in] superblock The context to clean up.
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__superblock_cleanup(struct SqshSuperblockContext *superblock);
+int sqsh__superblock_cleanup(struct SqshSuperblock *superblock);
 
 ////////////////////////////////////////
 // archive/compression_options_context.c
@@ -162,7 +162,7 @@ struct SqshArchive {
 	struct SqshCompression data_compression;
 	struct SqshCompression metablock_compression;
 	struct SqshCompressionManager file_compression_manager;
-	struct SqshSuperblockContext superblock;
+	struct SqshSuperblock superblock;
 	struct SqshTable id_table;
 	struct SqshTable export_table;
 	struct SqshXattrTable xattr_table;

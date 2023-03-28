@@ -1,7 +1,7 @@
 libsqsh_sources = [
 	'archive/archive.c',
 	'archive/compression_options_context.c',
-	'archive/superblock_context.c',
+	'archive/superblock.c',
 	'archive/trailing_context.c',
 	'chrome/inode.c',
 	'chrome/path_resolver.c',

@@ -43,8 +43,7 @@
 static int
 init_compression_manager(
 		struct SqshFragmentTable *table, struct SqshArchive *archive) {
-	const struct SqshSuperblockContext *superblock =
-			sqsh_archive_superblock(archive);
+	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 	const struct SqshCompression *compression =
 			sqsh_archive_compression_data(archive);
 
@@ -67,8 +66,7 @@ int
 sqsh__fragment_table_init(
 		struct SqshFragmentTable *table, struct SqshArchive *sqsh) {
 	int rv = 0;
-	const struct SqshSuperblockContext *superblock =
-			sqsh_archive_superblock(sqsh);
+	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
 	uint64_t start = sqsh_superblock_fragment_table_start(superblock);
 	uint32_t count = sqsh_superblock_fragment_entry_count(superblock);
 

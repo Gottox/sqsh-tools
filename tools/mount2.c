@@ -97,8 +97,7 @@ sqshfs_context_inode_ref(struct SqshfsContext *context, fuse_ino_t inode) {
 	int rv = 0;
 	uint64_t inode_ref = 0;
 	struct SqshArchive *archive = context->archive;
-	const struct SqshSuperblockContext *superblock =
-			sqsh_archive_superblock(archive);
+	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 
 	if (inode == FUSE_ROOT_ID) {
 		return sqsh_superblock_inode_root_ref(superblock);
@@ -175,7 +174,7 @@ sqshfs_inode_mode(struct SqshInode *inode) {
 
 static void
 sqshfs_inode_to_stat(
-		struct SqshInode *inode, const struct SqshSuperblockContext *superblock,
+		struct SqshInode *inode, const struct SqshSuperblock *superblock,
 		struct stat *st) {
 	st->st_dev = 0;
 	st->st_ino = sqsh_inode_number(inode);
@@ -204,7 +203,7 @@ sqshfs_getattr(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 	int rv = 0;
 	struct SqshInode *inode = NULL;
 	struct SqshfsContext *context = fuse_req_userdata(req);
-	const struct SqshSuperblockContext *superblock =
+	const struct SqshSuperblock *superblock =
 			sqsh_archive_superblock(context->archive);
 
 	inode = sqshfs_inode_open(context, ino, &rv);
@@ -230,7 +229,7 @@ sqshfs_lookup(fuse_req_t req, fuse_ino_t parent, const char *name) {
 	struct SqshInode *parent_inode = NULL;
 	struct SqshInode *inode = NULL;
 	struct SqshfsContext *context = fuse_req_userdata(req);
-	const struct SqshSuperblockContext *superblock =
+	const struct SqshSuperblock *superblock =
 			sqsh_archive_superblock(context->archive);
 
 	dbg("sqshfs_lookup: parent_inode: %lu name: %s\n", parent, name);
@@ -647,7 +646,7 @@ main(int argc, char *argv[]) {
 		goto out;
 	}
 
-	const struct SqshSuperblockContext *superblock =
+	const struct SqshSuperblock *superblock =
 			sqsh_archive_superblock(sqshfs_context.archive);
 	const uint64_t inode_count = sqsh_superblock_inode_count(superblock);
 

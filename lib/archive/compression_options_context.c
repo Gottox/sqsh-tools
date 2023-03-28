@@ -65,8 +65,7 @@ sqsh__compression_options_init(
 		struct SqshCompressionOptionsContext *context,
 		struct SqshArchive *sqsh) {
 	int rv = 0;
-	const struct SqshSuperblockContext *superblock =
-			sqsh_archive_superblock(sqsh);
+	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
 
 	// TODO: sane limit
 	rv = sqsh__metablock_iterator_init(

@@ -48,8 +48,7 @@ int
 sqsh__xattr_table_init(
 		struct SqshXattrTable *context, struct SqshArchive *sqsh) {
 	int rv = 0;
-	const struct SqshSuperblockContext *superblock =
-			sqsh_archive_superblock(sqsh);
+	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(sqsh);
 	const uint64_t xattr_address =
 			sqsh_superblock_xattr_id_table_start(superblock);

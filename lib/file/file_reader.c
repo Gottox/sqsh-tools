@@ -69,8 +69,7 @@ sqsh_file_reader_advance(
 	struct SqshFileIterator *iterator = &reader->iterator;
 	const struct SqshInode *inode = iterator->inode;
 	const struct SqshArchive *archive = inode->sqsh;
-	const struct SqshSuperblockContext *superblock =
-			sqsh_archive_superblock(archive);
+	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 	const uint32_t block_size = sqsh_superblock_block_size(superblock);
 
 	uint64_t current_offset = reader->current_offset;

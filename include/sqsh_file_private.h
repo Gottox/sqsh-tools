@@ -50,7 +50,7 @@ struct SqshFragmentTable {
 	/**
 	 * @privatesection
 	 */
-	const struct SqshSuperblockContext *superblock;
+	const struct SqshSuperblock *superblock;
 	struct SqshTable table;
 	struct SqshMapManager *map_manager;
 	struct SqshCompressionManager compression_manager;
@@ -88,7 +88,7 @@ struct SqshFileIterator {
 	 * @privatesection
 	 */
 	const struct SqshInode *inode;
-	const struct SqshSuperblockContext *superblock;
+	const struct SqshSuperblock *superblock;
 	struct SqshCompressionManager *compression_manager;
 	struct SqshMapManager *map_manager;
 

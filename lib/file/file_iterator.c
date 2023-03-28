@@ -121,7 +121,7 @@ map_block_uncompressed(struct SqshFileIterator *iterator, size_t desired_size) {
 	int rv = 0;
 	struct SqshMapManager *map_manager = iterator->map_manager;
 	const struct SqshInode *inode = iterator->inode;
-	const struct SqshSuperblockContext *superblock =
+	const struct SqshSuperblock *superblock =
 			sqsh_archive_superblock(inode->sqsh);
 	const uint64_t upper_limit = sqsh_superblock_bytes_used(superblock);
 
