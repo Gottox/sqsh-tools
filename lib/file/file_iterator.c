@@ -44,8 +44,7 @@
 
 int
 sqsh__file_iterator_init(
-		struct SqshFileIterator *iterator,
-		const struct SqshInode *inode) {
+		struct SqshFileIterator *iterator, const struct SqshInode *inode) {
 	int rv = 0;
 	struct SqshArchive *archive = inode->sqsh;
 	iterator->inode = inode;

@@ -167,8 +167,8 @@ uint32_t sqsh_inode_file_block_count(const struct SqshInode *context);
  *
  * @return the size of the block with the index.
  */
-uint32_t sqsh_inode_file_block_size(
-		const struct SqshInode *context, uint32_t index);
+uint32_t
+sqsh_inode_file_block_size(const struct SqshInode *context, uint32_t index);
 
 /**
  * @memberof SqshInode
@@ -179,8 +179,8 @@ uint32_t sqsh_inode_file_block_size(
  *
  * @return true if the block is compressed, false otherwise.
  */
-bool sqsh_inode_file_block_is_compressed(
-		const struct SqshInode *context, int index);
+bool
+sqsh_inode_file_block_is_compressed(const struct SqshInode *context, int index);
 
 /**
  * @memberof SqshInode
@@ -191,8 +191,7 @@ bool sqsh_inode_file_block_is_compressed(
  *
  * @return the fragment block index.
  */
-uint32_t
-sqsh_inode_file_fragment_block_index(const struct SqshInode *context);
+uint32_t sqsh_inode_file_fragment_block_index(const struct SqshInode *context);
 
 /**
  * @memberof SqshInode
@@ -203,8 +202,7 @@ sqsh_inode_file_fragment_block_index(const struct SqshInode *context);
  *
  * @return the offset inside of the fragment block.
  */
-uint32_t
-sqsh_inode_file_fragment_block_offset(const struct SqshInode *context);
+uint32_t sqsh_inode_file_fragment_block_offset(const struct SqshInode *context);
 
 /**
  * @memberof SqshInode
@@ -215,8 +213,7 @@ sqsh_inode_file_fragment_block_offset(const struct SqshInode *context);
  *
  * @return the directory block start.
  */
-uint32_t
-sqsh_inode_directory_block_start(const struct SqshInode *context);
+uint32_t sqsh_inode_directory_block_start(const struct SqshInode *context);
 
 /**
  * @memberof SqshInode
@@ -227,8 +224,7 @@ sqsh_inode_directory_block_start(const struct SqshInode *context);
  *
  * @return the directory block offset.
  */
-uint32_t
-sqsh_inode_directory_block_offset(const struct SqshInode *context);
+uint32_t sqsh_inode_directory_block_offset(const struct SqshInode *context);
 
 /**
  * @memberof SqshInode
@@ -248,8 +244,7 @@ bool sqsh_inode_file_has_fragment(const struct SqshInode *context);
  *
  * @return the type of the inode.
  */
-enum SqshInodeType
-sqsh_inode_type(const struct SqshInode *context);
+enum SqshInodeType sqsh_inode_type(const struct SqshInode *context);
 
 /**
  * @memberof SqshInode
@@ -273,8 +268,8 @@ const char *sqsh_inode_symlink(const struct SqshInode *context);
  *
  * @return int 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh_inode_symlink_dup(
-		const struct SqshInode *context, char **namebuffer);
+SQSH_NO_UNUSED int
+sqsh_inode_symlink_dup(const struct SqshInode *context, char **namebuffer);
 
 /**
  * @memberof SqshInode

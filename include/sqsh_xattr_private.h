@@ -70,8 +70,7 @@ struct SqshXattrIterator {
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_UNUSED int sqsh__xattr_iterator_init(
-		struct SqshXattrIterator *iterator,
-		const struct SqshInode *inode);
+		struct SqshXattrIterator *iterator, const struct SqshInode *inode);
 
 /**
  * @internal

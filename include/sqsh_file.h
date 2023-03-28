@@ -92,8 +92,7 @@ struct SqshFileIterator;
  * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int sqsh__file_iterator_init(
-		struct SqshFileIterator *iterator,
-		const struct SqshInode *inode);
+		struct SqshFileIterator *iterator, const struct SqshInode *inode);
 
 /**
  * @brief Cleans up resources used by a SqshFileIterator struct.

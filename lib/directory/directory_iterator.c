@@ -123,8 +123,7 @@ sqsh_directory_iterator_lookup(
 
 int
 sqsh__directory_iterator_init(
-		struct SqshDirectoryIterator *iterator,
-		struct SqshInode *inode) {
+		struct SqshDirectoryIterator *iterator, struct SqshInode *inode) {
 	int rv = 0;
 	struct SqshArchive *sqsh = inode->sqsh;
 	const struct SqshSuperblockContext *superblock =

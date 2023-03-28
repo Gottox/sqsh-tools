@@ -42,8 +42,7 @@
 
 int
 sqsh__xattr_iterator_init(
-		struct SqshXattrIterator *iterator,
-		const struct SqshInode *inode) {
+		struct SqshXattrIterator *iterator, const struct SqshInode *inode) {
 	int rv;
 	struct SqshDataXattrLookupTable ref = {0};
 	struct SqshXattrTable *xattr_table = NULL;

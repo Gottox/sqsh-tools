@@ -175,8 +175,8 @@ sqshfs_inode_mode(struct SqshInode *inode) {
 
 static void
 sqshfs_inode_to_stat(
-		struct SqshInode *inode,
-		const struct SqshSuperblockContext *superblock, struct stat *st) {
+		struct SqshInode *inode, const struct SqshSuperblockContext *superblock,
+		struct stat *st) {
 	st->st_dev = 0;
 	st->st_ino = sqsh_inode_number(inode);
 	st->st_mode = sqshfs_inode_mode(inode);

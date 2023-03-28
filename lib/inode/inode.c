@@ -141,8 +141,7 @@ get_size_info(const struct SqshInode *context, int index) {
 
 int
 sqsh__inode_init(
-		struct SqshInode *inode, struct SqshArchive *sqsh,
-		uint64_t inode_ref) {
+		struct SqshInode *inode, struct SqshArchive *sqsh, uint64_t inode_ref) {
 	const uint32_t outer_offset = sqsh_address_ref_outer_offset(inode_ref);
 	const uint16_t inner_offset = sqsh_address_ref_inner_offset(inode_ref);
 	uint64_t address_outer;
@@ -176,8 +175,7 @@ sqsh__inode_init(
 
 struct SqshInode *
 sqsh_inode_new(struct SqshArchive *sqsh, uint64_t inode_ref, int *err) {
-	struct SqshInode *context =
-			calloc(1, sizeof(struct SqshInode));
+	struct SqshInode *context = calloc(1, sizeof(struct SqshInode));
 	if (context == NULL) {
 		return NULL;
 	}
@@ -330,16 +328,14 @@ sqsh_inode_file_block_count(const struct SqshInode *context) {
 }
 
 uint32_t
-sqsh_inode_file_block_size(
-		const struct SqshInode *inode, uint32_t index) {
+sqsh_inode_file_block_size(const struct SqshInode *inode, uint32_t index) {
 	const struct SqshDataDatablockSize *size_info = get_size_info(inode, index);
 
 	return sqsh_data_datablock_size(size_info);
 }
 
 bool
-sqsh_inode_file_block_is_compressed(
-		const struct SqshInode *inode, int index) {
+sqsh_inode_file_block_is_compressed(const struct SqshInode *inode, int index) {
 	const struct SqshDataDatablockSize *size_info = get_size_info(inode, index);
 
 	return sqsh_data_datablock_is_compressed(size_info);
@@ -467,8 +463,7 @@ sqsh_inode_symlink(const struct SqshInode *context) {
 }
 
 int
-sqsh_inode_symlink_dup(
-		const struct SqshInode *inode, char **namebuffer) {
+sqsh_inode_symlink_dup(const struct SqshInode *inode, char **namebuffer) {
 	int size = sqsh_inode_symlink_size(inode);
 	const char *link_target = sqsh_inode_symlink(inode);
 
