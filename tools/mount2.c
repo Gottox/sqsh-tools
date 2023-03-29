@@ -300,6 +300,8 @@ sqshfs_readlink(fuse_req_t req, fuse_ino_t ino) {
 	}
 
 	char *symlink = NULL;
+	// fuse expects a null terminated string. Duplicate the symlink is the
+	// easiest way to do this.
 	rv = sqsh_inode_symlink_dup(inode, &symlink);
 	if (rv < 0) {
 		dbg("sqshfs_readlink: sqsh_inode_symlink_dup failed\n");
@@ -308,7 +310,7 @@ sqshfs_readlink(fuse_req_t req, fuse_ino_t ino) {
 	}
 	dbg("sqshfs_readlink: reply success\n");
 	fuse_reply_readlink(req, symlink);
-	free((void *)symlink);
+	free(symlink);
 
 out:
 	sqsh_inode_free(inode);
@@ -341,11 +343,10 @@ sqshfs_opendir(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 	}
 
 	fi->fh = (uintptr_t)handle;
-	handle = NULL;
 	dbg("sqshfs_opendir: reply success\n");
 	fuse_reply_open(req, fi);
 out:
-	if (handle != NULL) {
+	if (rv < 0) {
 		sqsh_inode_free(handle->inode);
 		sqsh_directory_iterator_free(handle->iterator);
 		free(handle);
