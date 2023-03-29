@@ -32,6 +32,7 @@ mktemp = find_program('mktemp')
 setfattr = find_program('setfattr')
 xxd = find_program('xxd')
 unshare = find_program('unshare')
+fusermount = find_program('fusermount')
 
 squashfs = custom_target(
 	'squashfs.image',
@@ -72,6 +73,20 @@ if get_option('test') == 'extended'
 			'SQSH_CAT': tools['sqsh-cat'].full_path(),
 			'SQSH_LS': tools['sqsh-ls'].full_path(),
 			'SQSH_LZO_HELPER_PATH': lzo_helper_path,
+		},
+	)
+
+	test('sqshfs-test',
+		files('sqshfs-test.sh'),
+		timeout: 20,
+		should_fail: true,
+		env: {
+			'BUILD_DIR': meson.current_build_dir(),
+			'MKSQUASHFS': mksquashfs.full_path(),
+			'SOURCE_ROOT': meson.project_source_root(),
+			'SQSHFS': tools['sqshfs'].full_path(),
+			'UNSHARE': unshare.full_path(),
+			'FUSERMOUNT': fusermount.full_path(),
 		},
 	)
 
