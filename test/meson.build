@@ -52,6 +52,13 @@ squashfs_h = custom_target(
 	command: [xxd, '-i', '@INPUT@'],
 )
 
+executable('read-chunk',
+	'read-chunk.c',
+	install : false,
+	c_args: test_c_args,
+	dependencies : libsqsh_dependency,
+)
+
 foreach p : sqsh_test
 	t = executable(p.underscorify(),
 		[ p, squashfs_h, sqsh_test_util ],
