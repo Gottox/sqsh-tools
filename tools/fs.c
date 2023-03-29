@@ -69,8 +69,6 @@ struct SqshfsOptions {
 
 struct SqshfsFileHandle {
 	struct SqshInode *inode;
-	struct SqshFileReader *reader;
-	sqsh_index_t last_size;
 };
 
 struct SqshfsDirHandle {
@@ -95,17 +93,31 @@ usage(const char *progname) {
 			progname, progname);
 }
 
+// fuse reserves 1 as the root inode. In order to avoid collisions with the
+// root inode, we need to map between the fuse inode and the sqsh inode by
+// setting them off by one.
+static fuse_ino_t
+inode_sqsh_to_fuse(uint32_t inode) {
+	return inode + 1;
+}
+
+static uint32_t
+inode_fuse_to_sqsh(fuse_ino_t inode) {
+	return inode - 1;
+}
+
 static uint64_t
-sqshfs_context_inode_ref(struct Sqshfs *context, fuse_ino_t inode) {
+sqshfs_context_inode_ref(struct Sqshfs *context, fuse_ino_t fuse_inode) {
 	int rv = 0;
 	uint64_t inode_ref = 0;
+	uint64_t sqsh_inode = inode_fuse_to_sqsh(fuse_inode);
 	struct SqshArchive *archive = context->archive;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 
-	if (inode == FUSE_ROOT_ID) {
+	if (fuse_inode == FUSE_ROOT_ID) {
 		return sqsh_superblock_inode_root_ref(superblock);
-	} else if (context->inode_map[inode - 1] != 0) {
-		return context->inode_map[inode - 1];
+	} else if (context->inode_map[sqsh_inode - 1] != 0) {
+		return context->inode_map[sqsh_inode - 1];
 	}
 
 	if (sqsh_superblock_has_export_table(superblock) == false) {
@@ -117,7 +129,7 @@ sqshfs_context_inode_ref(struct Sqshfs *context, fuse_ino_t inode) {
 		return 0;
 	}
 
-	rv = sqsh_export_table_resolve_inode(export_table, inode, &inode_ref);
+	rv = sqsh_export_table_resolve_inode(export_table, sqsh_inode, &inode_ref);
 	if (rv < 0) {
 		return 0;
 	}
@@ -177,7 +189,7 @@ sqshfs_inode_to_stat(
 		struct SqshInode *inode, const struct SqshSuperblock *superblock,
 		struct stat *st) {
 	st->st_dev = 0;
-	st->st_ino = sqsh_inode_number(inode);
+	st->st_ino = inode_sqsh_to_fuse(sqsh_inode_number(inode));
 	st->st_mode = sqshfs_inode_mode(inode);
 	st->st_nlink = sqsh_inode_hard_link_count(inode);
 	st->st_uid = sqsh_inode_uid(inode);
@@ -267,7 +279,7 @@ sqshfs_lookup(fuse_req_t req, fuse_ino_t parent, const char *name) {
 	}
 
 	struct fuse_entry_param entry = {
-			.ino = inode_number,
+			.ino = inode_sqsh_to_fuse(inode_number),
 			.attr_timeout = 1.0,
 			.entry_timeout = 1.0,
 			.generation = 1,
@@ -435,7 +447,6 @@ sqshfs_open(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 		fuse_reply_err(req, EIO);
 		goto out;
 	}
-	handle->reader = sqsh_file_reader_new(handle->inode, &rv);
 	if (rv < 0) {
 		dbg("sqshfs_open: sqsh_directory_iterator_new failed\n");
 		fuse_reply_err(req, EIO);
@@ -449,7 +460,6 @@ sqshfs_open(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 out:
 	if (handle != NULL) {
 		sqsh_inode_free(handle->inode);
-		sqsh_file_reader_free(handle->reader);
 		free(handle);
 	}
 }
@@ -462,7 +472,6 @@ sqshfs_release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 	dbg("sqshfs_release\n");
 
 	sqsh_inode_free(handle->inode);
-	sqsh_file_reader_free(handle->reader);
 	free(handle);
 }
 
@@ -473,20 +482,27 @@ sqshfs_read(
 	struct Sqshfs *context = fuse_req_userdata(req);
 	struct SqshfsFileHandle *handle = (void *)fi->fh;
 	int rv = 0;
+	struct SqshFileReader *reader = sqsh_file_reader_new(handle->inode, &rv);
 
 	dbg("sqshfs_read: %i %u %u\n", ino, offset, size);
 
-	rv = sqsh_file_reader_advance(handle->reader, handle->last_size, size);
+	uint64_t file_size = sqsh_inode_file_size(handle->inode);
+	if (size > file_size - offset) {
+		dbg("sqshfs_read: truncating read to file size\n");
+		size = file_size - offset;
+	}
+
+	rv = sqsh_file_reader_advance(reader, offset, size);
 	if (rv < 0) {
 		dbg("sqshfs_read: sqsh_file_reader_advance failed\n");
 		fuse_reply_err(req, EIO);
 		goto out;
 	}
-	const uint8_t *data = sqsh_file_reader_data(handle->reader);
-	const size_t data_size = sqsh_file_reader_size(handle->reader);
+	const uint8_t *data = sqsh_file_reader_data(reader);
+	const size_t data_size = sqsh_file_reader_size(reader);
 	fuse_reply_buf(req, (const char *)data, data_size);
 out:
-	return;
+	sqsh_file_reader_free(reader);
 }
 
 static void
