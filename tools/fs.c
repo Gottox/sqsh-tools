@@ -51,7 +51,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-#define dbg(...) fuse_log(FUSE_LOG_DEBUG, __VA_ARGS__)
+#define dbg(...) if (context->debug) { fuse_log(FUSE_LOG_DEBUG, __VA_ARGS__); }
 
 struct Sqshfs {
 	pthread_mutex_t lock;
@@ -124,7 +124,7 @@ sqshfs_context_inode_ref(struct Sqshfs *context, fuse_ino_t inode) {
 
 static void
 sqshfs_init(void *userdata, struct fuse_conn_info *conn) {
-	(void)userdata;
+	struct Sqshfs *context = userdata;
 	dbg("sqshfs_init\n");
 
 	if (conn->capable & FUSE_CAP_PARALLEL_DIROPS) {
@@ -134,7 +134,7 @@ sqshfs_init(void *userdata, struct fuse_conn_info *conn) {
 
 static void
 sqshfs_destroy(void *userdata) {
-	(void)userdata;
+	struct Sqshfs *context = userdata;
 	dbg("sqshfs_destroy\n");
 }
 
@@ -196,12 +196,13 @@ sqshfs_inode_open(struct Sqshfs *context, fuse_ino_t ino, int *err) {
 static void
 sqshfs_getattr(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 	(void)fi;
-	dbg("sqshfs_getattr\n");
 	int rv = 0;
 	struct SqshInode *inode = NULL;
 	struct Sqshfs *context = fuse_req_userdata(req);
 	const struct SqshSuperblock *superblock =
 			sqsh_archive_superblock(context->archive);
+
+	dbg("sqshfs_getattr\n");
 
 	inode = sqshfs_inode_open(context, ino, &rv);
 	if (rv < 0) {
@@ -402,8 +403,8 @@ out:
 
 static void
 sqshfs_releasedir(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
-	(void)req;
 	(void)ino;
+	struct Sqshfs *context = fuse_req_userdata(req);
 	dbg("sqshfs_releasedir\n");
 	struct SqshfsDirHandle *handle = (void *)fi->fh;
 
@@ -414,10 +415,10 @@ sqshfs_releasedir(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 
 static void
 sqshfs_open(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
+	struct Sqshfs *context = fuse_req_userdata(req);
 	dbg("sqshfs_open\n");
 
 	int rv = 0;
-	struct Sqshfs *context = fuse_req_userdata(req);
 	struct SqshfsFileHandle *handle = calloc(1, sizeof(*handle));
 	if (handle == NULL) {
 		dbg("sqshfs_open: calloc failed\n");
@@ -452,10 +453,10 @@ out:
 
 static void
 sqshfs_release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
-	(void)req;
 	(void)ino;
-	dbg("sqshfs_release\n");
+	struct Sqshfs *context = fuse_req_userdata(req);
 	struct SqshfsFileHandle *handle = (void *)fi->fh;
+	dbg("sqshfs_release\n");
 
 	sqsh_inode_free(handle->inode);
 	sqsh_file_reader_free(handle->reader);
@@ -466,10 +467,11 @@ static void
 sqshfs_read(
 		fuse_req_t req, fuse_ino_t ino, size_t size, off_t offset,
 		struct fuse_file_info *fi) {
+	struct Sqshfs *context = fuse_req_userdata(req);
+	struct SqshfsFileHandle *handle = (void *)fi->fh;
 	int rv = 0;
 
 	dbg("sqshfs_read: %i %u %u\n", ino, offset, size);
-	struct SqshfsFileHandle *handle = (void *)fi->fh;
 
 	rv = sqsh_file_reader_advance(handle->reader, handle->last_size, size);
 	if (rv < 0) {
@@ -659,7 +661,7 @@ main(int argc, char *argv[]) {
 	struct fuse_session *fuse_session = NULL;
 	struct fuse_cmdline_opts fuse_options = {0};
 	struct SqshfsOptions sqshfs_options = {0};
-	struct fuse_loop_config config;
+	struct fuse_loop_config config = {0};
 	struct Sqshfs sqshfs_context = {0};
 	int rv = EXIT_SUCCESS;
 
