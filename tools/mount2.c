@@ -138,9 +138,9 @@ sqshfs_destroy(void *userdata) {
 	dbg("sqshfs_destroy\n");
 }
 
-static __mode_t
+static mode_t
 sqshfs_inode_mode(struct SqshInode *inode) {
-	__mode_t mode = sqsh_inode_permission(inode);
+	mode_t mode = sqsh_inode_permission(inode);
 	switch (sqsh_inode_type(inode)) {
 	case SQSH_INODE_TYPE_DIRECTORY:
 		mode |= S_IFDIR;
