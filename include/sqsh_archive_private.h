@@ -169,6 +169,7 @@ struct SqshArchive {
 	struct SqshFragmentTable fragment_table;
 	uint8_t initialized;
 	struct SqshConfig config;
+	pthread_mutex_t lock;
 };
 
 /**
