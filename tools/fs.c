@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         mount.c
+ * @file         fs.c
  */
 
 #define FUSE_USE_VERSION 35
