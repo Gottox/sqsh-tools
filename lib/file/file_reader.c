@@ -100,7 +100,6 @@ sqsh_file_reader_advance(
 		// Direct mapping works
 		reader->current_offset = current_offset;
 		reader->data = sqsh_file_iterator_data(iterator) + block_offset;
-		reader->current_size = size;
 	} else {
 		struct SqshBuffer *buffer = &reader->buffer;
 		// We need to copy the data;
@@ -136,8 +135,8 @@ sqsh_file_reader_advance(
 		rv = 0;
 		reader->current_offset = 0;
 		reader->data = sqsh__buffer_data(buffer);
-		reader->current_size = sqsh__buffer_size(buffer);
 	}
+	reader->current_size = size;
 
 out:
 	return rv;
