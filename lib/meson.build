@@ -41,6 +41,8 @@ libsqsh_sources = [
 	'primitive/lru.c',
 	'primitive/rc_hash_map.c',
 	'primitive/rc_map.c',
+	'table/id_table.c',
+	'table/export_table.c',
 	'table/table.c',
 	'xattr/xattr_iterator.c',
 	'xattr/xattr_table.c',

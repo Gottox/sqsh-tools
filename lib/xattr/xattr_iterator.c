@@ -312,8 +312,7 @@ sqsh_xattr_iterator_name_size(struct SqshXattrIterator *iterator) {
 }
 
 char *
-sqsh_xattr_iterator_value_dup(
-		struct SqshXattrIterator *iterator) {
+sqsh_xattr_iterator_value_dup(struct SqshXattrIterator *iterator) {
 	const size_t size = sqsh_xattr_iterator_value_size(iterator);
 	const char *value = sqsh_xattr_iterator_value(iterator);
 

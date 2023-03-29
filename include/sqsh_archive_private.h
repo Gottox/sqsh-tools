@@ -163,8 +163,8 @@ struct SqshArchive {
 	struct SqshCompression metablock_compression;
 	struct SqshCompressionManager file_compression_manager;
 	struct SqshSuperblock superblock;
-	struct SqshTable id_table;
-	struct SqshTable export_table;
+	struct SqshIdTable id_table;
+	struct SqshExportTable export_table;
 	struct SqshXattrTable xattr_table;
 	struct SqshFragmentTable fragment_table;
 	uint8_t initialized;

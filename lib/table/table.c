@@ -137,7 +137,7 @@ out:
 }
 
 int
-sqsh_table_cleanup(struct SqshTable *table) {
+sqsh__table_cleanup(struct SqshTable *table) {
 	sqsh__map_reader_cleanup(&table->lookup_table);
 	return 0;
 }

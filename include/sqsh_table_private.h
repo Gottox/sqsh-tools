@@ -87,6 +87,73 @@ SQSH_NO_UNUSED int sqsh__table_init(
  */
 int sqsh__table_cleanup(struct SqshTable *table);
 
+////////////////////////////////////////
+// table/id_table.c
+
+struct SqshIdTable {
+	/**
+	 * @privatesection
+	 */
+	struct SqshTable table;
+};
+
+/**
+ * @internal
+ * @memberof SqshIdTable
+ * @brief Initializes a table with a SQSH context.
+ *
+ * @param[out] table The table to initialize.
+ * @param[in]  sqsh The SQSH context to use for the table.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+int sqsh__id_table_init(struct SqshIdTable *table, struct SqshArchive *sqsh);
+
+/**
+ * @internal
+ * @memberof SqshIdTable
+ * @brief Cleans up a table.
+ *
+ * @param[in] table The table to clean up.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+int sqsh__id_table_cleanup(struct SqshIdTable *table);
+
+////////////////////////////////////////
+// table/export_table.c
+
+struct SqshExportTable {
+	/**
+	 * @privatesection
+	 */
+	struct SqshTable table;
+};
+
+/**
+ * @internal
+ * @memberof SqshExportTable
+ * @brief Initializes a table with a SQSH context.
+ *
+ * @param[out] table The table to initialize.
+ * @param[in]  sqsh The SQSH context to use for the table.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+int sqsh__export_table_init(
+		struct SqshExportTable *table, struct SqshArchive *sqsh);
+
+/**
+ * @internal
+ * @memberof SqshExportTable
+ * @brief Cleans up a table.
+ *
+ * @param[in] table The table to clean up.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+int sqsh__export_table_cleanup(struct SqshExportTable *table);
+
 #ifdef __cplusplus
 }
 #endif

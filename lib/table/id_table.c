@@ -28,77 +28,29 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_table.h
+ * @file         id_table.c
  */
 
-#ifndef SQSH_TABLE_H
-#define SQSH_TABLE_H
+#include "../../include/sqsh_archive.h"
+#include "../../include/sqsh_table_private.h"
 
-#include "sqsh_common.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-struct SqshBuffer;
-struct SqshInode;
-
-////////////////////////////////////////
-// table/table.c
-
-struct SqshTable;
-
-/**
- * @memberof SqshTable
- * @brief Retrieves an element from the table.
- *
- * @param[in]  table The table to retrieve the element from.
- * @param[in]  index The index of the element to retrieve.
- * @param[out] target The buffer to store the element in.
- *
- * @return 0 on success, a negative value on error.
- */
 int
-sqsh_table_get(const struct SqshTable *table, sqsh_index_t index, void *target);
+sqsh__id_table_init(struct SqshIdTable *table, struct SqshArchive *sqsh) {
+	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
+	const uint64_t table_start = sqsh_superblock_id_table_start(superblock);
+	const uint16_t count = sqsh_superblock_id_count(superblock);
 
-////////////////////////////////////////
-// table/id_table.c
-
-struct SqshIdTable;
-
-/**
- * @memberof SqshTable
- * @brief Retrieves an element from the table.
- *
- * @param[in]  table The table to retrieve the element from.
- * @param[in]  index The index of the element to retrieve.
- * @param[out] id The buffer to store the element in.
- *
- * @return 0 on success, a negative value on error.
- */
-int sqsh_id_table_get(
-		const struct SqshIdTable *table, sqsh_index_t index, uint32_t *id);
-
-////////////////////////////////////////
-// table/export_table.c
-
-struct SqshExportTable;
-
-/**
- * @memberof SqshTable
- * @brief Retrieves an element from the table.
- *
- * @param[in]  table The table to retrieve the element from.
- * @param[in]  inode The index of the element to retrieve.
- * @param[out] inode_ref A pointer to a uint64_t to store the inode reference
- *
- * @return 0 on success, a negative value on error.
- */
-int sqsh_export_table_resolve_inode(
-		const struct SqshExportTable *table, uint32_t inode,
-		uint64_t *inode_ref);
-
-#ifdef __cplusplus
+	return sqsh__table_init(
+			&table->table, sqsh, table_start, sizeof(uint32_t), count);
 }
-#endif
-#endif // SQSH_TABLE_H
+
+int
+sqsh_id_table_get(
+		const struct SqshIdTable *table, sqsh_index_t index, uint32_t *id) {
+	return sqsh_table_get(&table->table, index, id);
+}
+
+int
+sqsh__id_table_cleanup(struct SqshIdTable *table) {
+	return sqsh__table_cleanup(&table->table);
+}

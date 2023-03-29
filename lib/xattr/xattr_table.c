@@ -101,7 +101,7 @@ sqsh_xattr_table_get(
 
 int
 sqsh__xattr_table_cleanup(struct SqshXattrTable *context) {
-	sqsh_table_cleanup(&context->table);
+	sqsh__table_cleanup(&context->table);
 	sqsh__map_reader_cleanup(&context->header);
 	return 0;
 }

@@ -205,7 +205,7 @@ out:
 
 int
 sqsh__fragment_table_cleanup(struct SqshFragmentTable *table) {
-	sqsh_table_cleanup(&table->table);
+	sqsh__table_cleanup(&table->table);
 	sqsh__compression_manager_cleanup(&table->compression_manager);
 	return 0;
 }

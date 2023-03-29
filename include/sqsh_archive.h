@@ -41,7 +41,8 @@ extern "C" {
 #endif
 
 struct SqshArchive;
-struct SqshTable;
+struct SqshIdTable;
+struct SqshExportTable;
 struct SqshFragmentTable;
 
 ////////////////////////////////////////
@@ -543,8 +544,8 @@ sqsh_archive_compression_metablock(const struct SqshArchive *archive);
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int
-sqsh_archive_id_table(struct SqshArchive *archive, struct SqshTable **id_table);
+SQSH_NO_UNUSED int sqsh_archive_id_table(
+		struct SqshArchive *archive, struct SqshIdTable **id_table);
 
 /**
  * @memberof SqshArchive
@@ -558,7 +559,7 @@ sqsh_archive_id_table(struct SqshArchive *archive, struct SqshTable **id_table);
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_UNUSED int sqsh_archive_export_table(
-		struct SqshArchive *archive, struct SqshTable **export_table);
+		struct SqshArchive *archive, struct SqshExportTable **export_table);
 
 /**
  * @memberof SqshArchive

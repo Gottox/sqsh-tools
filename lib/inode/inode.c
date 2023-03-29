@@ -508,7 +508,7 @@ sqsh_inode_device_id(const struct SqshInode *context) {
 static uint32_t
 inode_get_id(const struct SqshInode *context, sqsh_index_t idx) {
 	int rv = 0;
-	struct SqshTable *id_table;
+	struct SqshIdTable *id_table;
 	uint32_t id;
 
 	rv = sqsh_archive_id_table(context->sqsh, &id_table);
@@ -516,7 +516,7 @@ inode_get_id(const struct SqshInode *context, sqsh_index_t idx) {
 		return UINT32_MAX;
 	}
 
-	rv = sqsh_table_get(id_table, idx, &id);
+	rv = sqsh_id_table_get(id_table, idx, &id);
 	if (rv < 0) {
 		return UINT32_MAX;
 	}

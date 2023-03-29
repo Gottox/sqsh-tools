@@ -584,7 +584,7 @@ fuzz_crash_4(void) {
 			0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,
 	};
 
-	struct SqshTable *id_table = NULL;
+	struct SqshIdTable *id_table = NULL;
 	struct SqshArchive sqsh = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
@@ -625,7 +625,7 @@ fuzz_crash_5(void) {
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4f, 0x00, 0x00, 0x00,
 	};
 
-	struct SqshTable *id_table = NULL;
+	struct SqshIdTable *id_table = NULL;
 	struct SqshArchive sqsh = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
@@ -652,7 +652,7 @@ fuzz_crash_6(void) {
 			0x0,  0x0,  0x0,  0x0,  0x0,  0x0, 0x0, 0x0, 0x0,  0x0,  0x0, 0xa,
 	};
 
-	struct SqshTable *id_table = NULL;
+	struct SqshIdTable *id_table = NULL;
 	struct SqshArchive sqsh = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
@@ -680,7 +680,7 @@ fuzz_crash_7(void) {
 			0x0,  0x97, 0x97, 0x97, 0x97, 0x74, 0x97, 0x97,
 	};
 
-	struct SqshTable *id_table = NULL;
+	struct SqshIdTable *id_table = NULL;
 	struct SqshArchive sqsh = {0};
 	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(input));
 	rv = sqsh__archive_init(&sqsh, input, &config);

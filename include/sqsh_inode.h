@@ -265,7 +265,7 @@ const char *sqsh_inode_symlink(const struct SqshInode *context);
  *
  * @param[in] context The inode context.
  *
- * @return The target of a symbolic link, NULL if the inode is not a symbolic or 
+ * @return The target of a symbolic link, NULL if the inode is not a symbolic or
  * if the allocation fails.
  */
 SQSH_NO_UNUSED char *sqsh_inode_symlink_dup(const struct SqshInode *context);

@@ -51,7 +51,10 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-#define dbg(...) if (context->debug) { fuse_log(FUSE_LOG_DEBUG, __VA_ARGS__); }
+#define dbg(...) \
+	if (context->debug) { \
+		fuse_log(FUSE_LOG_DEBUG, __VA_ARGS__); \
+	}
 
 struct Sqshfs {
 	pthread_mutex_t lock;
@@ -108,13 +111,13 @@ sqshfs_context_inode_ref(struct Sqshfs *context, fuse_ino_t inode) {
 	if (sqsh_superblock_has_export_table(superblock) == false) {
 		return 0;
 	}
-	struct SqshTable *export_table;
+	struct SqshExportTable *export_table;
 	rv = sqsh_archive_export_table(archive, &export_table);
 	if (rv < 0) {
 		return 0;
 	}
 
-	rv = sqsh_table_get(export_table, inode - 1, &inode_ref);
+	rv = sqsh_export_table_resolve_inode(export_table, inode, &inode_ref);
 	if (rv < 0) {
 		return 0;
 	}

@@ -166,15 +166,12 @@ out:
 
 int
 sqsh_archive_id_table(
-		struct SqshArchive *archive, struct SqshTable **id_table) {
+		struct SqshArchive *archive, struct SqshIdTable **id_table) {
 	int rv = 0;
-	uint64_t table_start = sqsh_superblock_id_table_start(&archive->superblock);
 
 	pthread_mutex_lock(&archive->lock);
 	if (!is_initialized(archive, INITIALIZED_ID_TABLE)) {
-		rv = sqsh__table_init(
-				&archive->id_table, archive, table_start, sizeof(uint32_t),
-				sqsh_superblock_id_count(&archive->superblock));
+		rv = sqsh__id_table_init(&archive->id_table, archive);
 		if (rv < 0) {
 			goto out;
 		}
@@ -188,7 +185,7 @@ out:
 
 int
 sqsh_archive_export_table(
-		struct SqshArchive *archive, struct SqshTable **export_table) {
+		struct SqshArchive *archive, struct SqshExportTable **export_table) {
 	int rv = 0;
 	uint64_t table_start =
 			sqsh_superblock_export_table_start(&archive->superblock);
@@ -198,9 +195,7 @@ sqsh_archive_export_table(
 
 	pthread_mutex_lock(&archive->lock);
 	if (!(archive->initialized & INITIALIZED_EXPORT_TABLE)) {
-		rv = sqsh__table_init(
-				&archive->export_table, archive, table_start, sizeof(uint64_t),
-				sqsh_superblock_inode_count(&archive->superblock));
+		rv = sqsh__export_table_init(&archive->export_table, archive);
 		if (rv < 0) {
 			goto out;
 		}
@@ -283,10 +278,10 @@ sqsh__archive_cleanup(struct SqshArchive *archive) {
 	int rv = 0;
 
 	if (is_initialized(archive, INITIALIZED_ID_TABLE)) {
-		sqsh_table_cleanup(&archive->id_table);
+		sqsh__id_table_cleanup(&archive->id_table);
 	}
 	if (is_initialized(archive, INITIALIZED_EXPORT_TABLE)) {
-		sqsh_table_cleanup(&archive->export_table);
+		sqsh__export_table_cleanup(&archive->export_table);
 	}
 	if (is_initialized(archive, INITIALIZED_XATTR_TABLE)) {
 		sqsh__xattr_table_cleanup(&archive->xattr_table);
