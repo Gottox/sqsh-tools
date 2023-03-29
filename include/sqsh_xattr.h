@@ -149,12 +149,12 @@ SQSH_NO_UNUSED int sqsh_xattr_iterator_fullname_cmp(
  * The caller is responsible for freeing the memory.
  *
  * @param[in]  iterator        The iterator to use.
- * @param[out] fullname_buffer The buffer to hold the duplicated full name.
  *
- * @return 0 on success, a negative value on error.
+ * @return The full name of the current xattr on success, NULL if the allocation
+ * fails
  */
-SQSH_NO_UNUSED int sqsh_xattr_iterator_fullname_dup(
-		struct SqshXattrIterator *iterator, char **fullname_buffer);
+SQSH_NO_UNUSED char *
+sqsh_xattr_iterator_fullname_dup(struct SqshXattrIterator *iterator);
 
 /**
  * @memberof SqshXattrIterator
@@ -162,12 +162,12 @@ SQSH_NO_UNUSED int sqsh_xattr_iterator_fullname_dup(
  * The caller is responsible for freeing the memory.
  *
  * @param[in]  iterator    The iterator to use.
- * @param[out] value_buffer The buffer to hold the duplicated value.
  *
- * @return 0 on success, a negative value on error.
+ * @return The value of the current xattr on success, NULL if the allocation
+ * fails
  */
-SQSH_NO_UNUSED int sqsh_xattr_iterator_value_dup(
-		struct SqshXattrIterator *iterator, char **value_buffer);
+SQSH_NO_UNUSED char *
+sqsh_xattr_iterator_value_dup(struct SqshXattrIterator *iterator);
 
 /**
  * @memberof SqshXattrIterator

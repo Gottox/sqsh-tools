@@ -303,8 +303,8 @@ sqshfs_readlink(fuse_req_t req, fuse_ino_t ino) {
 	char *symlink = NULL;
 	// fuse expects a null terminated string. Duplicate the symlink is the
 	// easiest way to do this.
-	rv = sqsh_inode_symlink_dup(inode, &symlink);
-	if (rv < 0) {
+	symlink = sqsh_inode_symlink_dup(inode);
+	if (symlink == NULL) {
 		dbg("sqshfs_readlink: sqsh_inode_symlink_dup failed\n");
 		fuse_reply_err(req, ENOMEM);
 		goto out;
@@ -383,8 +383,8 @@ sqshfs_readdir(
 	struct stat stbuf = {0};
 	sqshfs_inode_to_stat(inode, NULL, &stbuf);
 	char *name = NULL;
-	rv = sqsh_directory_iterator_name_dup(handle->iterator, &name);
-	if (rv < 0) {
+	name = sqsh_directory_iterator_name_dup(handle->iterator);
+	if (name == NULL) {
 		dbg("sqshfs_readdir: sqsh_directory_iterator_name_dup failed\n");
 		fuse_reply_err(req, ENOMEM);
 		goto out;

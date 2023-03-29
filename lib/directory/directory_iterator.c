@@ -299,18 +299,12 @@ sqsh_directory_iterator_name(const struct SqshDirectoryIterator *iterator) {
 	return (char *)sqsh_data_directory_entry_name(entry);
 }
 
-int
-sqsh_directory_iterator_name_dup(
-		const struct SqshDirectoryIterator *iterator, char **name_buffer) {
+char *
+sqsh_directory_iterator_name_dup(const struct SqshDirectoryIterator *iterator) {
 	int size = sqsh_directory_iterator_name_size(iterator);
 	const char *entry_name = sqsh_directory_iterator_name(iterator);
 
-	*name_buffer = sqsh_memdup(entry_name, size);
-	if (*name_buffer) {
-		return size;
-	} else {
-		return -SQSH_ERROR_MALLOC_FAILED;
-	}
+	return sqsh_memdup(entry_name, size);
 }
 
 int

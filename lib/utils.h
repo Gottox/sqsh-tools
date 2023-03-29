@@ -58,6 +58,9 @@ extern "C" {
 
 SQSH_NO_UNUSED static inline void *
 sqsh_memdup(const void *source, size_t size) {
+	if (source == NULL) {
+		return NULL;
+	}
 	void *target = calloc(size + 1, sizeof(uint8_t));
 	if (target == NULL) {
 		return NULL;

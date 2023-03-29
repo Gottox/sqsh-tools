@@ -291,8 +291,8 @@ sqshfuse_readdir(
 
 	while (sqsh_directory_iterator_next(iter) > 0) {
 		char *name;
-		rv = sqsh_directory_iterator_name_dup(iter, &name);
-		if (rv < 0) {
+		name = sqsh_directory_iterator_name_dup(iter);
+		if (name == NULL) {
 			rv = -ENOMEM;
 			goto out;
 		}

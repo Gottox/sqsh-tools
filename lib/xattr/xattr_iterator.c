@@ -288,22 +288,22 @@ sqsh_xattr_iterator_fullname_cmp(
 	}
 }
 
-int
-sqsh_xattr_iterator_fullname_dup(
-		struct SqshXattrIterator *iterator, char **fullname_buffer) {
+char *
+sqsh_xattr_iterator_fullname_dup(struct SqshXattrIterator *iterator) {
 	const char *prefix = sqsh_xattr_iterator_prefix(iterator);
-	size_t name_size = sqsh_xattr_iterator_name_size(iterator);
-	size_t size = strlen(prefix) + name_size;
+	const char *name = sqsh_xattr_iterator_name(iterator);
 
-	*fullname_buffer = calloc(size + 1, sizeof(char));
-	if (*fullname_buffer) {
-		strcpy(*fullname_buffer, prefix);
-		strncat(*fullname_buffer, sqsh_xattr_iterator_name(iterator),
-				name_size);
-		return size;
-	} else {
-		return -SQSH_ERROR_MALLOC_FAILED;
+	const size_t prefix_size = strlen(prefix);
+	const size_t name_size = sqsh_xattr_iterator_name_size(iterator);
+	const size_t size = prefix_size + name_size;
+
+	char *fullname_buffer = calloc(size + 1, sizeof(char));
+	if (fullname_buffer == NULL) {
+		return NULL;
 	}
+	memcpy(fullname_buffer, prefix, prefix_size);
+	memcpy(&fullname_buffer[prefix_size], name, name_size);
+	return fullname_buffer;
 }
 
 uint16_t
@@ -311,18 +311,13 @@ sqsh_xattr_iterator_name_size(struct SqshXattrIterator *iterator) {
 	return sqsh_data_xattr_key_name_size(get_key(iterator));
 }
 
-int
+char *
 sqsh_xattr_iterator_value_dup(
-		struct SqshXattrIterator *iterator, char **value_buffer) {
-	int size = sqsh_xattr_iterator_value_size(iterator);
+		struct SqshXattrIterator *iterator) {
+	const size_t size = sqsh_xattr_iterator_value_size(iterator);
 	const char *value = sqsh_xattr_iterator_value(iterator);
 
-	*value_buffer = sqsh_memdup(value, size);
-	if (*value_buffer) {
-		return size;
-	} else {
-		return -SQSH_ERROR_MALLOC_FAILED;
-	}
+	return sqsh_memdup(value, size);
 }
 
 const char *

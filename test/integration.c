@@ -98,22 +98,22 @@ sqsh_ls(void) {
 
 	rv = sqsh_directory_iterator_next(iter);
 	assert(rv > 0);
-	rv = sqsh_directory_iterator_name_dup(iter, &name);
-	assert(rv == 1);
+	name = sqsh_directory_iterator_name_dup(iter);
+	assert(name != NULL);
 	assert(strcmp("a", name) == 0);
 	free(name);
 
 	rv = sqsh_directory_iterator_next(iter);
 	assert(rv >= 0);
-	rv = sqsh_directory_iterator_name_dup(iter, &name);
-	assert(rv == 1);
+	name = sqsh_directory_iterator_name_dup(iter);
+	assert(name != NULL);
 	assert(strcmp("b", name) == 0);
 	free(name);
 
 	rv = sqsh_directory_iterator_next(iter);
 	assert(rv >= 0);
-	rv = sqsh_directory_iterator_name_dup(iter, &name);
-	assert(rv == 9);
+	name = sqsh_directory_iterator_name_dup(iter);
+	assert(name != NULL);
 	assert(strcmp("large_dir", name) == 0);
 	free(name);
 
@@ -365,8 +365,8 @@ sqsh_test_xattr(void) {
 
 	rv = sqsh_directory_iterator_next(dir_iter);
 	assert(rv > 0);
-	rv = sqsh_directory_iterator_name_dup(dir_iter, &name);
-	assert(rv == 1);
+	name = sqsh_directory_iterator_name_dup(dir_iter);
+	assert(name != NULL);
 	assert(strcmp("a", name) == 0);
 	free(name);
 	entry_inode = sqsh_directory_iterator_inode_load(dir_iter, &rv);
@@ -377,12 +377,12 @@ sqsh_test_xattr(void) {
 	rv = sqsh_xattr_iterator_next(xattr_iter);
 	assert(rv > 0);
 	assert(sqsh_xattr_iterator_is_indirect(xattr_iter) == false);
-	rv = sqsh_xattr_iterator_fullname_dup(xattr_iter, &name);
-	assert(rv == 8);
+	name = sqsh_xattr_iterator_fullname_dup(xattr_iter);
+	assert(name != NULL);
 	assert(strcmp("user.foo", name) == 0);
 	free(name);
-	rv = sqsh_xattr_iterator_value_dup(xattr_iter, &value);
-	assert(rv == (int)strlen(expected_value));
+	value = sqsh_xattr_iterator_value_dup(xattr_iter);
+	assert(value != NULL);
 	assert(strcmp(expected_value, value) == 0);
 	free(value);
 	rv = sqsh_xattr_iterator_next(xattr_iter);
@@ -394,8 +394,8 @@ sqsh_test_xattr(void) {
 
 	rv = sqsh_directory_iterator_next(dir_iter);
 	assert(rv >= 0);
-	rv = sqsh_directory_iterator_name_dup(dir_iter, &name);
-	assert(rv == 1);
+	name = sqsh_directory_iterator_name_dup(dir_iter);
+	assert(name != NULL);
 	assert(strcmp("b", name) == 0);
 	free(name);
 	entry_inode = sqsh_directory_iterator_inode_load(dir_iter, &rv);
@@ -406,12 +406,12 @@ sqsh_test_xattr(void) {
 	rv = sqsh_xattr_iterator_next(xattr_iter);
 	assert(rv > 0);
 	assert(sqsh_xattr_iterator_is_indirect(xattr_iter) == true);
-	rv = sqsh_xattr_iterator_fullname_dup(xattr_iter, &name);
-	assert(rv == 8);
+	name = sqsh_xattr_iterator_fullname_dup(xattr_iter);
+	assert(name != NULL);
 	assert(strcmp("user.bar", name) == 0);
 	free(name);
-	rv = sqsh_xattr_iterator_value_dup(xattr_iter, &value);
-	assert(rv == (int)strlen(expected_value));
+	value = sqsh_xattr_iterator_value_dup(xattr_iter);
+	assert(value != NULL);
 	assert(strcmp(expected_value, value) == 0);
 	free(value);
 	rv = sqsh_xattr_iterator_next(xattr_iter);

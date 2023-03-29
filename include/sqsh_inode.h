@@ -264,12 +264,11 @@ const char *sqsh_inode_symlink(const struct SqshInode *context);
  * symbolic link.
  *
  * @param[in] context The inode context.
- * @param namebuffer a pointer that will be set to the allocated string.
  *
- * @return int 0 on success, less than 0 on error.
+ * @return The target of a symbolic link, NULL if the inode is not a symbolic or 
+ * if the allocation fails.
  */
-SQSH_NO_UNUSED int
-sqsh_inode_symlink_dup(const struct SqshInode *context, char **namebuffer);
+SQSH_NO_UNUSED char *sqsh_inode_symlink_dup(const struct SqshInode *context);
 
 /**
  * @memberof SqshInode

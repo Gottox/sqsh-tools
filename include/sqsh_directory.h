@@ -144,12 +144,11 @@ sqsh_directory_iterator_name(const struct SqshDirectoryIterator *iterator);
  * The caller is responsible for freeing the memory.
  *
  * @param[in]  iterator    The iterator to use.
- * @param[out] name_buffer The buffer to hold the duplicated name.
  *
- * @return 0 on success, a negative value on error.
+ * @return The target of a symbolic link, NULL if the allocation fails.
  */
-SQSH_NO_UNUSED int sqsh_directory_iterator_name_dup(
-		const struct SqshDirectoryIterator *iterator, char **name_buffer);
+SQSH_NO_UNUSED char *
+sqsh_directory_iterator_name_dup(const struct SqshDirectoryIterator *iterator);
 /**
  * @memberof SqshDirectoryIterator
  * @brief Frees the resources used by a directory iterator.

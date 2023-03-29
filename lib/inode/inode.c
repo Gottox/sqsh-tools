@@ -461,17 +461,12 @@ sqsh_inode_symlink(const struct SqshInode *context) {
 	return NULL;
 }
 
-int
-sqsh_inode_symlink_dup(const struct SqshInode *inode, char **namebuffer) {
-	int size = sqsh_inode_symlink_size(inode);
+char *
+sqsh_inode_symlink_dup(const struct SqshInode *inode) {
+	const size_t size = sqsh_inode_symlink_size(inode);
 	const char *link_target = sqsh_inode_symlink(inode);
 
-	*namebuffer = sqsh_memdup(link_target, size);
-	if (*namebuffer) {
-		return size;
-	} else {
-		return -SQSH_ERROR_MALLOC_FAILED;
-	}
+	return sqsh_memdup(link_target, size);
 }
 
 uint32_t
