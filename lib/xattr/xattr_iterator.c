@@ -50,15 +50,17 @@ sqsh__xattr_iterator_init(
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
 	uint32_t index = sqsh_inode_xattr_index(inode);
 
+	if (index == SQSH_INODE_NO_XATTR ||
+		sqsh_superblock_has_xattr_table(superblock) == false) {
+		iterator->remaining_entries = 0;
+		return 0;
+	}
+
 	rv = sqsh_archive_xattr_table(sqsh, &xattr_table);
 	if (rv < 0) {
 		return rv;
 	}
 
-	if (index == SQSH_INODE_NO_XATTR) {
-		iterator->remaining_entries = 0;
-		return 0;
-	}
 	if (index != SQSH_INODE_NO_XATTR && xattr_table == NULL) {
 		// TODO: Be more specific about the error code. This incidates
 		// not only a missing xattr table but also links into the non
