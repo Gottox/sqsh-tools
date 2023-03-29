@@ -539,7 +539,75 @@ sqshfs_listxattr(fuse_req_t req, fuse_ino_t ino, size_t size) {
 	(void)req;
 	(void)ino;
 	(void)size;
+	int rv = 0;
+	struct SqshInode *inode = NULL;
+	struct SqshXattrIterator *iterator = NULL;
+	struct Sqshfs *context = fuse_req_userdata(req);
+	const char *prefix, *name = NULL;
+	char buf[size];
+	size_t buf_size = 0;
+	char *p;
 	dbg("sqshfs_listxattr\n");
+
+	inode = sqshfs_inode_open(context, ino, &rv);
+	if (rv < 0) {
+		dbg("sqshfs_listxattr: sqshfs_inode_open failed\n");
+		fuse_reply_err(req, EIO);
+		goto out;
+	}
+
+	iterator = sqsh_xattr_iterator_new(inode, &rv);
+	if (rv < 0) {
+		dbg("sqshfs_listxattr: sqsh_xattr_iterator_new failed\n");
+		fuse_reply_err(req, EIO);
+		goto out;
+	}
+
+	p = buf;
+	while ((rv = sqsh_xattr_iterator_next(iterator)) > 0) {
+		prefix = sqsh_xattr_iterator_prefix(iterator);
+		if (prefix == NULL) {
+			dbg("sqshfs_listxattr: sqsh_xattr_iterator_prefix failed\n");
+			fuse_reply_err(req, EIO);
+			goto out;
+		}
+		name = sqsh_xattr_iterator_name(iterator);
+		if (name == NULL) {
+			dbg("sqshfs_listxattr: sqsh_xattr_iterator_name failed\n");
+			fuse_reply_err(req, EIO);
+			goto out;
+		}
+
+		size_t prefix_size = sqsh_xattr_iterator_prefix_size(iterator);
+		buf_size += prefix_size;
+		if (buf_size < size) {
+			memcpy(p, prefix, prefix_size);
+			p = &buf[buf_size];
+		}
+
+		size_t name_size = sqsh_xattr_iterator_name_size(iterator);
+		buf_size += name_size + 1;
+		if (buf_size < size) {
+			memcpy(p, name, name_size);
+			p[name_size] = '\0';
+			p = &buf[buf_size];
+		}
+	}
+	if (rv < 0) {
+		dbg("sqshfs_listxattr: sqsh_xattr_iterator_next failed\n");
+		fuse_reply_err(req, EIO);
+		goto out;
+	}
+	if (size == 0) {
+		dbg("sqshfs_listxattr: replying with size %zu", buf_size);
+		fuse_reply_xattr(req, buf_size);
+	} else {
+		dbg("sqshfs_listxattr: replying with buffer size %zu", buf_size);
+		fuse_reply_buf(req, buf, buf_size);
+	}
+out:
+	sqsh_xattr_iterator_free(iterator);
+	sqsh_inode_free(inode);
 }
 
 #if 0
