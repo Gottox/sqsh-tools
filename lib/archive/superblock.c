@@ -178,6 +178,11 @@ sqsh_superblock_has_export_table(const struct SqshSuperblock *superblock) {
 	return check_flag(superblock, SQSH_SUPERBLOCK_EXPORTABLE);
 }
 
+bool
+sqsh_superblock_has_xattr_table(const struct SqshSuperblock *superblock) {
+	return !check_flag(superblock, SQSH_SUPERBLOCK_NO_XATTRS);
+}
+
 uint32_t
 sqsh_superblock_block_size(const struct SqshSuperblock *superblock) {
 	return sqsh_data_superblock_block_size(get_header(superblock));

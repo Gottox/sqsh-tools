@@ -237,6 +237,16 @@ bool sqsh_superblock_has_export_table(const struct SqshSuperblock *context);
 
 /**
  * @memberof SqshSuperblock
+ * @brief Checks if a superblock context has an xattr table.
+ *
+ * @param[in] context The superblock context to check.
+ *
+ * @return True if the superblock context has an xattr table, false otherwise.
+ */
+bool sqsh_superblock_has_xattr_table(const struct SqshSuperblock *context);
+
+/**
+ * @memberof SqshSuperblock
  * @brief Checks if a superblock context has compression options.
  *
  * @param[in] context The superblock context to check.
