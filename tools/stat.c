@@ -187,26 +187,30 @@ stat_image(struct SqshArchive *sqsh) {
 	struct SqshCompressionOptions *compression_options;
 	int compression_id = sqsh_superblock_compression_id(superblock);
 	int rv = 0;
-	printf("             compression: %s (%i)\n",
-		   compression_id_name(compression_id), compression_id);
 	printf("             inode count: %i\n",
 		   sqsh_superblock_inode_count(superblock));
-	printf("           uid/gid count: %i\n",
-		   sqsh_superblock_id_count(superblock));
-	printf("           has fragments: %s\n",
-		   sqsh_superblock_has_fragments(superblock) ? "yes" : "no");
-	printf("        has export table: %s\n",
-		   sqsh_superblock_has_export_table(superblock) ? "yes" : "no");
-	printf(" has compression options: %s\n",
-		   sqsh_superblock_has_compression_options(superblock) ? "yes" : "no");
+	time_t mtime = sqsh_superblock_modification_time(superblock);
+	printf("       modification time: %s\n", ctime(&mtime));
 	printf("              block size: %i\n",
 		   sqsh_superblock_block_size(superblock));
 	printf("          fragment count: %i\n",
 		   sqsh_superblock_fragment_entry_count(superblock));
+	printf("             compression: %s (%i)\n",
+		   compression_id_name(compression_id), compression_id);
+	printf("           uid/gid count: %i\n",
+		   sqsh_superblock_id_count(superblock));
+	printf("          root inode ref: %" PRIu64 "\n",
+		   sqsh_superblock_inode_root_ref(superblock));
 	printf("            archive size: %" PRIu64 "\n",
 		   sqsh_superblock_bytes_used(superblock));
-	time_t mtime = sqsh_superblock_modification_time(superblock);
-	printf("       modification time: %s\n", ctime(&mtime));
+	printf("           has fragments: %s\n",
+		   sqsh_superblock_has_fragments(superblock) ? "yes" : "no");
+	printf("        has export table: %s\n",
+		   sqsh_superblock_has_export_table(superblock) ? "yes" : "no");
+	printf("         has xattr table: %s\n",
+		   sqsh_superblock_has_xattr_table(superblock) ? "yes" : "no");
+	printf(" has compression options: %s\n",
+		   sqsh_superblock_has_compression_options(superblock) ? "yes" : "no");
 
 	compression_options = sqsh_compression_options_new(sqsh, &rv);
 	if (rv == -SQSH_ERROR_NO_COMPRESSION_OPTIONS) {
