@@ -62,6 +62,74 @@ sqsh_file_reader_new(const struct SqshInode *inode, int *err) {
 	return context;
 }
 
+static int
+file_reader_direct(struct SqshFileReader *reader, size_t size) {
+	struct SqshFileIterator *iterator = &reader->iterator;
+	const struct SqshInode *inode = iterator->inode;
+	const struct SqshArchive *archive = inode->sqsh;
+	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
+	const uint32_t block_size = sqsh_superblock_block_size(superblock);
+
+	uint32_t block_offset = reader->current_offset % block_size;
+	reader->data = sqsh_file_iterator_data(iterator) + block_offset;
+	reader->current_size = size;
+
+	return 0;
+}
+
+static int
+file_reader_buffered(struct SqshFileReader *reader, size_t size) {
+	struct SqshFileIterator *iterator = &reader->iterator;
+	const struct SqshInode *inode = iterator->inode;
+	const struct SqshArchive *archive = inode->sqsh;
+	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
+	const uint32_t block_size = sqsh_superblock_block_size(superblock);
+	const uint32_t block_offset = reader->current_offset % block_size;
+	uint64_t end_offset;
+	if (SQSH_ADD_OVERFLOW(reader->current_offset, size, &end_offset)) {
+		return SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+
+	int rv = 0;
+	struct SqshBuffer *buffer = &reader->buffer;
+
+	sqsh__buffer_drain(&reader->buffer);
+	rv = sqsh__buffer_append(
+			buffer, sqsh_file_iterator_data(iterator) + block_offset,
+			sqsh_file_iterator_size(iterator) - block_offset);
+	if (rv < 0) {
+		goto out;
+	}
+	for (; (rv = sqsh_file_iterator_next(iterator, end_offset)) > 0;) {
+		const uint8_t *data = sqsh_file_iterator_data(iterator);
+		const size_t data_size = sqsh_file_iterator_size(iterator);
+		rv = sqsh__buffer_append(buffer, data, data_size);
+		if (rv < 0) {
+			goto out;
+		}
+		if (sqsh__buffer_size(buffer) >= size) {
+			break;
+		};
+	}
+	if (rv < 0) {
+		goto out;
+	}
+	if (sqsh__buffer_size(buffer) < size) {
+		// Premature end of file
+		rv = -SQSH_ERROR_TODO;
+		goto out;
+	}
+	if (rv < 0) {
+		goto out;
+	}
+	rv = 0;
+	reader->current_offset = 0;
+	reader->data = sqsh__buffer_data(buffer);
+	reader->current_size = size;
+out:
+	return rv;
+}
+
 int
 sqsh_file_reader_advance(
 		struct SqshFileReader *reader, sqsh_index_t offset, size_t size) {
@@ -82,7 +150,6 @@ sqsh_file_reader_advance(
 	}
 
 	sqsh_index_t skip_blocks = current_offset / block_size;
-	uint32_t block_offset = current_offset % block_size;
 
 	if (skip_blocks > 0) {
 		rv = sqsh_file_iterator_skip(iterator, skip_blocks - 1);
@@ -95,48 +162,13 @@ sqsh_file_reader_advance(
 		goto out;
 	}
 	rv = 0;
+	reader->current_offset = current_offset;
 
 	if (sqsh_file_iterator_size(iterator) >= end_offset) {
-		// Direct mapping works
-		reader->current_offset = current_offset;
-		reader->data = sqsh_file_iterator_data(iterator) + block_offset;
+		rv = file_reader_direct(reader, size);
 	} else {
-		struct SqshBuffer *buffer = &reader->buffer;
-		// We need to copy the data;
-		sqsh__buffer_drain(&reader->buffer);
-		rv = sqsh__buffer_append(
-				buffer, sqsh_file_iterator_data(iterator) + block_offset,
-				sqsh_file_iterator_size(iterator) - block_offset);
-		if (rv < 0) {
-			goto out;
-		}
-		for (; (rv = sqsh_file_iterator_next(iterator, end_offset)) > 0;) {
-			rv = sqsh__buffer_append(
-					buffer, sqsh_file_iterator_data(iterator),
-					sqsh_file_iterator_size(iterator));
-			if (rv < 0) {
-				goto out;
-			}
-			if (sqsh__buffer_size(buffer) >= size) {
-				break;
-			};
-		}
-		if (rv < 0) {
-			goto out;
-		}
-		if (sqsh__buffer_size(buffer) < size) {
-			// Premature end of file
-			rv = -SQSH_ERROR_TODO;
-			goto out;
-		}
-		if (rv < 0) {
-			goto out;
-		}
-		rv = 0;
-		reader->current_offset = 0;
-		reader->data = sqsh__buffer_data(buffer);
+		rv = file_reader_buffered(reader, size);
 	}
-	reader->current_size = size;
 
 out:
 	return rv;
