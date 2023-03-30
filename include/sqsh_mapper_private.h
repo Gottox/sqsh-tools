@@ -298,7 +298,7 @@ int sqsh__map_manager_release(
 int sqsh__map_manager_cleanup(struct SqshMapManager *manager);
 
 ////////////////////////////////////////
-// mapper/cursor.c
+// mapper/map_reader.c
 
 struct SqshMapReader {
 	/**
@@ -316,71 +316,71 @@ struct SqshMapReader {
 /**
  * @internal
  * @memberof SqshMapReader
- * @brief Initializes a mapping cursor
+ * @brief Initializes a mapping reader
  *
- * @param cursor The cursor to initialize
+ * @param reader The reader to initialize
  * @param mapper The mapper to use
- * @param start_address The start address of the cursor
- * @param upper_limit The upper limit of the cursor
+ * @param start_address The start address of the reader
+ * @param upper_limit The upper limit of the reader
  * @return 0 on success, negative on error
  */
 SQSH_NO_UNUSED int sqsh__map_reader_init(
-		struct SqshMapReader *cursor, struct SqshMapManager *mapper,
+		struct SqshMapReader *reader, struct SqshMapManager *mapper,
 		const uint64_t start_address, uint64_t upper_limit);
 
 /**
  * @internal
  * @memberof SqshMapReader
- * @brief Advances the cursor
+ * @brief Advances the reader
  *
- * @param cursor The cursor to advance
+ * @param reader The reader to query
  * @param offset The offset to advance to
  * @param size The size to advance
  * @return 0 on success, negative on error
  */
 SQSH_NO_UNUSED int sqsh__map_reader_advance(
-		struct SqshMapReader *cursor, sqsh_index_t offset, size_t size);
+		struct SqshMapReader *reader, sqsh_index_t offset, size_t size);
 
 /**
  * @internal
  * @memberof SqshMapReader
- * @brief Loads all data into the cursor. This is useful for
+ * @brief Loads all data into the reader. This is useful for
  * tables that must reside completely in memory.
  *
- * @param cursor The cursor to advance
+ * @param reader The reader to advance
  * @return 0 on success, negative on error
  */
-SQSH_NO_UNUSED int sqsh__map_reader_all(struct SqshMapReader *cursor);
+SQSH_NO_UNUSED int sqsh__map_reader_all(struct SqshMapReader *reader);
 
 /**
  * @internal
  * @memberof SqshMapReader
- * @brief Returns the current data of the cursor
+ * @brief Returns the current data of the reader
  *
- * @param cursor The cursor to get the data from
- * @return The current data of the cursor
+ * @param reader The reader to get the data from
+ * @return The current data of the reader
  */
-const uint8_t *sqsh__map_reader_data(const struct SqshMapReader *cursor);
+const uint8_t *sqsh__map_reader_data(const struct SqshMapReader *reader);
 
 /**
  * @internal
  * @memberof SqshMapReader
- * @brief Returns the current size of the cursor
+ * @brief Returns the current size of the reader
  *
- * @param cursor The cursor to get the size from
- * @return The current size of the cursor
+ * @param reader The reader to get the size from
+ * @return The current size of the reader
  */
-size_t sqsh__map_reader_size(const struct SqshMapReader *cursor);
+size_t sqsh__map_reader_size(const struct SqshMapReader *reader);
 
 /**
  * @internal
  * @memberof SqshMapReader
- * @brief Cleans up the cursor
+ * @brief Cleans up the reader
  *
- * @param cursor The cursor to clean up
+ * @param reader The reader to clean up
  * @return 0 on success, negative on error
  */
-int sqsh__map_reader_cleanup(struct SqshMapReader *cursor);
+int sqsh__map_reader_cleanup(struct SqshMapReader *reader);
 
 #ifdef __cplusplus
 }

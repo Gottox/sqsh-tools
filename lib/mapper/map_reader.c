@@ -37,55 +37,55 @@
 #include "../utils.h"
 
 static sqsh_index_t
-get_index(const struct SqshMapReader *cursor, uint64_t address) {
-	return address / sqsh__map_manager_block_size(cursor->map_manager);
+get_index(const struct SqshMapReader *reader, uint64_t address) {
+	return address / sqsh__map_manager_block_size(reader->map_manager);
 }
 
 static sqsh_index_t
-get_offset(const struct SqshMapReader *cursor, uint64_t address) {
-	return address % sqsh__map_manager_block_size(cursor->map_manager);
+get_offset(const struct SqshMapReader *reader, uint64_t address) {
+	return address % sqsh__map_manager_block_size(reader->map_manager);
 }
 
 int
 sqsh__map_reader_init(
-		struct SqshMapReader *cursor, struct SqshMapManager *map_manager,
+		struct SqshMapReader *reader, struct SqshMapManager *map_manager,
 		const uint64_t start_address, const uint64_t upper_limit) {
-	cursor->map_manager = map_manager;
-	cursor->address = start_address;
-	cursor->upper_limit = upper_limit;
-	cursor->current_mapping = NULL;
-	cursor->target = NULL;
+	reader->map_manager = map_manager;
+	reader->address = start_address;
+	reader->upper_limit = upper_limit;
+	reader->current_mapping = NULL;
+	reader->target = NULL;
 
-	return sqsh__buffer_init(&cursor->buffer);
+	return sqsh__buffer_init(&reader->buffer);
 }
 
 static int
 replace_mapping(
-		struct SqshMapReader *cursor, const struct SqshMapSlice *mapping) {
-	if (cursor->current_mapping != NULL) {
-		sqsh__map_manager_release(cursor->map_manager, cursor->current_mapping);
+		struct SqshMapReader *reader, const struct SqshMapSlice *mapping) {
+	if (reader->current_mapping != NULL) {
+		sqsh__map_manager_release(reader->map_manager, reader->current_mapping);
 	}
-	cursor->current_mapping = mapping;
+	reader->current_mapping = mapping;
 
 	return 0;
 }
 
 static int
-setup_direct(struct SqshMapReader *cursor) {
+setup_direct(struct SqshMapReader *reader) {
 	int rv = 0;
 	const struct SqshMapSlice *mapping = NULL;
 
 	rv = sqsh__map_manager_get(
-			cursor->map_manager, get_index(cursor, cursor->address), 1,
+			reader->map_manager, get_index(reader, reader->address), 1,
 			&mapping);
 	if (rv < 0) {
 		goto out;
 	}
 
-	replace_mapping(cursor, mapping);
+	replace_mapping(reader, mapping);
 
-	const uint8_t *data = sqsh__map_slice_data(cursor->current_mapping);
-	cursor->target = &data[get_offset(cursor, cursor->address)];
+	const uint8_t *data = sqsh__map_slice_data(reader->current_mapping);
+	reader->target = &data[get_offset(reader, reader->address)];
 
 out:
 	return rv;
@@ -93,111 +93,111 @@ out:
 
 static int
 add_buffered(
-		struct SqshMapReader *cursor, sqsh_index_t index, sqsh_index_t offset,
+		struct SqshMapReader *reader, sqsh_index_t index, sqsh_index_t offset,
 		size_t size) {
 	const struct SqshMapSlice *mapping = NULL;
-	int rv = sqsh__map_manager_get(cursor->map_manager, index, 1, &mapping);
+	int rv = sqsh__map_manager_get(reader->map_manager, index, 1, &mapping);
 	if (rv < 0) {
 		goto out;
 	}
 
 	const uint8_t *data = sqsh__map_slice_data(mapping);
-	rv = sqsh__buffer_append(&cursor->buffer, &data[offset], size - offset);
+	rv = sqsh__buffer_append(&reader->buffer, &data[offset], size - offset);
 	if (rv < 0) {
 		goto out;
 	}
 
 out:
-	sqsh__map_manager_release(cursor->map_manager, mapping);
+	sqsh__map_manager_release(reader->map_manager, mapping);
 
 	return rv;
 }
 
 static int
-setup_buffered(struct SqshMapReader *cursor) {
+setup_buffered(struct SqshMapReader *reader) {
 	int rv = 0;
-	size_t size = sqsh__map_manager_block_size(cursor->map_manager);
+	size_t size = sqsh__map_manager_block_size(reader->map_manager);
 
-	sqsh__buffer_drain(&cursor->buffer);
+	sqsh__buffer_drain(&reader->buffer);
 
-	sqsh_index_t index = get_index(cursor, cursor->address);
-	sqsh_index_t offset = get_offset(cursor, cursor->address);
+	sqsh_index_t index = get_index(reader, reader->address);
+	sqsh_index_t offset = get_offset(reader, reader->address);
 
-	const sqsh_index_t end_index = get_index(cursor, cursor->end_address);
+	const sqsh_index_t end_index = get_index(reader, reader->end_address);
 
 	for (; index < end_index; index++) {
-		rv = add_buffered(cursor, index, offset, size);
+		rv = add_buffered(reader, index, offset, size);
 		if (rv < 0) {
 			goto out;
 		}
 		offset = 0;
 	}
-	size = get_offset(cursor, cursor->end_address);
+	size = get_offset(reader, reader->end_address);
 	if (size != 0) {
-		add_buffered(cursor, index, offset, size);
+		add_buffered(reader, index, offset, size);
 	}
 
-	replace_mapping(cursor, NULL);
+	replace_mapping(reader, NULL);
 
-	const uint8_t *data = sqsh__buffer_data(&cursor->buffer);
-	cursor->target = data;
+	const uint8_t *data = sqsh__buffer_data(&reader->buffer);
+	reader->target = data;
 out:
 	return rv;
 }
 
 int
 sqsh__map_reader_advance(
-		struct SqshMapReader *cursor, sqsh_index_t offset, size_t size) {
+		struct SqshMapReader *reader, sqsh_index_t offset, size_t size) {
 	int rv = 0;
 	uint64_t address;
 	uint64_t end_address;
 
-	if (SQSH_ADD_OVERFLOW(cursor->address, offset, &address)) {
+	if (SQSH_ADD_OVERFLOW(reader->address, offset, &address)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	if (SQSH_ADD_OVERFLOW(address, size, &end_address)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
-	if (end_address > cursor->upper_limit) {
+	if (end_address > reader->upper_limit) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
-	cursor->address = address;
-	cursor->end_address = end_address;
+	reader->address = address;
+	reader->end_address = end_address;
 
-	if (get_index(cursor, cursor->address) ==
-		get_index(cursor, cursor->end_address)) {
+	if (get_index(reader, reader->address) ==
+		get_index(reader, reader->end_address)) {
 		// If both addresses point to the same index they are in the same block
 		// so we can access the data directly as there are no gaps.
-		rv = setup_direct(cursor);
+		rv = setup_direct(reader);
 	} else {
 		// If the addresses point to different indices there are gaps in the
 		// data so we need to copy the data into a buffer.
-		rv = setup_buffered(cursor);
+		rv = setup_buffered(reader);
 	}
 
 	return rv;
 }
 
 int
-sqsh__map_reader_all(struct SqshMapReader *cursor) {
+sqsh__map_reader_all(struct SqshMapReader *reader) {
 	return sqsh__map_reader_advance(
-			cursor, 0, cursor->upper_limit - cursor->address);
+			reader, 0, reader->upper_limit - reader->address);
 }
 
 const uint8_t *
-sqsh__map_reader_data(const struct SqshMapReader *cursor) {
-	return cursor->target;
+sqsh__map_reader_data(const struct SqshMapReader *reader) {
+	return reader->target;
 }
 
 size_t
-sqsh__map_reader_size(const struct SqshMapReader *cursor) {
-	return cursor->end_address - cursor->address;
+sqsh__map_reader_size(const struct SqshMapReader *reader) {
+	return reader->end_address - reader->address;
 }
 
 int
-sqsh__map_reader_cleanup(struct SqshMapReader *cursor) {
-	sqsh__buffer_cleanup(&cursor->buffer);
-	replace_mapping(cursor, NULL);
+sqsh__map_reader_cleanup(struct SqshMapReader *reader) {
+	sqsh__buffer_cleanup(&reader->buffer);
+	replace_mapping(reader, NULL);
 	return 0;
 }
