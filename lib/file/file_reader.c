@@ -43,9 +43,22 @@
 int
 sqsh__file_reader_init(
 		struct SqshFileReader *reader, const struct SqshInode *inode) {
+	int rv = 0;
 	reader->current_offset = 0;
 	reader->current_size = 0;
-	return sqsh__file_iterator_init(&reader->iterator, inode);
+
+	rv = sqsh__buffer_init(&reader->buffer);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = sqsh__file_iterator_init(&reader->iterator, inode);
+	if (rv < 0) {
+		goto out;
+	}
+
+out:
+	return rv;
 }
 
 struct SqshFileReader *

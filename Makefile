@@ -12,15 +12,15 @@ ARCH = x86_64
 
 MESON_FLAGS += -Ddefault_library=static
 MESON_FLAGS += -Db_lundef=false
-#MESON_FLAGS += -Dtest=extended
-MESON_FLAGS += -Dtest=true
+MESON_FLAGS += -Dtest=extended
+#MESON_FLAGS += -Dtest=true
 MESON_FLAGS += -Ddoc=internal
 MESON_FLAGS += -Dlzo=true
 #MESON_FLAGS += -Db_coverage=true
 
 SANATIZE = 0
 
-CC = clang
+CC = gcc
 
 ifeq ($(PODMAN), 1)
 	W = podman run --rm -ti -v .:/host gottox/sqsh-build:$(ARCH) env

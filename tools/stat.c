@@ -302,7 +302,7 @@ stat_file(struct SqshPathResolver *resolver, const char *path) {
 			bool is_compressed = sqsh_inode_file_block_is_compressed(inode, i);
 			uint32_t size = sqsh_inode_file_block_size(inode, i);
 
-			printf("                    - %i (compressed: %s)\n", size,
+			printf("          % 9i - %i (compressed: %s)\n", i, size,
 				   is_compressed ? "yes" : "no");
 		}
 		break;

@@ -132,7 +132,9 @@ map_block_uncompressed(struct SqshFileIterator *iterator, size_t desired_size) {
 	}
 
 	const uint64_t block_count = sqsh_inode_file_block_count(inode);
-	uint32_t outer_size = 0;
+	uint64_t outer_size = 0;
+	const size_t remaining_direct =
+			sqsh__map_reader_remaining_direct(map_reader);
 	for (; block_index < block_count; block_index++) {
 		if (sqsh_inode_file_block_is_compressed(inode, block_index)) {
 			break;
@@ -140,13 +142,22 @@ map_block_uncompressed(struct SqshFileIterator *iterator, size_t desired_size) {
 		if (outer_size >= desired_size) {
 			break;
 		}
+		const uint32_t block_size =
+				sqsh_inode_file_block_size(inode, block_index);
 
-		if (SQSH_ADD_OVERFLOW(
-					outer_size, sqsh_inode_file_block_size(inode, block_index),
-					&outer_size)) {
+		uint64_t new_outer_size;
+		if (SQSH_ADD_OVERFLOW(outer_size, block_size, &new_outer_size)) {
 			rv = SQSH_ERROR_INTEGER_OVERFLOW;
 			goto out;
 		}
+
+		// To avoid crossing mem block boundaries, we stop
+		// if the next block would cross the boundary. The only exception
+		// is that we need to map at least one block.
+		if (new_outer_size > remaining_direct && outer_size > 0) {
+			break;
+		}
+		outer_size = new_outer_size;
 	}
 	rv = sqsh__map_reader_advance(map_reader, 0, outer_size);
 	iterator->data = sqsh__map_reader_data(map_reader);

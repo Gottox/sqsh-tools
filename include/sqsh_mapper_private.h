@@ -331,9 +331,20 @@ SQSH_NO_UNUSED int sqsh__map_reader_init(
 /**
  * @internal
  * @memberof SqshMapReader
- * @brief Advances the reader
+ * @brief returns the remaining bytes that can be mapped directly.
  *
  * @param reader The reader to query
+ * @return size of the remaining bytes
+ */
+size_t
+sqsh__map_reader_remaining_direct(const struct SqshMapReader *reader);
+
+/**
+ * @internal
+ * @memberof SqshMapReader
+ * @brief Advances the reader
+ *
+ * @param reader The reader to advance
  * @param offset The offset to advance to
  * @param size The size to advance
  * @return 0 on success, negative on error
