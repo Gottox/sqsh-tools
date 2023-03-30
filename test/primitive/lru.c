@@ -44,7 +44,7 @@
 static atomic_uint rc_map_deinit_calls = 0;
 
 static void
-rc_map_deinit(void *data) {
+deinit(void *data) {
 	uint8_t *data_ptr = data;
 	*data_ptr = UINT8_MAX;
 	rc_map_deinit_calls++;
@@ -56,7 +56,7 @@ lru_map(void) {
 	struct SqshLru lru = {0};
 	struct SqshRcMap map = {0};
 
-	rv = sqsh__rc_map_init(&map, 128, sizeof(uint8_t), rc_map_deinit);
+	rv = sqsh__rc_map_init(&map, 128, sizeof(uint8_t), deinit);
 	assert(rv == 0);
 
 	rv = sqsh__lru_init(&lru, 10, &sqsh__lru_rc_map, &map);
@@ -75,7 +75,7 @@ lru_hash_map(void) {
 	struct SqshLru lru = {0};
 	struct SqshRcHashMap map = {0};
 
-	rv = sqsh__rc_hash_map_init(&map, 128, sizeof(uint8_t), rc_map_deinit);
+	rv = sqsh__rc_hash_map_init(&map, 128, sizeof(uint8_t), deinit);
 	assert(rv == 0);
 
 	rv = sqsh__lru_init(&lru, 10, &sqsh__lru_rc_hash_map, &map);
@@ -96,7 +96,7 @@ lru_hash_map_insert_and_retain(void) {
 	uint8_t data = 23;
 	const uint8_t *ptr;
 
-	rv = sqsh__rc_hash_map_init(&map, 128, sizeof(uint8_t), rc_map_deinit);
+	rv = sqsh__rc_hash_map_init(&map, 128, sizeof(uint8_t), deinit);
 	assert(rv == 0);
 
 	rv = sqsh__lru_init(&lru, 10, &sqsh__lru_rc_hash_map, &map);
@@ -115,8 +115,104 @@ lru_hash_map_insert_and_retain(void) {
 	assert(rv == 0);
 }
 
+static void
+lru_hash_map_insert_and_retain_twice(void) {
+	int rv;
+	struct SqshLru lru = {0};
+	struct SqshRcHashMap map = {0};
+	uint8_t data = 23;
+	const uint8_t *ptr;
+
+	rv = sqsh__rc_hash_map_init(&map, 128, sizeof(uint8_t), deinit);
+	assert(rv == 0);
+
+	rv = sqsh__lru_init(&lru, 10, &sqsh__lru_rc_hash_map, &map);
+	assert(rv == 0);
+
+	ptr = sqsh__rc_hash_map_put(&map, 42, &data);
+	rv = sqsh__lru_touch(&lru, 42);
+	assert(rv == 0);
+	sqsh__rc_hash_map_release(&map, ptr);
+
+	ptr = sqsh__rc_hash_map_put(&map, 36, &data);
+	rv = sqsh__lru_touch(&lru, 36);
+	assert(rv == 0);
+
+	rv = sqsh__lru_touch(&lru, 42);
+	assert(rv == 0);
+
+	sqsh__rc_hash_map_release(&map, ptr);
+
+	rv = sqsh__lru_cleanup(&lru);
+	assert(rv == 0);
+
+	rv = sqsh__rc_hash_map_cleanup(&map);
+	assert(rv == 0);
+}
+
+static void
+lru_hash_map_insert_and_retain_overflow(void) {
+	int rv;
+	struct SqshLru lru = {0};
+	struct SqshRcHashMap map = {0};
+	uint8_t data = 232;
+	const uint8_t *ptr;
+
+	rv = sqsh__rc_hash_map_init(&map, 10, sizeof(uint8_t), deinit);
+	assert(rv == 0);
+
+	rv = sqsh__lru_init(&lru, 10, &sqsh__lru_rc_hash_map, &map);
+	assert(rv == 0);
+
+	ptr = sqsh__rc_hash_map_put(&map, 0, &data);
+	rv = sqsh__lru_touch(&lru, 0);
+	assert(rv == 0);
+	sqsh__rc_hash_map_release(&map, ptr);
+
+	ptr = sqsh__rc_hash_map_put(&map, 1, &data);
+	rv = sqsh__lru_touch(&lru, 1);
+	assert(rv == 0);
+	sqsh__rc_hash_map_release(&map, ptr);
+
+	ptr = sqsh__rc_hash_map_put(&map, 2, &data);
+	rv = sqsh__lru_touch(&lru, 2);
+	assert(rv == 0);
+	sqsh__rc_hash_map_release(&map, ptr);
+
+	rv = sqsh__lru_touch(&lru, 0);
+	assert(rv == 0);
+	rv = sqsh__lru_touch(&lru, 1);
+	assert(rv == 0);
+
+	rv = sqsh__lru_touch(&lru, 0);
+	assert(rv == 0);
+	rv = sqsh__lru_touch(&lru, 1);
+	assert(rv == 0);
+
+	rv = sqsh__lru_touch(&lru, 0);
+	assert(rv == 0);
+	rv = sqsh__lru_touch(&lru, 1);
+	assert(rv == 0);
+
+	rv = sqsh__lru_touch(&lru, 0);
+	assert(rv == 0);
+	rv = sqsh__lru_touch(&lru, 1);
+	assert(rv == 0);
+
+	ptr = sqsh__rc_hash_map_retain(&map, 2);
+	assert(ptr == NULL);
+
+	rv = sqsh__lru_cleanup(&lru);
+	assert(rv == 0);
+
+	rv = sqsh__rc_hash_map_cleanup(&map);
+	assert(rv == 0);
+}
+
 DEFINE
 TEST(lru_map);
 TEST(lru_hash_map);
 TEST(lru_hash_map_insert_and_retain);
+TEST(lru_hash_map_insert_and_retain_twice);
+TEST(lru_hash_map_insert_and_retain_overflow);
 DEFINE_END
