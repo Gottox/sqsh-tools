@@ -115,8 +115,6 @@ out:
 
 static int
 map_block_uncompressed(struct SqshFileIterator *iterator, size_t desired_size) {
-	// TODO
-	(void)desired_size;
 	struct SqshMapReader *map_reader = &iterator->current_uncompressed;
 	int rv = 0;
 	struct SqshMapManager *map_manager = iterator->map_manager;
