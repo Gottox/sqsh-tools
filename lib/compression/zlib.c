@@ -89,6 +89,8 @@ sqsh_zlib_finish(void *context, uint8_t *target, size_t *target_size) {
 	}
 
 	*target_size = stream->total_out;
+
+	inflateEnd(stream);
 	return 0;
 }
 
