@@ -51,7 +51,7 @@ rc_map_deinit(void *data) {
 }
 
 static void
-init_lru(void) {
+lru_map(void) {
 	int rv;
 	struct SqshLru lru = {0};
 	struct SqshRcMap map = {0};
@@ -69,6 +69,54 @@ init_lru(void) {
 	assert(rv == 0);
 }
 
+static void
+lru_hash_map(void) {
+	int rv;
+	struct SqshLru lru = {0};
+	struct SqshRcHashMap map = {0};
+
+	rv = sqsh__rc_hash_map_init(&map, 128, sizeof(uint8_t), rc_map_deinit);
+	assert(rv == 0);
+
+	rv = sqsh__lru_init(&lru, 10, &sqsh__lru_rc_hash_map, &map);
+	assert(rv == 0);
+
+	rv = sqsh__lru_cleanup(&lru);
+	assert(rv == 0);
+
+	rv = sqsh__rc_hash_map_cleanup(&map);
+	assert(rv == 0);
+}
+
+static void
+lru_hash_map_insert_and_retain(void) {
+	int rv;
+	struct SqshLru lru = {0};
+	struct SqshRcHashMap map = {0};
+	uint8_t data = 23;
+	const uint8_t *ptr;
+
+	rv = sqsh__rc_hash_map_init(&map, 128, sizeof(uint8_t), rc_map_deinit);
+	assert(rv == 0);
+
+	rv = sqsh__lru_init(&lru, 10, &sqsh__lru_rc_hash_map, &map);
+	assert(rv == 0);
+
+	ptr = sqsh__rc_hash_map_put(&map, 42, &data);
+	rv = sqsh__lru_touch(&lru, 42);
+	assert(rv == 0);
+
+	sqsh__rc_hash_map_release(&map, ptr);
+
+	rv = sqsh__lru_cleanup(&lru);
+	assert(rv == 0);
+
+	rv = sqsh__rc_hash_map_cleanup(&map);
+	assert(rv == 0);
+}
+
 DEFINE
-TEST(init_lru);
+TEST(lru_map);
+TEST(lru_hash_map);
+TEST(lru_hash_map_insert_and_retain);
 DEFINE_END

@@ -81,6 +81,9 @@ set_and_get_element(void) {
 	assert(get_ptr != &data);
 	assert(*get_ptr == data);
 
+	sqsh__rc_hash_map_release(&map, set_ptr);
+	sqsh__rc_hash_map_release(&map, get_ptr);
+
 	rv = sqsh__rc_hash_map_cleanup(&map);
 	assert(rv == 0);
 }
@@ -90,25 +93,33 @@ check_overflow(void) {
 	int rv;
 	struct SqshRcHashMap map;
 	uint8_t data = 1;
+	const uint8_t *ptr;
 
 	rv = sqsh__rc_hash_map_init(&map, 4, sizeof(uint8_t), rc_hash_map_deinit);
 	assert(rv == 0);
 
-	sqsh__rc_hash_map_put(&map, 1, &data);
-	assert(rv == 0);
-	sqsh__rc_hash_map_put(&map, 2, &data);
-	assert(rv == 0);
-	sqsh__rc_hash_map_put(&map, 3, &data);
-	assert(rv == 0);
-	sqsh__rc_hash_map_put(&map, 4, &data);
-	assert(rv == 0);
+	ptr = sqsh__rc_hash_map_put(&map, 1, &data);
+	assert(*ptr == data);
+	ptr = sqsh__rc_hash_map_put(&map, 2, &data);
+	assert(*ptr == data);
+	ptr = sqsh__rc_hash_map_put(&map, 3, &data);
+	assert(*ptr == data);
+	ptr = sqsh__rc_hash_map_put(&map, 4, &data);
+	assert(*ptr == data);
 	data = 42;
-	sqsh__rc_hash_map_put(&map, 5, &data);
-	assert(rv == 0);
+	ptr = sqsh__rc_hash_map_put(&map, 5, &data);
+	assert(*ptr == data);
 
 	const uint8_t *get_ptr = sqsh__rc_hash_map_retain(&map, 5);
 	assert(rv == 0);
 	assert(*get_ptr == 42);
+	sqsh__rc_hash_map_release(&map, get_ptr);
+
+	sqsh__rc_hash_map_release_key(&map, 1);
+	sqsh__rc_hash_map_release_key(&map, 2);
+	sqsh__rc_hash_map_release_key(&map, 3);
+	sqsh__rc_hash_map_release_key(&map, 4);
+	sqsh__rc_hash_map_release_key(&map, 5);
 
 	rv = sqsh__rc_hash_map_cleanup(&map);
 	assert(rv == 0);

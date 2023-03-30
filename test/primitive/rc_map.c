@@ -80,6 +80,9 @@ set_and_get_element(void) {
 	assert(rv == 0);
 	assert(get_ptr != &data);
 	assert(get_ptr == get_ptr);
+	sqsh__rc_map_release(&map, get_ptr);
+
+	sqsh__rc_map_release(&map, set_ptr);
 
 	rv = sqsh__rc_map_cleanup(&map);
 	assert(rv == 0);
