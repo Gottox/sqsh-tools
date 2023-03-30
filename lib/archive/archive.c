@@ -289,6 +289,9 @@ sqsh__archive_cleanup(struct SqshArchive *archive) {
 	if (is_initialized(archive, INITIALIZED_FRAGMENT_TABLE)) {
 		sqsh__fragment_table_cleanup(&archive->fragment_table);
 	}
+	if (is_initialized(archive, INITIALIZED_FILE_COMPRESSION_MANAGER)) {
+		sqsh__compression_manager_cleanup(&archive->file_compression_manager);
+	}
 	sqsh__compression_cleanup(&archive->data_compression);
 	sqsh__compression_cleanup(&archive->metablock_compression);
 	sqsh__superblock_cleanup(&archive->superblock);
