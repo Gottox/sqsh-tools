@@ -23,14 +23,6 @@ endforeach
 
 if get_option('fuse')
 	fuse = dependency('fuse3')
-	tool = executable(
-		'sqsh-mount',
-		'mount.c',
-		c_args: c_args,
-		install: not meson.is_subproject(),
-		dependencies: [ libsqsh_dependency, fuse ]
-	)
-	tools += { 'sqsh-mount': tool }
 
 	tool = executable(
 		'sqshfs',

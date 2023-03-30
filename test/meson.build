@@ -97,19 +97,6 @@ if get_option('test') == 'extended'
 		},
 	)
 
-	test('mount-test',
-		files('mount-test.sh'),
-		timeout: 20,
-		should_fail: true,
-		env: {
-			'BUILD_DIR': meson.current_build_dir(),
-			'MKSQUASHFS': mksquashfs.full_path(),
-			'SOURCE_ROOT': meson.project_source_root(),
-			'SQSH_MOUNT': tools['sqsh-mount'].full_path(),
-			'UNSHARE': unshare.full_path(),
-		},
-	)
-
 	test('unpack-test',
 		files('unpack-test.sh'),
 		timeout: 20,
