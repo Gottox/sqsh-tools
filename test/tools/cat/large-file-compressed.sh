@@ -2,7 +2,7 @@
 
 ######################################################################
 # @author      : Enno Boland (mail@eboland.de)
-# @file        : repacktest
+# @file        : large-file-uncompressed.sh
 # @created     : Friday Mar 17, 2023 15:11:09 CET
 #
 # @description : creates an archive with a file that fails extracting
@@ -13,19 +13,19 @@
 : "${SOURCE_ROOT:?SOURCE_ROOT is not set}"
 : "${SQSH_CAT:?SQSH_CAT is not set}"
 
-cd "$SOURCE_ROOT"
+WORK_DIR="$BUILD_DIR/large-file-compressed"
 
-tmpdir="$BUILD_DIR/create_failing_archive"
-mkdir -p "$tmpdir"
+mkdir -p "$WORK_DIR"
 
-seq 1 8355841 | grep ".$" -o | tr -d '\n' > "$tmpdir/file"
+cd "$WORK_DIR"
 
-$MKSQUASHFS "$tmpdir/file" "$tmpdir/image" \
+seq 1 8355841 > "$PWD/file"
+
+$MKSQUASHFS "$PWD/file" "$PWD/large-file.squashfs" \
 	-comp gzip \
 	-all-root \
 	-noappend \
 	-b 4096 \
-	-noI -noD -noF -noX \
 	-noappend
 
-exec $SQSH_CAT "$tmpdir/image" "file"
+$SQSH_CAT "$PWD/large-file.squashfs" "file" | cmp - "$PWD/file"

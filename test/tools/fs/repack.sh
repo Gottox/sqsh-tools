@@ -2,7 +2,7 @@
 
 ######################################################################
 # @author      : Enno Boland (mail@eboland.de)
-# @file        : squashfs-test.sh
+# @file        : repack.sh
 # @created     : Friday Mar 17, 2023 15:11:09 CET
 #
 # @description : This script creates a squashfs image, mounts it, and
@@ -25,26 +25,21 @@ if [ -z "$INTERNAL_UNSHARED" ]; then
 	exec "$UNSHARE" -rm "$0" "$@"
 fi
 
-cd "$SOURCE_ROOT"
+WORK_DIR="$BUILD_DIR/fs-repack"
 
-tmpdir="$BUILD_DIR/sqshfs-test"
-mkdir -p "$tmpdir"
-
-ORIGINAL_IMAGE="$tmpdir/original.img"
-REPACKED_IMAGE="$tmpdir/repacked.img"
+mkdir -p "$WORK_DIR"
+cd "$WORK_DIR"
 
 # shellcheck disable=SC2086
-$MKSQUASHFS .git "$ORIGINAL_IMAGE" $MKSQUASHFS_OPTS
+$MKSQUASHFS "$SOURCE_ROOT/.git" "$PWD/original.squashfs" $MKSQUASHFS_OPTS
 
-MOUNT_POINT="$tmpdir/mnt"
+mkdir -p "mnt"
 
-mkdir -p "$MOUNT_POINT"
-
-$SQSHFS "$ORIGINAL_IMAGE" "$MOUNT_POINT"
+$SQSHFS "$PWD/original.squashfs" "$PWD/mnt"
 
 # shellcheck disable=SC2086
-$MKSQUASHFS "$MOUNT_POINT" "$REPACKED_IMAGE" $MKSQUASHFS_OPTS
+$MKSQUASHFS "$PWD/mnt" "$PWD/repacked.squashfs" $MKSQUASHFS_OPTS
 
-$FUSERMOUNT -u "$MOUNT_POINT"
+$FUSERMOUNT -u "mnt"
 
-exec cmp "$ORIGINAL_IMAGE" "$REPACKED_IMAGE"
+exec cmp "$PWD/original.squashfs" "$PWD/repacked.squashfs"

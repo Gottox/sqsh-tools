@@ -2,7 +2,7 @@
 
 ######################################################################
 # @author      : Enno Boland (mail@eboland.de)
-# @file        : unpack-test.sh
+# @file        : repack.sh
 # @created     : Friday Mar 17, 2023 15:11:09 CET
 #
 # @description : This script creates a squashfs image, mounts it, and
@@ -16,24 +16,21 @@
 
 MKSQUASHFS_OPTS="-no-xattrs -noappend -all-root -mkfs-time 0"
 
-cd "$SOURCE_ROOT"
+WORK_DIR="$BUILD_DIR/unpack-repack"
 
-tmpdir="$BUILD_DIR/unpack-dir"
-mkdir -p "$tmpdir"
-
-ORIGINAL_IMAGE="$tmpdir/original.img"
-REPACKED_IMAGE="$tmpdir/unpack.img"
+mkdir -p "$WORK_DIR"
+cd "$WORK_DIR"
 
 # shellcheck disable=SC2086
-$MKSQUASHFS .git "$ORIGINAL_IMAGE" $MKSQUASHFS_OPTS
+$MKSQUASHFS "$SOURCE_ROOT/.git" "original.squashfs" $MKSQUASHFS_OPTS
 
-UNPACK_DIR="$tmpdir/unpack"
+mkdir -p "unpack"
 
-mkdir -p "$UNPACK_DIR"
-
-$SQSH_UNPACK "$ORIGINAL_IMAGE" / "$UNPACK_DIR"
+$SQSH_UNPACK "original.squashfs" / "unpack"
 
 # shellcheck disable=SC2086
-$MKSQUASHFS "$UNPACK_DIR" "$REPACKED_IMAGE" $MKSQUASHFS_OPTS
+$MKSQUASHFS "unpack" "repacked.squashfs" $MKSQUASHFS_OPTS
 
-exec cmp "$ORIGINAL_IMAGE" "$REPACKED_IMAGE"
+rm -rf "unpack"
+
+exec cmp "original.squashfs" "repacked.squashfs"

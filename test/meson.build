@@ -14,6 +14,16 @@ sqsh_test = [
 	'compression/compression.c',
 	'compression/compression_manager.c',
 ]
+sqsh_extended_test = [
+	'selftest.sh',
+	'tools/cat/large-file-compressed.sh',
+	'tools/cat/large-file-uncompressed.sh',
+	'tools/fs/repack.sh',
+	'tools/unpack/repack.sh',
+]
+sqsh_failing_test = [
+	'tools/fs/repack.sh',
+]
 sqsh_test_util = [
 	'util.c',
 ]
@@ -70,53 +80,22 @@ foreach p : sqsh_test
 endforeach
 
 if get_option('test') == 'extended'
-	test('selftest',
-		files('selftest.sh'),
-		timeout: 60,
-		env: {
-			'BUILD_DIR': meson.current_build_dir(),
-			'MKSQUASHFS': mksquashfs.full_path(),
-			'SOURCE_ROOT': meson.project_source_root(),
-			'SQSH_CAT': tools['sqsh-cat'].full_path(),
-			'SQSH_LS': tools['sqsh-ls'].full_path(),
-			'SQSH_LZO_HELPER_PATH': lzo_helper_path,
-		},
-	)
-
-	test('sqshfs-test',
-		files('sqshfs-test.sh'),
-		timeout: 20,
-		should_fail: true,
-		env: {
-			'BUILD_DIR': meson.current_build_dir(),
-			'MKSQUASHFS': mksquashfs.full_path(),
-			'SOURCE_ROOT': meson.project_source_root(),
-			'SQSHFS': tools['sqshfs'].full_path(),
-			'UNSHARE': unshare.full_path(),
-			'FUSERMOUNT': fusermount.full_path(),
-		},
-	)
-
-	test('unpack-test',
-		files('unpack-test.sh'),
-		timeout: 20,
-		#should_fail: true,
-		env: {
-			'BUILD_DIR': meson.current_build_dir(),
-			'MKSQUASHFS': mksquashfs.full_path(),
-			'SOURCE_ROOT': meson.project_source_root(),
-			'SQSH_UNPACK': tools['sqsh-unpack'].full_path(),
-		},
-	)
-
-	test('large_file',
-		files('large_file.sh'),
-		timeout: 20,
-		env: {
-			'BUILD_DIR': meson.current_build_dir(),
-			'MKSQUASHFS': mksquashfs.full_path(),
-			'SOURCE_ROOT': meson.project_source_root(),
-			'SQSH_CAT': tools['sqsh-cat'].full_path(),
-		},
-	)
+	foreach p : sqsh_extended_test
+		test(p,
+			files(p),
+			should_fail: sqsh_failing_test.contains(p),
+			env: {
+				'BUILD_DIR': meson.current_build_dir(),
+				'SOURCE_ROOT': meson.project_source_root(),
+				'FUSERMOUNT': fusermount.full_path(),
+				'MKSQUASHFS': mksquashfs.full_path(),
+				'UNSHARE': unshare.full_path(),
+				'SQSHFS': tools['sqshfs'].full_path(),
+				'SQSH_CAT': tools['sqsh-cat'].full_path(),
+				'SQSH_LS': tools['sqsh-ls'].full_path(),
+				'SQSH_LZO_HELPER_PATH': lzo_helper_path,
+				'SQSH_UNPACK': tools['sqsh-unpack'].full_path(),
+			},
+		)
+	endforeach
 endif
