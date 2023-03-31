@@ -248,14 +248,26 @@ sqsh_file_iterator_next(
 int
 sqsh_file_iterator_skip(struct SqshFileIterator *iterator, size_t amount) {
 	int rv = 0;
+	const struct SqshInode *inode = iterator->inode;
+	uint32_t block_index = iterator->block_index;
+	uint64_t block_address = iterator->block_address;
 
-	// TODO: Do not actually map the data, just skip it.
-	for (uint64_t i = 0; i < amount; i++) {
-		rv = sqsh_file_iterator_next(iterator, 1);
-		if (rv < 0) {
+	for (sqsh_index_t i = 0; i < amount; i++) {
+		const uint32_t block_size = sqsh_inode_file_block_size(inode, block_index);
+
+		if (SQSH_ADD_OVERFLOW(block_address, block_size, &block_address)) {
+			rv = SQSH_ERROR_INTEGER_OVERFLOW;
+			goto out;
+		}
+
+		if (SQSH_ADD_OVERFLOW(block_index, 1, &block_index)) {
+			rv = SQSH_ERROR_INTEGER_OVERFLOW;
 			goto out;
 		}
 	}
+	iterator->block_address = block_address;
+	iterator->block_index = block_index;
+
 out:
 	return rv;
 }
