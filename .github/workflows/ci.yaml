@@ -45,7 +45,7 @@ jobs:
     - name: build
       run: |
         CC=${{ matrix.cc }}
-        $CC -DCONFIG_ZLIB -L/lib -lz -o sqsh-ls tools/ls.c $(find lib -name '*.c')
+        $CC -o sqsh-ls tools/ls.c $(find lib -name '*.c') -DCONFIG_ZLIB -L/lib -lz
 
   build:
     runs-on: ubuntu-latest
