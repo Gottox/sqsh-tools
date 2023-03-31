@@ -199,6 +199,11 @@ lru_hash_map_insert_and_retain_overflow(void) {
 	rv = sqsh__lru_touch(&lru, 1);
 	assert(rv == 0);
 
+	rv = sqsh__lru_touch(&lru, 0);
+	assert(rv == 0);
+	rv = sqsh__lru_touch(&lru, 1);
+	assert(rv == 0);
+
 	ptr = sqsh__rc_hash_map_retain(&map, 2);
 	assert(ptr == NULL);
 
