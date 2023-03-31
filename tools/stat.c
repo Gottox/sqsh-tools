@@ -33,8 +33,8 @@
 
 #include "common.h"
 
-#include <sqsh_chrome.h>
-#include <sqsh_directory.h>
+#include "../include/sqsh_chrome.h"
+#include "../include/sqsh_directory.h"
 
 #include <assert.h>
 #include <inttypes.h>

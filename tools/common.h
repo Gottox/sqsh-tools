@@ -12,11 +12,15 @@
 #endif
 
 #include <ctype.h>
-#include <sqsh_archive.h>
-#include <sqsh_error.h>
-#include <sqsh_mapper.h>
+#include "../include/sqsh_archive.h"
+#include "../include/sqsh_error.h"
+#include "../include/sqsh_mapper.h"
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef VERSION
+#	define VERSION "0.0.0-unknown"
+#endif
 
 static struct SqshArchive *
 open_archive(const char *image_path, int *err) {

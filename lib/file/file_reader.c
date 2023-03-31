@@ -38,7 +38,7 @@
 #include "../../include/sqsh_primitive_private.h"
 
 #include "../../include/sqsh_inode_private.h"
-#include "utils.h"
+#include "../utils.h"
 
 int
 sqsh__file_reader_init(

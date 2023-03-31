@@ -28,6 +28,25 @@ jobs:
     - name: test
       run: |
          ninja -C /tmp/build test
+
+  plain-build:
+    runs-on: ubuntu-latest
+    container: gottox/sqsh-build:${{ matrix.arch }}
+    strategy:
+      matrix:
+        cc:
+          - gcc
+          - clang
+        arch:
+          #- i386
+          - x86_64
+    steps:
+    - uses: actions/checkout@v3
+    - name: build
+      run: |
+        CC=${{ matrix.cc }}
+        $CC -DCONFIG_ZLIB -lz -o sqsh-ls tools/ls.c $(find lib -name '*.c')
+
   build:
     runs-on: ubuntu-latest
     container: gottox/sqsh-build:${{ matrix.arch }}
@@ -58,6 +77,7 @@ jobs:
     - name: build
       run: |
          ninja -C /tmp/build
+
   doxygen:
     needs:
     - build

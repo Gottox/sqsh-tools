@@ -31,9 +31,9 @@
  * @file         archive.c
  */
 
-#include "../include/sqsh_archive_private.h"
+#include "../../include/sqsh_archive_private.h"
 
-#include "../include/sqsh_data.h"
+#include "../../include/sqsh_data.h"
 
 #include <stdlib.h>
 #include <string.h>

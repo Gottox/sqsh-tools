@@ -33,9 +33,9 @@
 
 #include "common.h"
 
-#include <sqsh_chrome.h>
-#include <sqsh_inode.h>
-#include <sqsh_xattr.h>
+#include "../include/sqsh_chrome.h"
+#include "../include/sqsh_inode.h"
+#include "../include/sqsh_xattr.h"
 
 #include <assert.h>
 #include <limits.h>

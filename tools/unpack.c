@@ -33,9 +33,9 @@
 
 #include "common.h"
 
-#include <sqsh_chrome.h>
-#include <sqsh_directory.h>
-#include <sqsh_file.h>
+#include "../include/sqsh_chrome.h"
+#include "../include/sqsh_directory.h"
+#include "../include/sqsh_file.h"
 
 #include <errno.h>
 #include <libgen.h>

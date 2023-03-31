@@ -62,6 +62,8 @@
  * transmitted.
  */
 
+#ifdef CONFIG_LZO
+
 #include <lzo/lzo1x.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -130,3 +132,4 @@ main(int argc, char *argv[]) {
 
 	return EXIT_SUCCESS;
 }
+#endif
