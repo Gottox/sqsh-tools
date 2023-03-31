@@ -299,6 +299,28 @@ out:
 }
 
 static void
+sqshfs_access(fuse_req_t req, fuse_ino_t ino, int mask) {
+	int rv = 0;
+	struct SqshInode *inode = NULL;
+	struct Sqshfs *context = fuse_req_userdata(req);
+	dbg("sqshfs_access: %i\n", ino);
+
+	inode = sqshfs_inode_open(context, ino, &rv);
+	if (rv < 0) {
+		dbg("sqshfs_access: sqshfs_inode_open failed\n");
+		fuse_reply_err(req, EIO);
+		goto out;
+	}
+
+	const uint16_t permission = sqsh_inode_permission(inode);
+	dbg("sqshfs_access: reply success\n");
+	fuse_reply_err(req, permission & mask ? 0 : EACCES);
+
+out:
+	sqsh_inode_free(inode);
+}
+
+static void
 sqshfs_readlink(fuse_req_t req, fuse_ino_t ino) {
 	int rv = 0;
 	struct SqshInode *inode = NULL;
@@ -644,6 +666,7 @@ static const struct fuse_lowlevel_ops sqshfs_oper = {
 		.init = sqshfs_init,
 		.destroy = sqshfs_destroy,
 		.lookup = sqshfs_lookup,
+		.access = sqshfs_access,
 		.getattr = sqshfs_getattr,
 		.readlink = sqshfs_readlink,
 		.opendir = sqshfs_opendir,
