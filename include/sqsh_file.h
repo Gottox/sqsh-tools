@@ -128,7 +128,7 @@ sqsh_file_iterator_new(const struct SqshInode *inode, int *err);
  * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int
-sqsh_file_iterator_skip(struct SqshFileIterator *iterator, sqsh_index_t amount);
+sqsh_file_iterator_skip(struct SqshFileIterator *iterator, size_t amount);
 
 /**
  * @brief Reads a certain amount of data from the file iterator.

@@ -246,7 +246,7 @@ sqsh_file_iterator_next(
 }
 
 int
-sqsh_file_iterator_skip(struct SqshFileIterator *iterator, uint64_t amount) {
+sqsh_file_iterator_skip(struct SqshFileIterator *iterator, size_t amount) {
 	int rv = 0;
 
 	// TODO: Do not actually map the data, just skip it.
