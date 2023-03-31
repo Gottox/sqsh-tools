@@ -447,12 +447,6 @@ sqshfs_open(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 		fuse_reply_err(req, EIO);
 		goto out;
 	}
-	if (rv < 0) {
-		dbg("sqshfs_open: sqsh_directory_iterator_new failed\n");
-		fuse_reply_err(req, EIO);
-		goto out;
-	}
-
 	fi->fh = (uintptr_t)handle;
 	handle = NULL;
 	dbg("sqshfs_open: reply success\n");
