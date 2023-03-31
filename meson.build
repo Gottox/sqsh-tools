@@ -17,6 +17,8 @@ project(
 
 subdir('include')
 
+subdir('helper')
+
 subdir('lib')
 
 subdir('man')

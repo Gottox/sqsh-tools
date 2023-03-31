@@ -84,16 +84,6 @@ if get_option('lzo')
 		get_option('prefix'),
 		get_option('libexecdir')
 	)
-	lzo_helper = executable('sqsh-lzo-helper',
-		'compression/lzo-helper.c',
-		install: true,
-		install_dir: get_option('libexecdir'),
-		c_args : c_args + [ '-DSQSH_LZO_HELPER' ],
-		dependencies: dependency('lzo2'),
-		)
-	lzo_helper_path = lzo_helper.full_path()
-else
-	lzo_helper_path = ''
 endif
 
 if get_option('zstd')
