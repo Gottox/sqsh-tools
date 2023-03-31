@@ -7,8 +7,11 @@
 NINJA_TARGETS := test benchmark install dist scan-build clang-format uninstall \
 	all tidy doc coverage-html
 
-ARCH = x86_64
-#ARCH = i386
+ifeq ($(32BIT),1)
+	ARCH = i386
+else
+	ARCH = x86_64
+endif
 
 MESON_FLAGS += -Ddefault_library=static
 MESON_FLAGS += -Db_lundef=false
