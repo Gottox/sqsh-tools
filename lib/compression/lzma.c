@@ -42,7 +42,7 @@
 
 SQSH_STATIC_ASSERT(sizeof(sqsh__compression_context_t) >= sizeof(lzma_stream));
 
-static lzma_stream proto_stream = LZMA_STREAM_INIT;
+static const lzma_stream proto_stream = LZMA_STREAM_INIT;
 
 enum SqshLzmaType {
 	LZMA_TYPE_ALONE,
