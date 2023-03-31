@@ -87,7 +87,7 @@ if get_option('lzo')
 		'compression/lzo-helper.c',
 		install: true,
 		install_dir: get_option('libexecdir'),
-		c_args : c_args + '-DSQSH_LZO_HELPER',
+		c_args : c_args + [ '-DSQSH_LZO_HELPER' ],
 		dependencies: dependency('lzo2'),
 		)
 	lzo_helper_path = lzo_helper.full_path()
