@@ -12,7 +12,6 @@
 : "${BUILD_DIR:?BUILD_DIR is not set}"
 : "${MKSQUASHFS:?MKSQUASHFS is not set}"
 : "${SOURCE_ROOT:?SOURCE_ROOT is not set}"
-: "${SQSH_CAT:?SQSH_CAT is not set}"
 : "${READ_CHUNK:?READ_CHUNK is not set}"
 
 MKSQUASHFS_OPTS="-no-xattrs -noappend -mkfs-time 0 -b 4096"
@@ -24,15 +23,12 @@ cd "$WORK_DIR"
 
 OFFSET=262150
 
-seq 1 "$OFFSET" | head -c "$OFFSET" > "$PWD/file.orig"
+seq 1 "$OFFSET" | head -c "$OFFSET" > "$PWD/file"
 
 # shellcheck disable=SC2086
 $MKSQUASHFS "$PWD/file" "$PWD/original.squashfs" $MKSQUASHFS_OPTS
 
-mkdir -p "$PWD/mnt"
-
-$SQSH_CAT "$PWD/original.squashfs" file | tail -c 6 > tail.sqsh-cat
+tail -c 6 "$PWD/file" > tail.sqsh-cat
 $READ_CHUNK "$PWD/original.squashfs" file 262144 6 > tail.read-chunk
-
 
 exec cmp "$PWD/tail.sqsh-cat" "$PWD/tail.read-chunk"

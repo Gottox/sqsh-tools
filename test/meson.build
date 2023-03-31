@@ -24,7 +24,6 @@ sqsh_extended_test = [
 	'tools/unpack/repack.sh',
 ]
 sqsh_failing_test = [
-	'tools/read-chunk/tail.sh',
 ]
 sqsh_test_util = [
 	'util.c',
