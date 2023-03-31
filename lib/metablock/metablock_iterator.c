@@ -86,16 +86,34 @@ out:
 int
 sqsh__metablock_iterator_skip(
 		struct SqshMetablockIterator *iterator, size_t amount) {
+	// TODO: this function is currently unused. Here be dragons.
 	int rv = 0;
+	uint16_t size = iterator->size;
 
-	// TODO: replace _next calls with directly accessing the cursor and not
-	// mapping the data, just the headers
-	for (uint64_t i = 0; i < amount; i++) {
-		rv = sqsh__metablock_iterator_next(iterator);
+	for (sqsh_index_t i = 0; i < amount; i++) {
+		int rv = 0;
+
+		rv = sqsh__map_reader_advance(
+				&iterator->cursor, size, SQSH_SIZEOF_METABLOCK);
+		if (rv < 0) {
+			goto out;
+		}
+
+		const struct SqshDataMetablock *metablock =
+				(struct SqshDataMetablock *)sqsh__map_reader_data(
+						&iterator->cursor);
+		size = sqsh_data_metablock_size(metablock);
+		if (size > SQSH_METABLOCK_BLOCK_SIZE) {
+			rv = -SQSH_ERROR_TODO;
+			goto out;
+		}
+		rv = sqsh__map_reader_advance(
+				&iterator->cursor, SQSH_SIZEOF_METABLOCK, 0);
 		if (rv < 0) {
 			goto out;
 		}
 	}
+	iterator->size = size;
 out:
 	return rv;
 }
