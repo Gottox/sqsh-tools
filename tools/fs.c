@@ -74,6 +74,8 @@ struct SqshfsFileHandle {
 struct SqshfsDirHandle {
 	struct SqshInode *inode;
 	struct SqshDirectoryIterator *iterator;
+	char *current_name;
+	struct stat current_stat;
 };
 
 static const struct fuse_opt sqshfs_opts[] = {
@@ -395,18 +397,17 @@ sqshfs_readdir(
 	const uint64_t inode_ref =
 			sqsh_directory_iterator_inode_ref(handle->iterator);
 	inode = sqsh_inode_new(context->archive, inode_ref, &rv);
-	struct stat stbuf = {0};
-	sqshfs_inode_to_stat(inode, NULL, &stbuf);
-	char *name = NULL;
-	name = sqsh_directory_iterator_name_dup(handle->iterator);
-	if (name == NULL) {
+	sqshfs_inode_to_stat(inode, NULL, &handle->current_stat);
+	handle->current_name = sqsh_directory_iterator_name_dup(handle->iterator);
+	if (handle->current_name == NULL) {
 		dbg("sqshfs_readdir: sqsh_directory_iterator_name_dup failed\n");
 		fuse_reply_err(req, ENOMEM);
 		goto out;
 	}
-	size_t result_size =
-			fuse_add_direntry(req, buf, size, name, &stbuf, offset);
-	free(name);
+	size_t result_size = fuse_add_direntry(
+			req, buf, size, handle->current_name, &handle->current_stat,
+			offset);
+	free(handle->current_name);
 
 	dbg("sqshfs_readdir: reply success\n");
 	fuse_reply_buf(req, buf, result_size);
