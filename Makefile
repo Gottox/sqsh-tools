@@ -23,7 +23,8 @@ SANATIZE = 0
 CC = gcc
 
 ifeq ($(PODMAN), 1)
-	W = podman run --rm -ti -v .:/host gottox/sqsh-build:$(ARCH) env
+	W = podman run --rm -ti -v .:/host --device /dev/fuse --cap-add SYS_ADMIN gottox/sqsh-build:$(ARCH) \
+		env
 	BUILD_DIR = ./build_dir-podman
 else
 	W =
