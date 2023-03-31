@@ -165,13 +165,6 @@ extract_file(
 		const struct PathStack *path_stack) {
 	int rv = 0;
 	FILE *file = NULL;
-	struct SqshFileIterator *iterator;
-
-	iterator = sqsh_file_iterator_new(inode, &rv);
-	if (rv < 0) {
-		print_err(rv, "sqsh_file_new", path_stack);
-		goto out;
-	}
 
 	file = fopen(filename, "w");
 	if (file == NULL) {
@@ -179,24 +172,14 @@ extract_file(
 		goto out;
 	}
 
-	while ((rv = sqsh_file_iterator_next(iterator, SIZE_MAX)) > 0) {
-		const uint8_t *data = sqsh_file_iterator_data(iterator);
-		const size_t size = sqsh_file_iterator_size(iterator);
-		rv = fwrite(data, sizeof(uint8_t), size, file);
-		if (rv > 0 && (size_t)rv != size) {
-			rv = EXIT_FAILURE;
-			goto out;
-		}
-	}
-
+	rv = sqsh_file_to_stream(inode, file);
 	if (rv < 0) {
-		print_err(rv, "sqsh_file_iterator_next", path_stack);
+		print_err(rv, "sqsh_file_to_stream", path_stack);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 	fclose(file);
 out:
-	sqsh_file_iterator_free(iterator);
 	return rv;
 }
 

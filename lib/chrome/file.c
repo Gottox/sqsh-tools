@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Copyright (c) 2021, Enno Boland <g@s01.de>                                 *
+ * Copyright (c) 2023, Enno Boland <g@s01.de>                                 *
  *                                                                            *
  * Redistribution and use in source and binary forms, with or without         *
  * modification, are permitted provided that the following conditions are     *
@@ -28,106 +28,42 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         cat.c
+ * @file         file.c
  */
 
-#include "common.h"
+#define _DEFAULT_SOURCE
 
-#include "../include/sqsh_chrome.h"
-#include "../include/sqsh_file.h"
-#include "../include/sqsh_inode.h"
+#include "../../include/sqsh_chrome_private.h"
 
-#include <assert.h>
-#include <limits.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+#include <pthread.h>
+#include <stdatomic.h>
+#include <sys/sysinfo.h>
 
-static int
-usage(char *arg0) {
-	printf("usage: %s FILESYSTEM PATH [PATH ...]\n", arg0);
-	printf("       %s -v\n", arg0);
-	return EXIT_FAILURE;
-}
-
-static int
-cat_path(struct SqshPathResolver *resolver, char *path) {
-	struct SqshInode *inode = NULL;
-
-	int rv = 0;
-	inode = sqsh_path_resolver_resolve(resolver, path, &rv);
-	if (rv < 0) {
-		sqsh_perror(rv, path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-	if (sqsh_inode_type(inode) != SQSH_INODE_TYPE_FILE) {
-		fprintf(stderr, "%s: not a file\n", path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-	rv = sqsh_file_to_stream(inode, stdout);
-	if (rv < 0) {
-		sqsh_perror(rv, path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
-out:
-	sqsh_inode_free(inode);
-	return rv;
-}
+#include "../../include/sqsh_error.h"
+#include "../../include/sqsh_file_private.h"
+#include "../../include/sqsh_inode.h"
 
 int
-main(int argc, char *argv[]) {
+sqsh_file_to_stream(const struct SqshInode *inode, FILE *file) {
 	int rv = 0;
-	int opt = 0;
-	const char *image_path;
-	struct SqshArchive *sqsh = NULL;
-	struct SqshPathResolver *resolver = NULL;
+	struct SqshFileIterator iterator = {0};
 
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
-		switch (opt) {
-		case 'v':
-			puts("sqsh-cat-" VERSION);
-			return 0;
-		default:
-			return usage(argv[0]);
-		}
-	}
-
-	if (optind + 1 >= argc) {
-		return usage(argv[0]);
-	}
-
-	image_path = argv[optind];
-	optind++;
-
-	sqsh = open_archive(image_path, &rv);
+	rv = sqsh__file_iterator_init(&iterator, inode);
 	if (rv < 0) {
-		sqsh_perror(rv, image_path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-	resolver = sqsh_path_resolver_new(sqsh, &rv);
-	if (rv < 0) {
-		sqsh_perror(rv, image_path);
-		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	for (; optind < argc; optind++) {
-		rv = cat_path(resolver, argv[optind]);
-		if (rv < 0) {
+	while ((rv = sqsh_file_iterator_next(&iterator, SIZE_MAX)) > 0) {
+		const uint8_t *data = sqsh_file_iterator_data(&iterator);
+		const size_t size = sqsh_file_iterator_size(&iterator);
+		rv = fwrite(data, sizeof(uint8_t), size, file);
+		if (rv > 0 && (size_t)rv != size) {
+			rv = -SQSH_ERROR_TODO;
 			goto out;
 		}
 	}
 
 out:
-	sqsh_path_resolver_free(resolver);
-	sqsh_archive_free(sqsh);
+	sqsh__file_iterator_cleanup(&iterator);
 	return rv;
 }

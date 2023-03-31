@@ -36,6 +36,8 @@
 
 #include "sqsh_common.h"
 
+#include <stdio.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -105,6 +107,19 @@ sqsh_open(struct SqshArchive *archive, const char *path, int *err);
  * @return int 0 on success, less than 0 on error.
  */
 int sqsh_close(struct SqshInode *inode);
+
+////////////////////////////////////////
+// chrome/file.c
+
+/**
+ * @brief writes data to a file descriptor.
+ *
+ * @param[in] inode The inode context.
+ * @param[in] file The file descriptor.
+ *
+ * @return int The number of bytes read on success, less than 0 on error.
+ */
+int sqsh_file_to_stream(const struct SqshInode *inode, FILE *file);
 
 #ifdef __cplusplus
 }
