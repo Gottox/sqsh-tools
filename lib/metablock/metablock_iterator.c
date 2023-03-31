@@ -85,7 +85,7 @@ out:
 
 int
 sqsh__metablock_iterator_skip(
-		struct SqshMetablockIterator *iterator, uint64_t amount) {
+		struct SqshMetablockIterator *iterator, size_t amount) {
 	int rv = 0;
 
 	// TODO: replace _next calls with directly accessing the cursor and not
