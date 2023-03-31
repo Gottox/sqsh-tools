@@ -62,7 +62,7 @@
  * transmitted.
  */
 
-#ifdef CONFIG_LZO
+#ifdef SQSH_LZO_HELPER
 
 #include <lzo/lzo1x.h>
 #include <stdint.h>
