@@ -24,8 +24,6 @@ sqsh_extended_test = [
 	'tools/unpack/repack.sh',
 ]
 sqsh_failing_test = [
-	'tools/fs/large-file.sh',
-	'tools/fs/repack.sh',
 	'tools/read-chunk/tail.sh',
 ]
 sqsh_test_util = [
