@@ -20,11 +20,13 @@ sqsh_extended_test = [
 	'tools/cat/large-file-uncompressed.sh',
 	'tools/fs/large-file.sh',
 	'tools/fs/repack.sh',
+	'tools/read-chunk/tail.sh',
 	'tools/unpack/repack.sh',
 ]
 sqsh_failing_test = [
 	'tools/fs/large-file.sh',
 	'tools/fs/repack.sh',
+	'tools/read-chunk/tail.sh',
 ]
 sqsh_test_util = [
 	'util.c',
@@ -64,7 +66,7 @@ squashfs_h = custom_target(
 	command: [xxd, '-i', '@INPUT@'],
 )
 
-executable('read-chunk',
+read_chunk = executable('read-chunk',
 	'read-chunk.c',
 	install : false,
 	c_args: test_c_args,
@@ -92,6 +94,7 @@ if get_option('test') == 'extended'
 				'FUSERMOUNT': fusermount.full_path(),
 				'MKSQUASHFS': mksquashfs.full_path(),
 				'UNSHARE': unshare.full_path(),
+				'READ_CHUNK': read_chunk.full_path(),
 				'SQSHFS': tools['sqshfs'].full_path(),
 				'SQSH_CAT': tools['sqsh-cat'].full_path(),
 				'SQSH_LS': tools['sqsh-ls'].full_path(),
