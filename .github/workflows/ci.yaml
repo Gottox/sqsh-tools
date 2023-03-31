@@ -9,7 +9,9 @@ jobs:
           #- i386
           - x86_64
     runs-on: ubuntu-latest
-    container: gottox/sqsh-build:${{ matrix.arch }}
+    container:
+      image: gottox/sqsh-build:${{ matrix.arch }}
+      options: --device /dev/fuse --cap-add SYS_ADMIN
     steps:
     - uses: actions/checkout@v3
       with:
