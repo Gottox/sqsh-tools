@@ -118,7 +118,10 @@ SQSH_NO_UNUSED struct SqshFileIterator *
 sqsh_file_iterator_new(const struct SqshInode *inode, int *err);
 
 /**
- * @brief Skips a certain amount of data in the file iterator.
+ * @brief Skips a certain amount of data in the file iterator. Keep in mind
+ * that calling this function will invalidate the data pointer returned by
+ * sqsh_file_iterator_data(). You should call sqsh_file_iterator_next() after
+ * calling this function to get a new data pointer.
  *
  * @memberof SqshFileIterator
  *
