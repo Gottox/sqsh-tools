@@ -157,7 +157,7 @@ curl_download(
 	long http_code = 0;
 
 	rv = snprintf(
-			range_buffer, sizeof(range_buffer), "%" PRIu64 "-%" PRIu64, offset,
+			range_buffer, sizeof(range_buffer), "%zu-%" PRIu64, offset,
 			end_offset);
 	if (rv >= (int)sizeof(range_buffer)) {
 		rv = -SQSH_ERROR_MAPPER_MAP;
@@ -211,12 +211,18 @@ sqsh_mapper_curl_init(
 	size_t block_size = sqsh__mapper_block_size(mapper);
 	CURL *handle = configure_handle(mapper);
 
+	uint64_t size64 = *size;
 	rv = curl_download(
-			handle, 0, block_size, &mapper->data.cl.header_cache, size,
+			handle, 0, block_size, &mapper->data.cl.header_cache, &size64,
 			&mapper->data.cl.expected_time);
 	if (rv < 0) {
 		goto out;
 	}
+	if (size64 > SIZE_MAX) {
+		rv = -SQSH_ERROR_MAPPER_INIT;
+		goto out;
+	}
+	*size = (size_t)size64;
 
 out:
 	return rv;

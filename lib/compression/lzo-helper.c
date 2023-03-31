@@ -74,10 +74,10 @@ static int
 sqsh_uncompress(void) {
 	int rv = 0;
 	uint64_t compressed_size = 0;
-	uint64_t target_size = 0;
+	uint64_t target_size64 = 0;
 	char wrkmem[LZO1X_1_MEM_COMPRESS] = {0};
 
-	rv = fread(&target_size, sizeof(uint64_t), 1, stdin);
+	rv = fread(&target_size64, sizeof(uint64_t), 1, stdin);
 	if (rv != 1) {
 		return EXIT_FAILURE;
 	}
@@ -86,29 +86,32 @@ sqsh_uncompress(void) {
 		return EXIT_FAILURE;
 	}
 	uint8_t compressed[compressed_size];
-	uint8_t target[target_size];
+	uint8_t target[target_size64];
 
 	rv = fread(compressed, sizeof(uint8_t), compressed_size, stdin);
 	if (rv < 0 || (uint64_t)rv != compressed_size) {
 		return EXIT_FAILURE;
 	}
 
+	// We just trust, that the called won't overflow the target size.
+	lzo_uint target_size = target_size64;
 	const int64_t compress_rv = lzo1x_decompress_safe(
 			compressed, compressed_size, target, &target_size, wrkmem);
+	target_size64 = target_size;
 	if (compress_rv < 0) {
-		target_size = 0;
+		target_size64 = 0;
 	}
 
 	rv = fwrite(&compress_rv, sizeof(int64_t), 1, stdout);
 	if (rv != 1) {
 		return EXIT_FAILURE;
 	}
-	rv = fwrite(&target_size, sizeof(uint64_t), 1, stdout);
+	rv = fwrite(&target_size64, sizeof(uint64_t), 1, stdout);
 	if (rv != 1) {
 		return EXIT_FAILURE;
 	}
-	rv = fwrite(target, sizeof(uint8_t), target_size, stdout);
-	if (rv < 0 || (uint64_t)rv != target_size) {
+	rv = fwrite(target, sizeof(uint8_t), target_size64, stdout);
+	if (rv < 0 || (uint64_t)rv != target_size64) {
 		return EXIT_FAILURE;
 	}
 	fflush(stdout);

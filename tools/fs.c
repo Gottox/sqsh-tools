@@ -139,6 +139,16 @@ sqshfs_context_inode_ref(struct Sqshfs *context, fuse_ino_t fuse_inode) {
 	return inode_ref;
 }
 
+static struct SqshfsFileHandle *
+get_file_handle(struct fuse_file_info *fi) {
+	return (struct SqshfsFileHandle *)(uintptr_t)fi->fh;
+}
+
+static struct SqshfsDirHandle *
+get_dir_handle(struct fuse_file_info *fi) {
+	return (struct SqshfsDirHandle *)(uintptr_t)fi->fh;
+}
+
 static void
 sqshfs_init(void *userdata, struct fuse_conn_info *conn) {
 	struct Sqshfs *context = userdata;
@@ -402,7 +412,7 @@ sqshfs_readdir(
 	int rv = 0;
 	struct SqshInode *inode = NULL;
 	struct Sqshfs *context = fuse_req_userdata(req);
-	struct SqshfsDirHandle *handle = (void *)fi->fh;
+	struct SqshfsDirHandle *handle = get_dir_handle(fi);
 	dbg("sqshfs_readdir\n");
 	char buf[size];
 
@@ -444,7 +454,7 @@ sqshfs_releasedir(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 	(void)ino;
 	struct Sqshfs *context = fuse_req_userdata(req);
 	dbg("sqshfs_releasedir\n");
-	struct SqshfsDirHandle *handle = (void *)fi->fh;
+	struct SqshfsDirHandle *handle = get_dir_handle(fi);
 
 	sqsh_inode_free(handle->inode);
 	sqsh_directory_iterator_free(handle->iterator);
@@ -485,7 +495,7 @@ static void
 sqshfs_release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 	(void)ino;
 	struct Sqshfs *context = fuse_req_userdata(req);
-	struct SqshfsFileHandle *handle = (void *)fi->fh;
+	struct SqshfsFileHandle *handle = get_file_handle(fi);
 	dbg("sqshfs_release\n");
 
 	sqsh_inode_free(handle->inode);
@@ -497,7 +507,7 @@ sqshfs_read(
 		fuse_req_t req, fuse_ino_t ino, size_t size, off_t offset,
 		struct fuse_file_info *fi) {
 	struct Sqshfs *context = fuse_req_userdata(req);
-	struct SqshfsFileHandle *handle = (void *)fi->fh;
+	struct SqshfsFileHandle *handle = get_file_handle(fi);
 	int rv = 0;
 	struct SqshFileReader *reader = sqsh_file_reader_new(handle->inode, &rv);
 
