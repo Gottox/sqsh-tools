@@ -18,10 +18,12 @@ sqsh_extended_test = [
 	'selftest.sh',
 	'tools/cat/large-file-compressed.sh',
 	'tools/cat/large-file-uncompressed.sh',
+	'tools/fs/large-file.sh',
 	'tools/fs/repack.sh',
 	'tools/unpack/repack.sh',
 ]
 sqsh_failing_test = [
+	'tools/fs/large-file.sh',
 	'tools/fs/repack.sh',
 ]
 sqsh_test_util = [
