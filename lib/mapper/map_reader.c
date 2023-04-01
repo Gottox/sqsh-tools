@@ -152,6 +152,11 @@ sqsh__map_reader_remaining_direct(const struct SqshMapReader *reader) {
 	return block_size - offset;
 }
 
+uint64_t
+sqsh__map_reader_address(const struct SqshMapReader *reader) {
+	return reader->address;
+}
+
 int
 sqsh__map_reader_advance(
 		struct SqshMapReader *reader, sqsh_index_t offset, size_t size) {

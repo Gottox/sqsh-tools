@@ -43,6 +43,7 @@ extern "C" {
 #endif
 
 struct SqshArchive;
+struct SqshMapReader;
 
 ////////////////////////////////////////
 // compression/compression.c
@@ -151,6 +152,10 @@ SQSH_NO_UNUSED int sqsh__compression_manager_init(
 		const struct SqshCompression *compression, size_t size);
 
 size_t sqsh__compression_manager_size(struct SqshCompressionManager *manager);
+
+int sqsh__compression_manager_uncompress(
+		struct SqshCompressionManager *manager,
+		const struct SqshMapReader *reader, const struct SqshBuffer **target);
 
 SQSH_NO_UNUSED int sqsh__compression_manager_get(
 		struct SqshCompressionManager *manager, uint64_t offset, size_t size,

@@ -336,8 +336,19 @@ SQSH_NO_UNUSED int sqsh__map_reader_init(
  * @param reader The reader to query
  * @return size of the remaining bytes
  */
-size_t
-sqsh__map_reader_remaining_direct(const struct SqshMapReader *reader);
+size_t sqsh__map_reader_remaining_direct(const struct SqshMapReader *reader);
+
+/**
+ * @internal
+ * @memberof SqshMapReader
+ * @brief returns the current address of the reader
+ *
+ * @param reader The reader to query
+ * @return the current address of the reader
+ *
+ */
+SQSH_NO_UNUSED uint64_t
+sqsh__map_reader_address(const struct SqshMapReader *reader);
 
 /**
  * @internal

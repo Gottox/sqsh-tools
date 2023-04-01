@@ -129,8 +129,7 @@ uncompress_block(
 	struct SqshMapReader reader = {0};
 	const struct SqshCompression *compression = manager->compression;
 
-	rv = sqsh__map_reader_init(
-			&reader, manager->map_manager, offset, ~0);
+	rv = sqsh__map_reader_init(&reader, manager->map_manager, offset, ~0);
 	if (rv < 0) {
 		goto out;
 	}
@@ -150,6 +149,48 @@ uncompress_block(
 
 out:
 	sqsh__map_reader_cleanup(&reader);
+	return rv;
+}
+
+int
+sqsh__compression_manager_uncompress(
+		struct SqshCompressionManager *manager,
+		const struct SqshMapReader *reader, const struct SqshBuffer **target) {
+	int rv = 0;
+	const struct SqshCompression *compression = manager->compression;
+
+	rv = pthread_mutex_lock(&manager->lock);
+	if (rv != 0) {
+		// rv = -SQSH_ERROR_MUTEX_LOCK;
+		rv = -SQSH_ERROR_TODO;
+		goto out;
+	}
+
+	const uint64_t address = sqsh__map_reader_address(reader);
+	const size_t size = sqsh__map_reader_size(reader);
+
+	*target = sqsh__rc_hash_map_retain(&manager->hash_map, address);
+
+	if (*target == NULL) {
+		struct SqshBuffer buffer = {0};
+		rv = sqsh__buffer_init(&buffer);
+		if (rv < 0) {
+			goto out;
+		}
+		const uint8_t *data = sqsh__map_reader_data(reader);
+
+		rv = sqsh__compression_decompress_to_buffer(
+				compression, &buffer, data, size);
+		if (rv < 0) {
+			goto out;
+		}
+
+		*target = sqsh__rc_hash_map_put(&manager->hash_map, address, &buffer);
+	}
+	rv = sqsh__lru_touch(&manager->lru, address);
+
+out:
+	pthread_mutex_unlock(&manager->lock);
 	return rv;
 }
 
@@ -186,8 +227,6 @@ sqsh__compression_manager_get(
 out:
 	pthread_mutex_unlock(&manager->lock);
 	return rv;
-
-	return -SQSH_ERROR_TODO;
 }
 
 int
