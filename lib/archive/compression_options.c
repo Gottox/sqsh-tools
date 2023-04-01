@@ -66,9 +66,10 @@ sqsh__compression_options_init(
 	int rv = 0;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
 
-	// TODO: sane limit
+	uint64_t upper_limit = SQSH_SIZEOF_SUPERBLOCK +
+		SQSH_SIZEOF_METABLOCK + SQSH_METABLOCK_BLOCK_SIZE;
 	rv = sqsh__metablock_iterator_init(
-			&context->metablock, sqsh, SQSH_SIZEOF_SUPERBLOCK, UINT64_MAX);
+			&context->metablock, sqsh, SQSH_SIZEOF_SUPERBLOCK, upper_limit);
 	if (rv < 0) {
 		goto out;
 	}
