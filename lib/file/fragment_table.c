@@ -47,19 +47,13 @@ init_compression_manager(
 	const struct SqshCompression *compression =
 			sqsh_archive_compression_data(archive);
 
-	// we ignore the fact, that the datablock may begin at a different
-	// address when compression options are present.
-	uint64_t start_address = SQSH_SIZEOF_SUPERBLOCK;
-	const uint64_t upper_limit = sqsh_superblock_inode_table_start(superblock);
-
 	table->map_manager = sqsh_archive_map_manager(archive);
 	// TODO: Is it safe to assume, that every fragment has at least 2 entries?
 	// (except when ther is only one packed file)
 	// Be safe and assume it is not for now:
 	size_t size = sqsh_superblock_fragment_entry_count(superblock);
 	return sqsh__compression_manager_init(
-			&table->compression_manager, archive, compression, start_address,
-			upper_limit, size);
+			&table->compression_manager, archive, compression, size);
 }
 
 int

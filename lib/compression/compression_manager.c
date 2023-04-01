@@ -80,21 +80,12 @@ buffer_cleanup(void *buffer) {
 SQSH_NO_UNUSED int
 sqsh__compression_manager_init(
 		struct SqshCompressionManager *manager, struct SqshArchive *archive,
-		const struct SqshCompression *compression, uint64_t start_address,
-		uint64_t upper_limit, size_t size) {
+		const struct SqshCompression *compression, size_t size) {
 	int rv;
 	const struct SqshConfig *config = sqsh_archive_config(archive);
 	const size_t lru_size =
 			SQSH_CONFIG_DEFAULT(config->compression_lru_size, 128);
 
-	if (start_address > upper_limit) {
-		return -SQSH_ERROR_TODO;
-	}
-
-	if (size == 0) {
-		size_t block_size = sqsh__compression_block_size(compression);
-		size = SQSH_DIVIDE_CEIL(upper_limit - start_address, block_size);
-	}
 	// Give a bit of room to avoid too many key hash collisions
 	size = find_next_maybe_prime(2 * size);
 
@@ -117,7 +108,6 @@ sqsh__compression_manager_init(
 	}
 	manager->map_manager = sqsh_archive_map_manager(archive);
 	manager->compression = compression;
-	manager->upper_limit = upper_limit;
 
 out:
 	if (rv < 0) {
@@ -137,11 +127,10 @@ uncompress_block(
 		uint64_t offset, size_t size) {
 	int rv = 0;
 	struct SqshMapReader reader = {0};
-	const uint64_t upper_limit = manager->upper_limit;
 	const struct SqshCompression *compression = manager->compression;
 
 	rv = sqsh__map_reader_init(
-			&reader, manager->map_manager, offset, upper_limit);
+			&reader, manager->map_manager, offset, ~0);
 	if (rv < 0) {
 		goto out;
 	}

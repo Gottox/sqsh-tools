@@ -54,7 +54,7 @@ decompress(void) {
 	assert(rv == 0);
 
 	rv = sqsh__compression_manager_init(
-			&manager, &archive, &compression, 0, sizeof(payload), 10);
+			&manager, &archive, &compression, 10);
 	assert(rv == 0);
 
 	rv = sqsh__compression_manager_get(

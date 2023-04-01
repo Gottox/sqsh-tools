@@ -35,6 +35,8 @@
 
 #include "../../include/sqsh_data.h"
 
+#include "../utils.h"
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -147,12 +149,12 @@ sqsh__archive_file_compression_manager(
 		const struct SqshSuperblock *superblock =
 				sqsh_archive_superblock(archive);
 		const uint64_t bytes_used = sqsh_superblock_bytes_used(superblock);
-		const size_t capacity =
-				bytes_used / sqsh_superblock_block_size(superblock);
+		const size_t capacity = SQSH_DIVIDE_CEIL(
+				bytes_used, sqsh_superblock_block_size(superblock));
 
 		rv = sqsh__compression_manager_init(
 				&archive->file_compression_manager, archive,
-				&archive->data_compression, 0, bytes_used, capacity);
+				&archive->data_compression, capacity);
 		if (rv < 0) {
 			goto out;
 		}
