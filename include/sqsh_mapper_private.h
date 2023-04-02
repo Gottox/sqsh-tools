@@ -310,7 +310,7 @@ struct SqshMapReader {
 	struct SqshMapManager *map_manager;
 	const struct SqshMapSlice *current_mapping;
 	struct SqshBuffer buffer;
-	const uint8_t *target;
+	const uint8_t *data;
 };
 
 /**

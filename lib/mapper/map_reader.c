@@ -54,7 +54,7 @@ sqsh__map_reader_init(
 	reader->end_address = reader->address = start_address;
 	reader->upper_limit = upper_limit;
 	reader->current_mapping = NULL;
-	reader->target = NULL;
+	reader->data = NULL;
 
 	return sqsh__buffer_init(&reader->buffer);
 }
@@ -85,7 +85,7 @@ setup_direct(struct SqshMapReader *reader) {
 	replace_mapping(reader, mapping);
 
 	const uint8_t *data = sqsh__map_slice_data(reader->current_mapping);
-	reader->target = &data[get_offset(reader, reader->address)];
+	reader->data = &data[get_offset(reader, reader->address)];
 
 out:
 	return rv;
@@ -140,7 +140,7 @@ setup_buffered(struct SqshMapReader *reader) {
 	replace_mapping(reader, NULL);
 
 	const uint8_t *data = sqsh__buffer_data(&reader->buffer);
-	reader->target = data;
+	reader->data = data;
 out:
 	return rv;
 }
@@ -199,7 +199,7 @@ sqsh__map_reader_all(struct SqshMapReader *reader) {
 
 const uint8_t *
 sqsh__map_reader_data(const struct SqshMapReader *reader) {
-	return reader->target;
+	return reader->data;
 }
 
 size_t
