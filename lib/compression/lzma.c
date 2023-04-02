@@ -109,14 +109,15 @@ sqsh_lzma_finish(void *context, uint8_t *target, size_t *target_size) {
 
 	lzma_ret ret = lzma_code(stream, LZMA_FINISH);
 
-	if (ret != LZMA_STREAM_END) {
-		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
-	}
-
+	*target_size = stream->total_out;
 	lzma_end(stream);
 
-	*target_size = stream->total_out;
-	return 0;
+	if (ret == LZMA_STREAM_END) {
+		return 0;
+	} else {
+		*target_size = 0;
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+	}
 }
 
 static const struct SqshCompressionImpl impl_xz = {
