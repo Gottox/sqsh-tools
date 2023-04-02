@@ -54,6 +54,7 @@ sqsh__metablock_iterator_init(
 	iterator->outer_size = 0;
 	iterator->compression_manager = compression_manager;
 	iterator->old_compression = sqsh_archive_compression_metablock(sqsh);
+	memset(&iterator->extract_view, 0, sizeof(iterator->extract_view));
 	rv = sqsh__buffer_init(&iterator->old_buffer);
 	if (rv < 0) {
 		goto out;
