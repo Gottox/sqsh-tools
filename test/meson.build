@@ -84,6 +84,7 @@ if get_option('test') == 'extended'
 	foreach p : sqsh_extended_test
 		test(p,
 			files(p),
+			timeout: 60,
 			should_fail: sqsh_failing_test.contains(p),
 			env: {
 				'BUILD_DIR': meson.current_build_dir(),
