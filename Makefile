@@ -25,7 +25,13 @@ MESON_FLAGS += -Db_lundef=false
 MESON_FLAGS += -Dtest=extended
 #MESON_FLAGS += -Dtest=true
 MESON_FLAGS += -Ddoc=internal
+MESON_FLAGS += -Dcurl=enabled
+MESON_FLAGS += -Dzlib=enabled
+MESON_FLAGS += -Dlz4=enabled
+MESON_FLAGS += -Dlzma=enabled
 MESON_FLAGS += -Dlzo=enabled
+MESON_FLAGS += -Dzstd=enabled
+MESON_FLAGS += -Dfuse=enabled
 #MESON_FLAGS += -Db_coverage=true
 
 SANATIZE = 0
@@ -42,6 +48,7 @@ else
 	ifeq ($(SANATIZE), 1)
 		MESON_FLAGS += -Db_sanitize=thread
 	endif
+	MESON_FLAGS += -Dwerror=true
 endif
 ifeq ($(CC),clang)
 	#MESON_FLAGS += -Dfuzzer=true
@@ -56,10 +63,11 @@ $(NINJA_TARGETS): $(BUILD_DIR)
 	$W $(NINJA) -C $< $@
 
 $(BUILD_DIR): meson.build Makefile
+	[ "$(PODMAN)" ] && meson wrap update-db || true
 	[ -d "$@" ] && rm -rf "$@" || true
 	$W CC=$(CC) $(MESON) setup $(MESON_FLAGS) "$@"
 
 .PHONY: clean
 
 clean:
-	[ -d "$(BUILD_DIR)" ] && rm -rf "$(BUILD_DIR)" || true
+	rm -rf "$(BUILD_DIR)" subprojects
