@@ -55,10 +55,13 @@ libsqsh_headers_private = [
 ]
 
 libsqsh_dependencies = [
-	dependency('threads')
 ]
 
 c_args = [ ]
+if threads.found()
+	libsqsh_dependencies += threads
+endif
+
 if curl.found()
 	libsqsh_dependencies += curl
 	c_args += '-DCONFIG_CURL'

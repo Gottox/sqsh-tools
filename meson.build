@@ -15,7 +15,7 @@ project(
 	],
 )
 
-threads = dependency('threads')
+threads = dependency('threads', required: get_option('threads'))
 curl = dependency('libcurl', required: get_option('curl'))
 fuse = dependency('fuse3', required: get_option('fuse'))
 lz4 = dependency('liblz4', required: get_option('lz4'))
