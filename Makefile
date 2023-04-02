@@ -13,6 +13,13 @@ else
 	ARCH = x86_64
 endif
 
+ifeq ($(MUON),1)
+	MESON = muon
+	NINJA = muon
+else
+	MESON = meson
+	NINJA = ninja
+endif
 MESON_FLAGS += -Ddefault_library=static
 MESON_FLAGS += -Db_lundef=false
 MESON_FLAGS += -Dtest=extended
@@ -46,11 +53,11 @@ endif
 .PHONY: $(NINJA_TARGETS)
 
 $(NINJA_TARGETS): $(BUILD_DIR)
-	$W ninja -C $< $@
+	$W $(NINJA) -C $< $@
 
 $(BUILD_DIR): meson.build Makefile
 	[ -d "$@" ] && rm -rf "$@" || true
-	$W CC=$(CC) meson setup "$@" $(MESON_FLAGS)
+	$W CC=$(CC) $(MESON) setup $(MESON_FLAGS) "$@"
 
 .PHONY: clean
 
