@@ -18,8 +18,9 @@ jobs:
         fetch-depth: 0
     - name: configure
       run: |
-        meson wrap update-db
-        CC=clang meson setup /tmp/build \
+        apk add zlib-dev lz4-dev xz-dev lzo-dev zstd-dev
+        CC=clang meson setup --wrap-mode=nodownload /tmp/build \
+          -Dwerror=true \
           -Dcurl=enabled  \
           -Dzlib=enabled \
           -Dlz4=enabled \
