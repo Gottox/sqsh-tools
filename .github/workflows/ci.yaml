@@ -104,7 +104,7 @@ jobs:
           -Dlzma=disabled \
           -Dlzo=disabled \
           -Dzstd=disabled \
-          -Dtest=disabled \
+          -Dtest=false \
           -Ddoc=true
     - name: generate
       if: ${{ github.ref_type == 'tag' }}
