@@ -20,12 +20,12 @@ jobs:
       run: |
         meson wrap update-db
         CC=clang meson setup /tmp/build \
-          -Dcurl=false  \
-          -Dzlib=true \
-          -Dlz4=true \
-          -Dlzma=true  \
-          -Dlzo=true  \
-          -Dzstd=true  \
+          -Dcurl=enabled  \
+          -Dzlib=enabled \
+          -Dlz4=enabled \
+          -Dlzma=enabled  \
+          -Dlzo=enabled  \
+          -Dzstd=enabled  \
           -Dtest=extended \
           -Ddoc=false
     - name: test
@@ -48,6 +48,7 @@ jobs:
     - name: build
       run: |
         CC=${{ matrix.cc }}
+        apk add zlib-dev
         $CC -o sqsh-ls tools/ls.c $(find lib -name '*.c') -DCONFIG_ZLIB -L/lib -lz
 
   build:
@@ -59,8 +60,8 @@ jobs:
           - gcc
           - clang
         feature:
-          - true
-          - false
+          - enabled
+          - disabled
         arch:
           #- i386
           - x86_64
