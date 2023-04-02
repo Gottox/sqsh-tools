@@ -88,16 +88,13 @@ struct SqshFileIterator {
 	 * @privatesection
 	 */
 	const struct SqshInode *inode;
-	const struct SqshSuperblock *superblock;
 	struct SqshCompressionManager *compression_manager;
-	struct SqshMapManager *map_manager;
 
-	struct SqshMapReader current_uncompressed;
+	struct SqshMapReader map_reader;
 	const struct SqshBuffer *current_compressed;
 	struct SqshBuffer fragment_buffer;
 
 	uint32_t block_index;
-	uint64_t block_address;
 
 	const uint8_t *data;
 	size_t data_size;

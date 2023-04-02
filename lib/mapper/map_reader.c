@@ -51,7 +51,7 @@ sqsh__map_reader_init(
 		struct SqshMapReader *reader, struct SqshMapManager *map_manager,
 		const uint64_t start_address, const uint64_t upper_limit) {
 	reader->map_manager = map_manager;
-	reader->address = start_address;
+	reader->end_address = reader->address = start_address;
 	reader->upper_limit = upper_limit;
 	reader->current_mapping = NULL;
 	reader->target = NULL;
@@ -211,5 +211,6 @@ int
 sqsh__map_reader_cleanup(struct SqshMapReader *reader) {
 	sqsh__buffer_cleanup(&reader->buffer);
 	replace_mapping(reader, NULL);
+	memset(reader, 0, sizeof(*reader));
 	return 0;
 }
