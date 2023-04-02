@@ -157,10 +157,6 @@ int sqsh__compression_manager_uncompress(
 		struct SqshCompressionManager *manager,
 		const struct SqshMapReader *reader, const struct SqshBuffer **target);
 
-SQSH_NO_UNUSED int sqsh__compression_manager_get(
-		struct SqshCompressionManager *manager, uint64_t offset, size_t size,
-		const struct SqshBuffer **target);
-
 int sqsh__compression_manager_release(
 		struct SqshCompressionManager *manager,
 		const struct SqshBuffer *buffer);

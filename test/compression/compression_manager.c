@@ -44,22 +44,27 @@ static void
 decompress(void) {
 	int rv;
 	struct SqshArchive archive = {0};
-	struct SqshCompression compression = {0};
 	struct SqshCompressionManager manager = {0};
 	const struct SqshBuffer *buffer = NULL;
 	uint8_t payload[] = {SQSH_HEADER, ZLIB_ABCD};
 
-	rv = sqsh__compression_init(&compression, SQSH_COMPRESSION_GZIP, 4096);
 	mk_stub(&archive, payload, sizeof(payload));
+
+	struct SqshMapManager *map_manager = sqsh_archive_map_manager(&archive);
+	const struct SqshCompression *compression =
+			sqsh_archive_compression_metablock(&archive);
+	struct SqshMapReader reader = {0};
+	rv = sqsh__map_reader_init(
+			&reader, map_manager, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
 	assert(rv == 0);
 
-	rv = sqsh__compression_manager_init(
-			&manager, &archive, &compression, 10);
+	rv = sqsh__map_reader_advance(&reader, 0, CHUNK_SIZE(ZLIB_ABCD));
 	assert(rv == 0);
 
-	rv = sqsh__compression_manager_get(
-			&manager, SQSH_SIZEOF_SUPERBLOCK,
-			sizeof(payload) - SQSH_SIZEOF_SUPERBLOCK, &buffer);
+	rv = sqsh__compression_manager_init(&manager, &archive, compression, 10);
+	assert(rv == 0);
+
+	rv = sqsh__compression_manager_uncompress(&manager, &reader, &buffer);
 	assert(rv == 0);
 	assert(buffer != NULL);
 	assert(sqsh__buffer_size(buffer) == 4);
@@ -67,7 +72,6 @@ decompress(void) {
 
 	sqsh__compression_manager_release(&manager, buffer);
 	sqsh__compression_manager_cleanup(&manager);
-	sqsh__compression_cleanup(&compression);
 	sqsh__archive_cleanup(&archive);
 }
 

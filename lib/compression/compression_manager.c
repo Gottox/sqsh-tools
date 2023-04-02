@@ -195,41 +195,6 @@ out:
 }
 
 int
-sqsh__compression_manager_get(
-		struct SqshCompressionManager *manager, uint64_t offset, size_t size,
-		const struct SqshBuffer **target) {
-	int rv = 0;
-
-	rv = pthread_mutex_lock(&manager->lock);
-	if (rv != 0) {
-		// rv = -SQSH_ERROR_MUTEX_LOCK;
-		rv = -SQSH_ERROR_TODO;
-		goto out;
-	}
-
-	*target = sqsh__rc_hash_map_retain(&manager->hash_map, offset);
-
-	if (*target == NULL) {
-		struct SqshBuffer buffer = {0};
-		rv = sqsh__buffer_init(&buffer);
-		if (rv < 0) {
-			goto out;
-		}
-		rv = uncompress_block(&buffer, manager, offset, size);
-		if (rv < 0) {
-			goto out;
-		}
-
-		*target = sqsh__rc_hash_map_put(&manager->hash_map, offset, &buffer);
-	}
-	rv = sqsh__lru_touch(&manager->lru, offset);
-
-out:
-	pthread_mutex_unlock(&manager->lock);
-	return rv;
-}
-
-int
 sqsh__compression_manager_release(
 		struct SqshCompressionManager *manager,
 		const struct SqshBuffer *buffer) {
