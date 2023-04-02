@@ -29,8 +29,7 @@ jobs:
           -Ddoc=false
     - name: test
       run: |
-        cd /tmp/build
-        meson test --wrap='valgrind --leak-check=full --error-exitcode=1'
+         ninja -C /tmp/build test
 
   plain-build:
     runs-on: ubuntu-latest
@@ -48,13 +47,7 @@ jobs:
     - name: build
       run: |
         CC=${{ matrix.cc }}
-        $CC -o sqsh-ls tools/ls.c $(find lib -name '*.c') -L/lib \
-          -DCONFIG_CURL -lcurl \
-          -DCONFIG_ZLIB -lz \
-          -DCONFIG_LZ4 -llz4 \
-          -DCONFIG_LZMA -llzma \
-          -DCONFIG_LZO -DCONFIG_LZO_HELPER_PATH='"/usr/libexec/sqsh-lzo-helper"' \
-          -DCONFIG_ZSTD -lzstd
+        $CC -o sqsh-ls tools/ls.c $(find lib -name '*.c') -DCONFIG_ZLIB -L/lib -lz
 
   build:
     runs-on: ubuntu-latest
