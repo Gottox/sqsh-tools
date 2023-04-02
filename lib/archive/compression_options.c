@@ -77,12 +77,6 @@ sqsh__compression_options_init(
 
 	rv = sqsh__metablock_iterator_next(&context->metablock);
 	if (rv < 0) {
-		rv = -SQSH_ERROR_TODO;
-		goto out;
-	}
-
-	if (sqsh__metablock_iterator_is_compressed(&context->metablock)) {
-		rv = -SQSH_ERROR_TODO;
 		goto out;
 	}
 

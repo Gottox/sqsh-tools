@@ -55,7 +55,6 @@ struct SqshMetablockIterator {
 	const struct SqshCompression *old_compression;
 	struct SqshBuffer old_buffer;
 	struct SqshExtractView extract_view;
-	bool is_compressed;
 	uint16_t outer_size;
 	uint16_t inner_size;
 	const uint8_t *data;
@@ -112,28 +111,6 @@ sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator);
  */
 const uint8_t *
 sqsh__metablock_iterator_data(const struct SqshMetablockIterator *iterator);
-
-/**
- * @internal
- * @memberof SqshMetablockIterator
- * @brief Returns a pointer to the data of the current metablock.
- *
- * @param[in] iterator The iterator.
- * @return Returns the address of the data of the current metablock.
- */
-uint64_t sqsh__metablock_iterator_data_address(
-		const struct SqshMetablockIterator *iterator);
-
-/**
- * @internal
- * @memberof SqshMetablockIterator
- * @brief Returns whether the current metablock is compressed.
- *
- * @param[in] iterator The iterator.
- * @return Whether the current metablock is compressed.
- */
-bool sqsh__metablock_iterator_is_compressed(
-		const struct SqshMetablockIterator *iterator);
 
 /**
  * @internal

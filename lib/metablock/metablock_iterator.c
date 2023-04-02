@@ -52,7 +52,6 @@ sqsh__metablock_iterator_init(
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(sqsh);
 
 	iterator->outer_size = 0;
-	iterator->is_compressed = false;
 	iterator->compression_manager = compression_manager;
 	iterator->old_compression = sqsh_archive_compression_metablock(sqsh);
 	rv = sqsh__buffer_init(&iterator->old_buffer);
@@ -163,20 +162,6 @@ out:
 const uint8_t *
 sqsh__metablock_iterator_data(const struct SqshMetablockIterator *iterator) {
 	return iterator->data;
-}
-
-uint64_t
-sqsh__metablock_iterator_data_address(
-		const struct SqshMetablockIterator *iterator) {
-	// TODO: do not access the cursor directly, implement functions to get its
-	// address
-	return iterator->reader.address + SQSH_SIZEOF_METABLOCK;
-}
-
-bool
-sqsh__metablock_iterator_is_compressed(
-		const struct SqshMetablockIterator *iterator) {
-	return iterator->is_compressed;
 }
 
 size_t
