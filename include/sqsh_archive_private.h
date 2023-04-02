@@ -159,9 +159,9 @@ struct SqshArchive {
 	 * @privatesection
 	 */
 	struct SqshMapManager map_manager;
-	struct SqshCompression data_compression;
-	struct SqshCompression metablock_compression;
-	struct SqshCompressionManager file_compression_manager;
+	struct SqshExtractor data_compression;
+	struct SqshExtractor metablock_compression;
+	struct SqshExtractManager file_extract_manager;
 	struct SqshSuperblock superblock;
 	struct SqshIdTable id_table;
 	struct SqshExportTable export_table;
@@ -187,9 +187,9 @@ SQSH_NO_UNUSED int sqsh__archive_init(
 		struct SqshArchive *sqsh, const void *source,
 		const struct SqshConfig *config);
 
-int sqsh__archive_file_compression_manager(
+int sqsh__archive_file_extract_manager(
 		struct SqshArchive *archive,
-		struct SqshCompressionManager **file_compression_manager);
+		struct SqshExtractManager **file_extract_manager);
 
 /**
  * @internal

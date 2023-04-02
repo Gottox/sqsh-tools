@@ -523,14 +523,14 @@ struct SqshMapManager *sqsh_archive_map_manager(struct SqshArchive *archive);
 
 /**
  * @memberof SqshArchive
- * @brief sqsh_compression_data returns the compression context for data blocks
+ * @brief returns the compression context for data blocks
  *
  * @param[in] archive the Sqsh structure.
  *
  * @return the compression context.
  */
-const struct SqshCompression *
-sqsh_archive_compression_data(const struct SqshArchive *archive);
+const struct SqshExtractor *
+sqsh_archive_data_extractor(const struct SqshArchive *archive);
 
 /**
  * @memberof SqshArchive
@@ -541,8 +541,8 @@ sqsh_archive_compression_data(const struct SqshArchive *archive);
  *
  * @return the compression context.
  */
-const struct SqshCompression *
-sqsh_archive_compression_metablock(const struct SqshArchive *archive);
+const struct SqshExtractor *
+sqsh_archive_metablock_extractor(const struct SqshArchive *archive);
 
 /**
  * @memberof SqshArchive

@@ -31,7 +31,7 @@
  * @file         metablock_iterator.c
  */
 
-#include "../../include/sqsh_compression_private.h"
+#include "../../include/sqsh_extract_private.h"
 
 #include "../../include/sqsh_archive.h"
 #include "../../include/sqsh_metablock_private.h"
@@ -52,7 +52,7 @@ append_to_buffer(
 int
 sqsh__metablock_reader_init(
 		struct SqshMetablockReader *cursor, struct SqshArchive *sqsh,
-		struct SqshCompressionManager *compression_manager,
+		struct SqshExtractManager *compression_manager,
 		const uint64_t start_address, const uint64_t upper_limit) {
 	int rv;
 	rv = sqsh__metablock_iterator_init(
@@ -67,7 +67,7 @@ sqsh__metablock_reader_init(
 	}
 	cursor->size = 0;
 	cursor->offset = 0;
-	cursor->compression = sqsh_archive_compression_metablock(sqsh);
+	cursor->compression = sqsh_archive_metablock_extractor(sqsh);
 	cursor->compression_manager = compression_manager;
 
 out:

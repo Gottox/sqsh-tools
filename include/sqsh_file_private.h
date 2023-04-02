@@ -53,7 +53,7 @@ struct SqshFragmentTable {
 	const struct SqshSuperblock *superblock;
 	struct SqshTable table;
 	struct SqshMapManager *map_manager;
-	struct SqshCompressionManager compression_manager;
+	struct SqshExtractManager compression_manager;
 	uint64_t upper_limit;
 };
 
@@ -89,7 +89,7 @@ struct SqshFileIterator {
 	 * @privatesection
 	 */
 	const struct SqshInode *inode;
-	struct SqshCompressionManager *compression_manager;
+	struct SqshExtractManager *compression_manager;
 
 	struct SqshMapReader map_reader;
 	struct SqshExtractView extract_view;

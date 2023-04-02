@@ -28,70 +28,75 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         extract_view.c
+ * @file         extract_buffer.c
  */
 
-#include "../../include/sqsh_compression_private.h"
+#include "../../include/sqsh_extract_private.h"
 
-#include "../../include/sqsh_error.h"
-#include "../utils.h"
+SQSH_STATIC_ASSERT(
+		sizeof(sqsh__extractor_context_t) >=
+		sizeof(struct SqshExtractBuffer));
 
 int
-sqsh__extract_view_init(
-		struct SqshExtractView *view, struct SqshCompressionManager *manager,
-		const struct SqshMapReader *reader) {
+sqsh__extract_buffer_init(
+		void *context, uint8_t *target, size_t target_size) {
+	(void)target;
+	(void)target_size;
 	int rv = 0;
-	view->manager = manager;
-	view->offset = 0;
-	view->buffer = NULL;
+	struct SqshExtractBuffer *buffering = context;
 
-	rv = sqsh__compression_manager_uncompress(manager, reader, &view->buffer);
+	rv = sqsh__buffer_init(&buffering->buffer);
 	if (rv < 0) {
 		goto out;
 	}
-
-	view->size = sqsh__buffer_size(view->buffer);
+	buffering->compressed = NULL;
+	buffering->compressed_size = 0;
 
 out:
-	if (rv < 0) {
-		sqsh__extract_view_cleanup(view);
-	}
 	return rv;
 }
-
 int
-sqsh__extract_view_narrow(
-		struct SqshExtractView *view, sqsh_index_t offset, size_t size) {
-	sqsh_index_t end_offset;
-	if (SQSH_ADD_OVERFLOW(offset, size, &end_offset)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
+sqsh__extract_buffer_decompress(
+		void *context, const uint8_t *compressed,
+		const size_t compressed_size) {
+	int rv = 0;
+	struct SqshExtractBuffer *buffering = context;
+	if (buffering->compressed == NULL &&
+		sqsh__buffer_size(&buffering->buffer) == 0) {
+		buffering->compressed = compressed;
+		buffering->compressed_size = compressed_size;
+		return 0;
+	} else if (sqsh__buffer_size(&buffering->buffer) == 0) {
+		rv = sqsh__buffer_append(
+				&buffering->buffer, buffering->compressed,
+				buffering->compressed_size);
+		if (rv < 0) {
+			return rv;
+		}
 	}
-	if (end_offset > sqsh__buffer_size(view->buffer)) {
-		return -SQSH_ERROR_TODO;
+
+	rv = sqsh__buffer_append(&buffering->buffer, compressed, compressed_size);
+	if (rv < 0) {
+		return rv;
 	}
-	view->offset = offset;
-	view->size = size;
-	return 0;
+	buffering->compressed = sqsh__buffer_data(&buffering->buffer);
+	buffering->compressed_size = sqsh__buffer_size(&buffering->buffer);
+
+	return rv;
 }
 
 const uint8_t *
-sqsh__extract_view_data(const struct SqshExtractView *view) {
-	const uint8_t *data = sqsh__buffer_data(view->buffer);
-	return &data[view->offset];
+sqsh__extract_buffer_data(void *context) {
+	return ((struct SqshExtractBuffer *)context)->compressed;
 }
 
-size_t sqsh__extract_view_size(const struct SqshExtractView *view) {
-	return view->size;
+size_t
+sqsh__extract_buffer_size(void *context) {
+	return ((struct SqshExtractBuffer *)context)->compressed_size;
 }
 
-int sqsh__extract_view_cleanup(struct SqshExtractView *view) {
-	int rv = 0;
-
-	if (view->manager != NULL) {
-		rv = sqsh__compression_manager_release(view->manager, view->buffer);
-	}
-	view->buffer = NULL;
-	view->size = 0;
-	view->offset = 0;
-	return rv;
+int
+sqsh__extract_buffer_cleanup(void *context) {
+	struct SqshExtractBuffer *buffering = context;
+	return sqsh__buffer_cleanup(&buffering->buffer);
 }

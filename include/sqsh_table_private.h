@@ -34,7 +34,7 @@
 #ifndef SQSH_TABLE_PRIVATE_H
 #define SQSH_TABLE_PRIVATE_H
 
-#include "sqsh_compression_private.h"
+#include "sqsh_extract_private.h"
 #include "sqsh_mapper_private.h"
 #include "sqsh_table.h"
 

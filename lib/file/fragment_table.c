@@ -44,15 +44,15 @@ static int
 init_compression_manager(
 		struct SqshFragmentTable *table, struct SqshArchive *archive) {
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
-	const struct SqshCompression *compression =
-			sqsh_archive_compression_data(archive);
+	const struct SqshExtractor *compression =
+			sqsh_archive_data_extractor(archive);
 
 	table->map_manager = sqsh_archive_map_manager(archive);
 	// TODO: Is it safe to assume, that every fragment has at least 2 entries?
 	// (except when ther is only one packed file)
 	// Be safe and assume it is not for now:
 	size_t size = sqsh_superblock_fragment_entry_count(superblock);
-	return sqsh__compression_manager_init(
+	return sqsh__extract_manager_init(
 			&table->compression_manager, archive, compression, size);
 }
 
@@ -192,6 +192,6 @@ out:
 int
 sqsh__fragment_table_cleanup(struct SqshFragmentTable *table) {
 	sqsh__table_cleanup(&table->table);
-	sqsh__compression_manager_cleanup(&table->compression_manager);
+	sqsh__extract_manager_cleanup(&table->compression_manager);
 	return 0;
 }

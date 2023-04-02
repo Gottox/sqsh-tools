@@ -31,7 +31,7 @@
  * @file         lzma.c
  */
 
-#include "../../include/sqsh_compression_private.h"
+#include "../../include/sqsh_extract_private.h"
 
 #include "../../include/sqsh_error.h"
 
@@ -40,7 +40,7 @@
 #	include <lzma.h>
 #	include <string.h>
 
-SQSH_STATIC_ASSERT(sizeof(sqsh__compression_context_t) >= sizeof(lzma_stream));
+SQSH_STATIC_ASSERT(sizeof(sqsh__extractor_context_t) >= sizeof(lzma_stream));
 
 static const lzma_stream proto_stream = LZMA_STREAM_INIT;
 
@@ -120,22 +120,22 @@ sqsh_lzma_finish(void *context, uint8_t *target, size_t *target_size) {
 	}
 }
 
-static const struct SqshCompressionImpl impl_xz = {
+static const struct SqshExtractorImpl impl_xz = {
 		.init = sqsh_lzma_init_xz,
-		.decompress = sqsh_lzma_decompress,
+		.extract = sqsh_lzma_decompress,
 		.finish = sqsh_lzma_finish,
 };
 
-const struct SqshCompressionImpl *const sqsh__impl_xz = &impl_xz;
+const struct SqshExtractorImpl *const sqsh__impl_xz = &impl_xz;
 
-static const struct SqshCompressionImpl impl_lzma = {
+static const struct SqshExtractorImpl impl_lzma = {
 		.init = sqsh_lzma_init_alone,
-		.decompress = sqsh_lzma_decompress,
+		.extract = sqsh_lzma_decompress,
 		.finish = sqsh_lzma_finish,
 };
 
-const struct SqshCompressionImpl *const sqsh__impl_lzma = &impl_lzma;
+const struct SqshExtractorImpl *const sqsh__impl_lzma = &impl_lzma;
 #else
-const struct SqshCompressionImpl *const sqsh__impl_lzma = NULL;
-const struct SqshCompressionImpl *const sqsh__impl_xz = NULL;
+const struct SqshExtractorImpl *const sqsh__impl_lzma = NULL;
+const struct SqshExtractorImpl *const sqsh__impl_xz = NULL;
 #endif

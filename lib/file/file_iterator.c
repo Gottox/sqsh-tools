@@ -52,7 +52,7 @@ sqsh__file_iterator_init(
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(archive);
 	uint64_t block_address = sqsh_inode_file_blocks_start(inode);
 	const uint64_t upper_limit = sqsh_superblock_bytes_used(superblock);
-	rv = sqsh__archive_file_compression_manager(
+	rv = sqsh__archive_file_extract_manager(
 			archive, &iterator->compression_manager);
 	if (rv < 0) {
 		goto out;
@@ -88,7 +88,7 @@ static int
 map_block_compressed(
 		struct SqshFileIterator *iterator, sqsh_index_t next_offset) {
 	int rv = 0;
-	struct SqshCompressionManager *compression_manager =
+	struct SqshExtractManager *compression_manager =
 			iterator->compression_manager;
 	const struct SqshInode *inode = iterator->inode;
 	struct SqshExtractView *extract_view = &iterator->extract_view;

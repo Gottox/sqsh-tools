@@ -28,75 +28,78 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         buffering_compression.c
+ * @file         zstd.c
  */
 
-#include "../../include/sqsh_compression_private.h"
+#include "../../include/sqsh_extract_private.h"
+
+#include "../../include/sqsh_error.h"
+
+#ifdef CONFIG_ZSTD
+
+#	include <zstd.h>
+
+struct SqshZstdContext {
+	ZSTD_DCtx *stream;
+	ZSTD_outBuffer output;
+};
 
 SQSH_STATIC_ASSERT(
-		sizeof(sqsh__compression_context_t) >=
-		sizeof(struct SqshBufferingCompression));
+		sizeof(sqsh__extractor_context_t) >= sizeof(struct SqshZstdContext));
 
-int
-sqsh__buffering_compression_init(
-		void *context, uint8_t *target, size_t target_size) {
+static int
+sqsh_zstd_init(void *context, uint8_t *target, size_t target_size) {
 	(void)target;
 	(void)target_size;
-	int rv = 0;
-	struct SqshBufferingCompression *buffering = context;
-
-	rv = sqsh__buffer_init(&buffering->buffer);
-	if (rv < 0) {
-		goto out;
+	struct SqshZstdContext *ctx = context;
+	ctx->stream = ZSTD_createDCtx();
+	if (ctx->stream == NULL) {
+		return -SQSH_ERROR_COMPRESSION_INIT;
 	}
-	buffering->compressed = NULL;
-	buffering->compressed_size = 0;
+	ctx->output.dst = target;
+	ctx->output.size = target_size;
+	ctx->output.pos = 0;
 
-out:
-	return rv;
+	return 0;
 }
-int
-sqsh__buffering_compression_decompress(
+
+static int
+sqsh_zstd_decompress(
 		void *context, const uint8_t *compressed,
 		const size_t compressed_size) {
-	int rv = 0;
-	struct SqshBufferingCompression *buffering = context;
-	if (buffering->compressed == NULL &&
-		sqsh__buffer_size(&buffering->buffer) == 0) {
-		buffering->compressed = compressed;
-		buffering->compressed_size = compressed_size;
-		return 0;
-	} else if (sqsh__buffer_size(&buffering->buffer) == 0) {
-		rv = sqsh__buffer_append(
-				&buffering->buffer, buffering->compressed,
-				buffering->compressed_size);
-		if (rv < 0) {
-			return rv;
+	struct SqshZstdContext *ctx = context;
+	ZSTD_inBuffer input = {
+			.src = compressed,
+			.size = compressed_size,
+			.pos = 0,
+	};
+
+	while (input.pos < input.size) {
+		size_t rv = ZSTD_decompressStream(ctx->stream, &ctx->output, &input);
+		if (ZSTD_isError(rv)) {
+			return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 		}
 	}
-
-	rv = sqsh__buffer_append(&buffering->buffer, compressed, compressed_size);
-	if (rv < 0) {
-		return rv;
-	}
-	buffering->compressed = sqsh__buffer_data(&buffering->buffer);
-	buffering->compressed_size = sqsh__buffer_size(&buffering->buffer);
-
-	return rv;
+	return 0;
 }
 
-const uint8_t *
-sqsh__buffering_compression_data(void *context) {
-	return ((struct SqshBufferingCompression *)context)->compressed;
+static int
+sqsh_zstd_finish(void *context, uint8_t *target, size_t *target_size) {
+	(void)target;
+	(void)target_size;
+	struct SqshZstdContext *ctx = context;
+	ZSTD_freeDCtx(ctx->stream);
+	*target_size = ctx->output.pos;
+	return 0;
 }
 
-size_t
-sqsh__buffering_compression_size(void *context) {
-	return ((struct SqshBufferingCompression *)context)->compressed_size;
-}
+static const struct SqshExtractorImpl impl_zstd = {
+		.init = sqsh_zstd_init,
+		.extract = sqsh_zstd_decompress,
+		.finish = sqsh_zstd_finish,
+};
 
-int
-sqsh__buffering_compression_cleanup(void *context) {
-	struct SqshBufferingCompression *buffering = context;
-	return sqsh__buffer_cleanup(&buffering->buffer);
-}
+const struct SqshExtractorImpl *const sqsh__impl_zstd = &impl_zstd;
+#else
+const struct SqshExtractorImpl *const sqsh__impl_zstd = NULL;
+#endif

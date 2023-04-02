@@ -28,79 +28,88 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         zlib.c
+ * @file         extractor.c
  */
 
-#include "../../include/sqsh_compression_private.h"
+#include "../../include/sqsh_extract_private.h"
 
+#include "../../include/sqsh_archive.h"
 #include "../../include/sqsh_error.h"
+#include "../../include/sqsh_primitive_private.h"
 
-#ifdef CONFIG_ZLIB
-
-#	include <zlib.h>
-
-SQSH_STATIC_ASSERT(sizeof(sqsh__compression_context_t) >= sizeof(z_stream));
-
-static int
-sqsh_zlib_init(void *context, uint8_t *target, size_t target_size) {
-	z_stream *stream = context;
-	stream->zalloc = Z_NULL;
-	stream->zfree = Z_NULL;
-	stream->opaque = Z_NULL;
-	stream->next_out = target;
-	stream->avail_out = target_size;
-
-	if (inflateInit(stream) != Z_OK) {
-		return -SQSH_ERROR_COMPRESSION_INIT;
+const struct SqshExtractorImpl *
+extractor_by_id(int id) {
+	switch ((enum SqshSuperblockCompressionId)id) {
+	case SQSH_COMPRESSION_GZIP:
+		return sqsh__impl_zlib;
+	case SQSH_COMPRESSION_LZMA:
+		return sqsh__impl_lzma;
+	case SQSH_COMPRESSION_XZ:
+		return sqsh__impl_xz;
+	case SQSH_COMPRESSION_LZO:
+		return sqsh__impl_lzo;
+	case SQSH_COMPRESSION_LZ4:
+		return sqsh__impl_lz4;
+	case SQSH_COMPRESSION_ZSTD:
+		return sqsh__impl_zstd;
+	default:
+		return NULL;
 	}
+}
 
+int
+sqsh__extractor_init(
+		struct SqshExtractor *extractor, int algorithm_id,
+		size_t block_size) {
+	const struct SqshExtractorImpl *impl = extractor_by_id(algorithm_id);
+	if (impl == NULL) {
+		return -SQSH_ERROR_COMPRESSION_UNSUPPORTED;
+	}
+	extractor->impl = impl;
+	extractor->block_size = block_size;
 	return 0;
 }
 
-static int
-sqsh_zlib_decompress(
-		void *context, const uint8_t *compressed,
-		const size_t compressed_size) {
-	int rv;
-	z_stream *stream = context;
-	stream->next_in = (Bytef *)compressed;
-	stream->avail_in = compressed_size;
-	rv = inflate(stream, Z_NO_FLUSH);
+int
+sqsh__extractor_to_buffer(
+		const struct SqshExtractor *extractor, struct SqshBuffer *buffer,
+		const uint8_t *compressed, const size_t compressed_size) {
+	int rv = 0;
+	size_t max_size = extractor->block_size;
+	size_t size = 0;
+	uint8_t *decompressed = NULL;
+	const struct SqshExtractorImpl *impl = extractor->impl;
+	sqsh__extractor_context_t extractor_context = {0};
 
-	if (rv != Z_STREAM_END && rv != Z_OK) {
-		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
-	}
-	return 0;
-}
-
-static int
-sqsh_zlib_finish(void *context, uint8_t *target, size_t *target_size) {
-	(void)target;
-
-	int rv;
-	z_stream *stream = context;
-	stream->next_in = Z_NULL;
-	stream->avail_in = 0;
-
-	rv = inflate(stream, Z_FINISH);
-
-	if (rv != Z_STREAM_END) {
-		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+	rv = sqsh__buffer_add_capacity(buffer, &decompressed, max_size);
+	if (rv < 0) {
+		return rv;
 	}
 
-	*target_size = stream->total_out;
+	rv = impl->init(&extractor_context, decompressed, max_size);
+	if (rv < 0) {
+		return rv;
+	}
+	size = max_size;
+	// TODO: check return value of decompress
+	impl->extract(&extractor_context, compressed, compressed_size);
+	rv = impl->finish(&extractor_context, decompressed, &size);
+	if (rv < 0) {
+		return rv;
+	}
 
-	inflateEnd(stream);
-	return 0;
+	rv = sqsh__buffer_add_size(buffer, size);
+	return rv;
 }
 
-static const struct SqshCompressionImpl impl_zlib = {
-		.init = sqsh_zlib_init,
-		.decompress = sqsh_zlib_decompress,
-		.finish = sqsh_zlib_finish,
-};
+size_t
+sqsh__extractor_block_size(const struct SqshExtractor *extractor) {
+	return extractor->block_size;
+}
 
-const struct SqshCompressionImpl *const sqsh__impl_zlib = &impl_zlib;
-#else
-const struct SqshCompressionImpl *const sqsh__impl_zlib = NULL;
-#endif
+int
+sqsh__extractor_cleanup(struct SqshExtractor *extractor) {
+	extractor->impl = NULL;
+	extractor->block_size = 0;
+	return 0;
+}

@@ -34,7 +34,7 @@
 #ifndef SQSH_METABLOCK_PRIVATE_H
 #define SQSH_METABLOCK_PRIVATE_H
 
-#include "sqsh_compression_private.h"
+#include "sqsh_extract_private.h"
 #include "sqsh_mapper_private.h"
 
 #ifdef __cplusplus
@@ -51,8 +51,8 @@ struct SqshMetablockIterator {
 	 * @privatesection
 	 */
 	struct SqshMapReader reader;
-	struct SqshCompressionManager *compression_manager;
-	const struct SqshCompression *old_compression;
+	struct SqshExtractManager *compression_manager;
+	const struct SqshExtractor *old_compression;
 	struct SqshBuffer old_buffer;
 	struct SqshExtractView extract_view;
 	uint16_t outer_size;
@@ -74,7 +74,7 @@ struct SqshMetablockIterator {
  */
 SQSH_NO_UNUSED int sqsh__metablock_iterator_init(
 		struct SqshMetablockIterator *iterator, struct SqshArchive *sqsh,
-		struct SqshCompressionManager *compression_manager,
+		struct SqshExtractManager *compression_manager,
 		uint64_t start_address, uint64_t upper_limit);
 
 /**
@@ -144,8 +144,8 @@ struct SqshMetablockReader {
 	struct SqshBuffer buffer;
 	// TODO: remove the compression field and use the compression_manager
 	// instead
-	const struct SqshCompression *compression;
-	struct SqshCompressionManager *compression_manager;
+	const struct SqshExtractor *compression;
+	struct SqshExtractManager *compression_manager;
 	sqsh_index_t offset;
 	size_t size;
 };
@@ -165,7 +165,7 @@ struct SqshMetablockReader {
  */
 SQSH_NO_UNUSED int sqsh__metablock_reader_init(
 		struct SqshMetablockReader *cursor, struct SqshArchive *sqsh,
-		struct SqshCompressionManager *compression_manager,
+		struct SqshExtractManager *compression_manager,
 		const uint64_t start_address, const uint64_t upper_limit);
 
 /**

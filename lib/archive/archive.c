@@ -108,14 +108,14 @@ sqsh__archive_init(
 			sqsh_superblock_compression_id(&archive->superblock);
 	uint32_t data_block_size = sqsh_superblock_block_size(&archive->superblock);
 
-	rv = sqsh__compression_init(
+	rv = sqsh__extractor_init(
 			&archive->metablock_compression, compression_id,
 			SQSH_METABLOCK_BLOCK_SIZE);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = sqsh__compression_init(
+	rv = sqsh__extractor_init(
 			&archive->data_compression, compression_id, data_block_size);
 	if (rv < 0) {
 		goto out;
@@ -139,9 +139,9 @@ sqsh_archive_superblock(const struct SqshArchive *archive) {
 }
 
 int
-sqsh__archive_file_compression_manager(
+sqsh__archive_file_extract_manager(
 		struct SqshArchive *archive,
-		struct SqshCompressionManager **file_compression_manager) {
+		struct SqshExtractManager **file_extract_manager) {
 	int rv = 0;
 
 	pthread_mutex_lock(&archive->lock);
@@ -152,15 +152,15 @@ sqsh__archive_file_compression_manager(
 		const size_t capacity = SQSH_DIVIDE_CEIL(
 				bytes_used, sqsh_superblock_block_size(superblock));
 
-		rv = sqsh__compression_manager_init(
-				&archive->file_compression_manager, archive,
+		rv = sqsh__extract_manager_init(
+				&archive->file_extract_manager, archive,
 				&archive->data_compression, capacity);
 		if (rv < 0) {
 			goto out;
 		}
 		archive->initialized |= INITIALIZED_FILE_COMPRESSION_MANAGER;
 	}
-	*file_compression_manager = &archive->file_compression_manager;
+	*file_extract_manager = &archive->file_extract_manager;
 out:
 	pthread_mutex_unlock(&archive->lock);
 	return rv;
@@ -260,13 +260,13 @@ out:
 	return rv;
 }
 
-const struct SqshCompression *
-sqsh_archive_compression_data(const struct SqshArchive *archive) {
+const struct SqshExtractor *
+sqsh_archive_data_extractor(const struct SqshArchive *archive) {
 	return &archive->data_compression;
 }
 
-const struct SqshCompression *
-sqsh_archive_compression_metablock(const struct SqshArchive *archive) {
+const struct SqshExtractor *
+sqsh_archive_metablock_extractor(const struct SqshArchive *archive) {
 	return &archive->metablock_compression;
 }
 
@@ -292,10 +292,10 @@ sqsh__archive_cleanup(struct SqshArchive *archive) {
 		sqsh__fragment_table_cleanup(&archive->fragment_table);
 	}
 	if (is_initialized(archive, INITIALIZED_FILE_COMPRESSION_MANAGER)) {
-		sqsh__compression_manager_cleanup(&archive->file_compression_manager);
+		sqsh__extract_manager_cleanup(&archive->file_extract_manager);
 	}
-	sqsh__compression_cleanup(&archive->data_compression);
-	sqsh__compression_cleanup(&archive->metablock_compression);
+	sqsh__extractor_cleanup(&archive->data_compression);
+	sqsh__extractor_cleanup(&archive->metablock_compression);
 	sqsh__superblock_cleanup(&archive->superblock);
 	sqsh__map_manager_cleanup(&archive->map_manager);
 

@@ -22,3 +22,5 @@ option('tools', type : 'boolean', value : true,
 	description: 'Build libsqsh tools.')
 option('fuzzer', type : 'boolean', value : false,
 	description: 'Build fuzzers.')
+option('threads', type : 'feature', value : 'auto',
+	description: 'Build with thread support.')

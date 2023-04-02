@@ -28,68 +28,70 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         lz4.c
+ * @file         extract_view.c
  */
 
-#include "../../include/sqsh_compression_private.h"
+#include "../../include/sqsh_extract_private.h"
 
 #include "../../include/sqsh_error.h"
+#include "../utils.h"
 
-#ifdef CONFIG_LZ4
+int
+sqsh__extract_view_init(
+		struct SqshExtractView *view, struct SqshExtractManager *manager,
+		const struct SqshMapReader *reader) {
+	int rv = 0;
+	view->manager = manager;
+	view->offset = 0;
+	view->buffer = NULL;
 
-#	include <lz4.h>
+	rv = sqsh__extract_manager_uncompress(manager, reader, &view->buffer);
+	if (rv < 0) {
+		goto out;
+	}
 
-struct SqshLz4Context {
-	LZ4_streamDecode_t *stream;
-	uint8_t *target;
-	size_t target_size;
-	sqsh_index_t offset;
-};
+	view->size = sqsh__buffer_size(view->buffer);
 
-SQSH_STATIC_ASSERT(
-		sizeof(sqsh__compression_context_t) >= sizeof(LZ4_streamDecode_t));
+out:
+	if (rv < 0) {
+		sqsh__extract_view_cleanup(view);
+	}
+	return rv;
+}
 
-static int
-sqsh_lz4_init(void *context, uint8_t *target, size_t target_size) {
-	struct SqshLz4Context *ctx = context;
-	ctx->stream = LZ4_createStreamDecode();
-	ctx->target = target;
-	ctx->target_size = target_size;
-	ctx->offset = 0;
-
+int
+sqsh__extract_view_narrow(
+		struct SqshExtractView *view, sqsh_index_t offset, size_t size) {
+	sqsh_index_t end_offset;
+	if (SQSH_ADD_OVERFLOW(offset, size, &end_offset)) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+	if (end_offset > sqsh__buffer_size(view->buffer)) {
+		return -SQSH_ERROR_TODO;
+	}
+	view->offset = offset;
+	view->size = size;
 	return 0;
 }
 
-static int
-sqsh_lz4_decompress(
-		void *context, const uint8_t *compressed,
-		const size_t compressed_size) {
-	struct SqshLz4Context *ctx = context;
-
-	int size = LZ4_decompress_safe_continue(
-			ctx->stream, (const char *)compressed, (char *)ctx->target,
-			compressed_size, ctx->target_size - ctx->offset);
-	ctx->offset += size;
-	return 0;
+const uint8_t *
+sqsh__extract_view_data(const struct SqshExtractView *view) {
+	const uint8_t *data = sqsh__buffer_data(view->buffer);
+	return &data[view->offset];
 }
 
-static int
-sqsh_lz4_finish(void *context, uint8_t *target, size_t *target_size) {
-	(void)target;
-	(void)target_size;
-	struct SqshLz4Context *ctx = context;
-	LZ4_freeStreamDecode(ctx->stream);
-	*target_size = ctx->offset;
-	return 0;
+size_t sqsh__extract_view_size(const struct SqshExtractView *view) {
+	return view->size;
 }
 
-static const struct SqshCompressionImpl impl_lz4 = {
-		.init = sqsh_lz4_init,
-		.decompress = sqsh_lz4_decompress,
-		.finish = sqsh_lz4_finish,
-};
+int sqsh__extract_view_cleanup(struct SqshExtractView *view) {
+	int rv = 0;
 
-const struct SqshCompressionImpl *const sqsh__impl_lz4 = &impl_lz4;
-#else
-const struct SqshCompressionImpl *const sqsh__impl_lz4 = NULL;
-#endif
+	if (view->manager != NULL) {
+		rv = sqsh__extract_manager_release(view->manager, view->buffer);
+	}
+	view->buffer = NULL;
+	view->size = 0;
+	view->offset = 0;
+	return rv;
+}

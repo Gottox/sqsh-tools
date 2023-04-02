@@ -33,7 +33,7 @@
 
 #define _GNU_SOURCE
 
-#include "../../include/sqsh_compression_private.h"
+#include "../../include/sqsh_extract_private.h"
 
 #include "../../include/sqsh_error.h"
 
@@ -168,8 +168,8 @@ sqsh_lzo_finish(void *context, uint8_t *target, size_t *target_size) {
 		spawn_helper_subprocess(hlp);
 	}
 
-	const uint8_t *compressed = sqsh__buffering_compression_data(context);
-	const uint64_t compressed_size = sqsh__buffering_compression_size(context);
+	const uint8_t *compressed = sqsh__extract_buffer_data(context);
+	const uint64_t compressed_size = sqsh__extract_buffer_size(context);
 
 	uint64_t target_size_64 = *target_size;
 	rv = fwrite(&target_size_64, sizeof(uint64_t), 1, hlp->compressed_fd);
@@ -213,17 +213,17 @@ sqsh_lzo_finish(void *context, uint8_t *target, size_t *target_size) {
 	pthread_mutex_unlock(&hlp->mutex);
 
 out:
-	sqsh__buffering_compression_cleanup(context);
+	sqsh__extract_buffer_cleanup(context);
 	return rv;
 }
 
-static const struct SqshCompressionImpl impl_lzo = {
-		.init = sqsh__buffering_compression_init,
-		.decompress = sqsh__buffering_compression_decompress,
+static const struct SqshExtractorImpl impl_lzo = {
+		.init = sqsh__extract_buffer_init,
+		.extract = sqsh__extract_buffer_decompress,
 		.finish = sqsh_lzo_finish,
 };
 
-const struct SqshCompressionImpl *const sqsh__impl_lzo = &impl_lzo;
+const struct SqshExtractorImpl *const sqsh__impl_lzo = &impl_lzo;
 #else
-const struct SqshCompressionImpl *const sqsh__impl_lzo = NULL;
+const struct SqshExtractorImpl *const sqsh__impl_lzo = NULL;
 #endif

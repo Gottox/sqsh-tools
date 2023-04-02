@@ -28,10 +28,10 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         compression_manager.c
+ * @file         extract_manager.c
  */
 
-#include "../../include/sqsh_compression_private.h"
+#include "../../include/sqsh_extract_private.h"
 
 #include "../../include/sqsh_archive.h"
 #include "../../include/sqsh_error.h"
@@ -78,9 +78,9 @@ buffer_cleanup(void *buffer) {
 }
 
 SQSH_NO_UNUSED int
-sqsh__compression_manager_init(
-		struct SqshCompressionManager *manager, struct SqshArchive *archive,
-		const struct SqshCompression *compression, size_t size) {
+sqsh__extract_manager_init(
+		struct SqshExtractManager *manager, struct SqshArchive *archive,
+		const struct SqshExtractor *extractor, size_t size) {
 	int rv;
 	const struct SqshConfig *config = sqsh_archive_config(archive);
 	const size_t lru_size =
@@ -107,27 +107,27 @@ sqsh__compression_manager_init(
 		goto out;
 	}
 	manager->map_manager = sqsh_archive_map_manager(archive);
-	manager->compression = compression;
+	manager->extractor = extractor;
 
 out:
 	if (rv < 0) {
-		sqsh__compression_manager_cleanup(manager);
+		sqsh__extract_manager_cleanup(manager);
 	}
 	return rv;
 }
 
 size_t
-sqsh__compression_manager_size(struct SqshCompressionManager *manager) {
+sqsh__extract_manager_size(struct SqshExtractManager *manager) {
 	return sqsh__rc_hash_map_size(&manager->hash_map);
 }
 
 SQSH_NO_UNUSED int
 uncompress_block(
-		struct SqshBuffer *buffer, struct SqshCompressionManager *manager,
+		struct SqshBuffer *buffer, struct SqshExtractManager *manager,
 		uint64_t offset, size_t size) {
 	int rv = 0;
 	struct SqshMapReader reader = {0};
-	const struct SqshCompression *compression = manager->compression;
+	const struct SqshExtractor *extractor = manager->extractor;
 
 	rv = sqsh__map_reader_init(&reader, manager->map_manager, offset, ~0);
 	if (rv < 0) {
@@ -141,8 +141,8 @@ uncompress_block(
 
 	const uint8_t *data = sqsh__map_reader_data(&reader);
 
-	rv = sqsh__compression_decompress_to_buffer(
-			compression, buffer, data, size);
+	rv = sqsh__extractor_to_buffer(
+			extractor, buffer, data, size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -153,11 +153,11 @@ out:
 }
 
 int
-sqsh__compression_manager_uncompress(
-		struct SqshCompressionManager *manager,
+sqsh__extract_manager_uncompress(
+		struct SqshExtractManager *manager,
 		const struct SqshMapReader *reader, const struct SqshBuffer **target) {
 	int rv = 0;
-	const struct SqshCompression *compression = manager->compression;
+	const struct SqshExtractor *extractor = manager->extractor;
 
 	rv = pthread_mutex_lock(&manager->lock);
 	if (rv != 0) {
@@ -179,8 +179,8 @@ sqsh__compression_manager_uncompress(
 		}
 		const uint8_t *data = sqsh__map_reader_data(reader);
 
-		rv = sqsh__compression_decompress_to_buffer(
-				compression, &buffer, data, size);
+		rv = sqsh__extractor_to_buffer(
+				extractor, &buffer, data, size);
 		if (rv < 0) {
 			goto out;
 		}
@@ -195,8 +195,8 @@ out:
 }
 
 int
-sqsh__compression_manager_release(
-		struct SqshCompressionManager *manager,
+sqsh__extract_manager_release(
+		struct SqshExtractManager *manager,
 		const struct SqshBuffer *buffer) {
 	int rv = pthread_mutex_lock(&manager->lock);
 	if (rv != 0) {
@@ -213,7 +213,7 @@ out:
 }
 
 int
-sqsh__compression_manager_cleanup(struct SqshCompressionManager *manager) {
+sqsh__extract_manager_cleanup(struct SqshExtractManager *manager) {
 	sqsh__lru_cleanup(&manager->lru);
 	sqsh__rc_hash_map_cleanup(&manager->hash_map);
 	pthread_mutex_destroy(&manager->lock);

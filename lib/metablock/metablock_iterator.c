@@ -41,19 +41,19 @@
 #include <string.h>
 
 #include "../../include/sqsh_archive_private.h"
-#include "../../include/sqsh_compression_private.h"
+#include "../../include/sqsh_extract_private.h"
 
 int
 sqsh__metablock_iterator_init(
 		struct SqshMetablockIterator *iterator, struct SqshArchive *sqsh,
-		struct SqshCompressionManager *compression_manager,
+		struct SqshExtractManager *compression_manager,
 		uint64_t start_address, uint64_t upper_limit) {
 	int rv = 0;
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(sqsh);
 
 	iterator->outer_size = 0;
 	iterator->compression_manager = compression_manager;
-	iterator->old_compression = sqsh_archive_compression_metablock(sqsh);
+	iterator->old_compression = sqsh_archive_metablock_extractor(sqsh);
 	memset(&iterator->extract_view, 0, sizeof(iterator->extract_view));
 	rv = sqsh__buffer_init(&iterator->old_buffer);
 	if (rv < 0) {
@@ -99,7 +99,7 @@ sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator) {
 
 	if (is_compressed && iterator->compression_manager == NULL) {
 		sqsh__buffer_drain(&iterator->old_buffer);
-		rv = sqsh__compression_decompress_to_buffer(
+		rv = sqsh__extractor_to_buffer(
 				iterator->old_compression, &iterator->old_buffer,
 				sqsh__map_reader_data(&iterator->reader), iterator->outer_size);
 		if (rv < 0) {

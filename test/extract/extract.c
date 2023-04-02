@@ -35,23 +35,23 @@
 #include "../common.h"
 #include "../test.h"
 
-#include "../../include/sqsh_compression_private.h"
+#include "../../include/sqsh_extract_private.h"
 #include <stdint.h>
 
 static void
 decompress_test(
-		const struct SqshCompressionImpl *impl, uint8_t *input,
+		const struct SqshExtractorImpl *impl, uint8_t *input,
 		size_t input_size) {
 	int rv;
 	uint8_t output[16];
 	size_t output_size = sizeof(output);
-	sqsh__compression_context_t context = {0};
+	sqsh__extractor_context_t context = {0};
 
 	assert(impl != NULL);
 
 	rv = impl->init(context, output, output_size);
 	assert(rv >= 0);
-	rv = impl->decompress(context, input, input_size);
+	rv = impl->extract(context, input, input_size);
 	assert(rv >= 0);
 	rv = impl->finish(context, output, &output_size);
 	assert(rv >= 0);
@@ -62,12 +62,12 @@ decompress_test(
 
 static void
 decompress_test_split(
-		const struct SqshCompressionImpl *impl, uint8_t *input,
+		const struct SqshExtractorImpl *impl, uint8_t *input,
 		size_t input_size) {
 	int rv;
 	uint8_t output[16];
 	size_t output_size = sizeof(output);
-	sqsh__compression_context_t context = {0};
+	sqsh__extractor_context_t context = {0};
 
 	assert(impl != NULL);
 
@@ -76,9 +76,9 @@ decompress_test_split(
 
 		rv = impl->init(context, output, output_size);
 		assert(rv >= 0);
-		rv = impl->decompress(context, input, offset);
+		rv = impl->extract(context, input, offset);
 		assert(rv >= 0);
-		rv = impl->decompress(context, &input[offset], input_size - offset);
+		rv = impl->extract(context, &input[offset], input_size - offset);
 		assert(rv >= 0);
 		rv = impl->finish(context, output, &output_size);
 		assert(rv >= 0);

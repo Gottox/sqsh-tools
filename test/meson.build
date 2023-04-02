@@ -11,8 +11,8 @@ sqsh_test = [
 	'primitive/lru.c',
 	'primitive/rc_map.c',
 	'primitive/rc_hash_map.c',
-	'compression/compression.c',
-	'compression/compression_manager.c',
+	'extract/extract.c',
+	'extract/extract_manager.c',
 ]
 sqsh_extended_test = [
 	'selftest.sh',
