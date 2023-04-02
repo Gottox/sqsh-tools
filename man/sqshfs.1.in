@@ -1,16 +1,16 @@
-.TH sqsh-mount 1 "March 17, 2023" "Version @VERSION@" "User Commands"
+.TH sqshfs 1 "March 17, 2023" "Version @VERSION@" "User Commands"
 
 .SH NAME
-sqsh-mount \- mount a squashfs archive as a filesystem using FUSE.
+sqshfs \- mount a squashfs archive as a filesystem using FUSE.
 
 .SH SYNOPSIS
-.B sqsh-mount
+.B sqshfs
 [\fB-dfsVh\fR]
 [\fB-o\fR \fIOPTIONS\fR]
 \fIFILESYSTEM\fR \fIMOUNTPOINT\fR
 
 .SH DESCRIPTION
-.B sqsh-mount
+.B sqshfs
 is a tool to mount a squashfs archive as a filesystem using FUSE 
 (Filesystem in Userspace). 
 
@@ -29,7 +29,7 @@ Disable multi-threaded operation.
 
 .TP
 .BR \-V
-Print the version of \fBsqsh-mount\fR.
+Print the version of \fBsqshfs\fR.
 
 .TP
 .BR -o " opt,[opt...]"
@@ -45,22 +45,22 @@ The path to the squashfs archive to mount.
 The path to the directory where the squashfs archive will be mounted.
 
 .SH EXIT STATUS
-The \fBsqsh-mount\fR command exits with 0 on success, and non-zero on 
+The \fBsqshfs\fR command exits with 0 on success, and non-zero on 
 failure.
 
 .SH EXAMPLES
 To mount a squashfs archive at /path/to/filesystem.sqsh to /mnt:
 
-.BR sqsh-mount " " /path/to/filesystem.sqsh " " /mnt
+.BR sqshfs " " /path/to/filesystem.sqsh " " /mnt
 
 To mount a squashfs archive at /path/to/filesystem.sqsh to /mnt with 
 FUSE mount options:
 
-.BR sqsh-mount " " /path/to/filesystem.sqsh " " /mnt " " -o " " allow_other
+.BR sqshfs " " /path/to/filesystem.sqsh " " /mnt " " -o " " allow_other
 
-To print the version of \fBsqsh-mount\fR:
+To print the version of \fBsqshfs\fR:
 
-.BR sqsh-mount " " -V
+.BR sqshfs " " -V
 
 .SH SEE ALSO
 .BR sqsh-cat (1),

@@ -25,7 +25,7 @@ MESON_FLAGS += -Db_lundef=false
 MESON_FLAGS += -Dtest=extended
 #MESON_FLAGS += -Dtest=true
 MESON_FLAGS += -Ddoc=internal
-MESON_FLAGS += -Dlzo=true
+MESON_FLAGS += -Dlzo=enabled
 #MESON_FLAGS += -Db_coverage=true
 
 SANATIZE = 0

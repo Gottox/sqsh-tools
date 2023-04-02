@@ -15,6 +15,15 @@ project(
 	],
 )
 
+threads = dependency('threads')
+curl = dependency('libcurl', required: get_option('curl'))
+fuse = dependency('fuse3', required: get_option('fuse'))
+lz4 = dependency('liblz4', required: get_option('lz4'))
+lzma = dependency('liblzma', required: get_option('lzma'))
+lzo = dependency('lzo2', required: get_option('lzo'))
+zlib = dependency('zlib', required: get_option('zlib'))
+zstd = dependency('libzstd', required: get_option('zstd'))
+
 subdir('include')
 
 subdir('helper')

@@ -18,10 +18,10 @@ foreach template : tools_manpages
 	install_man(manpage)
 endforeach
 
-if get_option('fuse')
+if fuse.found()
 	manpage = configure_file(
-		input: 'sqsh-mount.1.in',
-		output: 'sqsh-mount.1',
+		input: 'sqshfs.1.in',
+		output: 'sqshfs.1',
 		configuration: conf_data
 	)
 	install_man(manpage)

@@ -58,27 +58,27 @@ libsqsh_dependencies = [
 ]
 
 c_args = [ ]
-if get_option('curl')
-	libsqsh_dependencies += dependency('libcurl')
+if curl.found()
+	libsqsh_dependencies += curl
 	c_args += '-DCONFIG_CURL'
 endif
 
-if get_option('zlib')
-	libsqsh_dependencies += dependency('zlib')
+if zlib.found()
+	libsqsh_dependencies += zlib
 	c_args += '-DCONFIG_ZLIB'
 endif
 
-if get_option('lz4')
-	libsqsh_dependencies += dependency('liblz4')
+if lz4.found()
+	libsqsh_dependencies += lz4
 	c_args += '-DCONFIG_LZ4'
 endif
 
-if get_option('lzma')
-	libsqsh_dependencies += dependency('liblzma')
+if lzma.found()
+	libsqsh_dependencies += lzma
 	c_args += '-DCONFIG_LZMA'
 endif
 
-if get_option('lzo')
+if lzo.found()
 	c_args += '-DCONFIG_LZO'
 	c_args += '-DCONFIG_LZO_HELPER_PATH="@0@/@1@/sqsh-lzo-helper"'.format(
 		get_option('prefix'),
@@ -86,8 +86,8 @@ if get_option('lzo')
 	)
 endif
 
-if get_option('zstd')
-	libsqsh_dependencies += dependency('libzstd')
+if zstd.found()
+	libsqsh_dependencies += zstd
 	c_args += '-DCONFIG_ZSTD'
 endif
 

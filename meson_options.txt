@@ -1,16 +1,16 @@
-option('curl',  type : 'boolean',
+option('curl',  type : 'feature',
 	description: 'Support opening remote files with cURL.')
-option('zlib',  type : 'boolean',
+option('zlib',  type : 'feature',
 	description: 'Support zlib compression.')
-option('lz4',   type : 'boolean',
+option('lz4',   type : 'feature',
 	description: 'Support LZ4 compression.')
-option('lzma',  type : 'boolean',
+option('lzma',  type : 'feature',
 	description: 'Support LZMA compression.')
-option('lzo',  type : 'boolean', value : false,
+option('lzo',  type : 'feature', value : 'disabled',
 	description: 'Support LZO compression.')
-option('zstd',  type : 'boolean',
+option('zstd',  type : 'feature',
 	description: 'Support ZSTD compression.')
-option('fuse',  type : 'boolean',
+option('fuse',  type : 'feature',
 	description: 'Support FUSE filesystem.')
 option('test',  type : 'combo', choices: ['true', 'false', 'extended'],
 	value : 'false',

@@ -1,9 +1,9 @@
-if get_option('lzo')
+if lzo.found()
 	lzo_helper = executable('sqsh-lzo-helper',
 		'compression/lzo-helper.c',
 		install: true,
 		install_dir: get_option('libexecdir'),
-		dependencies: dependency('lzo2'),
+		dependencies: lzo,
 	)
 	lzo_helper_path = lzo_helper.full_path()
 else

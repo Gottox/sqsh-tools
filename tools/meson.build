@@ -21,9 +21,7 @@ foreach src : tool_sources
 	tools += { tool_name: tool }
 endforeach
 
-if get_option('fuse')
-	fuse = dependency('fuse3')
-
+if fuse.found()
 	tool = executable(
 		'sqshfs',
 		'fs.c',
