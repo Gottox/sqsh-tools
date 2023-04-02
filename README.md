@@ -1,4 +1,5 @@
 # libsqsh
+[![CI](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml/badge.svg)](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml)
 
 squashfs is an open and free compressed read-only filesystem. It is used in
 embedded devices, live-CDs, or in packaging. It was original introduced into
