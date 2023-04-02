@@ -54,6 +54,7 @@ struct SqshFragmentTable {
 	struct SqshTable table;
 	struct SqshMapManager *map_manager;
 	struct SqshCompressionManager compression_manager;
+	uint64_t upper_limit;
 };
 
 /**

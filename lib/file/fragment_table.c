@@ -75,6 +75,7 @@ sqsh__fragment_table_init(
 	}
 
 	table->superblock = superblock;
+	table->upper_limit = sqsh_superblock_inode_table_start(superblock);
 
 out:
 	return rv;
@@ -107,23 +108,20 @@ out:
 static int
 read_fragment_compressed(
 		struct SqshFragmentTable *table, const struct SqshInode *inode,
-		struct SqshBuffer *buffer, uint64_t start_address, uint32_t size) {
+		struct SqshBuffer *buffer, const struct SqshMapReader *reader) {
 	int rv = 0;
 	const struct SqshBuffer *uncompressed = NULL;
-	rv = sqsh__compression_manager_get(
-			&table->compression_manager, start_address, size, &uncompressed);
+	rv = sqsh__compression_manager_uncompress(
+			&table->compression_manager, reader, &uncompressed);
 	if (rv < 0) {
 		goto out;
 	}
 	const uint8_t *data = sqsh__buffer_data(uncompressed);
-	const size_t data_size = sqsh__buffer_size(uncompressed);
-
-	rv = append_fragment(table, inode, buffer, data, data_size);
-
+	const size_t size = sqsh__buffer_size(uncompressed);
+	rv = append_fragment(table, inode, buffer, data, size);
 	if (rv < 0) {
 		goto out;
 	}
-
 out:
 	sqsh__compression_manager_release(
 			&table->compression_manager, uncompressed);
@@ -133,33 +131,16 @@ out:
 static int
 read_fragment_uncompressed(
 		struct SqshFragmentTable *table, const struct SqshInode *inode,
-		struct SqshBuffer *buffer, uint64_t start_address, uint32_t size) {
+		struct SqshBuffer *buffer, const struct SqshMapReader *reader) {
 	int rv = 0;
-	const uint8_t *data;
-	uint64_t upper_limit;
-	struct SqshMapReader reader = {0};
+	const uint8_t *data = sqsh__map_reader_data(reader);
+	const size_t size = sqsh__map_reader_size(reader);
 
-	if (SQSH_ADD_OVERFLOW(start_address, size, &upper_limit)) {
-		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
-		goto out;
-	}
-	rv = sqsh__map_reader_init(
-			&reader, table->map_manager, start_address, upper_limit);
-	if (rv < 0) {
-		goto out;
-	}
-	rv = sqsh__map_reader_all(&reader);
-	if (rv < 0) {
-		goto out;
-	}
-	data = sqsh__map_reader_data(&reader);
 	rv = append_fragment(table, inode, buffer, data, size);
 	if (rv < 0) {
 		goto out;
 	}
-
 out:
-	sqsh__map_reader_cleanup(&reader);
 	return rv;
 }
 
@@ -183,17 +164,29 @@ sqsh_fragment_table_to_buffer(
 	const uint32_t size = sqsh_data_datablock_size(size_info);
 	const bool is_compressed = sqsh_data_datablock_is_compressed(size_info);
 
+	struct SqshMapReader reader = {0};
+
+	rv = sqsh__map_reader_init(
+			&reader, table->map_manager, start_address, table->upper_limit);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh__map_reader_advance(&reader, 0, size);
+	if (rv < 0) {
+		goto out;
+	}
+
 	if (is_compressed) {
-		rv = read_fragment_compressed(
-				table, inode, buffer, start_address, size);
+		rv = read_fragment_compressed(table, inode, buffer, &reader);
 	} else {
-		rv = read_fragment_uncompressed(
-				table, inode, buffer, start_address, size);
+		rv = read_fragment_uncompressed(table, inode, buffer, &reader);
 	}
 	if (rv < 0) {
 		goto out;
 	}
+
 out:
+	sqsh__map_reader_cleanup(&reader);
 	return rv;
 }
 
