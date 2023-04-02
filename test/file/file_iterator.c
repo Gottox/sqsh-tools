@@ -88,6 +88,10 @@ load_segment_from_compressed_data_block(void) {
 	assert(size == 0);
 	data = sqsh_file_iterator_data(&iter);
 	assert(data == NULL);
+
+	sqsh__file_iterator_cleanup(&iter);
+	sqsh__inode_cleanup(&inode);
+	sqsh__archive_cleanup(&archive);
 }
 
 static void
@@ -151,6 +155,10 @@ load_two_segments_from_uncompressed_data_block(void) {
 	assert(size == 0);
 	data = sqsh_file_iterator_data(&iter);
 	assert(data == NULL);
+
+	sqsh__file_iterator_cleanup(&iter);
+	sqsh__inode_cleanup(&inode);
+	sqsh__archive_cleanup(&archive);
 }
 
 static void
@@ -202,6 +210,10 @@ load_segment_from_uncompressed_data_block(void) {
 	assert(size == 0);
 	data = sqsh_file_iterator_data(&iter);
 	assert(data == NULL);
+
+	sqsh__file_iterator_cleanup(&iter);
+	sqsh__inode_cleanup(&inode);
+	sqsh__archive_cleanup(&archive);
 }
 
 DEFINE

@@ -69,6 +69,9 @@ load_inode(void) {
 
 	assert(sqsh_inode_file_block_count(&inode) == 1);
 	assert(sqsh_inode_file_block_size(&inode, 0) == 42);
+
+	sqsh__inode_cleanup(&inode);
+	sqsh__archive_cleanup(&archive);
 }
 
 DEFINE

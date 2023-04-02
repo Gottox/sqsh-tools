@@ -78,6 +78,10 @@ load_file_from_compressed_data_block(void) {
 	assert(data[1] == 'b');
 	assert(data[2] == 'c');
 	assert(data[3] == 'd');
+
+	sqsh__file_reader_cleanup(&reader);
+	sqsh__inode_cleanup(&inode);
+	sqsh__archive_cleanup(&archive);
 }
 
 static void
@@ -115,6 +119,10 @@ load_file_from_compressed_data_block_with_offset(void) {
 	const uint8_t *data = sqsh_file_reader_data(&reader);
 	assert(data[0] == 'b');
 	assert(data[1] == 'c');
+
+	sqsh__file_reader_cleanup(&reader);
+	sqsh__inode_cleanup(&inode);
+	sqsh__archive_cleanup(&archive);
 }
 
 static void
@@ -154,6 +162,10 @@ load_file_from_uncompressed_data_block(void) {
 	assert(data[2] == 3);
 	assert(data[3] == 4);
 	assert(data[4] == 5);
+
+	sqsh__file_reader_cleanup(&reader);
+	sqsh__inode_cleanup(&inode);
+	sqsh__archive_cleanup(&archive);
 }
 
 DEFINE

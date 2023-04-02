@@ -113,6 +113,8 @@ sqsh_lzma_finish(void *context, uint8_t *target, size_t *target_size) {
 		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
 
+	lzma_end(stream);
+
 	*target_size = stream->total_out;
 	return 0;
 }
