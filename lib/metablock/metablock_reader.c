@@ -42,38 +42,11 @@
 static int
 append_to_buffer(
 		const struct SqshMetablockReader *reader, struct SqshBuffer *buffer) {
-	int rv = 0;
-
 	const struct SqshMetablockIterator *iterator = &reader->iterator;
-	bool is_compressed = sqsh__metablock_iterator_is_compressed(iterator);
 
-	if (!is_compressed) {
-		const uint8_t *data = sqsh__metablock_iterator_data(iterator);
-		size_t size = sqsh__metablock_iterator_size(iterator);
-		rv = sqsh__buffer_append(buffer, data, size);
-	} else if (reader->compression_manager == NULL) {
-		const uint8_t *data = sqsh__metablock_iterator_data(iterator);
-		size_t size = sqsh__metablock_iterator_size(iterator);
-
-		return sqsh__compression_decompress_to_buffer(
-				reader->compression, buffer, data, size);
-
-	} else {
-		const struct SqshBuffer *uncompressed = NULL;
-		struct SqshCompressionManager *manager = reader->compression_manager;
-		uint64_t address = sqsh__metablock_iterator_data_address(iterator);
-		size_t metablock_size = sqsh__metablock_iterator_size(iterator);
-		rv = sqsh__compression_manager_get(
-				manager, address, metablock_size, &uncompressed);
-		if (rv < 0) {
-			return rv;
-		}
-		const uint8_t *data = sqsh__buffer_data(uncompressed);
-		uint16_t size = sqsh__buffer_size(uncompressed);
-		rv = sqsh__buffer_append(buffer, data, size);
-		sqsh__compression_manager_release(manager, uncompressed);
-	}
-	return rv;
+	const uint8_t *data = sqsh__metablock_iterator_data(iterator);
+	size_t size = sqsh__metablock_iterator_size(iterator);
+	return sqsh__buffer_append(buffer, data, size);
 }
 
 int
@@ -83,7 +56,8 @@ sqsh__metablock_reader_init(
 		const uint64_t start_address, const uint64_t upper_limit) {
 	int rv;
 	rv = sqsh__metablock_iterator_init(
-			&cursor->iterator, sqsh, start_address, upper_limit);
+			&cursor->iterator, sqsh, compression_manager, start_address,
+			upper_limit);
 	if (rv < 0) {
 		goto out;
 	}

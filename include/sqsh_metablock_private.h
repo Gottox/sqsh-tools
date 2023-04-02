@@ -50,9 +50,15 @@ struct SqshMetablockIterator {
 	/**
 	 * @privatesection
 	 */
-	struct SqshMapReader cursor;
+	struct SqshMapReader reader;
+	struct SqshCompressionManager *compression_manager;
+	const struct SqshCompression *old_compression;
+	struct SqshBuffer old_buffer;
+	struct SqshExtractView extract_view;
 	bool is_compressed;
-	uint16_t size;
+	uint16_t outer_size;
+	uint16_t inner_size;
+	const uint8_t *data;
 };
 
 /**
@@ -62,12 +68,14 @@ struct SqshMetablockIterator {
  *
  * @param[out] iterator The iterator to initialize.
  * @param[in] sqsh The Squash instance the metablocks belong to.
+ * @param[in] compression_manager The compression manager to use.
  * @param[in] start_address The address of the first metablock to read.
  * @param[in] upper_limit The maximum address the iterator is allowed to read.
  * @return 0 on success, or a negative value on error.
  */
 SQSH_NO_UNUSED int sqsh__metablock_iterator_init(
 		struct SqshMetablockIterator *iterator, struct SqshArchive *sqsh,
+		struct SqshCompressionManager *compression_manager,
 		uint64_t start_address, uint64_t upper_limit);
 
 /**

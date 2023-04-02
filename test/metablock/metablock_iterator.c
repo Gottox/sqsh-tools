@@ -52,7 +52,7 @@ next_once(void) {
 	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_iterator_init(
-			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&iter, &sqsh, NULL, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
 	assert(rv == 0);
 
 	rv = sqsh__metablock_iterator_next(&iter);
@@ -84,7 +84,7 @@ next_twice(void) {
 	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_iterator_init(
-			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&iter, &sqsh, NULL, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
 	assert(rv == 0);
 
 	rv = sqsh__metablock_iterator_next(&iter);
