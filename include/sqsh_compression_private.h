@@ -168,6 +168,32 @@ int sqsh__compression_manager_release(
 int sqsh__compression_manager_cleanup(struct SqshCompressionManager *manager);
 
 ////////////////////////////////////////
+// compression/extract_view.c
+
+struct SqshExtractView {
+	/**
+	 * @privatesection
+	 */
+	struct SqshCompressionManager *manager;
+	const struct SqshBuffer *buffer;
+	size_t offset;
+	size_t size;
+};
+
+SQSH_NO_UNUSED int sqsh__extract_view_init(
+		struct SqshExtractView *view, struct SqshCompressionManager *manager,
+		const struct SqshMapReader *reader);
+
+SQSH_NO_UNUSED int sqsh__extract_view_narrow(
+		struct SqshExtractView *view, sqsh_index_t offset, size_t size);
+
+const uint8_t *sqsh__extract_view_data(const struct SqshExtractView *view);
+
+size_t sqsh__extract_view_size(const struct SqshExtractView *view);
+
+int sqsh__extract_view_cleanup(struct SqshExtractView *view);
+
+////////////////////////////////////////
 // compression/lz4.c
 
 extern const struct SqshCompressionImpl *const sqsh__impl_lz4;

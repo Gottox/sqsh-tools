@@ -110,21 +110,20 @@ read_fragment_compressed(
 		struct SqshFragmentTable *table, const struct SqshInode *inode,
 		struct SqshBuffer *buffer, const struct SqshMapReader *reader) {
 	int rv = 0;
-	const struct SqshBuffer *uncompressed = NULL;
-	rv = sqsh__compression_manager_uncompress(
-			&table->compression_manager, reader, &uncompressed);
+	struct SqshExtractView extract_view = {0};
+	rv = sqsh__extract_view_init(
+			&extract_view, &table->compression_manager, reader);
 	if (rv < 0) {
 		goto out;
 	}
-	const uint8_t *data = sqsh__buffer_data(uncompressed);
-	const size_t size = sqsh__buffer_size(uncompressed);
+	const uint8_t *data = sqsh__extract_view_data(&extract_view);
+	const size_t size = sqsh__extract_view_size(&extract_view);
 	rv = append_fragment(table, inode, buffer, data, size);
 	if (rv < 0) {
 		goto out;
 	}
 out:
-	sqsh__compression_manager_release(
-			&table->compression_manager, uncompressed);
+	sqsh__extract_view_cleanup(&extract_view);
 	return rv;
 }
 

@@ -6,6 +6,7 @@ libsqsh_sources = [
 	'chrome/file.c',
 	'chrome/inode.c',
 	'chrome/path_resolver.c',
+	'compression/extract_view.c',
 	'compression/buffering_compression.c',
 	'compression/compression.c',
 	'compression/compression_manager.c',

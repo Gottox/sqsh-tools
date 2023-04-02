@@ -91,7 +91,7 @@ map_block_compressed(
 	struct SqshCompressionManager *compression_manager =
 			iterator->compression_manager;
 	const struct SqshInode *inode = iterator->inode;
-	const struct SqshBuffer *compressed = NULL;
+	struct SqshExtractView *extract_view = &iterator->extract_view;
 	const sqsh_index_t block_index = iterator->block_index;
 	const sqsh_index_t block_size =
 			sqsh_inode_file_block_size(inode, block_index);
@@ -101,15 +101,12 @@ map_block_compressed(
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__compression_manager_uncompress(
-			compression_manager, &iterator->map_reader, &compressed);
+	rv = sqsh__extract_view_init(extract_view, compression_manager, &iterator->map_reader);
 	if (rv < 0) {
 		goto out;
 	}
-	iterator->data = sqsh__buffer_data(compressed);
-	iterator->data_size = sqsh__buffer_size(compressed);
-
-	iterator->current_compressed = compressed;
+	iterator->data = sqsh__extract_view_data(extract_view);
+	iterator->data_size = sqsh__extract_view_size(extract_view);
 
 	if (SQSH_ADD_OVERFLOW(block_index, 1, &iterator->block_index)) {
 		rv = SQSH_ERROR_INTEGER_OVERFLOW;
@@ -227,12 +224,8 @@ sqsh_file_iterator_next(
 	const struct SqshInode *inode = iterator->inode;
 	size_t block_count = sqsh_inode_file_block_count(inode);
 	const bool has_fragment = sqsh_inode_file_has_fragment(inode);
-	struct SqshCompressionManager *compression_manager =
-			iterator->compression_manager;
 
-	sqsh__compression_manager_release(
-			compression_manager, iterator->current_compressed);
-	iterator->current_compressed = NULL;
+	sqsh__extract_view_cleanup(&iterator->extract_view);
 	sqsh__buffer_cleanup(&iterator->fragment_buffer);
 
 	if (iterator->block_index < block_count) {
@@ -278,10 +271,7 @@ sqsh_file_iterator_size(struct SqshFileIterator *iterator) {
 int
 sqsh__file_iterator_cleanup(struct SqshFileIterator *iterator) {
 	sqsh__map_reader_cleanup(&iterator->map_reader);
-	sqsh__compression_manager_release(
-			iterator->compression_manager, iterator->current_compressed);
-
-	iterator->current_compressed = NULL;
+	sqsh__extract_view_cleanup(&iterator->extract_view);
 	sqsh__buffer_cleanup(&iterator->fragment_buffer);
 	return 0;
 }

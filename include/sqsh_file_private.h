@@ -92,7 +92,7 @@ struct SqshFileIterator {
 	struct SqshCompressionManager *compression_manager;
 
 	struct SqshMapReader map_reader;
-	const struct SqshBuffer *current_compressed;
+	struct SqshExtractView extract_view;
 	struct SqshBuffer fragment_buffer;
 
 	uint32_t block_index;
