@@ -67,8 +67,6 @@ sqsh__metablock_reader_init(
 	}
 	cursor->size = 0;
 	cursor->offset = 0;
-	cursor->compression = sqsh_archive_metablock_extractor(sqsh);
-	cursor->compression_manager = compression_manager;
 
 out:
 	if (rv < 0) {
