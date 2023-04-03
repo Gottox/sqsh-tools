@@ -48,6 +48,7 @@ enum InitializedBitmap {
 	INITIALIZED_XATTR_TABLE = 1 << 2,
 	INITIALIZED_FRAGMENT_TABLE = 1 << 3,
 	INITIALIZED_FILE_COMPRESSION_MANAGER = 1 << 4,
+	INITIALIZED_FRAGMENT_COMPRESSION_MANAGER = 1 << 5,
 };
 
 static bool
@@ -161,6 +162,33 @@ sqsh__archive_file_extract_manager(
 		archive->initialized |= INITIALIZED_FILE_COMPRESSION_MANAGER;
 	}
 	*file_extract_manager = &archive->file_extract_manager;
+out:
+	pthread_mutex_unlock(&archive->lock);
+	return rv;
+}
+
+int
+sqsh__archive_fragment_extract_manager(
+		struct SqshArchive *archive,
+		struct SqshExtractManager **fragment_extract_manager) {
+	int rv = 0;
+
+	pthread_mutex_lock(&archive->lock);
+	if (!is_initialized(archive, INITIALIZED_FRAGMENT_COMPRESSION_MANAGER)) {
+		const struct SqshSuperblock *superblock =
+				sqsh_archive_superblock(archive);
+		// Assume, that we have at least 2 files per fragment.
+		const size_t capacity = sqsh_superblock_fragment_entry_count(superblock) / 2;
+
+		rv = sqsh__extract_manager_init(
+				&archive->fragment_extract_manager, archive,
+				&archive->data_compression, capacity);
+		if (rv < 0) {
+			goto out;
+		}
+		archive->initialized |= INITIALIZED_FRAGMENT_COMPRESSION_MANAGER;
+	}
+	*fragment_extract_manager = &archive->fragment_extract_manager;
 out:
 	pthread_mutex_unlock(&archive->lock);
 	return rv;
@@ -293,6 +321,9 @@ sqsh__archive_cleanup(struct SqshArchive *archive) {
 	}
 	if (is_initialized(archive, INITIALIZED_FILE_COMPRESSION_MANAGER)) {
 		sqsh__extract_manager_cleanup(&archive->file_extract_manager);
+	}
+	if (is_initialized(archive, INITIALIZED_FRAGMENT_COMPRESSION_MANAGER)) {
+		sqsh__extract_manager_cleanup(&archive->fragment_extract_manager);
 	}
 	sqsh__extractor_cleanup(&archive->data_compression);
 	sqsh__extractor_cleanup(&archive->metablock_compression);

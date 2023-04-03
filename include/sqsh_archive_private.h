@@ -162,6 +162,7 @@ struct SqshArchive {
 	struct SqshExtractor data_compression;
 	struct SqshExtractor metablock_compression;
 	struct SqshExtractManager file_extract_manager;
+	struct SqshExtractManager fragment_extract_manager;
 	struct SqshSuperblock superblock;
 	struct SqshIdTable id_table;
 	struct SqshExportTable export_table;
@@ -188,6 +189,10 @@ SQSH_NO_UNUSED int sqsh__archive_init(
 		const struct SqshConfig *config);
 
 int sqsh__archive_file_extract_manager(
+		struct SqshArchive *archive,
+		struct SqshExtractManager **file_extract_manager);
+
+int sqsh__archive_fragment_extract_manager(
 		struct SqshArchive *archive,
 		struct SqshExtractManager **file_extract_manager);
 
