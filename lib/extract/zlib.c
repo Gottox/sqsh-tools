@@ -85,13 +85,15 @@ sqsh_zlib_finish(void *context, uint8_t *target, size_t *target_size) {
 	rv = inflate(stream, Z_FINISH);
 
 	if (rv != Z_STREAM_END) {
-		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+		rv = -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+		goto out;
 	}
 
 	*target_size = stream->total_out;
 
+out:
 	inflateEnd(stream);
-	return 0;
+	return rv;
 }
 
 static const struct SqshExtractorImpl impl_zlib = {
