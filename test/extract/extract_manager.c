@@ -70,6 +70,7 @@ decompress(void) {
 	assert(sqsh__buffer_size(buffer) == 4);
 	assert(memcmp(sqsh__buffer_data(buffer), "abcd", 4) == 0);
 
+	sqsh__map_reader_cleanup(&reader);
 	sqsh__extract_manager_release(&manager, buffer);
 	sqsh__extract_manager_cleanup(&manager);
 	sqsh__archive_cleanup(&archive);
