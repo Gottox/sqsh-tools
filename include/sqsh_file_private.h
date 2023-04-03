@@ -44,42 +44,27 @@ extern "C" {
 struct SqshArchive;
 
 ////////////////////////////////////////
-// file/fragment_table.c
+// file/fragment_view.c
 
-struct SqshFragmentTable {
+struct SqshFragmentView {
 	/**
 	 * @privatesection
 	 */
-	const struct SqshSuperblock *superblock;
-	struct SqshTable table;
-	struct SqshMapManager *map_manager;
-	struct SqshExtractManager compression_manager;
-	uint64_t upper_limit;
+	const struct SqshFragmentTable *fragment_table;
+	struct SqshMapReader map_reader;
+	struct SqshExtractView extract_view;
+	const uint8_t *data;
+	size_t size;
 };
 
-/**
- * @internal
- * @memberof SqshFragmentTable
- * @brief Initializes a fragment table with a SQSH context.
- *
- * @param[out] context The fragment table to initialize.
- * @param[in]  sqsh The SQSH context to use for the fragment table.
- *
- * @return 0 on success, a negative value on error.
- */
-SQSH_NO_UNUSED int sqsh__fragment_table_init(
-		struct SqshFragmentTable *context, struct SqshArchive *sqsh);
+int sqsh__fragment_view_init(
+		struct SqshFragmentView *view, const struct SqshInode *inode);
 
-/**
- * @internal
- * @memberof SqshFragmentTable
- * @brief Cleans up a fragment table.
- *
- * @param[in] context The fragment table to clean up.
- *
- * @return 0 on success, a negative value on error.
- */
-int sqsh__fragment_table_cleanup(struct SqshFragmentTable *context);
+const uint8_t *sqsh__fragment_view_data(const struct SqshFragmentView *view);
+
+size_t sqsh__fragment_view_size(const struct SqshFragmentView *view);
+
+int sqsh__fragment_view_cleanup(struct SqshFragmentView *view);
 
 ////////////////////////////////////////
 // file/file_iterator.c
@@ -93,12 +78,12 @@ struct SqshFileIterator {
 
 	struct SqshMapReader map_reader;
 	struct SqshExtractView extract_view;
-	struct SqshBuffer fragment_buffer;
+	struct SqshFragmentView fragment_view;
 
 	uint32_t block_index;
 
 	const uint8_t *data;
-	size_t data_size;
+	size_t size;
 };
 
 /**

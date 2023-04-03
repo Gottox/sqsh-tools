@@ -43,6 +43,7 @@ extern "C" {
 #endif
 
 struct SqshInode;
+struct SqshDataFragment;
 
 ////////////////////////////////////////
 // table/table.c
@@ -153,6 +154,45 @@ int sqsh__export_table_init(
  * @return 0 on success, a negative value on error.
  */
 int sqsh__export_table_cleanup(struct SqshExportTable *table);
+
+////////////////////////////////////////
+// file/fragment_table.c
+
+struct SqshFragmentTable {
+	/**
+	 * @privatesection
+	 */
+	struct SqshTable table;
+	struct SqshExtractManager extract_manager;
+};
+
+/**
+ * @internal
+ * @memberof SqshFragmentTable
+ * @brief Initializes a fragment table with a SQSH context.
+ *
+ * @param[out] table The fragment table to initialize.
+ * @param[in]  sqsh The SQSH context to use for the fragment table.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+SQSH_NO_UNUSED int sqsh__fragment_table_init(
+		struct SqshFragmentTable *table, struct SqshArchive *sqsh);
+
+int sqsh__fragment_table_get(
+		const struct SqshFragmentTable *table, const struct SqshInode *inode,
+		struct SqshDataFragment *fragment);
+
+/**
+ * @internal
+ * @memberof SqshFragmentTable
+ * @brief Cleans up a fragment table.
+ *
+ * @param[in] table The fragment table to clean up.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+int sqsh__fragment_table_cleanup(struct SqshFragmentTable *table);
 
 #ifdef __cplusplus
 }

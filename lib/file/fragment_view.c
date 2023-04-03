@@ -28,67 +28,28 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         fragment_table.c
+ * @file         fragment_view.c
  */
 
 #include "../../include/sqsh_file_private.h"
 
-#include "../../include/sqsh_inode.h"
-#include "../utils.h"
-
-// TODO: remove private header
-#include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_data_private.h"
 
+#include "../../include/sqsh_archive_private.h"
+#include "../../include/sqsh_error.h"
+#include "../../include/sqsh_inode_private.h"
+#include "../utils.h"
+
 static int
-init_compression_manager(
-		struct SqshFragmentTable *table, struct SqshArchive *archive) {
+apply_fragment(
+		struct SqshFragmentView *view, const struct SqshArchive *archive,
+		const struct SqshInode *inode, const uint8_t *data, size_t data_size) {
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
-	const struct SqshExtractor *compression =
-			sqsh_archive_data_extractor(archive);
-
-	table->map_manager = sqsh_archive_map_manager(archive);
-	// TODO: Is it safe to assume, that every fragment has at least 2 entries?
-	// (except when ther is only one packed file)
-	// Be safe and assume it is not for now:
-	size_t size = sqsh_superblock_fragment_entry_count(superblock);
-	return sqsh__extract_manager_init(
-			&table->compression_manager, archive, compression, size);
-}
-
-int
-sqsh__fragment_table_init(
-		struct SqshFragmentTable *table, struct SqshArchive *sqsh) {
-	int rv = 0;
-	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
-	uint64_t start = sqsh_superblock_fragment_table_start(superblock);
-	uint32_t count = sqsh_superblock_fragment_entry_count(superblock);
-
-	rv = init_compression_manager(table, sqsh);
-	if (rv < 0) {
-		goto out;
-	}
-	rv = sqsh__table_init(
-			&table->table, sqsh, start, SQSH_SIZEOF_FRAGMENT, count);
-	if (rv < 0) {
-		goto out;
-	}
-
-	table->superblock = superblock;
-	table->upper_limit = sqsh_superblock_inode_table_start(superblock);
-
-out:
-	return rv;
-}
-
-static int
-append_fragment(
-		struct SqshFragmentTable *table, const struct SqshInode *inode,
-		struct SqshBuffer *buffer, const uint8_t *data, size_t data_size) {
-	uint32_t block_size = sqsh_superblock_block_size(table->superblock);
+	uint32_t block_size = sqsh_superblock_block_size(superblock);
 	uint32_t offset = sqsh_inode_file_fragment_block_offset(inode);
 	uint32_t size = sqsh_inode_file_size(inode) % block_size;
 	uint32_t end_offset;
+
 	if (SQSH_ADD_OVERFLOW(offset, size, &end_offset)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
@@ -96,46 +57,50 @@ append_fragment(
 		return -SQSH_ERROR_SIZE_MISSMATCH;
 	}
 
-	int rv = 0;
-	rv = sqsh__buffer_append(buffer, &data[offset], size);
-	if (rv < 0) {
-		goto out;
-	}
-out:
-	return rv;
+	view->data = &data[offset];
+	view->size = size;
+
+	return 0;
 }
 
 static int
 read_fragment_compressed(
-		struct SqshFragmentTable *table, const struct SqshInode *inode,
-		struct SqshBuffer *buffer, const struct SqshMapReader *reader) {
+		struct SqshFragmentView *view, struct SqshArchive *archive,
+		const struct SqshInode *inode) {
 	int rv = 0;
-	struct SqshExtractView extract_view = {0};
-	rv = sqsh__extract_view_init(
-			&extract_view, &table->compression_manager, reader);
+	struct SqshExtractView *extract_view = &view->extract_view;
+	struct SqshMapReader *reader = &view->map_reader;
+	struct SqshExtractManager *extract_manager = NULL;
+
+	rv = sqsh__archive_fragment_extract_manager(archive, &extract_manager);
 	if (rv < 0) {
 		goto out;
 	}
-	const uint8_t *data = sqsh__extract_view_data(&extract_view);
-	const size_t size = sqsh__extract_view_size(&extract_view);
-	rv = append_fragment(table, inode, buffer, data, size);
+
+	rv = sqsh__extract_view_init(extract_view, extract_manager, reader);
+	if (rv < 0) {
+		goto out;
+	}
+	const uint8_t *data = sqsh__extract_view_data(extract_view);
+	const size_t size = sqsh__extract_view_size(extract_view);
+	rv = apply_fragment(view, archive, inode, data, size);
 	if (rv < 0) {
 		goto out;
 	}
 out:
-	sqsh__extract_view_cleanup(&extract_view);
 	return rv;
 }
 
 static int
 read_fragment_uncompressed(
-		struct SqshFragmentTable *table, const struct SqshInode *inode,
-		struct SqshBuffer *buffer, const struct SqshMapReader *reader) {
+		struct SqshFragmentView *view, struct SqshArchive *archive,
+		const struct SqshInode *inode) {
 	int rv = 0;
+	struct SqshMapReader *reader = &view->map_reader;
 	const uint8_t *data = sqsh__map_reader_data(reader);
 	const size_t size = sqsh__map_reader_size(reader);
 
-	rv = append_fragment(table, inode, buffer, data, size);
+	rv = apply_fragment(view, archive, inode, data, size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -144,54 +109,70 @@ out:
 }
 
 int
-sqsh_fragment_table_to_buffer(
-		struct SqshFragmentTable *table, const struct SqshInode *inode,
-		struct SqshBuffer *buffer) {
-	uint32_t index = sqsh_inode_file_fragment_block_index(inode);
+sqsh__fragment_view_init(
+		struct SqshFragmentView *view, const struct SqshInode *inode) {
+	struct SqshArchive *archive = inode->sqsh;
+	struct SqshMapReader *reader = &view->map_reader;
+	struct SqshFragmentTable *table = NULL;
 
 	int rv = 0;
 	struct SqshDataFragment fragment_info = {0};
 
-	rv = sqsh_table_get(&table->table, index, &fragment_info);
+	rv = sqsh_archive_fragment_table(archive, &table);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh__fragment_table_get(table, inode, &fragment_info);
 	if (rv < 0) {
 		goto out;
 	}
 
+	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 	const uint64_t start_address = sqsh_data_fragment_start(&fragment_info);
 	const struct SqshDataDatablockSize *size_info =
 			sqsh_data_fragment_size_info(&fragment_info);
 	const uint32_t size = sqsh_data_datablock_size(size_info);
 	const bool is_compressed = sqsh_data_datablock_is_compressed(size_info);
+	const uint64_t upper_limit = sqsh_superblock_inode_table_start(superblock);
+	struct SqshMapManager *map_manager = sqsh_archive_map_manager(archive);
 
-	struct SqshMapReader reader = {0};
-
-	rv = sqsh__map_reader_init(
-			&reader, table->map_manager, start_address, table->upper_limit);
+	rv = sqsh__map_reader_init(reader, map_manager, start_address, upper_limit);
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__map_reader_advance(&reader, 0, size);
+	rv = sqsh__map_reader_advance(reader, 0, size);
 	if (rv < 0) {
 		goto out;
 	}
 
 	if (is_compressed) {
-		rv = read_fragment_compressed(table, inode, buffer, &reader);
+		rv = read_fragment_compressed(view, archive, inode);
 	} else {
-		rv = read_fragment_uncompressed(table, inode, buffer, &reader);
+		rv = read_fragment_uncompressed(view, archive, inode);
 	}
 	if (rv < 0) {
 		goto out;
 	}
 
 out:
-	sqsh__map_reader_cleanup(&reader);
 	return rv;
 }
 
+const uint8_t *
+sqsh__fragment_view_data(const struct SqshFragmentView *view) {
+	return view->data;
+}
+
+size_t
+sqsh__fragment_view_size(const struct SqshFragmentView *view) {
+	return view->size;
+}
+
 int
-sqsh__fragment_table_cleanup(struct SqshFragmentTable *table) {
-	sqsh__table_cleanup(&table->table);
-	sqsh__extract_manager_cleanup(&table->compression_manager);
+sqsh__fragment_view_cleanup(struct SqshFragmentView *view) {
+	view->data = NULL;
+	view->size = 0;
+	sqsh__extract_view_cleanup(&view->extract_view);
+	sqsh__map_reader_cleanup(&view->map_reader);
 	return 0;
 }

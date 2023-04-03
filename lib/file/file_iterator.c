@@ -101,12 +101,13 @@ map_block_compressed(
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__extract_view_init(extract_view, compression_manager, &iterator->map_reader);
+	rv = sqsh__extract_view_init(
+			extract_view, compression_manager, &iterator->map_reader);
 	if (rv < 0) {
 		goto out;
 	}
 	iterator->data = sqsh__extract_view_data(extract_view);
-	iterator->data_size = sqsh__extract_view_size(extract_view);
+	iterator->size = sqsh__extract_view_size(extract_view);
 
 	if (SQSH_ADD_OVERFLOW(block_index, 1, &iterator->block_index)) {
 		rv = SQSH_ERROR_INTEGER_OVERFLOW;
@@ -162,7 +163,7 @@ map_block_uncompressed(
 		goto out;
 	}
 	iterator->data = sqsh__map_reader_data(reader);
-	iterator->data_size = outer_size;
+	iterator->size = outer_size;
 	iterator->block_index = block_index;
 
 	rv = 1;
@@ -193,22 +194,18 @@ map_fragment(struct SqshFileIterator *iterator) {
 	const struct SqshInode *inode = iterator->inode;
 	struct SqshArchive *archive = inode->sqsh;
 	struct SqshFragmentTable *fragment_table = NULL;
-	struct SqshBuffer *fragment_buffer = &iterator->fragment_buffer;
+	struct SqshFragmentView *fragment_view = &iterator->fragment_view;
 	rv = sqsh_archive_fragment_table(archive, &fragment_table);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = sqsh__buffer_init(fragment_buffer);
+	rv = sqsh__fragment_view_init(fragment_view, inode);
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh_fragment_table_to_buffer(fragment_table, inode, fragment_buffer);
-	if (rv < 0) {
-		goto out;
-	}
-	iterator->data = sqsh__buffer_data(fragment_buffer);
-	iterator->data_size = sqsh__buffer_size(fragment_buffer);
+	iterator->data = sqsh__fragment_view_data(fragment_view);
+	iterator->size = sqsh__fragment_view_size(fragment_view);
 	iterator->block_index = BLOCK_INDEX_FINISHED;
 out:
 	if (rv < 0) {
@@ -226,7 +223,6 @@ sqsh_file_iterator_next(
 	const bool has_fragment = sqsh_inode_file_has_fragment(inode);
 
 	sqsh__extract_view_cleanup(&iterator->extract_view);
-	sqsh__buffer_cleanup(&iterator->fragment_buffer);
 
 	if (iterator->block_index < block_count) {
 		return map_block(iterator, desired_size);
@@ -234,7 +230,7 @@ sqsh_file_iterator_next(
 		return map_fragment(iterator);
 	} else {
 		iterator->data = NULL;
-		iterator->data_size = 0;
+		iterator->size = 0;
 		return 0;
 	}
 }
@@ -265,14 +261,14 @@ sqsh_file_iterator_data(struct SqshFileIterator *iterator) {
 
 size_t
 sqsh_file_iterator_size(struct SqshFileIterator *iterator) {
-	return iterator->data_size;
+	return iterator->size;
 }
 
 int
 sqsh__file_iterator_cleanup(struct SqshFileIterator *iterator) {
 	sqsh__map_reader_cleanup(&iterator->map_reader);
 	sqsh__extract_view_cleanup(&iterator->extract_view);
-	sqsh__buffer_cleanup(&iterator->fragment_buffer);
+	sqsh__fragment_view_cleanup(&iterator->fragment_view);
 	return 0;
 }
 

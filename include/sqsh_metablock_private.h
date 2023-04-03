@@ -142,6 +142,7 @@ struct SqshMetablockReader {
 	 */
 	struct SqshMetablockIterator iterator;
 	struct SqshBuffer buffer;
+	const uint8_t *data;
 	// TODO: remove the compression field and use the compression_manager
 	// instead
 	const struct SqshExtractor *compression;
