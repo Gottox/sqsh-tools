@@ -26,7 +26,7 @@ $MKSQUASHFS "$SOURCE_ROOT/.git" "original.squashfs" $MKSQUASHFS_OPTS
 
 mkdir -p "unpack"
 
-$SQSH_UNPACK "original.squashfs" / "unpack"
+$SQSH_UNPACK "$PWD/original.squashfs" / "$PWD/unpack"
 
 # shellcheck disable=SC2086
 $MKSQUASHFS "unpack" "repacked.squashfs" $MKSQUASHFS_OPTS
