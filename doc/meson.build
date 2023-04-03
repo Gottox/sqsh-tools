@@ -6,16 +6,12 @@ git_version = run_command(
 	check : true
 ).stdout()
 
-conf_data = configuration_data()
-conf_data.set('DOXYGEN_INPUT', meson.project_source_root())
-conf_data.set('DOXYGEN_OUTPUT', meson.current_build_dir())
-conf_data.set('DOXYGEN_PROJECT_NUMBER', git_version)
-
-if get_option('doc') == 'internal'
-	conf_data.set('DOXYGEN_INTERNAL_DOCS', 'YES')
-else
-	conf_data.set('DOXYGEN_INTERNAL_DOCS', 'NO')
-endif
+conf_data = configuration_data({
+	'DOXYGEN_INPUT': meson.project_source_root(),
+	'DOXYGEN_OUTPUT': meson.current_build_dir(),
+	'DOXYGEN_PROJECT_NUMBER': git_version,
+	'DOXYGEN_INTERNAL_DOCS': get_option('doc') == 'internal' ? 'YES' : 'NO',
+})
 
 doxyfile = configure_file(
 	input: [ 'Doxyfile.in' ],
