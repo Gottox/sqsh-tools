@@ -71,6 +71,29 @@ next_once(void) {
 }
 
 static void
+next_failing_with_no_compression(void) {
+	int rv;
+	struct SqshArchive sqsh = {0};
+	struct SqshMetablockIterator iter;
+	uint8_t payload[] = {
+			SQSH_HEADER, METABLOCK_HEADER(1, 4), 'a', 'b', 'c', 'd',
+	};
+	mk_stub(&sqsh, payload, sizeof(payload));
+
+	rv = sqsh__metablock_iterator_init(
+			&iter, &sqsh, NULL, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+	assert(rv == 0);
+
+	rv = sqsh__metablock_iterator_next(&iter);
+	assert(rv != 0);
+
+	rv = sqsh__metablock_iterator_cleanup(&iter);
+	assert(rv == 0);
+
+	sqsh__archive_cleanup(&sqsh);
+}
+
+static void
 next_twice(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
@@ -175,6 +198,7 @@ next_twice(void) {
 
 DEFINE
 TEST(next_once);
+TEST(next_failing_with_no_compression);
 TEST(next_twice);
 // TEST(next_compressed);
 DEFINE_END
