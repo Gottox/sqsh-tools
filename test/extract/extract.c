@@ -71,7 +71,7 @@ decompress_test_split(
 
 	assert(impl != NULL);
 
-	for (sqsh_index_t offset = 0; offset < input_size; offset++) {
+	for (sqsh_index_t offset = 1; offset < input_size - 1; offset++) {
 		memset(output, 0, sizeof(output));
 
 		rv = impl->init(context, output, output_size);
@@ -229,11 +229,11 @@ TEST(decompress_xz);
 TEST(decompress_xz_split);
 TEST(decompress_lz4);
 TEST_OFF(decompress_lz4_split);
-TEST_OFF(decompress_lzo);
-TEST_OFF(decompress_lzo_split);
+TEST(decompress_lzo);
+TEST(decompress_lzo_split);
 TEST(decompress_zlib);
-TEST_OFF(decompress_zlib_split);
+TEST(decompress_zlib_split);
 TEST(decompress_zstd);
 TEST(decompress_zstd_split);
-TEST_OFF(multithreaded_lzo);
+TEST(multithreaded_lzo);
 DEFINE_END

@@ -40,7 +40,6 @@ extern "C" {
 #include "test.h"
 }
 #include <sqsh_archive_private.h>
-#include <sqsh_context.h>
 #include <sqsh_directory.h>
 #include <sqsh_mapper.h>
 #include <squashfs_image.h>
@@ -49,12 +48,12 @@ extern "C" {
 static void
 sqsh_empty() {
 	int rv;
-	struct Sqsh sqsh = {};
+	struct SqshArchive archive = {};
 	struct SqshConfig config = {};
 	config.source_mapper = sqsh_mapper_impl_static;
 	config.mapper_block_size = 1;
 	config.source_size = 0;
-	rv = sqsh__init(&sqsh, NULL, &config);
+	rv = sqsh__archive_init(&archive, NULL, &config);
 	assert(rv == -SQSH_ERROR_SUPERBLOCK_TOO_SMALL);
 }
 

@@ -172,7 +172,7 @@ sqsh_file_reader_advance(
 	if (rv < 0) {
 		goto out;
 	}
-	rv = 0;
+
 	reader->current_offset = current_offset;
 
 	if (sqsh_file_iterator_size(iterator) >= end_offset) {

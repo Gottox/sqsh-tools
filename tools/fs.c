@@ -759,7 +759,8 @@ main(int argc, char *argv[]) {
 			sqsh_archive_superblock(sqshfs_context.archive);
 	const uint64_t inode_count = sqsh_superblock_inode_count(superblock);
 
-	sqshfs_context.inode_map = calloc(inode_count, sizeof(uint64_t));
+	sqshfs_context.inode_map =
+			calloc(inode_count, sizeof(atomic_uint_fast64_t));
 	if (sqshfs_context.inode_map == NULL) {
 		rv = EXIT_FAILURE;
 		goto out;

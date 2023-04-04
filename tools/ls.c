@@ -159,18 +159,18 @@ ls_item(struct SqshPathResolver *resolver, const char *path,
 	struct SqshInode *entry_inode = NULL;
 	const char *name = sqsh_directory_iterator_name(iter);
 	const int name_size = sqsh_directory_iterator_name_size(iter);
-	char *current_path =
-			calloc(name_size + strlen(path ? path : "") + 2, sizeof(char));
+	size_t current_path_size = name_size + strlen(path ? path : "") + 2;
+	char *current_path = calloc(current_path_size, sizeof(char));
 
 	if (current_path == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
 	if (path != NULL) {
-		strcpy(current_path, path);
 		len = strlen(path);
+		strncpy(current_path, path, current_path_size - 1);
 		if (len > 0 && path[len - 1] != '/') {
-			strcat(current_path, "/");
+			strncat(current_path, "/", 2);
 		}
 	}
 	strncat(current_path, name, name_size);

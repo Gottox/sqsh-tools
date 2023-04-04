@@ -215,11 +215,13 @@ sqsh__rc_map_size(const struct SqshRcMap *array) {
 int
 sqsh__rc_map_cleanup(struct SqshRcMap *array) {
 #ifndef NDEBUG
-	int acc = 0;
-	for (size_t i = 0; i < array->size; ++i) {
-		acc |= array->ref_count[i];
+	if (array->ref_count != NULL) {
+		int acc = 0;
+		for (size_t i = 0; i < array->size; ++i) {
+			acc |= array->ref_count[i];
+		}
+		assert(acc == 0);
 	}
-	assert(acc == 0);
 #endif
 	free(array->data);
 	array->data = NULL;

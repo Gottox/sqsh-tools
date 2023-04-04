@@ -110,12 +110,16 @@ map_block_compressed(
 	iterator->size = sqsh__extract_view_size(extract_view);
 
 	if (SQSH_ADD_OVERFLOW(block_index, 1, &iterator->block_index)) {
-		rv = SQSH_ERROR_INTEGER_OVERFLOW;
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
 
 out:
-	return 1;
+	if (rv < 0) {
+		return rv;
+	} else {
+		return 1;
+	}
 }
 
 static int
