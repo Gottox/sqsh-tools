@@ -47,7 +47,10 @@ decompress_test(
 	size_t output_size = sizeof(output);
 	sqsh__extractor_context_t context = {0};
 
-	assert(impl != NULL);
+	if (impl == NULL) {
+		puts("skipping test extractor compile time disabled.");
+		return;
+	}
 
 	rv = impl->init(context, output, output_size);
 	assert(rv >= 0);
@@ -69,7 +72,10 @@ decompress_test_split(
 	size_t output_size = sizeof(output);
 	sqsh__extractor_context_t context = {0};
 
-	assert(impl != NULL);
+	if (impl == NULL) {
+		puts("skipping test extractor compile time disabled.");
+		return;
+	}
 
 	for (sqsh_index_t offset = 1; offset < input_size - 1; offset++) {
 		memset(output, 0, sizeof(output));
@@ -237,3 +243,4 @@ TEST(decompress_zstd);
 TEST(decompress_zstd_split);
 TEST(multithreaded_lzo);
 DEFINE_END
+
