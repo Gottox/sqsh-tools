@@ -67,7 +67,7 @@ sqsh_error_str(int error_code) {
 	case SQSH_ERROR_SUPERBLOCK_TOO_SMALL:
 		return "Superblock too small";
 	case SQSH_ERROR_WRONG_MAGIC:
-		return "Wrong magig";
+		return "Wrong magic";
 	case SQSH_ERROR_BLOCKSIZE_MISSMATCH:
 		return "Blocksize missmatch";
 	case SQSH_ERROR_SIZE_MISSMATCH:
