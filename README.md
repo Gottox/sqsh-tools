@@ -15,12 +15,17 @@ as minimal as possible.
 library only supports reading archives. If you need to create archives take a
 look at [squashfs-tools-ng](https://github.com/AgentD/squashfs-tools-ng/).
 
+libsqsh is portable! It is tested and designed for posix compatible environments
+but should be easy to port to other systems too. With
+[sqsh.js](https://github.com/Gottox/sqsh.js) there's a wasm implementation of
+libsqsh with a Javascript API designed to run in browsers.
+
 At this point development focuses on avoiding redundant decompressions and
 developing efficient cache tactics.
 
 * traverse directories
 * read file contents
-* open files by path (`sqsh_inode_load_by_path`)
+* open files by path
 * fast filename lookup
 * read metadata from inodes
 * read xattr from inodes
