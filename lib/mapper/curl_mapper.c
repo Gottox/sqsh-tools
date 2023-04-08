@@ -31,6 +31,8 @@
  * @file         curl_mapper.c
  */
 
+#define _DEFAULT_SOURCE
+
 #include "../../include/sqsh_mapper_private.h"
 
 #include "../../include/sqsh_data.h"
@@ -41,7 +43,7 @@
 
 #	include <curl/curl.h>
 #	include <inttypes.h>
-#	include <stdint.h>
+#	include <string.h>
 
 #	define CONTENT_RANGE "Content-Range"
 #	define CONTENT_RANGE_FORMAT "bytes %" PRIu64 "-%" PRIu64 "/%" PRIu64
@@ -199,7 +201,7 @@ sqsh_mapper_curl_init(
 	int rv = 0;
 	curl_global_init(CURL_GLOBAL_ALL);
 
-	mapper->data.cl.url = input;
+	mapper->data.cl.url = strdup(input);
 	mapper->data.cl.handle = curl_easy_init();
 
 	rv = pthread_mutex_init(&mapper->data.cl.lock, NULL);
@@ -272,6 +274,7 @@ out:
 
 static int
 sqsh_mapper_curl_cleanup(struct SqshMapper *mapper) {
+	free(mapper->data.cl.url);
 	pthread_mutex_destroy(&mapper->data.cl.lock);
 	curl_easy_cleanup(mapper->data.cl.handle);
 	return 0;

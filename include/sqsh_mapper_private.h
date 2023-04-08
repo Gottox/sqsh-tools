@@ -54,7 +54,7 @@ struct SqshCurlMapper {
 	/**
 	 * @privatesection
 	 */
-	const char *url;
+	char *url;
 	uint64_t expected_time;
 	void *handle;
 	uint8_t *header_cache;
