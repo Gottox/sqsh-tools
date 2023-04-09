@@ -177,8 +177,10 @@ sqsh__archive_fragment_extract_manager(
 	if (!is_initialized(archive, INITIALIZED_FRAGMENT_COMPRESSION_MANAGER)) {
 		const struct SqshSuperblock *superblock =
 				sqsh_archive_superblock(archive);
-		// Assume, that we have at least 2 files per fragment.
-		const size_t capacity = sqsh_superblock_fragment_entry_count(superblock) / 2;
+		// Assume, that we have at least 2 files per fragment. Have at least one
+		// element though.
+		const size_t capacity = SQSH_MAX(
+				1, sqsh_superblock_fragment_entry_count(superblock) / 2);
 
 		rv = sqsh__extract_manager_init(
 				&archive->fragment_extract_manager, archive,
