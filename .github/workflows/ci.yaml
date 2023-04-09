@@ -19,7 +19,7 @@ jobs:
     - name: configure
       run: |
         apk add zlib-dev lz4-dev xz-dev lzo-dev zstd-dev
-        CC=clang meson setup --wrap-mode=nodownload /tmp/build \
+        CC=clang meson setup /tmp/build \
           -Dwerror=true \
           -Dcurl=enabled  \
           -Dzlib=enabled \
