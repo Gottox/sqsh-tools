@@ -39,7 +39,7 @@
 
 int
 sqsh__mapper_init(
-		struct SqshMapper *mapper, const void *input,
+		struct SqshMapper *mapper, const void *source,
 		const struct SqshConfig *config) {
 	int rv = 0;
 	size_t size = config->source_size;
@@ -55,7 +55,7 @@ sqsh__mapper_init(
 		mapper->block_size = mapper->impl->block_size_hint;
 	}
 
-	rv = mapper->impl->init(mapper, input, &size);
+	rv = mapper->impl->init(mapper, source, &size);
 	if (rv < 0) {
 		return rv;
 	}
