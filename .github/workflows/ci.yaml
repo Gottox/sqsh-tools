@@ -29,6 +29,7 @@ jobs:
           -Dzstd=enabled  \
           -Dthreads=enabled \
           -Dtest=extended \
+          -Db_sanitize=address,undefined \
           -Ddoc=false
     - name: test
       run: |
