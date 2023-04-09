@@ -27,6 +27,7 @@ jobs:
           -Dlzma=enabled  \
           -Dlzo=enabled  \
           -Dzstd=enabled  \
+          -Dthreads=enabled \
           -Dtest=extended \
           -Ddoc=false
     - name: test
