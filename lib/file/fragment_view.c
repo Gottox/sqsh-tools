@@ -111,7 +111,7 @@ out:
 int
 sqsh__fragment_view_init(
 		struct SqshFragmentView *view, const struct SqshInode *inode) {
-	struct SqshArchive *archive = inode->sqsh;
+	struct SqshArchive *archive = inode->archive;
 	struct SqshMapReader *reader = &view->map_reader;
 	struct SqshFragmentTable *table = NULL;
 

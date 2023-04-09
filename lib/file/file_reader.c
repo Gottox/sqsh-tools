@@ -79,7 +79,7 @@ static int
 file_reader_direct(struct SqshFileReader *reader, size_t size) {
 	struct SqshFileIterator *iterator = &reader->iterator;
 	const struct SqshInode *inode = iterator->inode;
-	const struct SqshArchive *archive = inode->sqsh;
+	const struct SqshArchive *archive = inode->archive;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 	const uint32_t block_size = sqsh_superblock_block_size(superblock);
 
@@ -94,7 +94,7 @@ static int
 file_reader_buffered(struct SqshFileReader *reader, size_t size) {
 	struct SqshFileIterator *iterator = &reader->iterator;
 	const struct SqshInode *inode = iterator->inode;
-	const struct SqshArchive *archive = inode->sqsh;
+	const struct SqshArchive *archive = inode->archive;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 	const uint32_t block_size = sqsh_superblock_block_size(superblock);
 	const uint32_t block_offset = reader->current_offset % block_size;
@@ -149,7 +149,7 @@ sqsh_file_reader_advance(
 	int rv = 0;
 	struct SqshFileIterator *iterator = &reader->iterator;
 	const struct SqshInode *inode = iterator->inode;
-	const struct SqshArchive *archive = inode->sqsh;
+	const struct SqshArchive *archive = inode->archive;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 	const uint32_t block_size = sqsh_superblock_block_size(superblock);
 

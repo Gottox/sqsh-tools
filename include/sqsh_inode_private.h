@@ -50,7 +50,7 @@ struct SqshInode {
 	 */
 	uint64_t inode_ref;
 	struct SqshMetablockReader metablock;
-	struct SqshArchive *sqsh;
+	struct SqshArchive *archive;
 };
 
 /**

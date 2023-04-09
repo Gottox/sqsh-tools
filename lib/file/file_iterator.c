@@ -47,7 +47,7 @@ int
 sqsh__file_iterator_init(
 		struct SqshFileIterator *iterator, const struct SqshInode *inode) {
 	int rv = 0;
-	struct SqshArchive *archive = inode->sqsh;
+	struct SqshArchive *archive = inode->archive;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(archive);
 	uint64_t block_address = sqsh_inode_file_blocks_start(inode);
@@ -196,7 +196,7 @@ static int
 map_fragment(struct SqshFileIterator *iterator) {
 	int rv = 0;
 	const struct SqshInode *inode = iterator->inode;
-	struct SqshArchive *archive = inode->sqsh;
+	struct SqshArchive *archive = inode->archive;
 	struct SqshFragmentTable *fragment_table = NULL;
 	struct SqshFragmentView *fragment_view = &iterator->fragment_view;
 	rv = sqsh_archive_fragment_table(archive, &fragment_table);

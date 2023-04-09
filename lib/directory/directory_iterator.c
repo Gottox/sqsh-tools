@@ -49,7 +49,7 @@ directory_iterator_index_lookup(
 	const uint64_t inode_ref = sqsh_inode_ref(inode);
 
 	rv = sqsh__directory_index_iterator_init(
-			&index_iterator, inode->sqsh, inode_ref);
+			&index_iterator, inode->archive, inode_ref);
 	if (rv < 0) {
 		return rv;
 	}
@@ -125,8 +125,8 @@ int
 sqsh__directory_iterator_init(
 		struct SqshDirectoryIterator *iterator, struct SqshInode *inode) {
 	int rv = 0;
-	struct SqshArchive *sqsh = inode->sqsh;
-	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
+	struct SqshArchive *archive = inode->archive;
+	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 
 	if (sqsh_inode_type(inode) != SQSH_INODE_TYPE_DIRECTORY) {
 		return -SQSH_ERROR_NOT_A_DIRECTORY;
@@ -148,7 +148,7 @@ sqsh__directory_iterator_init(
 	iterator->inode = inode;
 
 	rv = sqsh__metablock_reader_init(
-			&iterator->metablock, sqsh, NULL, start_address, upper_limit);
+			&iterator->metablock, archive, NULL, start_address, upper_limit);
 	if (rv < 0) {
 		return rv;
 	}
@@ -216,9 +216,9 @@ struct SqshInode *
 sqsh_directory_iterator_inode_load(
 		const struct SqshDirectoryIterator *iterator, int *err) {
 	const uint64_t inode_ref = sqsh_directory_iterator_inode_ref(iterator);
-	struct SqshArchive *sqsh = iterator->inode->sqsh;
+	struct SqshArchive *archive = iterator->inode->archive;
 
-	return sqsh_inode_new(sqsh, inode_ref, err);
+	return sqsh_inode_new(archive, inode_ref, err);
 }
 
 static int

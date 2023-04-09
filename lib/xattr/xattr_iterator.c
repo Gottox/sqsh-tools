@@ -46,7 +46,7 @@ sqsh__xattr_iterator_init(
 	int rv;
 	struct SqshDataXattrLookupTable ref = {0};
 	struct SqshXattrTable *xattr_table = NULL;
-	struct SqshArchive *sqsh = inode->sqsh;
+	struct SqshArchive *sqsh = inode->archive;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
 	uint32_t index = sqsh_inode_xattr_index(inode);
 

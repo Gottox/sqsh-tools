@@ -141,13 +141,14 @@ get_size_info(const struct SqshInode *context, int index) {
 
 int
 sqsh__inode_init(
-		struct SqshInode *inode, struct SqshArchive *sqsh, uint64_t inode_ref) {
+		struct SqshInode *inode, struct SqshArchive *archive,
+		uint64_t inode_ref) {
 	const uint32_t outer_offset = sqsh_address_ref_outer_offset(inode_ref);
 	const uint16_t inner_offset = sqsh_address_ref_inner_offset(inode_ref);
 	uint64_t address_outer;
 
 	int rv = 0;
-	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
+	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 
 	const uint64_t inode_table_start =
 			sqsh_superblock_inode_table_start(superblock);
@@ -156,7 +157,7 @@ sqsh__inode_init(
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	rv = sqsh__metablock_reader_init(
-			&inode->metablock, sqsh, NULL, address_outer, ~0);
+			&inode->metablock, archive, NULL, address_outer, ~0);
 	if (rv < 0) {
 		return rv;
 	}
@@ -166,7 +167,7 @@ sqsh__inode_init(
 		return rv;
 	}
 
-	inode->sqsh = sqsh;
+	inode->archive = archive;
 	inode->inode_ref = inode_ref;
 
 	return inode_load(inode);
@@ -311,7 +312,7 @@ sqsh_inode_file_blocks_start(const struct SqshInode *context) {
 uint32_t
 sqsh_inode_file_block_count(const struct SqshInode *context) {
 	const struct SqshSuperblock *superblock =
-			sqsh_archive_superblock(context->sqsh);
+			sqsh_archive_superblock(context->archive);
 	uint64_t file_size = sqsh_inode_file_size(context);
 	uint32_t block_size = sqsh_superblock_block_size(superblock);
 
@@ -511,7 +512,7 @@ inode_get_id(const struct SqshInode *context, sqsh_index_t idx) {
 	struct SqshIdTable *id_table;
 	uint32_t id;
 
-	rv = sqsh_archive_id_table(context->sqsh, &id_table);
+	rv = sqsh_archive_id_table(context->archive, &id_table);
 	if (rv < 0) {
 		return UINT32_MAX;
 	}
