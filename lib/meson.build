@@ -47,8 +47,8 @@ libsqsh_sources = [
 	'table/fragment_table.c',
 	'table/id_table.c',
 	'table/table.c',
+	'table/xattr_table.c',
 	'xattr/xattr_iterator.c',
-	'xattr/xattr_table.c',
 ]
 
 libsqsh_headers_private = [

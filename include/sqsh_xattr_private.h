@@ -83,17 +83,6 @@ SQSH_NO_UNUSED int sqsh__xattr_iterator_init(
  */
 int sqsh__xattr_iterator_cleanup(struct SqshXattrIterator *iterator);
 
-////////////////////////////////////////
-// xattr/xattr_table.c
-
-struct SqshXattrTable {
-	/**
-	 * @privatesection
-	 */
-	struct SqshMapReader header;
-	struct SqshTable table;
-};
-
 /**
  * @internal
  * @memberof SqshXattrTable

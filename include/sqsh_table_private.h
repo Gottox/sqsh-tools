@@ -44,6 +44,8 @@ extern "C" {
 
 struct SqshInode;
 struct SqshDataFragment;
+struct SqshDataXattrLookupTable;
+
 
 ////////////////////////////////////////
 // table/table.c
@@ -193,6 +195,43 @@ int sqsh__fragment_table_get(
  * @return 0 on success, a negative value on error.
  */
 int sqsh__fragment_table_cleanup(struct SqshFragmentTable *table);
+
+////////////////////////////////////////
+// table/xattr_table.c
+
+struct SqshXattrTable {
+	/**
+	 * @privatesection
+	 */
+	struct SqshMapReader header;
+	struct SqshTable table;
+};
+
+/**
+ * @memberof SqshXattrTable
+ * @brief Retrieves the starting offset of the table.
+ *
+ * @param[in] table The extended attribute table to retrieve the offset from.
+ *
+ * @return The starting offset of the table.
+ */
+uint64_t sqsh_xattr_table_start(struct SqshXattrTable *table);
+
+/**
+ * @memberof SqshXattrTable
+ * @brief Retrieves an extended attribute from the table.
+ *
+ * @param[in]  table The extended attribute table to retrieve the attribute
+ * from.
+ * @param[in]  index The index of the attribute to retrieve.
+ * @param[out] target The extended attribute lookup table to store the attribute
+ * in.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+SQSH_NO_UNUSED int sqsh_xattr_table_get(
+		const struct SqshXattrTable *table, sqsh_index_t index,
+		struct SqshDataXattrLookupTable *target);
 
 #ifdef __cplusplus
 }
