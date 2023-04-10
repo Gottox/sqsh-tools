@@ -35,7 +35,6 @@
 #define SQSH_FILE_PRIVATE_H
 
 #include "sqsh_file.h"
-#include "sqsh_mapper_private.h"
 
 #ifdef __cplusplus
 extern "C" {
