@@ -46,6 +46,9 @@ struct SqshArchive;
 ////////////////////////////////////////
 // file/fragment_view.c
 
+/**
+ * @brief A view over the contents of a fragment.
+ */
 struct SqshFragmentView {
 	/**
 	 * @privatesection
@@ -69,6 +72,9 @@ int sqsh__fragment_view_cleanup(struct SqshFragmentView *view);
 ////////////////////////////////////////
 // file/file_iterator.c
 
+/**
+ * @brief An iterator over the contents of a file.
+ */
 struct SqshFileIterator {
 	/**
 	 * @privatesection
@@ -113,6 +119,9 @@ int sqsh__file_iterator_cleanup(struct SqshFileIterator *iterator);
 ////////////////////////////////////////
 // context/file_reader.c
 
+/**
+ * @brief A reader over the contents of a file.
+ */
 struct SqshFileReader {
 	/**
 	 * @privatesection
@@ -126,8 +135,8 @@ struct SqshFileReader {
 
 /**
  * @internal
- * @brief Initializes a SqshFileReader struct.
  * @memberof SqshFileReader
+ * @brief Initializes a SqshFileReader struct.
  *
  * @param[out] reader The file reader to initialize.
  * @param[in] inode    The inode context to retrieve the file contents from.
@@ -139,11 +148,12 @@ SQSH_NO_UNUSED int sqsh__file_reader_init(
 
 /**
  * @internal
+ * @memberof SqshFileReader
  * @brief Frees the resources used by the file reader.
  *
- * @memberof SqshFileReader
- *
  * @param reader The file reader to clean up.
+ *
+ * @return 0 on success, less than 0 on error.
  */
 int sqsh__file_reader_cleanup(struct SqshFileReader *reader);
 

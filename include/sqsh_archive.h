@@ -73,6 +73,9 @@ const uint8_t *sqsh_trailing_data(const struct SqshTrailingContext *context);
 ////////////////////////////////////////
 // archive/superblock_context.c
 
+/**
+ * @brief The compression used in the archive.
+ */
 enum SqshSuperblockCompressionId {
 	SQSH_COMPRESSION_GZIP = 1,
 	SQSH_COMPRESSION_LZMA = 2,
@@ -82,6 +85,9 @@ enum SqshSuperblockCompressionId {
 	SQSH_COMPRESSION_ZSTD = 6,
 };
 
+/**
+ * @brief The flags used in the superblock.
+ */
 enum SqshSuperblockFlags {
 	SQSH_SUPERBLOCK_UNCOMPRESSED_INODES = 0x0001,
 	SQSH_SUPERBLOCK_UNCOMPRESSED_DATA = 0x0002,
@@ -363,6 +369,8 @@ sqsh_compression_options_new(struct SqshArchive *sqsh, int *err);
  * @brief returns the compression level of gzip
  *
  * @param[in] context the compression options context
+ *
+ * @return the compression level of gzip
  */
 uint32_t sqsh_compression_options_gzip_compression_level(
 		const struct SqshCompressionOptions *context);
@@ -371,6 +379,8 @@ uint32_t sqsh_compression_options_gzip_compression_level(
  * @brief returns the compression window size of gzip
  *
  * @param[in] context the compression options context
+ *
+ * @return the compression window size of gzip
  */
 uint16_t sqsh_compression_options_gzip_window_size(
 		const struct SqshCompressionOptions *context);
@@ -379,6 +389,8 @@ uint16_t sqsh_compression_options_gzip_window_size(
  * @brief returns the compression strategy of gzip
  *
  * @param[in] context the compression options context
+ *
+ * @return the compression strategy of gzip
  */
 enum SqshGzipStrategies sqsh_compression_options_gzip_strategies(
 		const struct SqshCompressionOptions *context);
@@ -388,6 +400,8 @@ enum SqshGzipStrategies sqsh_compression_options_gzip_strategies(
  * @brief returns the dictionary size of xz
  *
  * @param[in] context the compression options context
+ *
+ * @return the dictionary size of xz
  */
 uint32_t sqsh_compression_options_xz_dictionary_size(
 		const struct SqshCompressionOptions *context);
@@ -396,6 +410,8 @@ uint32_t sqsh_compression_options_xz_dictionary_size(
  * @brief returns the compression options of xz
  *
  * @param[in] context the compression options context
+ *
+ * @return the compression options of xz
  */
 enum SqshXzFilters sqsh_compression_options_xz_filters(
 		const struct SqshCompressionOptions *context);
@@ -405,6 +421,8 @@ enum SqshXzFilters sqsh_compression_options_xz_filters(
  * @brief returns the version of lz4 used
  *
  * @param[in] context the compression options context
+ *
+ * @return the version of lz4 used
  */
 uint32_t sqsh_compression_options_lz4_version(
 		const struct SqshCompressionOptions *context);
@@ -413,6 +431,8 @@ uint32_t sqsh_compression_options_lz4_version(
  * @brief returns the flags of lz4
  *
  * @param[in] context the compression options context
+ *
+ * @return the flags of lz4
  */
 uint32_t sqsh_compression_options_lz4_flags(
 		const struct SqshCompressionOptions *context);
@@ -422,6 +442,8 @@ uint32_t sqsh_compression_options_lz4_flags(
  * @brief returns the compression level of zstd
  *
  * @param[in] context the compression options context
+ *
+ * @return the compression level of zstd
  */
 uint32_t sqsh_compression_options_zstd_compression_level(
 		const struct SqshCompressionOptions *context);
@@ -431,6 +453,8 @@ uint32_t sqsh_compression_options_zstd_compression_level(
  * @brief returns the algorithm of lzo
  *
  * @param[in] context the compression options context
+ *
+ * @return the algorithm of lzo
  */
 enum SqshLzoAlgorithm sqsh_compression_options_lzo_algorithm(
 		const struct SqshCompressionOptions *context);
@@ -439,6 +463,8 @@ enum SqshLzoAlgorithm sqsh_compression_options_lzo_algorithm(
  * @brief returns the compression level of lzo
  *
  * @param[in] context the compression options context
+ *
+ * @return the compression level of lzo
  */
 uint32_t sqsh_compression_options_lzo_compression_level(
 		const struct SqshCompressionOptions *context);
@@ -448,6 +474,8 @@ uint32_t sqsh_compression_options_lzo_compression_level(
  * @brief Frees a SqshCompressionOptions struct.
  *
  * @param[in] context The file context to free.
+ *
+ * @return 0 on success, less than 0 on error
  */
 int sqsh_compression_options_free(struct SqshCompressionOptions *context);
 
@@ -459,6 +487,9 @@ int sqsh_compression_options_free(struct SqshCompressionOptions *context);
  * a sqsh session.
  */
 struct SqshConfig {
+/**
+ * TODO
+ */
 #define SQSH_CONFIG_FIELDS \
 	uint64_t source_size; \
 	const struct SqshMemoryMapperImpl *source_mapper; \
@@ -466,6 +497,9 @@ struct SqshConfig {
 	int mapper_lru_size; \
 	int compression_lru_size;
 	SQSH_CONFIG_FIELDS
+	/**
+	 * @brief padding to ensure that the size of the struct 128 bytes.
+	 */
 	uint8_t _padding
 			[128 -
 			 offsetof(

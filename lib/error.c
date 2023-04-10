@@ -56,10 +56,12 @@ const char *
 sqsh_error_str(int error_code) {
 	error_code = abs(error_code);
 
-	if (error_code < SQSH_ERROR_SECTION) {
+	if (error_code < SQSH_ERROR_SECTION_START) {
 		return strerror(error_code);
 	}
 	switch ((enum SqshError)error_code) {
+	case SQSH_ERROR_SECTION_START:
+		break;
 	case SQSH_SUCCESS:
 		return "Success";
 	case SQSH_ERROR_NO_COMPRESSION_OPTIONS:

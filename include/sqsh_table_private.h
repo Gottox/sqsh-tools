@@ -46,10 +46,12 @@ struct SqshInode;
 struct SqshDataFragment;
 struct SqshDataXattrLookupTable;
 
-
 ////////////////////////////////////////
 // table/table.c
 
+/**
+ * @brief A generic table as used in an archive.
+ */
 struct SqshTable {
 	/**
 	 * @privatesection
@@ -93,6 +95,9 @@ int sqsh__table_cleanup(struct SqshTable *table);
 ////////////////////////////////////////
 // table/id_table.c
 
+/**
+ * @brief The id table of an archive.
+ */
 struct SqshIdTable {
 	/**
 	 * @privatesection
@@ -126,6 +131,9 @@ int sqsh__id_table_cleanup(struct SqshIdTable *table);
 ////////////////////////////////////////
 // table/export_table.c
 
+/**
+ * @brief The export table.
+ */
 struct SqshExportTable {
 	/**
 	 * @privatesection
@@ -160,6 +168,9 @@ int sqsh__export_table_cleanup(struct SqshExportTable *table);
 ////////////////////////////////////////
 // file/fragment_table.c
 
+/**
+ * @brief The fragment table of an archive.
+ */
 struct SqshFragmentTable {
 	/**
 	 * @privatesection
@@ -181,6 +192,18 @@ struct SqshFragmentTable {
 SQSH_NO_UNUSED int sqsh__fragment_table_init(
 		struct SqshFragmentTable *table, struct SqshArchive *sqsh);
 
+/**
+ * @internal
+ * @memberof SqshFragmentTable
+ * @brief Retrieves the fragment meta informations from the fragment table for
+ * the given inode.
+ *
+ * @param[in]  table The fragment table to use.
+ * @param[in]  inode The inode to retrieve the fragment meta informations for.
+ * @param[out] fragment The fragment meta informations.
+ *
+ * @return 0 on success, a negative value on error.
+ */
 int sqsh__fragment_table_get(
 		const struct SqshFragmentTable *table, const struct SqshInode *inode,
 		struct SqshDataFragment *fragment);
@@ -199,6 +222,9 @@ int sqsh__fragment_table_cleanup(struct SqshFragmentTable *table);
 ////////////////////////////////////////
 // table/xattr_table.c
 
+/**
+ * @brief The extended attribute lookup table.
+ */
 struct SqshXattrTable {
 	/**
 	 * @privatesection

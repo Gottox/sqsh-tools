@@ -45,6 +45,9 @@ extern "C" {
 ////////////////////////////////////////
 // xattr/xattr_iterator.c
 
+/**
+ * @brief An iterator over extended attributes.
+ */
 struct SqshXattrIterator {
 	/**
 	 * @privatesection

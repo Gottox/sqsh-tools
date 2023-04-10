@@ -46,11 +46,22 @@ extern "C" {
 #ifdef __cplusplus
 #	define SQSH_STATIC_ASSERT(cond)
 #else
-#	define SQSH_STATIC_ASSERT(cond) _Static_assert(cond, #    cond)
+/**
+ * @brief Static assert
+ *
+ * @param cond Condition to assert
+ */
+#	define SQSH_STATIC_ASSERT(cond) _Static_assert(cond, #cond)
 #endif
 
+/**
+ * @brief Warn if return value is unused
+ */
 #define SQSH_NO_UNUSED __attribute__((warn_unused_result))
 
+/**
+ * @brief typedef used for indexing
+ */
 typedef size_t sqsh_index_t;
 
 #ifdef __cplusplus

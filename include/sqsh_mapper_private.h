@@ -50,6 +50,9 @@ struct SqshConfig;
 ////////////////////////////////////////
 // mapper/curl_mapper.c
 
+/**
+ * @brief The curl mapper.
+ */
 struct SqshCurlMapper {
 	/**
 	 * @privatesection
@@ -64,6 +67,9 @@ struct SqshCurlMapper {
 ////////////////////////////////////////
 // mapper/mmap_mapper.c
 
+/**
+ * @brief The mmap mapper.
+ */
 struct SqshMmapMapper {
 	/**
 	 * @privatesection
@@ -75,6 +81,9 @@ struct SqshMmapMapper {
 ////////////////////////////////////////
 // mapper/static_mapper.c
 
+/**
+ * @brief The static mapper.
+ */
 struct SqshStaticMapper {
 	/**
 	 * @privatesection
@@ -87,6 +96,9 @@ struct SqshStaticMapper {
 
 struct SqshMapSlice;
 
+/**
+ * @brief The mapper that is used to map chunks of the archive into memory.
+ */
 struct SqshMapper {
 	/**
 	 * @privatesection
@@ -101,6 +113,9 @@ struct SqshMapper {
 	} data;
 };
 
+/**
+ * @brief The implementation of a memory mapper.
+ */
 struct SqshMemoryMapperImpl {
 	/**
 	 * @privatesection
@@ -164,6 +179,9 @@ int sqsh__mapper_cleanup(struct SqshMapper *mapper);
 ////////////////////////////////////////
 // mapper/map_slice.c
 
+/**
+ * @brief Represents a view into the data of an archive.
+ */
 struct SqshMapSlice {
 	/**
 	 * @privatesection
@@ -214,6 +232,9 @@ SQSH_NO_UNUSED int sqsh__map_slice_init(
 ////////////////////////////////////////
 // mapper/map_manager.c
 
+/**
+ * @brief The map manager.
+ */
 struct SqshMapManager {
 	/**
 	 * @privatesection
@@ -225,7 +246,9 @@ struct SqshMapManager {
 };
 
 /**
- * Initializes a new instance of SqshMapManager.
+ * @internal
+ * @memberof SqshMapManager
+ * @brief Initializes a new instance of SqshMapManager.
  *
  * @param[out] manager The SqshMapManager instance to initialize.
  * @param[in] input The input to use.
@@ -238,6 +261,8 @@ SQSH_NO_UNUSED int sqsh__map_manager_init(
 		const struct SqshConfig *config);
 
 /**
+ * @internal
+ * @memberof SqshMapManager
  * Gets the size of the backing archive.
  *
  * @param[in] manager The SqshMapManager instance.
@@ -247,7 +272,9 @@ SQSH_NO_UNUSED int sqsh__map_manager_init(
 uint64_t sqsh__map_manager_size(const struct SqshMapManager *manager);
 
 /**
- * Gets the size of a chunk.
+ * @internal
+ * @memberof SqshMapManager
+ * @brief Gets the size of a chunk.
  *
  * @param[in] manager The SqshMapManager instance.
  *
@@ -256,7 +283,9 @@ uint64_t sqsh__map_manager_size(const struct SqshMapManager *manager);
 size_t sqsh__map_manager_block_size(const struct SqshMapManager *manager);
 
 /**
- * Gets the number of chunks in the file.
+ * @internal
+ * @memberof SqshMapManager
+ * @brief Gets the number of chunks in the file.
  *
  * @param[in] manager The SqshMapManager instance.
  *
@@ -265,7 +294,9 @@ size_t sqsh__map_manager_block_size(const struct SqshMapManager *manager);
 size_t sqsh__map_manager_block_count(const struct SqshMapManager *manager);
 
 /**
- * Gets a map for a chunk.
+ * @internal
+ * @memberof SqshMapManager
+ * @brief Gets a map for a chunk.
  *
  * @param[in] manager The SqshMapManager instance.
  * @param[in] index The index of the chunk to map.
@@ -279,7 +310,9 @@ SQSH_NO_UNUSED int sqsh__map_manager_get(
 		const struct SqshMapSlice **target);
 
 /**
- * Releases a map for a chunk.
+ * @internal
+ * @memberof SqshMapManager
+ * @brief Releases a map for a chunk.
  *
  * @param[in] manager The SqshMapManager instance.
  * @param[in] mapping The mapping to release.
@@ -289,7 +322,9 @@ SQSH_NO_UNUSED int sqsh__map_manager_get(
 int sqsh__map_manager_release(
 		struct SqshMapManager *manager, const struct SqshMapSlice *mapping);
 /**
- * Cleans up the resources used by a SqshMapManager instance.
+ * @internal
+ * @memberof SqshMapManager
+ * @brief Cleans up the resources used by a SqshMapManager instance.
  *
  * @param[in] manager The SqshMapManager instance to cleanup.
  *
@@ -300,6 +335,9 @@ int sqsh__map_manager_cleanup(struct SqshMapManager *manager);
 ////////////////////////////////////////
 // mapper/map_reader.c
 
+/**
+ * @brief A reader over a mapping of data.
+ */
 struct SqshMapReader {
 	/**
 	 * @privatesection

@@ -45,6 +45,9 @@ struct SqshInode;
 ////////////////////////////////////////
 // xattr/xattr_iterator.c
 
+/**
+ * @brief The type of an external attribute.
+ */
 enum SqshXattrType {
 	SQSH_XATTR_USER = 0,
 	SQSH_XATTR_TRUSTED = 1,

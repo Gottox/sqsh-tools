@@ -64,6 +64,8 @@ struct SqshBuffer {
  * @brief sqsh__buffer_init initializes a SqshBuffer.
  *
  * @param[out] buffer The SqshBuffer to initialize.
+ *
+ * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int sqsh__buffer_init(struct SqshBuffer *buffer);
 
@@ -79,6 +81,8 @@ SQSH_NO_UNUSED int sqsh__buffer_init(struct SqshBuffer *buffer);
  *
  * @param[in,out] buffer The SqshBuffer to increase.
  * @param[in] additional_size The additional size to increase the buffer.
+ *
+ * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int
 sqsh__buffer_add_size(struct SqshBuffer *buffer, size_t additional_size);
@@ -96,6 +100,8 @@ sqsh__buffer_add_size(struct SqshBuffer *buffer, size_t additional_size);
  * @param[in,out] buffer The SqshBuffer to free.
  * @param[in] additional_buffer The pointer to the additional memory.
  * @param[in] additional_size The size of the additional memory.
+ *
+ * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int sqsh__buffer_add_capacity(
 		struct SqshBuffer *buffer, uint8_t **additional_buffer,
@@ -109,6 +115,8 @@ SQSH_NO_UNUSED int sqsh__buffer_add_capacity(
  * @param[in,out] buffer The SqshBuffer to append to.
  * @param[in] source The data to append.
  * @param[in] source_size The size of the data to append.
+ *
+ * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int sqsh__buffer_append(
 		struct SqshBuffer *buffer, const uint8_t *source,
@@ -140,7 +148,9 @@ const uint8_t *sqsh__buffer_data(const struct SqshBuffer *buffer);
  * @internal
  * @memberof SqshBuffer
  * @brief sqsh__buffer_size returns the size of the SqshBuffer.
+ *
  * @param[in] buffer The SqshBuffer to get the size from.
+ *
  * @return the size of the SqshBuffer.
  */
 size_t sqsh__buffer_size(const struct SqshBuffer *buffer);
@@ -150,14 +160,23 @@ size_t sqsh__buffer_size(const struct SqshBuffer *buffer);
  * @memberof SqshBuffer
  * @brief sqsh__buffer_cleanup frees the memory managed by the SqshBuffer.
  * @param[in,out] buffer The SqshBuffer to cleanup.
+ *
+ * @return 0 on success, less than 0 on error.
  */
 int sqsh__buffer_cleanup(struct SqshBuffer *buffer);
 
 ////////////////////////////////////////
 // primitive/rc_map.c
 
+/**
+ * @brief The type of the cleanup callback function.
+ */
 typedef void (*sqsh_rc_map_cleanup_t)(void *data);
 
+/**
+ * @internal
+ * @brief The SqshRcMap struct is a reference-counted array.
+ */
 struct SqshRcMap {
 	/**
 	 * @privatesection
@@ -274,15 +293,27 @@ bool sqsh__rc_map_contains(struct SqshRcMap *array, const void *element);
  */
 int sqsh__rc_map_cleanup(struct SqshRcMap *array);
 
+/**
+ * @internal
+ * @memberof SqshRcMap
+ *
+ * @brief An implementation table to use SqshRcMap as a SqshLruBackend.
+ */
 extern const struct SqshLruBackendImpl sqsh__lru_rc_map;
 
 ////////////////////////////////////////
 // primitive/rc_hash_map.c
 
+/**
+ * @brief The type of the key for the hash map.
+ */
 typedef uint64_t sqsh_rc_map_key_t;
 
 struct SqshRcHashMapInner;
 
+/**
+ * @brief A reference-counted hash map.
+ */
 struct SqshRcHashMap {
 	/**
 	 * @privatesection
@@ -296,7 +327,7 @@ struct SqshRcHashMap {
 
 /**
  * @internal
- * @memberof SqshRcMap
+ * @memberof SqshRcHashMap
  * @brief Initializes a reference-counted array.
  *
  * @param hash_map The array to initialize.
@@ -380,16 +411,36 @@ int sqsh__rc_hash_map_release_key(
  */
 int sqsh__rc_hash_map_cleanup(struct SqshRcHashMap *hash_map);
 
+/**
+ * @internal
+ * @memberof SqshRcHashMap
+ *
+ * @brief An implementation table to use SqshRcHashap as a SqshLruBackend.
+ */
 extern const struct SqshLruBackendImpl sqsh__lru_rc_hash_map;
 
 ////////////////////////////////////////
 // primitive/lru.c
 
+/**
+ * @internal
+ * @brief The connection to the backend data structure. used by the LRU cache.
+ */
 struct SqshLruBackendImpl {
+	/**
+	 * @brief Function that is called to retain an element.
+	 */
 	const void *(*retain)(void *backend, sqsh_index_t id);
+	/**
+	 * @brief Function that is called to release an element.
+	 */
 	int (*release)(void *backend, sqsh_index_t id);
 };
 
+/**
+ * @internal
+ * @brief Adds LRU functionality to a backend data structure.
+ */
 struct SqshLru {
 	/**
 	 * @privatesection
@@ -430,6 +481,10 @@ SQSH_NO_UNUSED int sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t id);
  * @internal
  * @memberof SqshLru
  * @brief Cleans up an LRU cache.
+ *
+ * @param lru The LRU cache to cleanup.
+ *
+ * @return 0 on success, a negative value on error.
  */
 int sqsh__lru_cleanup(struct SqshLru *lru);
 

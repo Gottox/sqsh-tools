@@ -41,16 +41,25 @@ extern "C" {
 ////////////////////////////////////////
 // mapper/curl_mapper.c
 
+/**
+ * @brief a mapper that uses curl to download the file.
+ */
 extern const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_curl;
 
 ////////////////////////////////////////
 // mapper/mmap_mapper.c
 
+/**
+ * @brief a mapper that uses mmap to map the file into memory.
+ */
 extern const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_mmap;
 
 ////////////////////////////////////////
 // mapper/static_mapper.c
 
+/**
+ * @brief a mapper that uses a static buffer.
+ */
 extern const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_static;
 
 #ifdef __cplusplus

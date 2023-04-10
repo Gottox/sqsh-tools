@@ -116,11 +116,6 @@ out:
 	return rv;
 }
 
-size_t
-sqsh__extract_manager_size(struct SqshExtractManager *manager) {
-	return sqsh__rc_hash_map_size(&manager->hash_map);
-}
-
 SQSH_NO_UNUSED int
 uncompress_block(
 		struct SqshBuffer *buffer, struct SqshExtractManager *manager,

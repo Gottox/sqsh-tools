@@ -42,11 +42,15 @@ extern "C" {
 
 ////////////////////////////////////////
 // error.c
-#define SQSH_ERROR_SECTION (1 << 8)
+
+/**
+ * @brief Error codes for sqsh.
+ */
 enum SqshError {
 	SQSH_SUCCESS = 0,
 	// Avoid collisions with errno
-	SQSH_ERROR_SUPERBLOCK_TOO_SMALL = SQSH_ERROR_SECTION + 1,
+	SQSH_ERROR_SECTION_START = (1 << 8),
+	SQSH_ERROR_SUPERBLOCK_TOO_SMALL,
 	SQSH_ERROR_WRONG_MAGIC,
 	SQSH_ERROR_BLOCKSIZE_MISSMATCH,
 	SQSH_ERROR_SIZE_MISSMATCH,
@@ -90,9 +94,21 @@ enum SqshError {
 	SQSH_ERROR_TODO,
 };
 
+/**
+ * @brief Print the error message for the given error code.
+ *
+ * @param error_code The error code.
+ * @param msg The message to print before the error message.
+ */
 void sqsh_perror(int error_code, const char *msg);
 
-SQSH_NO_UNUSED const char *sqsh_error_str(int errorcode);
+/**
+ * @brief Get the error message for the given error code.
+ *
+ * @param error_code The error code.
+ * @return The error message.
+ */
+SQSH_NO_UNUSED const char *sqsh_error_str(int error_code);
 
 #ifdef __cplusplus
 }

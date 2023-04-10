@@ -44,6 +44,9 @@ extern "C" {
 ////////////////////////////////////////
 // inode/inode.c
 
+/**
+ * @brief The Inode context
+ */
 struct SqshInode {
 	/**
 	 * @privatesection
@@ -55,14 +58,15 @@ struct SqshInode {
 
 /**
  * @internal
- * @brief Initialize the inode context from a inode reference. inode references
  * @memberof SqshInode
+ * @brief Initialize the inode context from a inode reference. inode references
  * are descriptors of the physical location of an inode inside the inode table.
  * They are diffrent from the inode number. In doubt use the inode number.
  *
  * @param context The inode context to initialize.
  * @param sqsh The sqsh context.
  * @param inode_ref The inode reference.
+ *
  * @return int 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int sqsh__inode_init(
@@ -70,9 +74,11 @@ SQSH_NO_UNUSED int sqsh__inode_init(
 		uint64_t inode_ref);
 /**
  * @internal
- * @brief cleans up the inode context.
  * @memberof SqshInode
+ * @brief cleans up the inode context.
+ *
  * @param context The inode context.
+ *
  * @return int 0 on success, less than 0 on error.
  */
 int sqsh__inode_cleanup(struct SqshInode *context);
@@ -80,6 +86,9 @@ int sqsh__inode_cleanup(struct SqshInode *context);
 ////////////////////////////////////////
 // inode/directory_index_iterator.c
 
+/**
+ * @brief Iterator for directory indexes
+ */
 struct SqshDirectoryIndexIterator {
 	/**
 	 * @privatesection
@@ -92,6 +101,7 @@ struct SqshDirectoryIndexIterator {
 /**
  * @internal
  * @memberof SqshDirectoryIndexIterator
+ *
  * @brief Initializes an iterator for a directory index
  *
  * @param[out] iterator  The iterator to initialize

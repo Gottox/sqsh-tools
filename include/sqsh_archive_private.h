@@ -47,6 +47,10 @@ extern "C" {
 ////////////////////////////////////////
 // archive/trailing_context.c
 
+/**
+ * @brief The trailing context is used to access the trailing data
+ * of the archive.
+ */
 struct SqshTrailingContext {
 	/**
 	 * @privatesection
@@ -81,6 +85,10 @@ int sqsh__trailing_cleanup(struct SqshTrailingContext *context);
 ////////////////////////////////////////
 // archive/superblock.c
 
+/**
+ * @brief The superblock context is used to access the superblock of
+ * the archive.
+ */
 struct SqshSuperblock {
 	/**
 	 * @privatesection
@@ -133,6 +141,8 @@ struct SqshCompressionOptions {
  * @brief Initialize the compression options context.
  * @param compression_options the compression options context
  * @param sqsh the Sqsh struct
+ *
+ * @return 0 on success, less than 0 on error
  */
 SQSH_NO_UNUSED int sqsh__compression_options_init(
 		struct SqshCompressionOptions *compression_options,
@@ -142,7 +152,10 @@ SQSH_NO_UNUSED int sqsh__compression_options_init(
  * @internal
  * @memberof SqshCompressionOptions
  * @brief Frees the resources used by the compression options context.
+ *
  * @param compression_options the compression options context
+ *
+ * @return 0 on success, less than 0 on error
  */
 int sqsh__compression_options_cleanup(
 		struct SqshCompressionOptions *compression_options);
@@ -175,8 +188,8 @@ struct SqshArchive {
 
 /**
  * @internal
- * @brief sqsh__init initializes the Sqsh structure.
  * @memberof SqshArchive
+ * @brief sqsh__init initializes the Sqsh structure.
  *
  * @param sqsh the Sqsh structure to initialize.
  * @param source the source to retrieve the archive from
@@ -188,19 +201,41 @@ SQSH_NO_UNUSED int sqsh__archive_init(
 		struct SqshArchive *sqsh, const void *source,
 		const struct SqshConfig *config);
 
+/**
+ * @internal
+ * @memberof SqshArchive
+ * @brief sqsh__archive_file_extract_manager retrieves a SqshExtractManager used
+ * for decompressing file contents.
+ *
+ * @param archive the SqshArchive to retrieve the SqshExtractManager from.
+ * @param file_extract_manager the SqshExtractManager to retrieve.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
 int sqsh__archive_file_extract_manager(
-		struct SqshArchive *archive,
-		struct SqshExtractManager **file_extract_manager);
-
-int sqsh__archive_fragment_extract_manager(
 		struct SqshArchive *archive,
 		struct SqshExtractManager **file_extract_manager);
 
 /**
  * @internal
+ * @memberof SqshArchive
+ * @brief sqsh__archive_fragment_extract_manager retrieves a SqshExtractManager
+ * used for decompressing fragment contents.
+ *
+ * @param archive the SqshArchive to retrieve the SqshExtractManager from.
+ * @param fragment_extract_manager the SqshExtractManager to retrieve.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+int sqsh__archive_fragment_extract_manager(
+		struct SqshArchive *archive,
+		struct SqshExtractManager **fragment_extract_manager);
+
+/**
+ * @internal
+ * @memberof SqshArchive
  * @brief sqsh__cleanup frees all resources allocated by the Sqsh structure and
  * cleans up the structure.
- * @memberof SqshArchive
  *
  * @param sqsh the Sqsh structure to cleanup.
  * @return 0 on success, less than 0 on error.

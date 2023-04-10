@@ -45,9 +45,18 @@ struct SqshArchive;
 ////////////////////////////////////////
 // inode/inode.c
 
+/**
+ * @brief Value that indicates the absence of a fragment.
+ */
 #define SQSH_INODE_NO_FRAGMENT 0xFFFFFFFF
+/**
+ * @brief Value that indicates the absence of an xattr table.
+ */
 #define SQSH_INODE_NO_XATTR 0xFFFFFFFF
 
+/**
+ * @brief enum that represents the inode type.
+ */
 enum SqshInodeType {
 	SQSH_INODE_TYPE_UNKNOWN = -1,
 	// avoid overlapping with the types in inode_data.h

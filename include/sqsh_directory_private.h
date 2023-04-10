@@ -44,6 +44,9 @@ extern "C" {
 ////////////////////////////////////////
 // directory/directory_iterator.c
 
+/**
+ * @brief A directory iterator.
+ */
 struct SqshDirectoryIterator {
 	/**
 	 * @privatesection

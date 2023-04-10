@@ -46,6 +46,9 @@ struct SqshArchive;
 ////////////////////////////////////////
 // chrome/path_resolver.c
 
+/**
+ * @brief Resolves paths to inodes.
+ */
 struct SqshPathResolver {
 	/**
 	 * @privatesection

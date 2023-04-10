@@ -46,6 +46,9 @@ struct SqshArchive;
 ////////////////////////////////////////
 // metablock/metablock_iterator.c
 
+/**
+ * @brief Iterator over metablocks.
+ */
 struct SqshMetablockIterator {
 	/**
 	 * @privatesection
@@ -136,6 +139,9 @@ int sqsh__metablock_iterator_cleanup(struct SqshMetablockIterator *iterator);
 ////////////////////////////////////////
 // metablock/metablock_reader.c
 
+/**
+ * @brief Reader over metablocks.
+ */
 struct SqshMetablockReader {
 	/**
 	 * @privatesection
