@@ -34,7 +34,7 @@
 #include "../../include/sqsh_metablock_private.h"
 
 #include "../../include/sqsh_archive.h"
-#include "../../include/sqsh_data.h"
+#include "../../include/sqsh_data_private.h"
 #include "../../include/sqsh_error.h"
 
 #include <stdint.h>
@@ -83,8 +83,8 @@ sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator) {
 	const struct SqshDataMetablock *metablock =
 			(struct SqshDataMetablock *)sqsh__map_reader_data(
 					&iterator->reader);
-	const bool is_compressed = sqsh_data_metablock_is_compressed(metablock);
-	iterator->outer_size = sqsh_data_metablock_size(metablock);
+	const bool is_compressed = sqsh__data_metablock_is_compressed(metablock);
+	iterator->outer_size = sqsh__data_metablock_size(metablock);
 
 	if (iterator->outer_size > SQSH_METABLOCK_BLOCK_SIZE) {
 		rv = -SQSH_ERROR_TODO;
@@ -144,7 +144,7 @@ sqsh__metablock_iterator_skip(
 		const struct SqshDataMetablock *metablock =
 				(struct SqshDataMetablock *)sqsh__map_reader_data(
 						&iterator->reader);
-		size = sqsh_data_metablock_size(metablock);
+		size = sqsh__data_metablock_size(metablock);
 		if (size > SQSH_METABLOCK_BLOCK_SIZE) {
 			rv = -SQSH_ERROR_TODO;
 			goto out;

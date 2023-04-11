@@ -77,7 +77,7 @@ sqsh__xattr_iterator_init(
 	}
 
 	// The XATTR table is the last block in the file system.
-	const uint64_t address_ref = sqsh_data_xattr_lookup_table_xattr_ref(ref);
+	const uint64_t address_ref = sqsh__data_xattr_lookup_table_xattr_ref(ref);
 	const uint64_t inner_offset = sqsh_address_ref_inner_offset(address_ref);
 	const uint64_t outer_offset = sqsh_address_ref_outer_offset(address_ref);
 	const uint64_t archive_size = sqsh_superblock_bytes_used(superblock);
@@ -94,7 +94,7 @@ sqsh__xattr_iterator_init(
 		goto out;
 	}
 
-	iterator->remaining_entries = sqsh_data_xattr_lookup_table_count(ref);
+	iterator->remaining_entries = sqsh__data_xattr_lookup_table_count(ref);
 	iterator->next_offset = inner_offset;
 	iterator->value_index = 0;
 	iterator->context = xattr_table;
@@ -148,10 +148,10 @@ static int
 xattr_value_indirect_load(struct SqshXattrIterator *iterator) {
 	const struct SqshDataXattrValue *value = get_value(iterator);
 	int rv = 0;
-	if (sqsh_data_xattr_value_size(value) != 8) {
+	if (sqsh__data_xattr_value_size(value) != 8) {
 		return -SQSH_ERROR_SIZE_MISSMATCH;
 	}
-	uint64_t ref = sqsh_data_xattr_value_ref(value);
+	uint64_t ref = sqsh__data_xattr_value_ref(value);
 	uint64_t outer_offset = sqsh_address_ref_outer_offset(ref);
 	uint16_t inner_offset = sqsh_address_ref_inner_offset(ref);
 
@@ -175,7 +175,7 @@ xattr_value_indirect_load(struct SqshXattrIterator *iterator) {
 	// Value offset 0 marks an indirect load.
 	iterator->value_index = 0;
 	value = get_value(iterator);
-	size += sqsh_data_xattr_value_size(value);
+	size += sqsh__data_xattr_value_size(value);
 	rv = sqsh__metablock_reader_advance(&iterator->out_of_line_value, 0, size);
 	if (rv < 0) {
 		goto out;
@@ -241,17 +241,17 @@ out:
 
 uint16_t
 sqsh_xattr_iterator_type(struct SqshXattrIterator *iterator) {
-	return sqsh_data_xattr_key_type(get_key(iterator)) & ~0x0100;
+	return sqsh__data_xattr_key_type(get_key(iterator)) & ~0x0100;
 }
 
 bool
 sqsh_xattr_iterator_is_indirect(struct SqshXattrIterator *iterator) {
-	return (sqsh_data_xattr_key_type(get_key(iterator)) & 0x0100) != 0;
+	return (sqsh__data_xattr_key_type(get_key(iterator)) & 0x0100) != 0;
 }
 
 const char *
 sqsh_xattr_iterator_name(struct SqshXattrIterator *iterator) {
-	return (const char *)sqsh_data_xattr_key_name(get_key(iterator));
+	return (const char *)sqsh__data_xattr_key_name(get_key(iterator));
 }
 
 const char *
@@ -313,7 +313,7 @@ sqsh_xattr_iterator_fullname_dup(struct SqshXattrIterator *iterator) {
 
 uint16_t
 sqsh_xattr_iterator_name_size(struct SqshXattrIterator *iterator) {
-	return sqsh_data_xattr_key_name_size(get_key(iterator));
+	return sqsh__data_xattr_key_name_size(get_key(iterator));
 }
 
 char *
@@ -326,12 +326,12 @@ sqsh_xattr_iterator_value_dup(struct SqshXattrIterator *iterator) {
 
 const char *
 sqsh_xattr_iterator_value(struct SqshXattrIterator *iterator) {
-	return (const char *)sqsh_data_xattr_value(get_value(iterator));
+	return (const char *)sqsh__data_xattr_value(get_value(iterator));
 }
 
 uint16_t
 sqsh_xattr_iterator_value_size(struct SqshXattrIterator *iterator) {
-	return sqsh_data_xattr_value_size(get_value(iterator));
+	return sqsh__data_xattr_value_size(get_value(iterator));
 }
 
 int

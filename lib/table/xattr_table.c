@@ -34,7 +34,7 @@
 #include "../../include/sqsh_xattr_private.h"
 
 #include "../../include/sqsh_archive.h"
-#include "../../include/sqsh_data.h"
+#include "../../include/sqsh_data_private.h"
 #include "../../include/sqsh_error.h"
 #include "../utils.h"
 
@@ -75,7 +75,7 @@ sqsh__xattr_table_init(
 	rv = sqsh__table_init(
 			&context->table, sqsh, xattr_address + SQSH_SIZEOF_XATTR_ID_TABLE,
 			SQSH_SIZEOF_XATTR_LOOKUP_TABLE,
-			sqsh_data_xattr_id_table_xattr_ids(header));
+			sqsh__data_xattr_id_table_xattr_ids(header));
 	if (rv < 0) {
 		goto out;
 	}
@@ -89,7 +89,7 @@ out:
 uint64_t
 sqsh_xattr_table_start(struct SqshXattrTable *table) {
 	const struct SqshDataXattrIdTable *header = get_header(table);
-	return sqsh_data_xattr_id_table_xattr_table_start(header);
+	return sqsh__data_xattr_id_table_xattr_table_start(header);
 }
 
 int

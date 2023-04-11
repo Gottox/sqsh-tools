@@ -129,8 +129,8 @@ sqsh__fragment_view_init(
 	}
 
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
-	const uint64_t start_address = sqsh_data_fragment_start(fragment_info);
-	const uint32_t size_info = sqsh_data_fragment_size_info(fragment_info);
+	const uint64_t start_address = sqsh__data_fragment_start(fragment_info);
+	const uint32_t size_info = sqsh__data_fragment_size_info(fragment_info);
 	const uint32_t size = sqsh_datablock_size(size_info);
 	const bool is_compressed = sqsh_datablock_is_compressed(size_info);
 	const uint64_t upper_limit = sqsh_superblock_inode_table_start(superblock);

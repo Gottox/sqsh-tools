@@ -60,49 +60,49 @@ SQSH_STATIC_ASSERT(
 		SQSH_SIZEOF_DIRECTORY_FRAGMENT);
 
 uint16_t
-sqsh_data_directory_entry_offset(const struct SqshDataDirectoryEntry *entry) {
+sqsh__data_directory_entry_offset(const struct SqshDataDirectoryEntry *entry) {
 	return le16toh(entry->offset);
 }
 
 int16_t
-sqsh_data_directory_entry_inode_offset(
+sqsh__data_directory_entry_inode_offset(
 		const struct SqshDataDirectoryEntry *entry) {
 	return le16toh(entry->inode_offset);
 }
 
 uint16_t
-sqsh_data_directory_entry_type(const struct SqshDataDirectoryEntry *entry) {
+sqsh__data_directory_entry_type(const struct SqshDataDirectoryEntry *entry) {
 	return le16toh(entry->type);
 }
 
 uint16_t
-sqsh_data_directory_entry_name_size(
+sqsh__data_directory_entry_name_size(
 		const struct SqshDataDirectoryEntry *entry) {
 	return le16toh(entry->name_size);
 }
 
 const uint8_t *
-sqsh_data_directory_entry_name(const struct SqshDataDirectoryEntry *entry) {
+sqsh__data_directory_entry_name(const struct SqshDataDirectoryEntry *entry) {
 	return (const uint8_t *)&entry[1];
 }
 
 uint32_t
-sqsh_data_directory_fragment_count(
+sqsh__data_directory_fragment_count(
 		const struct SqshDataDirectoryFragment *fragment) {
 	return le32toh(fragment->count);
 }
 uint32_t
-sqsh_data_directory_fragment_start(
+sqsh__data_directory_fragment_start(
 		const struct SqshDataDirectoryFragment *fragment) {
 	return le32toh(fragment->start);
 }
 uint32_t
-sqsh_data_directory_fragment_inode_number(
+sqsh__data_directory_fragment_inode_number(
 		const struct SqshDataDirectoryFragment *fragment) {
 	return le32toh(fragment->inode_number);
 }
 const struct SqshDataDirectoryEntry *
-sqsh_data_directory_fragment_entries(
+sqsh__data_directory_fragment_entries(
 		const struct SqshDataDirectoryFragment *fragment) {
 	return (const struct SqshDataDirectoryEntry *)&fragment[1];
 }

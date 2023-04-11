@@ -44,16 +44,16 @@ struct SQSH_UNALIGNED SqshDataMetablock {
 SQSH_STATIC_ASSERT(sizeof(struct SqshDataMetablock) == SQSH_SIZEOF_METABLOCK);
 
 int
-sqsh_data_metablock_is_compressed(const struct SqshDataMetablock *metablock) {
+sqsh__data_metablock_is_compressed(const struct SqshDataMetablock *metablock) {
 	return !(htole16(metablock->header) & 0x8000);
 }
 
 const uint8_t *
-sqsh_data_metablock_data(const struct SqshDataMetablock *metablock) {
+sqsh__data_metablock_data(const struct SqshDataMetablock *metablock) {
 	return (uint8_t *)&metablock[1];
 }
 
 uint16_t
-sqsh_data_metablock_size(const struct SqshDataMetablock *metablock) {
+sqsh__data_metablock_size(const struct SqshDataMetablock *metablock) {
 	return htole16(metablock->header) & 0x7FFF;
 }

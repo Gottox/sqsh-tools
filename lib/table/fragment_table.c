@@ -34,8 +34,7 @@
 #include "../../include/sqsh_archive.h"
 #include "../../include/sqsh_inode.h"
 #include "../../include/sqsh_table_private.h"
-
-#include "../../include/sqsh_data.h"
+#include "../../include/sqsh_data_private.h"
 
 int
 sqsh__fragment_table_init(

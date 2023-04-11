@@ -34,7 +34,7 @@
 #include "../../include/sqsh_directory_private.h"
 
 #include "../../include/sqsh_archive.h"
-#include "../../include/sqsh_data.h"
+#include "../../include/sqsh_data_private.h"
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_inode_private.h"
 #include "../utils.h"
@@ -177,7 +177,7 @@ int
 sqsh_directory_iterator_name_size(
 		const struct SqshDirectoryIterator *iterator) {
 	const struct SqshDataDirectoryEntry *entry = get_entry(iterator);
-	return sqsh_data_directory_entry_name_size(entry) + 1;
+	return sqsh__data_directory_entry_name_size(entry) + 1;
 }
 
 uint64_t
@@ -185,7 +185,7 @@ sqsh_directory_iterator_inode_ref(
 		const struct SqshDirectoryIterator *iterator) {
 	const uint32_t block_index = iterator->start_base;
 	const uint16_t block_offset =
-			sqsh_data_directory_entry_offset(get_entry(iterator));
+			sqsh__data_directory_entry_offset(get_entry(iterator));
 
 	return sqsh_address_ref_create(block_index, block_offset);
 }
@@ -193,7 +193,7 @@ sqsh_directory_iterator_inode_ref(
 enum SqshInodeType
 sqsh_directory_iterator_inode_type(
 		const struct SqshDirectoryIterator *iterator) {
-	switch (sqsh_data_directory_entry_type(get_entry(iterator))) {
+	switch (sqsh__data_directory_entry_type(get_entry(iterator))) {
 	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
 		return SQSH_INODE_TYPE_DIRECTORY;
 	case SQSH_INODE_TYPE_BASIC_FILE:
@@ -234,9 +234,9 @@ process_fragment(struct SqshDirectoryIterator *iterator) {
 
 	const struct SqshDataDirectoryFragment *fragment = get_fragment(iterator);
 	iterator->remaining_entries =
-			sqsh_data_directory_fragment_count(fragment) + 1;
-	iterator->start_base = sqsh_data_directory_fragment_start(fragment);
-	iterator->inode_base = sqsh_data_directory_fragment_inode_number(fragment);
+			sqsh__data_directory_fragment_count(fragment) + 1;
+	iterator->start_base = sqsh__data_directory_fragment_start(fragment);
+	iterator->inode_base = sqsh__data_directory_fragment_inode_number(fragment);
 
 	iterator->next_offset = SQSH_SIZEOF_DIRECTORY_FRAGMENT;
 
@@ -296,7 +296,7 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator) {
 const char *
 sqsh_directory_iterator_name(const struct SqshDirectoryIterator *iterator) {
 	const struct SqshDataDirectoryEntry *entry = get_entry(iterator);
-	return (char *)sqsh_data_directory_entry_name(entry);
+	return (char *)sqsh__data_directory_entry_name(entry);
 }
 
 char *

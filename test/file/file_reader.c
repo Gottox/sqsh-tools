@@ -36,7 +36,7 @@
 #include "../test.h"
 
 #include "../../include/sqsh_archive_private.h"
-#include "../../include/sqsh_data.h"
+#include "../../include/sqsh_data_private.h"
 #include "../../include/sqsh_inode_private.h"
 #include "../../lib/utils.h"
 #include "sqsh_file.h"

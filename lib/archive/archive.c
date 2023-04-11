@@ -33,7 +33,7 @@
 
 #include "../../include/sqsh_archive_private.h"
 
-#include "../../include/sqsh_data.h"
+#include "../../include/sqsh_data_private.h"
 
 #include "../utils.h"
 

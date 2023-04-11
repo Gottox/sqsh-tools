@@ -45,11 +45,11 @@ struct SQSH_UNALIGNED SqshDataFragment {
 SQSH_STATIC_ASSERT(sizeof(struct SqshDataFragment) == SQSH_SIZEOF_FRAGMENT);
 
 uint64_t
-sqsh_data_fragment_start(const struct SqshDataFragment *fragment) {
+sqsh__data_fragment_start(const struct SqshDataFragment *fragment) {
 	return le64toh(fragment->start);
 }
 
 uint32_t
-sqsh_data_fragment_size_info(const struct SqshDataFragment *fragment) {
+sqsh__data_fragment_size_info(const struct SqshDataFragment *fragment) {
 	return le32toh(fragment->size_info);
 }

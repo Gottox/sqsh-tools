@@ -33,7 +33,7 @@
 
 #include "../../include/sqsh_inode_private.h"
 
-#include "../../include/sqsh_data.h"
+#include "../../include/sqsh_data_private.h"
 #include "../../include/sqsh_error.h"
 
 #include <stdlib.h>
@@ -77,9 +77,9 @@ sqsh__directory_index_iterator_init(
 
 	// TODO: Move this block to a method of SqshInode
 	const struct SqshDataInodeDirectoryExt *xdir =
-			sqsh_data_inode_directory_ext(get_inode(iterator));
+			sqsh__data_inode_directory_ext(get_inode(iterator));
 	iterator->remaining_entries =
-			sqsh_data_inode_directory_ext_index_count(xdir);
+			sqsh__data_inode_directory_ext_index_count(xdir);
 
 out:
 	if (rv < 0) {
@@ -141,28 +141,28 @@ sqsh__directory_index_iterator_index(
 		const struct SqshDirectoryIndexIterator *iterator) {
 	const struct SqshDataInodeDirectoryIndex *current =
 			get_directory_index(iterator);
-	return sqsh_data_inode_directory_index_index(current);
+	return sqsh__data_inode_directory_index_index(current);
 }
 uint32_t
 sqsh__directory_index_iterator_start(
 		const struct SqshDirectoryIndexIterator *iterator) {
 	const struct SqshDataInodeDirectoryIndex *current =
 			get_directory_index(iterator);
-	return sqsh_data_inode_directory_index_start(current);
+	return sqsh__data_inode_directory_index_start(current);
 }
 uint32_t
 sqsh__directory_index_iterator_name_size(
 		const struct SqshDirectoryIndexIterator *iterator) {
 	const struct SqshDataInodeDirectoryIndex *current =
 			get_directory_index(iterator);
-	return sqsh_data_inode_directory_index_name_size(current) + 1;
+	return sqsh__data_inode_directory_index_name_size(current) + 1;
 }
 const char *
 sqsh__directory_index_iterator_name(
 		const struct SqshDirectoryIndexIterator *iterator) {
 	const struct SqshDataInodeDirectoryIndex *current =
 			get_directory_index(iterator);
-	return (const char *)sqsh_data_inode_directory_index_name(current);
+	return (const char *)sqsh__data_inode_directory_index_name(current);
 }
 
 int

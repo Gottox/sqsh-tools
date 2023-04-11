@@ -172,256 +172,256 @@ struct SQSH_UNALIGNED SqshDataInode {
 };
 
 uint16_t
-sqsh_data_inode_type(const struct SqshDataInode *inode) {
+sqsh__data_inode_type(const struct SqshDataInode *inode) {
 	return htole16(inode->header.type);
 }
 uint16_t
-sqsh_data_inode_permissions(const struct SqshDataInode *inode) {
+sqsh__data_inode_permissions(const struct SqshDataInode *inode) {
 	return htole16(inode->header.permissions);
 }
 uint16_t
-sqsh_data_inode_uid_idx(const struct SqshDataInode *inode) {
+sqsh__data_inode_uid_idx(const struct SqshDataInode *inode) {
 	return htole16(inode->header.uid_idx);
 }
 uint16_t
-sqsh_data_inode_gid_idx(const struct SqshDataInode *inode) {
+sqsh__data_inode_gid_idx(const struct SqshDataInode *inode) {
 	return htole16(inode->header.gid_idx);
 }
 uint32_t
-sqsh_data_inode_modified_time(const struct SqshDataInode *inode) {
+sqsh__data_inode_modified_time(const struct SqshDataInode *inode) {
 	return htole32(inode->header.modified_time);
 }
 uint32_t
-sqsh_data_inode_number(const struct SqshDataInode *inode) {
+sqsh__data_inode_number(const struct SqshDataInode *inode) {
 	return htole32(inode->header.inode_number);
 }
 
 uint32_t
-sqsh_data_inode_file_blocks_start(const struct SqshDataInodeFile *file) {
+sqsh__data_inode_file_blocks_start(const struct SqshDataInodeFile *file) {
 	return htole32(file->blocks_start);
 }
 uint32_t
-sqsh_data_inode_file_fragment_block_index(
+sqsh__data_inode_file_fragment_block_index(
 		const struct SqshDataInodeFile *file) {
 	return htole32(file->fragment_block_index);
 }
 uint32_t
-sqsh_data_inode_file_block_offset(const struct SqshDataInodeFile *file) {
+sqsh__data_inode_file_block_offset(const struct SqshDataInodeFile *file) {
 	return htole32(file->block_offset);
 }
 uint32_t
-sqsh_data_inode_file_size(const struct SqshDataInodeFile *file) {
+sqsh__data_inode_file_size(const struct SqshDataInodeFile *file) {
 	return htole32(file->file_size);
 }
 uint32_t
-sqsh_data_inode_file_block_size_info(
+sqsh__data_inode_file_block_size_info(
 		const struct SqshDataInodeFile *file, sqsh_index_t index) {
 	uint32_t *block_sizes = (uint32_t *)&file[1];
 	return htole32(block_sizes[index]);
 }
 
 uint64_t
-sqsh_data_inode_file_ext_blocks_start(
+sqsh__data_inode_file_ext_blocks_start(
 		const struct SqshDataInodeFileExt *file_ext) {
 	return htole64(file_ext->blocks_start);
 }
 uint64_t
-sqsh_data_inode_file_ext_size(const struct SqshDataInodeFileExt *file_ext) {
+sqsh__data_inode_file_ext_size(const struct SqshDataInodeFileExt *file_ext) {
 	return htole64(file_ext->file_size);
 }
 uint64_t
-sqsh_data_inode_file_ext_sparse(const struct SqshDataInodeFileExt *file_ext) {
+sqsh__data_inode_file_ext_sparse(const struct SqshDataInodeFileExt *file_ext) {
 	return htole64(file_ext->sparse);
 }
 uint32_t
-sqsh_data_inode_file_ext_hard_link_count(
+sqsh__data_inode_file_ext_hard_link_count(
 		const struct SqshDataInodeFileExt *file_ext) {
 	return htole32(file_ext->hard_link_count);
 }
 uint32_t
-sqsh_data_inode_file_ext_fragment_block_index(
+sqsh__data_inode_file_ext_fragment_block_index(
 		const struct SqshDataInodeFileExt *file_ext) {
 	return htole32(file_ext->fragment_block_index);
 }
 uint32_t
-sqsh_data_inode_file_ext_block_offset(
+sqsh__data_inode_file_ext_block_offset(
 		const struct SqshDataInodeFileExt *file_ext) {
 	return htole32(file_ext->block_offset);
 }
 uint32_t
-sqsh_data_inode_file_ext_xattr_idx(
+sqsh__data_inode_file_ext_xattr_idx(
 		const struct SqshDataInodeFileExt *file_ext) {
 	return htole32(file_ext->xattr_idx);
 }
 uint32_t
-sqsh_data_inode_file_ext_block_size_info(
+sqsh__data_inode_file_ext_block_size_info(
 		const struct SqshDataInodeFileExt *file_ext, sqsh_index_t index) {
 	uint32_t *block_sizes = (uint32_t *)&file_ext[1];
 	return htole32(block_sizes[index]);
 }
 
 const struct SqshDataInodeDirectory *
-sqsh_data_inode_directory(const struct SqshDataInode *inode) {
+sqsh__data_inode_directory(const struct SqshDataInode *inode) {
 	return &inode->data.directory;
 }
 const struct SqshDataInodeDirectoryExt *
-sqsh_data_inode_directory_ext(const struct SqshDataInode *inode) {
+sqsh__data_inode_directory_ext(const struct SqshDataInode *inode) {
 	return &inode->data.directory_ext;
 }
 const struct SqshDataInodeFile *
-sqsh_data_inode_file(const struct SqshDataInode *inode) {
+sqsh__data_inode_file(const struct SqshDataInode *inode) {
 	return &inode->data.file;
 }
 const struct SqshDataInodeFileExt *
-sqsh_data_inode_file_ext(const struct SqshDataInode *inode) {
+sqsh__data_inode_file_ext(const struct SqshDataInode *inode) {
 	return &inode->data.file_ext;
 }
 const struct SqshDataInodeSymlink *
-sqsh_data_inode_symlink(const struct SqshDataInode *inode) {
+sqsh__data_inode_symlink(const struct SqshDataInode *inode) {
 	return &inode->data.symlink;
 }
 const struct SqshDataInodeSymlinkExt *
-sqsh_data_inode_symlink_ext(const struct SqshDataInode *inode) {
+sqsh__data_inode_symlink_ext(const struct SqshDataInode *inode) {
 	return &inode->data.symlink_ext;
 }
 const struct SqshDataInodeDevice *
-sqsh_data_inode_device(const struct SqshDataInode *inode) {
+sqsh__data_inode_device(const struct SqshDataInode *inode) {
 	return &inode->data.device;
 }
 const struct SqshDataInodeDeviceExt *
-sqsh_data_inode_device_ext(const struct SqshDataInode *inode) {
+sqsh__data_inode_device_ext(const struct SqshDataInode *inode) {
 	return &inode->data.device_ext;
 }
 const struct SqshDataInodeIpc *
-sqsh_data_inode_ipc(const struct SqshDataInode *inode) {
+sqsh__data_inode_ipc(const struct SqshDataInode *inode) {
 	return &inode->data.ipc;
 }
 const struct SqshDataInodeIpcExt *
-sqsh_data_inode_ipc_ext(const struct SqshDataInode *inode) {
+sqsh__data_inode_ipc_ext(const struct SqshDataInode *inode) {
 	return &inode->data.ipc_ext;
 }
 
 uint32_t
-sqsh_data_inode_directory_block_start(
+sqsh__data_inode_directory_block_start(
 		const struct SqshDataInodeDirectory *directory) {
 	return htole32(directory->block_start);
 }
 uint32_t
-sqsh_data_inode_directory_hard_link_count(
+sqsh__data_inode_directory_hard_link_count(
 		const struct SqshDataInodeDirectory *directory) {
 	return htole32(directory->hard_link_count);
 }
 uint16_t
-sqsh_data_inode_directory_file_size(
+sqsh__data_inode_directory_file_size(
 		const struct SqshDataInodeDirectory *directory) {
 	return htole16(directory->file_size);
 }
 uint16_t
-sqsh_data_inode_directory_block_offset(
+sqsh__data_inode_directory_block_offset(
 		const struct SqshDataInodeDirectory *directory) {
 	return htole16(directory->block_offset);
 }
 uint32_t
-sqsh_data_inode_directory_parent_inode_number(
+sqsh__data_inode_directory_parent_inode_number(
 		const struct SqshDataInodeDirectory *directory) {
 	return htole32(directory->parent_inode_number);
 }
 
 uint32_t
-sqsh_data_inode_directory_ext_hard_link_count(
+sqsh__data_inode_directory_ext_hard_link_count(
 		const struct SqshDataInodeDirectoryExt *directory_ext) {
 	return htole32(directory_ext->hard_link_count);
 }
 uint32_t
-sqsh_data_inode_directory_ext_file_size(
+sqsh__data_inode_directory_ext_file_size(
 		const struct SqshDataInodeDirectoryExt *directory_ext) {
 	return htole32(directory_ext->file_size);
 }
 uint32_t
-sqsh_data_inode_directory_ext_block_start(
+sqsh__data_inode_directory_ext_block_start(
 		const struct SqshDataInodeDirectoryExt *directory_ext) {
 	return htole32(directory_ext->block_start);
 }
 uint32_t
-sqsh_data_inode_directory_ext_parent_inode_number(
+sqsh__data_inode_directory_ext_parent_inode_number(
 		const struct SqshDataInodeDirectoryExt *directory_ext) {
 	return htole32(directory_ext->parent_inode_number);
 }
 uint16_t
-sqsh_data_inode_directory_ext_index_count(
+sqsh__data_inode_directory_ext_index_count(
 		const struct SqshDataInodeDirectoryExt *directory_ext) {
 	return htole16(directory_ext->index_count);
 }
 uint16_t
-sqsh_data_inode_directory_ext_block_offset(
+sqsh__data_inode_directory_ext_block_offset(
 		const struct SqshDataInodeDirectoryExt *directory_ext) {
 	return htole16(directory_ext->block_offset);
 }
 uint32_t
-sqsh_data_inode_directory_ext_xattr_idx(
+sqsh__data_inode_directory_ext_xattr_idx(
 		const struct SqshDataInodeDirectoryExt *directory_ext) {
 	return htole32(directory_ext->xattr_idx);
 }
 const uint8_t *
-sqsh_data_inode_directory_ext_index(
+sqsh__data_inode_directory_ext_index(
 		const struct SqshDataInodeDirectoryExt *directory_ext) {
 	return (const uint8_t *)&directory_ext[1];
 }
 
 uint32_t
-sqsh_data_inode_directory_index_index(
+sqsh__data_inode_directory_index_index(
 		const struct SqshDataInodeDirectoryIndex *directory_index) {
 	return le32toh(directory_index->index);
 }
 uint32_t
-sqsh_data_inode_directory_index_start(
+sqsh__data_inode_directory_index_start(
 		const struct SqshDataInodeDirectoryIndex *directory_index) {
 	return le32toh(directory_index->start);
 }
 uint32_t
-sqsh_data_inode_directory_index_name_size(
+sqsh__data_inode_directory_index_name_size(
 		const struct SqshDataInodeDirectoryIndex *directory_index) {
 	return le32toh(directory_index->name_size);
 }
 const uint8_t *
-sqsh_data_inode_directory_index_name(
+sqsh__data_inode_directory_index_name(
 		const struct SqshDataInodeDirectoryIndex *directory_index) {
 	return (const uint8_t *)&directory_index[1];
 }
 
 uint32_t
-sqsh_data_inode_symlink_hard_link_count(
+sqsh__data_inode_symlink_hard_link_count(
 		const struct SqshDataInodeSymlink *symlink) {
 	return le32toh(symlink->hard_link_count);
 }
 uint32_t
-sqsh_data_inode_symlink_target_size(
+sqsh__data_inode_symlink_target_size(
 		const struct SqshDataInodeSymlink *symlink) {
 	return le32toh(symlink->target_size);
 }
 const uint8_t *
-sqsh_data_inode_symlink_target_path(
+sqsh__data_inode_symlink_target_path(
 		const struct SqshDataInodeSymlink *symlink) {
 	return (const uint8_t *)&symlink[1];
 }
 
 uint32_t
-sqsh_data_inode_symlink_ext_hard_link_count(
+sqsh__data_inode_symlink_ext_hard_link_count(
 		const struct SqshDataInodeSymlinkExt *symlink_ext) {
 	return le32toh(symlink_ext->hard_link_count);
 }
 uint32_t
-sqsh_data_inode_symlink_ext_target_size(
+sqsh__data_inode_symlink_ext_target_size(
 		const struct SqshDataInodeSymlinkExt *symlink_ext) {
 	return le32toh(symlink_ext->target_size);
 }
 const uint8_t *
-sqsh_data_inode_symlink_ext_target_path(
+sqsh__data_inode_symlink_ext_target_path(
 		const struct SqshDataInodeSymlinkExt *symlink_ext) {
 	return (const uint8_t *)&symlink_ext[1];
 }
 uint32_t
-sqsh_data_inode_symlink_ext_xattr_idx(
+sqsh__data_inode_symlink_ext_xattr_idx(
 		const struct SqshDataInodeSymlinkExt *symlink_ext) {
 	/*
 	 * The xattr attributes of a symlink are located behind the target_path.
@@ -442,49 +442,49 @@ sqsh_data_inode_symlink_ext_xattr_idx(
 	 *    xattr_idx -----> [n+1]
 	 */
 	const uint32_t target_size =
-			sqsh_data_inode_symlink_ext_target_size(symlink_ext) + 1;
+			sqsh__data_inode_symlink_ext_target_size(symlink_ext) + 1;
 	const uint8_t *target_path =
-			sqsh_data_inode_symlink_ext_target_path(symlink_ext);
+			sqsh__data_inode_symlink_ext_target_path(symlink_ext);
 	const uint8_t *target_path_end = &target_path[target_size];
 	const uint32_t *xattr_idx = (const uint32_t *)target_path_end;
 	return le32toh(*xattr_idx);
 }
 
 uint32_t
-sqsh_data_inode_device_hard_link_count(
+sqsh__data_inode_device_hard_link_count(
 		const struct SqshDataInodeDevice *device) {
 	return device->hard_link_count;
 }
 uint32_t
-sqsh_data_inode_device_device(const struct SqshDataInodeDevice *device) {
+sqsh__data_inode_device_device(const struct SqshDataInodeDevice *device) {
 	return device->device;
 }
 
 uint32_t
-sqsh_data_inode_device_ext_hard_link_count(
+sqsh__data_inode_device_ext_hard_link_count(
 		const struct SqshDataInodeDeviceExt *device) {
 	return device->hard_link_count;
 }
 uint32_t
-sqsh_data_inode_device_ext_device(const struct SqshDataInodeDeviceExt *device) {
+sqsh__data_inode_device_ext_device(const struct SqshDataInodeDeviceExt *device) {
 	return device->device;
 }
 uint32_t
-sqsh_data_inode_device_ext_xattr_idx(
+sqsh__data_inode_device_ext_xattr_idx(
 		const struct SqshDataInodeDeviceExt *device) {
 	return device->xattr_idx;
 }
 
 uint32_t
-sqsh_data_inode_ipc_hard_link_count(const struct SqshDataInodeIpc *ipc) {
+sqsh__data_inode_ipc_hard_link_count(const struct SqshDataInodeIpc *ipc) {
 	return ipc->hard_link_count;
 }
 
 uint32_t
-sqsh_data_inode_ipc_ext_hard_link_count(const struct SqshDataInodeIpcExt *ipc) {
+sqsh__data_inode_ipc_ext_hard_link_count(const struct SqshDataInodeIpcExt *ipc) {
 	return ipc->hard_link_count;
 }
 uint32_t
-sqsh_data_inode_ipc_ext_xattr_idx(const struct SqshDataInodeIpcExt *ipc) {
+sqsh__data_inode_ipc_ext_xattr_idx(const struct SqshDataInodeIpcExt *ipc) {
 	return ipc->xattr_idx;
 }

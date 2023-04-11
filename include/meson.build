@@ -4,7 +4,6 @@ headers = [
 	'sqsh_chrome_private.h',
 	'sqsh_common.h',
 	'sqsh_extract_private.h',
-	'sqsh_data.h',
 	'sqsh_data_private.h',
 	'sqsh_directory.h',
 	'sqsh_directory_private.h',
