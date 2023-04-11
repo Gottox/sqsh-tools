@@ -145,7 +145,6 @@ sqsh__directory_iterator_init(
 				sqsh_inode_file_size(inode), 3, &iterator->remaining_size)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
-	iterator->inode = inode;
 
 	rv = sqsh__metablock_reader_init(
 			&iterator->metablock, archive, NULL, start_address, upper_limit);
@@ -154,6 +153,7 @@ sqsh__directory_iterator_init(
 	}
 
 	iterator->next_offset = inner_offset;
+	iterator->inode = inode;
 
 	return rv;
 }
@@ -188,6 +188,17 @@ sqsh_directory_iterator_inode_ref(
 			sqsh__data_directory_entry_offset(get_entry(iterator));
 
 	return sqsh_address_ref_create(block_index, block_offset);
+}
+
+uint64_t
+sqsh_directory_iterator_inode_number(
+		const struct SqshDirectoryIterator *iterator) {
+	const struct SqshDataDirectoryEntry *entry = get_entry(iterator);
+	const uint32_t inode_base = iterator->inode_base;
+	const uint16_t inode_offset =
+			sqsh__data_directory_entry_inode_offset(entry);
+
+	return inode_base + inode_offset;
 }
 
 enum SqshInodeType

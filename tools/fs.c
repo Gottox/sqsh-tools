@@ -166,34 +166,32 @@ sqshfs_destroy(void *userdata) {
 }
 
 static mode_t
-sqshfs_inode_mode(struct SqshInode *inode) {
-	mode_t mode = sqsh_inode_permission(inode);
-	switch (sqsh_inode_type(inode)) {
+sqshfs_mode_type(enum SqshInodeType type) {
+	switch (type) {
 	case SQSH_INODE_TYPE_DIRECTORY:
-		mode |= S_IFDIR;
-		break;
+		return S_IFDIR;
 	case SQSH_INODE_TYPE_FILE:
-		mode |= S_IFREG;
-		break;
+		return S_IFREG;
 	case SQSH_INODE_TYPE_SYMLINK:
-		mode |= S_IFLNK;
-		break;
+		return S_IFLNK;
 	case SQSH_INODE_TYPE_BLOCK:
-		mode |= S_IFBLK;
-		break;
+		return S_IFBLK;
 	case SQSH_INODE_TYPE_CHAR:
-		mode |= S_IFCHR;
-		break;
+		return S_IFCHR;
 	case SQSH_INODE_TYPE_FIFO:
-		mode |= S_IFIFO;
-		break;
+		return S_IFIFO;
 	case SQSH_INODE_TYPE_SOCKET:
-		mode |= S_IFSOCK;
-		break;
+		return S_IFSOCK;
 	case SQSH_INODE_TYPE_UNKNOWN:
 		return 0;
 	}
-	return mode;
+	return 0;
+}
+
+static mode_t
+sqshfs_inode_mode(struct SqshInode *inode) {
+	mode_t mode = sqsh_inode_permission(inode);
+	return mode | sqshfs_mode_type(sqsh_inode_type(inode));
 }
 
 static void
@@ -410,7 +408,6 @@ sqshfs_readdir(
 	(void)ino;
 
 	int rv = 0;
-	struct SqshInode *inode = NULL;
 	struct Sqshfs *context = fuse_req_userdata(req);
 	struct SqshfsDirHandle *handle = get_dir_handle(fi);
 	dbg("sqshfs_readdir\n");
@@ -426,13 +423,15 @@ sqshfs_readdir(
 		fuse_reply_buf(req, NULL, 0);
 		goto out;
 	}
-	const uint64_t inode_ref =
-			sqsh_directory_iterator_inode_ref(handle->iterator);
-	inode = sqsh_inode_new(context->archive, inode_ref, &rv);
-	sqshfs_inode_to_stat(inode, NULL, &handle->current_stat);
+
+	handle->current_stat.st_ino =
+			sqsh_directory_iterator_inode_number(handle->iterator);
+	handle->current_stat.st_mode = sqshfs_mode_type(
+			sqsh_directory_iterator_inode_type(handle->iterator));
 	handle->current_name = sqsh_directory_iterator_name_dup(handle->iterator);
 	if (handle->current_name == NULL) {
-		dbg("sqshfs_readdir: sqsh_directory_iterator_name_dup failed\n");
+		dbg("sqshfs_readdir: sqsh_directory_iterator_name_dup "
+			"failed\n");
 		fuse_reply_err(req, ENOMEM);
 		goto out;
 	}
@@ -445,7 +444,6 @@ sqshfs_readdir(
 	fuse_reply_buf(req, buf, result_size);
 
 out:
-	sqsh_inode_free(inode);
 	return;
 }
 
@@ -615,7 +613,8 @@ sqshfs_listxattr(fuse_req_t req, fuse_ino_t ino, size_t size) {
 	while ((rv = sqsh_xattr_iterator_next(iterator)) > 0) {
 		prefix = sqsh_xattr_iterator_prefix(iterator);
 		if (prefix == NULL) {
-			dbg("sqshfs_listxattr: sqsh_xattr_iterator_prefix failed\n");
+			dbg("sqshfs_listxattr: sqsh_xattr_iterator_prefix "
+				"failed\n");
 			fuse_reply_err(req, EIO);
 			goto out;
 		}
