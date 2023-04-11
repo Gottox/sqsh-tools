@@ -46,8 +46,8 @@
 int
 sqsh__metablock_iterator_init(
 		struct SqshMetablockIterator *iterator, struct SqshArchive *sqsh,
-		struct SqshExtractManager *compression_manager,
-		uint64_t start_address, uint64_t upper_limit) {
+		struct SqshExtractManager *compression_manager, uint64_t start_address,
+		uint64_t upper_limit) {
 	int rv = 0;
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(sqsh);
 

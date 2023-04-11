@@ -80,11 +80,13 @@ sqsh__extract_view_data(const struct SqshExtractView *view) {
 	return &data[view->offset];
 }
 
-size_t sqsh__extract_view_size(const struct SqshExtractView *view) {
+size_t
+sqsh__extract_view_size(const struct SqshExtractView *view) {
 	return view->size;
 }
 
-int sqsh__extract_view_cleanup(struct SqshExtractView *view) {
+int
+sqsh__extract_view_cleanup(struct SqshExtractView *view) {
 	int rv = 0;
 
 	if (view->manager != NULL) {

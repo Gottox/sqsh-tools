@@ -36,8 +36,8 @@
 #include "../test.h"
 
 #include "../../include/sqsh_archive_private.h"
-#include "../../include/sqsh_extract_private.h"
 #include "../../include/sqsh_data.h"
+#include "../../include/sqsh_extract_private.h"
 #include "../../include/sqsh_mapper_private.h"
 
 static void

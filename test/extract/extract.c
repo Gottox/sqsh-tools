@@ -243,4 +243,3 @@ TEST(decompress_zstd);
 TEST(decompress_zstd_split);
 TEST(multithreaded_lzo);
 DEFINE_END
-

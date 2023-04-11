@@ -136,8 +136,7 @@ uncompress_block(
 
 	const uint8_t *data = sqsh__map_reader_data(&reader);
 
-	rv = sqsh__extractor_to_buffer(
-			extractor, buffer, data, size);
+	rv = sqsh__extractor_to_buffer(extractor, buffer, data, size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -149,8 +148,8 @@ out:
 
 int
 sqsh__extract_manager_uncompress(
-		struct SqshExtractManager *manager,
-		const struct SqshMapReader *reader, const struct SqshBuffer **target) {
+		struct SqshExtractManager *manager, const struct SqshMapReader *reader,
+		const struct SqshBuffer **target) {
 	int rv = 0;
 	const struct SqshExtractor *extractor = manager->extractor;
 
@@ -174,8 +173,7 @@ sqsh__extract_manager_uncompress(
 		}
 		const uint8_t *data = sqsh__map_reader_data(reader);
 
-		rv = sqsh__extractor_to_buffer(
-				extractor, &buffer, data, size);
+		rv = sqsh__extractor_to_buffer(extractor, &buffer, data, size);
 		if (rv < 0) {
 			goto out;
 		}
@@ -191,8 +189,7 @@ out:
 
 int
 sqsh__extract_manager_release(
-		struct SqshExtractManager *manager,
-		const struct SqshBuffer *buffer) {
+		struct SqshExtractManager *manager, const struct SqshBuffer *buffer) {
 	int rv = pthread_mutex_lock(&manager->lock);
 	if (rv != 0) {
 		// rv = -SQSH_ERROR_MUTEX_LOCK;

@@ -38,7 +38,8 @@
 #include "../../include/sqsh_data.h"
 
 int
-sqsh__fragment_table_init(struct SqshFragmentTable *table, struct SqshArchive *sqsh) {
+sqsh__fragment_table_init(
+		struct SqshFragmentTable *table, struct SqshArchive *sqsh) {
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
 	const uint64_t table_start =
 			sqsh_superblock_fragment_table_start(superblock);

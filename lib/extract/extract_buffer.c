@@ -34,12 +34,10 @@
 #include "../../include/sqsh_extract_private.h"
 
 SQSH_STATIC_ASSERT(
-		sizeof(sqsh__extractor_context_t) >=
-		sizeof(struct SqshExtractBuffer));
+		sizeof(sqsh__extractor_context_t) >= sizeof(struct SqshExtractBuffer));
 
 int
-sqsh__extract_buffer_init(
-		void *context, uint8_t *target, size_t target_size) {
+sqsh__extract_buffer_init(void *context, uint8_t *target, size_t target_size) {
 	(void)target;
 	(void)target_size;
 	int rv = 0;
