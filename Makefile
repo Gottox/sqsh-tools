@@ -22,8 +22,8 @@ else
 endif
 MESON_FLAGS += -Ddefault_library=static
 MESON_FLAGS += -Db_lundef=false
-MESON_FLAGS += -Dtest=extended
-#MESON_FLAGS += -Dtest=true
+#MESON_FLAGS += -Dtest=extended
+MESON_FLAGS += -Dtest=true
 MESON_FLAGS += -Ddoc=internal
 MESON_FLAGS += -Dcurl=enabled
 MESON_FLAGS += -Dzlib=enabled

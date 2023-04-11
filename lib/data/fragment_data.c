@@ -37,6 +37,13 @@
 
 #include <endian.h>
 
+struct SQSH_UNALIGNED SqshDataFragment {
+	uint64_t start;
+	uint32_t size_info;
+	uint32_t unused;
+};
+SQSH_STATIC_ASSERT(sizeof(struct SqshDataFragment) == SQSH_SIZEOF_FRAGMENT);
+
 uint64_t
 sqsh_data_fragment_start(const struct SqshDataFragment *fragment) {
 	return le64toh(fragment->start);

@@ -37,6 +37,12 @@
 
 #include <endian.h>
 
+struct SQSH_UNALIGNED SqshDataMetablock {
+	uint16_t header;
+	// uint8_t data[0];
+};
+SQSH_STATIC_ASSERT(sizeof(struct SqshDataMetablock) == SQSH_SIZEOF_METABLOCK);
+
 int
 sqsh_data_metablock_is_compressed(const struct SqshDataMetablock *metablock) {
 	return !(htole16(metablock->header) & 0x8000);

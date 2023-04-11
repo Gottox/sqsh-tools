@@ -38,6 +38,38 @@
 #include <endian.h>
 #include <string.h>
 
+struct SQSH_UNALIGNED SqshDataXattrKey {
+	uint16_t type;
+	uint16_t name_size;
+	// uint8_t name[0]; // [name_size - strlen(prefix)];
+};
+SQSH_STATIC_ASSERT(sizeof(struct SqshDataXattrKey) == SQSH_SIZEOF_XATTR_KEY);
+
+struct SQSH_UNALIGNED SqshDataXattrValue {
+	uint32_t value_size;
+	// uint8_t value[0]; // [value_size]
+};
+SQSH_STATIC_ASSERT(
+		sizeof(struct SqshDataXattrValue) == SQSH_SIZEOF_XATTR_VALUE);
+
+struct SQSH_UNALIGNED SqshDataXattrLookupTable {
+	uint64_t xattr_ref;
+	uint32_t count;
+	uint32_t size;
+};
+SQSH_STATIC_ASSERT(
+		sizeof(struct SqshDataXattrLookupTable) ==
+		SQSH_SIZEOF_XATTR_LOOKUP_TABLE);
+
+struct SQSH_UNALIGNED SqshDataXattrIdTable {
+	uint64_t xattr_table_start;
+	uint32_t xattr_ids;
+	uint32_t _unused;
+	// uint64_t table[0]; // [ceil(xattr_ids / 512.0)]
+};
+SQSH_STATIC_ASSERT(
+		sizeof(struct SqshDataXattrIdTable) == SQSH_SIZEOF_XATTR_ID_TABLE);
+
 uint16_t
 sqsh_data_xattr_key_type(const struct SqshDataXattrKey *xattr_key) {
 	return le16toh(xattr_key->type);
