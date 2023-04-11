@@ -4,8 +4,6 @@
  * @created     : Saturday Feb 18, 2023 14:06:14 CET
  */
 
-#define _DEFAULT_SOURCE
-
 #include "common.h"
 
 #include "../include/sqsh_archive_private.h"
@@ -19,26 +17,26 @@
 const uint8_t *
 mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size) {
 	int rv;
-	struct SqshDataSuperblock superblock = {
-			.magic = SQSH_SUPERBLOCK_MAGIC,
-			.inode_count = 0,
-			.modification_time = 0,
-			.block_size = 4096,
-			.fragment_entry_count = 0,
-			.compression_id = SQSH_COMPRESSION_GZIP,
-			.block_log = 12,
-			.flags = 0,
-			.id_count = 0,
-			.version_major = 4,
-			.version_minor = 0,
-			.root_inode_ref = 0,
-			.bytes_used = htole64(payload_size),
-			.id_table_start = 0,
-			.xattr_id_table_start = 0,
-			.inode_table_start = 0,
-			.directory_table_start = 0,
-			.fragment_table_start = 0,
-			.export_table_start = 0,
+	uint8_t superblock[SQSH_SIZEOF_SUPERBLOCK] = {
+			UINT32_BYTES(SQSH_SUPERBLOCK_MAGIC), // magic
+			UINT32_BYTES(0), // inode_count
+			UINT32_BYTES(0), // modification_time
+			UINT32_BYTES(4096), // block_size
+			UINT32_BYTES(0), // fragment_entry_count
+			UINT16_BYTES(SQSH_COMPRESSION_GZIP), // compression_id
+			UINT16_BYTES(12), // block_log
+			UINT16_BYTES(0), // flags
+			UINT16_BYTES(0), // id_count
+			UINT16_BYTES(4), // version_major
+			UINT16_BYTES(0), // version_minor
+			UINT64_BYTES((uint64_t)0), // root_inode_ref
+			UINT64_BYTES(payload_size), // bytes_used
+			UINT64_BYTES((uint64_t)0), // id_table_start
+			UINT64_BYTES((uint64_t)0), // xattr_id_table_start
+			UINT64_BYTES((uint64_t)0), // inode_table_start
+			UINT64_BYTES((uint64_t)0), // directory_table_start
+			UINT64_BYTES((uint64_t)0), // fragment_table_start
+			UINT64_BYTES((uint64_t)0), // export_table_start
 	};
 
 	memcpy(payload, &superblock, SQSH_SIZEOF_SUPERBLOCK);

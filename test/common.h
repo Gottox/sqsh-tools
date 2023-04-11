@@ -35,7 +35,6 @@
 #define COMMON_H
 
 #include "../include/sqsh_archive.h"
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
