@@ -76,6 +76,49 @@ decompress(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
+static void
+decompress_and_cached(void) {
+	int rv;
+	struct SqshArchive archive = {0};
+	struct SqshExtractManager manager = {0};
+	const struct SqshBuffer *buffer = NULL;
+	const struct SqshBuffer *cached_buffer = NULL;
+	uint8_t payload[] = {SQSH_HEADER, ZLIB_ABCD};
+
+	mk_stub(&archive, payload, sizeof(payload));
+
+	struct SqshMapManager *map_manager = sqsh_archive_map_manager(&archive);
+	const struct SqshExtractor *compression =
+			sqsh_archive_metablock_extractor(&archive);
+	struct SqshMapReader reader = {0};
+	rv = sqsh__map_reader_init(
+			&reader, map_manager, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+	assert(rv == 0);
+
+	rv = sqsh__map_reader_advance(&reader, 0, CHUNK_SIZE(ZLIB_ABCD));
+	assert(rv == 0);
+
+	rv = sqsh__extract_manager_init(&manager, &archive, compression, 10);
+	assert(rv == 0);
+
+	rv = sqsh__extract_manager_uncompress(&manager, &reader, &buffer);
+	assert(rv == 0);
+	assert(buffer != NULL);
+	assert(sqsh__buffer_size(buffer) == 4);
+	assert(memcmp(sqsh__buffer_data(buffer), "abcd", 4) == 0);
+
+	rv = sqsh__extract_manager_uncompress(&manager, &reader, &cached_buffer);
+	assert(rv == 0);
+	assert(buffer == cached_buffer);
+
+	sqsh__map_reader_cleanup(&reader);
+	sqsh__extract_manager_release(&manager, buffer);
+	sqsh__extract_manager_release(&manager, cached_buffer);
+	sqsh__extract_manager_cleanup(&manager);
+	sqsh__archive_cleanup(&archive);
+}
+
 DEFINE
 TEST(decompress);
+TEST(decompress_and_cached);
 DEFINE_END
