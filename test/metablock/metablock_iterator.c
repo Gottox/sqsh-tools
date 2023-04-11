@@ -134,71 +134,58 @@ next_twice(void) {
 	sqsh__archive_cleanup(&sqsh);
 }
 
-// static void
-// next_compressed(void) {
-//	int rv;
-//	struct SqshArchive sqsh = {0};
-//	struct SqshMetablockIterator iter;
-//	uint8_t payload[] = {
-//		SQSH_HEADER,
-//			METABLOCK_HEADER(1, CHUNK_SIZE(ZLIB_ABCD)),
-//			ZLIB_ABCD,
-//			METABLOCK_HEADER(1, CHUNK_SIZE(ZLIB_EFGH)),
-//			ZLIB_EFGH,
-//	};
-//	const uint8_t *p;
-//	size_t target_size;
-//	struct SqshBuffer buffer = {0};
-//
-//	uint8_t *data = mk_stub(&sqsh, payload, sizeof(payload), &target_size);
-//
-//	rv = sqsh__buffer_init(&buffer);
-//	assert(rv == 0);
-//
-//	rv = sqsh__metablock_iterator_init(
-//			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, target_size);
-//	assert(rv == 0);
-//
-//	rv = sqsh__metablock_iterator_next(&iter);
-//	assert(rv == 0);
-//
-//	assert(sqsh__metablock_iterator_size(&iter) == CHUNK_SIZE(ZLIB_ABCD));
-//
-//	rv = sqsh__metablock_iterator_append_to_buffer(&iter, &buffer);
-//	assert(rv == 0);
-//
-//	assert(sqsh__buffer_size(&buffer) == 4);
-//
-//	p = sqsh__buffer_data(&buffer);
-//	assert(p != NULL);
-//	assert(memcmp(p, "abcd", 4) == 0);
-//
-//	rv = sqsh__metablock_iterator_next(&iter);
-//	assert(rv == 0);
-//	sqsh__buffer_drain(&buffer);
-//
-//	assert(sqsh__metablock_iterator_size(&iter) == CHUNK_SIZE(ZLIB_EFGH));
-//
-//	rv = sqsh__metablock_iterator_append_to_buffer(&iter, &buffer);
-//	assert(rv == 0);
-//
-//	assert(sqsh__buffer_size(&buffer) == 4);
-//
-//	p = sqsh__buffer_data(&buffer);
-//	assert(p != NULL);
-//	assert(memcmp(p, "efgh", 4) == 0);
-//
-//	rv = sqsh__metablock_iterator_cleanup(&iter);
-//	assert(rv == 0);
-//
-//	sqsh__buffer_cleanup(&buffer);
-//	sqsh__archive_cleanup(&sqsh);
-//	free(data);
-//}
+static void
+next_compressed(void) {
+	int rv;
+	struct SqshArchive sqsh = {0};
+	struct SqshMetablockIterator iter;
+	struct SqshExtractManager extract_manager = {0};
+	uint8_t payload[] = {
+			SQSH_HEADER, METABLOCK_HEADER(1, CHUNK_SIZE(ZLIB_ABCD)),
+			ZLIB_ABCD,   METABLOCK_HEADER(1, CHUNK_SIZE(ZLIB_EFGH)),
+			ZLIB_EFGH,
+	};
+	const uint8_t *p;
+
+	mk_stub(&sqsh, payload, sizeof(payload));
+
+	rv = sqsh__extract_manager_init(
+			&extract_manager, &sqsh, sqsh_archive_metablock_extractor(&sqsh),
+			2);
+	assert(rv == 0);
+	rv = sqsh__metablock_iterator_init(
+			&iter, &sqsh, &extract_manager, SQSH_SIZEOF_SUPERBLOCK,
+			sizeof(payload));
+	assert(rv == 0);
+
+	rv = sqsh__metablock_iterator_next(&iter);
+	assert(rv == 0);
+
+	assert(sqsh__metablock_iterator_size(&iter) == 4);
+
+	p = sqsh__metablock_iterator_data(&iter);
+	assert(p != NULL);
+	assert(memcmp(p, "abcd", 4) == 0);
+
+	rv = sqsh__metablock_iterator_next(&iter);
+	assert(rv == 0);
+
+	assert(sqsh__metablock_iterator_size(&iter) == 4);
+
+	p = sqsh__metablock_iterator_data(&iter);
+	assert(p != NULL);
+	assert(memcmp(p, "efgh", 4) == 0);
+
+	rv = sqsh__metablock_iterator_cleanup(&iter);
+	assert(rv == 0);
+
+	sqsh__extract_manager_cleanup(&extract_manager);
+	sqsh__archive_cleanup(&sqsh);
+}
 
 DEFINE
 TEST(next_once);
 TEST(next_failing_with_no_compression);
 TEST(next_twice);
-// TEST(next_compressed);
+TEST(next_compressed);
 DEFINE_END
