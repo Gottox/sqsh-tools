@@ -323,20 +323,6 @@ SQSH_NO_UNUSED int sqsh__extract_view_init(
 /**
  * @internal
  * @memberof SqshExtractView
- * @brief Extracts a narrow view into the view.
- *
- * @param[in]     view        The view to narrow.
- * @param[in]     offset      The offset into the view to start the narrow.
- * @param[in]     size        The size of the narrow.
- *
- * @return 0 on success, a negative value on error.
- */
-SQSH_NO_UNUSED int sqsh__extract_view_narrow(
-		struct SqshExtractView *view, sqsh_index_t offset, size_t size);
-
-/**
- * @internal
- * @memberof SqshExtractView
  * @brief Gets the data of the view.
  *
  * @param[in]     view        The view to narrow.

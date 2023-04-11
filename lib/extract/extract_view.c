@@ -59,21 +59,6 @@ out:
 	return rv;
 }
 
-int
-sqsh__extract_view_narrow(
-		struct SqshExtractView *view, sqsh_index_t offset, size_t size) {
-	sqsh_index_t end_offset;
-	if (SQSH_ADD_OVERFLOW(offset, size, &end_offset)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
-	if (end_offset > sqsh__buffer_size(view->buffer)) {
-		return -SQSH_ERROR_TODO;
-	}
-	view->offset = offset;
-	view->size = size;
-	return 0;
-}
-
 const uint8_t *
 sqsh__extract_view_data(const struct SqshExtractView *view) {
 	const uint8_t *data = sqsh__buffer_data(view->buffer);
