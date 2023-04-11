@@ -229,7 +229,8 @@ sqsh_inode_hard_link_count(const struct SqshInode *context) {
 				sqsh__data_inode_device(inode));
 	case SQSH_INODE_TYPE_BASIC_FIFO:
 	case SQSH_INODE_TYPE_BASIC_SOCKET:
-		return sqsh__data_inode_ipc_hard_link_count(sqsh__data_inode_ipc(inode));
+		return sqsh__data_inode_ipc_hard_link_count(
+				sqsh__data_inode_ipc(inode));
 
 	case SQSH_INODE_TYPE_EXTENDED_DIRECTORY:
 		return sqsh__data_inode_directory_ext_hard_link_count(

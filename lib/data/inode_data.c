@@ -466,7 +466,8 @@ sqsh__data_inode_device_ext_hard_link_count(
 	return device->hard_link_count;
 }
 uint32_t
-sqsh__data_inode_device_ext_device(const struct SqshDataInodeDeviceExt *device) {
+sqsh__data_inode_device_ext_device(
+		const struct SqshDataInodeDeviceExt *device) {
 	return device->device;
 }
 uint32_t
@@ -481,7 +482,8 @@ sqsh__data_inode_ipc_hard_link_count(const struct SqshDataInodeIpc *ipc) {
 }
 
 uint32_t
-sqsh__data_inode_ipc_ext_hard_link_count(const struct SqshDataInodeIpcExt *ipc) {
+sqsh__data_inode_ipc_ext_hard_link_count(
+		const struct SqshDataInodeIpcExt *ipc) {
 	return ipc->hard_link_count;
 }
 uint32_t

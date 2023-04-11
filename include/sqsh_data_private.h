@@ -100,8 +100,8 @@ int16_t sqsh__data_directory_entry_inode_offset(
 		const struct SqshDataDirectoryEntry *entry);
 uint16_t
 sqsh__data_directory_entry_type(const struct SqshDataDirectoryEntry *entry);
-uint16_t
-sqsh__data_directory_entry_name_size(const struct SqshDataDirectoryEntry *entry);
+uint16_t sqsh__data_directory_entry_name_size(
+		const struct SqshDataDirectoryEntry *entry);
 const uint8_t *
 sqsh__data_directory_entry_name(const struct SqshDataDirectoryEntry *entry);
 
@@ -240,8 +240,8 @@ const uint8_t *sqsh__data_inode_directory_index_name(
 
 uint32_t
 sqsh__data_inode_file_blocks_start(const struct SqshDataInodeFile *file);
-uint32_t
-sqsh__data_inode_file_fragment_block_index(const struct SqshDataInodeFile *file);
+uint32_t sqsh__data_inode_file_fragment_block_index(
+		const struct SqshDataInodeFile *file);
 uint32_t
 sqsh__data_inode_file_block_offset(const struct SqshDataInodeFile *file);
 uint32_t sqsh__data_inode_file_size(const struct SqshDataInodeFile *file);
@@ -260,8 +260,8 @@ uint32_t sqsh__data_inode_file_ext_fragment_block_index(
 		const struct SqshDataInodeFileExt *file_ext);
 uint32_t sqsh__data_inode_file_ext_block_offset(
 		const struct SqshDataInodeFileExt *file_ext);
-uint32_t
-sqsh__data_inode_file_ext_xattr_idx(const struct SqshDataInodeFileExt *file_ext);
+uint32_t sqsh__data_inode_file_ext_xattr_idx(
+		const struct SqshDataInodeFileExt *file_ext);
 uint32_t sqsh__data_inode_file_ext_block_size_info(
 		const struct SqshDataInodeFileExt *file_ext, sqsh_index_t index);
 
@@ -345,10 +345,10 @@ uint16_t
 sqsh__data_superblock_flags(const struct SqshDataSuperblock *superblock);
 uint16_t
 sqsh__data_superblock_id_count(const struct SqshDataSuperblock *superblock);
-uint16_t
-sqsh__data_superblock_version_major(const struct SqshDataSuperblock *superblock);
-uint16_t
-sqsh__data_superblock_version_minor(const struct SqshDataSuperblock *superblock);
+uint16_t sqsh__data_superblock_version_major(
+		const struct SqshDataSuperblock *superblock);
+uint16_t sqsh__data_superblock_version_minor(
+		const struct SqshDataSuperblock *superblock);
 uint64_t sqsh__data_superblock_root_inode_ref(
 		const struct SqshDataSuperblock *superblock);
 uint64_t
