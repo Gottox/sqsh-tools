@@ -10,11 +10,6 @@ functionality to open/instantiate and close squashfs images.
 This directory contains code that eases the usage of this library. It wraps
 functionality like opening file contents by path.
 
-### [compression](./compression)
-
-This directory contains the glue code to the different compression algorithms
-as well as buffer and cache handling for decompressed data.
-
 ### [data](./data)
 
 This directory contains on-disk structures for squashfs. It does not contain 
@@ -23,6 +18,11 @@ any logic except for byte order conversion.
 ### [directory](./directory)
 
 This directory contains code that does directory handling.
+
+### [extract](./extract)
+
+This directory contains the glue code to the different compression algorithms
+as well as buffer and cache handling for decompressed data.
 
 ### [file](./file)
 
