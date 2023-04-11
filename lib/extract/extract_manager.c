@@ -116,36 +116,6 @@ out:
 	return rv;
 }
 
-SQSH_NO_UNUSED int
-uncompress_block(
-		struct SqshBuffer *buffer, struct SqshExtractManager *manager,
-		uint64_t offset, size_t size) {
-	int rv = 0;
-	struct SqshMapReader reader = {0};
-	const struct SqshExtractor *extractor = manager->extractor;
-
-	rv = sqsh__map_reader_init(&reader, manager->map_manager, offset, ~0);
-	if (rv < 0) {
-		goto out;
-	}
-
-	rv = sqsh__map_reader_advance(&reader, 0, size);
-	if (rv < 0) {
-		goto out;
-	}
-
-	const uint8_t *data = sqsh__map_reader_data(&reader);
-
-	rv = sqsh__extractor_to_buffer(extractor, buffer, data, size);
-	if (rv < 0) {
-		goto out;
-	}
-
-out:
-	sqsh__map_reader_cleanup(&reader);
-	return rv;
-}
-
 int
 sqsh__extract_manager_uncompress(
 		struct SqshExtractManager *manager, const struct SqshMapReader *reader,
