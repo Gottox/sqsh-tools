@@ -95,15 +95,6 @@ SQSH_STATIC_ASSERT(
 		SQSH_SIZEOF_COMPRESSION_OPTIONS);
 
 ////////////////////////////////////////
-// data/datablock_internal.c
-
-struct SQSH_UNALIGNED SqshDataDatablockSize {
-	uint32_t size;
-};
-SQSH_STATIC_ASSERT(
-		sizeof(struct SqshDataDatablockSize) == SQSH_SIZEOF_DATABLOCK_SIZE);
-
-////////////////////////////////////////
 // data/directory_internal.c
 
 struct SQSH_UNALIGNED SqshDataDirectoryEntry {
@@ -133,7 +124,7 @@ SQSH_STATIC_ASSERT(
 
 struct SQSH_UNALIGNED SqshDataFragment {
 	uint64_t start;
-	struct SqshDataDatablockSize size;
+	uint32_t size_info;
 	uint32_t unused;
 };
 

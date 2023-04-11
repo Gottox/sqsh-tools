@@ -42,7 +42,7 @@ sqsh_data_fragment_start(const struct SqshDataFragment *fragment) {
 	return le64toh(fragment->start);
 }
 
-const struct SqshDataDatablockSize *
+uint32_t
 sqsh_data_fragment_size_info(const struct SqshDataFragment *fragment) {
-	return &fragment->size;
+	return le32toh(fragment->size_info);
 }

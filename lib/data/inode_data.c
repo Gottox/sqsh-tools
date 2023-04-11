@@ -79,9 +79,11 @@ uint32_t
 sqsh_data_inode_file_size(const struct SqshDataInodeFile *file) {
 	return htole32(file->file_size);
 }
-const struct SqshDataDatablockSize *
-sqsh_data_inode_file_block_sizes(const struct SqshDataInodeFile *file) {
-	return (const struct SqshDataDatablockSize *)&file[1];
+uint32_t
+sqsh_data_inode_file_block_size_info(
+		const struct SqshDataInodeFile *file, sqsh_index_t index) {
+	uint32_t *block_sizes = (uint32_t *)&file[1];
+	return htole32(block_sizes[index]);
 }
 
 uint64_t
@@ -117,10 +119,11 @@ sqsh_data_inode_file_ext_xattr_idx(
 		const struct SqshDataInodeFileExt *file_ext) {
 	return htole32(file_ext->xattr_idx);
 }
-const struct SqshDataDatablockSize *
-sqsh_data_inode_file_ext_block_sizes(
-		const struct SqshDataInodeFileExt *file_ext) {
-	return (const struct SqshDataDatablockSize *)&file_ext[1];
+uint32_t
+sqsh_data_inode_file_ext_block_size_info(
+		const struct SqshDataInodeFileExt *file_ext, sqsh_index_t index) {
+	uint32_t *block_sizes = (uint32_t *)&file_ext[1];
+	return htole32(block_sizes[index]);
 }
 
 const struct SqshDataInodeDirectory *

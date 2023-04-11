@@ -85,18 +85,6 @@ uint32_t sqsh_compression_data_options_lzo_compression_level(
 		const union SqshDataCompressionOptions *options);
 
 ////////////////////////////////////////
-// data/datablock_data.c
-
-#define SQSH_SIZEOF_DATABLOCK_SIZE 4
-
-struct SQSH_UNALIGNED SqshDataDatablockSize;
-
-uint32_t
-sqsh_data_datablock_size(const struct SqshDataDatablockSize *datablock_size);
-bool sqsh_data_datablock_is_compressed(
-		const struct SqshDataDatablockSize *datablock_size);
-
-////////////////////////////////////////
 // data/directory_data.c
 
 #define SQSH_SIZEOF_DIRECTORY_FRAGMENT 12
@@ -134,10 +122,7 @@ const struct SqshDataDirectoryEntry *sqsh_data_directory_fragment_entries(
 struct SQSH_UNALIGNED SqshDataFragment;
 
 uint64_t sqsh_data_fragment_start(const struct SqshDataFragment *fragment);
-const struct SqshDataDatablockSize *
-sqsh_data_fragment_size_info(const struct SqshDataFragment *fragment);
-uint32_t
-sqsh_data_fragment_is_compressed(const struct SqshDataFragment *fragment);
+uint32_t sqsh_data_fragment_size_info(const struct SqshDataFragment *fragment);
 
 ////////////////////////////////////////
 // data/inode_data.c
@@ -260,8 +245,8 @@ sqsh_data_inode_file_fragment_block_index(const struct SqshDataInodeFile *file);
 uint32_t
 sqsh_data_inode_file_block_offset(const struct SqshDataInodeFile *file);
 uint32_t sqsh_data_inode_file_size(const struct SqshDataInodeFile *file);
-const struct SqshDataDatablockSize *
-sqsh_data_inode_file_block_sizes(const struct SqshDataInodeFile *file);
+uint32_t sqsh_data_inode_file_block_size_info(
+		const struct SqshDataInodeFile *file, sqsh_index_t index);
 
 uint64_t sqsh_data_inode_file_ext_blocks_start(
 		const struct SqshDataInodeFileExt *file_ext);
@@ -277,8 +262,8 @@ uint32_t sqsh_data_inode_file_ext_block_offset(
 		const struct SqshDataInodeFileExt *file_ext);
 uint32_t
 sqsh_data_inode_file_ext_xattr_idx(const struct SqshDataInodeFileExt *file_ext);
-const struct SqshDataDatablockSize *sqsh_data_inode_file_ext_block_sizes(
-		const struct SqshDataInodeFileExt *file_ext);
+uint32_t sqsh_data_inode_file_ext_block_size_info(
+		const struct SqshDataInodeFileExt *file_ext, sqsh_index_t index);
 
 uint32_t sqsh_data_inode_symlink_hard_link_count(
 		const struct SqshDataInodeSymlink *directory);

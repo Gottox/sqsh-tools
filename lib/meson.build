@@ -7,7 +7,6 @@ libsqsh_sources = [
 	'chrome/inode.c',
 	'chrome/path_resolver.c',
 	'data/compression_options_data.c',
-	'data/datablock_data.c',
 	'data/directory_data.c',
 	'data/fragment_data.c',
 	'data/inode_data.c',

@@ -121,7 +121,7 @@ inode_load(struct SqshInode *context) {
 	return rv;
 }
 
-static const struct SqshDataDatablockSize *
+static uint32_t
 get_size_info(const struct SqshInode *context, int index) {
 	const struct SqshDataInodeFile *basic_file;
 	const struct SqshDataInodeFileExt *extended_file;
@@ -130,10 +130,10 @@ get_size_info(const struct SqshInode *context, int index) {
 	switch (sqsh_data_inode_type(inode)) {
 	case SQSH_INODE_TYPE_BASIC_FILE:
 		basic_file = sqsh_data_inode_file(inode);
-		return &sqsh_data_inode_file_block_sizes(basic_file)[index];
+		return sqsh_data_inode_file_block_size_info(basic_file, index);
 	case SQSH_INODE_TYPE_EXTENDED_FILE:
 		extended_file = sqsh_data_inode_file_ext(inode);
-		return &sqsh_data_inode_file_ext_block_sizes(extended_file)[index];
+		return sqsh_data_inode_file_ext_block_size_info(extended_file, index);
 	}
 	// Should never happen
 	abort();
@@ -329,16 +329,16 @@ sqsh_inode_file_block_count(const struct SqshInode *context) {
 
 uint32_t
 sqsh_inode_file_block_size(const struct SqshInode *inode, uint32_t index) {
-	const struct SqshDataDatablockSize *size_info = get_size_info(inode, index);
+	const uint32_t size_info = get_size_info(inode, index);
 
-	return sqsh_data_datablock_size(size_info);
+	return sqsh_datablock_size(size_info);
 }
 
 bool
 sqsh_inode_file_block_is_compressed(const struct SqshInode *inode, int index) {
-	const struct SqshDataDatablockSize *size_info = get_size_info(inode, index);
+	const uint32_t size_info = get_size_info(inode, index);
 
-	return sqsh_data_datablock_is_compressed(size_info);
+	return sqsh_datablock_is_compressed(size_info);
 }
 
 uint32_t
