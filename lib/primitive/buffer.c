@@ -103,10 +103,6 @@ sqsh__buffer_append(
 void
 sqsh__buffer_drain(struct SqshBuffer *buffer) {
 	buffer->size = 0;
-	// TODO: cleaning the buffer is only for debug purposes. Remove it later.
-	if (buffer->data) {
-		memset(buffer->data, 0, buffer->capacity);
-	}
 }
 
 const uint8_t *

@@ -69,9 +69,6 @@ sqsh__xattr_table_init(
 
 	const struct SqshDataXattrIdTable *header = get_header(context);
 
-	// TODO: sqsh__table_init currently does the mapping of the table
-	// itself. This results in mapping the table and the header. They
-	// should be mapped once.
 	rv = sqsh__table_init(
 			&context->table, sqsh, xattr_address + SQSH_SIZEOF_XATTR_ID_TABLE,
 			SQSH_SIZEOF_XATTR_LOOKUP_TABLE,

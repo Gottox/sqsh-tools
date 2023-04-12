@@ -121,6 +121,17 @@ sqsh_directory_iterator_lookup(
 	return -SQSH_ERROR_NO_SUCH_FILE;
 }
 
+static uint64_t
+get_upper_limit(const struct SqshSuperblock *superblock) {
+	if (sqsh_superblock_has_fragments(superblock)) {
+		return sqsh_superblock_fragment_table_start(superblock);
+	} else if (sqsh_superblock_has_export_table(superblock)) {
+		return sqsh_superblock_export_table_start(superblock);
+	} else {
+		return sqsh_superblock_id_table_start(superblock);
+	}
+}
+
 int
 sqsh__directory_iterator_init(
 		struct SqshDirectoryIterator *iterator, struct SqshInode *inode) {
@@ -135,8 +146,7 @@ sqsh__directory_iterator_init(
 	const uint64_t outer_offset = sqsh_inode_directory_block_start(inode);
 	const uint32_t inner_offset = sqsh_inode_directory_block_offset(inode);
 	uint64_t start_address = sqsh_superblock_directory_table_start(superblock);
-	// TODO: Use a better upper limit
-	const uint64_t upper_limit = sqsh_superblock_bytes_used(superblock);
+	const uint64_t upper_limit = get_upper_limit(superblock);
 	if (SQSH_ADD_OVERFLOW(start_address, outer_offset, &start_address)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
