@@ -52,7 +52,7 @@ next_once(void) {
 	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_iterator_init(
-			&iter, &sqsh, NULL, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
 	assert(rv == 0);
 
 	rv = sqsh__metablock_iterator_next(&iter);
@@ -81,7 +81,7 @@ next_failing_with_no_compression(void) {
 	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_iterator_init(
-			&iter, &sqsh, NULL, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
 	assert(rv == 0);
 
 	rv = sqsh__metablock_iterator_next(&iter);
@@ -107,7 +107,7 @@ next_twice(void) {
 	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_iterator_init(
-			&iter, &sqsh, NULL, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
 	assert(rv == 0);
 
 	rv = sqsh__metablock_iterator_next(&iter);
@@ -139,7 +139,6 @@ next_compressed(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
-	struct SqshExtractManager extract_manager = {0};
 	uint8_t payload[] = {
 			SQSH_HEADER, METABLOCK_HEADER(1, CHUNK_SIZE(ZLIB_ABCD)),
 			ZLIB_ABCD,   METABLOCK_HEADER(1, CHUNK_SIZE(ZLIB_EFGH)),
@@ -149,13 +148,8 @@ next_compressed(void) {
 
 	mk_stub(&sqsh, payload, sizeof(payload));
 
-	rv = sqsh__extract_manager_init(
-			&extract_manager, &sqsh, sqsh_archive_metablock_extractor(&sqsh),
-			2);
-	assert(rv == 0);
 	rv = sqsh__metablock_iterator_init(
-			&iter, &sqsh, &extract_manager, SQSH_SIZEOF_SUPERBLOCK,
-			sizeof(payload));
+			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
 	assert(rv == 0);
 
 	rv = sqsh__metablock_iterator_next(&iter);
@@ -179,7 +173,6 @@ next_compressed(void) {
 	rv = sqsh__metablock_iterator_cleanup(&iter);
 	assert(rv == 0);
 
-	sqsh__extract_manager_cleanup(&extract_manager);
 	sqsh__archive_cleanup(&sqsh);
 }
 

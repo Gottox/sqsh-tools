@@ -52,7 +52,7 @@ advance_once(void) {
 	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_reader_init(
-			&cursor, &sqsh, NULL, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&cursor, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
 	assert(rv == 0);
 
 	rv = sqsh__metablock_reader_advance(&cursor, 0, 4);
@@ -84,7 +84,7 @@ advance_twice(void) {
 	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_reader_init(
-			&cursor, &sqsh, NULL, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&cursor, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
 	assert(rv == 0);
 
 	rv = sqsh__metablock_reader_advance(&cursor, 0, 4);
@@ -125,7 +125,7 @@ advance_overlapping(void) {
 	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_reader_init(
-			&cursor, &sqsh, NULL, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&cursor, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
 	assert(rv == 0);
 
 	rv = sqsh__metablock_reader_advance(&cursor, 2, 4);

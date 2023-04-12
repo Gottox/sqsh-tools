@@ -52,12 +52,10 @@ append_to_buffer(
 int
 sqsh__metablock_reader_init(
 		struct SqshMetablockReader *cursor, struct SqshArchive *sqsh,
-		struct SqshExtractManager *compression_manager,
 		const uint64_t start_address, const uint64_t upper_limit) {
 	int rv;
 	rv = sqsh__metablock_iterator_init(
-			&cursor->iterator, sqsh, compression_manager, start_address,
-			upper_limit);
+			&cursor->iterator, sqsh, start_address, upper_limit);
 	if (rv < 0) {
 		goto out;
 	}

@@ -156,8 +156,9 @@ sqsh__inode_init(
 	if (SQSH_ADD_OVERFLOW(inode_table_start, outer_offset, &address_outer)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
+	// TODO: set sane limit
 	rv = sqsh__metablock_reader_init(
-			&inode->metablock, archive, NULL, address_outer, ~0);
+			&inode->metablock, archive, address_outer, ~0);
 	if (rv < 0) {
 		return rv;
 	}

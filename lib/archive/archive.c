@@ -47,8 +47,8 @@ enum InitializedBitmap {
 	INITIALIZED_EXPORT_TABLE = 1 << 1,
 	INITIALIZED_XATTR_TABLE = 1 << 2,
 	INITIALIZED_FRAGMENT_TABLE = 1 << 3,
-	INITIALIZED_FILE_COMPRESSION_MANAGER = 1 << 4,
-	INITIALIZED_FRAGMENT_COMPRESSION_MANAGER = 1 << 5,
+	INITIALIZED_DATA_COMPRESSION_MANAGER = 1 << 4,
+	INITIALIZED_METABLOCK_COMPRESSION_MANAGER = 1 << 5,
 };
 
 static bool
@@ -139,58 +139,69 @@ sqsh_archive_superblock(const struct SqshArchive *archive) {
 	return &archive->superblock;
 }
 
+static uint64_t
+get_data_segment_size(const struct SqshSuperblock *superblock) {
+	// TODO: substract the size of the compression options block.
+	const uint64_t bytes_used = sqsh_superblock_bytes_used(superblock);
+	uint64_t res;
+	if (SQSH_SUB_OVERFLOW(bytes_used, SQSH_SIZEOF_SUPERBLOCK, &res)) {
+		return bytes_used;
+	}
+	return res;
+}
+
 int
-sqsh__archive_file_extract_manager(
+sqsh__archive_metablock_extract_manager(
 		struct SqshArchive *archive,
-		struct SqshExtractManager **file_extract_manager) {
+		struct SqshExtractManager **metablock_extract_manager) {
 	int rv = 0;
 
 	pthread_mutex_lock(&archive->lock);
-	if (!is_initialized(archive, INITIALIZED_FILE_COMPRESSION_MANAGER)) {
+	if (!is_initialized(archive, INITIALIZED_METABLOCK_COMPRESSION_MANAGER)) {
 		const struct SqshSuperblock *superblock =
 				sqsh_archive_superblock(archive);
-		const uint64_t bytes_used = sqsh_superblock_bytes_used(superblock);
+		const uint64_t range = sqsh_superblock_bytes_used(superblock) -
+				get_data_segment_size(superblock);
 		const size_t capacity = SQSH_DIVIDE_CEIL(
-				bytes_used, sqsh_superblock_block_size(superblock));
+				range, SQSH_SIZEOF_METABLOCK + SQSH_METABLOCK_BLOCK_SIZE);
 
 		rv = sqsh__extract_manager_init(
-				&archive->file_extract_manager, archive,
-				&archive->data_compression, capacity);
+				&archive->metablock_extract_manager, archive,
+				&archive->metablock_compression, capacity);
 		if (rv < 0) {
 			goto out;
 		}
-		archive->initialized |= INITIALIZED_FILE_COMPRESSION_MANAGER;
+		archive->initialized |= INITIALIZED_METABLOCK_COMPRESSION_MANAGER;
 	}
-	*file_extract_manager = &archive->file_extract_manager;
+	*metablock_extract_manager = &archive->metablock_extract_manager;
 out:
 	pthread_mutex_unlock(&archive->lock);
 	return rv;
 }
 
 int
-sqsh__archive_fragment_extract_manager(
+sqsh__archive_data_extract_manager(
 		struct SqshArchive *archive,
-		struct SqshExtractManager **fragment_extract_manager) {
+		struct SqshExtractManager **data_extract_manager) {
 	int rv = 0;
 
 	pthread_mutex_lock(&archive->lock);
-	if (!is_initialized(archive, INITIALIZED_FRAGMENT_COMPRESSION_MANAGER)) {
+	if (!is_initialized(archive, INITIALIZED_DATA_COMPRESSION_MANAGER)) {
 		const struct SqshSuperblock *superblock =
 				sqsh_archive_superblock(archive);
-		// Assume, that we have at least 2 files per fragment. Have at least one
-		// element though.
-		const size_t capacity = SQSH_MAX(
-				1, sqsh_superblock_fragment_entry_count(superblock) / 2);
+		const uint64_t range = get_data_segment_size(superblock);
+		const size_t capacity =
+				SQSH_DIVIDE_CEIL(range, sqsh_superblock_block_size(superblock));
 
 		rv = sqsh__extract_manager_init(
-				&archive->fragment_extract_manager, archive,
+				&archive->data_extract_manager, archive,
 				&archive->data_compression, capacity);
 		if (rv < 0) {
 			goto out;
 		}
-		archive->initialized |= INITIALIZED_FRAGMENT_COMPRESSION_MANAGER;
+		archive->initialized |= INITIALIZED_DATA_COMPRESSION_MANAGER;
 	}
-	*fragment_extract_manager = &archive->fragment_extract_manager;
+	*data_extract_manager = &archive->data_extract_manager;
 out:
 	pthread_mutex_unlock(&archive->lock);
 	return rv;
@@ -321,11 +332,11 @@ sqsh__archive_cleanup(struct SqshArchive *archive) {
 	if (is_initialized(archive, INITIALIZED_FRAGMENT_TABLE)) {
 		sqsh__fragment_table_cleanup(&archive->fragment_table);
 	}
-	if (is_initialized(archive, INITIALIZED_FILE_COMPRESSION_MANAGER)) {
-		sqsh__extract_manager_cleanup(&archive->file_extract_manager);
+	if (is_initialized(archive, INITIALIZED_DATA_COMPRESSION_MANAGER)) {
+		sqsh__extract_manager_cleanup(&archive->data_extract_manager);
 	}
-	if (is_initialized(archive, INITIALIZED_FRAGMENT_COMPRESSION_MANAGER)) {
-		sqsh__extract_manager_cleanup(&archive->fragment_extract_manager);
+	if (is_initialized(archive, INITIALIZED_METABLOCK_COMPRESSION_MANAGER)) {
+		sqsh__extract_manager_cleanup(&archive->metablock_extract_manager);
 	}
 	sqsh__extractor_cleanup(&archive->data_compression);
 	sqsh__extractor_cleanup(&archive->metablock_compression);

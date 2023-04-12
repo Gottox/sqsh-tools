@@ -46,16 +46,17 @@
 int
 sqsh__metablock_iterator_init(
 		struct SqshMetablockIterator *iterator, struct SqshArchive *sqsh,
-		struct SqshExtractManager *compression_manager, uint64_t start_address,
-		uint64_t upper_limit) {
+		uint64_t start_address, uint64_t upper_limit) {
 	int rv = 0;
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(sqsh);
 
 	iterator->outer_size = 0;
-	iterator->compression_manager = compression_manager;
-	iterator->old_compression = sqsh_archive_metablock_extractor(sqsh);
+	rv = sqsh__archive_metablock_extract_manager(
+			sqsh, &iterator->compression_manager);
+	if (rv < 0) {
+		goto out;
+	}
 	memset(&iterator->extract_view, 0, sizeof(iterator->extract_view));
-	rv = sqsh__buffer_init(&iterator->old_buffer);
 	if (rv < 0) {
 		goto out;
 	}
@@ -97,18 +98,7 @@ sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator) {
 		goto out;
 	}
 
-	if (is_compressed && iterator->compression_manager == NULL) {
-		sqsh__buffer_drain(&iterator->old_buffer);
-		rv = sqsh__extractor_to_buffer(
-				iterator->old_compression, &iterator->old_buffer,
-				sqsh__map_reader_data(&iterator->reader), iterator->outer_size);
-		if (rv < 0) {
-			goto out;
-		}
-		iterator->data = sqsh__buffer_data(&iterator->old_buffer);
-		iterator->inner_size = sqsh__buffer_size(&iterator->old_buffer);
-
-	} else if (is_compressed) {
+	if (is_compressed) {
 		rv = sqsh__extract_view_init(
 				&iterator->extract_view, iterator->compression_manager,
 				&iterator->reader);
@@ -172,7 +162,6 @@ sqsh__metablock_iterator_size(const struct SqshMetablockIterator *iterator) {
 
 int
 sqsh__metablock_iterator_cleanup(struct SqshMetablockIterator *iterator) {
-	sqsh__buffer_cleanup(&iterator->old_buffer);
 	sqsh__extract_view_cleanup(&iterator->extract_view);
 	return sqsh__map_reader_cleanup(&iterator->reader);
 }

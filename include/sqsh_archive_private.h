@@ -173,9 +173,9 @@ struct SqshArchive {
 	 */
 	struct SqshMapManager map_manager;
 	struct SqshExtractor data_compression;
+	struct SqshExtractManager data_extract_manager;
 	struct SqshExtractor metablock_compression;
-	struct SqshExtractManager file_extract_manager;
-	struct SqshExtractManager fragment_extract_manager;
+	struct SqshExtractManager metablock_extract_manager;
 	struct SqshSuperblock superblock;
 	struct SqshIdTable id_table;
 	struct SqshExportTable export_table;
@@ -204,32 +204,32 @@ SQSH_NO_UNUSED int sqsh__archive_init(
 /**
  * @internal
  * @memberof SqshArchive
- * @brief sqsh__archive_file_extract_manager retrieves a SqshExtractManager used
- * for decompressing file contents.
+ * @brief sqsh__archive_data_extract_manager retrieves a SqshExtractManager used
+ * for decompressing file and fragment contents.
  *
  * @param archive the SqshArchive to retrieve the SqshExtractManager from.
- * @param file_extract_manager the SqshExtractManager to retrieve.
+ * @param data_extract_manager the SqshExtractManager to retrieve.
  *
  * @return 0 on success, less than 0 on error.
  */
-int sqsh__archive_file_extract_manager(
+int sqsh__archive_data_extract_manager(
 		struct SqshArchive *archive,
-		struct SqshExtractManager **file_extract_manager);
+		struct SqshExtractManager **data_extract_manager);
 
 /**
  * @internal
  * @memberof SqshArchive
- * @brief sqsh__archive_fragment_extract_manager retrieves a SqshExtractManager
- * used for decompressing fragment contents.
+ * @brief sqsh__archive_metablock_extract_manager retrieves a SqshExtractManager
+ * used for decompressing metablock contents.
  *
  * @param archive the SqshArchive to retrieve the SqshExtractManager from.
- * @param fragment_extract_manager the SqshExtractManager to retrieve.
+ * @param metablock_extract_manager the SqshExtractManager to retrieve.
  *
  * @return 0 on success, less than 0 on error.
  */
-int sqsh__archive_fragment_extract_manager(
+int sqsh__archive_metablock_extract_manager(
 		struct SqshArchive *archive,
-		struct SqshExtractManager **fragment_extract_manager);
+		struct SqshExtractManager **metablock_extract_manager);
 
 /**
  * @internal

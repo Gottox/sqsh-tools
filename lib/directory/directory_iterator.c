@@ -147,7 +147,7 @@ sqsh__directory_iterator_init(
 	}
 
 	rv = sqsh__metablock_reader_init(
-			&iterator->metablock, archive, NULL, start_address, upper_limit);
+			&iterator->metablock, archive, start_address, upper_limit);
 	if (rv < 0) {
 		return rv;
 	}

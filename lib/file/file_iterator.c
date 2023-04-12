@@ -52,7 +52,7 @@ sqsh__file_iterator_init(
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(archive);
 	uint64_t block_address = sqsh_inode_file_blocks_start(inode);
 	const uint64_t upper_limit = sqsh_superblock_bytes_used(superblock);
-	rv = sqsh__archive_file_extract_manager(
+	rv = sqsh__archive_data_extract_manager(
 			archive, &iterator->compression_manager);
 	if (rv < 0) {
 		goto out;

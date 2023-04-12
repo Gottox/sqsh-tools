@@ -73,7 +73,7 @@ read_fragment_compressed(
 	struct SqshMapReader *reader = &view->map_reader;
 	struct SqshExtractManager *extract_manager = NULL;
 
-	rv = sqsh__archive_fragment_extract_manager(archive, &extract_manager);
+	rv = sqsh__archive_data_extract_manager(archive, &extract_manager);
 	if (rv < 0) {
 		goto out;
 	}

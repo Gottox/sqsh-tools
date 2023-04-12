@@ -69,8 +69,7 @@ sqsh__compression_options_init(
 	uint64_t upper_limit = SQSH_SIZEOF_SUPERBLOCK + SQSH_SIZEOF_METABLOCK +
 			SQSH_METABLOCK_BLOCK_SIZE;
 	rv = sqsh__metablock_iterator_init(
-			&context->metablock, sqsh, NULL, SQSH_SIZEOF_SUPERBLOCK,
-			upper_limit);
+			&context->metablock, sqsh, SQSH_SIZEOF_SUPERBLOCK, upper_limit);
 	if (rv < 0) {
 		goto out;
 	}
