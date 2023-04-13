@@ -141,11 +141,12 @@ sqsh_archive_superblock(const struct SqshArchive *archive) {
 
 static uint64_t
 get_data_segment_size(const struct SqshSuperblock *superblock) {
-	// TODO: substract the size of the compression options block.
-	const uint64_t bytes_used = sqsh_superblock_bytes_used(superblock);
+	const uint64_t inode_table_start =
+			sqsh_superblock_inode_table_start(superblock);
 	uint64_t res;
-	if (SQSH_SUB_OVERFLOW(bytes_used, SQSH_SIZEOF_SUPERBLOCK, &res)) {
-		return bytes_used;
+	// TODO: substract the size of the compression options block.
+	if (SQSH_SUB_OVERFLOW(inode_table_start, SQSH_SIZEOF_SUPERBLOCK, &res)) {
+		return inode_table_start;
 	}
 	return res;
 }
@@ -160,8 +161,13 @@ sqsh__archive_metablock_extract_manager(
 	if (!is_initialized(archive, INITIALIZED_METABLOCK_COMPRESSION_MANAGER)) {
 		const struct SqshSuperblock *superblock =
 				sqsh_archive_superblock(archive);
-		const uint64_t range = sqsh_superblock_bytes_used(superblock) -
-				get_data_segment_size(superblock);
+		uint64_t range;
+		if (SQSH_SUB_OVERFLOW(
+					sqsh_superblock_bytes_used(superblock),
+					get_data_segment_size(superblock), &range)) {
+			rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+			return rv;
+		}
 		const size_t capacity = SQSH_DIVIDE_CEIL(
 				range, SQSH_SIZEOF_METABLOCK + SQSH_METABLOCK_BLOCK_SIZE);
 

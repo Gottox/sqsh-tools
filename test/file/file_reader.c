@@ -46,18 +46,19 @@ load_file_from_compressed_data_block(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshInode inode = {0};
-	uint8_t payload[4096] = {
+	uint8_t payload[8192] = {
 			SQSH_HEADER,
-			/* inode */
-			[256] = METABLOCK_HEADER(0, 128), 0, 0, 0,
-			INODE_HEADER(2, 0, 0, 0, 0, 1),
-			INODE_BASIC_FILE(512, 0xFFFFFFFF, 0, 4),
-			DATA_BLOCK_REF(sizeof((uint8_t[]){ZLIB_ABCD}), 1),
 			/* datablock */
-			[512] = ZLIB_ABCD};
+			[1024] = ZLIB_ABCD,
+			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 128), 0, 0, 0,
+			INODE_HEADER(2, 0, 0, 0, 0, 1),
+			INODE_BASIC_FILE(1024, 0xFFFFFFFF, 0, 4),
+			DATA_BLOCK_REF(sizeof((uint8_t[]){ZLIB_ABCD}), 1),
+	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	uint64_t inode_ref = sqsh_address_ref_create(256, 3);
+	uint64_t inode_ref = sqsh_address_ref_create(0, 3);
 	rv = sqsh__inode_init(&inode, &archive, inode_ref);
 	assert(rv == 0);
 
@@ -89,15 +90,18 @@ load_file_from_compressed_data_block_with_offset(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshInode inode = {0};
-	uint8_t payload[4096] = {
+	uint8_t payload[8192] = {
+			/* clang-format off */
 			SQSH_HEADER,
-			/* inode */
-			[256] = METABLOCK_HEADER(0, 128), 0, 0, 0,
-			INODE_HEADER(2, 0, 0, 0, 0, 1),
-			INODE_BASIC_FILE(512, 0xFFFFFFFF, 0, 4),
-			DATA_BLOCK_REF(sizeof((uint8_t[]){ZLIB_ABCD}), 1),
 			/* datablock */
-			[512] = ZLIB_ABCD};
+			[1024] = ZLIB_ABCD,
+			/* inode */
+			[INODE_TABLE_OFFSET + 256] = METABLOCK_HEADER(0, 128), 0, 0, 0,
+			INODE_HEADER(2, 0, 0, 0, 0, 1),
+			INODE_BASIC_FILE(1024, 0xFFFFFFFF, 0, 4),
+			DATA_BLOCK_REF(sizeof((uint8_t[]){ZLIB_ABCD}), 1),
+			/* clang-format on */
+	};
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint64_t inode_ref = sqsh_address_ref_create(256, 3);
@@ -130,17 +134,20 @@ load_file_from_uncompressed_data_block(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshInode inode = {0};
-	uint8_t payload[4096] = {
+	uint8_t payload[8192] = {
+			/* clang-format off */
 			SQSH_HEADER,
-			/* inode */
-			[256] = METABLOCK_HEADER(0, 128), 0, 0, 0,
-			INODE_HEADER(2, 0, 0, 0, 0, 1),
-			INODE_BASIC_FILE(512, 0xFFFFFFFF, 0, 5), DATA_BLOCK_REF(5, 0),
 			/* datablock */
-			[512] = 1, 2, 3, 4, 5};
+			[1024] = 1, 2, 3, 4, 5,
+			/* inode */
+			[INODE_TABLE_OFFSET + 256] = METABLOCK_HEADER(0, 128),
+			INODE_HEADER(2, 0, 0, 0, 0, 1),
+			INODE_BASIC_FILE(1024, 0xFFFFFFFF, 0, 5), DATA_BLOCK_REF(5, 0),
+			/* clang-format on */
+	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	uint64_t inode_ref = sqsh_address_ref_create(256, 3);
+	uint64_t inode_ref = sqsh_address_ref_create(256, 0);
 	rv = sqsh__inode_init(&inode, &archive, inode_ref);
 	assert(rv == 0);
 

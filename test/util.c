@@ -30,14 +30,14 @@ mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size) {
 			UINT16_BYTES(0), // version_minor
 			UINT64_BYTES((uint64_t)0), // root_inode_ref
 			UINT64_BYTES((uint64_t)payload_size), // bytes_used
-			UINT64_BYTES((uint64_t)0), // id_table_start
-			UINT64_BYTES((uint64_t)0), // xattr_id_table_start
-			UINT64_BYTES((uint64_t)0), // inode_table_start
-			// Setting the directory table start to the end 
+			UINT64_BYTES((uint64_t)ID_TABLE_OFFSET), // id_table_start
+			UINT64_BYTES((uint64_t)XATTR_TABLE_OFFSET), // xattr_id_table_start
+			UINT64_BYTES((uint64_t)INODE_TABLE_OFFSET), // inode_table_start
+			// Setting the directory table start to the end
 			// of the archive so the inode tests don't fail
-			UINT64_BYTES((uint64_t)payload_size), // directory_table_start
-			UINT64_BYTES((uint64_t)0), // fragment_table_start
-			UINT64_BYTES((uint64_t)0), // export_table_start
+			UINT64_BYTES((uint64_t)DIRECTORY_TABLE_OFFSET), // directory_table_start
+			UINT64_BYTES((uint64_t)FRAGMENT_TABLE_OFFSET), // fragment_table_start
+			UINT64_BYTES((uint64_t)EXPORT_TABLE_OFFSET), // export_table_start
 	};
 
 	memcpy(payload, &superblock, SQSH_SIZEOF_SUPERBLOCK);

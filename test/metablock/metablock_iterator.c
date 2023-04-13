@@ -45,7 +45,7 @@ next_once(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
-	uint8_t payload[] = {
+	uint8_t payload[8192] = {
 			SQSH_HEADER, METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
 	};
 	const uint8_t *p;
@@ -75,7 +75,7 @@ next_failing_with_no_compression(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
-	uint8_t payload[] = {
+	uint8_t payload[8192] = {
 			SQSH_HEADER, METABLOCK_HEADER(1, 4), 'a', 'b', 'c', 'd',
 	};
 	mk_stub(&sqsh, payload, sizeof(payload));
@@ -98,7 +98,7 @@ next_twice(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
-	uint8_t payload[] = {
+	uint8_t payload[8192] = {
 			SQSH_HEADER, METABLOCK_HEADER(0, 4), 'a', 'b', 'c',
 			'd',         METABLOCK_HEADER(0, 4), 'e', 'f', 'g',
 			'h',
@@ -139,7 +139,7 @@ next_compressed(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
-	uint8_t payload[] = {
+	uint8_t payload[8192] = {
 			SQSH_HEADER, METABLOCK_HEADER(1, CHUNK_SIZE(ZLIB_ABCD)),
 			ZLIB_ABCD,   METABLOCK_HEADER(1, CHUNK_SIZE(ZLIB_EFGH)),
 			ZLIB_EFGH,

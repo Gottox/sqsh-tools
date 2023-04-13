@@ -45,7 +45,7 @@ advance_once(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor = {0};
-	uint8_t payload[] = {
+	uint8_t payload[8192] = {
 			SQSH_HEADER, METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
 	};
 	const uint8_t *p;
@@ -75,7 +75,7 @@ advance_twice(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor = {0};
-	uint8_t payload[] = {
+	uint8_t payload[8192] = {
 			SQSH_HEADER, METABLOCK_HEADER(0, 4), 'a', 'b', 'c',
 			'd',         METABLOCK_HEADER(0, 4), 'e', 'f', 'g',
 			'h',
@@ -116,7 +116,7 @@ advance_overlapping(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor;
-	uint8_t payload[] = {
+	uint8_t payload[8192] = {
 			SQSH_HEADER, METABLOCK_HEADER(0, 4), 'a', 'b', 'c',
 			'd',         METABLOCK_HEADER(0, 4), 'e', 'f', 'g',
 			'h',

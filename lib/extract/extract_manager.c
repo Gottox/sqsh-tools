@@ -86,6 +86,10 @@ sqsh__extract_manager_init(
 	const size_t lru_size =
 			SQSH_CONFIG_DEFAULT(config->compression_lru_size, 128);
 
+	if (size == 0) {
+		return -SQSH_ERROR_TODO;
+	}
+
 	// Give a bit of room to avoid too many key hash collisions
 	size = find_next_maybe_prime(2 * size);
 

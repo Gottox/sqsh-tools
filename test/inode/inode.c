@@ -45,10 +45,10 @@ load_inode(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshInode inode = {0};
-	uint8_t payload[2048] = {
+	uint8_t payload[8192] = {
 			SQSH_HEADER,
 			/* inode */
-			[1024] = METABLOCK_HEADER(0, 128),
+			[INODE_TABLE_OFFSET + 15] = METABLOCK_HEADER(0, 128),
 			0,
 			0,
 			0,
@@ -59,7 +59,7 @@ load_inode(void) {
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	uint64_t inode_ref = sqsh_address_ref_create(1024, 3);
+	uint64_t inode_ref = sqsh_address_ref_create(15, 3);
 	rv = sqsh__inode_init(&inode, &archive, inode_ref);
 	assert(rv == 0);
 

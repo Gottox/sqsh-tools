@@ -38,6 +38,50 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*
+ *  _______________    __ byte 0
+ * |               |
+ * |  Superblock   |
+ * |_______________|   __ byte 96
+ * |               |
+ * |  Compression  |
+ * |    options    |
+ * |_______________|   __ byte 1024
+ * |               |
+ * |  Data blocks  |
+ * |  & fragments  |
+ * |_______________|   __ byte 2048
+ * |               |
+ * |  Inode table  |
+ * |_______________|   __ byte 3072
+ * |               |
+ * |   Directory   |
+ * |     table     |
+ * |_______________|   __ byte 4096
+ * |               |
+ * |   Fragment    |
+ * |    table      |
+ * |_______________|   __ byte 5120
+ * |               |
+ * | Export table  |
+ * |_______________|   __ byte 6144
+ * |               |
+ * |    UID/GID    |
+ * |  lookup table |
+ * |_______________|   __ byte 7168
+ * |               |
+ * |     Xattr     |
+ * |     table     |
+ * |_______________|   __ byte 8192
+ */
+#define COMPRESS_OPTIONS_OFFSET 96
+#define INODE_TABLE_OFFSET 2048
+#define DIRECTORY_TABLE_OFFSET 3072
+#define FRAGMENT_TABLE_OFFSET 4096
+#define EXPORT_TABLE_OFFSET 5120
+#define ID_TABLE_OFFSET 6144
+#define XATTR_TABLE_OFFSET 7168
+
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 #	define UINT16_BYTES(x) (uint8_t)(x), (uint8_t)((x) >> 8)
 #	define UINT32_BYTES(x) \
