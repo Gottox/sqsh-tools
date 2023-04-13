@@ -51,7 +51,7 @@ extern "C" {
 #define SQSH_MULT_OVERFLOW(a, b, res) __builtin_mul_overflow(a, b, res)
 
 // Does not work for x == 0
-#define SQSH_DIVIDE_CEIL(x, y) ((((x)-1) / (y)) + 1)
+#define SQSH_DIVIDE_CEIL(x, y) ((x) == 0 ? 0 : (((x)-1) / (y)) + 1)
 #define SQSH_PADDING(x, p) SQSH_DIVIDE_CEIL(x, p) * p
 
 #define SQSH_CONFIG_DEFAULT(x, d) (size_t)(x == 0 ? (d) : SQSH_MAX(x, 0))
