@@ -396,6 +396,23 @@ sqsh_inode_directory_block_offset(const struct SqshInode *context) {
 }
 
 uint32_t
+sqsh_inode_directory_parent_inode(const struct SqshInode *context) {
+	const struct SqshDataInodeDirectory *basic_directory;
+	const struct SqshDataInodeDirectoryExt *extended_directory;
+	const struct SqshDataInode *inode = get_inode(context);
+
+	switch (sqsh__data_inode_type(inode)) {
+	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
+		basic_directory = sqsh__data_inode_directory(inode);
+		return sqsh__data_inode_directory_parent_inode_number(basic_directory);
+	case SQSH_INODE_TYPE_EXTENDED_DIRECTORY:
+		extended_directory = sqsh__data_inode_directory_ext(inode);
+		return sqsh__data_inode_directory_ext_parent_inode_number(extended_directory);
+	}
+	return UINT32_MAX;
+}
+
+uint32_t
 sqsh_inode_file_fragment_block_offset(const struct SqshInode *context) {
 	const struct SqshDataInodeFile *basic_file;
 	const struct SqshDataInodeFileExt *extended_file;

@@ -237,6 +237,16 @@ uint32_t sqsh_inode_directory_block_offset(const struct SqshInode *context);
 
 /**
  * @memberof SqshInode
+ * @brief retrieve the parent inode of the directory.
+ *
+ * @param[in] context The inode context.
+ *
+ * @return the directory block offset.
+ */
+uint32_t sqsh_inode_directory_parent_inode(const struct SqshInode *context);
+
+/**
+ * @memberof SqshInode
  * @brief returns true if the inode has a fragment block.
  *
  * @param[in] context The inode context.
