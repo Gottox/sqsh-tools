@@ -31,7 +31,7 @@
  * @file         file.c
  */
 
-#include "../../include/sqsh_chrome_private.h"
+#include "../../include/sqsh_chrome.h"
 
 #include "../../include/sqsh_file.h"
 

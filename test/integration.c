@@ -32,10 +32,10 @@
  */
 
 #include "common.h"
+#include "sqsh_tree.h"
 #include "test.h"
 #include <pthread.h>
 #include <sqsh_archive_private.h>
-#include <sqsh_chrome_private.h>
 #include <sqsh_directory_private.h>
 #include <sqsh_file_private.h>
 #include <sqsh_inode_private.h>
@@ -54,22 +54,20 @@ sqsh_empty(void) {
 static void
 sqsh_get_nonexistant(void) {
 	int rv;
-	struct SqshInode *inode = NULL;
 	struct SqshArchive sqsh = {0};
-	struct SqshPathResolver resolver = {0};
+	struct SqshTreeWalker walker = {0};
 
 	const struct SqshConfig config = DEFAULT_CONFIG(test_squashfs_image_len);
 	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
 	assert(rv == 0);
 
-	rv = sqsh__path_resolver_init(&resolver, &sqsh);
+	rv = sqsh__tree_walker_init(&walker, &sqsh);
 	assert(rv == 0);
 
-	inode = sqsh_path_resolver_resolve(&resolver, "/nonexistant", &rv);
+	rv = sqsh_tree_walker_resolve(&walker, "/nonexistant");
 	assert(rv < 0);
-	assert(inode == NULL);
 
-	rv = sqsh_path_resolver_cleanup(&resolver);
+	rv = sqsh__tree_walker_cleanup(&walker);
 	assert(rv == 0);
 
 	rv = sqsh__archive_cleanup(&sqsh);
@@ -353,7 +351,7 @@ sqsh_test_extended_dir(void) {
 	int rv;
 	struct SqshInode *inode = NULL;
 	struct SqshArchive sqsh = {0};
-	struct SqshPathResolver resolver = {0};
+	struct SqshTreeWalker walker = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = test_squashfs_image_len,
@@ -361,14 +359,19 @@ sqsh_test_extended_dir(void) {
 	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
 	assert(rv == 0);
 
-	rv = sqsh__path_resolver_init(&resolver, &sqsh);
+	rv = sqsh__tree_walker_init(&walker, &sqsh);
 	assert(rv == 0);
 
-	inode = sqsh_path_resolver_resolve(&resolver, "/large_dir/999", &rv);
+	rv = sqsh_tree_walker_resolve(&walker, "/large_dir/999");
 	assert(rv == 0);
+
+	inode = sqsh_tree_walker_inode_load(&walker, &rv);
+	assert(inode != NULL);
 
 	rv = sqsh_inode_free(inode);
 	assert(rv == 0);
+
+	rv = sqsh__tree_walker_cleanup(&walker);
 
 	rv = sqsh__archive_cleanup(&sqsh);
 	assert(rv == 0);
@@ -502,7 +505,7 @@ fuzz_crash_1(void) {
 
 	struct SqshInode *inode;
 	struct SqshArchive sqsh = {0};
-	struct SqshPathResolver resolver = {0};
+	struct SqshTreeWalker walker = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(input),
@@ -510,11 +513,15 @@ fuzz_crash_1(void) {
 	rv = sqsh__archive_init(&sqsh, input, &config);
 	assert(rv == 0);
 
-	rv = sqsh__path_resolver_init(&resolver, &sqsh);
+	rv = sqsh__tree_walker_init(&walker, &sqsh);
 	assert(rv == 0);
 
-	inode = sqsh_path_resolver_resolve(&resolver, "", &rv);
+	rv = sqsh_tree_walker_resolve(&walker, "");
 	assert(rv < 0);
+
+	inode = sqsh_tree_walker_inode_load(&walker, &rv);
+	assert(inode != NULL);
+	assert(rv == 0);
 
 	rv = sqsh_inode_free(inode);
 	assert(rv == 0);
@@ -541,7 +548,7 @@ fuzz_crash_2(void) {
 
 	struct SqshInode *inode = NULL;
 	struct SqshArchive sqsh = {0};
-	struct SqshPathResolver resolver = {0};
+	struct SqshTreeWalker walker = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(input),
@@ -549,10 +556,14 @@ fuzz_crash_2(void) {
 	rv = sqsh__archive_init(&sqsh, input, &config);
 	assert(rv == 0);
 
-	rv = sqsh__path_resolver_init(&resolver, &sqsh);
+	rv = sqsh__tree_walker_init(&walker, &sqsh);
 	assert(rv == 0);
 
-	inode = sqsh_path_resolver_resolve(&resolver, "", &rv);
+	rv = sqsh_tree_walker_resolve(&walker, "");
+	assert(rv < 0);
+
+	inode = sqsh_tree_walker_inode_load(&walker, &rv);
+	assert(inode != NULL);
 	assert(rv < 0);
 
 	rv = sqsh_inode_free(inode);
@@ -581,7 +592,7 @@ fuzz_crash_3(void) {
 
 	struct SqshInode *inode = NULL;
 	struct SqshArchive sqsh = {0};
-	struct SqshPathResolver resolver = {0};
+	struct SqshTreeWalker walker = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = sizeof(input),
@@ -589,10 +600,10 @@ fuzz_crash_3(void) {
 	rv = sqsh__archive_init(&sqsh, input, &config);
 	assert(rv == 0);
 
-	rv = sqsh__path_resolver_init(&resolver, &sqsh);
+	rv = sqsh__tree_walker_init(&walker, &sqsh);
 	assert(rv == 0);
 
-	inode = sqsh_path_resolver_resolve(&resolver, "", &rv);
+	rv = sqsh_tree_walker_resolve(&walker, "");
 	assert(rv < 0);
 
 	rv = sqsh_inode_free(inode);

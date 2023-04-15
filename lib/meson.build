@@ -5,7 +5,6 @@ libsqsh_sources = [
     'archive/trailing_context.c',
     'chrome/file.c',
     'chrome/inode.c',
-    'chrome/path_resolver.c',
     'data/compression_options_data.c',
     'data/directory_data.c',
     'data/fragment_data.c',

@@ -33,7 +33,7 @@
 
 #define _DEFAULT_SOURCE
 
-#include "../../include/sqsh_chrome_private.h"
+#include "../../include/sqsh_chrome.h"
 
 #include <pthread.h>
 #include <stdatomic.h>

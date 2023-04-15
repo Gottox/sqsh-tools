@@ -28,12 +28,9 @@ main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	struct SqshPathResolver *resolver = sqsh_path_resolver_new(archive, &rv);
-
-	struct SqshInode *inode =
-			sqsh_path_resolver_resolve(resolver, argv[2], &rv);
+	struct SqshInode *inode = sqsh_open(archive, argv[2], &rv);
 	if (inode == NULL) {
-		sqsh_perror(rv, "sqsh_path_resolver_resolve");
+		sqsh_perror(rv, "sqsh_open");
 		return EXIT_FAILURE;
 	}
 
@@ -59,7 +56,6 @@ main(int argc, char *argv[]) {
 
 	sqsh_file_reader_free(reader);
 	sqsh_inode_free(inode);
-	sqsh_path_resolver_free(resolver);
 	sqsh_archive_free(archive);
 	return EXIT_SUCCESS;
 }
