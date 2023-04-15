@@ -407,7 +407,8 @@ sqsh_inode_directory_parent_inode(const struct SqshInode *context) {
 		return sqsh__data_inode_directory_parent_inode_number(basic_directory);
 	case SQSH_INODE_TYPE_EXTENDED_DIRECTORY:
 		extended_directory = sqsh__data_inode_directory_ext(inode);
-		return sqsh__data_inode_directory_ext_parent_inode_number(extended_directory);
+		return sqsh__data_inode_directory_ext_parent_inode_number(
+				extended_directory);
 	}
 	return UINT32_MAX;
 }

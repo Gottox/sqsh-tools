@@ -54,8 +54,7 @@ static int (*print_item)(const struct SqshDirectoryIterator *, const char *) =
 		print_simple;
 
 static int
-ls(struct SqshArchive *archive, const char *path,
-   struct SqshInode *inode);
+ls(struct SqshArchive *archive, const char *path, struct SqshInode *inode);
 
 static int
 usage(char *arg0) {
@@ -195,8 +194,7 @@ out:
 }
 
 static int
-ls(struct SqshArchive *archive, const char *path,
-   struct SqshInode *inode) {
+ls(struct SqshArchive *archive, const char *path, struct SqshInode *inode) {
 	int rv = 0;
 	struct SqshDirectoryIterator *iter = NULL;
 

@@ -35,8 +35,10 @@ mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size) {
 			UINT64_BYTES((uint64_t)INODE_TABLE_OFFSET), // inode_table_start
 			// Setting the directory table start to the end
 			// of the archive so the inode tests don't fail
-			UINT64_BYTES((uint64_t)DIRECTORY_TABLE_OFFSET), // directory_table_start
-			UINT64_BYTES((uint64_t)FRAGMENT_TABLE_OFFSET), // fragment_table_start
+			UINT64_BYTES(
+					(uint64_t)DIRECTORY_TABLE_OFFSET), // directory_table_start
+			UINT64_BYTES(
+					(uint64_t)FRAGMENT_TABLE_OFFSET), // fragment_table_start
 			UINT64_BYTES((uint64_t)EXPORT_TABLE_OFFSET), // export_table_start
 	};
 

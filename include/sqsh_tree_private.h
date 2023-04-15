@@ -34,9 +34,9 @@
 #ifndef SQSH_TREE_PRIVATE_H
 #define SQSH_TREE_PRIVATE_H
 
-#include "sqsh_tree.h"
-#include "sqsh_inode_private.h"
 #include "sqsh_directory_private.h"
+#include "sqsh_inode_private.h"
+#include "sqsh_tree.h"
 
 #ifdef __cplusplus
 extern "C" {

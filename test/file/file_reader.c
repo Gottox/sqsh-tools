@@ -47,6 +47,7 @@ load_file_from_compressed_data_block(void) {
 	struct SqshArchive archive = {0};
 	struct SqshInode inode = {0};
 	uint8_t payload[8192] = {
+			/* clang-format off */
 			SQSH_HEADER,
 			/* datablock */
 			[1024] = ZLIB_ABCD,
@@ -55,6 +56,7 @@ load_file_from_compressed_data_block(void) {
 			INODE_HEADER(2, 0, 0, 0, 0, 1),
 			INODE_BASIC_FILE(1024, 0xFFFFFFFF, 0, 4),
 			DATA_BLOCK_REF(sizeof((uint8_t[]){ZLIB_ABCD}), 1),
+			/* clang-format on */
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
