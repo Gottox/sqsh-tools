@@ -1,26 +1,43 @@
-option('curl',  type : 'feature',
-	description: 'Support opening remote files with cURL.')
-option('zlib',  type : 'feature',
-	description: 'Support zlib compression.')
-option('lz4',   type : 'feature',
-	description: 'Support LZ4 compression.')
-option('lzma',  type : 'feature',
-	description: 'Support LZMA compression.')
-option('lzo',  type : 'feature', value : 'disabled',
-	description: 'Support LZO compression.')
-option('zstd',  type : 'feature',
-	description: 'Support ZSTD compression.')
-option('fuse',  type : 'feature',
-	description: 'Support FUSE filesystem.')
-option('test',  type : 'combo', choices: ['true', 'false', 'extended'],
-	value : 'false',
-	description: 'Run tests.')
-option('doc',   type : 'combo', choices: ['true', 'false', 'internal'],
-	value : 'false',
-	description: 'Generate documentation.')
-option('tools', type : 'boolean', value : true,
-	description: 'Build libsqsh tools.')
-option('fuzzer', type : 'boolean', value : false,
-	description: 'Build fuzzers.')
-option('threads', type : 'feature', value : 'auto',
-	description: 'Build with thread support.')
+option(
+    'curl',
+    type: 'feature',
+    description: 'Support opening remote files with cURL.',
+)
+option('zlib', type: 'feature', description: 'Support zlib compression.')
+option('lz4', type: 'feature', description: 'Support LZ4 compression.')
+option('lzma', type: 'feature', description: 'Support LZMA compression.')
+option(
+    'lzo',
+    type: 'feature',
+    value: 'disabled',
+    description: 'Support LZO compression.',
+)
+option('zstd', type: 'feature', description: 'Support ZSTD compression.')
+option('fuse', type: 'feature', description: 'Support FUSE filesystem.')
+option(
+    'test',
+    type: 'combo',
+    choices: ['true', 'false', 'extended'],
+    value: 'false',
+    description: 'Run tests.',
+)
+option(
+    'doc',
+    type: 'combo',
+    choices: ['true', 'false', 'internal'],
+    value: 'false',
+    description: 'Generate documentation.',
+)
+option(
+    'tools',
+    type: 'boolean',
+    value: true,
+    description: 'Build libsqsh tools.',
+)
+option('fuzzer', type: 'boolean', value: false, description: 'Build fuzzers.')
+option(
+    'threads',
+    type: 'feature',
+    value: 'auto',
+    description: 'Build with thread support.',
+)

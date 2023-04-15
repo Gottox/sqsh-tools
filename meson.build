@@ -1,18 +1,18 @@
 project(
-	'libsqsh',
-	['c'],
-	default_options : [
-		'c_std=c11',
-		'optimization=0',
-		'werror=false',
-		'warning_level=3'
-	],
-	version: '0.3.0',
-	meson_version: '>=0.57',
-	license: [
-		'BSD-2-Clause',
-		'GPL-2.0-only',
-	],
+    'libsqsh',
+    ['c'],
+    default_options: [
+        'c_std=c11',
+        'optimization=0',
+        'werror=false',
+        'warning_level=3',
+    ],
+    version: '0.3.0',
+    meson_version: '>=0.57',
+    license: [
+        'BSD-2-Clause',
+        'GPL-2.0-only',
+    ],
 )
 
 threads = dependency('threads', required: get_option('threads'))
@@ -33,33 +33,33 @@ subdir('lib')
 subdir('man')
 
 if get_option('default_library') == 'both'
-	libsqsh = libsqsh.get_static_lib()
+    libsqsh = libsqsh.get_static_lib()
 endif
 
 libsqsh_dependency = declare_dependency(
-	link_with: libsqsh,
-	include_directories: libsqsh_include
+    link_with: libsqsh,
+    include_directories: libsqsh_include,
 )
 
 if get_option('tools')
-	subdir('tools')
+    subdir('tools')
 endif
 
 if get_option('test') != 'false'
-	subdir('test')
+    subdir('test')
 endif
 
 if get_option('doc') != 'false'
-	subdir('doc')
+    subdir('doc')
 endif
 
 pkg_mod = import('pkgconfig')
 pkg_mod.generate(
-  libsqsh,
-  name : 'libsqsh',
-  filebase : 'libsqsh',
-  description : 'A library to access squashfs archives',
-  subdirs : 'sqsh',
-  libraries : libsqsh,
-  version : meson.project_version(),
+    libsqsh,
+    name: 'libsqsh',
+    filebase: 'libsqsh',
+    description: 'A library to access squashfs archives',
+    subdirs: 'sqsh',
+    libraries: libsqsh,
+    version: meson.project_version(),
 )
