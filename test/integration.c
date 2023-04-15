@@ -92,9 +92,6 @@ tree_walker(void) {
 	rv = sqsh_tree_walker_resolve(&walker, "/large_dir");
 	assert(rv == 0);
 
-	rv = sqsh_tree_walker_down(&walker);
-	assert(rv == 0);
-
 	rv = sqsh_tree_walker_resolve(&walker, "999");
 	assert(rv == 0);
 
