@@ -86,6 +86,7 @@ jobs:
         ninja -C /tmp/build
 
   build-openbsd:
+    if: ${{ false }}  # The job doesn't terminate. Disabling the job for noe
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
