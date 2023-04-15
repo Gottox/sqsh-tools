@@ -164,6 +164,7 @@ sqsh__directory_iterator_init(
 
 	iterator->next_offset = inner_offset;
 	iterator->inode = inode;
+	iterator->remaining_entries = 0;
 
 	return rv;
 }
