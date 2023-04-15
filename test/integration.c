@@ -39,6 +39,7 @@
 #include <sqsh_directory_private.h>
 #include <sqsh_file_private.h>
 #include <sqsh_inode_private.h>
+#include <sqsh_tree_private.h>
 #include <squashfs_image.h>
 
 static void
@@ -69,6 +70,42 @@ sqsh_get_nonexistant(void) {
 	assert(inode == NULL);
 
 	rv = sqsh_path_resolver_cleanup(&resolver);
+	assert(rv == 0);
+
+	rv = sqsh__archive_cleanup(&sqsh);
+	assert(rv == 0);
+}
+
+static void
+tree_walker(void) {
+	int rv;
+	struct SqshTreeWalker walker = {0};
+	struct SqshArchive sqsh = {0};
+	struct SqshInode *inode;
+	const struct SqshConfig config = DEFAULT_CONFIG(test_squashfs_image_len);
+	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
+	assert(rv == 0);
+
+	rv = sqsh__tree_walker_init(&walker, &sqsh);
+	assert(rv == 0);
+
+	rv = sqsh_tree_walker_resolve(&walker, "/large_dir");
+	assert(rv == 0);
+
+	rv = sqsh_tree_walker_down(&walker);
+	assert(rv == 0);
+
+	rv = sqsh_tree_walker_resolve(&walker, "999");
+	assert(rv == 0);
+
+	inode = sqsh_tree_walker_inode_load(&walker, &rv);
+	assert(inode != NULL);
+	assert(rv == 0);
+
+	rv = sqsh_inode_free(inode);
+	assert(rv == 0);
+
+	rv = sqsh__tree_walker_cleanup(&walker);
 	assert(rv == 0);
 
 	rv = sqsh__archive_cleanup(&sqsh);
@@ -139,15 +176,19 @@ sqsh_cat_fragment(void) {
 	struct SqshInode *inode = NULL;
 	struct SqshFileReader reader = {0};
 	struct SqshArchive sqsh = {0};
-	struct SqshPathResolver resolver = {0};
+	struct SqshTreeWalker walker = {0};
 	const struct SqshConfig config = DEFAULT_CONFIG(test_squashfs_image_len);
 	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
 	assert(rv == 0);
 
-	rv = sqsh__path_resolver_init(&resolver, &sqsh);
+	rv = sqsh__tree_walker_init(&walker, &sqsh);
 	assert(rv == 0);
 
-	inode = sqsh_path_resolver_resolve(&resolver, "a", &rv);
+	rv = sqsh_tree_walker_resolve(&walker, "a");
+	assert(rv == 0);
+
+	inode = sqsh_tree_walker_inode_load(&walker, &rv);
+	assert(inode != NULL);
 	assert(rv == 0);
 
 	rv = sqsh__file_reader_init(&reader, inode);
@@ -168,7 +209,7 @@ sqsh_cat_fragment(void) {
 	rv = sqsh_inode_free(inode);
 	assert(rv == 0);
 
-	rv = sqsh_path_resolver_cleanup(&resolver);
+	rv = sqsh__tree_walker_cleanup(&walker);
 	assert(rv == 0);
 
 	rv = sqsh__archive_cleanup(&sqsh);
@@ -183,7 +224,7 @@ sqsh_cat_datablock_and_fragment(void) {
 	struct SqshInode *inode = NULL;
 	struct SqshFileReader reader = {0};
 	struct SqshArchive sqsh = {0};
-	struct SqshPathResolver resolver = {0};
+	struct SqshTreeWalker walker = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = test_squashfs_image_len,
@@ -191,10 +232,14 @@ sqsh_cat_datablock_and_fragment(void) {
 	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
 	assert(rv == 0);
 
-	rv = sqsh__path_resolver_init(&resolver, &sqsh);
+	rv = sqsh__tree_walker_init(&walker, &sqsh);
 	assert(rv == 0);
 
-	inode = sqsh_path_resolver_resolve(&resolver, "b", &rv);
+	rv = sqsh_tree_walker_resolve(&walker, "b");
+	assert(rv == 0);
+
+	inode = sqsh_tree_walker_inode_load(&walker, &rv);
+	assert(inode != NULL);
 	assert(rv == 0);
 
 	rv = sqsh__file_reader_init(&reader, inode);
@@ -218,7 +263,7 @@ sqsh_cat_datablock_and_fragment(void) {
 	rv = sqsh_inode_free(inode);
 	assert(rv == 0);
 
-	rv = sqsh_path_resolver_cleanup(&resolver);
+	rv = sqsh__tree_walker_cleanup(&walker);
 	assert(rv == 0);
 
 	rv = sqsh__archive_cleanup(&sqsh);
@@ -232,7 +277,7 @@ sqsh_cat_size_overflow(void) {
 	struct SqshInode *inode = NULL;
 	struct SqshFileReader reader = {0};
 	struct SqshArchive sqsh = {0};
-	struct SqshPathResolver resolver = {0};
+	struct SqshTreeWalker walker = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = test_squashfs_image_len,
@@ -240,10 +285,14 @@ sqsh_cat_size_overflow(void) {
 	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
 	assert(rv == 0);
 
-	rv = sqsh__path_resolver_init(&resolver, &sqsh);
+	rv = sqsh__tree_walker_init(&walker, &sqsh);
 	assert(rv == 0);
 
-	inode = sqsh_path_resolver_resolve(&resolver, "b", &rv);
+	rv = sqsh_tree_walker_resolve(&walker, "b");
+	assert(rv == 0);
+
+	inode = sqsh_tree_walker_inode_load(&walker, &rv);
+	assert(inode != NULL);
 	assert(rv == 0);
 
 	rv = sqsh__file_reader_init(&reader, inode);
@@ -264,7 +313,7 @@ sqsh_cat_size_overflow(void) {
 	rv = sqsh_inode_free(inode);
 	assert(rv == 0);
 
-	rv = sqsh_path_resolver_cleanup(&resolver);
+	rv = sqsh__tree_walker_cleanup(&walker);
 	assert(rv == 0);
 
 	rv = sqsh__archive_cleanup(&sqsh);
@@ -796,6 +845,7 @@ multithreaded(void) {
 DEFINE
 TEST(sqsh_empty);
 TEST(sqsh_ls);
+TEST(tree_walker);
 TEST(sqsh_get_nonexistant);
 TEST(sqsh_cat_fragment);
 TEST(sqsh_cat_datablock_and_fragment);

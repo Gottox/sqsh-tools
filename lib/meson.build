@@ -47,6 +47,7 @@ libsqsh_sources = [
     'table/id_table.c',
     'table/table.c',
     'table/xattr_table.c',
+    'tree/walker.c',
     'xattr/xattr_iterator.c',
 ]
 
