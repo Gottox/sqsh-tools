@@ -90,7 +90,7 @@ SQSH_NO_UNUSED int sqsh_directory_iterator_lookup(
  *
  * @return The size of the name on success, a negative value on error.
  */
-int
+uint16_t
 sqsh_directory_iterator_name_size(const struct SqshDirectoryIterator *iterator);
 
 /**

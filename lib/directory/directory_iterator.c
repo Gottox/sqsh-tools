@@ -183,7 +183,7 @@ sqsh_directory_iterator_new(struct SqshInode *inode, int *err) {
 	return iterator;
 }
 
-int
+uint16_t
 sqsh_directory_iterator_name_size(
 		const struct SqshDirectoryIterator *iterator) {
 	const struct SqshDataDirectoryEntry *entry = get_entry(iterator);
