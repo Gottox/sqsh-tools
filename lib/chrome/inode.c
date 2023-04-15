@@ -36,18 +36,24 @@
 #include "../../include/sqsh_file.h"
 
 #include "../../include/sqsh_inode_private.h"
+#include "../../include/sqsh_tree_private.h"
 
 struct SqshInode *
 sqsh_open(struct SqshArchive *archive, const char *path, int *err) {
 	int rv;
-	struct SqshPathResolver resolver = {0};
+	struct SqshTreeWalker walker = {0};
 	struct SqshInode *inode = NULL;
-	rv = sqsh__path_resolver_init(&resolver, archive);
+	rv = sqsh__tree_walker_init(&walker, archive);
 	if (rv < 0) {
 		goto out;
 	}
 
-	inode = sqsh_path_resolver_resolve(&resolver, path, &rv);
+	rv = sqsh_tree_walker_resolve(&walker, path);
+	if (rv < 0) {
+		goto out;
+	}
+
+	inode = sqsh_tree_walker_inode_load(&walker, &rv);
 	if (rv < 0) {
 		goto out;
 	}
@@ -56,7 +62,7 @@ out:
 	if (err != NULL) {
 		*err = rv;
 	}
-	sqsh_path_resolver_cleanup(&resolver);
+	sqsh__tree_walker_cleanup(&walker);
 	return inode;
 }
 

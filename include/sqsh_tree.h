@@ -135,7 +135,15 @@ SQSH_NO_UNUSED int sqsh_tree_walker_lookup(
  */
 SQSH_NO_UNUSED int sqsh_tree_walker_down(struct SqshTreeWalker *walker);
 
-int sqsh_tree_walker_resolve(struct SqshTreeWalker *walker, const char *path);
+/**
+ * @brief Moves the walker to the root directory.
+ * @memberof SqshTreeWalker
+ *
+ * @param[in,out]   walker  The walker to use
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int sqsh_tree_walker_to_root(struct SqshTreeWalker *walker);
 
 /**
  * @brief Returns the inode of the current entry.
@@ -146,8 +154,20 @@ int sqsh_tree_walker_resolve(struct SqshTreeWalker *walker, const char *path);
  *
  * @return the inode of the current entry.
  */
-struct SqshInode *
+SQSH_NO_UNUSED struct SqshInode *
 sqsh_tree_walker_inode_load(struct SqshTreeWalker *walker, int *err);
+
+/**
+ * @brief Resolve a path with the tree walker.
+ * @memberof SqshTreeWalker
+ *
+ * @param[in,out]   walker  The walker to use
+ * @param[in]       path    The path to resolve.
+ *
+ * @return the inode of the current entry.
+ */
+SQSH_NO_UNUSED int
+sqsh_tree_walker_resolve(struct SqshTreeWalker *walker, const char *path);
 
 /**
  * @brief Cleans up resources used by a SqshTreeWalker struct.

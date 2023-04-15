@@ -174,6 +174,11 @@ sqsh_tree_walker_down(struct SqshTreeWalker *walker) {
 	return load_inode(walker, child_inode_ref);
 }
 
+int
+sqsh_tree_walker_to_root(struct SqshTreeWalker *walker) {
+	return load_inode(walker, walker->root_inode_ref);
+}
+
 struct SqshInode *
 sqsh_tree_walker_inode_load(struct SqshTreeWalker *walker, int *err) {
 	return sqsh_directory_iterator_inode_load(&walker->iterator, err);
@@ -204,7 +209,10 @@ sqsh_tree_walker_resolve(struct SqshTreeWalker *walker, const char *path) {
 	int rv = 0;
 	const char *segment = path;
 	if (segment[0] == '/') {
-		rv = load_inode(walker, walker->root_inode_ref);
+		rv = sqsh_tree_walker_to_root(walker);
+		if (rv < 0) {
+			goto out;
+		}
 	}
 
 	do {
