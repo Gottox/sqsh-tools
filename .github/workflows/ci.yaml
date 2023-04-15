@@ -83,7 +83,30 @@ jobs:
           -Ddoc=false
     - name: build
       run: |
-         ninja -C /tmp/build
+        ninja -C /tmp/build
+
+  build-openbsd:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: "cross-platform-actions/action@v0.10.0"
+      continue-on-error: true
+      with:
+        operating_system: openbsd
+        architecture: x86-64
+        version: 7.2
+        run: |
+          sudo pkg_add bzip2 curl git lzo2 meson lz4
+          CC=clang meson setup /tmp/build \
+            -Dcurl=enabled \
+            -Dzlib=enabled \
+            -Dlz4=enabled \
+            -Dlzma=enabled \
+            -Dlzo=enabled \
+            -Dzstd=enabled \
+            -Dtest=true \
+            -Ddoc=false
+          ninja -C /tmp/build
 
   doxygen:
     needs:
