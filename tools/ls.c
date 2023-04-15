@@ -54,7 +54,7 @@ static int (*print_item)(const struct SqshDirectoryIterator *, const char *) =
 		print_simple;
 
 static int
-ls(struct SqshPathResolver *resolver, const char *path,
+ls(struct SqshArchive *archive, const char *path,
    struct SqshInode *inode);
 
 static int
@@ -152,7 +152,7 @@ out:
 }
 
 static int
-ls_item(struct SqshPathResolver *resolver, const char *path,
+ls_item(struct SqshArchive *archive, const char *path,
 		struct SqshDirectoryIterator *iter) {
 	int rv = 0;
 	int len = 0;
@@ -182,7 +182,7 @@ ls_item(struct SqshPathResolver *resolver, const char *path,
 		if (rv < 0) {
 			goto out;
 		}
-		rv = ls(resolver, current_path, entry_inode);
+		rv = ls(archive, current_path, entry_inode);
 		if (rv < 0) {
 			goto out;
 		}
@@ -195,7 +195,7 @@ out:
 }
 
 static int
-ls(struct SqshPathResolver *resolver, const char *path,
+ls(struct SqshArchive *archive, const char *path,
    struct SqshInode *inode) {
 	int rv = 0;
 	struct SqshDirectoryIterator *iter = NULL;
@@ -208,7 +208,7 @@ ls(struct SqshPathResolver *resolver, const char *path,
 	}
 
 	while (sqsh_directory_iterator_next(iter) > 0) {
-		rv = ls_item(resolver, path, iter);
+		rv = ls_item(archive, path, iter);
 		if (rv < 0) {
 			rv = EXIT_FAILURE;
 			goto out;
@@ -222,11 +222,11 @@ out:
 }
 
 static int
-ls_path(struct SqshPathResolver *resolver, char *path) {
+ls_path(struct SqshArchive *archive, char *path) {
 	struct SqshInode *inode = NULL;
 	int rv = 0;
 
-	inode = sqsh_path_resolver_resolve(resolver, path, &rv);
+	inode = sqsh_open(archive, path, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		goto out;
@@ -238,7 +238,7 @@ ls_path(struct SqshPathResolver *resolver, char *path) {
 			goto out;
 		}
 
-		rv = ls(resolver, path, inode);
+		rv = ls(archive, path, inode);
 		if (rv < 0) {
 			sqsh_perror(rv, path);
 			rv = EXIT_FAILURE;
@@ -262,8 +262,7 @@ main(int argc, char *argv[]) {
 	int rv = 0;
 	int opt = 0;
 	const char *image_path;
-	struct SqshArchive *sqsh;
-	struct SqshPathResolver *resolver = NULL;
+	struct SqshArchive *archive;
 
 	while ((opt = getopt(argc, argv, "vrhl")) != -1) {
 		switch (opt) {
@@ -288,13 +287,7 @@ main(int argc, char *argv[]) {
 	image_path = argv[optind];
 	optind++;
 
-	sqsh = open_archive(image_path, &rv);
-	if (rv < 0) {
-		sqsh_perror(rv, image_path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-	resolver = sqsh_path_resolver_new(sqsh, &rv);
+	archive = open_archive(image_path, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, image_path);
 		rv = EXIT_FAILURE;
@@ -303,21 +296,20 @@ main(int argc, char *argv[]) {
 
 	for (; optind < argc; optind++) {
 		has_listed = true;
-		rv = ls_path(resolver, argv[optind]);
+		rv = ls_path(archive, argv[optind]);
 		if (rv < 0) {
 			goto out;
 		}
 	}
 
 	if (has_listed == false) {
-		rv = ls_path(resolver, NULL);
+		rv = ls_path(archive, NULL);
 		if (rv < 0) {
 			goto out;
 		}
 	}
 
 out:
-	sqsh_path_resolver_free(resolver);
-	sqsh_archive_free(sqsh);
+	sqsh_archive_free(archive);
 	return rv;
 }

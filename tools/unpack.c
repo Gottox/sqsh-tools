@@ -36,6 +36,7 @@
 #include "../include/sqsh_chrome.h"
 #include "../include/sqsh_directory.h"
 #include "../include/sqsh_file.h"
+#include "sqsh_tree_private.h"
 
 #include <errno.h>
 #include <libgen.h>
@@ -318,7 +319,7 @@ main(int argc, char *argv[]) {
 	char *src_path = "/";
 	char *target_path = NULL;
 	struct SqshArchive *sqsh;
-	struct SqshPathResolver *resolver = NULL;
+	struct SqshTreeWalker *walker = NULL;
 	struct SqshInode *inode = NULL;
 
 	while ((opt = getopt(argc, argv, "cvVh")) != -1) {
@@ -356,14 +357,20 @@ main(int argc, char *argv[]) {
 		rv = EXIT_FAILURE;
 		goto out;
 	}
-	resolver = sqsh_path_resolver_new(sqsh, &rv);
+	walker = sqsh_tree_walker_new(sqsh, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, image_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	inode = sqsh_path_resolver_resolve(resolver, src_path, &rv);
+	rv = sqsh_tree_walker_resolve(walker, src_path);
+	if (rv < 0) {
+		sqsh_perror(rv, src_path);
+		rv = EXIT_FAILURE;
+		goto out;
+	}
+	inode = sqsh_tree_walker_inode_load(walker, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, src_path);
 		rv = EXIT_FAILURE;
@@ -404,7 +411,7 @@ main(int argc, char *argv[]) {
 	}
 out:
 	sqsh_inode_free(inode);
-	sqsh_path_resolver_free(resolver);
+	sqsh_tree_walker_free(walker);
 	sqsh_archive_free(sqsh);
 	return rv;
 }

@@ -67,12 +67,12 @@ print_value(const char *value, size_t size) {
 	return 0;
 }
 static int
-fattr_path(struct SqshPathResolver *resolver, char *path) {
+fattr_path(struct SqshArchive *archive, char *path) {
 	struct SqshInode *inode = NULL;
 	struct SqshXattrIterator *iter = NULL;
 
 	int rv = 0;
-	inode = sqsh_path_resolver_resolve(resolver, path, &rv);
+	inode = sqsh_open(archive, path, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		rv = EXIT_FAILURE;
@@ -112,8 +112,7 @@ main(int argc, char *argv[]) {
 	int rv = 0;
 	int opt = 0;
 	const char *image_path;
-	struct SqshArchive *sqsh;
-	struct SqshPathResolver *resolver = NULL;
+	struct SqshArchive *archive;
 
 	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {
@@ -132,13 +131,7 @@ main(int argc, char *argv[]) {
 	image_path = argv[optind];
 	optind++;
 
-	sqsh = open_archive(image_path, &rv);
-	if (rv < 0) {
-		sqsh_perror(rv, image_path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-	resolver = sqsh_path_resolver_new(sqsh, &rv);
+	archive = open_archive(image_path, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, image_path);
 		rv = EXIT_FAILURE;
@@ -146,14 +139,13 @@ main(int argc, char *argv[]) {
 	}
 
 	for (; optind < argc; optind++) {
-		rv = fattr_path(resolver, argv[optind]);
+		rv = fattr_path(archive, argv[optind]);
 		if (rv < 0) {
 			goto out;
 		}
 	}
 
 out:
-	sqsh_path_resolver_free(resolver);
-	sqsh_archive_free(sqsh);
+	sqsh_archive_free(archive);
 	return rv;
 }

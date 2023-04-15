@@ -35,6 +35,7 @@
 
 #include "../include/sqsh_chrome.h"
 #include "../include/sqsh_directory.h"
+#include "../include/sqsh_tree.h"
 
 #include <assert.h>
 #include <inttypes.h>
@@ -266,11 +267,12 @@ inode_type_name(int type) {
 }
 
 static int
-stat_file(struct SqshPathResolver *resolver, const char *path) {
+stat_file(struct SqshTreeWalker *walker, const char *path) {
 	int rv = 0;
 	struct SqshInode *inode = NULL;
 	bool has_fragment = false;
-	inode = sqsh_path_resolver_resolve(resolver, path, &rv);
+	rv = sqsh_tree_walker_resolve(walker, path);
+	inode = sqsh_tree_walker_inode_load(walker, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		return rv;
@@ -328,7 +330,7 @@ main(int argc, char *argv[]) {
 	int opt = 0;
 	const char *image_path;
 	struct SqshArchive *sqsh;
-	struct SqshPathResolver *resolver = NULL;
+	struct SqshTreeWalker *walker = NULL;
 
 	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {
@@ -353,7 +355,7 @@ main(int argc, char *argv[]) {
 		rv = EXIT_FAILURE;
 		goto out;
 	}
-	resolver = sqsh_path_resolver_new(sqsh, &rv);
+	walker = sqsh_tree_walker_new(sqsh, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, image_path);
 		rv = EXIT_FAILURE;
@@ -363,13 +365,13 @@ main(int argc, char *argv[]) {
 	if (optind == argc) {
 		rv = stat_image(sqsh);
 	} else if (optind + 1 == argc) {
-		rv = stat_file(resolver, argv[optind]);
+		rv = stat_file(walker, argv[optind]);
 	} else {
 		rv = usage(argv[0]);
 	}
 
 out:
-	sqsh_path_resolver_free(resolver);
+	sqsh_tree_walker_free(walker);
 	sqsh_archive_free(sqsh);
 	return rv;
 }

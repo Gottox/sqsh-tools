@@ -36,6 +36,7 @@
 #include "../include/sqsh_chrome.h"
 #include "../include/sqsh_file.h"
 #include "../include/sqsh_inode.h"
+#include "../include/sqsh_tree.h"
 
 #include <assert.h>
 #include <limits.h>
@@ -52,11 +53,11 @@ usage(char *arg0) {
 }
 
 static int
-cat_path(struct SqshPathResolver *resolver, char *path) {
+cat_path(struct SqshArchive *archive, char *path) {
 	struct SqshInode *inode = NULL;
 
 	int rv = 0;
-	inode = sqsh_path_resolver_resolve(resolver, path, &rv);
+	inode = sqsh_open(archive, path, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		rv = EXIT_FAILURE;
@@ -87,7 +88,6 @@ main(int argc, char *argv[]) {
 	int opt = 0;
 	const char *image_path;
 	struct SqshArchive *sqsh = NULL;
-	struct SqshPathResolver *resolver = NULL;
 
 	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {
@@ -112,22 +112,15 @@ main(int argc, char *argv[]) {
 		rv = EXIT_FAILURE;
 		goto out;
 	}
-	resolver = sqsh_path_resolver_new(sqsh, &rv);
-	if (rv < 0) {
-		sqsh_perror(rv, image_path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
 
 	for (; optind < argc; optind++) {
-		rv = cat_path(resolver, argv[optind]);
+		rv = cat_path(sqsh, argv[optind]);
 		if (rv < 0) {
 			goto out;
 		}
 	}
 
 out:
-	sqsh_path_resolver_free(resolver);
 	sqsh_archive_free(sqsh);
 	return rv;
 }
