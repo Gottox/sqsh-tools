@@ -35,7 +35,7 @@
 
 #include "../../include/sqsh_archive.h"
 #include "../../include/sqsh_error.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 
 #include "../../include/sqsh_mapper.h"
 #include "../../include/sqsh_mapper_private.h"
