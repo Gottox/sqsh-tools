@@ -36,7 +36,7 @@
 #include "../../include/sqsh_archive.h"
 #include "../../include/sqsh_data_private.h"
 #include "../../include/sqsh_error.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 
 #include "../../include/sqsh_metablock_private.h"
 

@@ -34,7 +34,7 @@
 #include "../../include/sqsh_primitive_private.h"
 
 #include "../../include/sqsh_error.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 #include <stdint.h>
 
 #define COLLISION_RESERVE_BITS 2

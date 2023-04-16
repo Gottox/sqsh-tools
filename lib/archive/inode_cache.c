@@ -28,72 +28,73 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         utils.h
+ * @file         inode_cache.c
  */
 
-#ifndef SQSH_UTILS_H
-#define SQSH_UTILS_H
+#include "../../include/sqsh_archive_private.h"
 
-#include "../include/sqsh_common.h"
-
+#include <stdatomic.h>
+#include <stdint.h>
 #include <stdlib.h>
-#include <string.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+int
+sqsh__inode_cache_init(
+		struct SqshInodeCache *cache, struct SqshArchive *archive) {
+	int rv = 0;
+	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 
-#define SQSH_MIN(a, b) ((a) < (b) ? (a) : (b))
-#define SQSH_MAX(a, b) ((a) > (b) ? (a) : (b))
+	if (sqsh_superblock_has_export_table(superblock)) {
+		rv = sqsh_archive_export_table(archive, &cache->export_table);
+		if (rv < 0) {
+			goto out;
+		}
+		cache->inode_refs = NULL;
+	} else {
+		const uint32_t inode_count = sqsh_superblock_inode_count(superblock);
 
-#define SQSH_ADD_OVERFLOW(a, b, res) __builtin_add_overflow(a, b, res)
-#define SQSH_SUB_OVERFLOW(a, b, res) __builtin_sub_overflow(a, b, res)
-#define SQSH_MULT_OVERFLOW(a, b, res) __builtin_mul_overflow(a, b, res)
-
-// Does not work for x == 0
-#define SQSH_DIVIDE_CEIL(x, y) ((x) == 0 ? 0 : (((x)-1) / (y)) + 1)
-#define SQSH_PADDING(x, p) SQSH_DIVIDE_CEIL(x, p) * p
-
-#define SQSH_CONFIG_DEFAULT(x, d) (size_t)(x == 0 ? (d) : SQSH_MAX(x, 0))
-
-SQSH_NO_UNUSED static inline void *
-sqsh_memdup(const void *source, size_t size) {
-	if (source == NULL) {
-		return NULL;
+		cache->export_table = NULL;
+		cache->inode_refs = calloc(inode_count, sizeof(atomic_uint_fast64_t));
+		if (cache->inode_refs == NULL) {
+			rv = SQSH_ERROR_MALLOC_FAILED;
+			goto out;
+		}
 	}
-	void *target = calloc(size + 1, sizeof(uint8_t));
-	if (target == NULL) {
-		return NULL;
+out:
+	return rv;
+}
+uint64_t
+sqsh__inode_cache_get(
+		const struct SqshInodeCache *cache, uint64_t inode_number) {
+	uint64_t inode_ref = 0;
+	if (inode_number == 0) {
+		return 0;
 	}
-	return memcpy(target, source, size);
+	if (cache->export_table != NULL) {
+		return sqsh_export_table_resolve_inode(
+				cache->export_table, inode_number, &inode_ref);
+	} else {
+		inode_ref = atomic_load(&cache->inode_refs[inode_number - 1]);
+	}
+	return inode_ref;
 }
 
-SQSH_NO_UNUSED static inline uint64_t
-sqsh_address_ref_outer_offset(uint64_t ref) {
-	return ref >> 16;
+int
+sqsh__inode_cache_set(
+		struct SqshInodeCache *cache, uint64_t inode_number,
+		uint64_t inode_ref) {
+	if (inode_number == 0) {
+		return 0;
+	}
+	if (cache->export_table != NULL) {
+		return 0;
+	} else {
+		atomic_store(&cache->inode_refs[inode_number - 1], inode_ref);
+		return 0;
+	}
 }
 
-SQSH_NO_UNUSED static inline uint16_t
-sqsh_address_ref_inner_offset(uint64_t ref) {
-	return ref & 0xFFFF;
+int
+sqsh__inode_cache_cleanup(struct SqshInodeCache *cache) {
+	free(cache->inode_refs);
+	return 0;
 }
-
-SQSH_NO_UNUSED static inline uint64_t
-sqsh_address_ref_create(uint32_t outer_offset, uint16_t inner_offset) {
-	return ((uint64_t)outer_offset << 16) | inner_offset;
-}
-
-SQSH_NO_UNUSED static inline uint32_t
-sqsh_datablock_size(uint32_t size_info) {
-	return size_info & ~(1 << 24);
-}
-
-SQSH_NO_UNUSED static inline bool
-sqsh_datablock_is_compressed(uint32_t size_info) {
-	return !(size_info & (1 << 24));
-}
-
-#ifdef __cplusplus
-}
-#endif
-#endif /* end of include guard SQSH_UTILS_H */

@@ -38,7 +38,7 @@
 #include "../../include/sqsh_primitive_private.h"
 
 #include "../../include/sqsh_inode_private.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 #include <stdint.h>
 
 #define BLOCK_INDEX_FINISHED UINT32_MAX

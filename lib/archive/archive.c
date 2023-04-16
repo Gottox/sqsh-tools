@@ -31,11 +31,13 @@
  * @file         archive.c
  */
 
+#define _DEFAULT_SOURCE
+
 #include "../../include/sqsh_archive_private.h"
 
 #include "../../include/sqsh_data_private.h"
 
-#include "../utils.h"
+#include "../utils/utils.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -49,6 +51,7 @@ enum InitializedBitmap {
 	INITIALIZED_FRAGMENT_TABLE = 1 << 3,
 	INITIALIZED_DATA_COMPRESSION_MANAGER = 1 << 4,
 	INITIALIZED_METABLOCK_COMPRESSION_MANAGER = 1 << 5,
+	INITIALIZED_INODE_CACHE = 1 << 6,
 };
 
 static bool
@@ -86,7 +89,18 @@ sqsh__archive_init(
 	} else {
 		memset(&archive->config, 0, sizeof(struct SqshConfig));
 	}
-	rv = pthread_mutex_init(&archive->lock, NULL);
+
+	pthread_mutexattr_t mutex_attr;
+	rv = pthread_mutexattr_init(&mutex_attr);
+	if (rv != 0) {
+		rv = -SQSH_ERROR_TODO;
+		goto out;
+	}
+	// RECURSIVE is needed because: inode_cache may access the export_table
+	// during initialization.
+	pthread_mutexattr_settype(&mutex_attr, PTHREAD_MUTEX_RECURSIVE);
+	rv = pthread_mutex_init(&archive->lock, &mutex_attr);
+	pthread_mutexattr_destroy(&mutex_attr);
 	if (rv != 0) {
 		rv = -SQSH_ERROR_TODO;
 		goto out;
@@ -284,6 +298,25 @@ out:
 }
 
 int
+sqsh_archive_inode_cache(
+		struct SqshArchive *archive, struct SqshInodeCache **inode_cache) {
+	int rv = 0;
+
+	pthread_mutex_lock(&archive->lock);
+	if (!(archive->initialized & INITIALIZED_INODE_CACHE)) {
+		rv = sqsh__inode_cache_init(&archive->inode_cache, archive);
+		if (rv < 0) {
+			goto out;
+		}
+		archive->initialized |= INITIALIZED_INODE_CACHE;
+	}
+	*inode_cache = &archive->inode_cache;
+out:
+	pthread_mutex_unlock(&archive->lock);
+	return rv;
+}
+
+int
 sqsh_archive_xattr_table(
 		struct SqshArchive *archive, struct SqshXattrTable **xattr_table) {
 	int rv = 0;
@@ -343,6 +376,9 @@ sqsh__archive_cleanup(struct SqshArchive *archive) {
 	}
 	if (is_initialized(archive, INITIALIZED_METABLOCK_COMPRESSION_MANAGER)) {
 		sqsh__extract_manager_cleanup(&archive->metablock_extract_manager);
+	}
+	if (is_initialized(archive, INITIALIZED_INODE_CACHE)) {
+		sqsh__inode_cache_cleanup(&archive->inode_cache);
 	}
 	sqsh__extractor_cleanup(&archive->data_compression);
 	sqsh__extractor_cleanup(&archive->metablock_compression);

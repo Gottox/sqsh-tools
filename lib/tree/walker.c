@@ -31,7 +31,7 @@
  * @file         walker.c
  */
 
-#include "../../include/sqsh_archive.h"
+#include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_directory_private.h"
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_inode_private.h"
@@ -40,14 +40,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-void
+SQSH_NO_UNUSED int
 update_inode_from_iterator(struct SqshTreeWalker *walker) {
 	struct SqshDirectoryIterator *iterator = &walker->iterator;
 	uint64_t inode_number = sqsh_directory_iterator_inode_number(iterator);
 	uint64_t inode_ref = sqsh_directory_iterator_inode_ref(iterator);
 
-	walker->inode_ref_table[inode_number - 1] = inode_ref;
 	walker->current_inode_ref = inode_ref;
+	return sqsh__inode_cache_set(walker->inode_cache, inode_number, inode_ref);
 }
 
 static int
@@ -82,8 +82,8 @@ enter_directory(struct SqshTreeWalker *walker, uint64_t inode_ref) {
 	}
 
 	const uint64_t inode_number = sqsh_inode_number(inode);
-	walker->inode_ref_table[inode_number - 1] = inode_ref;
 	walker->current_inode_ref = inode_ref;
+	rv = sqsh__inode_cache_set(walker->inode_cache, inode_number, inode_ref);
 
 out:
 	return rv;
@@ -94,13 +94,11 @@ sqsh__tree_walker_init(
 		struct SqshTreeWalker *walker, struct SqshArchive *archive) {
 	int rv = 0;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
-	const uint64_t inode_count = sqsh_superblock_inode_count(superblock);
 
 	walker->archive = archive;
 	walker->root_inode_ref = sqsh_superblock_inode_root_ref(superblock);
-	walker->inode_ref_table = calloc(inode_count, sizeof(uint64_t));
-	if (walker->inode_ref_table == NULL) {
-		rv = -SQSH_ERROR_MALLOC_FAILED;
+	rv = sqsh_archive_inode_cache(archive, &walker->inode_cache);
+	if (rv < 0) {
 		goto out;
 	}
 	rv = enter_directory(walker, walker->root_inode_ref);
@@ -139,7 +137,8 @@ sqsh_tree_walker_up(struct SqshTreeWalker *walker) {
 		rv = -SQSH_ERROR_TODO;
 		goto out;
 	}
-	const uint64_t parent_inode_ref = walker->inode_ref_table[parent_inode - 1];
+	const uint64_t parent_inode_ref =
+			sqsh__inode_cache_get(walker->inode_cache, parent_inode);
 	if (parent_inode_ref == 0) {
 		rv = -SQSH_ERROR_TODO;
 		goto out;
@@ -162,8 +161,7 @@ sqsh_tree_walker_next(struct SqshTreeWalker *walker) {
 		return rv;
 	}
 
-	update_inode_from_iterator(walker);
-	return 0;
+	return update_inode_from_iterator(walker);
 }
 
 enum SqshInodeType
@@ -196,8 +194,7 @@ sqsh_tree_walker_lookup(
 		return rv;
 	}
 
-	update_inode_from_iterator(walker);
-	return 0;
+	return update_inode_from_iterator(walker);
 }
 
 int
@@ -279,7 +276,6 @@ int
 sqsh__tree_walker_cleanup(struct SqshTreeWalker *walker) {
 	sqsh__inode_cleanup(&walker->inode);
 	sqsh__directory_iterator_cleanup(&walker->iterator);
-	free(walker->inode_ref_table);
 	return 0;
 }
 

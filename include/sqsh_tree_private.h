@@ -57,7 +57,7 @@ struct SqshTreeWalker {
 	uint64_t root_inode_ref;
 	uint64_t current_inode_ref;
 	struct SqshArchive *archive;
-	uint64_t *inode_ref_table;
+	struct SqshInodeCache *inode_cache;
 	struct SqshInode inode;
 	struct SqshDirectoryIterator iterator;
 };

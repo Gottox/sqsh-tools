@@ -32,7 +32,7 @@
  */
 
 #include "../../include/sqsh_mapper_private.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 
 #include <errno.h>
 #include <fcntl.h>

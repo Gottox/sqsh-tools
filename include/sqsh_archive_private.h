@@ -83,6 +83,73 @@ SQSH_NO_UNUSED int sqsh__trailing_init(
 int sqsh__trailing_cleanup(struct SqshTrailingContext *context);
 
 ////////////////////////////////////////
+// archive/inode_cache.c
+
+/**
+ * @brief The inode cache context is used to cache inodes numbers and their
+ * corresponding inode references.
+ */
+struct SqshInodeCache {
+	/**
+	 * @privatesection
+	 */
+	_Atomic(uint64_t) *inode_refs;
+	struct SqshExportTable *export_table;
+};
+
+/**
+ * @internal
+ * @memberof SqshInodeCache
+ * @brief Initializes an inode cache context.
+ *
+ * @param[out] cache The context to initialize.
+ * @param[in]  archive The archive to use for the context.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+SQSH_NO_UNUSED int sqsh__inode_cache_init(
+		struct SqshInodeCache *cache, struct SqshArchive *archive);
+
+/**
+ * @internal
+ * @memberof SqshInodeCache
+ * @brief Gets the inode reference for a given inode number.
+ *
+ * @param[in] cache The context to use.
+ * @param[in] inode_number The inode number to get the reference for.
+ *
+ * @return The inode reference on success, a negative value on error.
+ */
+SQSH_NO_UNUSED uint64_t
+sqsh__inode_cache_get(const struct SqshInodeCache *cache, uint64_t inode_number);
+
+/**
+ * @internal
+ * @memberof SqshInodeCache
+ * @brief Sets the inode reference for a given inode number.
+ *
+ * @param[in] cache The context to use.
+ * @param[in] inode_number The inode number to set the reference for.
+ * @param[in] inode_ref The inode reference to set.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+SQSH_NO_UNUSED int sqsh__inode_cache_set(
+		struct SqshInodeCache *cache, uint64_t inode_number,
+		uint64_t inode_ref);
+
+/**
+ * @internal
+ * @memberof SqshInodeCache
+ * @brief Cleans up an inode cache context.
+ *
+ * @param[in] cache The context to clean up.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+int sqsh__inode_cache_cleanup(struct SqshInodeCache *cache);
+
+////////////////////////////////////////
 // archive/superblock.c
 
 /**
@@ -181,6 +248,7 @@ struct SqshArchive {
 	struct SqshExportTable export_table;
 	struct SqshXattrTable xattr_table;
 	struct SqshFragmentTable fragment_table;
+	struct SqshInodeCache inode_cache;
 	uint8_t initialized;
 	struct SqshConfig config;
 	pthread_mutex_t lock;

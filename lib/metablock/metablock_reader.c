@@ -37,7 +37,7 @@
 #include "../../include/sqsh_metablock_private.h"
 
 #include "../../include/sqsh_error.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 
 static int
 append_to_buffer(

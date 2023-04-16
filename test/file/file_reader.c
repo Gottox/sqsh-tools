@@ -38,7 +38,7 @@
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_data_private.h"
 #include "../../include/sqsh_inode_private.h"
-#include "../../lib/utils.h"
+#include "../../lib/utils/utils.h"
 #include "sqsh_file.h"
 
 static void

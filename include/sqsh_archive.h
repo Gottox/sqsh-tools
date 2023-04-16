@@ -509,6 +509,7 @@ struct SqshConfig {
 
 struct SqshArchive;
 struct SqshXattrTable;
+struct SqshInodeCache;
 
 /**
  * @memberof SqshArchive
@@ -591,6 +592,20 @@ sqsh_archive_metablock_extractor(const struct SqshArchive *archive);
  */
 SQSH_NO_UNUSED int sqsh_archive_id_table(
 		struct SqshArchive *archive, struct SqshIdTable **id_table);
+
+/**
+ * @memberof SqshArchive
+ * @brief Retrieves the export table of a Sqsh instance.
+ *
+ * @param[in]  archive        The Sqsh instance to retrieve the inode cache
+ *                            from.
+ * @param[out] inode_cache    Pointer to a struct SqshInodeCache where the 
+ *                            inode cache will be stored.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+SQSH_NO_UNUSED int sqsh_archive_inode_cache(
+		struct SqshArchive *archive, struct SqshInodeCache **inode_cache);
 
 /**
  * @memberof SqshArchive

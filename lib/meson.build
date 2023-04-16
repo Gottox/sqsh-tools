@@ -1,6 +1,7 @@
 libsqsh_sources = [
     'archive/archive.c',
     'archive/compression_options.c',
+    'archive/inode_cache.c',
     'archive/superblock.c',
     'archive/trailing_context.c',
     'chrome/file.c',
@@ -13,7 +14,6 @@ libsqsh_sources = [
     'data/superblock_data.c',
     'data/xattr_data.c',
     'directory/directory_iterator.c',
-    'error.c',
     'extract/extract_buffer.c',
     'extract/extract_manager.c',
     'extract/extract_view.c',
@@ -47,10 +47,11 @@ libsqsh_sources = [
     'table/table.c',
     'table/xattr_table.c',
     'tree/walker.c',
+    'utils/error.c',
     'xattr/xattr_iterator.c',
 ]
 
-libsqsh_headers_private = ['utils.h']
+libsqsh_headers_private = ['utils/utils.h']
 
 libsqsh_dependencies = []
 

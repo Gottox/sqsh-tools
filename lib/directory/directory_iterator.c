@@ -37,7 +37,7 @@
 #include "../../include/sqsh_data_private.h"
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_inode_private.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 
 static int
 directory_iterator_index_lookup(

@@ -38,7 +38,7 @@
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_inode_private.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 #include <alloca.h>
 
 static int

@@ -34,7 +34,7 @@
 #include "../../include/sqsh_mapper_private.h"
 
 #include "../../include/sqsh_error.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 
 static sqsh_index_t
 get_index(const struct SqshMapReader *reader, uint64_t address) {

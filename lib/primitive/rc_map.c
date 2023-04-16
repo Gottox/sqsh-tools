@@ -34,7 +34,7 @@
 #include "../../include/sqsh_primitive_private.h"
 
 #include "../../include/sqsh_error.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 #include <assert.h>
 
 #if 0

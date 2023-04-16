@@ -34,7 +34,7 @@
 #include "../../include/sqsh_archive_private.h"
 
 #include "../../include/sqsh_error.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 
 int
 sqsh__trailing_init(
