@@ -149,6 +149,7 @@ sqsh__extract_manager_uncompress(
 
 		rv = sqsh__extractor_to_buffer(extractor, &buffer, data, size);
 		if (rv < 0) {
+			sqsh__buffer_cleanup(&buffer);
 			goto out;
 		}
 
