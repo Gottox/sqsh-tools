@@ -89,7 +89,7 @@ inode_load(struct SqshInode *context) {
 		size += SQSH_SIZEOF_INODE_IPC_EXT;
 		break;
 	default:
-		return SQSH_ERROR_UNKOWN_INODE_TYPE;
+		return -SQSH_ERROR_UNKOWN_INODE_TYPE;
 	}
 	rv = sqsh__metablock_reader_advance(&context->metablock, 0, size);
 	if (rv < 0) {
