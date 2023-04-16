@@ -55,7 +55,7 @@ sqsh__inode_cache_init(
 		cache->export_table = NULL;
 		cache->inode_refs = calloc(inode_count, sizeof(atomic_uint_fast64_t));
 		if (cache->inode_refs == NULL) {
-			rv = SQSH_ERROR_MALLOC_FAILED;
+			rv = -SQSH_ERROR_MALLOC_FAILED;
 			goto out;
 		}
 	}

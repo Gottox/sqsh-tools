@@ -150,7 +150,7 @@ map_block_uncompressed(
 
 		uint64_t new_outer_size;
 		if (SQSH_ADD_OVERFLOW(outer_size, block_size, &new_outer_size)) {
-			rv = SQSH_ERROR_INTEGER_OVERFLOW;
+			rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 			goto out;
 		}
 

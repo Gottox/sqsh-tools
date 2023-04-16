@@ -100,7 +100,7 @@ file_reader_buffered(struct SqshFileReader *reader, size_t size) {
 	const uint32_t block_offset = reader->current_offset % block_size;
 	uint64_t end_offset;
 	if (SQSH_ADD_OVERFLOW(reader->current_offset, size, &end_offset)) {
-		return SQSH_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
 	int rv = 0;
@@ -155,11 +155,11 @@ sqsh_file_reader_advance(
 
 	uint64_t current_offset = reader->current_offset;
 	if (SQSH_ADD_OVERFLOW(offset, current_offset, &current_offset)) {
-		return SQSH_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	uint64_t end_offset;
 	if (SQSH_ADD_OVERFLOW(current_offset, size, &end_offset)) {
-		return SQSH_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
 	sqsh_index_t skip_blocks = current_offset / block_size;

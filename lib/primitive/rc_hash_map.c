@@ -72,12 +72,12 @@ extend_hash_map(struct SqshRcHashMap *hash_map) {
 	struct SqshRcHashMapInner *hash_maps;
 
 	if (SQSH_ADD_OVERFLOW(hash_map->hash_map_count, 1, &new_size)) {
-		return SQSH_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	hash_map->hash_map_count = new_size;
 	if (SQSH_MULT_OVERFLOW(
 				new_size, sizeof(struct SqshRcHashMapInner), &new_size)) {
-		return SQSH_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
 	hash_map->hash_maps = realloc(hash_map->hash_maps, new_size);
@@ -85,7 +85,7 @@ extend_hash_map(struct SqshRcHashMap *hash_map) {
 
 	hash_maps->keys = calloc(hash_map->map_size, sizeof(sqsh_rc_map_key_t));
 	if (hash_maps->keys == NULL) {
-		return SQSH_ERROR_MALLOC_FAILED;
+		return -SQSH_ERROR_MALLOC_FAILED;
 	}
 
 	return sqsh__rc_map_init(
@@ -177,7 +177,7 @@ sqsh__rc_hash_map_release(struct SqshRcHashMap *hash_map, const void *element) {
 			return sqsh__rc_map_release(values, element);
 		}
 	}
-	return SQSH_ERROR_TODO;
+	return -SQSH_ERROR_TODO;
 }
 
 int

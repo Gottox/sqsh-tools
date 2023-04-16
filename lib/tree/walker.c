@@ -31,11 +31,12 @@
  * @file         walker.c
  */
 
+#include "../../include/sqsh_tree_private.h"
+
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_directory_private.h"
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_inode_private.h"
-#include "../../include/sqsh_tree_private.h"
 
 #include <stdlib.h>
 #include <string.h>
