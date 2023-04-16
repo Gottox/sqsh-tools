@@ -120,8 +120,8 @@ SQSH_NO_UNUSED int sqsh__inode_cache_init(
  *
  * @return The inode reference on success, a negative value on error.
  */
-SQSH_NO_UNUSED uint64_t
-sqsh__inode_cache_get(const struct SqshInodeCache *cache, uint64_t inode_number);
+SQSH_NO_UNUSED uint64_t sqsh__inode_cache_get(
+		const struct SqshInodeCache *cache, uint64_t inode_number);
 
 /**
  * @internal
