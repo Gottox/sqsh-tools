@@ -13,12 +13,12 @@ else
 	ARCH = x86_64
 endif
 
-ifeq ($(MUON),1)
-	MESON = muon
-	NINJA = muon
-else
+ifeq ($(NOMUON),1)
 	MESON = meson
 	NINJA = ninja
+else
+	MESON = muon
+	NINJA = muon
 endif
 MESON_FLAGS += -Ddefault_library=static
 MESON_FLAGS += -Db_lundef=false
