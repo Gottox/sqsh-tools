@@ -54,7 +54,7 @@ update_inode_from_iterator(struct SqshTreeWalker *walker) {
 static int
 enter_directory(struct SqshTreeWalker *walker, uint64_t inode_ref) {
 	int rv = 0;
-	struct SqshInode *inode = &walker->inode;
+	struct SqshInode *inode = &walker->directory;
 	struct SqshDirectoryIterator *iterator = &walker->iterator;
 
 	rv = sqsh__inode_cleanup(inode);
@@ -125,7 +125,7 @@ sqsh_tree_walker_new(struct SqshArchive *archive, int *err) {
 int
 sqsh_tree_walker_up(struct SqshTreeWalker *walker) {
 	int rv = 0;
-	const struct SqshInode *inode = &walker->inode;
+	const struct SqshInode *inode = &walker->directory;
 	// We do not use the parent inode to check if it is the root node.
 	// According to the documentationen it *should* be zero. That's
 	// vague.
@@ -275,7 +275,7 @@ out:
 
 int
 sqsh__tree_walker_cleanup(struct SqshTreeWalker *walker) {
-	sqsh__inode_cleanup(&walker->inode);
+	sqsh__inode_cleanup(&walker->directory);
 	sqsh__directory_iterator_cleanup(&walker->iterator);
 	return 0;
 }
