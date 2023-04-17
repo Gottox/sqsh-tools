@@ -37,7 +37,6 @@ elif cc.get_id() == 'clang'
 endif
 
 mksquashfs = find_program('mksquashfs')
-mktemp = find_program('mktemp')
 setfattr = find_program('setfattr')
 xxd = find_program('xxd')
 unshare = find_program('unshare')
