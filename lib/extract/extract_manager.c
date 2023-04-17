@@ -93,9 +93,8 @@ sqsh__extract_manager_init(
 	// Give a bit of room to avoid too many key hash collisions
 	size = find_next_maybe_prime(2 * size);
 
-	rv = pthread_mutex_init(&manager->lock, NULL);
-	if (rv != 0) {
-		rv = -SQSH_ERROR_TODO;
+	rv = sqsh_mutex_init(&manager->lock);
+	if (rv < 0) {
 		goto out;
 	}
 	rv = sqsh__rc_hash_map_init(
@@ -127,10 +126,8 @@ sqsh__extract_manager_uncompress(
 	int rv = 0;
 	const struct SqshExtractor *extractor = manager->extractor;
 
-	rv = pthread_mutex_lock(&manager->lock);
-	if (rv != 0) {
-		// rv = -SQSH_ERROR_MUTEX_LOCK;
-		rv = -SQSH_ERROR_TODO;
+	rv = sqsh_mutex_lock(&manager->lock);
+	if (rv < 0) {
 		goto out;
 	}
 
@@ -158,23 +155,21 @@ sqsh__extract_manager_uncompress(
 	rv = sqsh__lru_touch(&manager->lru, address);
 
 out:
-	pthread_mutex_unlock(&manager->lock);
+	sqsh_mutex_unlock(&manager->lock);
 	return rv;
 }
 
 int
 sqsh__extract_manager_release(
 		struct SqshExtractManager *manager, const struct SqshBuffer *buffer) {
-	int rv = pthread_mutex_lock(&manager->lock);
-	if (rv != 0) {
-		// rv = -SQSH_ERROR_MUTEX_LOCK;
-		rv = -SQSH_ERROR_TODO;
+	int rv = sqsh_mutex_lock(&manager->lock);
+	if (rv < 0) {
 		goto out;
 	}
 
 	rv = sqsh__rc_hash_map_release(&manager->hash_map, buffer);
 
-	pthread_mutex_unlock(&manager->lock);
+	sqsh_mutex_unlock(&manager->lock);
 out:
 	return rv;
 }
@@ -183,7 +178,7 @@ int
 sqsh__extract_manager_cleanup(struct SqshExtractManager *manager) {
 	sqsh__lru_cleanup(&manager->lru);
 	sqsh__rc_hash_map_cleanup(&manager->hash_map);
-	pthread_mutex_destroy(&manager->lock);
+	sqsh_mutex_destroy(&manager->lock);
 
 	return 0;
 }

@@ -90,19 +90,10 @@ sqsh__archive_init(
 		memset(&archive->config, 0, sizeof(struct SqshConfig));
 	}
 
-	pthread_mutexattr_t mutex_attr;
-	rv = pthread_mutexattr_init(&mutex_attr);
-	if (rv != 0) {
-		rv = -SQSH_ERROR_TODO;
-		goto out;
-	}
 	// RECURSIVE is needed because: inode_cache may access the export_table
 	// during initialization.
-	pthread_mutexattr_settype(&mutex_attr, PTHREAD_MUTEX_RECURSIVE);
-	rv = pthread_mutex_init(&archive->lock, &mutex_attr);
-	pthread_mutexattr_destroy(&mutex_attr);
-	if (rv != 0) {
-		rv = -SQSH_ERROR_TODO;
+	rv = sqsh_mutex_init_recursive(&archive->lock);
+	if (rv < 0) {
 		goto out;
 	}
 
@@ -171,7 +162,10 @@ sqsh__archive_metablock_extract_manager(
 		struct SqshExtractManager **metablock_extract_manager) {
 	int rv = 0;
 
-	pthread_mutex_lock(&archive->lock);
+	rv = sqsh_mutex_lock(&archive->lock);
+	if (rv < 0) {
+		goto out;
+	}
 	if (!is_initialized(archive, INITIALIZED_METABLOCK_COMPRESSION_MANAGER)) {
 		const struct SqshSuperblock *superblock =
 				sqsh_archive_superblock(archive);
@@ -195,7 +189,7 @@ sqsh__archive_metablock_extract_manager(
 	}
 	*metablock_extract_manager = &archive->metablock_extract_manager;
 out:
-	pthread_mutex_unlock(&archive->lock);
+	sqsh_mutex_unlock(&archive->lock);
 	return rv;
 }
 
@@ -205,7 +199,10 @@ sqsh__archive_data_extract_manager(
 		struct SqshExtractManager **data_extract_manager) {
 	int rv = 0;
 
-	pthread_mutex_lock(&archive->lock);
+	rv = sqsh_mutex_lock(&archive->lock);
+	if (rv < 0) {
+		goto out;
+	}
 	if (!is_initialized(archive, INITIALIZED_DATA_COMPRESSION_MANAGER)) {
 		const struct SqshSuperblock *superblock =
 				sqsh_archive_superblock(archive);
@@ -223,7 +220,7 @@ sqsh__archive_data_extract_manager(
 	}
 	*data_extract_manager = &archive->data_extract_manager;
 out:
-	pthread_mutex_unlock(&archive->lock);
+	sqsh_mutex_unlock(&archive->lock);
 	return rv;
 }
 
@@ -232,7 +229,10 @@ sqsh_archive_id_table(
 		struct SqshArchive *archive, struct SqshIdTable **id_table) {
 	int rv = 0;
 
-	pthread_mutex_lock(&archive->lock);
+	rv = sqsh_mutex_lock(&archive->lock);
+	if (rv < 0) {
+		goto out;
+	}
 	if (!is_initialized(archive, INITIALIZED_ID_TABLE)) {
 		rv = sqsh__id_table_init(&archive->id_table, archive);
 		if (rv < 0) {
@@ -242,7 +242,7 @@ sqsh_archive_id_table(
 	}
 	*id_table = &archive->id_table;
 out:
-	pthread_mutex_unlock(&archive->lock);
+	sqsh_mutex_unlock(&archive->lock);
 	return rv;
 }
 
@@ -256,7 +256,10 @@ sqsh_archive_export_table(
 		return -SQSH_ERROR_NO_EXPORT_TABLE;
 	}
 
-	pthread_mutex_lock(&archive->lock);
+	rv = sqsh_mutex_lock(&archive->lock);
+	if (rv < 0) {
+		goto out;
+	}
 	if (!(archive->initialized & INITIALIZED_EXPORT_TABLE)) {
 		rv = sqsh__export_table_init(&archive->export_table, archive);
 		if (rv < 0) {
@@ -267,7 +270,7 @@ sqsh_archive_export_table(
 	*export_table = &archive->export_table;
 
 out:
-	pthread_mutex_unlock(&archive->lock);
+	sqsh_mutex_unlock(&archive->lock);
 	return rv;
 }
 
@@ -282,7 +285,10 @@ sqsh_archive_fragment_table(
 		return -SQSH_ERROR_NO_FRAGMENT_TABLE;
 	}
 
-	pthread_mutex_lock(&archive->lock);
+	rv = sqsh_mutex_lock(&archive->lock);
+	if (rv < 0) {
+		goto out;
+	}
 	if (!is_initialized(archive, INITIALIZED_FRAGMENT_TABLE)) {
 		rv = sqsh__fragment_table_init(&archive->fragment_table, archive);
 
@@ -293,7 +299,7 @@ sqsh_archive_fragment_table(
 	}
 	*fragment_table = &archive->fragment_table;
 out:
-	pthread_mutex_unlock(&archive->lock);
+	sqsh_mutex_unlock(&archive->lock);
 	return rv;
 }
 
@@ -302,7 +308,10 @@ sqsh_archive_inode_cache(
 		struct SqshArchive *archive, struct SqshInodeCache **inode_cache) {
 	int rv = 0;
 
-	pthread_mutex_lock(&archive->lock);
+	rv = sqsh_mutex_lock(&archive->lock);
+	if (rv < 0) {
+		goto out;
+	}
 	if (!(archive->initialized & INITIALIZED_INODE_CACHE)) {
 		rv = sqsh__inode_cache_init(&archive->inode_cache, archive);
 		if (rv < 0) {
@@ -312,7 +321,7 @@ sqsh_archive_inode_cache(
 	}
 	*inode_cache = &archive->inode_cache;
 out:
-	pthread_mutex_unlock(&archive->lock);
+	sqsh_mutex_unlock(&archive->lock);
 	return rv;
 }
 
@@ -326,7 +335,10 @@ sqsh_archive_xattr_table(
 		return -SQSH_ERROR_NO_XATTR_TABLE;
 	}
 
-	pthread_mutex_lock(&archive->lock);
+	rv = sqsh_mutex_lock(&archive->lock);
+	if (rv < 0) {
+		goto out;
+	}
 	if (!(archive->initialized & INITIALIZED_XATTR_TABLE)) {
 		rv = sqsh__xattr_table_init(&archive->xattr_table, archive);
 		if (rv < 0) {
@@ -336,7 +348,7 @@ sqsh_archive_xattr_table(
 	}
 	*xattr_table = &archive->xattr_table;
 out:
-	pthread_mutex_unlock(&archive->lock);
+	sqsh_mutex_unlock(&archive->lock);
 	return rv;
 }
 
@@ -385,7 +397,7 @@ sqsh__archive_cleanup(struct SqshArchive *archive) {
 	sqsh__superblock_cleanup(&archive->superblock);
 	sqsh__map_manager_cleanup(&archive->map_manager);
 
-	pthread_mutex_destroy(&archive->lock);
+	sqsh_mutex_destroy(&archive->lock);
 
 	return rv;
 }

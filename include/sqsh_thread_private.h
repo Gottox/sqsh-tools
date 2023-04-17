@@ -28,11 +28,13 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_error.h
+ * @file         sqsh_thread_private.h
  */
 
-#ifndef SQSH_ERROR_H
-#define SQSH_ERROR_H
+#ifndef SQSH_THREAD_PRIVATE_H
+#define SQSH_THREAD_PRIVATE_H
+
+#include <pthread.h>
 
 #include "sqsh_common.h"
 
@@ -40,60 +42,65 @@
 extern "C" {
 #endif
 
-////////////////////////////////////////
-// error.c
+typedef pthread_mutex_t sqsh_mutex_t;
 
 /**
- * @brief Error codes for sqsh.
- */
-enum SqshError {
-	SQSH_SUCCESS = 0,
-	// Avoid collisions with errno
-	SQSH_ERROR_SECTION_START = (1 << 8),
-	SQSH_ERROR_SUPERBLOCK_TOO_SMALL,
-	SQSH_ERROR_WRONG_MAGIC,
-	SQSH_ERROR_BLOCKSIZE_MISSMATCH,
-	SQSH_ERROR_SIZE_MISSMATCH,
-	SQSH_ERROR_COMPRESSION_INIT,
-	SQSH_ERROR_COMPRESSION_UNSUPPORTED,
-	SQSH_ERROR_COMPRESSION_DECOMPRESS,
-	SQSH_ERROR_UNKOWN_INODE_TYPE,
-	SQSH_ERROR_NOT_A_DIRECTORY,
-	SQSH_ERROR_NOT_A_FILE,
-	SQSH_ERROR_MALLOC_FAILED,
-	SQSH_ERROR_MUTEX_INIT_FAILED,
-	SQSH_ERROR_MUTEX_LOCK_FAILED,
-	SQSH_ERROR_MUTEX_DESTROY_FAILED,
-	SQSH_ERROR_INTEGER_OVERFLOW,
-	SQSH_ERROR_NO_SUCH_FILE,
-	SQSH_ERROR_NO_FRAGMENT_TABLE,
-	SQSH_ERROR_NO_EXTENDED_DIRECTORY,
-	SQSH_ERROR_NO_EXPORT_TABLE,
-	SQSH_ERROR_NO_XATTR_TABLE,
-	SQSH_ERROR_NO_COMPRESSION_OPTIONS,
-	SQSH_ERROR_MAPPER_INIT,
-	SQSH_ERROR_MAPPER_MAP,
-	SQSH_ERROR_CURL_INVALID_RANGE_HEADER,
-	SQSH_ERROR_TODO,
-};
-
-/**
- * @brief Print the error message for the given error code.
+ * @brief sqsh_mutex_init initializes a mutex.
  *
- * @param error_code The error code.
- * @param msg The message to print before the error message.
+ * @param mutex the mutex to initialize.
+ *
+ * @return 0 on success, less than 0 on error.
  */
-void sqsh_perror(int error_code, const char *msg);
+SQSH_NO_UNUSED int sqsh_mutex_init(sqsh_mutex_t *mutex);
 
 /**
- * @brief Get the error message for the given error code.
+ * @brief sqsh_mutex_init initializes a mutex with support for
+ * recursive locking.
  *
- * @param error_code The error code.
- * @return The error message.
+ * @param mutex the mutex to initialize.
+ *
+ * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED const char *sqsh_error_str(int error_code);
+SQSH_NO_UNUSED int sqsh_mutex_init_recursive(sqsh_mutex_t *mutex);
+
+/**
+ * @brief sqsh_mutex_lock locks a mutex.
+ *
+ * @param mutex the mutex to lock.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int sqsh_mutex_lock(sqsh_mutex_t *mutex);
+
+/**
+ * @brief sqsh_mutex_trylock tries to lock a mutex.
+ * If the mutex is already locked, the function returns immediately.
+ *
+ * @param mutex the mutex to lock.
+ *
+ * @return 0 on success, less than 0 on error, 1 if the mutex is already locked.
+ */
+SQSH_NO_UNUSED int sqsh_mutex_trylock(sqsh_mutex_t *mutex);
+
+/**
+ * @brief sqsh_mutex_lock unlocks a mutex.
+ *
+ * @param mutex the mutex to lock.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+int sqsh_mutex_unlock(sqsh_mutex_t *mutex);
+
+/**
+ * @brief sqsh_mutex_unlock unlocks a mutex.
+ *
+ * @param mutex the mutex to unlock.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+int sqsh_mutex_destroy(sqsh_mutex_t *mutex);
 
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_ERROR_H
+#endif // SQSH_THREAD_PRIVATE_H

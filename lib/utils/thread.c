@@ -28,72 +28,88 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_error.h
+ * @file         thread.c
  */
 
-#ifndef SQSH_ERROR_H
-#define SQSH_ERROR_H
+#define _DEFAULT_SOURCE
 
-#include "sqsh_common.h"
+#include "../../include/sqsh_thread_private.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "../../include/sqsh_error.h"
 
-////////////////////////////////////////
-// error.c
+#include <errno.h>
+#include <pthread.h>
+#include <stdlib.h>
 
-/**
- * @brief Error codes for sqsh.
- */
-enum SqshError {
-	SQSH_SUCCESS = 0,
-	// Avoid collisions with errno
-	SQSH_ERROR_SECTION_START = (1 << 8),
-	SQSH_ERROR_SUPERBLOCK_TOO_SMALL,
-	SQSH_ERROR_WRONG_MAGIC,
-	SQSH_ERROR_BLOCKSIZE_MISSMATCH,
-	SQSH_ERROR_SIZE_MISSMATCH,
-	SQSH_ERROR_COMPRESSION_INIT,
-	SQSH_ERROR_COMPRESSION_UNSUPPORTED,
-	SQSH_ERROR_COMPRESSION_DECOMPRESS,
-	SQSH_ERROR_UNKOWN_INODE_TYPE,
-	SQSH_ERROR_NOT_A_DIRECTORY,
-	SQSH_ERROR_NOT_A_FILE,
-	SQSH_ERROR_MALLOC_FAILED,
-	SQSH_ERROR_MUTEX_INIT_FAILED,
-	SQSH_ERROR_MUTEX_LOCK_FAILED,
-	SQSH_ERROR_MUTEX_DESTROY_FAILED,
-	SQSH_ERROR_INTEGER_OVERFLOW,
-	SQSH_ERROR_NO_SUCH_FILE,
-	SQSH_ERROR_NO_FRAGMENT_TABLE,
-	SQSH_ERROR_NO_EXTENDED_DIRECTORY,
-	SQSH_ERROR_NO_EXPORT_TABLE,
-	SQSH_ERROR_NO_XATTR_TABLE,
-	SQSH_ERROR_NO_COMPRESSION_OPTIONS,
-	SQSH_ERROR_MAPPER_INIT,
-	SQSH_ERROR_MAPPER_MAP,
-	SQSH_ERROR_CURL_INVALID_RANGE_HEADER,
-	SQSH_ERROR_TODO,
-};
-
-/**
- * @brief Print the error message for the given error code.
- *
- * @param error_code The error code.
- * @param msg The message to print before the error message.
- */
-void sqsh_perror(int error_code, const char *msg);
-
-/**
- * @brief Get the error message for the given error code.
- *
- * @param error_code The error code.
- * @return The error message.
- */
-SQSH_NO_UNUSED const char *sqsh_error_str(int error_code);
-
-#ifdef __cplusplus
+int
+sqsh_mutex_init(sqsh_mutex_t *mutex) {
+	int rv = pthread_mutex_init(mutex, NULL);
+	if (rv != 0) {
+		return -SQSH_ERROR_MUTEX_INIT_FAILED;
+	}
+	return 0;
 }
-#endif
-#endif // SQSH_ERROR_H
+
+int
+sqsh_mutex_init_recursive(sqsh_mutex_t *mutex) {
+	pthread_mutexattr_t mutex_attr;
+	int rv = pthread_mutexattr_init(&mutex_attr);
+	if (rv != 0) {
+		return -SQSH_ERROR_MUTEX_INIT_FAILED;
+	}
+
+	pthread_mutexattr_settype(&mutex_attr, PTHREAD_MUTEX_RECURSIVE);
+	pthread_mutexattr_destroy(&mutex_attr);
+
+	rv = pthread_mutex_init(mutex, &mutex_attr);
+	if (rv != 0) {
+		rv = -SQSH_ERROR_MUTEX_INIT_FAILED;
+		goto out;
+	}
+
+out:
+	pthread_mutexattr_destroy(&mutex_attr);
+	return rv;
+}
+
+int
+sqsh_mutex_lock(sqsh_mutex_t *mutex) {
+	int rv = pthread_mutex_lock(mutex);
+	if (rv != 0) {
+		return -SQSH_ERROR_MUTEX_LOCK_FAILED;
+	} else {
+		return 0;
+	}
+}
+
+int
+sqsh_mutex_trylock(sqsh_mutex_t *mutex) {
+	int rv = pthread_mutex_trylock(mutex);
+	if (rv == EBUSY) {
+		return 1;
+	} else if (rv != 0) {
+		return -SQSH_ERROR_MUTEX_LOCK_FAILED;
+	} else {
+		return 0;
+	}
+}
+
+int
+sqsh_mutex_unlock(sqsh_mutex_t *mutex) {
+	int rv = pthread_mutex_unlock(mutex);
+	if (rv != 0) {
+		return -SQSH_ERROR_MUTEX_LOCK_FAILED;
+	} else {
+		return 0;
+	}
+}
+
+int
+sqsh_mutex_destroy(sqsh_mutex_t *mutex) {
+	int rv = pthread_mutex_destroy(mutex);
+	if (rv != 0) {
+		return -SQSH_ERROR_MUTEX_DESTROY_FAILED;
+	} else {
+		return 0;
+	}
+}

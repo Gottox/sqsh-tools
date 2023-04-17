@@ -13,6 +13,7 @@ headers = [
     'sqsh_mapper_private.h',
     'sqsh_metablock_private.h',
     'sqsh_primitive_private.h',
+    'sqsh_thread_private.h',
     'sqsh_table.h',
     'sqsh_table_private.h',
     'sqsh_xattr.h',

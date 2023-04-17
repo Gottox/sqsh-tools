@@ -36,8 +36,7 @@
 
 #include "sqsh_primitive_private.h"
 
-#include <pthread.h>
-#include <sys/wait.h>
+#include "sqsh_thread_private.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -231,7 +230,7 @@ struct SqshExtractManager {
 	const struct SqshExtractor *extractor;
 	struct SqshMapManager *map_manager;
 	struct SqshLru lru;
-	pthread_mutex_t lock;
+	sqsh_mutex_t lock;
 };
 
 /**

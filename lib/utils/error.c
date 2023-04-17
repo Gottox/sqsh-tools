@@ -86,6 +86,12 @@ sqsh_error_str(int error_code) {
 		return "Not a file";
 	case SQSH_ERROR_MALLOC_FAILED:
 		return "Malloc Failed";
+	case SQSH_ERROR_MUTEX_INIT_FAILED:
+		return "Mutex init failed";
+	case SQSH_ERROR_MUTEX_LOCK_FAILED:
+		return "Mutex lock failed";
+	case SQSH_ERROR_MUTEX_DESTROY_FAILED:
+		return "Mutex destroy failed";
 	case SQSH_ERROR_INTEGER_OVERFLOW:
 		return "Integer overflow";
 	case SQSH_ERROR_NO_SUCH_FILE:

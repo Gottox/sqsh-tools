@@ -58,7 +58,7 @@ struct SqshLzoHelper {
 	pid_t pid;
 	FILE *compressed_fd;
 	FILE *uncompressed_fd;
-	pthread_mutex_t mutex;
+	sqsh_mutex_t mutex;
 };
 
 pthread_once_t helper_initialized = PTHREAD_ONCE_INIT;
@@ -134,7 +134,7 @@ init_helper(void) {
 	}
 
 	for (sqsh_index_t i = 0; i < max_worker_count; i++) {
-		if (pthread_mutex_init(&helper->mutex, NULL) != 0) {
+		if (sqsh_mutex_init(&helper->mutex) < 0) {
 			abort();
 		}
 	}
@@ -151,14 +151,14 @@ sqsh_lzo_finish(void *context, uint8_t *target, size_t *target_size) {
 	struct SqshLzoHelper *hlp = NULL;
 
 	for (sqsh_index_t i = 0; i < max_worker_count; i++) {
-		if (pthread_mutex_trylock(&helper[i].mutex) == 0) {
+		if (sqsh_mutex_trylock(&helper[i].mutex) == 0) {
 			hlp = &helper[i];
 			break;
 		}
 	}
 	if (hlp == NULL) {
 		hlp = &helper[0];
-		if (pthread_mutex_lock(&hlp->mutex) != 0) {
+		if (sqsh_mutex_lock(&hlp->mutex) != 0) {
 			rv = -SQSH_ERROR_TODO;
 			goto out;
 		}
@@ -210,7 +210,7 @@ sqsh_lzo_finish(void *context, uint8_t *target, size_t *target_size) {
 	}
 	*target_size = uncompressed_size;
 
-	pthread_mutex_unlock(&hlp->mutex);
+	sqsh_mutex_unlock(&hlp->mutex);
 
 out:
 	sqsh__extract_buffer_cleanup(context);

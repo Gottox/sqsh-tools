@@ -48,6 +48,7 @@ libsqsh_sources = [
     'table/xattr_table.c',
     'tree/walker.c',
     'utils/error.c',
+    'utils/thread.c',
     'xattr/xattr_iterator.c',
 ]
 

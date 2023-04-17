@@ -38,6 +38,7 @@
 
 #include "sqsh_error.h"
 #include "sqsh_file_private.h"
+#include "sqsh_thread_private.h"
 #include "sqsh_xattr_private.h"
 
 #ifdef __cplusplus
@@ -251,7 +252,7 @@ struct SqshArchive {
 	struct SqshInodeCache inode_cache;
 	uint8_t initialized;
 	struct SqshConfig config;
-	pthread_mutex_t lock;
+	sqsh_mutex_t lock;
 };
 
 /**

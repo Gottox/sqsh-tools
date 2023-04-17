@@ -36,9 +36,8 @@
 
 #include "sqsh_mapper.h"
 
-#include <pthread.h>
-
 #include "sqsh_primitive_private.h"
+#include "sqsh_thread_private.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,7 +60,7 @@ struct SqshCurlMapper {
 	uint64_t expected_time;
 	void *handle;
 	uint8_t *header_cache;
-	pthread_mutex_t lock;
+	sqsh_mutex_t lock;
 };
 
 ////////////////////////////////////////
@@ -242,7 +241,7 @@ struct SqshMapManager {
 	struct SqshMapper mapper;
 	struct SqshLru lru;
 	struct SqshRcMap maps;
-	pthread_mutex_t lock;
+	sqsh_mutex_t lock;
 };
 
 /**
