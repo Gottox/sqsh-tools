@@ -68,6 +68,11 @@ read_chunk = executable(
     dependencies: libsqsh_dependency,
 )
 
+depends = []
+if lzo.found()
+    depends += lzo_helper
+endif
+
 foreach p : sqsh_test
     t = executable(
         p.underscorify(),
@@ -76,7 +81,7 @@ foreach p : sqsh_test
         c_args: test_c_args,
         dependencies: libsqsh_dependency,
     )
-    test(p, t, env: {'SQSH_LZO_HELPER_PATH': lzo_helper_path})
+    test(p, t, env: {'SQSH_LZO_HELPER_PATH': lzo_helper_path}, depends: depends)
 endforeach
 
 if get_option('test') == 'extended'
