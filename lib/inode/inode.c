@@ -58,7 +58,7 @@ inode_load(struct SqshInode *context) {
 		size += SQSH_SIZEOF_INODE_DIRECTORY;
 		break;
 	case SQSH_INODE_TYPE_BASIC_FILE:
-		size += SQSH_SIZEOF_INODE_FILE_EXT;
+		size += SQSH_SIZEOF_INODE_FILE;
 		break;
 	case SQSH_INODE_TYPE_BASIC_SYMLINK:
 		size += SQSH_SIZEOF_INODE_SYMLINK;
