@@ -123,7 +123,11 @@ sqsh__metablock_iterator_skip(
 	int rv = 0;
 	uint16_t size = iterator->outer_size;
 
-	for (sqsh_index_t i = 0; i < amount; i++) {
+	if (amount == 0) {
+		return 0;
+	}
+
+	for (sqsh_index_t i = 0; i < amount - 1; i++) {
 		int rv = 0;
 
 		rv = sqsh__map_reader_advance(
@@ -147,6 +151,8 @@ sqsh__metablock_iterator_skip(
 		}
 	}
 	iterator->outer_size = size;
+
+	rv = sqsh__metablock_iterator_next(iterator);
 out:
 	return rv;
 }

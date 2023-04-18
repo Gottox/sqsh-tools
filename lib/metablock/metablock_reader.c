@@ -107,7 +107,8 @@ out:
 }
 
 static int
-metablock_map_next(struct SqshMetablockReader *reader, sqsh_index_t offset, size_t size) {
+metablock_map_next(
+		struct SqshMetablockReader *reader, sqsh_index_t offset, size_t size) {
 	int rv = 0;
 	struct SqshMetablockIterator *iterator = &reader->iterator;
 	size_t skip = offset / SQSH_METABLOCK_BLOCK_SIZE;
@@ -117,17 +118,16 @@ metablock_map_next(struct SqshMetablockReader *reader, sqsh_index_t offset, size
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
-	if (skip > 1) {
-		rv = sqsh__metablock_iterator_skip(iterator, skip - 1);
-		if (rv < 0) {
-			goto out;
-		}
+	// At the first iteration, we're technically *before* the first block. So
+	// we need to skip one block more.
+	if (reader->data == NULL) {
+		skip++;
 	}
-
-	rv = sqsh__metablock_iterator_next(iterator);
+	rv = sqsh__metablock_iterator_skip(iterator, skip);
 	if (rv < 0) {
 		goto out;
 	}
+
 	reader->data_size = sqsh__metablock_iterator_size(iterator);
 	reader->data = sqsh__metablock_iterator_data(iterator);
 	reader->offset = offset;
