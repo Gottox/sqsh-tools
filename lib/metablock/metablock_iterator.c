@@ -51,6 +51,7 @@ sqsh__metablock_iterator_init(
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(sqsh);
 
 	iterator->outer_size = 0;
+	iterator->inner_size = 0;
 	rv = sqsh__archive_metablock_extract_manager(
 			sqsh, &iterator->compression_manager);
 	if (rv < 0) {
