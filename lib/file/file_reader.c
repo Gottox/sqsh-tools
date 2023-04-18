@@ -186,12 +186,12 @@ out:
 }
 
 const uint8_t *
-sqsh_file_reader_data(struct SqshFileReader *reader) {
+sqsh_file_reader_data(const struct SqshFileReader *reader) {
 	return reader->data;
 }
 
 size_t
-sqsh_file_reader_size(struct SqshFileReader *reader) {
+sqsh_file_reader_size(const struct SqshFileReader *reader) {
 	return reader->current_size;
 }
 

@@ -81,7 +81,7 @@ int sqsh_file_reader_advance(
  *
  * @return A pointer to the current data in the file reader.
  */
-const uint8_t *sqsh_file_reader_data(struct SqshFileReader *reader);
+const uint8_t *sqsh_file_reader_data(const struct SqshFileReader *reader);
 
 /**
  * @brief Gets the size of the current data in the file reader.
@@ -91,7 +91,7 @@ const uint8_t *sqsh_file_reader_data(struct SqshFileReader *reader);
  *
  * @return The size of the current data in the file reader.
  */
-size_t sqsh_file_reader_size(struct SqshFileReader *reader);
+size_t sqsh_file_reader_size(const struct SqshFileReader *reader);
 
 /**
  * @brief Cleans up resources used by a SqshFileReader struct.
