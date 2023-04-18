@@ -171,7 +171,7 @@ sqsh__map_reader_advance(
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	if (end_address > reader->upper_limit) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_OUT_OF_BOUNDS;
 	}
 
 	reader->address = address;

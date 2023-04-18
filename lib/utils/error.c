@@ -92,6 +92,8 @@ sqsh_error_str(int error_code) {
 		return "Mutex lock failed";
 	case SQSH_ERROR_MUTEX_DESTROY_FAILED:
 		return "Mutex destroy failed";
+	case SQSH_ERROR_OUT_OF_BOUNDS:
+		return "Out of bounds";
 	case SQSH_ERROR_INTEGER_OVERFLOW:
 		return "Integer overflow";
 	case SQSH_ERROR_NO_SUCH_FILE:
