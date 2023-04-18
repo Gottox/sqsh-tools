@@ -153,9 +153,9 @@ struct SqshMetablockReader {
 /**
  * @internal
  * @memberof SqshMetablockReader
- * @brief Initializes a metablock cursor.
+ * @brief Initializes a metablock reader.
  *
- * @param[out] cursor Pointer to the metablock cursor to be initialized.
+ * @param[out] reader Pointer to the metablock reader to be initialized.
  * @param[in] sqsh Pointer to the Sqsh struct.
  * @param[in] start_address Start address of the metablock.
  * @param[in] upper_limit Upper limit of the metablock.
@@ -163,58 +163,58 @@ struct SqshMetablockReader {
  * @return 0 on success, less than zero on error.
  */
 SQSH_NO_UNUSED int sqsh__metablock_reader_init(
-		struct SqshMetablockReader *cursor, struct SqshArchive *sqsh,
+		struct SqshMetablockReader *reader, struct SqshArchive *sqsh,
 		const uint64_t start_address, const uint64_t upper_limit);
 
 /**
  * @internal
  * @memberof SqshMetablockReader
- * @brief Advances the metablock cursor by the given offset and size.
+ * @brief Advances the metablock reader by the given offset and size.
  *
- * @param[in,out] cursor Pointer to the metablock cursor to be advanced.
- * @param[in] offset Offset to advance the cursor by.
- * @param[in] size Size of the block to advance the cursor by.
+ * @param[in,out] reader Pointer to the metablock reader to be advanced.
+ * @param[in] offset Offset to advance the reader by.
+ * @param[in] size Size of the block to advance the reader by.
  *
  * @return 0 on success, less than zero on error.
  */
 SQSH_NO_UNUSED int sqsh__metablock_reader_advance(
-		struct SqshMetablockReader *cursor, sqsh_index_t offset, size_t size);
+		struct SqshMetablockReader *reader, sqsh_index_t offset, size_t size);
 
 /**
  * @internal
  * @memberof SqshMetablockReader
  * @brief Returns a pointer to the data at the current position of the metablock
- * cursor.
+ * reader.
  *
- * @param[in] cursor Pointer to the metablock cursor.
+ * @param[in] reader Pointer to the metablock reader.
  *
- * @return Pointer to the data at the current position of the metablock cursor.
+ * @return Pointer to the data at the current position of the metablock reader.
  */
 const uint8_t *
-sqsh__metablock_reader_data(const struct SqshMetablockReader *cursor);
+sqsh__metablock_reader_data(const struct SqshMetablockReader *reader);
 
 /**
  * @internal
  * @memberof SqshMetablockReader
  * @brief Returns the size of the data at the current position of the metablock
- * cursor.
+ * reader.
  *
- * @param[in] cursor Pointer to the metablock cursor.
+ * @param[in] reader Pointer to the metablock reader.
  *
- * @return Size of the data at the current position of the metablock cursor.
+ * @return Size of the data at the current position of the metablock reader.
  */
-size_t sqsh__metablock_reader_size(const struct SqshMetablockReader *cursor);
+size_t sqsh__metablock_reader_size(const struct SqshMetablockReader *reader);
 
 /**
  * @internal
  * @memberof SqshMetablockReader
- * @brief Cleans up and frees the resources used by the metablock cursor.
+ * @brief Cleans up and frees the resources used by the metablock reader.
  *
- * @param[in,out] cursor Pointer to the metablock cursor to be cleaned up.
+ * @param[in,out] reader Pointer to the metablock reader to be cleaned up.
  *
  * @return 0 on success, less than zero on error.
  */
-int sqsh__metablock_reader_cleanup(struct SqshMetablockReader *cursor);
+int sqsh__metablock_reader_cleanup(struct SqshMetablockReader *reader);
 
 #ifdef __cplusplus
 }
