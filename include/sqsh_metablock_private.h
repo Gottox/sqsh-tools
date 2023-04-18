@@ -142,12 +142,8 @@ struct SqshMetablockReader {
 	/**
 	 * @privatesection
 	 */
+	struct SqshReader reader;
 	struct SqshMetablockIterator iterator;
-	struct SqshBuffer buffer;
-	const uint8_t *data;
-	sqsh_index_t offset;
-	size_t data_size;
-	size_t size;
 };
 
 /**

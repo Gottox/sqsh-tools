@@ -40,6 +40,38 @@
 #include "../../include/sqsh_error.h"
 #include "../utils/utils.h"
 
+static int
+metablock_iterator_next(void *iterator, size_t desired_size) {
+	(void)desired_size;
+	return sqsh__metablock_iterator_next(iterator);
+}
+static int
+metablock_iterator_skip(void *iterator, size_t amount, size_t desired_size) {
+	(void)desired_size;
+	return sqsh__metablock_iterator_skip(iterator, amount);
+}
+static size_t
+metablock_iterator_block_size(const void *iterator) {
+	(void)iterator;
+	return SQSH_METABLOCK_BLOCK_SIZE;
+}
+static const uint8_t *
+metablock_iterator_data(const void *iterator) {
+	return sqsh__metablock_iterator_data(iterator);
+}
+static size_t
+metablock_iterator_size(const void *iterator) {
+	return sqsh__metablock_iterator_size(iterator);
+}
+
+static const struct SqshIteratorImpl metablock_reader_impl = {
+		.next = metablock_iterator_next,
+		.skip = metablock_iterator_skip,
+		.block_size = metablock_iterator_block_size,
+		.data = metablock_iterator_data,
+		.size = metablock_iterator_size,
+};
+
 int
 sqsh__metablock_reader_init(
 		struct SqshMetablockReader *reader, struct SqshArchive *sqsh,
@@ -50,100 +82,8 @@ sqsh__metablock_reader_init(
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__buffer_init(&reader->buffer);
-	if (rv < 0) {
-		goto out;
-	}
-	reader->size = 0;
-	reader->data_size = 0;
-	reader->offset = 0;
-	reader->data = NULL;
-
-out:
-	if (rv < 0) {
-		sqsh__metablock_reader_cleanup(reader);
-	}
-	return rv;
-}
-
-static int
-metablock_extend(
-		struct SqshMetablockReader *reader, sqsh_index_t offset, size_t size,
-		sqsh_index_t end_offset) {
-	int rv = 0;
-	struct SqshMetablockIterator *iterator = &reader->iterator;
-	struct SqshBuffer *buffer = &reader->buffer;
-
-	sqsh__buffer_drain(buffer);
-
-	const uint8_t *data = sqsh__metablock_iterator_data(iterator);
-	const size_t data_size = sqsh__metablock_iterator_size(iterator);
-	rv = sqsh__buffer_append(buffer, data, data_size);
-	if (rv < 0) {
-		goto out;
-	}
-
-	while (end_offset > sqsh__buffer_size(buffer)) {
-		rv = sqsh__metablock_iterator_next(iterator);
-		if (rv < 0) {
-			goto out;
-		} else if (rv == 0) {
-			rv = -SQSH_ERROR_OUT_OF_BOUNDS;
-			goto out;
-		}
-		rv = 0;
-
-		const uint8_t *data = sqsh__metablock_iterator_data(iterator);
-		const size_t size = sqsh__metablock_iterator_size(iterator);
-		rv = sqsh__buffer_append(buffer, data, size);
-		if (rv < 0) {
-			goto out;
-		}
-	}
-
-	reader->data_size = sqsh__buffer_size(buffer);
-	reader->data = sqsh__buffer_data(buffer);
-	reader->offset = offset;
-	reader->size = size;
-
-out:
-	return rv;
-}
-
-static int
-metablock_map_next(
-		struct SqshMetablockReader *reader, sqsh_index_t offset, size_t size) {
-	int rv = 0;
-	struct SqshMetablockIterator *iterator = &reader->iterator;
-	size_t skip = offset / SQSH_METABLOCK_BLOCK_SIZE;
-	offset = offset % SQSH_METABLOCK_BLOCK_SIZE;
-	sqsh_index_t end_offset;
-	if (SQSH_ADD_OVERFLOW(offset, size, &end_offset)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
-
-	// At the first iteration, we're technically *before* the first block. So
-	// we need to skip one block more.
-	if (reader->data == NULL) {
-		skip++;
-	}
-	rv = sqsh__metablock_iterator_skip(iterator, skip);
-	if (rv < 0) {
-		goto out;
-	} else if (rv == 0) {
-		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
-		goto out;
-	}
-	rv = 0;
-
-	reader->data_size = sqsh__metablock_iterator_size(iterator);
-	reader->data = sqsh__metablock_iterator_data(iterator);
-	reader->offset = offset;
-	reader->size = size;
-
-	if (end_offset > reader->data_size) {
-		rv = metablock_extend(reader, offset, size, end_offset);
-	}
+	rv = sqsh__reader_init(
+			&reader->reader, &metablock_reader_impl, &reader->iterator);
 out:
 	return rv;
 }
@@ -151,43 +91,23 @@ out:
 int
 sqsh__metablock_reader_advance(
 		struct SqshMetablockReader *reader, sqsh_index_t offset, size_t size) {
-	int rv = 0;
-
-	sqsh_index_t new_offset;
-	if (SQSH_ADD_OVERFLOW(reader->offset, offset, &new_offset)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
-	sqsh_index_t end_offset;
-	if (SQSH_ADD_OVERFLOW(new_offset, size, &end_offset)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
-	if (new_offset <= reader->data_size) {
-		reader->offset = new_offset;
-		reader->size = size;
-		if (end_offset > reader->data_size) {
-			rv = metablock_extend(reader, new_offset, size, end_offset);
-		}
-	} else {
-		rv = metablock_map_next(reader, new_offset, size);
-	}
-
-	return rv;
+	return sqsh__reader_advance(&reader->reader, offset, size);
 }
 
 const uint8_t *
 sqsh__metablock_reader_data(const struct SqshMetablockReader *reader) {
-	return &reader->data[reader->offset];
+	return sqsh__reader_data(&reader->reader);
 }
 
 size_t
 sqsh__metablock_reader_size(const struct SqshMetablockReader *reader) {
-	return reader->size;
+	return sqsh__reader_size(&reader->reader);
 }
 
 int
 sqsh__metablock_reader_cleanup(struct SqshMetablockReader *reader) {
+	sqsh__reader_cleanup(&reader->reader);
 	sqsh__metablock_iterator_cleanup(&reader->iterator);
-	sqsh__buffer_cleanup(&reader->buffer);
 
 	return 0;
 }

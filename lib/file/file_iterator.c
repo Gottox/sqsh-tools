@@ -64,6 +64,7 @@ sqsh__file_iterator_init(
 	}
 
 	iterator->block_index = 0;
+	iterator->block_size = sqsh_superblock_block_size(superblock);
 	iterator->inode = inode;
 out:
 	return rv;
@@ -284,12 +285,17 @@ out:
 }
 
 const uint8_t *
-sqsh_file_iterator_data(struct SqshFileIterator *iterator) {
+sqsh_file_iterator_data(const struct SqshFileIterator *iterator) {
 	return iterator->data;
 }
 
 size_t
-sqsh_file_iterator_size(struct SqshFileIterator *iterator) {
+sqsh__file_iterator_block_size(const struct SqshFileIterator *iterator) {
+	return iterator->block_size;
+}
+
+size_t
+sqsh_file_iterator_size(const struct SqshFileIterator *iterator) {
 	return iterator->size;
 }
 

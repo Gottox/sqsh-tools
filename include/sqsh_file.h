@@ -161,7 +161,18 @@ sqsh_file_iterator_next(struct SqshFileIterator *iterator, size_t desired_size);
  * @return A pointer to the current data in the file iterator.
  */
 SQSH_NO_UNUSED const uint8_t *
-sqsh_file_iterator_data(struct SqshFileIterator *iterator);
+sqsh_file_iterator_data(const struct SqshFileIterator *iterator);
+
+/**
+ * @brief Returns the block size of the file iterator.
+ * @memberof SqshFileIterator
+ *
+ * @param[in] iterator The file iterator to get the size from.
+ *
+ * @return The size of the data currently in the file iterator.
+ */
+SQSH_NO_UNUSED size_t
+sqsh__file_iterator_block_size(const struct SqshFileIterator *iterator);
 
 /**
  * @brief Gets the size of the data currently in the file iterator.
@@ -172,7 +183,7 @@ sqsh_file_iterator_data(struct SqshFileIterator *iterator);
  * @return The size of the data currently in the file iterator.
  */
 SQSH_NO_UNUSED size_t
-sqsh_file_iterator_size(struct SqshFileIterator *iterator);
+sqsh_file_iterator_size(const struct SqshFileIterator *iterator);
 
 /**
  * @brief Frees the resources used by a SqshFileIterator struct.

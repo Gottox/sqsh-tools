@@ -84,9 +84,8 @@ struct SqshFileIterator {
 	struct SqshMapReader map_reader;
 	struct SqshExtractView extract_view;
 	struct SqshFragmentView fragment_view;
-
+	size_t block_size;
 	uint32_t block_index;
-
 	const uint8_t *data;
 	size_t size;
 };
@@ -126,10 +125,7 @@ struct SqshFileReader {
 	 * @privatesection
 	 */
 	struct SqshFileIterator iterator;
-	sqsh_index_t current_offset;
-	size_t current_size;
-	struct SqshBuffer buffer;
-	const uint8_t *data;
+	struct SqshReader reader;
 };
 
 /**

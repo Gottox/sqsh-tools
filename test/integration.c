@@ -298,10 +298,6 @@ sqsh_cat_size_overflow(void) {
 	rv = sqsh_file_reader_advance(&reader, 0, size + 4096);
 	assert(rv != 0); // TODO: check for correct error code
 
-	assert(sqsh_file_reader_size(&reader) == 0);
-
-	assert(sqsh_file_reader_data(&reader) == NULL);
-
 	rv = sqsh__file_reader_cleanup(&reader);
 	assert(rv == 0);
 
