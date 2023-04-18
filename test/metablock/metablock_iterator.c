@@ -56,7 +56,7 @@ next_once(void) {
 	assert(rv == 0);
 
 	rv = sqsh__metablock_iterator_next(&iter);
-	assert(rv == 0);
+	assert(rv == 4);
 
 	assert(sqsh__metablock_iterator_size(&iter) == 4);
 
@@ -111,7 +111,7 @@ next_twice(void) {
 	assert(rv == 0);
 
 	rv = sqsh__metablock_iterator_next(&iter);
-	assert(rv == 0);
+	assert(rv == 4);
 
 	assert(sqsh__metablock_iterator_size(&iter) == 4);
 
@@ -120,7 +120,7 @@ next_twice(void) {
 	assert(memcmp(p, "abcd", 4) == 0);
 
 	rv = sqsh__metablock_iterator_next(&iter);
-	assert(rv == 0);
+	assert(rv == 4);
 
 	assert(sqsh__metablock_iterator_size(&iter) == 4);
 
@@ -153,7 +153,7 @@ next_compressed(void) {
 	assert(rv == 0);
 
 	rv = sqsh__metablock_iterator_next(&iter);
-	assert(rv == 0);
+	assert(rv == 4);
 
 	assert(sqsh__metablock_iterator_size(&iter) == 4);
 
@@ -162,7 +162,7 @@ next_compressed(void) {
 	assert(memcmp(p, "abcd", 4) == 0);
 
 	rv = sqsh__metablock_iterator_next(&iter);
-	assert(rv == 0);
+	assert(rv == 4);
 
 	assert(sqsh__metablock_iterator_size(&iter) == 4);
 

@@ -112,6 +112,7 @@ sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator) {
 		iterator->data = sqsh__map_reader_data(&iterator->reader);
 		iterator->inner_size = iterator->outer_size;
 	}
+	rv = sqsh__metablock_iterator_size(iterator);
 out:
 	return rv;
 }

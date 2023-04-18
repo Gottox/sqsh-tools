@@ -87,7 +87,11 @@ metablock_extend(
 		rv = sqsh__metablock_iterator_next(iterator);
 		if (rv < 0) {
 			goto out;
+		} else if (rv == 0) {
+			rv = -SQSH_ERROR_OUT_OF_BOUNDS;
+			goto out;
 		}
+		rv = 0;
 
 		const uint8_t *data = sqsh__metablock_iterator_data(iterator);
 		const size_t size = sqsh__metablock_iterator_size(iterator);
@@ -126,7 +130,11 @@ metablock_map_next(
 	rv = sqsh__metablock_iterator_skip(iterator, skip);
 	if (rv < 0) {
 		goto out;
+	} else if (rv == 0) {
+		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
+		goto out;
 	}
+	rv = 0;
 
 	reader->data_size = sqsh__metablock_iterator_size(iterator);
 	reader->data = sqsh__metablock_iterator_data(iterator);
