@@ -114,12 +114,9 @@ map_block_compressed(
 		goto out;
 	}
 
+	rv = sqsh_file_iterator_size(iterator);
 out:
-	if (rv < 0) {
-		return rv;
-	} else {
-		return 1;
-	}
+	return rv;
 }
 
 static int
@@ -240,7 +237,34 @@ sqsh_file_iterator_next(
 }
 
 int
-sqsh_file_iterator_skip(struct SqshFileIterator *iterator, size_t amount) {
+sqsh_file_iterator_skip(
+		struct SqshFileIterator *iterator, size_t amount, size_t desired_size) {
+	int rv = 0;
+	if (amount == 0) {
+		return 0;
+	}
+
+	for (size_t i = 0; i < amount - 1; i++) {
+		int rv = sqsh_file_iterator_next(iterator, 1);
+		if (rv < 0) {
+			goto out;
+		} else if (rv == 0) {
+			rv = -SQSH_ERROR_OUT_OF_BOUNDS;
+			goto out;
+		}
+	}
+
+	rv = sqsh_file_iterator_next(iterator, desired_size);
+	if (rv < 0) {
+		goto out;
+	} else if (rv == 0) {
+		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
+		goto out;
+	}
+out:
+	return rv;
+
+#if 0
 	int rv = 0;
 	const struct SqshInode *inode = iterator->inode;
 
@@ -256,6 +280,7 @@ sqsh_file_iterator_skip(struct SqshFileIterator *iterator, size_t amount) {
 
 out:
 	return rv;
+#endif
 }
 
 const uint8_t *

@@ -131,18 +131,21 @@ sqsh_file_iterator_new(const struct SqshInode *inode, int *err);
  *
  * @param[in,out] iterator The file iterator to skip data in.
  * @param[in] amount The amount of data to skip.
+ * @param[in] desired_size The desired size of the data to read. May be more or
+ * less than the actual size of the data read.
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int
-sqsh_file_iterator_skip(struct SqshFileIterator *iterator, size_t amount);
+SQSH_NO_UNUSED int sqsh_file_iterator_skip(
+		struct SqshFileIterator *iterator, size_t amount, size_t desired_size);
 
 /**
  * @brief Reads a certain amount of data from the file iterator.
  * @memberof SqshFileIterator
  *
  * @param[in,out] iterator The file iterator to read data from.
- * @param[in] desired_size The amount of data to read.
+ * @param[in] desired_size The desired size of the data to read. May be more or
+ * less than the actual size of the data read.
  *
  * @return The number of bytes read on success, less than 0 on error.
  */

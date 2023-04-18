@@ -164,7 +164,7 @@ sqsh_file_reader_advance(
 
 	sqsh_index_t skip_blocks = current_offset / block_size;
 
-	rv = sqsh_file_iterator_skip(iterator, skip_blocks);
+	rv = sqsh_file_iterator_skip(iterator, skip_blocks, 1);
 	if (rv < 0) {
 		goto out;
 	}
