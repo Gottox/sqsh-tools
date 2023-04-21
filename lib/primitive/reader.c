@@ -156,7 +156,7 @@ sqsh__reader_advance(
 	if (SQSH_ADD_OVERFLOW(new_offset, size, &end_offset)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
-	if (new_offset <= reader->data_size) {
+	if (new_offset < reader->data_size) {
 		reader->offset = new_offset;
 		reader->size = size;
 		if (end_offset > reader->data_size) {
