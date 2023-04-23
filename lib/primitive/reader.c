@@ -110,18 +110,13 @@ reader_map_next(struct SqshReader *reader, sqsh_index_t offset, size_t size) {
 	void *iterator = reader->iterator;
 	const struct SqshIteratorImpl *impl = reader->impl;
 	size_t block_size = impl->block_size(iterator);
-	size_t skip = offset / block_size;
+	size_t skip = ((offset - reader->data_size) / block_size) + 1;
 	offset = offset % block_size;
 	sqsh_index_t end_offset;
 	if (SQSH_ADD_OVERFLOW(offset, size, &end_offset)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
-	// At the first iteration, we're technically *before* the first block. So
-	// we need to skip one block more.
-	if (reader->data == NULL) {
-		skip++;
-	}
 	rv = impl->skip(iterator, skip, 1);
 	if (rv < 0) {
 		goto out;
