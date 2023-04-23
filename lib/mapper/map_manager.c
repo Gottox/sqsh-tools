@@ -163,6 +163,9 @@ out:
 int
 sqsh__map_manager_release(
 		struct SqshMapManager *manager, const struct SqshMapSlice *mapping) {
+	if (manager == NULL) {
+		return 0;
+	}
 	int rv = sqsh_mutex_lock(&manager->lock);
 	if (rv < 0) {
 		goto out;
