@@ -5,6 +5,7 @@ sqsh_test = [
     'inode/inode.c',
     'integration.c',
     'mapper/map_reader.c',
+    'mapper/map_iterator.c',
     'metablock/metablock_reader.c',
     'metablock/metablock_iterator.c',
     'primitive/buffer.c',

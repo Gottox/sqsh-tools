@@ -343,6 +343,40 @@ int sqsh__map_manager_release(
 int sqsh__map_manager_cleanup(struct SqshMapManager *manager);
 
 ////////////////////////////////////////
+// mapper/map_iterator.c
+
+struct SqshMapIterator {
+	/**
+	 * @privatesection
+	 */
+	sqsh_index_t index;
+	sqsh_index_t segment_count;
+	struct SqshMapManager *map_manager;
+	const struct SqshMapSlice *mapping;
+	const uint8_t *data;
+	size_t size;
+};
+
+SQSH_NO_UNUSED int sqsh__map_iterator_init(
+		struct SqshMapIterator *iterator, struct SqshMapManager *manager,
+		uint64_t address);
+
+SQSH_NO_UNUSED int sqsh__map_iterator_next(struct SqshMapIterator *iterator);
+
+SQSH_NO_UNUSED int
+sqsh__map_iterator_skip(struct SqshMapIterator *iterator, size_t amount);
+
+const uint8_t *sqsh__map_iterator_data(const struct SqshMapIterator *iterator);
+
+size_t sqsh__map_iterator_block_size(const struct SqshMapIterator *iterator);
+
+sqsh_index_t sqsh__map_iterator_address(const struct SqshMapIterator *iterator);
+
+size_t sqsh__map_iterator_size(const struct SqshMapIterator *iterator);
+
+int sqsh__map_iterator_cleanup(struct SqshMapIterator *iterator);
+
+////////////////////////////////////////
 // mapper/map_reader.c
 
 /**

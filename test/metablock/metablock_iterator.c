@@ -99,9 +99,13 @@ next_twice(void) {
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
 	uint8_t payload[8192] = {
-			SQSH_HEADER, METABLOCK_HEADER(0, 4), 'a', 'b', 'c',
-			'd',         METABLOCK_HEADER(0, 4), 'e', 'f', 'g',
-			'h',
+			/* clang-format off */
+			SQSH_HEADER,
+			METABLOCK_HEADER(0, 4),
+			'a', 'b', 'c', 'd', 
+			METABLOCK_HEADER(0, 4),
+			'e', 'f', 'g', 'h',
+			/* clang-format on */
 	};
 	const uint8_t *p;
 	mk_stub(&sqsh, payload, sizeof(payload));

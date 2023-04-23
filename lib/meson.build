@@ -29,6 +29,7 @@ libsqsh_sources = [
     'inode/directory_index_iterator.c',
     'inode/inode.c',
     'mapper/curl_mapper.c',
+    'mapper/map_iterator.c',
     'mapper/map_manager.c',
     'mapper/map_reader.c',
     'mapper/map_slice.c',
