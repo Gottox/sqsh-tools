@@ -37,6 +37,7 @@
 
 #include <sqsh_mapper_private.h>
 #include <stdint.h>
+#include <string.h>
 
 static void
 init_cursor(void) {
@@ -143,6 +144,34 @@ advance_twice_with_offset(void) {
 }
 
 static void
+initial_advance(void) {
+	int rv;
+	struct SqshMapManager mapper = {0};
+	struct SqshMapReader cursor = {0};
+	const uint8_t buffer[] = "THIS IS A TEST STRING";
+	rv = sqsh__map_manager_init(
+			&mapper, buffer,
+			&(struct SqshConfig){
+					.mapper_block_size = 4,
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
+	assert(rv == 0);
+
+	rv = sqsh__map_reader_init(&cursor, &mapper, 5, sizeof(buffer) - 1);
+	assert(rv == 0);
+
+	rv = sqsh__map_reader_advance(&cursor, 0, 3);
+	assert(rv == 0);
+	const uint8_t *data = sqsh__map_reader_data(&cursor);
+	assert(3 == sqsh__map_reader_size(&cursor));
+	assert(memcmp(data, "IS ", 3) == 0);
+	//assert(data == &buffer[5]);
+
+	sqsh__map_reader_cleanup(&cursor);
+	sqsh__map_manager_cleanup(&mapper);
+}
+
+static void
 advance_to_out_of_bounds(void) {
 	int rv;
 	struct SqshMapManager mapper = {0};
@@ -165,10 +194,84 @@ advance_to_out_of_bounds(void) {
 	sqsh__map_manager_cleanup(&mapper);
 }
 
+static void
+initial_advance_2(void) {
+	int rv;
+	struct SqshMapManager mapper = {0};
+	struct SqshMapReader cursor = {0};
+	const uint8_t buffer[1024] = {
+			/* clang-format off */
+		[96] = 'A', 'B', 'C', 'D', '1', '2', '3', '4',
+			/* clang-format on */
+	};
+	rv = sqsh__map_manager_init(
+			&mapper, buffer,
+			&(struct SqshConfig){
+					.mapper_block_size = 2,
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
+	assert(rv == 0);
+
+	rv = sqsh__map_reader_init(&cursor, &mapper, 96, sizeof(buffer) - 1);
+	assert(rv == 0);
+
+	rv = sqsh__map_reader_advance(&cursor, 4, 4);
+	assert(rv == 0);
+
+	const uint8_t *data = sqsh__map_reader_data(&cursor);
+	assert(sqsh__map_reader_size(&cursor) == 4);
+	assert(memcmp(data, "1234", 2) == 0);
+
+	sqsh__map_reader_cleanup(&cursor);
+	sqsh__map_manager_cleanup(&mapper);
+}
+
+static void
+error_1(void) {
+	int rv;
+	struct SqshMapManager mapper = {0};
+	struct SqshMapReader cursor = {0};
+	const uint8_t buffer[1024] = {
+			/* clang-format off */
+		[96] = 'A', 'B', 'C', 'D', '1', '2', '3', '4',
+			/* clang-format on */
+	};
+	rv = sqsh__map_manager_init(
+			&mapper, buffer,
+			&(struct SqshConfig){
+					.mapper_block_size = 2,
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
+	assert(rv == 0);
+
+	rv = sqsh__map_reader_init(&cursor, &mapper, 96, sizeof(buffer) - 1);
+	assert(rv == 0);
+
+	rv = sqsh__map_reader_advance(&cursor, 0, 4);
+	assert(rv == 0);
+
+	const uint8_t *data = sqsh__map_reader_data(&cursor);
+	assert(sqsh__map_reader_size(&cursor) == 4);
+	assert(memcmp(data, "ABCD", 4) == 0);
+
+	rv = sqsh__map_reader_advance(&cursor, 4, 4);
+	assert(rv == 0);
+
+	data = sqsh__map_reader_data(&cursor);
+	assert(sqsh__map_reader_size(&cursor) == 4);
+	assert(memcmp(data, "1234", 4) == 0);
+
+	sqsh__map_reader_cleanup(&cursor);
+	sqsh__map_manager_cleanup(&mapper);
+}
+
 DEFINE
 TEST(init_cursor);
 TEST(advance_once);
 TEST(advance_once_with_offset);
 TEST(advance_twice_with_offset);
+TEST(initial_advance);
 TEST(advance_to_out_of_bounds);
+TEST(initial_advance_2);
+TEST(error_1);
 DEFINE_END
