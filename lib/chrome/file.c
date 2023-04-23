@@ -150,7 +150,7 @@ sqsh_file_to_stream(const struct SqshInode *inode, FILE *file) {
 
 	while ((rv = sqsh_file_iterator_next(&iterator, SIZE_MAX)) > 0) {
 		const uint8_t *data = sqsh_file_iterator_data(&iterator);
-		const size_t size = sqsh_file_iterator_size(&iterator);
+		const size_t size = rv;
 		rv = fwrite(data, sizeof(uint8_t), size, file);
 		if (rv > 0 && (size_t)rv != size) {
 			rv = -SQSH_ERROR_TODO;
