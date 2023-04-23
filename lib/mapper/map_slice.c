@@ -63,6 +63,11 @@ sqsh__map_slice_data(const struct SqshMapSlice *mapping) {
 	return mapping->mapper->impl->map_data(mapping);
 }
 
+size_t
+sqsh__map_slice_size(const struct SqshMapSlice *mapping) {
+	return mapping->size;
+}
+
 int
 sqsh__map_slice_cleanup(struct SqshMapSlice *mapping) {
 	int rv = 0;

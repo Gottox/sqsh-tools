@@ -205,6 +205,17 @@ const uint8_t *sqsh__map_slice_data(const struct SqshMapSlice *mapping);
 /**
  * @internal
  * @memberof SqshMapSlice
+ * @brief Retrieves the data in a mapping.
+ *
+ * @param[in] mapping The mapping to retrieve the data from.
+ *
+ * @return The data in the mapping.
+ */
+size_t sqsh__map_slice_size(const struct SqshMapSlice *mapping);
+
+/**
+ * @internal
+ * @memberof SqshMapSlice
  * @brief Unmaps a mapping.
  *
  * @param[in] mapping The mapping to unmap.
