@@ -101,11 +101,6 @@ sqsh__extractor_to_buffer(
 	return rv;
 }
 
-size_t
-sqsh__extractor_block_size(const struct SqshExtractor *extractor) {
-	return extractor->block_size;
-}
-
 int
 sqsh__extractor_cleanup(struct SqshExtractor *extractor) {
 	extractor->impl = NULL;

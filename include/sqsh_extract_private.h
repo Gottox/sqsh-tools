@@ -120,17 +120,6 @@ SQSH_NO_UNUSED int sqsh__extractor_to_buffer(
 /**
  * @internal
  * @memberof SqshExtractor
- * @brief returns the block size of the extractor
- *
- * @param[in]     extractor     The extractor context to use.
- *
- * @return the block size of the extractor context.
- */
-size_t sqsh__extractor_block_size(const struct SqshExtractor *extractor);
-
-/**
- * @internal
- * @memberof SqshExtractor
  * @brief Cleans up a extractor context.
  *
  * @param[in] extractor The context to clean up.
