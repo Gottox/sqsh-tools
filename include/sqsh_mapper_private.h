@@ -345,6 +345,10 @@ int sqsh__map_manager_cleanup(struct SqshMapManager *manager);
 ////////////////////////////////////////
 // mapper/map_iterator.c
 
+/**
+ * @internal
+ * @brief An iterator over the chunks in a file.
+ */
 struct SqshMapIterator {
 	/**
 	 * @privatesection
@@ -357,23 +361,92 @@ struct SqshMapIterator {
 	size_t size;
 };
 
+/**
+ * @internal
+ * @memberof SqshMapIterator
+ * @brief Initializes a new instance of SqshMapIterator.
+ *
+ * @param[out] iterator The SqshMapIterator instance to initialize.
+ * @param[in] manager The SqshMapManager instance to use.
+ * @param[in] address The address to start the iterator at.
+ * @return Returns 0 on success, a negative value on error.
+ */
 SQSH_NO_UNUSED int sqsh__map_iterator_init(
 		struct SqshMapIterator *iterator, struct SqshMapManager *manager,
 		uint64_t address);
 
+/**
+ * @internal
+ * @memberof SqshMapIterator
+ * @brief Moves the iterator to the next chunk.
+ *
+ * @param[in] iterator The SqshMapIterator instance.
+ * @return Returns 0 on success, a negative value on error.
+ */
 SQSH_NO_UNUSED int sqsh__map_iterator_next(struct SqshMapIterator *iterator);
 
+/**
+ * @internal
+ * @memberof SqshMapIterator
+ * @brief Moves the iterator an arbitrary number of chunks forward.
+ * `sqsh__map_iterator_skip(iter, 1);` is equivalent to
+ * `sqsh__map_iterator_next(iter);`.
+ *
+ * @param[in] iterator The SqshMapIterator instance.
+ * @param[in] amount The number of chunks to skip.
+ * @return Returns 0 on success, a negative value on error.
+ */
 SQSH_NO_UNUSED int
 sqsh__map_iterator_skip(struct SqshMapIterator *iterator, size_t amount);
 
+/**
+ * @internal
+ * @memberof SqshMapIterator
+ * @brief returns the data for the current chunk.
+ *
+ * @param[in] iterator The SqshMapIterator instance.
+ * @return the data for the current chunk.
+ */
 const uint8_t *sqsh__map_iterator_data(const struct SqshMapIterator *iterator);
 
+/**
+ * @internal
+ * @memberof SqshMapIterator
+ * @brief returns the block size of the iterator.
+ *
+ * @param[in] iterator The SqshMapIterator instance.
+ * @return the size of the current chunk.
+ */
 size_t sqsh__map_iterator_block_size(const struct SqshMapIterator *iterator);
 
+/**
+ * @internal
+ * @memberof SqshMapIterator 
+ * @brief returns the address of the current chunk.
+ *
+ * @param[in] iterator The SqshMapIterator instance.
+ * @return the address of the current chunk.
+ */
 sqsh_index_t sqsh__map_iterator_address(const struct SqshMapIterator *iterator);
 
+/**
+ * @internal
+ * @memberof SqshMapIterator 
+ * @brief returns the size of the current chunk.
+ *
+ * @param[in] iterator The SqshMapIterator instance.
+ * @return the size of the current chunk.
+ */
 size_t sqsh__map_iterator_size(const struct SqshMapIterator *iterator);
 
+/**
+ * @internal
+ * @memberof SqshMapIterator 
+ * @brief returns the index of the current chunk.
+ *
+ * @param[in] iterator The SqshMapIterator instance.
+ * @return the index of the current chunk.
+ */
 int sqsh__map_iterator_cleanup(struct SqshMapIterator *iterator);
 
 ////////////////////////////////////////

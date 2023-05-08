@@ -42,6 +42,9 @@
 extern "C" {
 #endif
 
+/**
+ * @brief sqsh_thread_t represents a thread.
+ */
 typedef pthread_mutex_t sqsh_mutex_t;
 
 /**

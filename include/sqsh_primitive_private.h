@@ -491,7 +491,14 @@ int sqsh__lru_cleanup(struct SqshLru *lru);
 ////////////////////////////////////////
 // primitive/reader.c
 
+/**
+ * @internal
+ * @brief A buffer that is used to read data from a SqshReader.
+ */
 struct SqshIteratorImpl {
+	/**
+	 * @privatesection
+	 */
 	int (*next)(void *iterator, size_t desired_size);
 	int (*skip)(void *iterator, size_t amount, size_t desired_size);
 	size_t (*block_size)(const void *iterator);
@@ -499,7 +506,14 @@ struct SqshIteratorImpl {
 	size_t (*size)(const void *iterator);
 };
 
+/**
+ * @internal
+ * @brief A buffer that is used to read data from a SqshReader.
+ */
 struct SqshReader {
+	/**
+	 * @privatesection
+	 */
 	const struct SqshIteratorImpl *impl;
 	void *iterator;
 
