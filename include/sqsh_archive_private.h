@@ -253,6 +253,7 @@ struct SqshArchive {
 	uint8_t initialized;
 	struct SqshConfig config;
 	sqsh_mutex_t lock;
+	uint8_t *zero_block;
 };
 
 /**
@@ -299,6 +300,19 @@ int sqsh__archive_data_extract_manager(
 int sqsh__archive_metablock_extract_manager(
 		struct SqshArchive *archive,
 		struct SqshExtractManager **metablock_extract_manager);
+
+
+/**
+ * @internal
+ * @memberof SqshArchive 
+ *
+ * @brief sqsh__archive_id_table retrieves a zero block.
+ *
+ * @param archive the SqshArchive to retrieve the zero block from.
+ * @return the zero block.
+ */
+const uint8_t *
+sqsh__archive_zero_block(const struct SqshArchive *archive);
 
 /**
  * @internal

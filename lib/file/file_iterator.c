@@ -94,11 +94,11 @@ map_block_compressed(
 	const struct SqshInode *inode = iterator->inode;
 	struct SqshExtractView *extract_view = &iterator->extract_view;
 	const sqsh_index_t block_index = iterator->block_index;
-	const sqsh_index_t block_size =
+	const sqsh_index_t data_block_size =
 			sqsh_inode_file_block_size(inode, block_index);
 
 	rv = sqsh__map_reader_advance(
-			&iterator->map_reader, next_offset, block_size);
+			&iterator->map_reader, next_offset, data_block_size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -143,11 +143,11 @@ map_block_uncompressed(
 		if (outer_size >= desired_size) {
 			break;
 		}
-		const uint32_t block_size =
+		const uint32_t data_block_size =
 				sqsh_inode_file_block_size(inode, block_index);
 
 		uint64_t new_outer_size;
-		if (SQSH_ADD_OVERFLOW(outer_size, block_size, &new_outer_size)) {
+		if (SQSH_ADD_OVERFLOW(outer_size, data_block_size, &new_outer_size)) {
 			rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 			goto out;
 		}
@@ -174,16 +174,49 @@ out:
 }
 
 static int
+map_zero_block(struct SqshFileIterator *iterator) {
+	const struct SqshInode *inode = iterator->inode;
+	struct SqshArchive *archive = inode->archive;
+	const uint8_t *zero_block = sqsh__archive_zero_block(archive);
+
+	const sqsh_index_t block_index = iterator->block_index;
+	const bool has_fragment = sqsh_inode_file_has_fragment(inode);
+	const size_t block_count = sqsh_inode_file_block_count(inode);
+	const size_t file_size = sqsh_inode_file_size(inode);
+
+	size_t size;
+	if (file_size == 0) {
+		size = 0;
+	} else if (has_fragment || block_index != block_count - 1) {
+		size = iterator->block_size;
+	} else {
+		size = file_size % iterator->block_size;
+		if (size == 0) {
+			size = iterator->block_size;
+		}
+	}
+	iterator->size = size;
+	iterator->data = zero_block;
+	iterator->block_index++;
+
+	return size;
+}
+
+static int
 map_block(struct SqshFileIterator *iterator, size_t desired_size) {
 	const struct SqshInode *inode = iterator->inode;
 
 	const sqsh_index_t block_index = iterator->block_index;
 	const bool is_compressed =
 			sqsh_inode_file_block_is_compressed(inode, block_index);
+	const size_t data_block_size =
+			sqsh_inode_file_block_size(inode, block_index);
 	const sqsh_index_t next_offset =
 			sqsh__map_reader_size(&iterator->map_reader);
 
-	if (is_compressed) {
+	if (data_block_size == 0) {
+		return map_zero_block(iterator);
+	} else if (is_compressed) {
 		return map_block_compressed(iterator, next_offset);
 	} else {
 		return map_block_uncompressed(iterator, next_offset, desired_size);

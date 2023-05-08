@@ -110,6 +110,13 @@ sqsh__archive_init(
 		goto out;
 	}
 
+	archive->zero_block = calloc(
+			sqsh_superblock_block_size(&archive->superblock), sizeof(uint8_t));
+	if (archive->zero_block == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
+	}
+
 	enum SqshSuperblockCompressionId compression_id =
 			sqsh_superblock_compression_id(&archive->superblock);
 	uint32_t data_block_size = sqsh_superblock_block_size(&archive->superblock);
@@ -362,6 +369,11 @@ sqsh_archive_metablock_extractor(const struct SqshArchive *archive) {
 	return &archive->metablock_compression;
 }
 
+const uint8_t *
+sqsh__archive_zero_block(const struct SqshArchive *archive) {
+	return archive->zero_block;
+}
+
 struct SqshMapManager *
 sqsh_archive_map_manager(struct SqshArchive *archive) {
 	return &archive->map_manager;
@@ -396,6 +408,8 @@ sqsh__archive_cleanup(struct SqshArchive *archive) {
 	sqsh__extractor_cleanup(&archive->metablock_compression);
 	sqsh__superblock_cleanup(&archive->superblock);
 	sqsh__map_manager_cleanup(&archive->map_manager);
+
+	free(archive->zero_block);
 
 	sqsh_mutex_destroy(&archive->lock);
 

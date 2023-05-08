@@ -80,7 +80,6 @@ struct SqshFileIterator {
 	 */
 	const struct SqshInode *inode;
 	struct SqshExtractManager *compression_manager;
-
 	struct SqshMapReader map_reader;
 	struct SqshExtractView extract_view;
 	struct SqshFragmentView fragment_view;

@@ -216,8 +216,69 @@ load_segment_from_uncompressed_data_block(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
+static void
+load_zero_padding(void) {
+	int rv;
+	struct SqshArchive archive = {0};
+	struct SqshInode inode = {0};
+	uint8_t payload[8192] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			INODE_HEADER(2, 0, 0, 0, 0, 1),
+			INODE_BASIC_FILE(512, 0xFFFFFFFF, 0, 4096 + 5),
+			DATA_BLOCK_REF(0, 1),
+			DATA_BLOCK_REF(0, 1),
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
+	rv = sqsh__inode_init(&inode, &archive, inode_ref);
+	assert(rv == 0);
+
+	assert(sqsh_inode_type(&inode) == SQSH_INODE_TYPE_FILE);
+	assert(sqsh_inode_file_has_fragment(&inode) == false);
+
+	struct SqshFileIterator iter = {0};
+	rv = sqsh__file_iterator_init(&iter, &inode);
+	assert(rv == 0);
+
+	rv = sqsh_file_iterator_next(&iter, 1);
+	assert(rv > 0);
+
+	size_t size = sqsh_file_iterator_size(&iter);
+	assert(size == 4096);
+
+	rv = sqsh_file_iterator_next(&iter, 1);
+	assert(rv > 0);
+
+	size = sqsh_file_iterator_size(&iter);
+	assert(size == 5);
+	const uint8_t *data = sqsh_file_iterator_data(&iter);
+	assert(data[0] == 0);
+	assert(data[1] == 0);
+	assert(data[2] == 0);
+	assert(data[3] == 0);
+	assert(data[4] == 0);
+
+	rv = sqsh_file_iterator_next(&iter, 1);
+	assert(rv == 0);
+
+	size = sqsh_file_iterator_size(&iter);
+	assert(size == 0);
+	data = sqsh_file_iterator_data(&iter);
+	assert(data == NULL);
+
+	sqsh__file_iterator_cleanup(&iter);
+	sqsh__inode_cleanup(&inode);
+	sqsh__archive_cleanup(&archive);
+}
+
 DEFINE
 TEST(load_two_segments_from_uncompressed_data_block);
 TEST(load_segment_from_uncompressed_data_block);
 TEST(load_segment_from_compressed_data_block);
+TEST(load_zero_padding);
 DEFINE_END
