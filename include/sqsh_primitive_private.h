@@ -503,11 +503,13 @@ struct SqshReader {
 	const struct SqshIteratorImpl *impl;
 	void *iterator;
 
-	sqsh_index_t offset;
+	sqsh_index_t iterator_offset;
+	sqsh_index_t buffer_offset;
+	sqsh_index_t data_offset;
 	size_t size;
+	size_t data_size;
 	struct SqshBuffer buffer;
 	const uint8_t *data;
-	size_t data_size;
 };
 
 /**
