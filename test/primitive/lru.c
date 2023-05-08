@@ -35,7 +35,7 @@
 #include "../common.h"
 #include "../test.h"
 
-#include <sqsh_primitive_private.h>
+#include "../../include/sqsh_primitive_private.h"
 
 #include <stdatomic.h>
 #include <stdint.h>
