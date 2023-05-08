@@ -120,7 +120,6 @@ out:
 int
 sqsh__metablock_iterator_skip(
 		struct SqshMetablockIterator *iterator, size_t amount) {
-	// TODO: this function is currently unused. Here be dragons.
 	int rv = 0;
 	uint16_t size = iterator->outer_size;
 
