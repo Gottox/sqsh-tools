@@ -265,6 +265,36 @@ error_1(void) {
 	sqsh__map_manager_cleanup(&mapper);
 }
 
+static void
+error_2(void) {
+	int rv;
+	struct SqshMapManager mapper = {0};
+	struct SqshMapReader cursor = {0};
+	const uint8_t buffer[1024] = {
+			/* clang-format off */
+		[96] = 'A', 'B', 'C', 'D', '1', '2', '3', '4',
+			/* clang-format on */
+	};
+	rv = sqsh__map_manager_init(
+			&mapper, buffer,
+			&(struct SqshConfig){
+					.mapper_block_size = 2,
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
+	assert(rv == 0);
+
+	rv = sqsh__map_reader_init(&cursor, &mapper, 96, sizeof(buffer) - 1);
+	assert(rv == 0);
+
+	for (int i = 0; i < 64; i++) {
+		rv = sqsh__map_reader_advance(&cursor, 1, 2);
+		assert(rv == 0);
+	}
+
+	sqsh__map_reader_cleanup(&cursor);
+	sqsh__map_manager_cleanup(&mapper);
+}
+
 DEFINE
 TEST(init_cursor);
 TEST(advance_once);
@@ -274,4 +304,5 @@ TEST(initial_advance);
 TEST(advance_to_out_of_bounds);
 TEST(initial_advance_2);
 TEST(error_1);
+TEST(error_2);
 DEFINE_END
