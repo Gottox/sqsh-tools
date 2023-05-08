@@ -162,33 +162,25 @@ iterator_forward_to(
 	return 0;
 }
 
-static bool
-is_buffered(struct SqshReader *reader) {
-	const uint8_t *data = reader->data;
-	const uint8_t *buffer_data = sqsh__buffer_data(&reader->buffer);
-	const size_t buffer_size = sqsh__buffer_size(&reader->buffer);
-	if (data >= buffer_data && data < &buffer_data[buffer_size]) {
-		return true;
-	} else {
-		return false;
-	}
-}
-
 static int
 prepare_buffered(struct SqshReader *reader) {
 	const uint8_t *data = reader->data;
 	const size_t data_size = reader->data_size;
 	int rv = 0;
+	struct SqshBuffer tmp = {0};
 
-	if (is_buffered(reader)) {
-		return 0;
+	rv = sqsh__buffer_init(&tmp);
+	if (rv < 0) {
+		return rv;
 	}
 
-	// If the data is not in the buffer, we can just copy the data into the
-	// buffer.
-	sqsh__buffer_drain(&reader->buffer);
-	rv = sqsh__buffer_append(&reader->buffer, data, data_size);
+	rv = sqsh__buffer_append(&tmp, data, data_size);
+	if (rv < 0) {
+		return rv;
+	}
 	reader->buffer_offset = reader->data_offset;
+
+	rv = sqsh__buffer_move(&reader->buffer, &tmp);
 
 	return rv;
 }
@@ -244,8 +236,7 @@ sqsh__reader_advance(
 		if (rv < 0) {
 			return rv;
 		}
-		reader->data =
-				reader->impl->data(reader->iterator);
+		reader->data = reader->impl->data(reader->iterator);
 		reader->data_size = reader->impl->size(reader->iterator);
 		reader->data_offset = reader->iterator_offset;
 	} else if (new_offset >= reader->buffer_offset) {

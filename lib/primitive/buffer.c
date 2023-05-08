@@ -100,6 +100,15 @@ sqsh__buffer_append(
 	return rv;
 }
 
+int sqsh__buffer_move(struct SqshBuffer *buffer, struct SqshBuffer *source) {
+	sqsh__buffer_cleanup(buffer);
+
+	memcpy(buffer, source, sizeof(struct SqshBuffer));
+	memset(source, 0, sizeof(struct SqshBuffer));
+
+	return 0;
+}
+
 void
 sqsh__buffer_drain(struct SqshBuffer *buffer) {
 	buffer->size = 0;

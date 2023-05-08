@@ -125,7 +125,21 @@ SQSH_NO_UNUSED int sqsh__buffer_append(
 /**
  * @internal
  * @memberof SqshBuffer
- * @brief sqsh__buffer_drain resets the buffer size to 0.
+ * @brief moves the data from buffer source to buffer. The source buffer will be
+ * invalid after this operation.
+ *
+ * @param[in,out] buffer The SqshBuffer to move to.
+ * @param[in] source The SqshBuffer to move from.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int
+sqsh__buffer_move(struct SqshBuffer *buffer, struct SqshBuffer *source);
+
+/**
+ * @internal
+ * @memberof SqshBuffer
+ * @brief resets the buffer size to 0.
  *
  * This does not free the memory allocated by the buffer so that
  * the buffer can be reused.

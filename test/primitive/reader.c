@@ -315,7 +315,7 @@ reader_map_into_buffer_twice(void) {
 
 	data = sqsh__reader_data(&reader);
 	assert(sqsh__reader_size(&reader) == 14);
-	assert(memcmp(data, "90123456890123", 14) == 0);
+	assert(memcmp(data, "90123456789012", 14) == 0);
 
 	sqsh__reader_cleanup(&reader);
 }
@@ -331,5 +331,5 @@ TEST(reader_advance_over_boundary);
 TEST(reader_initial_advance_2);
 TEST(reader_error_1);
 TEST(reader_map_into_buffer);
-TEST_OFF(reader_map_into_buffer_twice);
+TEST(reader_map_into_buffer_twice);
 DEFINE_END
