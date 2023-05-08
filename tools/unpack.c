@@ -47,6 +47,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <utime.h>
+#include <fcntl.h>
 
 bool do_chown = false;
 bool verbose = false;
@@ -263,7 +264,7 @@ extract(const char *filename, struct SqshInode *inode,
 			goto out;
 		}
 
-		switch (sqsh_inode_type(inode)) {
+		switch (type) {
 		case SQSH_INODE_TYPE_FILE:
 			rv = extract_file(filename, inode, &new_path_stack);
 			break;
@@ -285,22 +286,26 @@ extract(const char *filename, struct SqshInode *inode,
 		goto out;
 	}
 
-	times.actime = times.modtime = sqsh_inode_modified_time(inode);
-	rv = utime(filename, &times);
-	if (rv < 0) {
-		print_err(rv = -errno, "utime", &new_path_stack);
-		goto out;
-	}
-	rv = chmod(filename, mode);
-	if (rv < 0) {
-		print_err(rv = -errno, "chmod", path_stack);
-		goto out;
+
+	if (type != SQSH_INODE_TYPE_SYMLINK) {
+		times.actime = times.modtime = sqsh_inode_modified_time(inode);
+		rv = utime(filename, &times);
+		if (rv < 0) {
+			print_err(rv = -errno, "utime", &new_path_stack);
+			goto out;
+		}
+
+		rv = fchmodat(AT_FDCWD, filename, mode, AT_SYMLINK_NOFOLLOW);
+		if (rv < 0) {
+			print_err(rv = -errno, "chmod", path_stack);
+			goto out;
+		}
 	}
 
 	if (do_chown) {
 		fuid = sqsh_inode_uid(inode);
 		fgid = sqsh_inode_gid(inode);
-		rv = chown(filename, fuid, fgid);
+		rv = fchownat(AT_FDCWD, filename, fuid, fgid, AT_SYMLINK_NOFOLLOW);
 		if (rv < 0) {
 			print_err(rv = -errno, "chown", &new_path_stack);
 			goto out;
