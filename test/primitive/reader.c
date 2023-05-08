@@ -268,6 +268,58 @@ reader_error_1(void) {
 	sqsh__reader_cleanup(&reader);
 }
 
+static void
+reader_map_into_buffer(void) {
+	int rv;
+	struct SqshReader reader = {0};
+	struct TestIterator iter = { .data = "0123456789", .remaining = 2 };
+
+	rv = sqsh__reader_init(&reader, &impl, &iter);
+	assert(rv == 0);
+
+	rv = sqsh__reader_advance(&reader, 8, 4);
+	assert(rv == 0);
+
+	const uint8_t *data = sqsh__reader_data(&reader);
+	assert(sqsh__reader_size(&reader) == 4);
+	assert(memcmp(data, "8901", 4) == 0);
+
+	rv = sqsh__reader_advance(&reader, 1, 4);
+	assert(rv == 0);
+
+	data = sqsh__reader_data(&reader);
+	assert(sqsh__reader_size(&reader) == 4);
+	assert(memcmp(data, "9012", 4) == 0);
+
+	sqsh__reader_cleanup(&reader);
+}
+
+static void
+reader_map_into_buffer_twice(void) {
+	int rv;
+	struct SqshReader reader = {0};
+	struct TestIterator iter = { .data = "0123456789", .remaining = 3 };
+
+	rv = sqsh__reader_init(&reader, &impl, &iter);
+	assert(rv == 0);
+
+	rv = sqsh__reader_advance(&reader, 8, 4);
+	assert(rv == 0);
+
+	const uint8_t *data = sqsh__reader_data(&reader);
+	assert(sqsh__reader_size(&reader) == 4);
+	assert(memcmp(data, "8901", 4) == 0);
+
+	rv = sqsh__reader_advance(&reader, 1, 14);
+	assert(rv == 0);
+
+	data = sqsh__reader_data(&reader);
+	assert(sqsh__reader_size(&reader) == 14);
+	assert(memcmp(data, "90123456890123", 14) == 0);
+
+	sqsh__reader_cleanup(&reader);
+}
+
 DEFINE
 TEST(reader_init);
 TEST(reader_advance_once);
@@ -278,4 +330,6 @@ TEST(reader_advance_to_out_of_bounds);
 TEST(reader_advance_over_boundary);
 TEST(reader_initial_advance_2);
 TEST(reader_error_1);
+TEST(reader_map_into_buffer);
+TEST_OFF(reader_map_into_buffer_twice);
 DEFINE_END

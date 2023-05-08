@@ -248,10 +248,6 @@ sqsh__reader_advance(
 				reader->impl->data(reader->iterator);
 		reader->data_size = reader->impl->size(reader->iterator);
 		reader->data_offset = reader->iterator_offset;
-		// Forward the data pointer to the requested offset.
-		reader->data += new_offset - reader->data_offset;
-		reader->data_size -= new_offset - reader->data_offset;
-		reader->data_offset = new_offset;
 	} else if (new_offset >= reader->buffer_offset) {
 		// case 2: We can map the beginning of the requested range from the
 		// buffer.
@@ -262,6 +258,10 @@ sqsh__reader_advance(
 		// Should never happen.
 		__builtin_unreachable();
 	}
+	// Forward the data pointer to the requested offset.
+	reader->data += new_offset - reader->data_offset;
+	reader->data_size -= new_offset - reader->data_offset;
+	reader->data_offset = new_offset;
 
 	reader->size = size;
 
