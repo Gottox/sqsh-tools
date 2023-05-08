@@ -62,6 +62,7 @@ sqsh__map_iterator_init(
 	iterator->index = address_to_index(iterator, start_address);
 	iterator->mapping = NULL;
 	iterator->data = NULL;
+	iterator->size = 0;
 	iterator->segment_count = SQSH_DIVIDE_CEIL(archive_size, block_size);
 
 	return 0;

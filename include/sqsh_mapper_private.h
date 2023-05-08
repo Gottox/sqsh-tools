@@ -387,12 +387,9 @@ struct SqshMapReader {
 	 * @privatesection
 	 */
 	uint64_t address;
-	uint64_t end_address;
 	uint64_t upper_limit;
-	struct SqshMapManager *map_manager;
-	const struct SqshMapSlice *current_mapping;
-	struct SqshBuffer buffer;
-	const uint8_t *data;
+	struct SqshMapIterator iterator;
+	struct SqshReader reader;
 };
 
 /**
