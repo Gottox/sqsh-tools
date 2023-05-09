@@ -97,7 +97,7 @@
  * ```
  *                      Start  End
  *                        v     v
- *                        =============================
+ *                        =======
  *                           ##########################
  * ```
  * ### Scenario 2: buffer to direct
@@ -106,13 +106,28 @@
  * ```
  *                      Start  End
  *                        v     v
- *                        =============================
+ *                        =======
  *                           ##########################
  * ```
  * After:
  * ```
  *                            Start  End
  *                              v     v
+ *                           ##########################
+ * ```
+ *
+ * ### Scenario 3: buffer over multiple blocks
+ * Before:
+ * ```
+ *                Start  End
+ *                  v     v
+ * ##########################
+ * ```
+ * After:
+ * ```
+ *                      Start                           End
+ *                        v                              v
+ *                        ================================
  *                           ##########################
  * ```
  */
@@ -163,56 +178,91 @@ iterator_forward_to(
 }
 
 static int
-prepare_buffered(struct SqshReader *reader) {
-	const uint8_t *data = reader->data;
-	const size_t data_size = reader->data_size;
-	int rv = 0;
-	struct SqshBuffer tmp = {0};
-
-	rv = sqsh__buffer_init(&tmp);
-	if (rv < 0) {
-		return rv;
-	}
-
-	rv = sqsh__buffer_append(&tmp, data, data_size);
-	if (rv < 0) {
-		return rv;
-	}
-	reader->buffer_offset = reader->data_offset;
-
-	rv = sqsh__buffer_move(&reader->buffer, &tmp);
-
-	return rv;
-}
-
-static int
-extend_buffer(struct SqshReader *reader, size_t size) {
+map_buffered(
+		struct SqshReader *reader, sqsh_index_t new_offset,
+		size_t new_end_offset) {
+	int rv;
+	struct SqshBuffer new_buffer = {0};
+	const sqsh_index_t buffer_offset = reader->buffer_offset;
+	const sqsh_index_t iterator_offset = reader->iterator_offset;
+	const size_t target_size = new_end_offset - new_offset;
 	const struct SqshIteratorImpl *impl = reader->impl;
 	void *iterator = reader->iterator;
-	int rv = prepare_buffered(reader);
+
+	rv = sqsh__buffer_init(&new_buffer);
 	if (rv < 0) {
-		return rv;
+		goto out;
+	}
+	if (new_offset < buffer_offset) {
+		// Should never happen
+		abort();
 	}
 
-	while (sqsh__buffer_size(&reader->buffer) < size) {
-		const size_t desired_size = size - sqsh__buffer_size(&reader->buffer);
-		reader->iterator_offset += impl->size(iterator);
-		rv = impl->next(iterator, desired_size);
+	/*
+	 * 1. If the requested range is covered by the old buffer, copy
+	 *    the data starting from the old buffer to the new buffer.
+	 */
+	if (new_offset < iterator_offset && buffer_offset < iterator_offset) {
+		sqsh_index_t end_offset = SQSH_MIN(new_end_offset, iterator_offset);
+
+		size_t size = end_offset - new_offset;
+		sqsh_index_t inner_offset = new_offset - buffer_offset;
+		const uint8_t *data = sqsh__buffer_data(&reader->buffer);
+
+		rv = sqsh__buffer_append(&new_buffer, &data[inner_offset], size);
 		if (rv < 0) {
-			return rv;
-		} else if (rv == 0) {
-			return -SQSH_ERROR_OUT_OF_BOUNDS;
-		}
-		rv = sqsh__buffer_append(
-				&reader->buffer, impl->data(iterator), impl->size(iterator));
-		if (rv < 0) {
-			return rv;
+			goto out;
 		}
 	}
+
+	/*
+	 * 2. The remainder of the requested range is read from the iterator
+	 */
+	sqsh_index_t inner_offset = 0;
+	if (new_offset > iterator_offset) {
+		inner_offset = new_offset - iterator_offset;
+	}
+	// We expect, that the iterator is already at the correct position.
+	while (true) {
+		const size_t size = SQSH_MIN(
+				impl->size(iterator) - inner_offset,
+				target_size - sqsh__buffer_size(&new_buffer));
+		const uint8_t *data = impl->data(iterator);
+
+		rv = sqsh__buffer_append(&new_buffer, &data[inner_offset], size);
+		if (rv < 0) {
+			goto out;
+		}
+
+		inner_offset = 0;
+		if (sqsh__buffer_size(&new_buffer) < target_size) {
+			const size_t desired_size =
+					target_size - sqsh__buffer_size(&new_buffer);
+			reader->iterator_offset += impl->size(iterator);
+			rv = impl->next(iterator, desired_size);
+			if (rv < 0) {
+				goto out;
+			} else if (rv == 0) {
+				rv = -SQSH_ERROR_OUT_OF_BOUNDS;
+				goto out;
+			}
+		} else {
+			break;
+		}
+	}
+
+	rv = sqsh__buffer_move(&reader->buffer, &new_buffer);
+	if (rv < 0) {
+		goto out;
+	}
+	reader->data_offset = new_offset;
+	reader->buffer_offset = new_offset;
 	reader->data = sqsh__buffer_data(&reader->buffer);
 	reader->data_size = sqsh__buffer_size(&reader->buffer);
-	reader->data_offset = reader->buffer_offset;
-	return 0;
+
+out:
+	sqsh__buffer_cleanup(&new_buffer);
+	return rv;
 }
 
 int
@@ -230,8 +280,6 @@ sqsh__reader_advance(
 
 	// Finding the start of the new range.
 	if (new_offset >= reader->iterator_offset) {
-		// case 1: We can map the beginning of the requested range from the
-		// iterator.
 		rv = iterator_forward_to(reader, new_offset, 1);
 		if (rv < 0) {
 			return rv;
@@ -239,25 +287,21 @@ sqsh__reader_advance(
 		reader->data = reader->impl->data(reader->iterator);
 		reader->data_size = reader->impl->size(reader->iterator);
 		reader->data_offset = reader->iterator_offset;
-	} else if (new_offset >= reader->buffer_offset) {
-		// case 2: We can map the beginning of the requested range from the
-		// buffer.
-		reader->data = sqsh__buffer_data(&reader->buffer);
-		reader->data_size = sqsh__buffer_size(&reader->buffer);
-		reader->data_offset = reader->buffer_offset;
-	} else {
-		// Should never happen.
-		__builtin_unreachable();
+		sqsh__buffer_cleanup(&reader->buffer);
 	}
+
 	// Forward the data pointer to the requested offset.
-	reader->data += new_offset - reader->data_offset;
-	reader->data_size -= new_offset - reader->data_offset;
+	const sqsh_index_t inner_offset = new_offset - reader->data_offset;
+	reader->data += inner_offset;
+	reader->data_size -= inner_offset;
 	reader->data_offset = new_offset;
 
 	reader->size = size;
 
+	// If the requested range is not covered by the iterator,
+	// turn it into a buffer and extend it.
 	if (new_end_offset > reader->data_offset + reader->data_size) {
-		rv = extend_buffer(reader, new_end_offset - reader->data_offset);
+		rv = map_buffered(reader, new_offset, new_end_offset);
 		if (rv < 0) {
 			return rv;
 		}
