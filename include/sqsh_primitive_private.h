@@ -139,19 +139,6 @@ sqsh__buffer_move(struct SqshBuffer *buffer, struct SqshBuffer *source);
 /**
  * @internal
  * @memberof SqshBuffer
- * @brief resets the buffer size to 0.
- *
- * This does not free the memory allocated by the buffer so that
- * the buffer can be reused.
- *
- * @param[in,out] buffer The SqshBuffer to drain.
- */
-
-void sqsh__buffer_drain(struct SqshBuffer *buffer);
-
-/**
- * @internal
- * @memberof SqshBuffer
  * @brief sqsh__buffer_data returns the data of the SqshBuffer.
  * @param[in] buffer The SqshBuffer to get the data from.
  * @return a pointer to the data of the SqshBuffer.
