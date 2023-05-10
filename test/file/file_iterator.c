@@ -106,11 +106,11 @@ load_two_segments_from_uncompressed_data_block(void) {
 			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
 			INODE_HEADER(2, 0, 0, 0, 0, 1),
 			INODE_BASIC_FILE(8192, 0xFFFFFFFF, 0, 4096 + 5),
-			DATA_BLOCK_REF(4096, 0),
+			DATA_BLOCK_REF(1000, 0),
 			DATA_BLOCK_REF(5, 0),
 			/* datablocks */
-			[8192 ... 8192 + 4095] = 0xa1,
-			[8192 + 4096] = 1, 2, 3, 4, 5
+			[8192 ... 8192 + 999] = 0xa1,
+			[8192 + 1000] = 1, 2, 3, 4, 5
 			/* clang-format on */
 	};
 	mk_stub(&archive, payload, sizeof(payload));
@@ -130,10 +130,20 @@ load_two_segments_from_uncompressed_data_block(void) {
 	assert(rv > 0);
 
 	size_t size = sqsh_file_iterator_size(&iter);
-	assert(size == 4096);
+	assert(size == 1000);
 	const uint8_t *data = sqsh_file_iterator_data(&iter);
 	for (size_t i = 0; i < size; i++) {
 		assert(data[i] == 0xa1);
+	}
+
+	rv = sqsh_file_iterator_next(&iter, 1);
+	assert(rv > 0);
+
+	size = sqsh_file_iterator_size(&iter);
+	assert(size == 4096 - 1000);
+	data = sqsh_file_iterator_data(&iter);
+	for (size_t i = 0; i < size; i++) {
+		assert(data[i] == 0);
 	}
 
 	rv = sqsh_file_iterator_next(&iter, 1);
