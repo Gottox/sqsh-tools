@@ -36,7 +36,9 @@
 
 #include "sqsh_common.h"
 
+#include <fcntl.h>
 #include <stdio.h>
+#include <time.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -82,6 +84,16 @@ int sqsh_close(struct SqshInode *inode);
 int sqsh_file_to_stream(const struct SqshInode *inode, FILE *file);
 
 /**
+ * @brief checks if a file exists.
+ *
+ * @param[in] archive  The sqsh archive context.
+ * @param[in] path     The path the file or directory.
+ *
+ * @return true if the file exists, false otherwise.
+ */
+bool sqsh_file_exists(struct SqshArchive *archive, const char *path);
+
+/**
  * @brief retrieves the content of a file.
  *
  * @param[in] archive  The sqsh archive context.
@@ -90,6 +102,36 @@ int sqsh_file_to_stream(const struct SqshInode *inode, FILE *file);
  * @return The content of the file on success, NULL on error.
  */
 char *sqsh_file_content(struct SqshArchive *archive, const char *path);
+
+/**
+ * @brief retrieves the size of a file.
+ *
+ * @param[in] archive  The sqsh archive context.
+ * @param[in] path     The path the file or directory.
+ *
+ * @return The size of the file on success, less than 0 on error.
+ */
+size_t sqsh_file_size(struct SqshArchive *archive, const char *path);
+
+/**
+ * @brief retrieves unix permissions of a file.
+ *
+ * @param[in] archive  The sqsh archive context.
+ * @param[in] path     The path the file or directory.
+ *
+ * @return The unix permissions of the file on success, less than 0 on error.
+ */
+mode_t sqsh_file_permissions(struct SqshArchive *archive, const char *path);
+
+/**
+ * @brief retrieves the modification time of a file.
+ *
+ * @param[in] archive  The sqsh archive context.
+ * @param[in] path     The path the file or directory.
+ *
+ * @return The modification time of the file on success, less than 0 on error.
+ */
+time_t sqsh_file_mtime(struct SqshArchive *archive, const char *path);
 
 #ifdef __cplusplus
 }

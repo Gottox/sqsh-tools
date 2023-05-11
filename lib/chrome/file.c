@@ -166,12 +166,11 @@ out:
 	return rv;
 }
 
-char *
-sqsh_file_content(struct SqshArchive *archive, const char *path) {
-	int rv = 0;
-	struct SqshFileIterator iterator = {0};
+
+static int
+file_open_path(struct SqshInode *inode, struct SqshArchive *archive, const char *path) {
+	int rv;
 	struct SqshTreeWalker walker = {0};
-	struct SqshInode inode = {0};
 
 	rv = sqsh__tree_walker_init(&walker, archive);
 	if (rv < 0) {
@@ -183,7 +182,41 @@ sqsh_file_content(struct SqshArchive *archive, const char *path) {
 		goto out;
 	}
 
-	rv = sqsh__inode_init(&inode, archive, walker.current_inode_ref);
+	rv = sqsh__inode_init(inode, archive, walker.current_inode_ref);
+	if (rv < 0) {
+		goto out;
+	}
+
+out:
+	sqsh__tree_walker_cleanup(&walker);
+	return rv;
+}
+
+bool
+sqsh_file_exists(struct SqshArchive *archive, const char *path) {
+	int rv = 0;
+	struct SqshInode inode = {0};
+	bool exists = false;
+
+	rv = file_open_path(&inode, archive, path);
+	if (rv < 0) {
+		goto out;
+	}
+
+	exists = true;
+
+out:
+	sqsh__inode_cleanup(&inode);
+	return exists;
+}
+
+char *
+sqsh_file_content(struct SqshArchive *archive, const char *path) {
+	int rv = 0;
+	struct SqshFileIterator iterator = {0};
+	struct SqshInode inode = {0};
+
+	rv = file_open_path(&inode, archive, path);
 	if (rv < 0) {
 		goto out;
 	}
@@ -211,10 +244,63 @@ sqsh_file_content(struct SqshArchive *archive, const char *path) {
 out:
 	sqsh__file_iterator_cleanup(&iterator);
 	sqsh__inode_cleanup(&inode);
-	sqsh__tree_walker_cleanup(&walker);
 	if (rv < 0) {
 		free(content);
 		content = NULL;
 	}
 	return content;
+}
+
+size_t
+sqsh_file_size(struct SqshArchive *archive, const char *path) {
+	int rv = 0;
+	struct SqshInode inode = {0};
+	size_t file_size = 0;
+
+	rv = file_open_path(&inode, archive, path);
+	if (rv < 0) {
+		goto out;
+	}
+
+	file_size = sqsh_inode_file_size(&inode);
+
+out:
+	sqsh__inode_cleanup(&inode);
+	return file_size;
+}
+
+mode_t
+sqsh_file_permission(struct SqshArchive *archive, const char *path) {
+	int rv = 0;
+	struct SqshInode inode = {0};
+	size_t permission = 0;
+
+	rv = file_open_path(&inode, archive, path);
+	if (rv < 0) {
+		goto out;
+	}
+
+	permission = sqsh_inode_permission(&inode);
+
+out:
+	sqsh__inode_cleanup(&inode);
+	return permission;
+}
+
+time_t
+sqsh_file_mtime(struct SqshArchive *archive, const char *path) {
+	int rv = 0;
+	struct SqshInode inode = {0};
+	size_t modified = 0;
+
+	rv = file_open_path(&inode, archive, path);
+	if (rv < 0) {
+		goto out;
+	}
+
+	modified = sqsh_inode_modified_time(&inode);
+
+out:
+	sqsh__inode_cleanup(&inode);
+	return modified;
 }
