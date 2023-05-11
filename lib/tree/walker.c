@@ -37,7 +37,7 @@
 #include "../../include/sqsh_directory_private.h"
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_inode_private.h"
-#include "utils/utils.h"
+#include "../utils/utils.h"
 
 #include <stdlib.h>
 #include <string.h>
