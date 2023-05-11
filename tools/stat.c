@@ -271,7 +271,7 @@ stat_file(struct SqshTreeWalker *walker, const char *path) {
 	int rv = 0;
 	struct SqshInode *inode = NULL;
 	bool has_fragment = false;
-	rv = sqsh_tree_walker_resolve(walker, path);
+	rv = sqsh_tree_walker_resolve(walker, path, false);
 	inode = sqsh_tree_walker_inode_load(walker, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, path);

@@ -60,6 +60,7 @@ struct SqshTreeWalker {
 	struct SqshInodeCache *inode_cache;
 	struct SqshInode directory;
 	struct SqshDirectoryIterator iterator;
+	bool begin_iterator;
 };
 
 /**

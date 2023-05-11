@@ -48,7 +48,7 @@ sqsh_open(struct SqshArchive *archive, const char *path, int *err) {
 		goto out;
 	}
 
-	rv = sqsh_tree_walker_resolve(&walker, path);
+	rv = sqsh_tree_walker_resolve(&walker, path, true);
 	if (rv < 0) {
 		goto out;
 	}

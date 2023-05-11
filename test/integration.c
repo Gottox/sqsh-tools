@@ -64,7 +64,7 @@ sqsh_get_nonexistant(void) {
 	rv = sqsh__tree_walker_init(&walker, &sqsh);
 	assert(rv == 0);
 
-	rv = sqsh_tree_walker_resolve(&walker, "/nonexistant");
+	rv = sqsh_tree_walker_resolve(&walker, "/nonexistant", false);
 	assert(rv < 0);
 
 	rv = sqsh__tree_walker_cleanup(&walker);
@@ -87,10 +87,10 @@ tree_walker(void) {
 	rv = sqsh__tree_walker_init(&walker, &sqsh);
 	assert(rv == 0);
 
-	rv = sqsh_tree_walker_resolve(&walker, "/large_dir");
+	rv = sqsh_tree_walker_resolve(&walker, "/large_dir", false);
 	assert(rv == 0);
 
-	rv = sqsh_tree_walker_resolve(&walker, "999");
+	rv = sqsh_tree_walker_resolve(&walker, "999", false);
 	assert(rv == 0);
 
 	inode = sqsh_tree_walker_inode_load(&walker, &rv);
@@ -179,7 +179,7 @@ sqsh_cat_fragment(void) {
 	rv = sqsh__tree_walker_init(&walker, &sqsh);
 	assert(rv == 0);
 
-	rv = sqsh_tree_walker_resolve(&walker, "a");
+	rv = sqsh_tree_walker_resolve(&walker, "a", false);
 	assert(rv == 0);
 
 	inode = sqsh_tree_walker_inode_load(&walker, &rv);
@@ -230,7 +230,7 @@ sqsh_cat_datablock_and_fragment(void) {
 	rv = sqsh__tree_walker_init(&walker, &sqsh);
 	assert(rv == 0);
 
-	rv = sqsh_tree_walker_resolve(&walker, "b");
+	rv = sqsh_tree_walker_resolve(&walker, "b", false);
 	assert(rv == 0);
 
 	inode = sqsh_tree_walker_inode_load(&walker, &rv);
@@ -283,7 +283,7 @@ sqsh_cat_size_overflow(void) {
 	rv = sqsh__tree_walker_init(&walker, &sqsh);
 	assert(rv == 0);
 
-	rv = sqsh_tree_walker_resolve(&walker, "b");
+	rv = sqsh_tree_walker_resolve(&walker, "b", false);
 	assert(rv == 0);
 
 	inode = sqsh_tree_walker_inode_load(&walker, &rv);
@@ -358,7 +358,7 @@ sqsh_test_extended_dir(void) {
 	rv = sqsh__tree_walker_init(&walker, &sqsh);
 	assert(rv == 0);
 
-	rv = sqsh_tree_walker_resolve(&walker, "/large_dir/999");
+	rv = sqsh_tree_walker_resolve(&walker, "/large_dir/999", false);
 	assert(rv == 0);
 
 	inode = sqsh_tree_walker_inode_load(&walker, &rv);
@@ -512,7 +512,7 @@ fuzz_crash_1(void) {
 	rv = sqsh__tree_walker_init(&walker, &sqsh);
 	assert(rv == 0);
 
-	rv = sqsh_tree_walker_resolve(&walker, "");
+	rv = sqsh_tree_walker_resolve(&walker, "", false);
 	assert(rv < 0);
 
 	inode = sqsh_tree_walker_inode_load(&walker, &rv);
@@ -555,7 +555,7 @@ fuzz_crash_2(void) {
 	rv = sqsh__tree_walker_init(&walker, &sqsh);
 	assert(rv == 0);
 
-	rv = sqsh_tree_walker_resolve(&walker, "");
+	rv = sqsh_tree_walker_resolve(&walker, "", false);
 	assert(rv < 0);
 
 	inode = sqsh_tree_walker_inode_load(&walker, &rv);
@@ -599,7 +599,7 @@ fuzz_crash_3(void) {
 	rv = sqsh__tree_walker_init(&walker, &sqsh);
 	assert(rv == 0);
 
-	rv = sqsh_tree_walker_resolve(&walker, "");
+	rv = sqsh_tree_walker_resolve(&walker, "", false);
 	assert(rv < 0);
 
 	rv = sqsh_inode_free(inode);

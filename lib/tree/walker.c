@@ -37,6 +37,7 @@
 #include "../../include/sqsh_directory_private.h"
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_inode_private.h"
+#include "utils/utils.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -77,6 +78,7 @@ enter_directory(struct SqshTreeWalker *walker, uint64_t inode_ref) {
 		goto out;
 	}
 
+	walker->begin_iterator = true;
 	rv = sqsh__directory_iterator_init(iterator, inode);
 	if (rv < 0) {
 		goto out;
@@ -98,6 +100,7 @@ sqsh__tree_walker_init(
 
 	walker->archive = archive;
 	walker->root_inode_ref = sqsh_superblock_inode_root_ref(superblock);
+	walker->begin_iterator = true;
 	rv = sqsh_archive_inode_cache(archive, &walker->inode_cache);
 	if (rv < 0) {
 		goto out;
@@ -158,6 +161,7 @@ int
 sqsh_tree_walker_next(struct SqshTreeWalker *walker) {
 	struct SqshDirectoryIterator *iterator = &walker->iterator;
 	int rv = sqsh_directory_iterator_next(iterator);
+	walker->begin_iterator = false;
 	if (rv < 0) {
 		return rv;
 	}
@@ -166,34 +170,67 @@ sqsh_tree_walker_next(struct SqshTreeWalker *walker) {
 }
 
 enum SqshInodeType
-sqsh_tree_walker_inode_type(const struct SqshTreeWalker *walker) {
-	return sqsh_directory_iterator_inode_type(&walker->iterator);
+sqsh_tree_walker_type(const struct SqshTreeWalker *walker) {
+	if (walker->begin_iterator == true) {
+		return sqsh_inode_type(&walker->directory);
+	} else {
+		return sqsh_directory_iterator_inode_type(&walker->iterator);
+	}
 }
 
 const char *
 sqsh_tree_walker_name(const struct SqshTreeWalker *walker) {
-	return sqsh_directory_iterator_name(&walker->iterator);
+	if (walker->begin_iterator == true) {
+		return NULL;
+	} else {
+		return sqsh_directory_iterator_name(&walker->iterator);
+	}
 }
 
 uint16_t
 sqsh_tree_walker_name_size(const struct SqshTreeWalker *walker) {
-	return sqsh_directory_iterator_name_size(&walker->iterator);
+	if (walker->begin_iterator == true) {
+		return 0;
+	} else {
+		return sqsh_directory_iterator_name_size(&walker->iterator);
+	}
 }
 
 char *
 sqsh_tree_walker_name_dup(const struct SqshTreeWalker *walker) {
-	return sqsh_directory_iterator_name_dup(&walker->iterator);
+	if (walker->begin_iterator == true) {
+		return NULL;
+	} else {
+		return sqsh_directory_iterator_name_dup(&walker->iterator);
+	}
+}
+
+int
+sqsh_tree_walker_revert(struct SqshTreeWalker *walker) {
+	struct SqshInode *inode = &walker->directory;
+	struct SqshDirectoryIterator *iterator = &walker->iterator;
+
+	walker->begin_iterator = true;
+	sqsh__directory_iterator_cleanup(iterator);
+	walker->begin_iterator = true;
+	return sqsh__directory_iterator_init(iterator, inode);
 }
 
 int
 sqsh_tree_walker_lookup(
 		struct SqshTreeWalker *walker, const char *name,
 		const size_t name_size) {
+	int rv = 0;
 	struct SqshDirectoryIterator *iterator = &walker->iterator;
-	int rv = sqsh_directory_iterator_lookup(iterator, name, name_size);
+	rv = sqsh_tree_walker_revert(walker);
 	if (rv < 0) {
 		return rv;
 	}
+	rv = sqsh_directory_iterator_lookup(iterator, name, name_size);
+	if (rv < 0) {
+		return rv;
+	}
+	walker->begin_iterator = false;
 
 	return update_inode_from_iterator(walker);
 }
@@ -236,8 +273,8 @@ path_segment_len(const char *segment) {
 	}
 }
 
-int
-sqsh_tree_walker_resolve(struct SqshTreeWalker *walker, const char *path) {
+static int
+tree_walker_resolve(struct SqshTreeWalker *walker, const char *path) {
 	int rv = 0;
 	const char *segment = path, *next_segment;
 	if (segment[0] == '/') {
@@ -259,8 +296,7 @@ sqsh_tree_walker_resolve(struct SqshTreeWalker *walker, const char *path) {
 			if (rv < 0) {
 				goto out;
 			}
-			if (sqsh_tree_walker_inode_type(walker) ==
-				SQSH_INODE_TYPE_DIRECTORY) {
+			if (sqsh_tree_walker_type(walker) == SQSH_INODE_TYPE_DIRECTORY) {
 				rv = sqsh_tree_walker_down(walker);
 			}
 		}
@@ -270,6 +306,38 @@ sqsh_tree_walker_resolve(struct SqshTreeWalker *walker, const char *path) {
 	} while ((segment = next_segment));
 
 out:
+	return rv;
+}
+
+int
+sqsh_tree_walker_resolve(
+		struct SqshTreeWalker *walker, const char *path, bool follow_links) {
+	int rv = 0;
+
+	char *current_path = sqsh_memdup(path, strlen(path));
+	for (int i = 0; i < 100; i++) {
+		rv = tree_walker_resolve(walker, path);
+		if (rv < 0) {
+			goto out;
+		}
+		if (!follow_links) {
+			break;
+		}
+		if (sqsh_tree_walker_type(walker) != SQSH_INODE_TYPE_SYMLINK) {
+			break;
+		}
+		struct SqshInode inode = {0};
+		rv = sqsh__inode_init(
+				&inode, walker->archive, walker->current_inode_ref);
+		if (rv < 0) {
+			goto out;
+		}
+		free(current_path);
+		current_path = sqsh_inode_symlink_dup(&inode);
+		sqsh__inode_cleanup(&inode);
+	}
+out:
+	free(current_path);
 	return rv;
 }
 

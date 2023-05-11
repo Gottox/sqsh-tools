@@ -15,6 +15,7 @@ sqsh_test = [
     'primitive/reader.c',
     'extract/extract.c',
     'extract/extract_manager.c',
+    'tree/walker.c',
 ]
 sqsh_extended_test = [
     'selftest.sh',

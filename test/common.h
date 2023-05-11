@@ -109,8 +109,20 @@
 #define INODE_BASIC_FILE(block_start, frag_index, block_offset, file_size) \
 	UINT32_BYTES(block_start), UINT32_BYTES(frag_index), \
 			UINT32_BYTES(block_offset), UINT32_BYTES(file_size)
+#define INODE_BASIC_DIR(block_index, file_size, block_offset, parent_inode) \
+	UINT32_BYTES(block_index), UINT32_BYTES(1 /* link count */), \
+			UINT32_BYTES(file_size), UINT32_BYTES(block_offset), \
+			UINT32_BYTES(parent_inode)
+#define INODE_BASIC_SYMLINK(target_size) \
+	UINT32_BYTES(1 /* link count */), UINT32_BYTES(target_size)
 #define DATA_BLOCK_REF(size, compressed) \
 	UINT32_BYTES(size | (compressed ? 0x0 : (1 << 24)))
+
+#define DIRECTORY_HEADER(count, start, inode_number) \
+	UINT32_BYTES(count), UINT32_BYTES(start), UINT32_BYTES(inode_number)
+#define DIRECTORY_ENTRY(offset, inode_offset, type, name_size) \
+	UINT16_BYTES(offset), UINT16_BYTES(inode_offset), UINT16_BYTES(type), \
+			UINT16_BYTES((name_size) - 1)
 
 #define ZLIB_ABCD \
 	0x78, 0x9c, 0x4b, 0x4c, 0x4a, 0x4e, 0x01, 0x00, 0x03, 0xd8, 0x01, 0x8b

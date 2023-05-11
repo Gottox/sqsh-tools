@@ -369,7 +369,7 @@ main(int argc, char *argv[]) {
 		goto out;
 	}
 
-	rv = sqsh_tree_walker_resolve(walker, src_path);
+	rv = sqsh_tree_walker_resolve(walker, src_path, false);
 	if (rv < 0) {
 		sqsh_perror(rv, src_path);
 		rv = EXIT_FAILURE;

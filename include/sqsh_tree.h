@@ -123,6 +123,16 @@ SQSH_NO_UNUSED char *
 sqsh_tree_walker_name_dup(const struct SqshTreeWalker *walker);
 
 /**
+ * @brief reverts the walker to the begining of the current directory.
+ * @memberof SqshTreeWalker
+ *
+ * @param[in,out]   walker  The walker to use
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int sqsh_tree_walker_revert(struct SqshTreeWalker *walker);
+
+/**
  * @brief Looks up an entry in the current directory.
  * @memberof SqshTreeWalker
  *
@@ -130,7 +140,7 @@ sqsh_tree_walker_name_dup(const struct SqshTreeWalker *walker);
  * @param[in]       name    The name of the entry to look up.
  * @param[in]       name_size The size of the name.
  *
- * @return the inode of the current entry.
+ * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_UNUSED int sqsh_tree_walker_lookup(
 		struct SqshTreeWalker *walker, const char *name,
@@ -172,13 +182,14 @@ sqsh_tree_walker_inode_load(const struct SqshTreeWalker *walker, int *err);
  * @brief Resolve a path with the tree walker.
  * @memberof SqshTreeWalker
  *
- * @param[in,out]   walker  The walker to use
- * @param[in]       path    The path to resolve.
+ * @param[in,out]   walker           The walker to use
+ * @param[in]       path             The path to resolve.
+ * @param[in]       follow_symlinks  Whether to follow symlinks.
  *
  * @return the inode of the current entry.
  */
-SQSH_NO_UNUSED int
-sqsh_tree_walker_resolve(struct SqshTreeWalker *walker, const char *path);
+SQSH_NO_UNUSED int sqsh_tree_walker_resolve(
+		struct SqshTreeWalker *walker, const char *path, bool follow_symlinks);
 
 /**
  * @brief Cleans up resources used by a SqshTreeWalker struct.
