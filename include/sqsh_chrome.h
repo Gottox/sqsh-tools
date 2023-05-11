@@ -54,7 +54,7 @@ struct SqshArchive;
  * @param[in] path The path the file or directory.
  * @param[out] err Pointer to an int where the error code will be stored.
  *
- * @return int 0 on success, less than 0 on error.
+ * @return 0 on success, less than 0 on error.
  */
 struct SqshInode *
 sqsh_open(struct SqshArchive *archive, const char *path, int *err);
@@ -64,7 +64,7 @@ sqsh_open(struct SqshArchive *archive, const char *path, int *err);
  *
  * @param[in] inode The inode context.
  *
- * @return int 0 on success, less than 0 on error.
+ * @return 0 on success, less than 0 on error.
  */
 int sqsh_close(struct SqshInode *inode);
 
@@ -77,9 +77,19 @@ int sqsh_close(struct SqshInode *inode);
  * @param[in] inode The inode context.
  * @param[in] file The file descriptor.
  *
- * @return int The number of bytes read on success, less than 0 on error.
+ * @return The number of bytes read on success, less than 0 on error.
  */
 int sqsh_file_to_stream(const struct SqshInode *inode, FILE *file);
+
+/**
+ * @brief retrieves the content of a file.
+ *
+ * @param[in] archive  The sqsh archive context.
+ * @param[in] path     The path the file or directory.
+ *
+ * @return The content of the file on success, NULL on error.
+ */
+char *sqsh_file_content(struct SqshArchive *archive, const char *path);
 
 #ifdef __cplusplus
 }

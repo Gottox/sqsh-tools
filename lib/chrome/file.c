@@ -35,6 +35,8 @@
 
 #include "../../include/sqsh_chrome.h"
 
+#include <stdlib.h>
+#include <string.h>
 #include <pthread.h>
 #include <stdatomic.h>
 #include <sys/sysinfo.h>
@@ -42,6 +44,7 @@
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_file_private.h"
 #include "../../include/sqsh_inode.h"
+#include "../../include/sqsh_tree_private.h"
 
 #if 0
 struct SqshToStreamThreadInfo {
@@ -161,4 +164,57 @@ sqsh_file_to_stream(const struct SqshInode *inode, FILE *file) {
 out:
 	sqsh__file_iterator_cleanup(&iterator);
 	return rv;
+}
+
+char *
+sqsh_file_content(struct SqshArchive *archive, const char *path) {
+	int rv = 0;
+	struct SqshFileIterator iterator = {0};
+	struct SqshTreeWalker walker = {0};
+	struct SqshInode inode = {0};
+
+	rv = sqsh__tree_walker_init(&walker, archive);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = sqsh_tree_walker_resolve(&walker, path, true);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = sqsh__inode_init(&inode, archive, walker.current_inode_ref);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = sqsh__file_iterator_init(&iterator, &inode);
+	if (rv < 0) {
+		goto out;
+	}
+
+	size_t file_size = sqsh_inode_file_size(&inode);
+	char *content = calloc(file_size + 1, sizeof(char));
+	if (content == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
+	}
+
+	for (int pos = 0;
+		 (rv = sqsh_file_iterator_next(&iterator, SIZE_MAX)) > 0;) {
+		const uint8_t *data = sqsh_file_iterator_data(&iterator);
+		const size_t size = sqsh_file_iterator_size(&iterator);
+		memcpy(content + pos, data, size);
+		pos += size;
+	}
+
+out:
+	sqsh__file_iterator_cleanup(&iterator);
+	sqsh__inode_cleanup(&inode);
+	sqsh__tree_walker_cleanup(&walker);
+	if (rv < 0) {
+		free(content);
+		content = NULL;
+	}
+	return content;
 }

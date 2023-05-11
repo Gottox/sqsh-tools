@@ -40,6 +40,7 @@
 #include <sqsh_file_private.h>
 #include <sqsh_inode_private.h>
 #include <sqsh_tree_private.h>
+#include <sqsh_chrome.h>
 #include <squashfs_image.h>
 
 static void
@@ -160,6 +161,23 @@ sqsh_ls(void) {
 	assert(rv == 0);
 
 	rv = sqsh__archive_cleanup(&sqsh);
+	assert(rv == 0);
+}
+
+static void
+sqsh_read_content(void) {
+	int rv;
+	char *data;
+	struct SqshArchive archive = {0};
+	const struct SqshConfig config = DEFAULT_CONFIG(test_squashfs_image_len);
+	rv = sqsh__archive_init(&archive, (char *)test_squashfs_image, &config);
+	assert(rv == 0);
+
+	data = sqsh_file_content(&archive, "/a");
+	assert(strcmp(data, "a\n") == 0);
+	free(data);
+
+	rv = sqsh__archive_cleanup(&archive);
 	assert(rv == 0);
 }
 
@@ -851,6 +869,7 @@ TEST(sqsh_empty);
 TEST(sqsh_ls);
 TEST(tree_walker);
 TEST(sqsh_get_nonexistant);
+TEST(sqsh_read_content);
 TEST(sqsh_cat_fragment);
 TEST(sqsh_cat_datablock_and_fragment);
 TEST(sqsh_cat_size_overflow);
