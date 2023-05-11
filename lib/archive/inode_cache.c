@@ -32,6 +32,7 @@
  */
 
 #include "../../include/sqsh_archive_private.h"
+#include "../../include/sqsh_error.h"
 
 #include <stdatomic.h>
 #include <stdint.h>
@@ -54,6 +55,7 @@ sqsh__inode_cache_init(
 
 		cache->export_table = NULL;
 		cache->inode_refs = calloc(inode_count, sizeof(atomic_uint_fast64_t));
+		cache->inode_count = inode_count;
 		if (cache->inode_refs == NULL) {
 			rv = -SQSH_ERROR_MALLOC_FAILED;
 			goto out;
@@ -72,6 +74,8 @@ sqsh__inode_cache_get(
 	if (cache->export_table != NULL) {
 		return sqsh_export_table_resolve_inode(
 				cache->export_table, inode_number, &inode_ref);
+	} else if(inode_number - 1 > cache->inode_count) {
+		return -SQSH_ERROR_OUT_OF_BOUNDS;
 	} else {
 		inode_ref = atomic_load(&cache->inode_refs[inode_number - 1]);
 	}
@@ -87,6 +91,8 @@ sqsh__inode_cache_set(
 	}
 	if (cache->export_table != NULL) {
 		return 0;
+	} else if(inode_number - 1 > cache->inode_count) {
+		return -SQSH_ERROR_OUT_OF_BOUNDS;
 	} else {
 		atomic_store(&cache->inode_refs[inode_number - 1], inode_ref);
 		return 0;

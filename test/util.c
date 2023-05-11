@@ -18,7 +18,7 @@ mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size) {
 	int rv;
 	uint8_t superblock[SQSH_SIZEOF_SUPERBLOCK] = {
 			UINT32_BYTES(SQSH_SUPERBLOCK_MAGIC), // magic
-			UINT32_BYTES(0), // inode_count
+			UINT32_BYTES(100), // inode_count
 			UINT32_BYTES(0), // modification_time
 			UINT32_BYTES(4096), // block_size
 			UINT32_BYTES(0), // fragment_entry_count

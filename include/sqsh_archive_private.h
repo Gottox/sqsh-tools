@@ -95,6 +95,7 @@ struct SqshInodeCache {
 	 * @privatesection
 	 */
 	_Atomic(uint64_t) *inode_refs;
+	size_t inode_count;
 	struct SqshExportTable *export_table;
 };
 
