@@ -56,31 +56,26 @@ meson compile
 meson install
 ```
 
-## How to...?
-
-### ... open an archive?
+## Example
 
 ```c
 int rv;
 struct SqshArchive archive = sqsh_archive_new("/path/to/archive.squashfs", NULL, &rv);
-if (rv < 0)
-	abort();
-// Do something with the archive!
+assert(rv == 0)
+struct SqshInode *file = sqsh_open(&archive, "/path/to/file", &rv);
+assert(rv == 0);
+struct SqshFileIterator *iterator = sqsh_file_iterator_new(file, &rv)
+assert(rv == 0);
+while(sqsh_file_iterator_next(iterator, 1) > 0) {
+	const uint8_t *data = sqsh_file_iterator_data(iterator);
+	size_t size = sqsh_file_iterator_size(iterator);
+	printf("Chunk Size: %lu\n", size);
+	printf("Data: \n", size);
+	fwrite(data, 1, size, stdout);
+}
+sqsh_file_iterator_close(iterator);
+sqsh_close(&file);
 sqsh_archive_free(archive);
-```
-
-### ... get metainformations about a file?
-
-```c
-struct SqshInode inode = { 0 };
-int rv = sqsh_inode_load_by_path(&inode, &archive, "/path/to/file");
-if (rv < 0)
-	abort();
-// inode contains metainformations about '/path/to/file'.
-// They can be queried with the sqsh_inode_* functions.
-// This for example gives you the file size of a file:
-int file_size = sqsh_inode_file_size(&inode);
-sqsh_inode_cleanup(&inode);
 ```
 
 ## Resource
