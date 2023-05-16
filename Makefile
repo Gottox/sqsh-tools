@@ -5,7 +5,7 @@
 ######################################################################
 
 NINJA_TARGETS := test benchmark install dist scan-build clang-format uninstall \
-	all tidy doc coverage-html
+	all clang-tidy doc coverage-html
 
 ifeq ($(32BIT),1)
 	ARCH = i386
@@ -25,18 +25,20 @@ MESON_FLAGS += -Db_lundef=false
 #MESON_FLAGS += -Dtest=extended
 MESON_FLAGS += -Dtest=true
 MESON_FLAGS += -Ddoc=internal
+#MESON_FLAGS += -Dfuzzer=true
+MESON_FLAGS += -Dfuzzer_timeout=1800
 MESON_FLAGS += -Dcurl=enabled
 MESON_FLAGS += -Dzlib=enabled
 MESON_FLAGS += -Dlz4=enabled
 MESON_FLAGS += -Dlzma=enabled
-MESON_FLAGS += -Dlzo=enabled
+#MESON_FLAGS += -Dlzo=enabled
 MESON_FLAGS += -Dzstd=enabled
 MESON_FLAGS += -Dfuse=enabled
 #MESON_FLAGS += -Db_coverage=true
 
-SANATIZE = 0
+SANATIZE = 1
 
-CC = gcc
+CC = clang
 
 ifeq ($(PODMAN), 1)
 	W = podman run --rm -ti -v .:/host --device /dev/fuse --cap-add SYS_ADMIN gottox/sqsh-build:$(ARCH) \
@@ -46,7 +48,7 @@ else
 	W =
 	BUILD_DIR = ./build_dir
 	ifeq ($(SANATIZE), 1)
-		MESON_FLAGS += -Db_sanitize=thread
+		MESON_FLAGS += -Db_sanitize=address,undefined
 	endif
 	MESON_FLAGS += -Dwerror=true
 endif
