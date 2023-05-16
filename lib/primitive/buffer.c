@@ -89,6 +89,10 @@ sqsh__buffer_append(
 		struct SqshBuffer *buffer, const uint8_t *source, const size_t size) {
 	int rv = 0;
 	uint8_t *additional_buffer;
+	
+	if(size <= 0) {
+		return 0;
+	}
 
 	rv = sqsh__buffer_add_capacity(buffer, &additional_buffer, size);
 	if (rv < 0) {
@@ -100,7 +104,8 @@ sqsh__buffer_append(
 	return rv;
 }
 
-int sqsh__buffer_move(struct SqshBuffer *buffer, struct SqshBuffer *source) {
+int
+sqsh__buffer_move(struct SqshBuffer *buffer, struct SqshBuffer *source) {
 	sqsh__buffer_cleanup(buffer);
 
 	memcpy(buffer, source, sizeof(struct SqshBuffer));

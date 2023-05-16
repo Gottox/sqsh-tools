@@ -82,22 +82,34 @@ sqsh__extractor_to_buffer(
 
 	rv = sqsh__buffer_add_capacity(buffer, &decompressed, max_size);
 	if (rv < 0) {
-		return rv;
+		goto out;
 	}
 
 	rv = impl->init(&extractor_context, decompressed, max_size);
 	if (rv < 0) {
-		return rv;
-	}
-	size = max_size;
-	// TODO: check return value of decompress
-	impl->extract(&extractor_context, compressed, compressed_size);
-	rv = impl->finish(&extractor_context, decompressed, &size);
-	if (rv < 0) {
-		return rv;
+		goto out;
 	}
 
+	size = max_size;
+	rv = impl->extract(&extractor_context, compressed, compressed_size);
+	if (rv < 0) {
+		// Make sure we finish the stream even it failed before.
+		impl->finish(&extractor_context, decompressed, &size);
+		goto out;
+	}
+
+	rv = impl->finish(&extractor_context, decompressed, &size);
+	if (rv < 0) {
+		goto out;
+	}
+
+	if (size > max_size) {
+		rv = -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+		goto out;
+	}
 	rv = sqsh__buffer_add_size(buffer, size);
+
+out:
 	return rv;
 }
 

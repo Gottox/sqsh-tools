@@ -154,25 +154,32 @@ sqsh__inode_init(
 			sqsh_superblock_inode_table_start(superblock);
 
 	if (SQSH_ADD_OVERFLOW(inode_table_start, outer_offset, &address_outer)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
 	}
 	const uint64_t upper_limit =
 			sqsh_superblock_directory_table_start(superblock);
 	rv = sqsh__metablock_reader_init(
 			&inode->metablock, archive, address_outer, upper_limit);
 	if (rv < 0) {
-		return rv;
+		goto out;
 	}
 	rv = sqsh__metablock_reader_advance(
 			&inode->metablock, inner_offset, SQSH_SIZEOF_INODE_HEADER);
 	if (rv < 0) {
-		return rv;
+		goto out;
 	}
 
 	inode->archive = archive;
 	inode->inode_ref = inode_ref;
 
-	return inode_load(inode);
+	rv = inode_load(inode);
+
+out:
+	if (rv < 0) {
+		sqsh__inode_cleanup(inode);
+	}
+	return rv;
 }
 
 struct SqshInode *

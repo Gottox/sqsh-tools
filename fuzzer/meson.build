@@ -24,10 +24,15 @@ fuzzer = executable(
 test(
     'simple_fuzzer',
     fuzzer,
+    depends: corpus_tgt,
     args: [corpus_tgt.full_path(), source_corpus,
-        '-max_total_time=10',
         '-error_exitcode=1',
         '-timeout_exitcode=1',
+        '-timeout=1',
+        '-max_total_time=@0@'.format(get_option('fuzzer_timeout')),
     ],
-    depends: corpus_tgt,
+    timeout: 10 + get_option('fuzzer_timeout'),
+    env: {
+        'SQSH_LZO_HELPER_PATH': lzo_helper_path
+    },
 )

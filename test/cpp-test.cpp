@@ -48,13 +48,14 @@ extern "C" {
 static void
 sqsh_empty() {
 	int rv;
-	struct SqshArchive archive = {};
+	struct SqshArchive *archive = NULL;
 	struct SqshConfig config = {};
 	config.source_mapper = sqsh_mapper_impl_static;
 	config.mapper_block_size = 1;
 	config.source_size = 0;
-	rv = sqsh__archive_init(&archive, NULL, &config);
+	archive = sqsh_archive_new(NULL, &config, &rv);
 	assert(rv == -SQSH_ERROR_SUPERBLOCK_TOO_SMALL);
+	assert(archive == NULL);
 }
 
 DEFINE

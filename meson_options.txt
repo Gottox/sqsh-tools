@@ -35,6 +35,7 @@ option(
     description: 'Build libsqsh tools.',
 )
 option('fuzzer', type: 'boolean', value: false, description: 'Build fuzzers.')
+option('fuzzer_timeout', type: 'integer', value: 10, description: 'set the fuzzer timeout')
 option(
     'threads',
     type: 'feature',
