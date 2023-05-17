@@ -124,8 +124,54 @@ next_twice(void) {
 	sqsh__map_manager_cleanup(&mapper);
 }
 
+static void
+map_iterator_out_of_bounds_inside_blocksize(void) {
+	int rv;
+	struct SqshMapManager mapper = {0};
+	struct SqshMapIterator cursor = {0};
+	const uint8_t buffer[] = "12345678901234567890";
+	rv = sqsh__map_manager_init(
+			&mapper, buffer,
+			&(struct SqshConfig){
+					.mapper_block_size = 12,
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
+
+	assert(rv == 0);
+
+	rv = sqsh__map_iterator_init(&cursor, &mapper, 22);
+	assert(rv != 0);
+
+	sqsh__map_iterator_cleanup(&cursor);
+	sqsh__map_manager_cleanup(&mapper);
+}
+
+static void
+map_iterator_out_of_bounds_outside_blocksize(void) {
+	int rv;
+	struct SqshMapManager mapper = {0};
+	struct SqshMapIterator cursor = {0};
+	const uint8_t buffer[] = "12345678901234567890";
+	rv = sqsh__map_manager_init(
+			&mapper, buffer,
+			&(struct SqshConfig){
+					.mapper_block_size = 12,
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
+
+	assert(rv == 0);
+
+	rv = sqsh__map_iterator_init(&cursor, &mapper, 30);
+	assert(rv != 0);
+
+	sqsh__map_iterator_cleanup(&cursor);
+	sqsh__map_manager_cleanup(&mapper);
+}
+
 DEFINE
 TEST(init_cursor);
 TEST(next_once);
 TEST(next_twice);
+TEST(map_iterator_out_of_bounds_inside_blocksize);
+TEST(map_iterator_out_of_bounds_outside_blocksize);
 DEFINE_END

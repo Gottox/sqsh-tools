@@ -58,6 +58,10 @@ sqsh__map_iterator_init(
 	const size_t block_size = sqsh__map_manager_block_size(manager);
 	const size_t archive_size = sqsh__map_manager_size(manager);
 
+	if (start_address >= archive_size) {
+		return -SQSH_ERROR_OUT_OF_BOUNDS;
+	}
+
 	iterator->map_manager = manager;
 	iterator->index = address_to_index(iterator, start_address);
 	iterator->mapping = NULL;
