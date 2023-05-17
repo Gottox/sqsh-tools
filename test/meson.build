@@ -29,6 +29,9 @@ sqsh_extended_test = [
     'tools/read-chunk/tail.sh',
     'tools/unpack/repack.sh',
 ]
+sqsh_extra_source = {
+    'fuzzer_repro.c': '../fuzzer/simple.c',
+}
 sqsh_failing_test = []
 sqsh_test_util = [
     'util.c',
@@ -80,9 +83,13 @@ if lzo.found()
 endif
 
 foreach p : sqsh_test
+    sources = [p, squashfs_h, sqsh_test_util]
+    if sqsh_extra_source.has_key(p)
+        sources += [sqsh_extra_source[p]]
+    endif
     t = executable(
         p.underscorify(),
-        [p, squashfs_h, sqsh_test_util],
+        sources,
         install: false,
         c_args: test_c_args,
         dependencies: libsqsh_dependency,

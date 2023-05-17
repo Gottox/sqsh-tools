@@ -69,7 +69,7 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 	if (iter == NULL) {
 		goto out;
 	}
-	while (sqsh_directory_iterator_next(iter)) {
+	while ((rv = sqsh_directory_iterator_next(iter)) > 0) {
 		if (read_file(iter) < 0)
 			break;
 	}
@@ -80,5 +80,6 @@ out:
 	sqsh_inode_free(inode);
 	sqsh_archive_free(archive);
 
-	return rv; // Non-zero return values are reserved for future use.
+	(void)rv;
+	return 0; // Non-zero return values are reserved for future use.
 }
