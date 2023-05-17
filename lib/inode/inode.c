@@ -96,6 +96,9 @@ inode_load(struct SqshInode *context) {
 		return rv;
 	}
 
+	// the pointer may have been invalidated by reader_advance, so reretreive
+	// it.
+	inode = get_inode(context);
 	switch (type) {
 	case SQSH_INODE_TYPE_EXTENDED_FILE:
 	case SQSH_INODE_TYPE_BASIC_FILE:
