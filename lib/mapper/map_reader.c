@@ -95,6 +95,9 @@ sqsh__map_reader_init(
 
 	rv = sqsh__reader_advance(&reader->reader, offset, 0);
 out:
+	if (rv < 0) {
+		sqsh__map_reader_cleanup(reader);
+	}
 	return rv;
 }
 
