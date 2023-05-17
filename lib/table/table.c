@@ -109,9 +109,11 @@ sqsh_table_get(
 	int rv = 0;
 	struct SqshArchive *sqsh = table->sqsh;
 	struct SqshMetablockReader metablock = {0};
+	size_t lookup_table_bytes = sqsh__map_reader_size(&table->lookup_table);
 	uint64_t lookup_index =
 			index * table->element_size / SQSH_METABLOCK_BLOCK_SIZE;
-	if (lookup_index >= table->element_count) {
+	if (lookup_index >= table->element_count ||
+		lookup_index * sizeof(uint64_t) >= lookup_table_bytes) {
 		return -SQSH_ERROR_OUT_OF_BOUNDS;
 	}
 	uint64_t metablock_address = lookup_table_get(table, lookup_index);
