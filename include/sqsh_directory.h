@@ -63,7 +63,8 @@ sqsh_directory_iterator_new(struct SqshInode *inode, int *err);
  *
  * @param[in,out] iterator The iterator to advance.
  *
- * @return 0 on success, a negative value on error.
+ * @return amount of bytes available in the current block on success, 0 if the
+ * end of the directory has been reached, a negative value on error.
  */
 SQSH_NO_UNUSED int
 sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator);
