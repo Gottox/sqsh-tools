@@ -222,6 +222,10 @@ map_buffered(
 	if (new_offset > iterator_offset) {
 		inner_offset = new_offset - iterator_offset;
 	}
+	if (inner_offset >= impl->size(iterator)) {
+		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
+		goto out;
+	}
 	// We expect, that the iterator is already at the correct position.
 	while (true) {
 		const size_t size = SQSH_MIN(
