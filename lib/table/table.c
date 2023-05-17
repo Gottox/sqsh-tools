@@ -41,6 +41,7 @@
 #include "../../include/sqsh_metablock_private.h"
 
 typedef const __attribute__((aligned(1))) uint64_t unaligned_uint64_t;
+
 static uint64_t
 lookup_table_get(const struct SqshTable *table, sqsh_index_t index) {
 	unaligned_uint64_t *lookup_table =
@@ -110,6 +111,9 @@ sqsh_table_get(
 	struct SqshMetablockReader metablock = {0};
 	uint64_t lookup_index =
 			index * table->element_size / SQSH_METABLOCK_BLOCK_SIZE;
+	if (lookup_index >= table->element_count) {
+		return -SQSH_ERROR_OUT_OF_BOUNDS;
+	}
 	uint64_t metablock_address = lookup_table_get(table, lookup_index);
 	uint64_t element_offset =
 			(index * table->element_size) % SQSH_METABLOCK_BLOCK_SIZE;
