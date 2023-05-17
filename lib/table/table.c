@@ -84,7 +84,7 @@ sqsh__table_init(
 	}
 	rv = sqsh__map_reader_all(&table->lookup_table);
 	if (rv < 0) {
-		return rv;
+		goto out;
 	}
 
 	table->sqsh = sqsh;
@@ -96,6 +96,9 @@ sqsh__table_init(
 	}
 
 out:
+	if (rv < 0) {
+		sqsh__table_cleanup(table);
+	}
 	return rv;
 }
 
