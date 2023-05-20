@@ -47,12 +47,12 @@ sqsh__trailing_init(
 	uint64_t trailing_size;
 
 	if (archive_size <= trailing_start) {
-		rv = -SQSH_ERROR_TODO;
+		rv = -SQSH_ERROR_SIZE_MISSMATCH;
 		goto out;
 	}
 
 	if (SQSH_SUB_OVERFLOW(archive_size, trailing_start, &trailing_size)) {
-		rv = -SQSH_ERROR_TODO;
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
 

@@ -114,6 +114,10 @@ sqsh_error_str(int error_code) {
 		return "Compression unkown";
 	case SQSH_ERROR_CURL_INVALID_RANGE_HEADER:
 		return "Invalid range header";
+	case SQSL_ERROR_ELEMENT_NOT_FOUND:
+		return "Element not found";
+	case SQSH_ERROR_INVALID_ARGUMENT:
+		return "Invalid argument";
 	case SQSH_ERROR_TODO:
 		return "Todo";
 	}

@@ -177,7 +177,7 @@ sqsh__rc_hash_map_release(struct SqshRcHashMap *hash_map, const void *element) {
 			return sqsh__rc_map_release(values, element);
 		}
 	}
-	return -SQSH_ERROR_TODO;
+	return -SQSL_ERROR_ELEMENT_NOT_FOUND;
 }
 
 int
