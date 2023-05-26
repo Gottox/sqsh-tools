@@ -40,106 +40,12 @@
 #include <pthread.h>
 #include <stdatomic.h>
 #include <sys/sysinfo.h>
+#include <errno.h>
 
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_file_private.h"
 #include "../../include/sqsh_inode.h"
 #include "../../include/sqsh_tree_private.h"
-
-#if 0
-struct SqshToStreamThreadInfo {
-	pthread_t thread;
-	pthread_barrier_t *barrier;
-	struct SqshFileIterator iterator[2];
-	size_t worker_count;
-	bool finished;
-	bool joining;
-};
-
-void *
-to_stream_worker(void *arg) {
-	int rv = 0;
-	struct SqshToStreamThreadInfo *worker = arg;
-	int current = 0;
-
-	do {
-		struct SqshFileIterator *iterator = &worker->iterator[current];
-		pthread_barrier_t *barrier = &worker->barrier[current];
-		if (worker->finished == false) {
-			rv = sqsh_file_iterator_next(iterator, 1);
-			if (rv < 0) {
-				goto out;
-			} else if (rv == 0) {
-				worker->finished = true;
-			}
-		}
-		current = (current + 1) % 2;
-		pthread_barrier_wait(barrier);
-	} while (worker->joining == false);
-
-out:
-	return NULL;
-}
-int
-sqsh_file_to_stream_mt(const struct SqshInode *inode, FILE *file) {
-	int rv = 0;
-	int nprocs = get_nprocs();
-	if (nprocs < 0) {
-		return -SQSH_ERROR_TODO;
-	}
-	pthread_barrier_t barrier[2];
-	size_t worker_count = nprocs - 1;
-	struct SqshToStreamThreadInfo workers[worker_count];
-
-	for (sqsh_index_t i = 0; i < 2; i++) {
-		rv = pthread_barrier_init(
-				&barrier[i], NULL, worker_count + 1);
-		if (rv < 0) {
-			goto out;
-		}
-	}
-
-	for (sqsh_index_t i = 0; i < worker_count; i++) {
-		struct SqshToStreamThreadInfo *worker = &workers[i];
-		worker->worker_count = worker_count;
-		worker->barrier = workers[i].barrier;
-		worker->finished = false;
-		worker->joining = false;
-
-		for (sqsh_index_t j = 0; j < worker_count; j++) {
-			rv = sqsh__file_iterator_init(&worker->iterator[j], inode);
-			if (rv < 0) {
-				goto out;
-			}
-			rv = sqsh_file_iterator_skip(&worker->iterator[j], i + (j * worker_count));
-			if (rv < 0) {
-				goto out;
-			}
-		}
-
-		rv = pthread_create(&worker->thread, NULL, to_stream_worker, worker);
-		if (rv < 0) {
-			goto out;
-		}
-	}
-
-	for (sqsh_index_t finished = 0; finished < worker_count;) {
-		for (sqsh_index_t i = 0; i < 2; i++) {
-			pthread_barrier_wait(&barrier[i]);
-			for (sqsh_index_t j = 0; j < worker_count; j++) {
-				if (workers[j].joining) {
-					continue;
-				} else if (workers[j].finished) {
-					finished++;
-					pthread_join(workers[j].thread, NULL);
-				}
-			}
-		}
-	}
-out:
-	return 0;
-}
-#endif
 
 int
 sqsh_file_to_stream(const struct SqshInode *inode, FILE *file) {
@@ -156,7 +62,7 @@ sqsh_file_to_stream(const struct SqshInode *inode, FILE *file) {
 		const size_t size = sqsh_file_iterator_size(&iterator);
 		rv = fwrite(data, sizeof(uint8_t), size, file);
 		if (rv > 0 && (size_t)rv != size) {
-			rv = -SQSH_ERROR_TODO;
+			rv = -errno;
 			goto out;
 		}
 	}

@@ -88,13 +88,13 @@ sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator) {
 	const bool is_compressed = sqsh__data_metablock_is_compressed(metablock);
 	const size_t outer_size = sqsh__data_metablock_size(metablock);
 	if (outer_size > SQSH_METABLOCK_BLOCK_SIZE) {
-		rv = -SQSH_ERROR_TODO;
+		rv = -SQSH_ERROR_SIZE_MISSMATCH;
 		goto out;
 	}
 	iterator->outer_size = outer_size;
 
 	if (iterator->outer_size > SQSH_METABLOCK_BLOCK_SIZE) {
-		rv = -SQSH_ERROR_TODO;
+		rv = -SQSH_ERROR_SIZE_MISSMATCH;
 		goto out;
 	}
 
@@ -146,7 +146,7 @@ sqsh__metablock_iterator_skip(
 						&iterator->reader);
 		size = sqsh__data_metablock_size(metablock);
 		if (size > SQSH_METABLOCK_BLOCK_SIZE) {
-			rv = -SQSH_ERROR_TODO;
+			rv = -SQSH_ERROR_SIZE_MISSMATCH;
 			goto out;
 		}
 		rv = sqsh__map_reader_advance(
