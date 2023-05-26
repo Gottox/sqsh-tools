@@ -74,7 +74,7 @@ read_chunk = executable(
     'read-chunk.c',
     install: false,
     c_args: test_c_args,
-    dependencies: libsqsh_dependency,
+    dependencies: libsqsh_dep,
 )
 
 depends = []
@@ -92,7 +92,7 @@ foreach p : sqsh_test
         sources,
         install: false,
         c_args: test_c_args,
-        dependencies: libsqsh_dependency,
+        dependencies: libsqsh_dep,
     )
     test(p, t, env: {'SQSH_LZO_HELPER_PATH': lzo_helper_path}, depends: depends)
 endforeach

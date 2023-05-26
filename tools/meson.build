@@ -16,7 +16,7 @@ foreach src : tool_sources
         src,
         c_args: c_args,
         install: not meson.is_subproject(),
-        dependencies: libsqsh_dependency,
+        dependencies: libsqsh_dep,
     )
     tools += {tool_name: tool}
 endforeach
@@ -27,7 +27,7 @@ if fuse.found()
         'fs.c',
         c_args: c_args,
         install: not meson.is_subproject(),
-        dependencies: [libsqsh_dependency, fuse],
+        dependencies: [libsqsh_dep, fuse],
     )
     tools += {'sqshfs': tool}
 endif
