@@ -37,6 +37,8 @@
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_primitive_private.h"
 
+struct SqshExtractorImpl *const sqsh__impl_lzo = NULL;
+
 const struct SqshExtractorImpl *
 extractor_by_id(int id) {
 	switch ((enum SqshSuperblockCompressionId)id) {

@@ -31,7 +31,6 @@ MESON_FLAGS += -Dcurl=enabled
 MESON_FLAGS += -Dzlib=enabled
 MESON_FLAGS += -Dlz4=enabled
 MESON_FLAGS += -Dlzma=enabled
-#MESON_FLAGS += -Dlzo=enabled
 MESON_FLAGS += -Dzstd=enabled
 MESON_FLAGS += -Dfuse=enabled
 #MESON_FLAGS += -Db_coverage=true

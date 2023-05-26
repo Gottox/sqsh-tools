@@ -20,7 +20,6 @@ libsqsh_sources = [
     'extract/extractor.c',
     'extract/lz4.c',
     'extract/lzma.c',
-    'extract/lzo.c',
     'extract/zlib.c',
     'extract/zstd.c',
     'file/file_iterator.c',
@@ -81,14 +80,6 @@ endif
 if lzma.found()
     libsqsh_dependencies += lzma
     c_args += '-DCONFIG_LZMA'
-endif
-
-if lzo.found()
-    c_args += '-DCONFIG_LZO'
-    c_args += '-DCONFIG_LZO_HELPER_PATH="@0@/@1@/sqsh-lzo-helper"'.format(
-        get_option('prefix'),
-        get_option('libexecdir'),
-    )
 endif
 
 if zstd.found()

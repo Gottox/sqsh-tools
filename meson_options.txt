@@ -6,12 +6,6 @@ option(
 option('zlib', type: 'feature', description: 'Support zlib compression.')
 option('lz4', type: 'feature', description: 'Support LZ4 compression.')
 option('lzma', type: 'feature', description: 'Support LZMA compression.')
-option(
-    'lzo',
-    type: 'feature',
-    value: 'disabled',
-    description: 'Support LZO compression.',
-)
 option('zstd', type: 'feature', description: 'Support ZSTD compression.')
 option('fuse', type: 'feature', description: 'Support FUSE filesystem.')
 option(

@@ -43,7 +43,6 @@ developing efficient cache tactics.
 * zlib *optional*
 * liblz4 *optional*
 * liblzma *optional*
-* lzo2 *optional*
 * libzstd *optional*
 * fuse3 *optional*
 
@@ -88,9 +87,3 @@ sqsh_archive_free(archive);
 
 * Stack located structures
 * usable in multithreaded applications
-
-## License
-
-The library is licensed under Simplified BSD License (BSD-2-Clause). The one
-exception is `bin/sqsh-lzo-helper.c`, which is licensed under GPL-2.0-only.
-This is done to comply with lzo's licence terms.

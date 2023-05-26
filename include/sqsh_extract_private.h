@@ -364,9 +364,11 @@ extern const struct SqshExtractorImpl *const sqsh__impl_xz;
 // extract/lzo.c
 
 /**
- * @brief The implementation of the lzo extractor.
+ * @brief The implementation of the lzo extractor. This is NULL by default.
+ * If you want to use this, you need to link against
+ * [libsqsh-lzo](https://github.com/Gottox/libsqsh-lzo).
  */
-extern const struct SqshExtractorImpl *const sqsh__impl_lzo;
+extern struct SqshExtractorImpl *const sqsh__impl_lzo;
 
 ////////////////////////////////////////
 // extract/zlib.c

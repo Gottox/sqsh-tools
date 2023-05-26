@@ -77,11 +77,6 @@ read_chunk = executable(
     dependencies: libsqsh_dep,
 )
 
-depends = []
-if lzo.found()
-    depends += lzo_helper
-endif
-
 foreach p : sqsh_test
     sources = [p, squashfs_h, sqsh_test_util]
     if sqsh_extra_source.has_key(p)
@@ -94,7 +89,7 @@ foreach p : sqsh_test
         c_args: test_c_args,
         dependencies: libsqsh_dep,
     )
-    test(p, t, env: {'SQSH_LZO_HELPER_PATH': lzo_helper_path}, depends: depends)
+    test(p, t)
 endforeach
 
 if get_option('test') == 'extended'
@@ -113,7 +108,6 @@ if get_option('test') == 'extended'
                 'SQSHFS': tools['sqshfs'].full_path(),
                 'SQSH_CAT': tools['sqsh-cat'].full_path(),
                 'SQSH_LS': tools['sqsh-ls'].full_path(),
-                'SQSH_LZO_HELPER_PATH': lzo_helper_path,
                 'SQSH_UNPACK': tools['sqsh-unpack'].full_path(),
             },
         )
