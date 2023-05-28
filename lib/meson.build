@@ -14,7 +14,6 @@ libsqsh_sources = [
     'data/superblock_data.c',
     'data/xattr_data.c',
     'directory/directory_iterator.c',
-    'extract/extract_buffer.c',
     'extract/extract_manager.c',
     'extract/extract_view.c',
     'extract/extractor.c',
