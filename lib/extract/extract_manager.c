@@ -87,7 +87,7 @@ sqsh__extract_manager_init(
 			SQSH_CONFIG_DEFAULT(config->compression_lru_size, 128);
 
 	if (size == 0) {
-		return -SQSH_ERROR_TODO;
+		return -SQSH_ERROR_SIZE_MISSMATCH;
 	}
 
 	// Give a bit of room to avoid too many key hash collisions

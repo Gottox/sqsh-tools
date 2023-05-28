@@ -74,7 +74,7 @@ enter_directory(struct SqshTreeWalker *walker, uint64_t inode_ref) {
 	}
 
 	if (sqsh_inode_type(inode) != SQSH_INODE_TYPE_DIRECTORY) {
-		rv = -SQSH_ERROR_TODO;
+		rv = -SQSH_ERROR_NOT_A_DIRECTORY;
 		goto out;
 	}
 
@@ -134,17 +134,17 @@ sqsh_tree_walker_up(struct SqshTreeWalker *walker) {
 	// vague.
 
 	if (sqsh_inode_ref(inode) == walker->root_inode_ref) {
-		return -SQSH_ERROR_TODO;
+		return -SQSH_ERROR_WALKER_CANNOT_GO_UP;
 	}
 	const uint64_t parent_inode = sqsh_inode_directory_parent_inode(inode);
 	if (parent_inode <= 0) {
-		rv = -SQSH_ERROR_TODO;
+		rv = -SQSH_ERROR_CORRUPTED_INODE;
 		goto out;
 	}
 	const uint64_t parent_inode_ref =
 			sqsh__inode_cache_get(walker->inode_cache, parent_inode);
 	if (parent_inode_ref == 0) {
-		rv = -SQSH_ERROR_TODO;
+		rv = -SQSH_ERROR_INTERNAL;
 		goto out;
 	}
 

@@ -118,8 +118,12 @@ sqsh_error_str(int error_code) {
 		return "Element not found";
 	case SQSH_ERROR_INVALID_ARGUMENT:
 		return "Invalid argument";
-	case SQSH_ERROR_TODO:
-		return "Todo";
+	case SQSH_ERROR_WALKER_CANNOT_GO_UP:
+		return "Walker cannot go up";
+	case SQSH_ERROR_CORRUPTED_INODE:
+		return "Corrupted inode";
+	case SQSH_ERROR_INTERNAL:
+		return "Internal error";
 	}
 	snprintf(err_str, sizeof(err_str), UNKOWN_ERROR_FORMAT, abs(error_code));
 	return err_str;
