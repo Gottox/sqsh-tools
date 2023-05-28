@@ -35,12 +35,12 @@
 
 #include "../../include/sqsh_chrome.h"
 
-#include <stdlib.h>
-#include <string.h>
+#include <errno.h>
 #include <pthread.h>
 #include <stdatomic.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/sysinfo.h>
-#include <errno.h>
 
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_file_private.h"
@@ -72,9 +72,10 @@ out:
 	return rv;
 }
 
-
 static int
-file_open_path(struct SqshInode *inode, struct SqshArchive *archive, const char *path) {
+file_open_path(
+		struct SqshInode *inode, struct SqshArchive *archive,
+		const char *path) {
 	int rv;
 	struct SqshTreeWalker walker = {0};
 
@@ -121,6 +122,7 @@ sqsh_file_content(struct SqshArchive *archive, const char *path) {
 	int rv = 0;
 	struct SqshFileIterator iterator = {0};
 	struct SqshInode inode = {0};
+	char *content = NULL;
 
 	rv = file_open_path(&inode, archive, path);
 	if (rv < 0) {
@@ -133,7 +135,7 @@ sqsh_file_content(struct SqshArchive *archive, const char *path) {
 	}
 
 	size_t file_size = sqsh_inode_file_size(&inode);
-	char *content = calloc(file_size + 1, sizeof(char));
+	content = calloc(file_size + 1, sizeof(char));
 	if (content == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
