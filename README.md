@@ -34,6 +34,12 @@ developing efficient cache tactics.
 * open remote file systems through http (needs *libcurl*)
 * ... much more
 
+### LZO2
+
+LZO2 is a fast compression algorithm. Unfortunately the current implementation
+is GPL licensed and therefore not included in this library. If you want to use 
+LZO2 there's and independent glue library called [libsqsh-lzo](https://github.com/Gottox/libsqsh-lzo).
+
 ## building
 
 ### dependencies
