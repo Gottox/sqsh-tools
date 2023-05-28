@@ -32,7 +32,4 @@ test(
         '-max_total_time=@0@'.format(get_option('fuzzer_timeout')),
     ],
     timeout: 10 + get_option('fuzzer_timeout'),
-    env: {
-        'SQSH_LZO_HELPER_PATH': lzo_helper_path
-    },
 )

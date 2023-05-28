@@ -11,7 +11,6 @@ project(
     meson_version: '>=0.57',
     license: [
         'BSD-2-Clause',
-        'GPL-2.0-only',
     ],
 )
 

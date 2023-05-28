@@ -153,20 +153,6 @@ decompress_lz4_split(void) {
 }
 
 static void
-decompress_lzo(void) {
-	uint8_t input[] = {0x15, 0x61, 0x62, 0x63, 0x64, 0x11, 0x00, 0x00};
-
-	decompress_test(sqsh__impl_lzo, input, sizeof(input));
-}
-
-static void
-decompress_lzo_split(void) {
-	uint8_t input[] = {0x15, 0x61, 0x62, 0x63, 0x64, 0x11, 0x00, 0x00};
-
-	decompress_test_split(sqsh__impl_lzo, input, sizeof(input));
-}
-
-static void
 decompress_zlib(void) {
 	uint8_t input[] = {
 			ZLIB_ABCD,
@@ -200,34 +186,6 @@ decompress_zstd_split(void) {
 	decompress_test_split(sqsh__impl_zstd, input, sizeof(input));
 }
 
-static void *
-multithreaded_lzo_worker(void *arg) {
-	(void)arg;
-	uint8_t input[] = {0x15, 0x61, 0x62, 0x63, 0x64, 0x11, 0x00, 0x00};
-
-	for (int i = 0; i < 10000; i++) {
-		decompress_test(sqsh__impl_lzo, input, sizeof(input));
-	}
-	return 0;
-}
-
-static void
-multithreaded_lzo(void) {
-	(void)multithreaded_lzo_worker;
-	int rv;
-	pthread_t threads[16] = {0};
-
-	for (unsigned long i = 0; i < LENGTH(threads); i++) {
-		rv = pthread_create(&threads[i], NULL, multithreaded_lzo_worker, NULL);
-		assert(rv == 0);
-	}
-
-	for (unsigned long i = 0; i < LENGTH(threads); i++) {
-		rv = pthread_join(threads[i], NULL);
-		assert(rv == 0);
-	}
-}
-
 DEFINE
 TEST(decompress_lzma);
 TEST_OFF(decompress_lzma_split);
@@ -235,11 +193,8 @@ TEST(decompress_xz);
 TEST(decompress_xz_split);
 TEST(decompress_lz4);
 TEST_OFF(decompress_lz4_split);
-TEST(decompress_lzo);
-TEST(decompress_lzo_split);
 TEST(decompress_zlib);
 TEST(decompress_zlib_split);
 TEST(decompress_zstd);
 TEST(decompress_zstd_split);
-TEST(multithreaded_lzo);
 DEFINE_END

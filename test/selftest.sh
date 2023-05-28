@@ -14,7 +14,6 @@
 : "${SOURCE_ROOT:?SOURCE_ROOT is not set}"
 : "${SQSH_CAT:?SQSH_CAT is not set}"
 : "${SQSH_LS:?SQSH_LS is not set}"
-: "${SQSH_LZO_HELPER_PATH:?SQSH_LZO_HELPER_PATH is not set}"
 
 cd "$SOURCE_ROOT"
 

@@ -18,14 +18,13 @@ jobs:
         fetch-depth: 0
     - name: configure
       run: |
-        apk add zlib-dev lz4-dev xz-dev lzo-dev zstd-dev
+        apk add zlib-dev lz4-dev xz-dev zstd-dev
         CC=gcc meson setup /tmp/build \
           -Dwerror=true \
           -Dcurl=enabled  \
           -Dzlib=enabled \
           -Dlz4=enabled \
           -Dlzma=enabled  \
-          -Dlzo=enabled  \
           -Dzstd=enabled  \
           -Dthreads=enabled \
           -Dtest=extended \
@@ -77,7 +76,6 @@ jobs:
           -Dzlib=${{ matrix.feature }} \
           -Dlz4=${{ matrix.feature }} \
           -Dlzma=${{ matrix.feature }} \
-          -Dlzo=${{ matrix.feature }} \
           -Dzstd=${{ matrix.feature }} \
           -Dtest=false \
           -Ddoc=false
@@ -97,13 +95,12 @@ jobs:
         architecture: x86-64
         version: 7.2
         run: |
-          sudo pkg_add bzip2 curl git lzo2 meson lz4
+          sudo pkg_add bzip2 curl git meson lz4
           CC=clang meson setup /tmp/build \
             -Dcurl=enabled \
             -Dzlib=enabled \
             -Dlz4=enabled \
             -Dlzma=enabled \
-            -Dlzo=enabled \
             -Dzstd=enabled \
             -Dtest=true \
             -Ddoc=false
@@ -127,7 +124,6 @@ jobs:
           -Dzlib=disabled \
           -Dlz4=disabled\
           -Dlzma=disabled \
-          -Dlzo=disabled \
           -Dzstd=disabled \
           -Dtest=false \
           -Ddoc=true

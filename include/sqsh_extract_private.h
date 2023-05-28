@@ -55,6 +55,13 @@ struct SqshMapReader;
 typedef uint8_t sqsh__extractor_context_t[256];
 
 /**
+ * @brief The implementation of the lzo extractor. This is NULL by default.
+ * If you want to use this, you need to link against
+ * [libsqsh-lzo](https://github.com/Gottox/libsqsh-lzo).
+ */
+extern const struct SqshExtractorImpl *sqsh__impl_lzo;
+
+/**
  * @internal
  * @brief The SqshExtractorImpl struct is used to implement a extractor
  * that is then used by the SqshExtractor.
@@ -282,16 +289,6 @@ extern const struct SqshExtractorImpl *const sqsh__impl_lzma;
  * @brief The implementation of the xz extractor.
  */
 extern const struct SqshExtractorImpl *const sqsh__impl_xz;
-
-////////////////////////////////////////
-// extract/lzo.c
-
-/**
- * @brief The implementation of the lzo extractor. This is NULL by default.
- * If you want to use this, you need to link against
- * [libsqsh-lzo](https://github.com/Gottox/libsqsh-lzo).
- */
-extern struct SqshExtractorImpl *const sqsh__impl_lzo;
 
 ////////////////////////////////////////
 // extract/zlib.c
