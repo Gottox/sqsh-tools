@@ -63,7 +63,7 @@ out:
 	return rv;
 }
 uint64_t
-sqsh__inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number) {
+sqsh_inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number) {
 	int rv;
 	uint64_t inode_ref = 0;
 	if (inode_number - 1 > map->inode_count) {
@@ -83,7 +83,7 @@ sqsh__inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number) {
 }
 
 int
-sqsh__inode_map_set(
+sqsh_inode_map_set(
 		struct SqshInodeMap *map, uint64_t inode_number, uint64_t inode_ref) {
 	uint64_t old_value;
 	if (inode_number - 1 > map->inode_count) {

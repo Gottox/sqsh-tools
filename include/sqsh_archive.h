@@ -71,6 +71,38 @@ size_t sqsh_trailing_size(const struct SqshTrailingContext *context);
 const uint8_t *sqsh_trailing_data(const struct SqshTrailingContext *context);
 
 ////////////////////////////////////////
+// archive/inode_map.c
+
+struct SqshInodeMap;
+
+/**
+ * @internal
+ * @memberof SqshInodeMap
+ * @brief Gets the inode reference for a given inode number.
+ *
+ * @param[in] map The context to use.
+ * @param[in] inode_number The inode number to get the reference for.
+ *
+ * @return The inode reference on success, a negative value on error.
+ */
+SQSH_NO_UNUSED uint64_t
+sqsh_inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number);
+
+/**
+ * @internal
+ * @memberof SqshInodeMap
+ * @brief Sets the inode reference for a given inode number.
+ *
+ * @param[in] map The context to use.
+ * @param[in] inode_number The inode number to set the reference for.
+ * @param[in] inode_ref The inode reference to set.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+SQSH_NO_UNUSED int sqsh_inode_map_set(
+		struct SqshInodeMap *map, uint64_t inode_number, uint64_t inode_ref);
+
+////////////////////////////////////////
 // archive/superblock_context.c
 
 /**
