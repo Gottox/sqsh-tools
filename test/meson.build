@@ -1,7 +1,7 @@
-#add_languages('cpp')
+add_languages('cpp')
 
 sqsh_test = [
-    #'cpp-test.cpp',
+    'cpp-test.cpp',
     'file/file_reader.c',
     'file/file_iterator.c',
     'fuzzer_repro.c',

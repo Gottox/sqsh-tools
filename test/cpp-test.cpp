@@ -39,7 +39,8 @@ extern "C" {
 #include "common.h"
 #include "test.h"
 }
-#include <sqsh_archive_private.h>
+#include <sqsh_archive.h>
+#include <sqsh_error.h>
 #include <sqsh_directory.h>
 #include <sqsh_mapper.h>
 #include <squashfs_image.h>

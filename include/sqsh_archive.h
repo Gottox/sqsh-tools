@@ -482,30 +482,32 @@ int sqsh_compression_options_free(struct SqshCompressionOptions *context);
 ////////////////////////////////////////
 // archive/archive.c
 
-/**
- * @brief The SqshConfig struct contains all the configuration options for
- * a sqsh session.
- */
-struct SqshConfig {
-/**
- * TODO
- */
 #define SQSH_CONFIG_FIELDS \
 	uint64_t source_size; \
 	const struct SqshMemoryMapperImpl *source_mapper; \
 	int mapper_block_size; \
 	int mapper_lru_size; \
 	int compression_lru_size;
+/**
+ * @internal
+ */
+struct SqshConfig__internal {
+	SQSH_CONFIG_FIELDS
+	char _end;
+};
+
+/**
+ * @brief The SqshConfig struct contains all the configuration options for
+ * a sqsh session.
+ */
+struct SqshConfig {
 	SQSH_CONFIG_FIELDS
 	/**
 	 * @brief padding to ensure that the size of the struct 128 bytes.
 	 */
-	uint8_t _padding
-			[128 -
-			 offsetof(
-					 struct { SQSH_CONFIG_FIELDS char z; }, z)];
-#undef SQSH_CONFIG_FIELDS
+	uint8_t _padding[128 - offsetof(struct SqshConfig__internal, _end)];
 };
+#undef SQSH_CONFIG_FIELDS
 
 struct SqshArchive;
 struct SqshXattrTable;
