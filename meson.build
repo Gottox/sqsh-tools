@@ -14,13 +14,13 @@ project(
     ],
 )
 
-threads = dependency('threads', required: get_option('threads'))
-curl = dependency('libcurl', required: get_option('curl'))
-fuse = dependency('fuse3', required: get_option('fuse'))
-lz4 = dependency('liblz4', required: get_option('lz4'))
-lzma = dependency('liblzma', required: get_option('lzma'))
-zlib = dependency('zlib', required: get_option('zlib'))
-zstd = dependency('libzstd', required: get_option('zstd'))
+threads_dep = dependency('threads', required: get_option('threads'))
+curl_dep = dependency('libcurl', required: get_option('curl'))
+fuse_dep = dependency('fuse3', required: get_option('fuse'))
+lz4_dep = dependency('liblz4', required: get_option('lz4'))
+lzma_dep = dependency('liblzma', required: get_option('lzma'))
+zlib_dep = dependency('zlib', required: get_option('zlib'))
+zstd_dep = dependency('libzstd', required: get_option('zstd'))
 
 subdir('include')
 

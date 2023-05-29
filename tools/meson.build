@@ -21,13 +21,13 @@ foreach src : tool_sources
     tools += {tool_name: tool}
 endforeach
 
-if fuse.found()
+if fuse_dep.found()
     tool = executable(
         'sqshfs',
         'fs.c',
         c_args: c_args,
         install: not meson.is_subproject(),
-        dependencies: [libsqsh_dep, fuse],
+        dependencies: [libsqsh_dep, fuse_dep],
     )
     tools += {'sqshfs': tool}
 endif

@@ -57,32 +57,32 @@ libsqsh_headers_private = ['utils/utils.h']
 libsqsh_dependencies = []
 
 c_args = []
-if threads.found()
-    libsqsh_dependencies += threads
+if threads_dep.found()
+    libsqsh_dependencies += threads_dep
 endif
 
-if curl.found()
-    libsqsh_dependencies += curl
+if curl_dep.found()
+    libsqsh_dependencies += curl_dep
     c_args += '-DCONFIG_CURL'
 endif
 
-if zlib.found()
-    libsqsh_dependencies += zlib
+if zlib_dep.found()
+    libsqsh_dependencies += zlib_dep
     c_args += '-DCONFIG_ZLIB'
 endif
 
-if lz4.found()
-    libsqsh_dependencies += lz4
+if lz4_dep.found()
+    libsqsh_dependencies += lz4_dep
     c_args += '-DCONFIG_LZ4'
 endif
 
-if lzma.found()
-    libsqsh_dependencies += lzma
+if lzma_dep.found()
+    libsqsh_dependencies += lzma_dep
     c_args += '-DCONFIG_LZMA'
 endif
 
-if zstd.found()
-    libsqsh_dependencies += zstd
+if zstd_dep.found()
+    libsqsh_dependencies += zstd_dep
     c_args += '-DCONFIG_ZSTD'
 endif
 
