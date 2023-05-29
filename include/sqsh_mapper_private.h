@@ -421,7 +421,7 @@ size_t sqsh__map_iterator_block_size(const struct SqshMapIterator *iterator);
 
 /**
  * @internal
- * @memberof SqshMapIterator 
+ * @memberof SqshMapIterator
  * @brief returns the address of the current chunk.
  *
  * @param[in] iterator The SqshMapIterator instance.
@@ -431,7 +431,7 @@ sqsh_index_t sqsh__map_iterator_address(const struct SqshMapIterator *iterator);
 
 /**
  * @internal
- * @memberof SqshMapIterator 
+ * @memberof SqshMapIterator
  * @brief returns the size of the current chunk.
  *
  * @param[in] iterator The SqshMapIterator instance.
@@ -441,7 +441,7 @@ size_t sqsh__map_iterator_size(const struct SqshMapIterator *iterator);
 
 /**
  * @internal
- * @memberof SqshMapIterator 
+ * @memberof SqshMapIterator
  * @brief returns the index of the current chunk.
  *
  * @param[in] iterator The SqshMapIterator instance.

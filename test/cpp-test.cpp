@@ -40,8 +40,8 @@ extern "C" {
 #include "test.h"
 }
 #include <sqsh_archive.h>
-#include <sqsh_error.h>
 #include <sqsh_directory.h>
+#include <sqsh_error.h>
 #include <sqsh_mapper.h>
 #include <squashfs_image.h>
 #include <stdint.h>

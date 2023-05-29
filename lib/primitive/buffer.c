@@ -89,8 +89,8 @@ sqsh__buffer_append(
 		struct SqshBuffer *buffer, const uint8_t *source, const size_t size) {
 	int rv = 0;
 	uint8_t *additional_buffer;
-	
-	if(size <= 0) {
+
+	if (size <= 0) {
 		return 0;
 	}
 

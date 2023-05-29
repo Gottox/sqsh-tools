@@ -226,7 +226,7 @@ static void
 reader_initial_advance_2(void) {
 	int rv;
 	struct SqshReader reader = {0};
-	struct TestIterator iter = { .data = "ABCD", .remaining = 10 };
+	struct TestIterator iter = {.data = "ABCD", .remaining = 10};
 
 	rv = sqsh__reader_init(&reader, &impl, &iter);
 	assert(rv == 0);
@@ -245,7 +245,7 @@ static void
 reader_error_1(void) {
 	int rv;
 	struct SqshReader reader = {0};
-	struct TestIterator iter = { .data = "AB", .remaining = 10 };
+	struct TestIterator iter = {.data = "AB", .remaining = 10};
 
 	rv = sqsh__reader_init(&reader, &impl, &iter);
 	assert(rv == 0);
@@ -272,7 +272,7 @@ static void
 reader_map_into_buffer(void) {
 	int rv;
 	struct SqshReader reader = {0};
-	struct TestIterator iter = { .data = "0123456789", .remaining = 2 };
+	struct TestIterator iter = {.data = "0123456789", .remaining = 2};
 
 	rv = sqsh__reader_init(&reader, &impl, &iter);
 	assert(rv == 0);
@@ -298,7 +298,7 @@ static void
 reader_map_into_buffer_twice(void) {
 	int rv;
 	struct SqshReader reader = {0};
-	struct TestIterator iter = { .data = "0123456789", .remaining = 3 };
+	struct TestIterator iter = {.data = "0123456789", .remaining = 3};
 
 	rv = sqsh__reader_init(&reader, &impl, &iter);
 	assert(rv == 0);

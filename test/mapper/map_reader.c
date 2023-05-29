@@ -165,7 +165,7 @@ initial_advance(void) {
 	const uint8_t *data = sqsh__map_reader_data(&cursor);
 	assert(3 == sqsh__map_reader_size(&cursor));
 	assert(memcmp(data, "IS ", 3) == 0);
-	//assert(data == &buffer[5]);
+	// assert(data == &buffer[5]);
 
 	sqsh__map_reader_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);

@@ -122,7 +122,7 @@
 	UINT32_BYTES(count), UINT32_BYTES(start), UINT32_BYTES(inode_number)
 #define DIRECTORY_ENTRY(offset, inode_offset, type, name_size) \
 	UINT16_BYTES(offset), UINT16_BYTES(inode_offset), UINT16_BYTES(type), \
-			UINT16_BYTES((name_size) - 1)
+			UINT16_BYTES((name_size)-1)
 
 #define ZLIB_ABCD \
 	0x78, 0x9c, 0x4b, 0x4c, 0x4a, 0x4e, 0x01, 0x00, 0x03, 0xd8, 0x01, 0x8b

@@ -39,6 +39,7 @@
 #include "sqsh_tree_private.h"
 
 #include <errno.h>
+#include <fcntl.h>
 #include <libgen.h>
 #include <limits.h>
 #include <stdio.h>
@@ -47,7 +48,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <utime.h>
-#include <fcntl.h>
 
 bool do_chown = false;
 bool verbose = false;
@@ -285,7 +285,6 @@ extract(const char *filename, struct SqshInode *inode,
 	if (rv < 0) {
 		goto out;
 	}
-
 
 	if (type != SQSH_INODE_TYPE_SYMLINK) {
 		times.actime = times.modtime = sqsh_inode_modified_time(inode);
