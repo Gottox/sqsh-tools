@@ -65,13 +65,17 @@ out:
 }
 uint64_t
 sqsh__inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number) {
+	int rv;
 	uint64_t inode_ref = 0;
 	if (inode_number == 0) {
 		return 0;
 	}
 	if (map->export_table != NULL) {
-		return sqsh_export_table_resolve_inode(
+		rv = sqsh_export_table_resolve_inode(
 				map->export_table, inode_number, &inode_ref);
+		if (rv < 0) {
+			return 0;
+		}
 	} else if (inode_number - 1 > map->inode_count) {
 		return -SQSH_ERROR_OUT_OF_BOUNDS;
 	} else {
