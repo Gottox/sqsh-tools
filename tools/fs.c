@@ -60,7 +60,7 @@ struct Sqshfs {
 	pthread_mutex_t lock;
 	struct SqshArchive *archive;
 	bool debug;
-	atomic_uint_fast64_t *inode_map;
+	struct SqshInodeMap *inode_map;
 };
 
 struct SqshfsOptions {
@@ -110,33 +110,15 @@ inode_fuse_to_sqsh(fuse_ino_t inode) {
 
 static uint64_t
 sqshfs_context_inode_ref(struct Sqshfs *context, fuse_ino_t fuse_inode) {
-	int rv = 0;
-	uint64_t inode_ref = 0;
 	uint64_t sqsh_inode = inode_fuse_to_sqsh(fuse_inode);
 	struct SqshArchive *archive = context->archive;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 
 	if (fuse_inode == FUSE_ROOT_ID) {
 		return sqsh_superblock_inode_root_ref(superblock);
-	} else if (context->inode_map[sqsh_inode - 1] != 0) {
-		return context->inode_map[sqsh_inode - 1];
 	}
 
-	if (sqsh_superblock_has_export_table(superblock) == false) {
-		return 0;
-	}
-	struct SqshExportTable *export_table;
-	rv = sqsh_archive_export_table(archive, &export_table);
-	if (rv < 0) {
-		return 0;
-	}
-
-	rv = sqsh_export_table_resolve_inode(export_table, sqsh_inode, &inode_ref);
-	if (rv < 0) {
-		return 0;
-	}
-
-	return inode_ref;
+	return sqsh_inode_map_get(context->inode_map, sqsh_inode);
 }
 
 static struct SqshfsFileHandle *
@@ -288,6 +270,13 @@ sqshfs_lookup(fuse_req_t req, fuse_ino_t parent, const char *name) {
 		goto out;
 	}
 
+	rv = sqsh_inode_map_set(context->inode_map, inode_number, inode_ref);
+	if (rv < 0) {
+		dbg("sqshfs_lookup: sqsh__inode_map_set failed\n");
+		fuse_reply_err(req, EIO);
+		goto out;
+	}
+
 	struct fuse_entry_param entry = {
 			.ino = inode_sqsh_to_fuse(inode_number),
 			.attr_timeout = 1.0,
@@ -297,8 +286,6 @@ sqshfs_lookup(fuse_req_t req, fuse_ino_t parent, const char *name) {
 	sqshfs_inode_to_stat(inode, NULL, &entry.attr);
 	dbg("sqshfs_lookup: reply success. inode: %i\n", inode_number);
 	fuse_reply_entry(req, &entry);
-
-	context->inode_map[inode_number - 1] = inode_ref;
 
 out:
 	sqsh_inode_free(inode);
@@ -754,13 +741,9 @@ main(int argc, char *argv[]) {
 		goto out;
 	}
 
-	const struct SqshSuperblock *superblock =
-			sqsh_archive_superblock(sqshfs_context.archive);
-	const uint64_t inode_count = sqsh_superblock_inode_count(superblock);
-
-	sqshfs_context.inode_map =
-			calloc(inode_count, sizeof(atomic_uint_fast64_t));
-	if (sqshfs_context.inode_map == NULL) {
+	rv = sqsh_archive_inode_map(sqshfs_context.archive, &sqshfs_context.inode_map);
+	if (rv < 0) {
+		sqsh_perror(rv, "sqsh_archive_inode_map");
 		rv = EXIT_FAILURE;
 		goto out;
 	}
@@ -797,7 +780,6 @@ out:
 	}
 	free(fuse_options.mountpoint);
 	fuse_opt_free_args(&args);
-	free(sqshfs_context.inode_map);
 	sqsh_archive_free(sqshfs_context.archive);
 
 	return rv;
