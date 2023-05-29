@@ -124,6 +124,8 @@ sqsh_error_str(int error_code) {
 		return "Corrupted inode";
 	case SQSH_ERROR_INTERNAL:
 		return "Internal error";
+	case SQSH_ERROR_INODE_MAP_IS_INCONSISTENT:
+		return "Inode map is inconsistent";
 	}
 	snprintf(err_str, sizeof(err_str), UNKOWN_ERROR_FORMAT, abs(error_code));
 	return err_str;

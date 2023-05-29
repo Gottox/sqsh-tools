@@ -42,6 +42,8 @@ int
 sqsh__inode_map_init(struct SqshInodeMap *map, struct SqshArchive *archive) {
 	int rv = 0;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
+	const uint32_t inode_count = sqsh_superblock_inode_count(superblock);
+	map->inode_count = inode_count;
 
 	if (sqsh_superblock_has_export_table(superblock)) {
 		rv = sqsh_archive_export_table(archive, &map->export_table);
@@ -50,11 +52,8 @@ sqsh__inode_map_init(struct SqshInodeMap *map, struct SqshArchive *archive) {
 		}
 		map->inode_refs = NULL;
 	} else {
-		const uint32_t inode_count = sqsh_superblock_inode_count(superblock);
-
 		map->export_table = NULL;
 		map->inode_refs = calloc(inode_count, sizeof(atomic_uint_fast64_t));
-		map->inode_count = inode_count;
 		if (map->inode_refs == NULL) {
 			rv = -SQSH_ERROR_MALLOC_FAILED;
 			goto out;
@@ -67,17 +66,16 @@ uint64_t
 sqsh__inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number) {
 	int rv;
 	uint64_t inode_ref = 0;
-	if (inode_number == 0) {
+	if (inode_number - 1 > map->inode_count) {
+		return -SQSH_ERROR_OUT_OF_BOUNDS;
+	} else if (inode_number == 0) {
 		return 0;
-	}
-	if (map->export_table != NULL) {
+	} else if (map->export_table != NULL) {
 		rv = sqsh_export_table_resolve_inode(
 				map->export_table, inode_number, &inode_ref);
 		if (rv < 0) {
 			return 0;
 		}
-	} else if (inode_number - 1 > map->inode_count) {
-		return -SQSH_ERROR_OUT_OF_BOUNDS;
 	} else {
 		inode_ref = atomic_load(&map->inode_refs[inode_number - 1]);
 	}
@@ -87,15 +85,19 @@ sqsh__inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number) {
 int
 sqsh__inode_map_set(
 		struct SqshInodeMap *map, uint64_t inode_number, uint64_t inode_ref) {
-	if (inode_number == 0) {
-		return 0;
-	}
-	if (map->export_table != NULL) {
-		return 0;
-	} else if (inode_number - 1 > map->inode_count) {
+	uint64_t old_value;
+	if (inode_number - 1 > map->inode_count) {
 		return -SQSH_ERROR_OUT_OF_BOUNDS;
+	} else if (inode_number == 0) {
+		return 0;
+	} else if (map->export_table != NULL) {
+		return 0;
 	} else {
-		atomic_store(&map->inode_refs[inode_number - 1], inode_ref);
+		_Atomic(uint64_t) *obj = &map->inode_refs[inode_number - 1];
+		old_value = atomic_exchange(obj, inode_ref);
+		if (old_value != 0 && old_value != inode_ref) {
+			return -SQSH_ERROR_INODE_MAP_IS_INCONSISTENT;
+		}
 		return 0;
 	}
 }
