@@ -1,4 +1,4 @@
-add_languages('cpp')
+add_languages('cpp', native: false)
 
 sqsh_test = [
     'cpp-test.cpp',
