@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         inode_cache.c
+ * @file         inode_map.c
  */
 
 #include "../../include/sqsh_archive_private.h"
@@ -39,24 +39,23 @@
 #include <stdlib.h>
 
 int
-sqsh__inode_cache_init(
-		struct SqshInodeCache *cache, struct SqshArchive *archive) {
+sqsh__inode_map_init(struct SqshInodeMap *map, struct SqshArchive *archive) {
 	int rv = 0;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 
 	if (sqsh_superblock_has_export_table(superblock)) {
-		rv = sqsh_archive_export_table(archive, &cache->export_table);
+		rv = sqsh_archive_export_table(archive, &map->export_table);
 		if (rv < 0) {
 			goto out;
 		}
-		cache->inode_refs = NULL;
+		map->inode_refs = NULL;
 	} else {
 		const uint32_t inode_count = sqsh_superblock_inode_count(superblock);
 
-		cache->export_table = NULL;
-		cache->inode_refs = calloc(inode_count, sizeof(atomic_uint_fast64_t));
-		cache->inode_count = inode_count;
-		if (cache->inode_refs == NULL) {
+		map->export_table = NULL;
+		map->inode_refs = calloc(inode_count, sizeof(atomic_uint_fast64_t));
+		map->inode_count = inode_count;
+		if (map->inode_refs == NULL) {
 			rv = -SQSH_ERROR_MALLOC_FAILED;
 			goto out;
 		}
@@ -65,42 +64,40 @@ out:
 	return rv;
 }
 uint64_t
-sqsh__inode_cache_get(
-		const struct SqshInodeCache *cache, uint64_t inode_number) {
+sqsh__inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number) {
 	uint64_t inode_ref = 0;
 	if (inode_number == 0) {
 		return 0;
 	}
-	if (cache->export_table != NULL) {
+	if (map->export_table != NULL) {
 		return sqsh_export_table_resolve_inode(
-				cache->export_table, inode_number, &inode_ref);
-	} else if(inode_number - 1 > cache->inode_count) {
+				map->export_table, inode_number, &inode_ref);
+	} else if (inode_number - 1 > map->inode_count) {
 		return -SQSH_ERROR_OUT_OF_BOUNDS;
 	} else {
-		inode_ref = atomic_load(&cache->inode_refs[inode_number - 1]);
+		inode_ref = atomic_load(&map->inode_refs[inode_number - 1]);
 	}
 	return inode_ref;
 }
 
 int
-sqsh__inode_cache_set(
-		struct SqshInodeCache *cache, uint64_t inode_number,
-		uint64_t inode_ref) {
+sqsh__inode_map_set(
+		struct SqshInodeMap *map, uint64_t inode_number, uint64_t inode_ref) {
 	if (inode_number == 0) {
 		return 0;
 	}
-	if (cache->export_table != NULL) {
+	if (map->export_table != NULL) {
 		return 0;
-	} else if(inode_number - 1 > cache->inode_count) {
+	} else if (inode_number - 1 > map->inode_count) {
 		return -SQSH_ERROR_OUT_OF_BOUNDS;
 	} else {
-		atomic_store(&cache->inode_refs[inode_number - 1], inode_ref);
+		atomic_store(&map->inode_refs[inode_number - 1], inode_ref);
 		return 0;
 	}
 }
 
 int
-sqsh__inode_cache_cleanup(struct SqshInodeCache *cache) {
-	free(cache->inode_refs);
+sqsh__inode_map_cleanup(struct SqshInodeMap *map) {
+	free(map->inode_refs);
 	return 0;
 }

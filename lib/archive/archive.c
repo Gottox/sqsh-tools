@@ -51,7 +51,7 @@ enum InitializedBitmap {
 	INITIALIZED_FRAGMENT_TABLE = 1 << 3,
 	INITIALIZED_DATA_COMPRESSION_MANAGER = 1 << 4,
 	INITIALIZED_METABLOCK_COMPRESSION_MANAGER = 1 << 5,
-	INITIALIZED_INODE_CACHE = 1 << 6,
+	INITIALIZED_INODE_MAP = 1 << 6,
 };
 
 static bool
@@ -90,7 +90,7 @@ sqsh__archive_init(
 		memset(&archive->config, 0, sizeof(struct SqshConfig));
 	}
 
-	// RECURSIVE is needed because: inode_cache may access the export_table
+	// RECURSIVE is needed because: inode_map may access the export_table
 	// during initialization.
 	rv = sqsh_mutex_init_recursive(&archive->lock);
 	if (rv < 0) {
@@ -311,22 +311,22 @@ out:
 }
 
 int
-sqsh_archive_inode_cache(
-		struct SqshArchive *archive, struct SqshInodeCache **inode_cache) {
+sqsh_archive_inode_map(
+		struct SqshArchive *archive, struct SqshInodeMap **inode_map) {
 	int rv = 0;
 
 	rv = sqsh_mutex_lock(&archive->lock);
 	if (rv < 0) {
 		goto out;
 	}
-	if (!(archive->initialized & INITIALIZED_INODE_CACHE)) {
-		rv = sqsh__inode_cache_init(&archive->inode_cache, archive);
+	if (!(archive->initialized & INITIALIZED_INODE_MAP)) {
+		rv = sqsh__inode_map_init(&archive->inode_map, archive);
 		if (rv < 0) {
 			goto out;
 		}
-		archive->initialized |= INITIALIZED_INODE_CACHE;
+		archive->initialized |= INITIALIZED_INODE_MAP;
 	}
-	*inode_cache = &archive->inode_cache;
+	*inode_map = &archive->inode_map;
 out:
 	sqsh_mutex_unlock(&archive->lock);
 	return rv;
@@ -401,8 +401,8 @@ sqsh__archive_cleanup(struct SqshArchive *archive) {
 	if (is_initialized(archive, INITIALIZED_METABLOCK_COMPRESSION_MANAGER)) {
 		sqsh__extract_manager_cleanup(&archive->metablock_extract_manager);
 	}
-	if (is_initialized(archive, INITIALIZED_INODE_CACHE)) {
-		sqsh__inode_cache_cleanup(&archive->inode_cache);
+	if (is_initialized(archive, INITIALIZED_INODE_MAP)) {
+		sqsh__inode_map_cleanup(&archive->inode_map);
 	}
 	sqsh__extractor_cleanup(&archive->data_compression);
 	sqsh__extractor_cleanup(&archive->metablock_compression);

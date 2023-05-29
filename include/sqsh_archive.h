@@ -511,7 +511,7 @@ struct SqshConfig {
 
 struct SqshArchive;
 struct SqshXattrTable;
-struct SqshInodeCache;
+struct SqshInodeMap;
 
 /**
  * @memberof SqshArchive
@@ -601,13 +601,13 @@ SQSH_NO_UNUSED int sqsh_archive_id_table(
  *
  * @param[in]  archive        The Sqsh instance to retrieve the inode cache
  *                            from.
- * @param[out] inode_cache    Pointer to a struct SqshInodeCache where the
+ * @param[out] inode_map      Pointer to a struct SqshInodeMap where the
  *                            inode cache will be stored.
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh_archive_inode_cache(
-		struct SqshArchive *archive, struct SqshInodeCache **inode_cache);
+SQSH_NO_UNUSED int sqsh_archive_inode_map(
+		struct SqshArchive *archive, struct SqshInodeMap **inode_map);
 
 /**
  * @memberof SqshArchive
