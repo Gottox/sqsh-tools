@@ -26,26 +26,26 @@ MESON_FLAGS += -Db_lundef=false
 MESON_FLAGS += -Dtest=true
 MESON_FLAGS += -Ddoc=internal
 #MESON_FLAGS += -Dfuzzer=true
-MESON_FLAGS += -Dfuzzer_timeout=1800
+MESON_FLAGS += -Dfuzzer_timeout=10
 MESON_FLAGS += -Dcurl=enabled
 MESON_FLAGS += -Dzlib=enabled
 MESON_FLAGS += -Dlz4=enabled
 MESON_FLAGS += -Dlzma=enabled
 MESON_FLAGS += -Dzstd=enabled
 MESON_FLAGS += -Dfuse=enabled
-#MESON_FLAGS += -Db_coverage=true
+MESON_FLAGS += -Db_coverage=true
 
 SANATIZE = 1
 
-CC = clang
+CC = gcc
 
 ifeq ($(PODMAN), 1)
 	W = podman run --rm -ti -v .:/host --device /dev/fuse --cap-add SYS_ADMIN gottox/sqsh-build:$(ARCH) \
 		env
-	BUILD_DIR = ./build_dir-podman
+	BUILD_DIR = ./build-podman
 else
 	W =
-	BUILD_DIR = ./build_dir
+	BUILD_DIR = ./build
 	ifeq ($(SANATIZE), 1)
 		MESON_FLAGS += -Db_sanitize=address,undefined
 	endif
