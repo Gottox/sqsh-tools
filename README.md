@@ -88,8 +88,3 @@ sqsh_archive_free(archive);
 * https://dr-emann.github.io/squashfs/
 * https://dr-emann.github.io/squashfs/squashfs.html
 * https://www.kernel.org/doc/Documentation/filesystems/squashfs.txt (useless)
-
-## Design principles
-
-* Stack located structures
-* usable in multithreaded applications
