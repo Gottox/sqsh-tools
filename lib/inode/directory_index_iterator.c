@@ -75,7 +75,6 @@ sqsh__directory_index_iterator_init(
 
 	iterator->next_offset = INODE_HEADER_SIZE;
 
-	// TODO: Move this block to a method of SqshInode
 	const struct SqshDataInodeDirectoryExt *xdir =
 			sqsh__data_inode_directory_ext(get_inode(iterator));
 	iterator->remaining_entries =

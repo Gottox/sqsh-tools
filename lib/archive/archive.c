@@ -156,7 +156,11 @@ get_data_segment_size(const struct SqshSuperblock *superblock) {
 	const uint64_t inode_table_start =
 			sqsh_superblock_inode_table_start(superblock);
 	uint64_t res;
-	// TODO: substract the size of the compression options block.
+	// BUG: This function does not return exact results. It may report values
+	// that are too large, as it does not take into account the size of the
+	// compression options. This is not a problem for the current implementation
+	// as this size is only used for finding upper limits for the extract
+	// manager.
 	if (SQSH_SUB_OVERFLOW(inode_table_start, SQSH_SIZEOF_SUPERBLOCK, &res)) {
 		return inode_table_start;
 	}
