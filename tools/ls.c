@@ -154,11 +154,11 @@ static int
 ls_item(struct SqshArchive *archive, const char *path,
 		struct SqshDirectoryIterator *iter) {
 	int rv = 0;
-	int len = 0;
 	struct SqshInode *entry_inode = NULL;
 	const char *name = sqsh_directory_iterator_name(iter);
 	const int name_size = sqsh_directory_iterator_name_size(iter);
-	size_t current_path_size = name_size + strlen(path ? path : "") + 2;
+	const size_t path_len = path ? strlen(path) : 0;
+	const size_t current_path_size = name_size + path_len + 2;
 	char *current_path = calloc(current_path_size, sizeof(char));
 
 	if (current_path == NULL) {
@@ -166,9 +166,8 @@ ls_item(struct SqshArchive *archive, const char *path,
 		goto out;
 	}
 	if (path != NULL) {
-		len = strlen(path);
-		strncpy(current_path, path, current_path_size - 1);
-		if (len > 0 && path[len - 1] != '/') {
+		memcpy(current_path, path, path_len);
+		if (path_len > 0 && path[path_len - 1] != '/') {
 			strncat(current_path, "/", 2);
 		}
 	}
