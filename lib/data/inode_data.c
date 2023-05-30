@@ -258,8 +258,10 @@ sqsh__data_inode_file_ext_xattr_idx(
 uint32_t
 sqsh__data_inode_file_ext_block_size_info(
 		const struct SqshDataInodeFileExt *file_ext, sqsh_index_t index) {
-	uint32_t *block_sizes = (uint32_t *)&file_ext[1];
-	return htole32(block_sizes[index]);
+	struct {
+		uint32_t b;
+	} SQSH_UNALIGNED *block_sizes = (void *)&file_ext[1];
+	return htole32(block_sizes[index].b);
 }
 
 const struct SqshDataInodeDirectory *
