@@ -216,8 +216,10 @@ sqsh__data_inode_file_size(const struct SqshDataInodeFile *file) {
 uint32_t
 sqsh__data_inode_file_block_size_info(
 		const struct SqshDataInodeFile *file, sqsh_index_t index) {
-	uint32_t *block_sizes = (uint32_t *)&file[1];
-	return htole32(block_sizes[index]);
+	struct {
+		uint32_t b;
+	} SQSH_UNALIGNED *block_sizes = (void *)&file[1];
+	return htole32(block_sizes[index].b);
 }
 
 uint64_t
