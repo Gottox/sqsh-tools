@@ -444,6 +444,7 @@ sqshfs_releasedir(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 	sqsh_inode_free(handle->inode);
 	sqsh_directory_iterator_free(handle->iterator);
 	free(handle);
+	fuse_reply_err(req, 0);
 }
 
 static void
@@ -485,6 +486,7 @@ sqshfs_release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 
 	sqsh_inode_free(handle->inode);
 	free(handle);
+	fuse_reply_err(req, 0);
 }
 
 static void
