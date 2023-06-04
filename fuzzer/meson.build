@@ -22,7 +22,7 @@ fuzzer = executable(
     fuzzer_src,
     c_args: fuzzer_c_args,
     link_args: fuzzer_link_args,
-    dependencies: libsqsh_dependency,
+    dependencies: libsqsh_dep,
 )
 
 test(

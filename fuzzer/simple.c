@@ -11,6 +11,8 @@
 #include "../include/sqsh_inode_private.h"
 #include <stdint.h>
 
+#define DEFAULT_CHUNK_SIZE 4096
+
 static int
 read_file(struct SqshDirectoryIterator *iter) {
 	struct SqshInode *inode = NULL;
@@ -27,8 +29,20 @@ read_file(struct SqshDirectoryIterator *iter) {
 		goto out;
 	}
 
-	size_t file_size = sqsh_inode_file_size(inode);
-	rv = sqsh_file_reader_advance(&file, 0, file_size);
+	size_t size = sqsh_inode_file_size(inode);
+	size_t chunk_size = 0;
+	for(; size > 0; size -= chunk_size) {
+		const size_t advance = chunk_size;
+		chunk_size = DEFAULT_CHUNK_SIZE;
+		if (chunk_size > size) {
+			chunk_size = size;
+		}
+		rv = sqsh_file_reader_advance(&file, advance, chunk_size);
+		if (rv < 0) {
+			goto out;
+		}
+	}
+
 	if (rv < 0) {
 		goto out;
 	}
