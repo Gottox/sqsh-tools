@@ -37,7 +37,9 @@
 #include "../../include/sqsh_error.h"
 #include "../utils/utils.h"
 
+#ifdef __linux__
 #include <alloca.h>
+#endif
 
 #include "../../include/sqsh_data_private.h"
 #include "../../include/sqsh_inode_private.h"

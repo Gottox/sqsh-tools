@@ -40,7 +40,6 @@
 #include <stdatomic.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/sysinfo.h>
 
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_file_private.h"

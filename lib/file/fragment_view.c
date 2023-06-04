@@ -39,7 +39,9 @@
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_inode_private.h"
 #include "../utils/utils.h"
+#ifdef __linux__
 #include <alloca.h>
+#endif
 
 static int
 apply_fragment(
