@@ -7,7 +7,8 @@ tmp=$3
 mkdir -p "$tmp"
 echo a > "$tmp/a"
 seq 1 1050000 | tr -cd "\n" | tr '\n' b > "$tmp/b"
-mkdir "$tmp/large_dir"
+mkdir -p "$tmp/large_dir"
+$SETFATTR -n user.force_extended -v true "$tmp/large_dir"
 seq 1 1050 | sed "s#.*#$tmp/large_dir/&#" | xargs touch
 $SETFATTR -n user.foo -v 1234567891234567891234567890001234567890 "$tmp/a"
 $SETFATTR -n user.bar -v 1234567891234567891234567890001234567890 "$tmp/b"
