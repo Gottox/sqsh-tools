@@ -39,6 +39,43 @@
 #include "../../include/sqsh_inode_private.h"
 #include "../utils/utils.h"
 
+static uint64_t
+get_upper_limit(const struct SqshSuperblock *superblock) {
+	if (sqsh_superblock_has_fragments(superblock)) {
+		return sqsh_superblock_fragment_table_start(superblock);
+	} else if (sqsh_superblock_has_export_table(superblock)) {
+		return sqsh_superblock_export_table_start(superblock);
+	} else {
+		return sqsh_superblock_id_table_start(superblock);
+	}
+}
+
+static int
+load_metablock(
+		struct SqshDirectoryIterator *iterator, const uint64_t outer_offset,
+		uint32_t inner_offset) {
+	struct SqshInode *inode = iterator->inode;
+	struct SqshArchive *archive = inode->archive;
+	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
+
+	uint64_t start_address = sqsh_superblock_directory_table_start(superblock);
+	const uint64_t upper_limit = get_upper_limit(superblock);
+	if (SQSH_ADD_OVERFLOW(start_address, outer_offset, &start_address)) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+
+	if (SQSH_SUB_OVERFLOW(
+				sqsh_inode_file_size(inode), 3, &iterator->remaining_size)) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+
+	iterator->next_offset = inner_offset % SQSH_METABLOCK_BLOCK_SIZE;
+	iterator->remaining_entries = 0;
+
+	return sqsh__metablock_reader_init(
+			&iterator->metablock, archive, start_address, upper_limit);
+}
+
 static int
 directory_iterator_index_lookup(
 		struct SqshDirectoryIterator *iterator, const char *name,
@@ -47,11 +84,13 @@ directory_iterator_index_lookup(
 	struct SqshDirectoryIndexIterator index_iterator = {0};
 	struct SqshInode *inode = iterator->inode;
 	const uint64_t inode_ref = sqsh_inode_ref(inode);
+	uint32_t start = 0;
+	uint32_t index = 0;
 
 	rv = sqsh__directory_index_iterator_init(
 			&index_iterator, inode->archive, inode_ref);
 	if (rv < 0) {
-		return rv;
+		goto out;
 	}
 	while ((rv = sqsh__directory_index_iterator_next(&index_iterator)) > 0) {
 		const char *index_name =
@@ -64,20 +103,17 @@ directory_iterator_index_lookup(
 					SQSH_MIN(index_name_size, name_len + 1)) < 0) {
 			break;
 		}
-
-		const uint32_t index_offset =
-				sqsh__directory_index_iterator_index(&index_iterator);
-		if (SQSH_ADD_OVERFLOW(
-					iterator->next_offset, index_offset,
-					&iterator->next_offset)) {
-			return -SQSH_ERROR_INTEGER_OVERFLOW;
-		}
+		start = sqsh__directory_index_iterator_start(&index_iterator);
+		index = sqsh__directory_index_iterator_index(&index_iterator);
 	}
+	sqsh__metablock_reader_cleanup(&iterator->metablock);
+	rv = load_metablock(iterator, start, index);
 	iterator->remaining_entries = 0;
 	if (rv < 0) {
-		return rv;
+		goto out;
 	}
-	rv = sqsh__directory_index_iterator_cleanup(&index_iterator);
+out:
+	sqsh__directory_index_iterator_cleanup(&index_iterator);
 	return rv;
 }
 
@@ -121,50 +157,23 @@ sqsh_directory_iterator_lookup(
 	return -SQSH_ERROR_NO_SUCH_FILE;
 }
 
-static uint64_t
-get_upper_limit(const struct SqshSuperblock *superblock) {
-	if (sqsh_superblock_has_fragments(superblock)) {
-		return sqsh_superblock_fragment_table_start(superblock);
-	} else if (sqsh_superblock_has_export_table(superblock)) {
-		return sqsh_superblock_export_table_start(superblock);
-	} else {
-		return sqsh_superblock_id_table_start(superblock);
-	}
-}
-
 int
 sqsh__directory_iterator_init(
 		struct SqshDirectoryIterator *iterator, struct SqshInode *inode) {
 	int rv = 0;
-	struct SqshArchive *archive = inode->archive;
-	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 
 	if (sqsh_inode_type(inode) != SQSH_INODE_TYPE_DIRECTORY) {
 		return -SQSH_ERROR_NOT_A_DIRECTORY;
 	}
 
+	iterator->inode = inode;
+
 	const uint64_t outer_offset = sqsh_inode_directory_block_start(inode);
 	const uint32_t inner_offset = sqsh_inode_directory_block_offset(inode);
-	uint64_t start_address = sqsh_superblock_directory_table_start(superblock);
-	const uint64_t upper_limit = get_upper_limit(superblock);
-	if (SQSH_ADD_OVERFLOW(start_address, outer_offset, &start_address)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
-
-	if (SQSH_SUB_OVERFLOW(
-				sqsh_inode_file_size(inode), 3, &iterator->remaining_size)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
-
-	rv = sqsh__metablock_reader_init(
-			&iterator->metablock, archive, start_address, upper_limit);
+	rv = load_metablock(iterator, outer_offset, inner_offset);
 	if (rv < 0) {
 		return rv;
 	}
-
-	iterator->next_offset = inner_offset;
-	iterator->inode = inode;
-	iterator->remaining_entries = 0;
 
 	return rv;
 }
