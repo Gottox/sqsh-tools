@@ -117,21 +117,6 @@ SQSH_NO_UNUSED int sqsh__directory_index_iterator_init(
 /**
  * @internal
  * @memberof SqshDirectoryIndexIterator
- * @brief Creates a new iterator for a directory index
- *
- * @param[in] inode_ref  The inode ref for the directory to iterate over
- * @param[in] sqsh       The sqsh context
- * @param[out] err       Pointer to an int where the error code will be stored
- *
- * @return The newly created iterator on success, NULL on error
- */
-SQSH_NO_UNUSED
-struct SqshDirectoryIndexIterator *sqsh__directory_index_iterator_new(
-		uint64_t inode_ref, struct SqshArchive *sqsh, int *err);
-
-/**
- * @internal
- * @memberof SqshDirectoryIndexIterator
  * @brief Advances the iterator to the next entry in the directory index
  *
  * @param[in] iterator The iterator to advance
@@ -199,18 +184,6 @@ const char *sqsh__directory_index_iterator_name(
  * @return 0 on success, a negative value on error.
  */
 int sqsh__directory_index_iterator_cleanup(
-		struct SqshDirectoryIndexIterator *iterator);
-
-/**
- * @internal
- * @memberof SqshDirectoryIndexIterator
- * @brief Frees the resources used by the given directory index iterator.
- *
- * @param iterator The iterator to free.
- *
- * @return 0 on success, a negative value on error.
- */
-int sqsh__directory_index_iterator_free(
 		struct SqshDirectoryIndexIterator *iterator);
 
 #ifdef __cplusplus
