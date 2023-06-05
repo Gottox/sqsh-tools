@@ -146,7 +146,13 @@ sqsh__map_manager_get(
 
 	if (*target == NULL) {
 		struct SqshMapSlice mapping = {0};
+		sqsh_mutex_unlock(&manager->lock);
 		rv = load_mapping(&mapping, manager, index, span);
+		if (rv < 0) {
+			goto out;
+		}
+
+		rv = sqsh_mutex_lock(&manager->lock);
 		if (rv < 0) {
 			goto out;
 		}

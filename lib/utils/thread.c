@@ -59,7 +59,6 @@ sqsh_mutex_init_recursive(sqsh_mutex_t *mutex) {
 	}
 
 	pthread_mutexattr_settype(&mutex_attr, PTHREAD_MUTEX_RECURSIVE);
-	pthread_mutexattr_destroy(&mutex_attr);
 
 	rv = pthread_mutex_init(mutex, &mutex_attr);
 	if (rv != 0) {

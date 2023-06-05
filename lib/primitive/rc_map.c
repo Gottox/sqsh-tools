@@ -139,9 +139,11 @@ sqsh__rc_map_set(
 
 	target = get_element(array, index);
 
+	// If the element is already in the array, cleanup the new data and
+	// retain the old.
 	if (sqsh__rc_map_is_empty(array, index) == false) {
 		array->cleanup(data);
-		return NULL;
+		return sqsh__rc_map_retain(array, &index);
 	}
 
 	memcpy(target, data, array->element_size);
