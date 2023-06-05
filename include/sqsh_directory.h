@@ -141,8 +141,12 @@ SQSH_NO_UNUSED struct SqshInode *sqsh_directory_iterator_inode_load(
 
 /**
  * @memberof SqshDirectoryIterator
- * @brief Retrieves the name of the current entry. Note that the name is not
- * null-terminated.
+ * @brief Retrieves the name of the current entry.
+ *
+ * The returned pointer is allocated internally and only valid until the next
+ * call of sqsh_directory_iterator_next(). It must not be freed. The returned
+ * string is not 0 terminated. Use sqsh_directory_iterator_name_size() to get
+ * the size of the value.
  *
  * @param[in] iterator The iterator to use.
  *
@@ -150,24 +154,29 @@ SQSH_NO_UNUSED struct SqshInode *sqsh_directory_iterator_inode_load(
  */
 const char *
 sqsh_directory_iterator_name(const struct SqshDirectoryIterator *iterator);
+
 /**
  * @memberof SqshDirectoryIterator
  * @brief creates a heap allocated copy of the name of the current entry.
- * The caller is responsible for freeing the memory.
+ *
+ * The caller is responsible for freeing the memory. The returned string is 0
+ * terminated.
  *
  * @param[in]  iterator    The iterator to use.
  *
- * @return The target of a symbolic link, NULL if the allocation fails.
+ * @return The name of the current entry.
  */
 SQSH_NO_UNUSED char *
 sqsh_directory_iterator_name_dup(const struct SqshDirectoryIterator *iterator);
+
 /**
  * @memberof SqshDirectoryIterator
  * @brief Frees the resources used by a directory iterator.
  *
  * @param[in] iterator The iterator to free.
  *
- * @return 0 on success, a negative value on error.
+ * @return The file name of the current directory entry, NULL if the allocation
+ * fails. The user is responsible for freeing the memory.
  */
 int sqsh_directory_iterator_free(struct SqshDirectoryIterator *iterator);
 

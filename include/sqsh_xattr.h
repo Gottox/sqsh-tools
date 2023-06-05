@@ -104,7 +104,8 @@ bool sqsh_xattr_iterator_is_indirect(struct SqshXattrIterator *iterator);
  *
  * @param[in] iterator The iterator to use.
  *
- * @return The prefix of the current xattr.
+ * @return The null terminated prefix of the current xattr. The returned pointer
+ * is staticly allocated and must not be freed.
  */
 const char *sqsh_xattr_iterator_prefix(struct SqshXattrIterator *iterator);
 
@@ -121,6 +122,10 @@ uint16_t sqsh_xattr_iterator_prefix_size(struct SqshXattrIterator *iterator);
 /**
  * @memberof SqshXattrIterator
  * @brief Retrieves the name of the current xattr.
+ *
+ * The returned pointer is allocated internally and only valid until the next
+ * call to sqsh_xattr_iterator_next(). It must not be freed. The string is not 0
+ * terminated. Use sqsh_xattr_iterator_name_size() to get the size of the name.
  *
  * @param[in] iterator The iterator to use.
  *
@@ -140,7 +145,8 @@ uint16_t sqsh_xattr_iterator_name_size(struct SqshXattrIterator *iterator);
 
 /**
  * @memberof SqshXattrIterator
- * @brief Compares the full name of the current xattr with a given name.
+ * @brief Compares the full name of the current xattr with a given 0-terminated
+ * name.
  *
  * @param[in] iterator The iterator to use.
  * @param[in] name     The name to compare with.
@@ -157,10 +163,13 @@ SQSH_NO_UNUSED int sqsh_xattr_iterator_fullname_cmp(
  * @brief creates a heap allocated copy of the full name of the current entry.
  * The caller is responsible for freeing the memory.
  *
+ * The user is responsible for freeing the memory. The returned string is 0
+ * terminated.
+ *
  * @param[in]  iterator        The iterator to use.
  *
  * @return The full name of the current xattr on success, NULL if the allocation
- * fails
+ * fails.
  */
 SQSH_NO_UNUSED char *
 sqsh_xattr_iterator_fullname_dup(struct SqshXattrIterator *iterator);
@@ -170,10 +179,14 @@ sqsh_xattr_iterator_fullname_dup(struct SqshXattrIterator *iterator);
  * @brief creates a heap allocated copy of the value of the current entry.
  * The caller is responsible for freeing the memory.
  *
+ * The user is responsible for freeing the memory. The returned string is 0
+ * terminated, but may contain binary data. Use sqsh_xattr_iterator_value_size()
+ * to get the size of the value.
+ *
  * @param[in]  iterator    The iterator to use.
  *
  * @return The value of the current xattr on success, NULL if the allocation
- * fails
+ * fails.
  */
 SQSH_NO_UNUSED char *
 sqsh_xattr_iterator_value_dup(struct SqshXattrIterator *iterator);
@@ -182,9 +195,16 @@ sqsh_xattr_iterator_value_dup(struct SqshXattrIterator *iterator);
  * @memberof SqshXattrIterator
  * @brief Retrieves the value of the current xattr.
  *
+ * The returned pointer is allocated internally and only valid until the next
+ * call to sqsh_xattr_iterator_next(). It must not be freed. The string is not 0
+ * terminated. Use sqsh_xattr_iterator_value_size() to get the size of the
+ * value.
+ *
  * @param[in] iterator The iterator to use.
  *
- * @return The value of the current xattr.
+ * @return The value of the current xattr. The returned pointer is allocated
+ * internally and only valid until the next call to sqsh_xattr_iterator_next().
+ * It must not be freed.
  */
 const char *sqsh_xattr_iterator_value(struct SqshXattrIterator *iterator);
 
