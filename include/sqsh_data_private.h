@@ -313,9 +313,6 @@ struct SQSH_UNALIGNED SqshDataMetablock;
 int
 sqsh__data_metablock_is_compressed(const struct SqshDataMetablock *metablock);
 
-const uint8_t *
-sqsh__data_metablock_data(const struct SqshDataMetablock *metablock);
-
 uint16_t sqsh__data_metablock_size(const struct SqshDataMetablock *metablock);
 
 ////////////////////////////////////////
