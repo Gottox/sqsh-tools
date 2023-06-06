@@ -31,7 +31,7 @@ read_file(struct SqshDirectoryIterator *iter) {
 
 	size_t size = sqsh_inode_file_size(inode);
 	size_t chunk_size = 0;
-	for(; size > 0; size -= chunk_size) {
+	for (; size > 0; size -= chunk_size) {
 		const size_t advance = chunk_size;
 		chunk_size = DEFAULT_CHUNK_SIZE;
 		if (chunk_size > size) {

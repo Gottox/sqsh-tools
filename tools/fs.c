@@ -743,7 +743,8 @@ main(int argc, char *argv[]) {
 		goto out;
 	}
 
-	rv = sqsh_archive_inode_map(sqshfs_context.archive, &sqshfs_context.inode_map);
+	rv = sqsh_archive_inode_map(
+			sqshfs_context.archive, &sqshfs_context.inode_map);
 	if (rv < 0) {
 		sqsh_perror(rv, "sqsh_archive_inode_map");
 		rv = EXIT_FAILURE;
