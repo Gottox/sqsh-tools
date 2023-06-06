@@ -4,3 +4,4 @@
 * remove lzo compression
 * fix C++ support and reenable tests
 * `inode_map`: detect inconsistent adds to the inode map
+* `directory_iterator`: fix fast indexed lookup
