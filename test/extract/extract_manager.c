@@ -51,8 +51,7 @@ decompress(void) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(&archive);
-	const struct SqshExtractor *compression =
-			sqsh_archive_metablock_extractor(&archive);
+	const struct SqshExtractor *compression = &archive.data_compression;
 	struct SqshMapReader reader = {0};
 	rv = sqsh__map_reader_init(
 			&reader, map_manager, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
@@ -88,8 +87,7 @@ decompress_and_cached(void) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(&archive);
-	const struct SqshExtractor *compression =
-			sqsh_archive_metablock_extractor(&archive);
+	const struct SqshExtractor *compression = &archive.data_compression;
 	struct SqshMapReader reader = {0};
 	rv = sqsh__map_reader_init(
 			&reader, map_manager, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));

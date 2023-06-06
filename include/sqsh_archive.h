@@ -593,29 +593,6 @@ struct SqshMapManager *sqsh_archive_map_manager(struct SqshArchive *archive);
 
 /**
  * @memberof SqshArchive
- * @brief returns the compression context for data blocks
- *
- * @param[in] archive the Sqsh structure.
- *
- * @return the compression context.
- */
-const struct SqshExtractor *
-sqsh_archive_data_extractor(const struct SqshArchive *archive);
-
-/**
- * @memberof SqshArchive
- * @brief sqsh_compression_data returns the compression context for metadata
- * blocks.
- *
- * @param[in] archive the Sqsh structure.
- *
- * @return the compression context.
- */
-const struct SqshExtractor *
-sqsh_archive_metablock_extractor(const struct SqshArchive *archive);
-
-/**
- * @memberof SqshArchive
  * @brief Retrieves the id table of a Sqsh instance.
  *
  * @param[in]  archive    The Sqsh instance to retrieve the id table from.

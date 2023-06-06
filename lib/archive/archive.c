@@ -363,16 +363,6 @@ out:
 	return rv;
 }
 
-const struct SqshExtractor *
-sqsh_archive_data_extractor(const struct SqshArchive *archive) {
-	return &archive->data_compression;
-}
-
-const struct SqshExtractor *
-sqsh_archive_metablock_extractor(const struct SqshArchive *archive) {
-	return &archive->metablock_compression;
-}
-
 const uint8_t *
 sqsh__archive_zero_block(const struct SqshArchive *archive) {
 	return archive->zero_block;
