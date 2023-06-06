@@ -41,7 +41,9 @@
 #include "../../include/sqsh_mapper_private.h"
 #include "../../include/sqsh_primitive_private.h"
 
-// Calculates pow(x,y) % mod
+/**
+ * Calculates pow(x,y) % mod
+ */
 static uint64_t
 mod_power(uint64_t x, uint64_t y, uint64_t mod) {
 	uint64_t res = 1;
@@ -90,7 +92,7 @@ sqsh__extract_manager_init(
 		return -SQSH_ERROR_SIZE_MISSMATCH;
 	}
 
-	// Give a bit of room to avoid too many key hash collisions
+	/* Give a bit of room to avoid too many key hash collisions */
 	size = find_next_maybe_prime(2 * size);
 
 	rv = sqsh_mutex_init(&manager->lock);

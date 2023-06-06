@@ -96,8 +96,9 @@ inode_load(struct SqshInode *context) {
 		return rv;
 	}
 
-	// the pointer may have been invalidated by reader_advance, so reretreive
-	// it.
+	/* The pointer may have been invalidated by reader_advance, so reretreive
+	 * it.
+	 */
 	inode = get_inode(context);
 	switch (type) {
 	case SQSH_INODE_TYPE_EXTENDED_FILE:
@@ -113,7 +114,7 @@ inode_load(struct SqshInode *context) {
 		break;
 	case SQSH_INODE_TYPE_EXTENDED_SYMLINK:
 		size += sqsh_inode_symlink_size(context);
-		// xattr index
+		/* xattr index */
 		size += sizeof(uint32_t);
 	default:
 		/* nop */
@@ -138,7 +139,7 @@ get_size_info(const struct SqshInode *context, int index) {
 		extended_file = sqsh__data_inode_file_ext(inode);
 		return sqsh__data_inode_file_ext_block_size_info(extended_file, index);
 	}
-	// Should never happen
+	/* Should never happen */
 	abort();
 }
 

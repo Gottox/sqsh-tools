@@ -61,8 +61,9 @@ load_mapping(
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
-	// If we're retrieving the last block, we need to make sure that we don't
-	// read past the end of the file, so cap the size to the remaining bytes.
+	/* If we're retrieving the last block, we need to make sure that we don't
+	 * read past the end of the file, so cap the size to the remaining bytes.
+	 */
 	if (index == block_count - 1 && file_size % block_size != 0) {
 		size = file_size % block_size;
 	}

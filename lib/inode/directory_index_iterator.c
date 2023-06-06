@@ -100,7 +100,7 @@ sqsh__directory_index_iterator_next(
 	const size_t remaining_entries = iterator->remaining_entries;
 	iterator->remaining_entries--;
 
-	// Make sure next entry is loaded:
+	/* Make sure next entry is loaded: */
 	size = SQSH_SIZEOF_INODE_DIRECTORY_INDEX;
 	rv = sqsh__metablock_reader_advance(
 			&iterator->inode.metablock, iterator->next_offset, size);
@@ -108,7 +108,7 @@ sqsh__directory_index_iterator_next(
 		return rv;
 	}
 
-	// Make sure current index has its name populated
+	/* Make sure current index has its name populated */
 	size += sqsh__directory_index_iterator_name_size(iterator);
 	rv = sqsh__metablock_reader_advance(&iterator->inode.metablock, 0, size);
 	if (rv < 0) {

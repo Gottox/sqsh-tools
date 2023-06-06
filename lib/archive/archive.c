@@ -80,8 +80,8 @@ sqsh__archive_init(
 		const struct SqshConfig *config) {
 	int rv = 0;
 
-	// Initialize struct to 0, so in an error case we have a clean state that
-	// we can call sqsh_mapper_cleanup on.
+	/*  Initialize struct to 0, so in an error case we have a clean state that
+	 * we can call sqsh_mapper_cleanup on. */
 	memset(&archive->map_manager, 0, sizeof(struct SqshMapManager));
 
 	if (config != NULL) {
@@ -90,8 +90,8 @@ sqsh__archive_init(
 		memset(&archive->config, 0, sizeof(struct SqshConfig));
 	}
 
-	// RECURSIVE is needed because: inode_map may access the export_table
-	// during initialization.
+	/*  RECURSIVE is needed because: inode_map may access the export_table
+	 *  during initialization. */
 	rv = sqsh_mutex_init_recursive(&archive->lock);
 	if (rv < 0) {
 		goto out;
@@ -156,11 +156,11 @@ get_data_segment_size(const struct SqshSuperblock *superblock) {
 	const uint64_t inode_table_start =
 			sqsh_superblock_inode_table_start(superblock);
 	uint64_t res;
-	// BUG: This function does not return exact results. It may report values
-	// that are too large, as it does not take into account the size of the
-	// compression options. This is not a problem for the current implementation
-	// as this size is only used for finding upper limits for the extract
-	// manager.
+	/* BUG: This function does not return exact results. It may report values
+	 * that are too large, as it does not take into account the size of the
+	 * compression options. This is not a problem for the current implementation
+	 * as this size is only used for finding upper limits for the extract
+	 * manager. */
 	if (SQSH_SUB_OVERFLOW(inode_table_start, SQSH_SIZEOF_SUPERBLOCK, &res)) {
 		return inode_table_start;
 	}

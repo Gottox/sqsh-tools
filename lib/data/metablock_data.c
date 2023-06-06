@@ -39,7 +39,7 @@
 
 struct SQSH_UNALIGNED SqshDataMetablock {
 	uint16_t header;
-	// uint8_t data[0];
+	/* uint8_t data[0]; */
 };
 SQSH_STATIC_ASSERT(sizeof(struct SqshDataMetablock) == SQSH_SIZEOF_METABLOCK);
 

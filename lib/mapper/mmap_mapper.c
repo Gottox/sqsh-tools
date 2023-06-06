@@ -128,10 +128,10 @@ sqsh_mapping_mmap_data(const struct SqshMapSlice *mapping) {
 
 static const struct SqshMemoryMapperImpl impl = {
 #if UINTPTR_MAX >= UINT64_MAX
-		// 1 GiB
+		/* 1 GiB */
 		.block_size_hint = 1 * 1024 * 1024 * 1024,
 #else
-		// 100 MiB
+		/* 100 MiB */
 		.block_size_hint = 100 * 1024 * 1024,
 #endif
 		.init = sqsh_mapper_mmap_init,

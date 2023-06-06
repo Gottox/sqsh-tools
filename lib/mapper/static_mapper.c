@@ -43,7 +43,7 @@ sqsh_mapper_static_mem_init(
 static int
 sqsh_mapper_static_mem_map(struct SqshMapSlice *mapping) {
 	size_t offset = mapping->offset;
-	// Cast to remove const qualifier.
+	/* Cast to remove const qualifier. */
 	uint8_t *data = (uint8_t *)mapping->mapper->data.sm.data;
 	mapping->data = &data[offset];
 	return 0;

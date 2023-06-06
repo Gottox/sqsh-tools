@@ -111,13 +111,14 @@ get_file_time(CURL *handle, uint64_t *file_time) {
 	int rv;
 
 	rv = curl_easy_getinfo(handle, CURLINFO_FILETIME_T, &file_time_t);
-	// According to curl docs, file_time_t is set to -1 if the server does not
-	// report a file time. We treat this as an error as we need to detect if
-	// the file has changed.
+	/* According to curl docs, file_time_t is set to -1 if the server does not
+	 * report a file time. We treat this as an error as we need to detect if
+	 * the file has changed.
+	 */
 	if (rv != CURLE_OK || file_time_t < 0) {
 		return -SQSH_ERROR_MAPPER_MAP;
 	}
-	// We checked for negative values above, so this cast should be safe.
+	/* We checked for negative values above, so this cast should be safe. */
 	*file_time = (uint64_t)file_time_t;
 
 	return 0;
@@ -152,8 +153,9 @@ curl_download(
 	};
 
 	int rv = 0;
-	// The actual max-size this string should ever use is 42, but we
-	// add some padding to be a nice number. Not that 42 isn't nice.
+	/* The actual max-size this string should ever use is 42, but we
+	 * add some padding to be a nice number. Not that 42 isn't nice.
+	 */
 	char range_buffer[64] = {0};
 	const uint64_t end_offset = offset + size - 1;
 	long http_code = 0;
@@ -294,7 +296,7 @@ sqsh_mapping_curl_data(const struct SqshMapSlice *mapping) {
 }
 
 static const struct SqshMemoryMapperImpl impl = {
-		// 40kb
+		/* 40kb */
 		.block_size_hint = 40 * 1024,       .init = sqsh_mapper_curl_init,
 		.map = sqsh_mapper_curl_map,        .cleanup = sqsh_mapper_curl_cleanup,
 		.map_data = sqsh_mapping_curl_data, .unmap = sqsh_mapping_curl_unmap,

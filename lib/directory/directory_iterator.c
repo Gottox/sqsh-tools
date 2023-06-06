@@ -98,7 +98,7 @@ directory_iterator_index_lookup(
 		const uint32_t index_name_size =
 				sqsh__directory_index_iterator_name_size(&index_iterator);
 
-		// BUG: the branch could be taken too early when the name is a prefix
+		/* BUG: the branch could be taken too early when the name is a prefix */
 		if (strncmp(name, (char *)index_name,
 					SQSH_MIN(index_name_size, name_len + 1)) < 0) {
 			break;
@@ -287,7 +287,7 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator) {
 	if (iterator->remaining_size == 0) {
 		return 0;
 	} else if (iterator->remaining_entries == 0) {
-		// New fragment begins
+		/*  New fragment begins */
 		rv = process_fragment(iterator);
 		if (rv < 0) {
 			return rv;
@@ -296,7 +296,7 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator) {
 
 	iterator->remaining_entries--;
 
-	// Make sure next entry is loaded:
+	/*  Make sure next entry is loaded: */
 	size = SQSH_SIZEOF_DIRECTORY_ENTRY;
 	rv = sqsh__metablock_reader_advance(
 			&iterator->metablock, iterator->next_offset, size);
@@ -304,13 +304,13 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator) {
 		return rv;
 	}
 
-	// Make sure next entry has its name populated
+	/*  Make sure next entry has its name populated */
 	if (SQSH_ADD_OVERFLOW(
 				size, sqsh_directory_iterator_name_size(iterator), &size)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
-	// May invalidate pointers into directory entries. that's why the
-	// get_entry() call is repeated below.
+	/*  May invalidate pointers into directory entries. that's why the */
+	/*  get_entry() call is repeated below. */
 	rv = sqsh__metablock_reader_advance(&iterator->metablock, 0, size);
 	if (rv < 0) {
 		return rv;

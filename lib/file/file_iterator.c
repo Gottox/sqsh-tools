@@ -147,7 +147,7 @@ map_block_uncompressed(
 		}
 		const uint32_t data_block_size =
 				sqsh_inode_file_block_size(inode, block_index);
-		// Set the sparse size only if we are not at the last block.
+		/* Set the sparse size only if we are not at the last block. */
 		if (block_index + 1 != block_count) {
 			iterator->sparse_size = iterator->block_size - data_block_size;
 		}
@@ -158,9 +158,10 @@ map_block_uncompressed(
 			goto out;
 		}
 
-		// To avoid crossing mem block boundaries, we stop
-		// if the next block would cross the boundary. The only exception
-		// is that we need to map at least one block.
+		/* To avoid crossing mem block boundaries, we stop
+		 * if the next block would cross the boundary. The only exception
+		 * is that we need to map at least one block.
+		 */
 		if (new_outer_size > remaining_direct && outer_size > 0) {
 			break;
 		}

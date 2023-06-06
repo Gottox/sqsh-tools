@@ -194,7 +194,7 @@ map_buffered(
 		goto out;
 	}
 	if (new_offset < buffer_offset) {
-		// Should never happen
+		/* Should never happen */
 		abort();
 	}
 
@@ -226,7 +226,7 @@ map_buffered(
 		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
 		goto out;
 	}
-	// We expect, that the iterator is already at the correct position.
+	/* We expect, that the iterator is already at the correct position. */
 	while (true) {
 		const size_t size = SQSH_MIN(
 				impl->size(iterator) - inner_offset,
@@ -282,7 +282,7 @@ sqsh__reader_advance(
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
-	// Finding the start of the new range.
+	/* Finding the start of the new range. */
 	if (new_offset >= reader->iterator_offset) {
 		rv = iterator_forward_to(reader, new_offset, 1);
 		if (rv < 0) {
@@ -294,7 +294,7 @@ sqsh__reader_advance(
 		sqsh__buffer_cleanup(&reader->buffer);
 	}
 
-	// Forward the data pointer to the requested offset.
+	/* Forward the data pointer to the requested offset. */
 	const sqsh_index_t inner_offset = new_offset - reader->data_offset;
 	reader->data += inner_offset;
 	reader->data_size -= inner_offset;
@@ -302,8 +302,8 @@ sqsh__reader_advance(
 
 	reader->size = size;
 
-	// If the requested range is not covered by the iterator,
-	// turn it into a buffer and extend it.
+	/* If the requested range is not covered by the iterator, */
+	/* turn it into a buffer and extend it. */
 	if (new_end_offset > reader->data_offset + reader->data_size) {
 		rv = map_buffered(reader, new_offset, new_end_offset);
 		if (rv < 0) {

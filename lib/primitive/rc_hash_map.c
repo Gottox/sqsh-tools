@@ -60,7 +60,7 @@ static sqsh_index_t
 key_to_index(const sqsh_rc_map_key_t key, const size_t size) {
 	sqsh_index_t hash = djb2_hash(&key, sizeof(uint64_t));
 
-	// reserve the lower COLLISION_RESERVE_BITS bits for collisions.
+	/* reserve the lower COLLISION_RESERVE_BITS bits for collisions. */
 	hash <<= COLLISION_RESERVE_BITS;
 	return hash % size;
 }

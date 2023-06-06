@@ -129,9 +129,9 @@ int
 sqsh_tree_walker_up(struct SqshTreeWalker *walker) {
 	int rv = 0;
 	const struct SqshInode *inode = &walker->directory;
-	// We do not use the parent inode to check if it is the root node.
-	// According to the documentationen it *should* be zero. That's
-	// vague.
+	/* We do not use the parent inode to check if it is the root node.
+	 * According to the documentationen it *should* be zero. That's vague.
+	 */
 
 	if (sqsh_inode_ref(inode) == walker->root_inode_ref) {
 		return -SQSH_ERROR_WALKER_CANNOT_GO_UP;

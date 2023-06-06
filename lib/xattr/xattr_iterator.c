@@ -38,7 +38,7 @@
 #include "../utils/utils.h"
 
 #ifdef __linux__
-#include <alloca.h>
+#	include <alloca.h>
 #endif
 
 #include "../../include/sqsh_data_private.h"
@@ -75,7 +75,7 @@ sqsh__xattr_iterator_init(
 		goto out;
 	}
 
-	// The XATTR table is the last block in the file system.
+	/* The XATTR table is the last block in the file system. */
 	const uint64_t address_ref = sqsh__data_xattr_lookup_table_xattr_ref(ref);
 	const uint64_t inner_offset = sqsh_address_ref_inner_offset(address_ref);
 	const uint64_t outer_offset = sqsh_address_ref_outer_offset(address_ref);
@@ -171,7 +171,7 @@ xattr_value_indirect_load(struct SqshXattrIterator *iterator) {
 		goto out;
 	}
 
-	// Value offset 0 marks an indirect load.
+	/* Value offset 0 marks an indirect load. */
 	iterator->value_index = 0;
 	value = get_value(iterator);
 	size += sqsh__data_xattr_value_size(value);
@@ -195,14 +195,14 @@ sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator) {
 		return 0;
 	}
 
-	// Load Key Header
+	/* Load Key Header */
 	rv = sqsh__metablock_reader_advance(
 			&iterator->metablock, iterator->next_offset, SQSH_SIZEOF_XATTR_KEY);
 	if (rv < 0) {
 		goto out;
 	}
 
-	// Load Key Name
+	/* Load Key Name */
 	const uint16_t name_size = sqsh_xattr_iterator_name_size(iterator);
 	size += name_size;
 	rv = sqsh__metablock_reader_advance(&iterator->metablock, 0, size);
@@ -210,10 +210,10 @@ sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator) {
 		goto out;
 	}
 
-	// Load Value Header
+	/* Load Value Header */
 	iterator->value_index = SQSH_SIZEOF_XATTR_KEY + name_size;
 
-	// Load Value
+	/* Load Value */
 	const uint16_t value_size = sqsh_xattr_iterator_value_size(iterator);
 	size += value_size;
 	rv = sqsh__metablock_reader_advance(&iterator->metablock, 0, size);

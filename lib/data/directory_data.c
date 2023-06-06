@@ -42,7 +42,7 @@ struct SQSH_UNALIGNED SqshDataDirectoryEntry {
 	int16_t inode_offset;
 	uint16_t type;
 	uint16_t name_size;
-	// uint8_t name[0]; // [name_size + 1]
+	/* uint8_t name[0]; // [name_size + 1] */
 };
 
 SQSH_STATIC_ASSERT(
@@ -52,7 +52,7 @@ struct SQSH_UNALIGNED SqshDataDirectoryFragment {
 	uint32_t count;
 	uint32_t start;
 	uint32_t inode_number;
-	// struct SqshDataDirectoryEntry entries[0]; // [count + 1]
+	/* struct SqshDataDirectoryEntry entries[0]; // [count + 1] */
 };
 
 SQSH_STATIC_ASSERT(
