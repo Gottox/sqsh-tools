@@ -97,6 +97,7 @@ sqsh__directory_index_iterator_next(
 		return 0;
 	}
 
+	const size_t remaining_entries = iterator->remaining_entries;
 	iterator->remaining_entries--;
 
 	// Make sure next entry is loaded:
@@ -115,7 +116,7 @@ sqsh__directory_index_iterator_next(
 	}
 
 	iterator->next_offset = size;
-	return iterator->remaining_entries;
+	return remaining_entries;
 }
 
 uint32_t

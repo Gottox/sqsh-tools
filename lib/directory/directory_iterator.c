@@ -84,8 +84,8 @@ directory_iterator_index_lookup(
 	struct SqshDirectoryIndexIterator index_iterator = {0};
 	struct SqshInode *inode = iterator->inode;
 	const uint64_t inode_ref = sqsh_inode_ref(inode);
-	uint32_t start = 0;
-	uint32_t index = 0;
+	uint64_t outer_offset = sqsh_inode_directory_block_start(inode);
+	uint32_t inner_offset = sqsh_inode_directory_block_offset(inode);
 
 	rv = sqsh__directory_index_iterator_init(
 			&index_iterator, inode->archive, inode_ref);
@@ -103,11 +103,11 @@ directory_iterator_index_lookup(
 					SQSH_MIN(index_name_size, name_len + 1)) < 0) {
 			break;
 		}
-		start = sqsh__directory_index_iterator_start(&index_iterator);
-		index = sqsh__directory_index_iterator_index(&index_iterator);
+		outer_offset = sqsh__directory_index_iterator_start(&index_iterator);
+		inner_offset = sqsh__directory_index_iterator_index(&index_iterator);
 	}
 	sqsh__metablock_reader_cleanup(&iterator->metablock);
-	rv = load_metablock(iterator, start, index);
+	rv = load_metablock(iterator, outer_offset, inner_offset);
 	iterator->remaining_entries = 0;
 	if (rv < 0) {
 		goto out;
