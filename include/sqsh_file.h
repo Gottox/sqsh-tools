@@ -42,8 +42,9 @@ extern "C" {
 
 struct SqshInode;
 
-////////////////////////////////////////
-// context/file_reader.c
+/***************************************
+ * context/file_reader.c
+ */
 
 struct SqshFileReader;
 
@@ -103,8 +104,9 @@ size_t sqsh_file_reader_size(const struct SqshFileReader *reader);
  */
 int sqsh_file_reader_free(struct SqshFileReader *reader);
 
-////////////////////////////////////////
-// file/file_iterator.c
+/***************************************
+ * file/file_iterator.c
+ */
 
 struct SqshFileIterator;
 
@@ -198,4 +200,4 @@ int sqsh_file_iterator_free(struct SqshFileIterator *iterator);
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_FILE_H
+#endif /* SQSH_FILE_H */

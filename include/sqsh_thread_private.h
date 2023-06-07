@@ -106,4 +106,4 @@ int sqsh_mutex_destroy(sqsh_mutex_t *mutex);
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_THREAD_PRIVATE_H
+#endif /* SQSH_THREAD_PRIVATE_H */

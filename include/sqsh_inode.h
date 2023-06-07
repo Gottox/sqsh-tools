@@ -42,8 +42,9 @@ extern "C" {
 
 struct SqshArchive;
 
-////////////////////////////////////////
-// inode/inode.c
+/***************************************
+ * inode/inode.c
+ */
 
 /**
  * @brief Value that indicates the absence of a fragment.
@@ -59,7 +60,7 @@ struct SqshArchive;
  */
 enum SqshInodeType {
 	SQSH_INODE_TYPE_UNKNOWN = -1,
-	// avoid overlapping with the types in inode_data.h
+	/* avoid overlapping with the types in inode_data.h */
 	SQSH_INODE_TYPE_DIRECTORY = 1 + (1 << 8),
 	SQSH_INODE_TYPE_FILE,
 	SQSH_INODE_TYPE_SYMLINK,
@@ -364,4 +365,4 @@ int sqsh_inode_free(struct SqshInode *context);
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_INODE_H
+#endif /* SQSH_INODE_H */

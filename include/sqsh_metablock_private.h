@@ -43,8 +43,9 @@ extern "C" {
 
 struct SqshArchive;
 
-////////////////////////////////////////
-// metablock/metablock_iterator.c
+/***************************************
+ * metablock/metablock_iterator.c
+ */
 
 /**
  * @brief Iterator over metablocks.
@@ -132,8 +133,9 @@ sqsh__metablock_iterator_size(const struct SqshMetablockIterator *iterator);
  */
 int sqsh__metablock_iterator_cleanup(struct SqshMetablockIterator *iterator);
 
-////////////////////////////////////////
-// metablock/metablock_reader.c
+/***************************************
+ * metablock/metablock_reader.c
+ */
 
 /**
  * @brief Reader over metablocks.
@@ -215,4 +217,4 @@ int sqsh__metablock_reader_cleanup(struct SqshMetablockReader *reader);
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_METABLOCK_PRIVATE_H
+#endif /* SQSH_METABLOCK_PRIVATE_H */

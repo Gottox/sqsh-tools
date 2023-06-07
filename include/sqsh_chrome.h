@@ -46,8 +46,9 @@ extern "C" {
 
 struct SqshArchive;
 
-////////////////////////////////////////
-// chrome/inode.c
+/***************************************
+ * chrome/inode.c
+ */
 
 /**
  * @brief Initialize the inode context from a path.
@@ -70,8 +71,9 @@ sqsh_open(struct SqshArchive *archive, const char *path, int *err);
  */
 int sqsh_close(struct SqshInode *inode);
 
-////////////////////////////////////////
-// chrome/file.c
+/***************************************
+ * chrome/file.c
+ */
 
 /**
  * @brief writes data to a file descriptor.

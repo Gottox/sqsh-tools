@@ -42,8 +42,9 @@ extern "C" {
 
 struct SqshArchive;
 
-////////////////////////////////////////
-// file/fragment_view.c
+/***************************************
+ * file/fragment_view.c
+ */
 
 /**
  * @brief A view over the contents of a fragment.
@@ -68,8 +69,9 @@ size_t sqsh__fragment_view_size(const struct SqshFragmentView *view);
 
 int sqsh__fragment_view_cleanup(struct SqshFragmentView *view);
 
-////////////////////////////////////////
-// file/file_iterator.c
+/***************************************
+ * file/file_iterator.c
+ */
 
 /**
  * @brief An iterator over the contents of a file.
@@ -114,8 +116,9 @@ SQSH_NO_UNUSED int sqsh__file_iterator_init(
  */
 int sqsh__file_iterator_cleanup(struct SqshFileIterator *iterator);
 
-////////////////////////////////////////
-// context/file_reader.c
+/***************************************
+ * context/file_reader.c
+ */
 
 /**
  * @brief A reader over the contents of a file.
@@ -155,4 +158,4 @@ int sqsh__file_reader_cleanup(struct SqshFileReader *reader);
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_FILE_PRIVATE_H
+#endif /* SQSH_FILE_PRIVATE_H */

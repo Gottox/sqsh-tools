@@ -40,8 +40,9 @@
 extern "C" {
 #endif
 
-////////////////////////////////////////
-// iterator/directory_iterator.c
+/***************************************
+ * iterator/directory_iterator.c
+ */
 
 struct SqshDirectoryIterator;
 
@@ -183,4 +184,4 @@ int sqsh_directory_iterator_free(struct SqshDirectoryIterator *iterator);
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_DIRECTORY_H
+#endif /* SQSH_DIRECTORY_H */

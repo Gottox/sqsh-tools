@@ -42,8 +42,9 @@ extern "C" {
 
 struct SqshInode;
 
-////////////////////////////////////////
-// xattr/xattr_iterator.c
+/***************************************
+ * xattr/xattr_iterator.c
+ */
 
 /**
  * @brief The type of an external attribute.
@@ -231,4 +232,4 @@ int sqsh_xattr_iterator_free(struct SqshXattrIterator *iterator);
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_XATTR_H
+#endif /* SQSH_XATTR_H */

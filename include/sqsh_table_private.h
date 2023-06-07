@@ -46,8 +46,9 @@ struct SqshInode;
 struct SqshDataFragment;
 struct SqshDataXattrLookupTable;
 
-////////////////////////////////////////
-// table/table.c
+/***************************************
+ * table/table.c
+ */
 
 /**
  * @brief A generic table as used in an archive.
@@ -92,8 +93,9 @@ SQSH_NO_UNUSED int sqsh__table_init(
  */
 int sqsh__table_cleanup(struct SqshTable *table);
 
-////////////////////////////////////////
-// table/id_table.c
+/***************************************
+ * table/id_table.c
+ */
 
 /**
  * @brief The id table of an archive.
@@ -128,8 +130,9 @@ int sqsh__id_table_init(struct SqshIdTable *table, struct SqshArchive *sqsh);
  */
 int sqsh__id_table_cleanup(struct SqshIdTable *table);
 
-////////////////////////////////////////
-// table/export_table.c
+/***************************************
+ * table/export_table.c
+ */
 
 /**
  * @brief The export table.
@@ -165,8 +168,9 @@ int sqsh__export_table_init(
  */
 int sqsh__export_table_cleanup(struct SqshExportTable *table);
 
-////////////////////////////////////////
-// file/fragment_table.c
+/***************************************
+ * file/fragment_table.c
+ */
 
 /**
  * @brief The fragment table of an archive.
@@ -219,8 +223,9 @@ int sqsh__fragment_table_get(
  */
 int sqsh__fragment_table_cleanup(struct SqshFragmentTable *table);
 
-////////////////////////////////////////
-// table/xattr_table.c
+/***************************************
+ * table/xattr_table.c
+ */
 
 /**
  * @brief The extended attribute lookup table.
@@ -262,4 +267,4 @@ SQSH_NO_UNUSED int sqsh_xattr_table_get(
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_TABLE_PRIVATE_H
+#endif /* SQSH_TABLE_PRIVATE_H */

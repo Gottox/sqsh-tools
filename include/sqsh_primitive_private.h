@@ -40,8 +40,9 @@
 extern "C" {
 #endif
 
-////////////////////////////////////////
-// primitive/buffer.c
+/***************************************
+ * primitive/buffer.c
+ */
 
 /**
  * @brief The SqshBuffer struct is a buffer for arbitrary data.
@@ -166,8 +167,9 @@ size_t sqsh__buffer_size(const struct SqshBuffer *buffer);
  */
 int sqsh__buffer_cleanup(struct SqshBuffer *buffer);
 
-////////////////////////////////////////
-// primitive/rc_map.c
+/***************************************
+ * primitive/rc_map.c
+ */
 
 /**
  * @brief The type of the cleanup callback function.
@@ -302,8 +304,9 @@ int sqsh__rc_map_cleanup(struct SqshRcMap *array);
  */
 extern const struct SqshLruBackendImpl sqsh__lru_rc_map;
 
-////////////////////////////////////////
-// primitive/rc_hash_map.c
+/***************************************
+ * primitive/rc_hash_map.c
+ */
 
 /**
  * @brief The type of the key for the hash map.
@@ -420,8 +423,9 @@ int sqsh__rc_hash_map_cleanup(struct SqshRcHashMap *hash_map);
  */
 extern const struct SqshLruBackendImpl sqsh__lru_rc_hash_map;
 
-////////////////////////////////////////
-// primitive/lru.c
+/***************************************
+ * primitive/lru.c
+ */
 
 /**
  * @internal
@@ -489,8 +493,9 @@ SQSH_NO_UNUSED int sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t id);
  */
 int sqsh__lru_cleanup(struct SqshLru *lru);
 
-////////////////////////////////////////
-// primitive/reader.c
+/***************************************
+ * primitive/reader.c
+ */
 
 /**
  * @internal
@@ -594,4 +599,4 @@ int sqsh__reader_cleanup(struct SqshReader *reader);
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_PRIMITIVE_PRIVATE_H
+#endif /* SQSH_PRIMITIVE_PRIVATE_H */

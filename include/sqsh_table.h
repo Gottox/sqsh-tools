@@ -43,8 +43,9 @@ extern "C" {
 struct SqshBuffer;
 struct SqshInode;
 
-////////////////////////////////////////
-// table/table.c
+/***************************************
+ * table/table.c
+ */
 
 struct SqshTable;
 
@@ -61,8 +62,9 @@ struct SqshTable;
 int
 sqsh_table_get(const struct SqshTable *table, sqsh_index_t index, void *target);
 
-////////////////////////////////////////
-// table/id_table.c
+/***************************************
+ * table/id_table.c
+ */
 
 struct SqshIdTable;
 
@@ -79,8 +81,9 @@ struct SqshIdTable;
 int sqsh_id_table_get(
 		const struct SqshIdTable *table, sqsh_index_t index, uint32_t *id);
 
-////////////////////////////////////////
-// table/export_table.c
+/***************************************
+ * table/export_table.c
+ */
 
 struct SqshExportTable;
 
@@ -101,4 +104,4 @@ int sqsh_export_table_resolve_inode(
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_TABLE_H
+#endif /* SQSH_TABLE_H */

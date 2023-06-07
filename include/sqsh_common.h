@@ -66,4 +66,4 @@ typedef size_t sqsh_index_t;
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_COMMON_H
+#endif /* SQSH_COMMON_H */

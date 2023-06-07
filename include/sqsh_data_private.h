@@ -37,8 +37,9 @@
 extern "C" {
 #endif
 
-////////////////////////////////////////
-// data/compression_options_data.c
+/***************************************
+ * data/compression_options_data.c
+ */
 
 #define SQSH_SIZEOF_COMPRESSION_OPTIONS_GZIP 8
 #define SQSH_SIZEOF_COMPRESSION_OPTIONS_XZ 8
@@ -84,8 +85,9 @@ uint32_t sqsh_compression_data_options_lzo_algorithm(
 uint32_t sqsh_compression_data_options_lzo_compression_level(
 		const union SqshDataCompressionOptions *options);
 
-////////////////////////////////////////
-// data/directory_data.c
+/***************************************
+ * data/directory_data.c
+ */
 
 #define SQSH_SIZEOF_DIRECTORY_FRAGMENT 12
 #define SQSH_SIZEOF_DIRECTORY_ENTRY 8
@@ -114,8 +116,9 @@ uint32_t sqsh__data_directory_fragment_inode_number(
 const struct SqshDataDirectoryEntry *sqsh__data_directory_fragment_entries(
 		const struct SqshDataDirectoryFragment *fragment);
 
-////////////////////////////////////////
-// data/fragment_data.c
+/***************************************
+ * data/fragment_data.c
+ */
 
 #define SQSH_SIZEOF_FRAGMENT 16
 
@@ -124,8 +127,9 @@ struct SQSH_UNALIGNED SqshDataFragment;
 uint64_t sqsh__data_fragment_start(const struct SqshDataFragment *fragment);
 uint32_t sqsh__data_fragment_size_info(const struct SqshDataFragment *fragment);
 
-////////////////////////////////////////
-// data/inode_data.c
+/***************************************
+ * data/inode_data.c
+ */
 
 #define SQSH_SIZEOF_INODE_DIRECTORY_INDEX 12
 #define SQSH_SIZEOF_INODE_DIRECTORY 16
@@ -301,8 +305,9 @@ sqsh__data_inode_ipc_ext_hard_link_count(const struct SqshDataInodeIpcExt *ipc);
 uint32_t
 sqsh__data_inode_ipc_ext_xattr_idx(const struct SqshDataInodeIpcExt *ipc);
 
-////////////////////////////////////////
-// data/metablock_data.c
+/***************************************
+ * data/metablock_data.c
+ */
 
 #define SQSH_SIZEOF_METABLOCK 2
 
@@ -315,8 +320,9 @@ sqsh__data_metablock_is_compressed(const struct SqshDataMetablock *metablock);
 
 uint16_t sqsh__data_metablock_size(const struct SqshDataMetablock *metablock);
 
-////////////////////////////////////////
-// data/superblock_data.c
+/***************************************
+ * data/superblock_data.c
+ */
 
 #define SQSH_SIZEOF_SUPERBLOCK 96
 
@@ -363,8 +369,9 @@ uint64_t sqsh__data_superblock_fragment_table_start(
 uint64_t sqsh__data_superblock_export_table_start(
 		const struct SqshDataSuperblock *superblock);
 
-////////////////////////////////////////
-// data/xattr_data.c
+/***************************************
+ * data/xattr_data.c
+ */
 
 #define SQSH_SIZEOF_XATTR_KEY 4
 #define SQSH_SIZEOF_XATTR_VALUE 4
@@ -409,4 +416,4 @@ sqsh__data_xattr_id_table(const struct SqshDataXattrIdTable *xattr_id_table);
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_DATA_PRIVATE_H
+#endif /* SQSH_DATA_PRIVATE_H */

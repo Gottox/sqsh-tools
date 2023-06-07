@@ -44,8 +44,9 @@ extern "C" {
 
 struct SqshArchive;
 
-////////////////////////////////////////
-// tree/walker.c
+/***************************************
+ * tree/walker.c
+ */
 
 /**
  * @brief A walker over the contents of a file.
@@ -90,4 +91,4 @@ int sqsh__tree_walker_cleanup(struct SqshTreeWalker *walker);
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_TREE_PRIVATE_H
+#endif /* SQSH_TREE_PRIVATE_H */

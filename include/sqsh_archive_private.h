@@ -45,8 +45,9 @@
 extern "C" {
 #endif
 
-////////////////////////////////////////
-// archive/trailing_context.c
+/***************************************
+ * archive/trailing_context.c
+ */
 
 /**
  * @brief The trailing context is used to access the trailing data
@@ -83,8 +84,9 @@ SQSH_NO_UNUSED int sqsh__trailing_init(
  */
 int sqsh__trailing_cleanup(struct SqshTrailingContext *context);
 
-////////////////////////////////////////
-// archive/inode_map.c
+/***************************************
+ * archive/inode_map.c
+ */
 
 /**
  * @brief The inode map context is used to cache inodes numbers and their
@@ -123,8 +125,9 @@ sqsh__inode_map_init(struct SqshInodeMap *map, struct SqshArchive *archive);
  */
 int sqsh__inode_map_cleanup(struct SqshInodeMap *map);
 
-////////////////////////////////////////
-// archive/superblock.c
+/***************************************
+ * archive/superblock.c
+ */
 
 /**
  * @brief The superblock context is used to access the superblock of
@@ -161,8 +164,9 @@ SQSH_NO_UNUSED int sqsh__superblock_init(
  */
 int sqsh__superblock_cleanup(struct SqshSuperblock *superblock);
 
-////////////////////////////////////////
-// archive/compression_options.c
+/***************************************
+ * archive/compression_options.c
+ */
 
 /**
  * @brief The compression options context is used to store the
@@ -201,8 +205,9 @@ SQSH_NO_UNUSED int sqsh__compression_options_init(
 int sqsh__compression_options_cleanup(
 		struct SqshCompressionOptions *compression_options);
 
-////////////////////////////////////////
-// archive/archive.c
+/***************************************
+ * archive/archive.c
+ */
 
 /**
  * @brief The Sqsh struct contains all information about the current

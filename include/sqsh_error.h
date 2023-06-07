@@ -40,15 +40,16 @@
 extern "C" {
 #endif
 
-////////////////////////////////////////
-// error.c
+/***************************************
+ * error.c
+ */
 
 /**
  * @brief Error codes for sqsh.
  */
 enum SqshError {
 	SQSH_SUCCESS = 0,
-	// Avoid collisions with errno
+	/* Avoid collisions with errno */
 	SQSH_ERROR_SECTION_START = (1 << 8),
 	SQSH_ERROR_SUPERBLOCK_TOO_SMALL,
 	SQSH_ERROR_WRONG_MAGIC,
@@ -102,4 +103,4 @@ SQSH_NO_UNUSED const char *sqsh_error_str(int error_code);
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_ERROR_H
+#endif /* SQSH_ERROR_H */

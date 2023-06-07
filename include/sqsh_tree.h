@@ -42,8 +42,9 @@
 extern "C" {
 #endif
 
-////////////////////////////////////////
-// tree/walker.c
+/***************************************
+ * tree/walker.c
+ */
 
 struct SqshTreeWalker;
 

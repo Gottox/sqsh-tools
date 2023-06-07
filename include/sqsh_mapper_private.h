@@ -38,6 +38,7 @@
 
 #include "sqsh_primitive_private.h"
 #include "sqsh_thread_private.h"
+#include <sys/wait.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,8 +47,9 @@ extern "C" {
 struct SqshArchive;
 struct SqshConfig;
 
-////////////////////////////////////////
-// mapper/curl_mapper.c
+/***************************************
+ * mapper/curl_mapper.c
+ */
 
 /**
  * @brief The curl mapper.
@@ -63,8 +65,9 @@ struct SqshCurlMapper {
 	sqsh_mutex_t lock;
 };
 
-////////////////////////////////////////
-// mapper/mmap_mapper.c
+/***************************************
+ * mapper/mmap_mapper.c
+ */
 
 /**
  * @brief The mmap mapper.
@@ -77,8 +80,9 @@ struct SqshMmapMapper {
 	long page_size;
 };
 
-////////////////////////////////////////
-// mapper/static_mapper.c
+/***************************************
+ * mapper/static_mapper.c
+ */
 
 /**
  * @brief The static mapper.
@@ -90,8 +94,9 @@ struct SqshStaticMapper {
 	const uint8_t *data;
 };
 
-////////////////////////////////////////
-// mapper/mapper.c
+/***************************************
+ * mapper/mapper.c
+ */
 
 struct SqshMapSlice;
 
@@ -175,8 +180,9 @@ size_t sqsh__mapper_block_size(const struct SqshMapper *mapper);
  */
 int sqsh__mapper_cleanup(struct SqshMapper *mapper);
 
-////////////////////////////////////////
-// mapper/map_slice.c
+/***************************************
+ * mapper/map_slice.c
+ */
 
 /**
  * @brief Represents a view into the data of an archive.
@@ -239,8 +245,9 @@ SQSH_NO_UNUSED int sqsh__map_slice_init(
 		struct SqshMapSlice *mapping, struct SqshMapper *mapper,
 		sqsh_index_t offset, size_t size);
 
-////////////////////////////////////////
-// mapper/map_manager.c
+/***************************************
+ * mapper/map_manager.c
+ */
 
 /**
  * @brief The map manager.
@@ -342,8 +349,9 @@ int sqsh__map_manager_release(
  */
 int sqsh__map_manager_cleanup(struct SqshMapManager *manager);
 
-////////////////////////////////////////
-// mapper/map_iterator.c
+/***************************************
+ * mapper/map_iterator.c
+ */
 
 /**
  * @internal
@@ -449,8 +457,9 @@ size_t sqsh__map_iterator_size(const struct SqshMapIterator *iterator);
  */
 int sqsh__map_iterator_cleanup(struct SqshMapIterator *iterator);
 
-////////////////////////////////////////
-// mapper/map_reader.c
+/***************************************
+ * mapper/map_reader.c
+ */
 
 /**
  * @brief A reader over a mapping of data.
@@ -559,4 +568,4 @@ int sqsh__map_reader_cleanup(struct SqshMapReader *reader);
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_PRIVATE_MAPPER_H
+#endif /* SQSH_PRIVATE_MAPPER_H */

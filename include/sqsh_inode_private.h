@@ -41,8 +41,9 @@
 extern "C" {
 #endif
 
-////////////////////////////////////////
-// inode/inode.c
+/***************************************
+ * inode/inode.c
+ */
 
 /**
  * @brief The Inode context
@@ -83,8 +84,9 @@ SQSH_NO_UNUSED int sqsh__inode_init(
  */
 int sqsh__inode_cleanup(struct SqshInode *context);
 
-////////////////////////////////////////
-// inode/directory_index_iterator.c
+/***************************************
+ * inode/directory_index_iterator.c
+ */
 
 /**
  * @brief Iterator for directory indexes
@@ -189,4 +191,4 @@ int sqsh__directory_index_iterator_cleanup(
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_INODE_PRIVATE_H
+#endif /* SQSH_INODE_PRIVATE_H */

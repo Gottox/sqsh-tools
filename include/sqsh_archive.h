@@ -45,8 +45,9 @@ struct SqshIdTable;
 struct SqshExportTable;
 struct SqshFragmentTable;
 
-////////////////////////////////////////
-// archive/trailing_context.c
+/***************************************
+ * archive/trailing_context.c
+ */
 
 struct SqshTrailingContext;
 
@@ -70,8 +71,9 @@ size_t sqsh_trailing_size(const struct SqshTrailingContext *context);
  */
 const uint8_t *sqsh_trailing_data(const struct SqshTrailingContext *context);
 
-////////////////////////////////////////
-// archive/inode_map.c
+/***************************************
+ * archive/inode_map.c
+ */
 
 struct SqshInodeMap;
 
@@ -102,8 +104,9 @@ sqsh_inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number);
 SQSH_NO_UNUSED int sqsh_inode_map_set(
 		struct SqshInodeMap *map, uint64_t inode_number, uint64_t inode_ref);
 
-////////////////////////////////////////
-// archive/superblock_context.c
+/***************************************
+ * archive/superblock_context.c
+ */
 
 /**
  * @brief The compression used in the archive.
@@ -339,8 +342,9 @@ sqsh_superblock_fragment_entry_count(const struct SqshSuperblock *context);
  */
 uint64_t sqsh_superblock_bytes_used(const struct SqshSuperblock *context);
 
-////////////////////////////////////////
-// archive/compression_options_context.c
+/***************************************
+ * archive/compression_options_context.c
+ */
 
 /**
  * @brief definitions of gzip strategies
@@ -511,8 +515,9 @@ uint32_t sqsh_compression_options_lzo_compression_level(
  */
 int sqsh_compression_options_free(struct SqshCompressionOptions *context);
 
-////////////////////////////////////////
-// archive/archive.c
+/***************************************
+ * archive/archive.c
+ */
 
 #define SQSH_CONFIG_FIELDS \
 	uint64_t source_size; \
@@ -673,4 +678,4 @@ int sqsh_archive_free(struct SqshArchive *archive);
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_H
+#endif /* SQSH_H */

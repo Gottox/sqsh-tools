@@ -45,8 +45,9 @@ extern "C" {
 struct SqshArchive;
 struct SqshMapReader;
 
-////////////////////////////////////////
-// extract/extract.c
+/***************************************
+ * extract/extract.c
+ */
 
 /**
  * @internal
@@ -135,8 +136,9 @@ SQSH_NO_UNUSED int sqsh__extractor_to_buffer(
  */
 int sqsh__extractor_cleanup(struct SqshExtractor *extractor);
 
-////////////////////////////////////////
-// extract/extract_manager.c
+/***************************************
+ * extract/extract_manager.c
+ */
 
 /**
  * @brief Manages chunks of compressed areas from an archive.
@@ -207,8 +209,9 @@ int sqsh__extract_manager_release(
  */
 int sqsh__extract_manager_cleanup(struct SqshExtractManager *manager);
 
-////////////////////////////////////////
-// extract/extract_view.c
+/***************************************
+ * extract/extract_view.c
+ */
 
 /**
  * @brief A fiew into compressed memory managed by a SqshExtractManager.
@@ -271,15 +274,17 @@ size_t sqsh__extract_view_size(const struct SqshExtractView *view);
  */
 int sqsh__extract_view_cleanup(struct SqshExtractView *view);
 
-////////////////////////////////////////
-// extract/lz4.c
+/***************************************
+ * extract/lz4.c
+ */
 
 /**
  * @brief The implementation of the lz4 extractor.
  */
 extern const struct SqshExtractorImpl *const sqsh__impl_lz4;
-////////////////////////////////////////
-// extract/lzma.c
+/***************************************
+ * extract/lzma.c
+ */
 
 /**
  * @brief The implementation of the lzma extractor.
@@ -290,16 +295,18 @@ extern const struct SqshExtractorImpl *const sqsh__impl_lzma;
  */
 extern const struct SqshExtractorImpl *const sqsh__impl_xz;
 
-////////////////////////////////////////
-// extract/zlib.c
+/***************************************
+ * extract/zlib.c
+ */
 
 /**
  * @brief The implementation of the zlib extractor.
  */
 extern const struct SqshExtractorImpl *const sqsh__impl_zlib;
 
-////////////////////////////////////////
-// extract/zstd.c
+/***************************************
+ * extract/zstd.c
+ */
 
 /**
  * @brief The implementation of the zstd extractor.
@@ -309,4 +316,4 @@ extern const struct SqshExtractorImpl *const sqsh__impl_zstd;
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_EXTRACT_PRIVATE_H
+#endif /* SQSH_EXTRACT_PRIVATE_H */

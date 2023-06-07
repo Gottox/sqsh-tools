@@ -42,8 +42,9 @@
 extern "C" {
 #endif
 
-////////////////////////////////////////
-// xattr/xattr_iterator.c
+/***************************************
+ * xattr/xattr_iterator.c
+ */
 
 /**
  * @brief An iterator over extended attributes.
@@ -113,4 +114,4 @@ int sqsh__xattr_table_cleanup(struct SqshXattrTable *context);
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_XATTR_PRIVATE_H
+#endif /* SQSH_XATTR_PRIVATE_H */
