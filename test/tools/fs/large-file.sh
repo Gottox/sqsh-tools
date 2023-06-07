@@ -18,6 +18,8 @@
 
 MKSQUASHFS_OPTS="-no-xattrs -noappend -mkfs-time 0 -b 4096"
 
+SQSHFS_IMPL="$(basename "$SQSHFS")"
+
 # unshares the mount namespace, so that sqshfs will be terminated
 # when this script exits
 if [ -z "$INTERNAL_UNSHARED" ]; then
@@ -25,7 +27,7 @@ if [ -z "$INTERNAL_UNSHARED" ]; then
 	exec "$UNSHARE" -rm "$0" "$@"
 fi
 
-WORK_DIR="$BUILD_DIR/fs-large-file"
+WORK_DIR="$BUILD_DIR/$SQSHFS_IMPL/fs-large-file"
 
 mkdir -p "$WORK_DIR"
 cd "$WORK_DIR"

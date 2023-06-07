@@ -16,7 +16,15 @@ project(
 
 threads_dep = dependency('threads', required: get_option('threads'))
 curl_dep = dependency('libcurl', required: get_option('curl'))
-fuse_dep = dependency('fuse3', required: get_option('fuse'))
+fuse3_dep = dependency(
+    'fuse3',
+    required: get_option('fuse'),
+)
+fuse2_dep = dependency(
+    'fuse',
+    version: '>=2.8.0',
+    required: get_option('fuse-old'),
+)
 lz4_dep = dependency('liblz4', required: get_option('lz4'))
 lzma_dep = dependency('liblzma', required: get_option('lzma'))
 zlib_dep = dependency('zlib', required: get_option('zlib'))

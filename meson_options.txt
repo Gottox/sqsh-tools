@@ -7,7 +7,13 @@ option('zlib', type: 'feature', description: 'Support zlib compression.')
 option('lz4', type: 'feature', description: 'Support LZ4 compression.')
 option('lzma', type: 'feature', description: 'Support LZMA compression.')
 option('zstd', type: 'feature', description: 'Support ZSTD compression.')
-option('fuse', type: 'feature', description: 'Support FUSE filesystem.')
+option('fuse', type: 'feature', description: 'Support FUSE-3 filesystem.')
+option(
+    'fuse-old',
+    type: 'feature',
+    description: 'Support FUSE-2 filesystem.',
+    value: 'disabled',
+)
 option(
     'test',
     type: 'combo',
@@ -29,7 +35,12 @@ option(
     description: 'Build libsqsh tools.',
 )
 option('fuzzer', type: 'boolean', value: false, description: 'Build fuzzers.')
-option('fuzzer_timeout', type: 'integer', value: 10, description: 'set the fuzzer timeout')
+option(
+    'fuzzer_timeout',
+    type: 'integer',
+    value: 10,
+    description: 'set the fuzzer timeout',
+)
 option(
     'threads',
     type: 'feature',

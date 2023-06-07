@@ -29,10 +29,12 @@ sqsh_extended_test = [
     'selftest.sh',
     'tools/cat/large-file-compressed.sh',
     'tools/cat/large-file-uncompressed.sh',
-    'tools/fs/large-file.sh',
-    'tools/fs/repack.sh',
     'tools/read-chunk/tail.sh',
     'tools/unpack/repack.sh',
+]
+sqsh_extended_fs_test = [
+    'tools/fs/large-file.sh',
+    'tools/fs/repack.sh',
 ]
 sqsh_extra_source = {
     'fuzzer_repro.c': '../fuzzer/simple.c',
@@ -115,11 +117,40 @@ if get_option('test') == 'extended'
                 'MKSQUASHFS': mksquashfs.full_path(),
                 'UNSHARE': unshare.full_path(),
                 'READ_CHUNK': read_chunk.full_path(),
-                'SQSHFS': tools['sqshfs'].full_path(),
                 'SQSH_CAT': tools['sqsh-cat'].full_path(),
                 'SQSH_LS': tools['sqsh-ls'].full_path(),
                 'SQSH_UNPACK': tools['sqsh-unpack'].full_path(),
             },
         )
+    endforeach
+
+    fs_impl = []
+    if fuse3_dep.found()
+        fs_impl += tools['sqshfs']
+    endif
+    if fuse2_dep.found()
+        fs_impl += tools['sqshfs2']
+    endif
+
+    foreach impl : fs_impl
+        foreach p : sqsh_extended_fs_test
+            test(
+                p + ' (' + impl.name() + ')',
+                files(p),
+                should_fail: sqsh_failing_test.contains(p),
+                env: {
+                    'SQSHFS': impl.full_path(),
+                    'BUILD_DIR': meson.current_build_dir(),
+                    'SOURCE_ROOT': meson.project_source_root(),
+                    'FUSERMOUNT': fusermount.full_path(),
+                    'MKSQUASHFS': mksquashfs.full_path(),
+                    'UNSHARE': unshare.full_path(),
+                    'READ_CHUNK': read_chunk.full_path(),
+                    'SQSH_CAT': tools['sqsh-cat'].full_path(),
+                    'SQSH_LS': tools['sqsh-ls'].full_path(),
+                    'SQSH_UNPACK': tools['sqsh-unpack'].full_path(),
+                },
+            )
+        endforeach
     endforeach
 endif

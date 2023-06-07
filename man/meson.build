@@ -18,7 +18,7 @@ foreach template : tools_manpages
     install_man(manpage)
 endforeach
 
-if fuse_dep.found()
+if fuse3_dep.found() or fuse2_dep.found()
     manpage = configure_file(
         input: 'sqshfs.1.in',
         output: 'sqshfs.1',
