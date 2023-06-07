@@ -27,6 +27,7 @@ jobs:
           -Dlzma=enabled  \
           -Dzstd=enabled  \
           -Dthreads=enabled \
+          -Dfuse-old=enabled \
           -Dtest=extended \
           -Ddoc=false
     - name: test
@@ -77,6 +78,7 @@ jobs:
           -Dlz4=${{ matrix.feature }} \
           -Dlzma=${{ matrix.feature }} \
           -Dzstd=${{ matrix.feature }} \
+          -Dfuse-old=${{ matrix.feature }} \
           -Dtest=false \
           -Ddoc=false
     - name: build
@@ -102,6 +104,8 @@ jobs:
             -Dlz4=enabled \
             -Dlzma=enabled \
             -Dzstd=enabled \
+            -Dfuse-old=enabled \
+            -Dfuse=disabled \
             -Dtest=true \
             -Ddoc=false
           ninja -C /tmp/build
