@@ -106,6 +106,10 @@ directory_iterator_index_lookup(
 		outer_offset = sqsh__directory_index_iterator_start(&index_iterator);
 		inner_offset = sqsh__directory_index_iterator_index(&index_iterator);
 	}
+	if (rv < 0) {
+		goto out;
+	}
+
 	sqsh__metablock_reader_cleanup(&iterator->metablock);
 	rv = load_metablock(iterator, outer_offset, inner_offset);
 	iterator->remaining_entries = 0;
