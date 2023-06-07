@@ -51,7 +51,7 @@ jobs:
       run: |
         CC=${{ matrix.cc }}
         apk add zlib-dev
-        $CC -o sqsh-ls tools/ls.c $(find lib -name '*.c') -DCONFIG_ZLIB -L/lib -lz
+        $CC -o sqsh-ls tools/common.c tools/ls.c $(find lib -name '*.c') -DCONFIG_ZLIB -L/lib -lz
 
   build:
     runs-on: ubuntu-latest
