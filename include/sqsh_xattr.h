@@ -52,7 +52,7 @@ struct SqshInode;
 enum SqshXattrType {
 	SQSH_XATTR_USER = 0,
 	SQSH_XATTR_TRUSTED = 1,
-	SQSH_XATTR_SECURITY = 2,
+	SQSH_XATTR_SECURITY = 2
 };
 
 struct SqshXattrIterator;

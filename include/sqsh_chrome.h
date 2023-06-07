@@ -138,4 +138,4 @@ time_t sqsh_file_mtime(struct SqshArchive *archive, const char *path);
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_CHROME_H
+#endif /* SQSH_CHROME_H */

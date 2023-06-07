@@ -68,4 +68,4 @@ extern const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_static;
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_MAPPER_H
+#endif /* SQSH_MAPPER_H */

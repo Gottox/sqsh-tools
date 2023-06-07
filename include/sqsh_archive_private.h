@@ -96,7 +96,7 @@ struct SqshInodeMap {
 	/**
 	 * @privatesection
 	 */
-	_Atomic(uint64_t) *inode_refs;
+	void *inode_refs; /* atomic_uint_fast64_t */
 	size_t inode_count;
 	struct SqshExportTable *export_table;
 };
@@ -304,4 +304,4 @@ int sqsh__archive_cleanup(struct SqshArchive *sqsh);
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_ARCHIVE_PRIVATE_H
+#endif /* SQSH_ARCHIVE_PRIVATE_H */

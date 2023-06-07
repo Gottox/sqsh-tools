@@ -132,8 +132,9 @@
 #define CHUNK_SIZE(...) sizeof((uint8_t[]){__VA_ARGS__})
 
 #define DEFAULT_MAPPER sqsh_mapper_impl_static
-// We're using a ridiculously small block size to
-// test the mappers ability to handle small blocks.
+/* We're using a ridiculously small block size to
+ * test the mappers ability to handle small blocks.
+ */
 #define DEFAULT_BLOCK_SIZE 1
 
 #define DEFAULT_CONFIG(s) \

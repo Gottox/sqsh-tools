@@ -66,6 +66,7 @@ uint64_t
 sqsh_inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number) {
 	int rv;
 	uint64_t inode_ref = 0;
+	atomic_uint_fast64_t *inode_refs = map->inode_refs;
 	if (inode_number - 1 > map->inode_count) {
 		return -SQSH_ERROR_OUT_OF_BOUNDS;
 	} else if (inode_number == 0) {
@@ -77,7 +78,7 @@ sqsh_inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number) {
 			return 0;
 		}
 	} else {
-		inode_ref = atomic_load(&map->inode_refs[inode_number - 1]);
+		inode_ref = atomic_load(&inode_refs[inode_number - 1]);
 	}
 	return inode_ref;
 }
@@ -85,21 +86,18 @@ sqsh_inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number) {
 int
 sqsh_inode_map_set(
 		struct SqshInodeMap *map, uint64_t inode_number, uint64_t inode_ref) {
-	uint64_t old_value;
+	uint_fast64_t old_value;
+	atomic_uint_fast64_t *inode_refs = map->inode_refs;
+
 	if (inode_number - 1 > map->inode_count) {
 		return -SQSH_ERROR_OUT_OF_BOUNDS;
-	} else if (inode_number == 0) {
-		return 0;
-	} else if (map->export_table != NULL) {
-		return 0;
-	} else {
-		_Atomic(uint64_t) *obj = &map->inode_refs[inode_number - 1];
-		old_value = atomic_exchange(obj, inode_ref);
+	} else if (inode_number != 0 && map->export_table == NULL) {
+		old_value = atomic_exchange(&inode_refs[inode_number - 1], inode_ref);
 		if (old_value != 0 && old_value != inode_ref) {
 			return -SQSH_ERROR_INODE_MAP_IS_INCONSISTENT;
 		}
-		return 0;
 	}
+	return 0;
 }
 
 int

@@ -2,6 +2,7 @@ add_languages('cpp', native: false)
 
 sqsh_test = [
     'cpp-test.cpp',
+    'ansi.c',
     'directory/directory_iterator.c',
     'extract/extract.c',
     'extract/extract_manager.c',
@@ -21,6 +22,9 @@ sqsh_test = [
     'primitive/reader.c',
     'tree/walker.c',
 ]
+sqsh_test_extra_args = {
+    'ansi.c': '-ansi',
+}
 sqsh_extended_test = [
     'selftest.sh',
     'tools/cat/large-file-compressed.sh',
@@ -83,11 +87,16 @@ foreach p : sqsh_test
     if sqsh_extra_source.has_key(p)
         sources += [sqsh_extra_source[p]]
     endif
+    this_c_args = []
+    this_c_args += test_c_args
+    if sqsh_test_extra_args.has_key(p)
+        this_c_args += sqsh_test_extra_args[p]
+    endif
     t = executable(
         p.underscorify(),
         sources,
         install: false,
-        c_args: test_c_args,
+        c_args: this_c_args,
         dependencies: libsqsh_dep,
     )
     test(p, t)
