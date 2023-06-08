@@ -60,7 +60,7 @@ typedef uint8_t sqsh__extractor_context_t[256];
  * If you want to use this, you need to link against
  * [libsqsh-lzo](https://github.com/Gottox/libsqsh-lzo).
  */
-extern const struct SqshExtractorImpl *sqsh__impl_lzo;
+extern const struct SqshExtractorImpl *const sqsh__impl_lzo;
 
 /**
  * @internal
