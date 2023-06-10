@@ -41,7 +41,12 @@
 #include <sqsh_file_private.h>
 #include <sqsh_inode_private.h>
 #include <sqsh_tree_private.h>
-#include <squashfs_image.h>
+
+extern uint8_t _binary_test_squashfs_image_start;
+extern uint8_t _binary_test_squashfs_image_end;
+
+#define TEST_SQUASHFS_IMAGE_LEN ((size_t)&_binary_test_squashfs_image_end - (size_t)&_binary_test_squashfs_image_start)
+#define TEST_SQUASHFS_IMAGE (&_binary_test_squashfs_image_start)
 
 static void
 sqsh_empty(void) {
@@ -58,8 +63,8 @@ sqsh_get_nonexistant(void) {
 	struct SqshArchive sqsh = {0};
 	struct SqshTreeWalker walker = {0};
 
-	const struct SqshConfig config = DEFAULT_CONFIG(test_squashfs_image_len);
-	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
+	const struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
 	rv = sqsh__tree_walker_init(&walker, &sqsh);
@@ -81,8 +86,8 @@ tree_walker(void) {
 	struct SqshTreeWalker walker = {0};
 	struct SqshArchive sqsh = {0};
 	struct SqshInode *inode;
-	const struct SqshConfig config = DEFAULT_CONFIG(test_squashfs_image_len);
-	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
+	const struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
 	rv = sqsh__tree_walker_init(&walker, &sqsh);
@@ -116,8 +121,8 @@ sqsh_ls(void) {
 	struct SqshDirectoryIterator *iter = NULL;
 	struct SqshArchive sqsh = {0};
 	const struct SqshSuperblock *superblock;
-	const struct SqshConfig config = DEFAULT_CONFIG(test_squashfs_image_len);
-	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
+	const struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
 	superblock = sqsh_archive_superblock(&sqsh);
@@ -169,8 +174,8 @@ sqsh_read_content(void) {
 	int rv;
 	char *data;
 	struct SqshArchive archive = {0};
-	const struct SqshConfig config = DEFAULT_CONFIG(test_squashfs_image_len);
-	rv = sqsh__archive_init(&archive, (char *)test_squashfs_image, &config);
+	const struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	rv = sqsh__archive_init(&archive, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
 	data = sqsh_file_content(&archive, "/a");
@@ -190,8 +195,8 @@ sqsh_cat_fragment(void) {
 	struct SqshFileReader reader = {0};
 	struct SqshArchive sqsh = {0};
 	struct SqshTreeWalker walker = {0};
-	const struct SqshConfig config = DEFAULT_CONFIG(test_squashfs_image_len);
-	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
+	const struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
 	rv = sqsh__tree_walker_init(&walker, &sqsh);
@@ -240,9 +245,9 @@ sqsh_cat_datablock_and_fragment(void) {
 	struct SqshTreeWalker walker = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
-			.source_size = test_squashfs_image_len,
+			.source_size = TEST_SQUASHFS_IMAGE_LEN,
 	};
-	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
+	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
 	rv = sqsh__tree_walker_init(&walker, &sqsh);
@@ -293,9 +298,9 @@ sqsh_cat_size_overflow(void) {
 	struct SqshTreeWalker walker = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
-			.source_size = test_squashfs_image_len,
+			.source_size = TEST_SQUASHFS_IMAGE_LEN,
 	};
-	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
+	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
 	rv = sqsh__tree_walker_init(&walker, &sqsh);
@@ -338,9 +343,9 @@ sqsh_test_uid_and_gid(void) {
 	const struct SqshSuperblock *superblock;
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
-			.source_size = test_squashfs_image_len,
+			.source_size = TEST_SQUASHFS_IMAGE_LEN,
 	};
-	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
+	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
 	superblock = sqsh_archive_superblock(&sqsh);
@@ -368,9 +373,9 @@ sqsh_test_extended_dir(void) {
 	struct SqshTreeWalker walker = {0};
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
-			.source_size = test_squashfs_image_len,
+			.source_size = TEST_SQUASHFS_IMAGE_LEN,
 	};
-	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
+	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
 	rv = sqsh__tree_walker_init(&walker, &sqsh);
@@ -404,9 +409,9 @@ sqsh_test_xattr(void) {
 	const struct SqshSuperblock *superblock;
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
-			.source_size = test_squashfs_image_len,
+			.source_size = TEST_SQUASHFS_IMAGE_LEN,
 	};
-	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
+	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
 	superblock = sqsh_archive_superblock(&sqsh);
@@ -535,8 +540,8 @@ multithreaded(void) {
 	pthread_t threads[16] = {0};
 	struct SqshArchive sqsh = {0};
 
-	const struct SqshConfig config = DEFAULT_CONFIG(test_squashfs_image_len);
-	rv = sqsh__archive_init(&sqsh, (char *)test_squashfs_image, &config);
+	const struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(&sqsh);

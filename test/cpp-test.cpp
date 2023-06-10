@@ -43,7 +43,6 @@ extern "C" {
 #include <sqsh_directory.h>
 #include <sqsh_error.h>
 #include <sqsh_mapper.h>
-#include <squashfs_image.h>
 #include <stdint.h>
 
 static void

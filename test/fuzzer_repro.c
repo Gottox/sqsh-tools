@@ -41,7 +41,6 @@
 #include <sqsh_file_private.h>
 #include <sqsh_inode_private.h>
 #include <sqsh_tree_private.h>
-#include <squashfs_image.h>
 #include <sys/resource.h>
 #include <sys/time.h>
 

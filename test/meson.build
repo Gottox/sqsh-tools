@@ -54,7 +54,7 @@ endif
 
 mksquashfs = find_program('mksquashfs')
 setfattr = find_program('setfattr')
-xxd = find_program('xxd')
+ld = find_program('ld')
 unshare = find_program('unshare')
 fusermount = find_program('fusermount')
 
@@ -68,13 +68,15 @@ squashfs = custom_target(
     command: ['../utils/create_squashfs.sh', '', '@OUTPUT@', '@PRIVATE_DIR@'],
 )
 
-squashfs_h = custom_target(
-    'squashfs_image.h',
+squashfs_o = custom_target(
+    'squashfs_image.o',
     input: squashfs,
-    output: 'squashfs_image.h',
-    capture: true,
-    command: [xxd, '-i', '@INPUT@'],
+    output: 'squashfs_image.o',
+    command: [ld, '-z', 'noexecstack', '-r', '-b', 'binary', '-o', '@OUTPUT@', '@INPUT@'],
 )
+sqsh_extra_source += {
+    'integration.c': squashfs_o,
+}
 
 read_chunk = executable(
     'read-chunk',
@@ -85,9 +87,9 @@ read_chunk = executable(
 )
 
 foreach p : sqsh_test
-    sources = [p, squashfs_h, sqsh_test_util]
+    sources = [p, sqsh_test_util]
     if sqsh_extra_source.has_key(p)
-        sources += [sqsh_extra_source[p]]
+        sources += sqsh_extra_source[p]
     endif
     this_c_args = []
     this_c_args += test_c_args
