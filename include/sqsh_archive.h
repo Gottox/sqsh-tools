@@ -31,8 +31,8 @@
  * @file         sqsh_archive.h
  */
 
-#ifndef SQSH_H
-#define SQSH_H
+#ifndef SQSH_ARCHIVE_H
+#define SQSH_ARCHIVE_H
 
 #include "sqsh_common.h"
 
@@ -678,4 +678,4 @@ int sqsh_archive_free(struct SqshArchive *archive);
 #ifdef __cplusplus
 }
 #endif
-#endif /* SQSH_H */
+#endif /* SQSH_ARCHIVE_H */

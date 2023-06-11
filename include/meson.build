@@ -1,4 +1,5 @@
 headers = [
+    'sqsh.h',
     'sqsh_archive.h',
     'sqsh_chrome.h',
     'sqsh_common.h',
