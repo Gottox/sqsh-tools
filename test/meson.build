@@ -53,19 +53,19 @@ elif cc.get_id() == 'clang'
 endif
 
 mksquashfs = find_program('mksquashfs')
-setfattr = find_program('setfattr')
+mksquashfs_version = run_command(mksquashfs, ['-version'], capture: true, check: true).stdout().split(' ')[2]
+if mksquashfs_version.version_compare('<4.6')
+    error('mksquashfs version 4.6 or newer is required. Installed: ' + mksquashfs_version)
+endif
 ld = find_program('ld')
-unshare = find_program('unshare')
-fusermount = find_program('fusermount')
 
 squashfs = custom_target(
     'squashfs.image',
     output: 'squashfs.image',
     env: {
         'MKSQUASHFS': mksquashfs.full_path(),
-        'SETFATTR': setfattr.full_path(),
     },
-    command: ['../utils/create_squashfs.sh', '', '@OUTPUT@', '@PRIVATE_DIR@'],
+    command: ['./integration_create.sh', '', '@OUTPUT@', '@PRIVATE_DIR@'],
 )
 
 squashfs_o = custom_target(
@@ -115,9 +115,7 @@ if get_option('test') == 'extended'
             env: {
                 'BUILD_DIR': meson.current_build_dir(),
                 'SOURCE_ROOT': meson.project_source_root(),
-                'FUSERMOUNT': fusermount.full_path(),
                 'MKSQUASHFS': mksquashfs.full_path(),
-                'UNSHARE': unshare.full_path(),
                 'READ_CHUNK': read_chunk.full_path(),
                 'SQSH_CAT': tools['sqsh-cat'].full_path(),
                 'SQSH_LS': tools['sqsh-ls'].full_path(),
@@ -144,9 +142,7 @@ if get_option('test') == 'extended'
                     'SQSHFS': impl.full_path(),
                     'BUILD_DIR': meson.current_build_dir(),
                     'SOURCE_ROOT': meson.project_source_root(),
-                    'FUSERMOUNT': fusermount.full_path(),
                     'MKSQUASHFS': mksquashfs.full_path(),
-                    'UNSHARE': unshare.full_path(),
                     'READ_CHUNK': read_chunk.full_path(),
                     'SQSH_CAT': tools['sqsh-cat'].full_path(),
                     'SQSH_LS': tools['sqsh-ls'].full_path(),

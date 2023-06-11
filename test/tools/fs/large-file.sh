@@ -13,19 +13,14 @@
 : "${MKSQUASHFS:?MKSQUASHFS is not set}"
 : "${SOURCE_ROOT:?SOURCE_ROOT is not set}"
 : "${SQSHFS:?SQSHFS is not set}"
-: "${UNSHARE:?UNSHARE is not set}"
-: "${FUSERMOUNT:?FUSERMOUNT is not set}"
+
+unmount() {
+	fusermount -u "$1" || umount "$1"
+}
 
 MKSQUASHFS_OPTS="-no-xattrs -noappend -mkfs-time 0 -b 4096"
 
 SQSHFS_IMPL="$(basename "$SQSHFS")"
-
-# unshares the mount namespace, so that sqshfs will be terminated
-# when this script exits
-if [ -z "$INTERNAL_UNSHARED" ]; then
-	export INTERNAL_UNSHARED=1
-	exec "$UNSHARE" -rm "$0" "$@"
-fi
 
 WORK_DIR="$BUILD_DIR/$SQSHFS_IMPL/fs-large-file"
 
@@ -45,6 +40,6 @@ $SQSHFS "$PWD/original.squashfs" "$PWD/mnt"
 
 cat "$PWD/mnt/file.orig" > "$PWD/file.extracted"
 
-$FUSERMOUNT -u "$PWD/mnt"
+unmount "$PWD/mnt"
 
 exec cmp "$PWD/file.orig" "$PWD/file.extracted"

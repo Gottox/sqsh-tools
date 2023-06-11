@@ -8,12 +8,12 @@ mkdir -p "$tmp"
 echo a > "$tmp/a"
 seq 1 1050000 | tr -cd "\n" | tr '\n' b > "$tmp/b"
 mkdir -p "$tmp/large_dir"
-$SETFATTR -n user.force_extended -v true "$tmp/large_dir"
 seq 1 1050 | sed "s#.*#$tmp/large_dir/&#" | xargs touch
-$SETFATTR -n user.foo -v 1234567891234567891234567890001234567890 "$tmp/a"
-$SETFATTR -n user.bar -v 1234567891234567891234567890001234567890 "$tmp/b"
 [ -e "$out" ] && rm "$out"
 $MKSQUASHFS "$tmp" "$out" \
+	-p '"a" x user.foo=1234567891234567891234567890001234567890' \
+	-p '"b" x user.bar=1234567891234567891234567890001234567890' \
+	-p '"large_dir" x user.force_extended=true' \
 	-nopad \
 	-force-uid 2020 \
 	-force-gid 202020 \
