@@ -272,6 +272,25 @@ sqsh_xattr_iterator_prefix_size(struct SqshXattrIterator *iterator) {
 }
 
 int
+sqsh_xattr_iterator_lookup(
+		struct SqshXattrIterator *iterator, const char *name) {
+	int rv = 0, rv_cmp = 0;
+
+	while ((rv = sqsh_xattr_iterator_next(iterator)) > 0) {
+		rv_cmp = sqsh_xattr_iterator_fullname_cmp(iterator, name);
+		if (rv_cmp == 0) {
+			return 0;
+		} else if (rv_cmp > 0) {
+			return -SQSH_ERROR_NO_SUCH_XATTR;
+		}
+	}
+	if (rv < 0) {
+		return rv;
+	} else {
+		return -SQSH_ERROR_NO_SUCH_XATTR;
+	}
+}
+int
 sqsh_xattr_iterator_fullname_cmp(
 		struct SqshXattrIterator *iterator, const char *name) {
 	int rv = 0;

@@ -98,6 +98,8 @@ sqsh_error_str(int error_code) {
 		return "Integer overflow";
 	case SQSH_ERROR_NO_SUCH_FILE:
 		return "No such file or directory";
+	case SQSH_ERROR_NO_SUCH_XATTR:
+		return "No such xattr";
 	case SQSH_ERROR_NO_EXTENDED_DIRECTORY:
 		return "No extended directory";
 	case SQSH_ERROR_NO_FRAGMENT_TABLE:

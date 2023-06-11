@@ -146,6 +146,18 @@ uint16_t sqsh_xattr_iterator_name_size(struct SqshXattrIterator *iterator);
 
 /**
  * @memberof SqshXattrIterator
+ * @brief Looks up an xattr by name.
+ *
+ * @param[in] iterator The iterator to use.
+ * @param[in] name     The name to lookup
+ *
+ * @return 0 if the xattr was found, a negative value otherwise.
+ */
+SQSH_NO_UNUSED int sqsh_xattr_iterator_lookup(
+		struct SqshXattrIterator *iterator, const char *name);
+
+/**
+ * @memberof SqshXattrIterator
  * @brief Compares the full name of the current xattr with a given 0-terminated
  * name.
  *
