@@ -286,27 +286,30 @@ fs_getxattr(const char *path, const char *name, char *buf, size_t size) {
 	}
 
 	iterator = sqsh_xattr_iterator_new(inode, &rv);
-	while ((rv = sqsh_xattr_iterator_next(iterator)) > 0) {
-		if (sqsh_xattr_iterator_fullname_cmp(iterator, name) != 0) {
-			continue;
-		}
-		const char *value = sqsh_xattr_iterator_value(iterator);
-		size_t value_len = sqsh_xattr_iterator_value_size(iterator);
-		if (value_len + 1 > size) {
-			rv = -ERANGE;
-			goto out;
-		}
-		memcpy(buf, value, value_len);
-		buf[value_len + 1] = '\0';
-		rv = value_len;
+	if (rv < 0) {
 		goto out;
 	}
 
-	rv = -ENODATA;
+	rv = sqsh_xattr_iterator_lookup(iterator, name);
+	if (rv < 0) {
+		goto out;
+	}
+
+	const char *value = sqsh_xattr_iterator_value(iterator);
+	size_t value_len = sqsh_xattr_iterator_value_size(iterator);
+	if (value_len > size) {
+		rv = SQSH_ERROR_OUT_OF_BOUNDS;
+		goto out;
+	}
+
+	memcpy(buf, value, value_len);
+	buf[value_len] = '\0';
+	rv = value_len;
+
 out:
 	sqsh_xattr_iterator_free(iterator);
 	sqsh_inode_free(inode);
-	return rv;
+	return fs_common_map_err(rv);
 }
 
 static struct fuse_operations fs_oper = {

@@ -381,25 +381,21 @@ fs_getxattr(fuse_req_t req, fuse_ino_t ino, const char *name, size_t size) {
 		goto out;
 	}
 
-	while (value_ptr == NULL && (rv = sqsh_xattr_iterator_next(iterator)) > 0) {
-		if (sqsh_xattr_iterator_fullname_cmp(iterator, name) == 0) {
-			value_ptr = sqsh_xattr_iterator_value(iterator);
-			value_size = sqsh_xattr_iterator_value_size(iterator);
-		}
-	}
+	rv = sqsh_xattr_iterator_lookup(iterator, name);
 	if (rv < 0) {
-		fuse_reply_err(req, EIO);
+		fuse_reply_err(req, fs_common_map_err(rv));
 		goto out;
-	} else if (value_ptr == NULL) {
-		fuse_reply_err(req, ENODATA);
-		goto out;
-	} else if (size == 0) {
+	}
+
+	value_ptr = sqsh_xattr_iterator_value(iterator);
+	value_size = sqsh_xattr_iterator_value_size(iterator);
+
+	if (size == 0) {
 		fuse_reply_xattr(req, value_size);
-	} else if (value_size <= size) {
-		fuse_reply_buf(req, value_ptr, value_size);
-	} else {
+	} else if (size < value_size) {
 		fuse_reply_err(req, ERANGE);
-		goto out;
+	} else {
+		fuse_reply_buf(req, value_ptr, value_size);
 	}
 
 out:
