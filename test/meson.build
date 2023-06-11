@@ -21,6 +21,7 @@ sqsh_test = [
     'primitive/rc_map.c',
     'primitive/reader.c',
     'tree/walker.c',
+    'xattr/xattr_iterator.c',
 ]
 sqsh_test_extra_args = {
     'ansi.c': '-ansi',

@@ -83,11 +83,13 @@
 #define XATTR_TABLE_OFFSET 7168
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-#	define UINT16_BYTES(x) (uint8_t)(x), (uint8_t)((x) >> 8)
+#	define UINT16_BYTES(x) (uint8_t)(x), (uint8_t)(((uint64_t)(x)) >> 8)
 #	define UINT32_BYTES(x) \
-		UINT16_BYTES((uint16_t)(x)), UINT16_BYTES((uint16_t)((x) >> 16))
+		UINT16_BYTES((uint16_t)(x)), \
+				UINT16_BYTES((uint16_t)(((uint32_t)(x)) >> 16))
 #	define UINT64_BYTES(x) \
-		UINT32_BYTES((uint32_t)(x)), UINT32_BYTES((uint32_t)((x) >> 32))
+		UINT32_BYTES((uint32_t)(x)), \
+				UINT32_BYTES((uint32_t)(((uint64_t)(x)) >> 32))
 #else
 #	define UINT16_BYTES(x) (uint8_t)((x) >> 8), (uint8_t)(x)
 #	define UINT32_BYTES(x) \
@@ -113,6 +115,14 @@
 	UINT32_BYTES(block_index), UINT32_BYTES(1 /* link count */), \
 			UINT32_BYTES(file_size), UINT32_BYTES(block_offset), \
 			UINT32_BYTES(parent_inode)
+#define INODE_EXT_DIR( \
+		block_index, file_size, block_offset, parent_inode, index_count, \
+		xattr_index) \
+	UINT32_BYTES(1 /* link count */), UINT32_BYTES(file_size), \
+			UINT32_BYTES(block_index), UINT32_BYTES(parent_inode), \
+			UINT32_BYTES(index_count), UINT32_BYTES(block_offset), \
+			UINT32_BYTES(xattr_index)
+
 #define INODE_BASIC_SYMLINK(target_size) \
 	UINT32_BYTES(1 /* link count */), UINT32_BYTES(target_size)
 #define DATA_BLOCK_REF(size, compressed) \
@@ -123,6 +133,17 @@
 #define DIRECTORY_ENTRY(offset, inode_offset, type, name_size) \
 	UINT16_BYTES(offset), UINT16_BYTES(inode_offset), UINT16_BYTES(type), \
 			UINT16_BYTES((name_size)-1)
+
+#define XATTR_LOOKUP_HEADER(kv_start, count) \
+	UINT64_BYTES(kv_start), UINT32_BYTES(count), UINT32_BYTES(0)
+#define XATTR_LOOKUP_ENTRY(xattr_index, xattr_off, count, size) \
+	UINT64_BYTES(((xattr_index) << 16) | (xattr_off)), UINT32_BYTES(count), \
+			UINT32_BYTES(size)
+#define XATTR_NAME_HEADER(type, size) \
+	UINT16_BYTES(type), UINT16_BYTES(size)
+#define XATTR_VALUE_HEADER(size) \
+	UINT32_BYTES(size)
+
 
 #define ZLIB_ABCD \
 	0x78, 0x9c, 0x4b, 0x4c, 0x4a, 0x4e, 0x01, 0x00, 0x03, 0xd8, 0x01, 0x8b
