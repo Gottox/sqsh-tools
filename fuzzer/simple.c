@@ -9,7 +9,9 @@
 #include "../include/sqsh_directory_private.h"
 #include "../include/sqsh_file_private.h"
 #include "../include/sqsh_inode_private.h"
+#include "../include/sqsh_xattr_private.h"
 #include <stdint.h>
+#include <malloc.h>
 
 #define DEFAULT_CHUNK_SIZE 4096
 
@@ -45,6 +47,17 @@ read_file(struct SqshDirectoryIterator *iter) {
 
 	if (rv < 0) {
 		goto out;
+	}
+
+	struct SqshXattrIterator xattr_iter = {0};
+	rv = sqsh__xattr_iterator_init(&xattr_iter, inode);
+	if (rv < 0) {
+		goto out;
+	}
+	while ((rv = sqsh_xattr_iterator_next(&xattr_iter)) > 0) {
+		char *fullname = sqsh_xattr_iterator_fullname_dup(&xattr_iter);
+		free(fullname);
+		sqsh_xattr_iterator_value(&xattr_iter);
 	}
 
 out:
