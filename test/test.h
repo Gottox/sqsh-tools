@@ -67,7 +67,7 @@ main(int argc, char **argv) {
 		T_color_good = "\x1b[32;1m";
 		T_color_reset = "\x1b[0m";
 	}
-	strcpy(T_progname, argv[0]);
+	strncpy(T_progname, argv[0], sizeof(T_progname) - 1);
 	return T_test_def(argc < 2 ? NULL : argv[1]);
 }
 
