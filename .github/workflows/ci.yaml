@@ -108,7 +108,7 @@ jobs:
             -Dtest=extended \
             -Ddoc=false
           # fuse needs root privileges on OpenBSD
-          sudo ninja -C /tmp/build
+          sudo ninja -C /tmp/build test
 
   doxygen:
     needs:
