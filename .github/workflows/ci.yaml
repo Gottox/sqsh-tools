@@ -86,11 +86,10 @@ jobs:
         ninja -C /tmp/build
 
   build-openbsd:
-    if: ${{ false }}  # The job doesn't terminate. Disabling the job for noe
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: "cross-platform-actions/action@v0.10.0"
+    - uses: "cross-platform-actions/action@v0.14.0"
       continue-on-error: true
       with:
         operating_system: openbsd
@@ -106,9 +105,10 @@ jobs:
             -Dzstd=enabled \
             -Dfuse-old=enabled \
             -Dfuse=disabled \
-            -Dtest=true \
+            -Dtest=extended \
             -Ddoc=false
-          ninja -C /tmp/build
+          # fuse needs root privileges on OpenBSD
+          sudo ninja -C /tmp/build
 
   doxygen:
     needs:
