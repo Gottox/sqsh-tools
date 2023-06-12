@@ -96,7 +96,7 @@ jobs:
         architecture: x86-64
         version: 7.2
         run: |
-          sudo pkg_add bzip2 curl git meson lz4
+          sudo pkg_add git meson squashfs-tools curl lz4 xz zstd
           CC=clang meson setup /tmp/build \
             -Dcurl=enabled \
             -Dzlib=enabled \
