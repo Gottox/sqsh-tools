@@ -133,6 +133,8 @@ load_xattr(void) {
 	assert(rv == 0);
 
 	sqsh_xattr_iterator_free(iterator);
+	sqsh__inode_cleanup(&inode);
+	sqsh__archive_cleanup(&archive);
 }
 
 static void
@@ -194,6 +196,8 @@ load_xattr_indirect(void) {
 	assert(rv == 0);
 
 	sqsh_xattr_iterator_free(iterator);
+	sqsh__inode_cleanup(&inode);
+	sqsh__archive_cleanup(&archive);
 }
 
 DEFINE
