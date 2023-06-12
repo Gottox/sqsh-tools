@@ -108,7 +108,7 @@ jobs:
             -Dtest=extended \
             -Ddoc=false
           # fuse needs root privileges on OpenBSD
-          sudo meson -C /tmp/build test -t 5
+          sudo meson test -C /tmp/build -t 5
 
   doxygen:
     needs:
