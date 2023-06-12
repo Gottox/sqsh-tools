@@ -107,6 +107,12 @@ if get_option('test') == 'extended'
             p,
             files(p),
             should_fail: sqsh_failing_test.contains(p),
+            depends: [
+                read_chunk,
+                tools['sqsh-ls'],
+                tools['sqsh-cat'],
+                tools['sqsh-unpack'],
+            ],
             env: {
                 'BUILD_DIR': meson.current_build_dir(),
                 'SOURCE_ROOT': meson.project_source_root(),
@@ -133,6 +139,13 @@ if get_option('test') == 'extended'
                 p + ' (' + impl.name() + ')',
                 files(p),
                 should_fail: sqsh_failing_test.contains(p),
+                depends: [
+                    read_chunk,
+                    fs_impl,
+                    tools['sqsh-ls'],
+                    tools['sqsh-cat'],
+                    tools['sqsh-unpack'],
+                ],
                 env: {
                     'SQSHFS': impl.full_path(),
                     'BUILD_DIR': meson.current_build_dir(),
