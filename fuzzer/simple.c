@@ -11,7 +11,7 @@
 #include "../include/sqsh_inode_private.h"
 #include "../include/sqsh_xattr_private.h"
 #include <stdint.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 #define DEFAULT_CHUNK_SIZE 4096
 

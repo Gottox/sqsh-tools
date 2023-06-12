@@ -23,7 +23,7 @@ cd "$WORK_DIR"
 
 OFFSET=262150
 
-seq 1 "$OFFSET" | head -c "$OFFSET" > "$PWD/file"
+seq 1 "$OFFSET" | dd bs=1 count="$OFFSET" > "$PWD/file"
 
 # shellcheck disable=SC2086
 $MKSQUASHFS "$PWD/file" "$PWD/original.squashfs" $MKSQUASHFS_OPTS

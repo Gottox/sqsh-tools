@@ -58,8 +58,6 @@ mksquashfs_version = run_command(mksquashfs, ['-version'], capture: true, check:
 if mksquashfs_version.version_compare('<4.6')
     error('mksquashfs version 4.6 or newer is required. Installed: ' + mksquashfs_version)
 endif
-ld = find_program('ld')
-
 squashfs = custom_target(
     'squashfs.image',
     output: 'squashfs.image',
@@ -69,14 +67,14 @@ squashfs = custom_target(
     command: ['./integration_create.sh', '', '@OUTPUT@', '@PRIVATE_DIR@'],
 )
 
-squashfs_o = custom_target(
-    'squashfs_image.o',
+squashfs_h = custom_target(
+    'squashfs_image.c',
     input: squashfs,
-    output: 'squashfs_image.o',
-    command: [ld, '-z', 'noexecstack', '-r', '-b', 'binary', '-o', '@OUTPUT@', '@INPUT@'],
+    output: 'squashfs_image.c',
+    command: ['../utils/f2h.sh', 'squashfs_image', '@INPUT@', '@OUTPUT@'],
 )
 sqsh_extra_source += {
-    'integration.c': squashfs_o,
+    'integration.c': squashfs_h,
 }
 
 read_chunk = executable(
@@ -102,7 +100,7 @@ foreach p : sqsh_test
         sources,
         install: false,
         c_args: this_c_args,
-        dependencies: libsqsh_dep,
+        dependencies: [libsqsh_dep, threads_dep],
     )
     test(p, t)
 endforeach
