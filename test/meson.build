@@ -54,10 +54,6 @@ elif cc.get_id() == 'clang'
 endif
 
 mksquashfs = find_program('mksquashfs')
-mksquashfs_version = run_command(mksquashfs, ['-version'], capture: true, check: true).stdout().split(' ')[2]
-if mksquashfs_version.version_compare('<4.6')
-    error('mksquashfs version 4.6 or newer is required. Installed: ' + mksquashfs_version)
-endif
 squashfs = custom_target(
     'squashfs.image',
     output: 'squashfs.image',
