@@ -60,7 +60,7 @@ load_xattr(void) {
 			UINT64_BYTES(XATTR_TABLE_OFFSET + 128),
 			[XATTR_TABLE_OFFSET + 128] = METABLOCK_HEADER(0, 128),
 			XATTR_LOOKUP_ENTRY(
-					128, 5, 3, 0 /* TODO: this value is ignored. See #28 */),
+					128, 5, 3, 44),
 			[XATTR_TABLE_OFFSET + 256] = METABLOCK_HEADER(0, 128),
 			0xa1, 0xa1, 0xa1, 0xa1, 0xa1, /* offset bytes */
 			XATTR_NAME_HEADER(0, 3),
@@ -154,7 +154,7 @@ load_xattr_indirect(void) {
 			UINT64_BYTES(XATTR_TABLE_OFFSET + 128),
 			[XATTR_TABLE_OFFSET + 128] = METABLOCK_HEADER(0, 128),
 			XATTR_LOOKUP_ENTRY(
-					128, 0, 1, 0 /* TODO: this value is ignored. See #28 */),
+					128, 0, 1, 12),
 			[XATTR_TABLE_OFFSET + 128 + 128] = METABLOCK_HEADER(0, 128),
 			XATTR_NAME_HEADER(0 | 0x0100, 3),
 			'a', 'b', 'c',

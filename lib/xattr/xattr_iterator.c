@@ -94,6 +94,7 @@ sqsh__xattr_iterator_init(
 	}
 
 	iterator->remaining_entries = sqsh__data_xattr_lookup_table_count(ref);
+	iterator->remaining_size = sqsh__data_xattr_lookup_table_size(ref);
 	iterator->next_offset = inner_offset;
 	iterator->value_index = 0;
 	iterator->context = xattr_table;
@@ -192,6 +193,10 @@ sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator) {
 	sqsh__metablock_reader_cleanup(&iterator->out_of_line_value);
 
 	if (iterator->remaining_entries == 0) {
+		if (iterator->remaining_size != 0) {
+			rv = -SQSH_ERROR_XATTR_SIZE_MISSMATCH;
+			goto out;
+		}
 		return 0;
 	}
 
@@ -230,10 +235,18 @@ sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator) {
 		}
 	}
 
+	const size_t processed_size = sqsh_xattr_iterator_prefix_size(iterator) +
+			name_size + sqsh_xattr_iterator_value_size(iterator) + 1;
+	if (SQSH_SUB_OVERFLOW(
+				iterator->remaining_size, processed_size,
+				&iterator->remaining_size)) {
+		rv = -SQSH_ERROR_XATTR_SIZE_MISSMATCH;
+		goto out;
+	}
+
 	rv = iterator->remaining_entries;
 
 	iterator->remaining_entries--;
-
 out:
 	return rv;
 }

@@ -128,6 +128,8 @@ sqsh_error_str(int error_code) {
 		return "Internal error";
 	case SQSH_ERROR_INODE_MAP_IS_INCONSISTENT:
 		return "Inode map is inconsistent";
+	case SQSH_ERROR_XATTR_SIZE_MISSMATCH:
+		return "Xattr size missmatch";
 	}
 	snprintf(err_str, sizeof(err_str), UNKOWN_ERROR_FORMAT, abs(error_code));
 	return err_str;

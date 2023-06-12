@@ -58,6 +58,7 @@ struct SqshXattrIterator {
 	struct SqshMetablockReader out_of_line_value;
 	struct SqshXattrTable *context;
 	size_t remaining_entries;
+	size_t remaining_size;
 	uint64_t upper_limit;
 	sqsh_index_t next_offset;
 	sqsh_index_t value_index;
