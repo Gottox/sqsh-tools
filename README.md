@@ -78,7 +78,7 @@ while(sqsh_file_iterator_next(iterator, 1) > 0) {
 	puts("Data:");
 	fwrite(data, 1, size, stdout);
 }
-sqsh_file_iterator_close(iterator);
+sqsh_file_iterator_free(iterator);
 sqsh_close(file);
 sqsh_archive_free(archive);
 ```
