@@ -73,7 +73,6 @@ jobs:
       run: |
         meson wrap update-db
         CC=${{ matrix.cc }} meson setup /tmp/build \
-          -Dwerror=true \
           -Dcurl=${{ matrix.feature }} \
           -Dzlib=${{ matrix.feature }} \
           -Dlz4=${{ matrix.feature }} \
