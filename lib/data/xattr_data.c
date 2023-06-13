@@ -126,10 +126,3 @@ sqsh__data_xattr_id_table_xattr_ids(
 		const struct SqshDataXattrIdTable *xattr_id_table) {
 	return le32toh(xattr_id_table->xattr_ids);
 }
-uint64_t
-sqsh__data_xattr_id_table_ref(
-		const struct SqshDataXattrIdTable *xattr_id_table, uint64_t index) {
-	const uint64_t *table = (const uint64_t *)&xattr_id_table[1];
-
-	return le64toh(table[index]);
-}
