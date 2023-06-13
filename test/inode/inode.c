@@ -52,7 +52,7 @@ load_inode(void) {
 			0,
 			0,
 			0,
-			INODE_HEADER(2, 0, 0, 0, 0, 1),
+			INODE_HEADER(2, 0666, 0, 0, 4242, 1),
 			INODE_BASIC_FILE(1024, 0xFFFFFFFF, 0, 1),
 			UINT32_BYTES(42),
 
@@ -64,6 +64,8 @@ load_inode(void) {
 	assert(rv == 0);
 
 	assert(sqsh_inode_type(&inode) == SQSH_INODE_TYPE_FILE);
+	assert(sqsh_inode_permission(&inode) == 0666);
+	assert(sqsh_inode_modified_time(&inode) == 4242);
 	assert(sqsh_inode_file_blocks_start(&inode) == 1024);
 	assert(sqsh_inode_file_has_fragment(&inode) == false);
 
