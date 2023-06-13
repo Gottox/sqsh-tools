@@ -82,18 +82,6 @@ sqsh_mutex_lock(sqsh_mutex_t *mutex) {
 }
 
 int
-sqsh_mutex_trylock(sqsh_mutex_t *mutex) {
-	int rv = pthread_mutex_trylock(mutex);
-	if (rv == EBUSY) {
-		return 1;
-	} else if (rv != 0) {
-		return -SQSH_ERROR_MUTEX_LOCK_FAILED;
-	} else {
-		return 0;
-	}
-}
-
-int
 sqsh_mutex_unlock(sqsh_mutex_t *mutex) {
 	int rv = pthread_mutex_unlock(mutex);
 	if (rv != 0) {

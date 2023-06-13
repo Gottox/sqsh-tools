@@ -76,16 +76,6 @@ SQSH_NO_UNUSED int sqsh_mutex_init_recursive(sqsh_mutex_t *mutex);
 SQSH_NO_UNUSED int sqsh_mutex_lock(sqsh_mutex_t *mutex);
 
 /**
- * @brief sqsh_mutex_trylock tries to lock a mutex.
- * If the mutex is already locked, the function returns immediately.
- *
- * @param mutex the mutex to lock.
- *
- * @return 0 on success, less than 0 on error, 1 if the mutex is already locked.
- */
-SQSH_NO_UNUSED int sqsh_mutex_trylock(sqsh_mutex_t *mutex);
-
-/**
  * @brief sqsh_mutex_lock unlocks a mutex.
  *
  * @param mutex the mutex to lock.
