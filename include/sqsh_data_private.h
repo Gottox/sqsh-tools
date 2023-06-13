@@ -113,8 +113,6 @@ uint32_t sqsh__data_directory_fragment_start(
 		const struct SqshDataDirectoryFragment *fragment);
 uint32_t sqsh__data_directory_fragment_inode_number(
 		const struct SqshDataDirectoryFragment *fragment);
-const struct SqshDataDirectoryEntry *sqsh__data_directory_fragment_entries(
-		const struct SqshDataDirectoryFragment *fragment);
 
 /***************************************
  * data/fragment_data.c

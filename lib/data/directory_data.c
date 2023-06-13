@@ -101,8 +101,3 @@ sqsh__data_directory_fragment_inode_number(
 		const struct SqshDataDirectoryFragment *fragment) {
 	return le32toh(fragment->inode_number);
 }
-const struct SqshDataDirectoryEntry *
-sqsh__data_directory_fragment_entries(
-		const struct SqshDataDirectoryFragment *fragment) {
-	return (const struct SqshDataDirectoryEntry *)&fragment[1];
-}
