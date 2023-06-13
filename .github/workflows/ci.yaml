@@ -73,6 +73,7 @@ jobs:
       run: |
         meson wrap update-db
         CC=${{ matrix.cc }} meson setup /tmp/build \
+          -Dwerror=true \
           -Dcurl=${{ matrix.feature }} \
           -Dzlib=${{ matrix.feature }} \
           -Dlz4=${{ matrix.feature }} \
@@ -98,6 +99,7 @@ jobs:
         run: |
           sudo pkg_add git meson squashfs-tools curl lz4 xz zstd
           CC=clang meson setup /tmp/build \
+            -Dwerror=true \
             -Dcurl=enabled \
             -Dzlib=enabled \
             -Dlz4=enabled \
@@ -124,6 +126,7 @@ jobs:
       run: |
         git config --global --add safe.directory $PWD
         CC=clang meson setup /tmp/build \
+          -Dwerror=true \
           -Dcurl=disabled \
           -Dzlib=disabled \
           -Dlz4=disabled\
