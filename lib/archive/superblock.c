@@ -133,6 +133,16 @@ sqsh_superblock_inode_count(const struct SqshSuperblock *superblock) {
 	return sqsh__data_superblock_inode_count(get_header(superblock));
 }
 
+uint16_t
+sqsh_superblock_version_major(const struct SqshSuperblock *superblock) {
+	return sqsh__data_superblock_version_major(get_header(superblock));
+}
+
+uint16_t
+sqsh_superblock_version_minor(const struct SqshSuperblock *superblock) {
+	return sqsh__data_superblock_version_minor(get_header(superblock));
+}
+
 uint64_t
 sqsh_superblock_inode_table_start(const struct SqshSuperblock *superblock) {
 	return sqsh__data_superblock_inode_table_start(get_header(superblock));

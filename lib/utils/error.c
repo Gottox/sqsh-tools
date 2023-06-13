@@ -130,6 +130,8 @@ sqsh_error_str(int error_code) {
 		return "Inode map is inconsistent";
 	case SQSH_ERROR_XATTR_SIZE_MISSMATCH:
 		return "Xattr size missmatch";
+	case SQSH_ERROR_UNSUPPORTED_VERSION:
+		return "Unsupported version";
 	}
 	snprintf(err_str, sizeof(err_str), UNKOWN_ERROR_FORMAT, abs(error_code));
 	return err_str;
