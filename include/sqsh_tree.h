@@ -36,6 +36,8 @@
 
 #include "sqsh_common.h"
 
+#include "sqsh_inode.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
