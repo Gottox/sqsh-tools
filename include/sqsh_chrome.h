@@ -45,6 +45,7 @@ extern "C" {
 #endif
 
 struct SqshArchive;
+struct SqshInode;
 
 /***************************************
  * chrome/inode.c

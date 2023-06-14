@@ -209,10 +209,6 @@ int sqsh__compression_options_cleanup(
  * archive/archive.c
  */
 
-/**
- * @brief The Sqsh struct contains all information about the current
- * sqsh session.
- */
 struct SqshArchive {
 	/**
 	 * @privatesection

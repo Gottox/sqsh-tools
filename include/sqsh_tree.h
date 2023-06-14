@@ -35,12 +35,12 @@
 #define SQSH_TREE_H
 
 #include "sqsh_common.h"
-#include "sqsh_inode.h"
-#include "sqsh_table_private.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+struct SqshArchive;
 
 /***************************************
  * tree/walker.c

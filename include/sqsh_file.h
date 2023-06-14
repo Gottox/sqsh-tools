@@ -34,7 +34,7 @@
 #ifndef SQSH_FILE_H
 #define SQSH_FILE_H
 
-#include "sqsh_table_private.h"
+#include "sqsh_common.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,6 +46,10 @@ struct SqshInode;
  * context/file_reader.c
  */
 
+/**
+ * @brief The file reader allows to read user defined byte ranges from a file
+ * inside of a SqshArchive.
+ */
 struct SqshFileReader;
 
 /**

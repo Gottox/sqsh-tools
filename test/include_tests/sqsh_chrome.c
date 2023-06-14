@@ -28,77 +28,15 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_table.h
+ * @file         sqsh_chrome.c
  */
 
-#ifndef SQSH_TABLE_H
-#define SQSH_TABLE_H
+#include "../../include/sqsh_chrome.h"
 
-#include "sqsh_common.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/***************************************
- * table/table.c
- */
-
-struct SqshTable;
-
-/**
- * @memberof SqshTable
- * @brief Retrieves an element from the table.
- *
- * @param[in]  table The table to retrieve the element from.
- * @param[in]  index The index of the element to retrieve.
- * @param[out] target The buffer to store the element in.
- *
- * @return 0 on success, a negative value on error.
- */
 int
-sqsh_table_get(const struct SqshTable *table, sqsh_index_t index, void *target);
-
-/***************************************
- * table/id_table.c
- */
-
-struct SqshIdTable;
-
-/**
- * @memberof SqshTable
- * @brief Retrieves an element from the table.
- *
- * @param[in]  table The table to retrieve the element from.
- * @param[in]  index The index of the element to retrieve.
- * @param[out] id The buffer to store the element in.
- *
- * @return 0 on success, a negative value on error.
- */
-int sqsh_id_table_get(
-		const struct SqshIdTable *table, sqsh_index_t index, uint32_t *id);
-
-/***************************************
- * table/export_table.c
- */
-
-struct SqshExportTable;
-
-/**
- * @memberof SqshTable
- * @brief Retrieves an element from the table.
- *
- * @param[in]  table The table to retrieve the element from.
- * @param[in]  inode The index of the element to retrieve.
- * @param[out] inode_ref A pointer to a uint64_t to store the inode reference
- *
- * @return 0 on success, a negative value on error.
- */
-int sqsh_export_table_resolve_inode(
-		const struct SqshExportTable *table, uint32_t inode,
-		uint64_t *inode_ref);
-
-#ifdef __cplusplus
+main(int argc, char *argv[]) {
+	(void)argc;
+	(void)argv;
+	return 0;
 }
-#endif
-#endif /* SQSH_TABLE_H */
+
