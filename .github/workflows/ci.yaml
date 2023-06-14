@@ -137,7 +137,6 @@ jobs:
           -Dtest=false \
           -Ddoc=true
     - name: generate
-      if: ${{ github.ref_type == 'tag' }}
       run: |
         cd /tmp/build
         meson compile doc
