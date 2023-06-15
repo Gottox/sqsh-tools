@@ -4,6 +4,8 @@ libsqsh_sources = [
     'archive/inode_map.c',
     'archive/superblock.c',
     'archive/trailing_context.c',
+    'chrome/archive.c',
+    'chrome/stream.c',
     'chrome/file.c',
     'chrome/inode.c',
     'data/compression_options_data.c',

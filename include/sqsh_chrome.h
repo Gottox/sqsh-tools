@@ -48,6 +48,30 @@ struct SqshArchive;
 struct SqshInode;
 
 /***************************************
+ * chrome/archive.c
+ */
+
+/**
+ * @memberof SqshArchive 
+ * @brief opens a sqsh archive. 
+ *
+ * @param[in] path The path to the sqsh archive.
+ *
+ * @return The sqsh archive context on success, NULL on error.
+ */
+struct SqshArchive *sqsh_archive_open(const char *path);
+
+/**
+ * @memberof SqshArchive 
+ * @brief closes a sqsh archive. 
+ *
+ * @param[in] archive The sqsh archive context.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+int sqsh_archive_close(struct SqshArchive *archive);
+
+/***************************************
  * chrome/inode.c
  */
 
@@ -73,7 +97,7 @@ sqsh_open(struct SqshArchive *archive, const char *path, int *err);
 int sqsh_close(struct SqshInode *inode);
 
 /***************************************
- * chrome/file.c
+ * chrome/stream.c
  */
 
 /**
@@ -85,6 +109,10 @@ int sqsh_close(struct SqshInode *inode);
  * @return The number of bytes read on success, less than 0 on error.
  */
 int sqsh_file_to_stream(const struct SqshInode *inode, FILE *file);
+
+/***************************************
+ * chrome/file.c
+ */
 
 /**
  * @brief checks if a file exists.
