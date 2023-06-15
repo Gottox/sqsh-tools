@@ -26,9 +26,9 @@ WARN_AS_ERROR        = YES
 
 
 # Input files
-INPUT         = @DOXYGEN_INPUT@/README.md @DOXYGEN_INPUT@/include
+INPUT         = @DOXYGEN_INPUT@/README.md @DOXYGEN_INPUT@/include @DOXYGEN_INPUT@/doc
 EXCLUDE       = @DOXYGEN_INPUT@/include/sqsh_data_private.h
-FILE_PATTERNS = *.h README.md
+FILE_PATTERNS = *.h *.md
 EXCLUDE_PATTERNS = *_internal.h
 RECURSIVE     = YES
 USE_MDFILE_AS_MAINPAGE = @DOXYGEN_INPUT@/README.md

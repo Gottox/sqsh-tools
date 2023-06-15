@@ -1,3 +1,7 @@
+sqsh_doc_src = [
+    'guide.md'
+]
+
 doxygen = find_program('doxygen')
 git = find_program('git')
 git_version = run_command(
@@ -25,6 +29,7 @@ custom_target(
     'doc',
     build_by_default: true,
     command: [doxygen, doxyfile],
+    depend_files: sqsh_doc_src + [ doxyfile ],
     depends: libsqsh,
     output: ['html'],
 )
