@@ -149,7 +149,7 @@ xattr_value_indirect_load(struct SqshXattrIterator *iterator) {
 	const struct SqshDataXattrValue *value = get_value(iterator);
 	int rv = 0;
 	if (sqsh__data_xattr_value_size(value) != 8) {
-		return -SQSH_ERROR_SIZE_MISSMATCH;
+		return -SQSH_ERROR_SIZE_MISMATCH;
 	}
 	uint64_t ref = sqsh__data_xattr_value_ref(value);
 	uint64_t outer_offset = sqsh_address_ref_outer_offset(ref);
@@ -194,7 +194,7 @@ sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator) {
 
 	if (iterator->remaining_entries == 0) {
 		if (iterator->remaining_size != 0) {
-			rv = -SQSH_ERROR_XATTR_SIZE_MISSMATCH;
+			rv = -SQSH_ERROR_XATTR_SIZE_MISMATCH;
 			goto out;
 		}
 		return 0;
@@ -240,7 +240,7 @@ sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator) {
 	if (SQSH_SUB_OVERFLOW(
 				iterator->remaining_size, processed_size,
 				&iterator->remaining_size)) {
-		rv = -SQSH_ERROR_XATTR_SIZE_MISSMATCH;
+		rv = -SQSH_ERROR_XATTR_SIZE_MISMATCH;
 		goto out;
 	}
 

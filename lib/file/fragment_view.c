@@ -57,7 +57,7 @@ apply_fragment(
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	if (end_offset > data_size) {
-		return -SQSH_ERROR_SIZE_MISSMATCH;
+		return -SQSH_ERROR_SIZE_MISMATCH;
 	}
 
 	view->data = &data[offset];

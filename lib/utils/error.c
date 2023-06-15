@@ -70,10 +70,10 @@ sqsh_error_str(int error_code) {
 		return "Superblock too small";
 	case SQSH_ERROR_WRONG_MAGIC:
 		return "Wrong magic";
-	case SQSH_ERROR_BLOCKSIZE_MISSMATCH:
-		return "Blocksize missmatch";
-	case SQSH_ERROR_SIZE_MISSMATCH:
-		return "Size missmatch";
+	case SQSH_ERROR_BLOCKSIZE_MISMATCH:
+		return "Blocksize mismatch";
+	case SQSH_ERROR_SIZE_MISMATCH:
+		return "Size mismatch";
 	case SQSH_ERROR_COMPRESSION_INIT:
 		return "Compression init";
 	case SQSH_ERROR_COMPRESSION_DECOMPRESS:
@@ -128,8 +128,8 @@ sqsh_error_str(int error_code) {
 		return "Internal error";
 	case SQSH_ERROR_INODE_MAP_IS_INCONSISTENT:
 		return "Inode map is inconsistent";
-	case SQSH_ERROR_XATTR_SIZE_MISSMATCH:
-		return "Xattr size missmatch";
+	case SQSH_ERROR_XATTR_SIZE_MISMATCH:
+		return "Xattr size mismatch";
 	case SQSH_ERROR_UNSUPPORTED_VERSION:
 		return "Unsupported version";
 	}

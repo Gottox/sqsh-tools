@@ -44,13 +44,13 @@ sqsh__map_slice_init(
 	size_t end_offset;
 	size_t archive_size = sqsh__mapper_size(mapper);
 	if (offset > archive_size) {
-		return -SQSH_ERROR_SIZE_MISSMATCH;
+		return -SQSH_ERROR_SIZE_MISMATCH;
 	}
 	if (SQSH_ADD_OVERFLOW(offset, size, &end_offset)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	if (end_offset > archive_size) {
-		return -SQSH_ERROR_SIZE_MISSMATCH;
+		return -SQSH_ERROR_SIZE_MISMATCH;
 	}
 	mapping->mapper = mapper;
 	mapping->offset = offset;

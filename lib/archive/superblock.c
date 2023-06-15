@@ -94,18 +94,18 @@ sqsh__superblock_init(
 
 	uint32_t block_size = sqsh__data_superblock_block_size(header);
 	if (block_size < 4096 || block_size > 1048576) {
-		rv = -SQSH_ERROR_BLOCKSIZE_MISSMATCH;
+		rv = -SQSH_ERROR_BLOCKSIZE_MISMATCH;
 		goto out;
 	}
 
 	if (sqsh__data_superblock_block_log(header) != log2_u32(block_size)) {
-		rv = -SQSH_ERROR_BLOCKSIZE_MISSMATCH;
+		rv = -SQSH_ERROR_BLOCKSIZE_MISMATCH;
 		goto out;
 	}
 
 	if (sqsh__data_superblock_bytes_used(header) >
 		sqsh__map_manager_size(map_manager)) {
-		rv = -SQSH_ERROR_SIZE_MISSMATCH;
+		rv = -SQSH_ERROR_SIZE_MISMATCH;
 		goto out;
 	}
 

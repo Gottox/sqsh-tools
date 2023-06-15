@@ -47,7 +47,7 @@ sqsh__trailing_init(
 	uint64_t trailing_size;
 
 	if (archive_size <= trailing_start) {
-		rv = -SQSH_ERROR_SIZE_MISSMATCH;
+		rv = -SQSH_ERROR_SIZE_MISMATCH;
 		goto out;
 	}
 
