@@ -95,5 +95,4 @@ libsqsh = library(
     c_args: c_args,
     dependencies: libsqsh_dependencies,
     version: meson.project_version(),
-    soversion: meson.project_version().split('.')[0],
 )
