@@ -64,12 +64,6 @@ cat_path(struct SqshArchive *archive, char *path) {
 		goto out;
 	}
 
-	if (sqsh_inode_type(inode) != SQSH_INODE_TYPE_FILE) {
-		fprintf(stderr, "%s: not a file\n", path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-
 	rv = sqsh_file_to_stream(inode, stdout);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
