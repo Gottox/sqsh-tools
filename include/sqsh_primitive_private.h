@@ -224,11 +224,10 @@ bool sqsh__rc_map_is_empty(struct SqshRcMap *array, sqsh_index_t index);
  * @param array The array to set the value in.
  * @param index The index to set the value at.
  * @param data The data to set.
- * @param span The number of indices to span. (Use 1 for a single index.)
  * @return 0 on success, a negative value on error.
  */
 const void *sqsh__rc_map_set(
-		struct SqshRcMap *array, sqsh_index_t index, void *data, int span);
+		struct SqshRcMap *array, sqsh_index_t index, void *data);
 
 /**
  * @internal
@@ -249,7 +248,7 @@ size_t sqsh__rc_map_size(const struct SqshRcMap *array);
  * @param index The index of the data.
  * @return A pointer to the retained data.
  */
-const void *sqsh__rc_map_retain(struct SqshRcMap *array, sqsh_index_t *index);
+const void *sqsh__rc_map_retain(struct SqshRcMap *array, sqsh_index_t index);
 
 /**
  * @internal

@@ -136,14 +136,13 @@ sqsh__map_manager_get(
 		const struct SqshMapSlice **target) {
 	int rv = 0;
 	assert(span == 1);
-	sqsh_index_t real_index = index;
 
 	rv = sqsh_mutex_lock(&manager->lock);
 	if (rv < 0) {
 		goto out;
 	}
 
-	*target = sqsh__rc_map_retain(&manager->maps, &real_index);
+	*target = sqsh__rc_map_retain(&manager->maps, index);
 
 	if (*target == NULL) {
 		struct SqshMapSlice mapping = {0};
@@ -158,9 +157,9 @@ sqsh__map_manager_get(
 			goto out;
 		}
 
-		*target = sqsh__rc_map_set(&manager->maps, index, &mapping, span);
+		*target = sqsh__rc_map_set(&manager->maps, index, &mapping);
 	}
-	rv = sqsh__lru_touch(&manager->lru, real_index);
+	rv = sqsh__lru_touch(&manager->lru, index);
 
 out:
 	sqsh_mutex_unlock(&manager->lock);

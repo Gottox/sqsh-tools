@@ -131,11 +131,8 @@ sqsh__rc_map_is_empty(struct SqshRcMap *array, sqsh_index_t index) {
 
 const void *
 sqsh__rc_map_set(
-		struct SqshRcMap *array, sqsh_index_t index, void *data, int span) {
-	(void)span;
+		struct SqshRcMap *array, sqsh_index_t index, void *data) {
 	void *target;
-
-	assert(span == 1);
 
 	target = get_element(array, index);
 
@@ -143,7 +140,7 @@ sqsh__rc_map_set(
 	 * the old. */
 	if (sqsh__rc_map_is_empty(array, index) == false) {
 		array->cleanup(data);
-		return sqsh__rc_map_retain(array, &index);
+		return sqsh__rc_map_retain(array, index);
 	}
 
 	memcpy(target, data, array->element_size);
@@ -154,13 +151,13 @@ sqsh__rc_map_set(
 }
 
 const void *
-sqsh__rc_map_retain(struct SqshRcMap *array, sqsh_index_t *index) {
+sqsh__rc_map_retain(struct SqshRcMap *array, sqsh_index_t index) {
 	void *data = NULL;
 
-	if (sqsh__rc_map_is_empty(array, *index) == false) {
-		retain_rc(array, *index);
-		debug_print(array, *index, '+');
-		data = get_element(array, *index);
+	if (sqsh__rc_map_is_empty(array, index) == false) {
+		retain_rc(array, index);
+		debug_print(array, index, '+');
+		data = get_element(array, index);
 	}
 
 	return data;
@@ -236,7 +233,7 @@ sqsh__rc_map_cleanup(struct SqshRcMap *array) {
 
 static const void *
 lru_rc_map_retain(void *backend, sqsh_index_t index) {
-	return sqsh__rc_map_retain(backend, &index);
+	return sqsh__rc_map_retain(backend, index);
 }
 
 static int

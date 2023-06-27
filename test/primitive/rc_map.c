@@ -72,11 +72,11 @@ set_and_get_element(void) {
 	assert(rv == 0);
 
 	sqsh_index_t index = 42;
-	const uint8_t *set_ptr = sqsh__rc_map_set(&map, index, &data, 1);
+	const uint8_t *set_ptr = sqsh__rc_map_set(&map, index, &data);
 	assert(rv == 0);
 	assert(set_ptr != &data);
 
-	const uint8_t *get_ptr = sqsh__rc_map_retain(&map, &index);
+	const uint8_t *get_ptr = sqsh__rc_map_retain(&map, index);
 	assert(rv == 0);
 	assert(get_ptr != &data);
 	assert(get_ptr == get_ptr);

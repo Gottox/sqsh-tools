@@ -137,7 +137,7 @@ sqsh__rc_hash_map_put(
 
 found:
 	keys[index] = key;
-	return sqsh__rc_map_set(values, index, data, 1);
+	return sqsh__rc_map_set(values, index, data);
 }
 
 size_t
@@ -159,8 +159,7 @@ sqsh__rc_hash_map_retain(
 			struct SqshRcMap *values = &hash_map->hash_maps[j].values;
 			sqsh_rc_map_key_t *keys = hash_map->hash_maps[j].keys;
 			if (keys[index] == key) {
-				sqsh_index_t real_index = index;
-				return sqsh__rc_map_retain(values, &real_index);
+				return sqsh__rc_map_retain(values, index);
 			}
 		}
 	}
