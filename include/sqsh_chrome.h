@@ -52,8 +52,8 @@ struct SqshInode;
  */
 
 /**
- * @memberof SqshArchive 
- * @brief opens a sqsh archive. 
+ * @memberof SqshArchive
+ * @brief opens a sqsh archive.
  *
  * @param[in] path The path to the sqsh archive.
  *
@@ -62,8 +62,8 @@ struct SqshInode;
 struct SqshArchive *sqsh_archive_open(const char *path);
 
 /**
- * @memberof SqshArchive 
- * @brief closes a sqsh archive. 
+ * @memberof SqshArchive
+ * @brief closes a sqsh archive.
  *
  * @param[in] archive The sqsh archive context.
  *

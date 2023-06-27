@@ -110,8 +110,10 @@ sqsh__archive_init(
 		goto out;
 	}
 
-	uint16_t version_minor = sqsh_superblock_version_minor(&archive->superblock);
-	uint16_t version_major = sqsh_superblock_version_major(&archive->superblock);
+	uint16_t version_minor =
+			sqsh_superblock_version_minor(&archive->superblock);
+	uint16_t version_major =
+			sqsh_superblock_version_major(&archive->superblock);
 	if (version_major != 4 && version_minor != 0) {
 		rv = -SQSH_ERROR_UNSUPPORTED_VERSION;
 		goto out;

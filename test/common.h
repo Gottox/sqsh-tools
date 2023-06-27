@@ -139,11 +139,8 @@
 #define XATTR_LOOKUP_ENTRY(xattr_index, xattr_off, count, size) \
 	UINT64_BYTES(((xattr_index) << 16) | (xattr_off)), UINT32_BYTES(count), \
 			UINT32_BYTES(size)
-#define XATTR_NAME_HEADER(type, size) \
-	UINT16_BYTES(type), UINT16_BYTES(size)
-#define XATTR_VALUE_HEADER(size) \
-	UINT32_BYTES(size)
-
+#define XATTR_NAME_HEADER(type, size) UINT16_BYTES(type), UINT16_BYTES(size)
+#define XATTR_VALUE_HEADER(size) UINT32_BYTES(size)
 
 #define ZLIB_ABCD \
 	0x78, 0x9c, 0x4b, 0x4c, 0x4a, 0x4e, 0x01, 0x00, 0x03, 0xd8, 0x01, 0x8b

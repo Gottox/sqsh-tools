@@ -317,13 +317,12 @@ size_t sqsh__map_manager_block_count(const struct SqshMapManager *manager);
  *
  * @param[in] manager The SqshMapManager instance.
  * @param[in] index The index of the chunk to map.
- * @param[in] span The number of chunks to map.
  * @param[out] target The mapping to store the result in.
  *
  * @return Returns 0 on success, a negative value on error.
  */
 SQSH_NO_UNUSED int sqsh__map_manager_get(
-		struct SqshMapManager *manager, sqsh_index_t index, int span,
+		struct SqshMapManager *manager, sqsh_index_t index,
 		const struct SqshMapSlice **target);
 
 /**

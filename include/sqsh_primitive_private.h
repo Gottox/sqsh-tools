@@ -226,8 +226,8 @@ bool sqsh__rc_map_is_empty(struct SqshRcMap *array, sqsh_index_t index);
  * @param data The data to set.
  * @return 0 on success, a negative value on error.
  */
-const void *sqsh__rc_map_set(
-		struct SqshRcMap *array, sqsh_index_t index, void *data);
+const void *
+sqsh__rc_map_set(struct SqshRcMap *array, sqsh_index_t index, void *data);
 
 /**
  * @internal

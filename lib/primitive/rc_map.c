@@ -130,8 +130,7 @@ sqsh__rc_map_is_empty(struct SqshRcMap *array, sqsh_index_t index) {
 }
 
 const void *
-sqsh__rc_map_set(
-		struct SqshRcMap *array, sqsh_index_t index, void *data) {
+sqsh__rc_map_set(struct SqshRcMap *array, sqsh_index_t index, void *data) {
 	void *target;
 
 	target = get_element(array, index);

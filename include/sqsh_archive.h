@@ -191,7 +191,8 @@ uint32_t sqsh_superblock_inode_count(const struct SqshSuperblock *context);
  * @memberof SqshSuperblock
  * @brief Retrieves the major version of an archive.
  *
- * @param[in] superblock The superblock context to retrieve the major version from.
+ * @param[in] superblock The superblock context to retrieve the major version
+ * from.
  *
  * @return The major version of this archive.
  */
@@ -201,7 +202,8 @@ uint16_t sqsh_superblock_version_major(const struct SqshSuperblock *superblock);
  * @memberof SqshSuperblock
  * @brief Retrieves the minor version of an archive.
  *
- * @param[in] superblock The superblock context to retrieve the minor version from.
+ * @param[in] superblock The superblock context to retrieve the minor version
+ * from.
  *
  * @return The minor version of this archive.
  */

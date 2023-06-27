@@ -576,6 +576,6 @@ TEST(sqsh_cat_datablock_and_fragment);
 TEST(sqsh_cat_size_overflow);
 TEST(sqsh_test_uid_and_gid);
 TEST(sqsh_test_extended_dir);
-//TEST(sqsh_test_xattr);
+// TEST(sqsh_test_xattr);
 TEST(multithreaded);
 DEFINE_END
