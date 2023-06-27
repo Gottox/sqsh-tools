@@ -98,7 +98,7 @@ sqsh__map_iterator_skip(struct SqshMapIterator *iterator, size_t amount) {
 
 	sqsh__map_manager_release(iterator->map_manager, iterator->mapping);
 	rv = sqsh__map_manager_get(
-			iterator->map_manager, iterator->index, 1, &iterator->mapping);
+			iterator->map_manager, iterator->index, &iterator->mapping);
 	if (rv < 0) {
 		goto out;
 	}

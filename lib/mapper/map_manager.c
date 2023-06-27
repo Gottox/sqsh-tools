@@ -48,9 +48,8 @@ map_cleanup_cb(void *data) {
 SQSH_NO_UNUSED static int
 load_mapping(
 		struct SqshMapSlice *mapping, struct SqshMapManager *manager,
-		sqsh_index_t index, int span) {
+		sqsh_index_t index) {
 	int rv = 0;
-	assert(span == 1);
 
 	const size_t block_size = sqsh__mapper_block_size(&manager->mapper);
 	const size_t block_count = sqsh__map_manager_block_count(manager);
@@ -132,10 +131,9 @@ sqsh__map_manager_block_count(const struct SqshMapManager *manager) {
 
 int
 sqsh__map_manager_get(
-		struct SqshMapManager *manager, sqsh_index_t index, int span,
+		struct SqshMapManager *manager, sqsh_index_t index,
 		const struct SqshMapSlice **target) {
 	int rv = 0;
-	assert(span == 1);
 
 	rv = sqsh_mutex_lock(&manager->lock);
 	if (rv < 0) {
@@ -147,7 +145,7 @@ sqsh__map_manager_get(
 	if (*target == NULL) {
 		struct SqshMapSlice mapping = {0};
 		sqsh_mutex_unlock(&manager->lock);
-		rv = load_mapping(&mapping, manager, index, span);
+		rv = load_mapping(&mapping, manager, index);
 		if (rv < 0) {
 			goto out;
 		}
