@@ -61,13 +61,14 @@ elif cc.get_id() == 'clang'
 endif
 
 mksquashfs = find_program('mksquashfs')
+integration_create = files('integration_create.sh')
 squashfs = custom_target(
     'squashfs.image',
     output: 'squashfs.image',
     env: {
         'MKSQUASHFS': mksquashfs.full_path(),
     },
-    command: ['./integration_create.sh', '', '@OUTPUT@', '@PRIVATE_DIR@'],
+    command: [integration_create, '', '@OUTPUT@', '@PRIVATE_DIR@'],
 )
 
 squashfs_h = custom_target(
