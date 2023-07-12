@@ -690,6 +690,17 @@ uint32_t sqsh_compression_options_lzo_compression_level(
 
 /**
  * @memberof SqshCompressionOptions
+ * @brief returns the size of the compression options struct
+ *
+ * @param[in] context the compression options context
+ *
+ * @return the size of the compression options struct
+ */
+size_t
+sqsh_compression_options_size(const struct SqshCompressionOptions *context);
+
+/**
+ * @memberof SqshCompressionOptions
  * @brief Frees a SqshCompressionOptions struct.
  *
  * @param[in] context The file context to free.

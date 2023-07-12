@@ -152,7 +152,7 @@ size_t sqsh_file_size(struct SqshArchive *archive, const char *path);
  *
  * @return The unix permissions of the file on success, less than 0 on error.
  */
-mode_t sqsh_file_permissions(struct SqshArchive *archive, const char *path);
+mode_t sqsh_file_permission(struct SqshArchive *archive, const char *path);
 
 /**
  * @brief retrieves the modification time of a file.
