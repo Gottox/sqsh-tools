@@ -37,12 +37,14 @@
 #include <stdatomic.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 int
 sqsh__inode_map_init(struct SqshInodeMap *map, struct SqshArchive *archive) {
 	int rv = 0;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 	const uint32_t inode_count = sqsh_superblock_inode_count(superblock);
+	memset(map, 0, sizeof(*map));
 	map->inode_count = inode_count;
 
 	if (sqsh_superblock_has_export_table(superblock)) {

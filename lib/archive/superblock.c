@@ -37,6 +37,8 @@
 
 #include "../../include/sqsh_data_private.h"
 
+#include <string.h>
+
 enum SqshInitialized {
 	SQSH_INITIALIZED_ID_TABLE = 1 << 0,
 	SQSH_INITIALIZED_EXPORT_TABLE = 1 << 2,
@@ -70,6 +72,7 @@ int
 sqsh__superblock_init(
 		struct SqshSuperblock *superblock, struct SqshMapManager *map_manager) {
 	int rv = 0;
+	memset(superblock, 0, sizeof(*superblock));
 
 	if (sqsh__map_manager_size(map_manager) < SQSH_SIZEOF_SUPERBLOCK) {
 		rv = -SQSH_ERROR_SUPERBLOCK_TOO_SMALL;

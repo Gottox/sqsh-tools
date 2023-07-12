@@ -38,6 +38,7 @@
 #include "../../include/sqsh_error.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 static const union SqshDataCompressionOptions *
 compression_options(const struct SqshCompressionOptions *context) {
@@ -65,6 +66,7 @@ sqsh__compression_options_init(
 		struct SqshCompressionOptions *context, struct SqshArchive *sqsh) {
 	int rv = 0;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
+	memset(context, 0, sizeof(*context));
 
 	uint64_t upper_limit = SQSH_SIZEOF_SUPERBLOCK + SQSH_SIZEOF_METABLOCK +
 			SQSH_METABLOCK_BLOCK_SIZE;

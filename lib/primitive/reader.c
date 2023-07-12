@@ -137,6 +137,7 @@ sqsh__reader_init(
 		struct SqshReader *reader, const struct SqshIteratorImpl *impl,
 		void *iterator) {
 	int rv;
+	memset(reader, 0, sizeof(*reader));
 	rv = sqsh__buffer_init(&reader->buffer);
 	if (rv < 0) {
 		return rv;

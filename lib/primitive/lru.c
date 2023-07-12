@@ -66,6 +66,7 @@ int
 sqsh__lru_init(
 		struct SqshLru *lru, size_t size, const struct SqshLruBackendImpl *impl,
 		void *backend) {
+	memset(lru, 0, sizeof(*lru));
 	lru->impl = impl;
 	lru->backend = backend;
 	lru->size = size;

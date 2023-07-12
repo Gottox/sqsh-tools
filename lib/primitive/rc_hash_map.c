@@ -97,6 +97,7 @@ int
 sqsh__rc_hash_map_init(
 		struct SqshRcHashMap *hash_map, size_t size, size_t element_size,
 		sqsh_rc_map_cleanup_t cleanup) {
+	memset(hash_map, 0, sizeof(*hash_map));
 	hash_map->hash_maps = NULL;
 	hash_map->hash_map_count = 0;
 	hash_map->map_size = size;
