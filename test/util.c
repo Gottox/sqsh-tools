@@ -24,13 +24,13 @@ mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size) {
 			/* modification_time */
 			UINT32_BYTES(0),
 			/* block_size */
-			UINT32_BYTES(4096),
+			UINT32_BYTES(32768),
 			/* fragment_entry_count */
 			UINT32_BYTES(0),
 			/* compression_id */
 			UINT16_BYTES(SQSH_COMPRESSION_GZIP),
 			/* block_log */
-			UINT16_BYTES(12),
+			UINT16_BYTES(15),
 			/* flags */
 			UINT16_BYTES(0),
 			/* id_count */

@@ -43,6 +43,8 @@
 
 #define BLOCK_INDEX_FINISHED UINT32_MAX
 
+static const uint8_t ZERO_BLOCK[16384] = {0};
+
 int
 sqsh__file_iterator_init(
 		struct SqshFileIterator *iterator, const struct SqshInode *inode) {
@@ -183,8 +185,6 @@ out:
 static int
 map_zero_block(struct SqshFileIterator *iterator) {
 	const struct SqshInode *inode = iterator->inode;
-	struct SqshArchive *archive = inode->archive;
-	const uint8_t *zero_block = sqsh__archive_zero_block(archive);
 
 	const sqsh_index_t block_index = iterator->block_index;
 	const bool has_fragment = sqsh_inode_file_has_fragment(inode);
@@ -196,7 +196,8 @@ map_zero_block(struct SqshFileIterator *iterator) {
 	if (file_size == 0) {
 		size = 0;
 	} else if (sparse_size > 0) {
-		size = sparse_size;
+		size = SQSH_MIN(sizeof(ZERO_BLOCK), sparse_size);
+		iterator->sparse_size -= size;
 	} else if (has_fragment || block_index != block_count - 1) {
 		size = iterator->block_size;
 	} else {
@@ -207,8 +208,7 @@ map_zero_block(struct SqshFileIterator *iterator) {
 	}
 
 	iterator->size = size;
-	iterator->data = zero_block;
-	iterator->sparse_size = 0;
+	iterator->data = ZERO_BLOCK;
 
 	return size;
 }
