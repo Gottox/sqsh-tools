@@ -70,7 +70,7 @@ sqsh_inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number) {
 	uint64_t inode_ref = 0;
 	atomic_uint_fast64_t *inode_refs = map->inode_refs;
 	if (inode_number - 1 > map->inode_count) {
-		return -SQSH_ERROR_OUT_OF_BOUNDS;
+		return 0;
 	} else if (inode_number == 0) {
 		return 0;
 	} else if (map->export_table != NULL) {
