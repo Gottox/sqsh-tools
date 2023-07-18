@@ -128,7 +128,7 @@ mode_t
 sqsh_file_permission(struct SqshArchive *archive, const char *path) {
 	int rv = 0;
 	struct SqshInode *inode = NULL;
-	size_t permission = 0;
+	mode_t permission = 0;
 
 	inode = sqsh_open(archive, path, &rv);
 	if (rv < 0) {
@@ -146,7 +146,7 @@ time_t
 sqsh_file_mtime(struct SqshArchive *archive, const char *path) {
 	int rv = 0;
 	struct SqshInode *inode = NULL;
-	size_t modified = 0;
+	time_t modified = 0;
 
 	inode = sqsh_open(archive, path, &rv);
 	if (rv < 0) {
