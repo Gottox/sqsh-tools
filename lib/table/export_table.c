@@ -48,7 +48,7 @@ sqsh__export_table_init(
 
 int
 sqsh_export_table_resolve_inode(
-		const struct SqshExportTable *table, uint32_t inode,
+		const struct SqshExportTable *table, uint64_t inode,
 		uint64_t *inode_ref) {
 	if (inode < 1) {
 		return -SQSH_ERROR_INVALID_ARGUMENT;

@@ -95,7 +95,7 @@ struct SqshExportTable;
  * @return 0 on success, a negative value on error.
  */
 int sqsh_export_table_resolve_inode(
-		const struct SqshExportTable *table, uint32_t inode,
+		const struct SqshExportTable *table, uint64_t inode,
 		uint64_t *inode_ref);
 
 #ifdef __cplusplus
