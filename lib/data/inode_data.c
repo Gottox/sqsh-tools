@@ -216,9 +216,9 @@ sqsh__data_inode_file_size(const struct SqshDataInodeFile *file) {
 uint32_t
 sqsh__data_inode_file_block_size_info(
 		const struct SqshDataInodeFile *file, sqsh_index_t index) {
-	struct {
+	const struct {
 		uint32_t b;
-	} SQSH_UNALIGNED *block_sizes = (void *)&file[1];
+	} SQSH_UNALIGNED *block_sizes = (const void *)&file[1];
 	return htole32(block_sizes[index].b);
 }
 
@@ -258,9 +258,9 @@ sqsh__data_inode_file_ext_xattr_idx(
 uint32_t
 sqsh__data_inode_file_ext_block_size_info(
 		const struct SqshDataInodeFileExt *file_ext, sqsh_index_t index) {
-	struct {
+	const struct {
 		uint32_t b;
-	} SQSH_UNALIGNED *block_sizes = (void *)&file_ext[1];
+	} SQSH_UNALIGNED *block_sizes = (const void *)&file_ext[1];
 	return htole32(block_sizes[index].b);
 }
 
@@ -450,8 +450,10 @@ sqsh__data_inode_symlink_ext_xattr_idx(
 	const uint8_t *target_path =
 			sqsh__data_inode_symlink_ext_target_path(symlink_ext);
 	const uint8_t *target_path_end = &target_path[target_size];
-	const uint32_t *xattr_idx = (const uint32_t *)target_path_end;
-	return le32toh(*xattr_idx);
+	const struct {
+		uint32_t x;
+	} SQSH_UNALIGNED *xattr_idx = (const void *)target_path_end;
+	return le32toh(xattr_idx->x);
 }
 
 uint32_t
