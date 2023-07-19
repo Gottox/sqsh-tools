@@ -295,7 +295,7 @@ sqsh_file_iterator_skip(
 	}
 
 	for (size_t i = 0; i < amount - 1; i++) {
-		int rv = sqsh_file_iterator_next(iterator, 1);
+		rv = sqsh_file_iterator_next(iterator, 1);
 		if (rv < 0) {
 			goto out;
 		} else if (rv == 0) {
