@@ -50,13 +50,28 @@ enum InitializedBitmap {
 	INITIALIZED_XATTR_TABLE = 1 << 2,
 	INITIALIZED_FRAGMENT_TABLE = 1 << 3,
 	INITIALIZED_DATA_COMPRESSION_MANAGER = 1 << 4,
-	INITIALIZED_METABLOCK_COMPRESSION_MANAGER = 1 << 5,
-	INITIALIZED_INODE_MAP = 1 << 6,
+	INITIALIZED_INODE_MAP = 1 << 5,
 };
 
 static bool
 is_initialized(const struct SqshArchive *archive, enum InitializedBitmap mask) {
 	return archive->initialized & mask;
+}
+
+static uint64_t
+get_data_segment_size(const struct SqshSuperblock *superblock) {
+	const uint64_t inode_table_start =
+			sqsh_superblock_inode_table_start(superblock);
+	uint64_t res;
+	/* BUG: This function does not return exact results. It may report values
+	 * that are too large, as it does not take into account the size of the
+	 * compression options. This is not a problem for the current implementation
+	 * as this size is only used for finding upper limits for the extract
+	 * manager. */
+	if (SQSH_SUB_OVERFLOW(inode_table_start, SQSH_SIZEOF_SUPERBLOCK, &res)) {
+		return inode_table_start;
+	}
+	return res;
 }
 
 struct SqshArchive *
@@ -119,23 +134,22 @@ sqsh__archive_init(
 		goto out;
 	}
 
-	enum SqshSuperblockCompressionId compression_id =
-			sqsh_superblock_compression_id(&archive->superblock);
-	uint32_t data_block_size = sqsh_superblock_block_size(&archive->superblock);
+	uint64_t range;
+	if (SQSH_SUB_OVERFLOW(
+				sqsh_superblock_bytes_used(&archive->superblock),
+				get_data_segment_size(&archive->superblock), &range)) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		return rv;
+	}
+	const size_t metablock_capacity = SQSH_DIVIDE_CEIL(
+			range, SQSH_SIZEOF_METABLOCK + SQSH_METABLOCK_BLOCK_SIZE);
 
-	rv = sqsh__extractor_init(
-			&archive->metablock_compression, compression_id,
-			SQSH_METABLOCK_BLOCK_SIZE);
+	rv = sqsh__extract_manager_init(
+			&archive->metablock_extract_manager, archive,
+			SQSH_METABLOCK_BLOCK_SIZE, metablock_capacity);
 	if (rv < 0) {
 		goto out;
 	}
-
-	rv = sqsh__extractor_init(
-			&archive->data_compression, compression_id, data_block_size);
-	if (rv < 0) {
-		goto out;
-	}
-
 out:
 	if (rv < 0) {
 		sqsh__archive_cleanup(archive);
@@ -153,57 +167,9 @@ sqsh_archive_superblock(const struct SqshArchive *archive) {
 	return &archive->superblock;
 }
 
-static uint64_t
-get_data_segment_size(const struct SqshSuperblock *superblock) {
-	const uint64_t inode_table_start =
-			sqsh_superblock_inode_table_start(superblock);
-	uint64_t res;
-	/* BUG: This function does not return exact results. It may report values
-	 * that are too large, as it does not take into account the size of the
-	 * compression options. This is not a problem for the current implementation
-	 * as this size is only used for finding upper limits for the extract
-	 * manager. */
-	if (SQSH_SUB_OVERFLOW(inode_table_start, SQSH_SIZEOF_SUPERBLOCK, &res)) {
-		return inode_table_start;
-	}
-	return res;
-}
-
-int
-sqsh__archive_metablock_extract_manager(
-		struct SqshArchive *archive,
-		struct SqshExtractManager **metablock_extract_manager) {
-	int rv = 0;
-
-	rv = sqsh_mutex_lock(&archive->lock);
-	if (rv < 0) {
-		goto out;
-	}
-	if (!is_initialized(archive, INITIALIZED_METABLOCK_COMPRESSION_MANAGER)) {
-		const struct SqshSuperblock *superblock =
-				sqsh_archive_superblock(archive);
-		uint64_t range;
-		if (SQSH_SUB_OVERFLOW(
-					sqsh_superblock_bytes_used(superblock),
-					get_data_segment_size(superblock), &range)) {
-			rv = -SQSH_ERROR_INTEGER_OVERFLOW;
-			return rv;
-		}
-		const size_t capacity = SQSH_DIVIDE_CEIL(
-				range, SQSH_SIZEOF_METABLOCK + SQSH_METABLOCK_BLOCK_SIZE);
-
-		rv = sqsh__extract_manager_init(
-				&archive->metablock_extract_manager, archive,
-				&archive->metablock_compression, capacity);
-		if (rv < 0) {
-			goto out;
-		}
-		archive->initialized |= INITIALIZED_METABLOCK_COMPRESSION_MANAGER;
-	}
-	*metablock_extract_manager = &archive->metablock_extract_manager;
-out:
-	sqsh_mutex_unlock(&archive->lock);
-	return rv;
+struct SqshExtractManager *
+sqsh__archive_metablock_extract_manager(struct SqshArchive *archive) {
+	return &archive->metablock_extract_manager;
 }
 
 int
@@ -222,10 +188,12 @@ sqsh__archive_data_extract_manager(
 		const uint64_t range = get_data_segment_size(superblock);
 		const size_t capacity =
 				SQSH_DIVIDE_CEIL(range, sqsh_superblock_block_size(superblock));
+		const uint32_t datablock_blocksize =
+				sqsh_superblock_block_size(superblock);
 
 		rv = sqsh__extract_manager_init(
-				&archive->data_extract_manager, archive,
-				&archive->data_compression, capacity);
+				&archive->data_extract_manager, archive, datablock_blocksize,
+				capacity);
 		if (rv < 0) {
 			goto out;
 		}
@@ -389,14 +357,10 @@ sqsh__archive_cleanup(struct SqshArchive *archive) {
 	if (is_initialized(archive, INITIALIZED_DATA_COMPRESSION_MANAGER)) {
 		sqsh__extract_manager_cleanup(&archive->data_extract_manager);
 	}
-	if (is_initialized(archive, INITIALIZED_METABLOCK_COMPRESSION_MANAGER)) {
-		sqsh__extract_manager_cleanup(&archive->metablock_extract_manager);
-	}
 	if (is_initialized(archive, INITIALIZED_INODE_MAP)) {
 		sqsh__inode_map_cleanup(&archive->inode_map);
 	}
-	sqsh__extractor_cleanup(&archive->data_compression);
-	sqsh__extractor_cleanup(&archive->metablock_compression);
+	sqsh__extract_manager_cleanup(&archive->metablock_extract_manager);
 	sqsh__superblock_cleanup(&archive->superblock);
 	sqsh__map_manager_cleanup(&archive->map_manager);
 

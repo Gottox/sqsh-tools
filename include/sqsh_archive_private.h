@@ -214,9 +214,7 @@ struct SqshArchive {
 	 * @privatesection
 	 */
 	struct SqshMapManager map_manager;
-	struct SqshExtractor data_compression;
 	struct SqshExtractManager data_extract_manager;
-	struct SqshExtractor metablock_compression;
 	struct SqshExtractManager metablock_extract_manager;
 	struct SqshSuperblock superblock;
 	struct SqshIdTable id_table;
@@ -266,13 +264,11 @@ int sqsh__archive_data_extract_manager(
  * used for decompressing metablock contents.
  *
  * @param archive the SqshArchive to retrieve the SqshExtractManager from.
- * @param metablock_extract_manager the SqshExtractManager to retrieve.
  *
- * @return 0 on success, less than 0 on error.
+ * @return the SqshExtractManager.
  */
-int sqsh__archive_metablock_extract_manager(
-		struct SqshArchive *archive,
-		struct SqshExtractManager **metablock_extract_manager);
+struct SqshExtractManager *
+sqsh__archive_metablock_extract_manager(struct SqshArchive *archive);
 
 /**
  * @internal

@@ -148,7 +148,7 @@ struct SqshExtractManager {
 	 * @privatesection
 	 */
 	struct SqshRcHashMap hash_map;
-	const struct SqshExtractor *extractor;
+	struct SqshExtractor extractor;
 	struct SqshMapManager *map_manager;
 	struct SqshLru lru;
 	sqsh_mutex_t lock;
@@ -161,14 +161,14 @@ struct SqshExtractManager {
  *
  * @param[in]     manager     The manager to initialize.
  * @param[in]     archive     The archive to use.
- * @param[in]     extractor   The extractor to use.
+ * @param[in]     block_size  The block size to use.
  * @param[in]     size        The size of the manager.
  *
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_UNUSED int sqsh__extract_manager_init(
 		struct SqshExtractManager *manager, struct SqshArchive *archive,
-		const struct SqshExtractor *extractor, size_t size);
+		uint32_t block_size, size_t size);
 
 /**
  * @internal

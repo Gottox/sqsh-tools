@@ -46,12 +46,11 @@ decompress(void) {
 	struct SqshArchive archive = {0};
 	struct SqshExtractManager manager = {0};
 	const struct SqshBuffer *buffer = NULL;
-	uint8_t payload[] = {SQSH_HEADER, ZLIB_ABCD};
+	uint8_t payload[8192] = {SQSH_HEADER, ZLIB_ABCD};
 
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(&archive);
-	const struct SqshExtractor *compression = &archive.data_compression;
 	struct SqshMapReader reader = {0};
 	rv = sqsh__map_reader_init(
 			&reader, map_manager, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
@@ -60,7 +59,7 @@ decompress(void) {
 	rv = sqsh__map_reader_advance(&reader, 0, CHUNK_SIZE(ZLIB_ABCD));
 	assert(rv == 0);
 
-	rv = sqsh__extract_manager_init(&manager, &archive, compression, 10);
+	rv = sqsh__extract_manager_init(&manager, &archive, 8192, 10);
 	assert(rv == 0);
 
 	rv = sqsh__extract_manager_uncompress(&manager, &reader, &buffer);
@@ -82,12 +81,11 @@ decompress_and_cached(void) {
 	struct SqshExtractManager manager = {0};
 	const struct SqshBuffer *buffer = NULL;
 	const struct SqshBuffer *cached_buffer = NULL;
-	uint8_t payload[] = {SQSH_HEADER, ZLIB_ABCD};
+	uint8_t payload[8192] = {SQSH_HEADER, ZLIB_ABCD};
 
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(&archive);
-	const struct SqshExtractor *compression = &archive.data_compression;
 	struct SqshMapReader reader = {0};
 	rv = sqsh__map_reader_init(
 			&reader, map_manager, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
@@ -96,7 +94,7 @@ decompress_and_cached(void) {
 	rv = sqsh__map_reader_advance(&reader, 0, CHUNK_SIZE(ZLIB_ABCD));
 	assert(rv == 0);
 
-	rv = sqsh__extract_manager_init(&manager, &archive, compression, 10);
+	rv = sqsh__extract_manager_init(&manager, &archive, 8192, 10);
 	assert(rv == 0);
 
 	rv = sqsh__extract_manager_uncompress(&manager, &reader, &buffer);
