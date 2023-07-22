@@ -189,8 +189,8 @@ sqsh_inode_file_block_size(const struct SqshInode *context, uint32_t index);
  *
  * @return true if the block is compressed, false otherwise.
  */
-bool
-sqsh_inode_file_block_is_compressed(const struct SqshInode *context, uint32_t index);
+bool sqsh_inode_file_block_is_compressed(
+		const struct SqshInode *context, uint32_t index);
 
 /**
  * @memberof SqshInode

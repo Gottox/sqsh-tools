@@ -349,7 +349,8 @@ sqsh_inode_file_block_size(const struct SqshInode *inode, uint32_t index) {
 }
 
 bool
-sqsh_inode_file_block_is_compressed(const struct SqshInode *inode, uint32_t index) {
+sqsh_inode_file_block_is_compressed(
+		const struct SqshInode *inode, uint32_t index) {
 	const uint32_t size_info = get_size_info(inode, index);
 
 	return sqsh_datablock_is_compressed(size_info);
