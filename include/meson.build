@@ -23,4 +23,6 @@ headers = [
 
 libsqsh_include = include_directories('.')
 
-install_headers(headers, subdir: 'sqsh')
+if not meson.is_subproject()
+    install_headers(headers, subdir: 'sqsh')
+endif
