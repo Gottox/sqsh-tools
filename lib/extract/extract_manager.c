@@ -137,11 +137,6 @@ sqsh__extract_manager_uncompress(
 			manager->compression_id;
 	const uint32_t block_size = manager->block_size;
 
-	rv = sqsh__extractor_init(&extractor, compression_id, block_size);
-	if (rv < 0) {
-		goto out;
-	}
-
 	rv = sqsh_mutex_lock(&manager->lock);
 	if (rv < 0) {
 		goto out;
@@ -159,6 +154,11 @@ sqsh__extract_manager_uncompress(
 			goto out;
 		}
 		const uint8_t *data = sqsh__map_reader_data(reader);
+
+		rv = sqsh__extractor_init(&extractor, compression_id, block_size);
+		if (rv < 0) {
+			goto out;
+		}
 
 		rv = sqsh__extractor_to_buffer(&extractor, &buffer, data, size);
 		if (rv < 0) {
