@@ -155,12 +155,13 @@ sqsh__extract_manager_uncompress(
 		}
 		const uint8_t *data = sqsh__map_reader_data(reader);
 
-		rv = sqsh__extractor_init(&extractor, compression_id, block_size);
+		rv = sqsh__extractor_init(
+				&extractor, &buffer, compression_id, block_size);
 		if (rv < 0) {
 			goto out;
 		}
 
-		rv = sqsh__extractor_to_buffer(&extractor, &buffer, data, size);
+		rv = sqsh__extractor_to_buffer(&extractor, data, size);
 		if (rv < 0) {
 			sqsh__buffer_cleanup(&buffer);
 			goto out;

@@ -91,6 +91,7 @@ struct SqshExtractor {
 	/**
 	 * @privatesection
 	 */
+	struct SqshBuffer *buffer;
 	const struct SqshExtractorImpl *impl;
 	size_t block_size;
 };
@@ -101,29 +102,30 @@ struct SqshExtractor {
  * @brief Initializes a extractor context.
  *
  * @param[out] extractor      The context to initialize.
+ * @param[out] buffer         The buffer to store the decompressed data.
  * @param[in]  algorithm_id   The id of the compression algorithm to use.
  * @param[in]  block_size     The block size to use for the extraction.
  *
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_UNUSED int sqsh__extractor_init(
-		struct SqshExtractor *extractor, int algorithm_id, size_t block_size);
+		struct SqshExtractor *extractor, struct SqshBuffer *buffer,
+		int algorithm_id, size_t block_size);
 
 /**
  * @internal
  * @memberof SqshExtractor
  * @brief Decompresses data to a buffer.
  *
- * @param[in]     extractor     The extractor context to use.
- * @param[out]    buffer          The buffer to store the decompressed data.
+ * @param[in]     extractor       The extractor context to use.
  * @param[in]     compressed      The compressed data to decompress.
  * @param[in]     compressed_size The size of the compressed data.
  *
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_UNUSED int sqsh__extractor_to_buffer(
-		const struct SqshExtractor *extractor, struct SqshBuffer *buffer,
-		const uint8_t *compressed, const size_t compressed_size);
+		const struct SqshExtractor *extractor, const uint8_t *compressed,
+		const size_t compressed_size);
 
 /**
  * @internal

@@ -62,26 +62,29 @@ extractor_by_id(int id) {
 
 int
 sqsh__extractor_init(
-		struct SqshExtractor *extractor, int algorithm_id, size_t block_size) {
+		struct SqshExtractor *extractor, struct SqshBuffer *buffer,
+		int algorithm_id, size_t block_size) {
 	const struct SqshExtractorImpl *impl = extractor_by_id(algorithm_id);
 	if (impl == NULL) {
 		return -SQSH_ERROR_COMPRESSION_UNSUPPORTED;
 	}
 	extractor->impl = impl;
 	extractor->block_size = block_size;
+	extractor->buffer = buffer;
 	return 0;
 }
 
 int
 sqsh__extractor_to_buffer(
-		const struct SqshExtractor *extractor, struct SqshBuffer *buffer,
-		const uint8_t *compressed, const size_t compressed_size) {
+		const struct SqshExtractor *extractor, const uint8_t *compressed,
+		const size_t compressed_size) {
 	int rv = 0;
 	size_t max_size = extractor->block_size;
 	size_t size = 0;
 	uint8_t *decompressed = NULL;
 	const struct SqshExtractorImpl *impl = extractor->impl;
 	sqsh__extractor_context_t extractor_context = {0};
+	struct SqshBuffer *buffer = extractor->buffer;
 
 	rv = sqsh__buffer_add_capacity(buffer, &decompressed, max_size);
 	if (rv < 0) {
