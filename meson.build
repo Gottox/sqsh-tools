@@ -35,10 +35,6 @@ subdir('lib')
 
 subdir('man')
 
-if get_option('default_library') == 'both'
-    libsqsh = libsqsh.get_static_lib()
-endif
-
 libsqsh_dep = declare_dependency(
     link_with: libsqsh,
     include_directories: libsqsh_include,
