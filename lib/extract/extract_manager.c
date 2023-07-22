@@ -117,10 +117,8 @@ sqsh__extract_manager_init(
 	enum SqshSuperblockCompressionId compression_id =
 			sqsh_superblock_compression_id(superblock);
 
-	rv = sqsh__extractor_init(&manager->extractor, compression_id, block_size);
-	if (rv < 0) {
-		goto out;
-	}
+	manager->compression_id = compression_id;
+	manager->block_size = block_size;
 
 out:
 	if (rv < 0) {
@@ -134,7 +132,15 @@ sqsh__extract_manager_uncompress(
 		struct SqshExtractManager *manager, const struct SqshMapReader *reader,
 		const struct SqshBuffer **target) {
 	int rv = 0;
-	const struct SqshExtractor *extractor = &manager->extractor;
+	struct SqshExtractor extractor = {0};
+	const enum SqshSuperblockCompressionId compression_id =
+			manager->compression_id;
+	const uint32_t block_size = manager->block_size;
+
+	rv = sqsh__extractor_init(&extractor, compression_id, block_size);
+	if (rv < 0) {
+		goto out;
+	}
 
 	rv = sqsh_mutex_lock(&manager->lock);
 	if (rv < 0) {
@@ -154,7 +160,7 @@ sqsh__extract_manager_uncompress(
 		}
 		const uint8_t *data = sqsh__map_reader_data(reader);
 
-		rv = sqsh__extractor_to_buffer(extractor, &buffer, data, size);
+		rv = sqsh__extractor_to_buffer(&extractor, &buffer, data, size);
 		if (rv < 0) {
 			sqsh__buffer_cleanup(&buffer);
 			goto out;
@@ -165,6 +171,7 @@ sqsh__extract_manager_uncompress(
 	rv = sqsh__lru_touch(&manager->lru, address);
 
 out:
+	sqsh__extractor_cleanup(&extractor);
 	sqsh_mutex_unlock(&manager->lock);
 	return rv;
 }
@@ -187,7 +194,6 @@ out:
 int
 sqsh__extract_manager_cleanup(struct SqshExtractManager *manager) {
 	sqsh__lru_cleanup(&manager->lru);
-	sqsh__extractor_cleanup(&manager->extractor);
 	sqsh__rc_hash_map_cleanup(&manager->hash_map);
 	sqsh_mutex_destroy(&manager->lock);
 

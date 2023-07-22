@@ -148,7 +148,8 @@ struct SqshExtractManager {
 	 * @privatesection
 	 */
 	struct SqshRcHashMap hash_map;
-	struct SqshExtractor extractor;
+	unsigned int compression_id;
+	uint32_t block_size;
 	struct SqshMapManager *map_manager;
 	struct SqshLru lru;
 	sqsh_mutex_t lock;
