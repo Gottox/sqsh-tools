@@ -99,6 +99,18 @@ struct SqshExtractor {
 /**
  * @internal
  * @memberof SqshExtractor
+ * @brief Returns the extractor implementation for a given id.
+ *
+ * @param[in]  id   The id of the compression algorithm to use.
+ *
+ * @return pointer to the extractor implementation or NULL if the extraction
+ * algorithm is not supported.
+ */
+const struct SqshExtractorImpl *sqsh__extractor_impl_from_id(int id);
+
+/**
+ * @internal
+ * @memberof SqshExtractor
  * @brief Initializes a extractor context.
  *
  * @param[out] extractor      The context to initialize.

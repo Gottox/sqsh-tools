@@ -89,6 +89,11 @@ sqsh__extract_manager_init(
 			SQSH_CONFIG_DEFAULT(config->compression_lru_size, 128);
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 
+	if (sqsh__extractor_impl_from_id(sqsh_superblock_compression_id(superblock)) ==
+			NULL) {
+		return -SQSH_ERROR_COMPRESSION_UNSUPPORTED;
+	}
+
 	if (size == 0) {
 		return -SQSH_ERROR_SIZE_MISMATCH;
 	}

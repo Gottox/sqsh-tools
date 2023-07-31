@@ -41,7 +41,7 @@ const struct SqshExtractorImpl *const __attribute__((weak)) sqsh__impl_lzo =
 		NULL;
 
 const struct SqshExtractorImpl *
-extractor_by_id(int id) {
+sqsh__extractor_impl_from_id(int id) {
 	switch ((enum SqshSuperblockCompressionId)id) {
 	case SQSH_COMPRESSION_GZIP:
 		return sqsh__impl_zlib;
@@ -64,7 +64,7 @@ int
 sqsh__extractor_init(
 		struct SqshExtractor *extractor, struct SqshBuffer *buffer,
 		int algorithm_id, size_t block_size) {
-	const struct SqshExtractorImpl *impl = extractor_by_id(algorithm_id);
+	const struct SqshExtractorImpl *impl = sqsh__extractor_impl_from_id(algorithm_id);
 	if (impl == NULL) {
 		return -SQSH_ERROR_COMPRESSION_UNSUPPORTED;
 	}
