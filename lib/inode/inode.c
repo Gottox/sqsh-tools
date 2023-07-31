@@ -52,7 +52,7 @@ inode_load(struct SqshInode *context) {
 	size_t size = SQSH_SIZEOF_INODE_HEADER;
 
 	const struct SqshDataInode *inode = get_inode(context);
-	enum SqshDataInodeType type = sqsh__data_inode_type(inode);
+	const enum SqshDataInodeType type = sqsh__data_inode_type(inode);
 	switch (type) {
 	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
 		size += SQSH_SIZEOF_INODE_DIRECTORY;
@@ -96,8 +96,8 @@ inode_load(struct SqshInode *context) {
 		return rv;
 	}
 
-	/* The pointer may have been invalidated by reader_advance, so reretreive
-	 * it.
+	/* The pointer may has been invalidated by reader_advance, so retrieve it
+	 * again.
 	 */
 	inode = get_inode(context);
 	switch (type) {
