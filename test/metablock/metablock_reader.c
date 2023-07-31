@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include "../test.h"
+#include <testlib.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_data_private.h>
@@ -303,12 +303,12 @@ advance_overflow(void) {
 	sqsh__archive_cleanup(&sqsh);
 }
 
-DEFINE
-TEST(advance_once);
-TEST(advance_twice);
-TEST(advance_overlapping);
-TEST(advance_overlapping_2);
-TEST(advance_skip);
-TEST(advance_skip_2);
-TEST(advance_overflow);
-DEFINE_END
+DECLARE_TESTS
+TEST(advance_once)
+TEST(advance_twice)
+TEST(advance_overlapping)
+TEST(advance_overlapping_2)
+TEST(advance_skip)
+TEST(advance_skip_2)
+TEST(advance_overflow)
+END_TESTS

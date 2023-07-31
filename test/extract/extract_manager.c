@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include "../test.h"
+#include <testlib.h>
 
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_data_private.h"
@@ -114,7 +114,7 @@ decompress_and_cached(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
-DEFINE
-TEST(decompress);
-TEST(decompress_and_cached);
-DEFINE_END
+DECLARE_TESTS
+TEST(decompress)
+TEST(decompress_and_cached)
+END_TESTS

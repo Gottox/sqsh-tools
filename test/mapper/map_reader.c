@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include "../test.h"
+#include <testlib.h>
 
 #include <sqsh_mapper_private.h>
 #include <stdint.h>
@@ -295,14 +295,14 @@ error_2(void) {
 	sqsh__map_manager_cleanup(&mapper);
 }
 
-DEFINE
-TEST(init_cursor);
-TEST(advance_once);
-TEST(advance_once_with_offset);
-TEST(advance_twice_with_offset);
-TEST(initial_advance);
-TEST(advance_to_out_of_bounds);
-TEST(initial_advance_2);
-TEST(error_1);
-TEST(error_2);
-DEFINE_END
+DECLARE_TESTS
+TEST(init_cursor)
+TEST(advance_once)
+TEST(advance_once_with_offset)
+TEST(advance_twice_with_offset)
+TEST(initial_advance)
+TEST(advance_to_out_of_bounds)
+TEST(initial_advance_2)
+TEST(error_1)
+TEST(error_2)
+END_TESTS

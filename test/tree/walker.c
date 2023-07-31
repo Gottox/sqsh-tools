@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include "../test.h"
+#include <testlib.h>
 
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_data_private.h"
@@ -82,6 +82,6 @@ walker_symlink_open(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
-DEFINE
-TEST(walker_symlink_open);
-DEFINE_END
+DECLARE_TESTS
+TEST(walker_symlink_open)
+END_TESTS

@@ -71,4 +71,4 @@ $(BUILD_DIR): meson.build Makefile
 .PHONY: clean
 
 clean:
-	rm -rf "$(BUILD_DIR)" subprojects
+	rm -rf "$(BUILD_DIR)"

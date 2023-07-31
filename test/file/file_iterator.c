@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include "../test.h"
+#include <testlib.h>
 
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_data_private.h"
@@ -359,10 +359,10 @@ load_zero_big_padding(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
-DEFINE
-TEST(load_two_segments_from_uncompressed_data_block);
-TEST(load_segment_from_uncompressed_data_block);
-TEST(load_segment_from_compressed_data_block);
-TEST(load_zero_padding);
-TEST(load_zero_big_padding);
-DEFINE_END
+DECLARE_TESTS
+TEST(load_two_segments_from_uncompressed_data_block)
+TEST(load_segment_from_uncompressed_data_block)
+TEST(load_segment_from_compressed_data_block)
+TEST(load_zero_padding)
+TEST(load_zero_big_padding)
+END_TESTS

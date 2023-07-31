@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include "../test.h"
+#include <testlib.h>
 
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_inode_private.h"
@@ -200,7 +200,7 @@ load_xattr_indirect(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
-DEFINE
-TEST(load_xattr);
-TEST(load_xattr_indirect);
-DEFINE_END
+DECLARE_TESTS
+TEST(load_xattr)
+TEST(load_xattr_indirect)
+END_TESTS

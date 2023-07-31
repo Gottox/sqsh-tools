@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include "../test.h"
+#include <testlib.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_data_private.h>
@@ -180,9 +180,9 @@ next_compressed(void) {
 	sqsh__archive_cleanup(&sqsh);
 }
 
-DEFINE
-TEST(next_once);
-TEST(next_failing_with_no_compression);
-TEST(next_twice);
-TEST(next_compressed);
-DEFINE_END
+DECLARE_TESTS
+TEST(next_once)
+TEST(next_failing_with_no_compression)
+TEST(next_twice)
+TEST(next_compressed)
+END_TESTS

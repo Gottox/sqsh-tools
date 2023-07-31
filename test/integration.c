@@ -33,7 +33,7 @@
 
 #include "common.h"
 #include "sqsh_tree.h"
-#include "test.h"
+#include <testlib.h>
 #include <pthread.h>
 #include <sqsh_archive_private.h>
 #include <sqsh_chrome.h>
@@ -565,17 +565,17 @@ multithreaded(void) {
 	assert(rv == 0);
 }
 
-DEFINE
-TEST(sqsh_empty);
-TEST(sqsh_ls);
-TEST(tree_walker);
-TEST(sqsh_get_nonexistant);
-TEST(sqsh_read_content);
-TEST(sqsh_cat_fragment);
-TEST(sqsh_cat_datablock_and_fragment);
-TEST(sqsh_cat_size_overflow);
-TEST(sqsh_test_uid_and_gid);
-TEST(sqsh_test_extended_dir);
+DECLARE_TESTS
+TEST(sqsh_empty)
+TEST(sqsh_ls)
+TEST(tree_walker)
+TEST(sqsh_get_nonexistant)
+TEST(sqsh_read_content)
+TEST(sqsh_cat_fragment)
+TEST(sqsh_cat_datablock_and_fragment)
+TEST(sqsh_cat_size_overflow)
+TEST(sqsh_test_uid_and_gid)
+TEST(sqsh_test_extended_dir)
 // TEST(sqsh_test_xattr);
-TEST(multithreaded);
-DEFINE_END
+TEST(multithreaded)
+END_TESTS

@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include "../test.h"
+#include <testlib.h>
 
 #include <sqsh_primitive_private.h>
 
@@ -88,7 +88,7 @@ set_and_get_element(void) {
 	assert(rv == 0);
 }
 
-DEFINE
-TEST(init_rc_map);
-TEST(set_and_get_element);
-DEFINE_END
+DECLARE_TESTS
+TEST(init_rc_map)
+TEST(set_and_get_element)
+END_TESTS

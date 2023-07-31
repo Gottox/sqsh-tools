@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include "../test.h"
+#include <testlib.h>
 
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_data_private.h"
@@ -100,6 +100,6 @@ iter_two_files(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
-DEFINE
-TEST(iter_two_files);
-DEFINE_END
+DECLARE_TESTS
+TEST(iter_two_files)
+END_TESTS

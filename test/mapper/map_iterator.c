@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include "../test.h"
+#include <testlib.h>
 
 #include <sqsh_mapper_private.h>
 #include <stdint.h>
@@ -168,10 +168,10 @@ map_iterator_out_of_bounds_outside_blocksize(void) {
 	sqsh__map_manager_cleanup(&mapper);
 }
 
-DEFINE
-TEST(init_cursor);
-TEST(next_once);
-TEST(next_twice);
-TEST(map_iterator_out_of_bounds_inside_blocksize);
-TEST(map_iterator_out_of_bounds_outside_blocksize);
-DEFINE_END
+DECLARE_TESTS
+TEST(init_cursor)
+TEST(next_once)
+TEST(next_twice)
+TEST(map_iterator_out_of_bounds_inside_blocksize)
+TEST(map_iterator_out_of_bounds_outside_blocksize)
+END_TESTS

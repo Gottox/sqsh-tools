@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include "../test.h"
+#include <testlib.h>
 
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_data_private.h"
@@ -76,6 +76,6 @@ load_inode(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
-DEFINE
-TEST(load_inode);
-DEFINE_END
+DECLARE_TESTS
+TEST(load_inode)
+END_TESTS

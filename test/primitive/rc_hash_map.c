@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include "../test.h"
+#include <testlib.h>
 
 #include <sqsh_primitive_private.h>
 
@@ -125,8 +125,8 @@ check_overflow(void) {
 	assert(rv == 0);
 }
 
-DEFINE
-TEST(init_rc_hash_map);
-TEST(set_and_get_element);
-TEST(check_overflow);
-DEFINE_END
+DECLARE_TESTS
+TEST(init_rc_hash_map)
+TEST(set_and_get_element)
+TEST(check_overflow)
+END_TESTS

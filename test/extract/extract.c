@@ -29,12 +29,11 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         buffer.c
+ * @file         extract.c
  */
 
 #include "../common.h"
-#include "../test.h"
-
+#include <testlib.h>
 #include "../../include/sqsh_extract_private.h"
 #include <stdint.h>
 
@@ -186,15 +185,15 @@ decompress_zstd_split(void) {
 	decompress_test_split(sqsh__impl_zstd, input, sizeof(input));
 }
 
-DEFINE
-TEST(decompress_lzma);
-TEST_OFF(decompress_lzma_split);
-TEST(decompress_xz);
-TEST(decompress_xz_split);
-TEST(decompress_lz4);
-TEST_OFF(decompress_lz4_split);
-TEST(decompress_zlib);
-TEST(decompress_zlib_split);
-TEST(decompress_zstd);
-TEST(decompress_zstd_split);
-DEFINE_END
+DECLARE_TESTS
+TEST(decompress_lzma)
+NO_TEST(decompress_lzma_split)
+TEST(decompress_xz)
+TEST(decompress_xz_split)
+TEST(decompress_lz4)
+NO_TEST(decompress_lz4_split)
+TEST(decompress_zlib)
+TEST(decompress_zlib_split)
+TEST(decompress_zstd)
+TEST(decompress_zstd_split)
+END_TESTS

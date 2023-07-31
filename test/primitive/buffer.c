@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include "../test.h"
+#include <testlib.h>
 
 #include <sqsh_primitive_private.h>
 
@@ -70,7 +70,7 @@ append_to_buffer(void) {
 	assert(rv == 0);
 }
 
-DEFINE
-TEST(init_buffer);
-TEST(append_to_buffer);
-DEFINE_END
+DECLARE_TESTS
+TEST(init_buffer)
+TEST(append_to_buffer)
+END_TESTS

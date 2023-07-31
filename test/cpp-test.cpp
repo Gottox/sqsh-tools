@@ -35,10 +35,8 @@
 #	error "This file is C++ only"
 #endif
 
-extern "C" {
 #include "common.h"
-#include "test.h"
-}
+#include <testlib.h>
 #include <sqsh_archive.h>
 #include <sqsh_directory.h>
 #include <sqsh_error.h>
@@ -58,6 +56,6 @@ sqsh_empty() {
 	assert(archive == NULL);
 }
 
-DEFINE
-TEST(sqsh_empty);
-DEFINE_END
+DECLARE_TESTS
+TEST(sqsh_empty)
+END_TESTS

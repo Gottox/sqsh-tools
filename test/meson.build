@@ -89,6 +89,7 @@ read_chunk = executable(
     dependencies: libsqsh_dep,
 )
 
+testlib_dep = subproject('cextras').get_variable('testlib_dep')
 foreach p : sqsh_test
     sources = [p, sqsh_test_util]
     if sqsh_extra_source.has_key(p)
@@ -101,7 +102,7 @@ foreach p : sqsh_test
         sources,
         install: false,
         c_args: this_c_args,
-        dependencies: [libsqsh_dep, threads_dep],
+        dependencies: [libsqsh_dep, threads_dep, testlib_dep],
     )
     test(p, t)
 endforeach

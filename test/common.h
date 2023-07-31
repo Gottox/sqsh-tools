@@ -37,6 +37,8 @@
 #include "../include/sqsh_archive.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include <assert.h>
 
 /*
  *  _______________    __ byte 0

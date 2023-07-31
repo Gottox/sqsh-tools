@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include "../test.h"
+#include <testlib.h>
 
 #include "../../include/sqsh_primitive_private.h"
 
@@ -320,16 +320,16 @@ reader_map_into_buffer_twice(void) {
 	sqsh__reader_cleanup(&reader);
 }
 
-DEFINE
-TEST(reader_init);
-TEST(reader_advance_once);
-TEST(reader_advance_once_with_offset);
-TEST(reader_advance_twice_with_offset);
-TEST(reader_initial_advance);
-TEST(reader_advance_to_out_of_bounds);
-TEST(reader_advance_over_boundary);
-TEST(reader_initial_advance_2);
-TEST(reader_error_1);
-TEST(reader_map_into_buffer);
-TEST(reader_map_into_buffer_twice);
-DEFINE_END
+DECLARE_TESTS
+TEST(reader_init)
+TEST(reader_advance_once)
+TEST(reader_advance_once_with_offset)
+TEST(reader_advance_twice_with_offset)
+TEST(reader_initial_advance)
+TEST(reader_advance_to_out_of_bounds)
+TEST(reader_advance_over_boundary)
+TEST(reader_initial_advance_2)
+TEST(reader_error_1)
+TEST(reader_map_into_buffer)
+TEST(reader_map_into_buffer_twice)
+END_TESTS

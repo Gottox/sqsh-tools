@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include "../test.h"
+#include <testlib.h>
 
 #include "../../include/sqsh_primitive_private.h"
 
@@ -214,10 +214,10 @@ lru_hash_map_insert_and_retain_overflow(void) {
 	assert(rv == 0);
 }
 
-DEFINE
-TEST(lru_map);
-TEST(lru_hash_map);
-TEST(lru_hash_map_insert_and_retain);
-TEST(lru_hash_map_insert_and_retain_twice);
-TEST(lru_hash_map_insert_and_retain_overflow);
-DEFINE_END
+DECLARE_TESTS
+TEST(lru_map)
+TEST(lru_hash_map)
+TEST(lru_hash_map_insert_and_retain)
+TEST(lru_hash_map_insert_and_retain_twice)
+TEST(lru_hash_map_insert_and_retain_overflow)
+END_TESTS

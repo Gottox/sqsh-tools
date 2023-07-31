@@ -33,7 +33,7 @@
 
 #include "common.h"
 #include "sqsh_tree.h"
-#include "test.h"
+#include <testlib.h>
 #include <pthread.h>
 #include <sqsh_archive_private.h>
 #include <sqsh_chrome.h>
@@ -902,23 +902,23 @@ fuzz_oom_1(void) {
 	sqsh_archive_free(archive);
 }
 
-DEFINE
-TEST_OFF(fuzz_crash_1); // Fails since the library sets up tables
-TEST_OFF(fuzz_crash_2); // Fails since the library sets up tables
-TEST_OFF(fuzz_crash_3); // Fails since the library sets up tables
-TEST_OFF(fuzz_crash_4);
-TEST_OFF(fuzz_crash_5);
-TEST_OFF(fuzz_crash_6);
-TEST_OFF(fuzz_crash_7);
-TEST(fuzz_crash_8);
-TEST(fuzz_crash_9);
-TEST(fuzz_crash_10);
-TEST(fuzz_crash_11);
-TEST(fuzz_crash_12);
-TEST(fuzz_crash_13);
-TEST(fuzz_crash_14);
-TEST(fuzz_crash_15);
-TEST(fuzz_crash_16);
-TEST(fuzz_crash_17);
-TEST(fuzz_oom_1);
-DEFINE_END
+DECLARE_TESTS
+NO_TEST(fuzz_crash_1) // Fails since the library sets up tables
+NO_TEST(fuzz_crash_2) // Fails since the library sets up tables
+NO_TEST(fuzz_crash_3) // Fails since the library sets up tables
+NO_TEST(fuzz_crash_4)
+NO_TEST(fuzz_crash_5)
+NO_TEST(fuzz_crash_6)
+NO_TEST(fuzz_crash_7)
+TEST(fuzz_crash_8)
+TEST(fuzz_crash_9)
+TEST(fuzz_crash_10)
+TEST(fuzz_crash_11)
+TEST(fuzz_crash_12)
+TEST(fuzz_crash_13)
+TEST(fuzz_crash_14)
+TEST(fuzz_crash_15)
+TEST(fuzz_crash_16)
+TEST(fuzz_crash_17)
+TEST(fuzz_oom_1)
+END_TESTS

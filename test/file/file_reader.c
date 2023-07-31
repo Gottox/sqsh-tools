@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include "../test.h"
+#include <testlib.h>
 
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_data_private.h"
@@ -177,8 +177,8 @@ load_file_from_uncompressed_data_block(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
-DEFINE
-TEST(load_file_from_uncompressed_data_block);
-TEST(load_file_from_compressed_data_block);
-TEST(load_file_from_compressed_data_block_with_offset);
-DEFINE_END
+DECLARE_TESTS
+TEST(load_file_from_uncompressed_data_block)
+TEST(load_file_from_compressed_data_block)
+TEST(load_file_from_compressed_data_block_with_offset)
+END_TESTS
