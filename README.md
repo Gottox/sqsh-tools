@@ -20,9 +20,6 @@ but should be easy to port to other systems too. With
 [sqsh.js](https://github.com/Gottox/sqsh.js) there's a wasm implementation of
 libsqsh with a Javascript API designed to run in browsers.
 
-At this point development focuses on avoiding redundant decompressions and
-developing efficient cache tactics.
-
 * traverse directories
 * read file contents
 * open files by path
@@ -32,7 +29,6 @@ developing efficient cache tactics.
 * read symlinks from inodes
 * read device ids from inodes
 * open remote file systems through http (needs *libcurl*)
-* ... much more
 
 ### LZO2
 
