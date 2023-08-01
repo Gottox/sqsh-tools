@@ -69,7 +69,7 @@ sqsh_inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number) {
 	int rv;
 	uint64_t inode_ref = 0;
 	atomic_uint_fast64_t *inode_refs = map->inode_refs;
-	if (inode_number - 1 > map->inode_count) {
+	if (inode_number - 1 >= map->inode_count) {
 		return 0;
 	} else if (inode_number == 0) {
 		return 0;
@@ -91,7 +91,7 @@ sqsh_inode_map_set(
 	uint_fast64_t old_value;
 	atomic_uint_fast64_t *inode_refs = map->inode_refs;
 
-	if (inode_number - 1 > map->inode_count) {
+	if (inode_number - 1 >= map->inode_count) {
 		return -SQSH_ERROR_OUT_OF_BOUNDS;
 	} else if (inode_number != 0 && map->export_table == NULL) {
 		old_value = atomic_exchange(&inode_refs[inode_number - 1], inode_ref);
