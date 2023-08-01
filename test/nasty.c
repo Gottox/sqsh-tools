@@ -31,7 +31,7 @@
  * @file         integration.c
  */
 
-#include "../../include/sqsh.h"
+#include "../include/sqsh.h"
 #include "common.h"
 #include <testlib.h>
 
