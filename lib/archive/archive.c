@@ -107,7 +107,7 @@ sqsh__archive_init(
 
 	/*  RECURSIVE is needed because: inode_map may access the export_table
 	 *  during initialization. */
-	rv = sqsh_mutex_init_recursive(&archive->lock);
+	rv = sqsh__mutex_init_recursive(&archive->lock);
 	if (rv < 0) {
 		goto out;
 	}
@@ -178,7 +178,7 @@ sqsh__archive_data_extract_manager(
 		struct SqshExtractManager **data_extract_manager) {
 	int rv = 0;
 
-	rv = sqsh_mutex_lock(&archive->lock);
+	rv = sqsh__mutex_lock(&archive->lock);
 	if (rv < 0) {
 		goto out;
 	}
@@ -201,7 +201,7 @@ sqsh__archive_data_extract_manager(
 	}
 	*data_extract_manager = &archive->data_extract_manager;
 out:
-	sqsh_mutex_unlock(&archive->lock);
+	sqsh__mutex_unlock(&archive->lock);
 	return rv;
 }
 
@@ -210,7 +210,7 @@ sqsh_archive_id_table(
 		struct SqshArchive *archive, struct SqshIdTable **id_table) {
 	int rv = 0;
 
-	rv = sqsh_mutex_lock(&archive->lock);
+	rv = sqsh__mutex_lock(&archive->lock);
 	if (rv < 0) {
 		goto out;
 	}
@@ -223,7 +223,7 @@ sqsh_archive_id_table(
 	}
 	*id_table = &archive->id_table;
 out:
-	sqsh_mutex_unlock(&archive->lock);
+	sqsh__mutex_unlock(&archive->lock);
 	return rv;
 }
 
@@ -237,7 +237,7 @@ sqsh_archive_export_table(
 		return -SQSH_ERROR_NO_EXPORT_TABLE;
 	}
 
-	rv = sqsh_mutex_lock(&archive->lock);
+	rv = sqsh__mutex_lock(&archive->lock);
 	if (rv < 0) {
 		goto out;
 	}
@@ -251,7 +251,7 @@ sqsh_archive_export_table(
 	*export_table = &archive->export_table;
 
 out:
-	sqsh_mutex_unlock(&archive->lock);
+	sqsh__mutex_unlock(&archive->lock);
 	return rv;
 }
 
@@ -266,7 +266,7 @@ sqsh_archive_fragment_table(
 		return -SQSH_ERROR_NO_FRAGMENT_TABLE;
 	}
 
-	rv = sqsh_mutex_lock(&archive->lock);
+	rv = sqsh__mutex_lock(&archive->lock);
 	if (rv < 0) {
 		goto out;
 	}
@@ -280,7 +280,7 @@ sqsh_archive_fragment_table(
 	}
 	*fragment_table = &archive->fragment_table;
 out:
-	sqsh_mutex_unlock(&archive->lock);
+	sqsh__mutex_unlock(&archive->lock);
 	return rv;
 }
 
@@ -289,7 +289,7 @@ sqsh_archive_inode_map(
 		struct SqshArchive *archive, struct SqshInodeMap **inode_map) {
 	int rv = 0;
 
-	rv = sqsh_mutex_lock(&archive->lock);
+	rv = sqsh__mutex_lock(&archive->lock);
 	if (rv < 0) {
 		goto out;
 	}
@@ -302,7 +302,7 @@ sqsh_archive_inode_map(
 	}
 	*inode_map = &archive->inode_map;
 out:
-	sqsh_mutex_unlock(&archive->lock);
+	sqsh__mutex_unlock(&archive->lock);
 	return rv;
 }
 
@@ -316,7 +316,7 @@ sqsh_archive_xattr_table(
 		return -SQSH_ERROR_NO_XATTR_TABLE;
 	}
 
-	rv = sqsh_mutex_lock(&archive->lock);
+	rv = sqsh__mutex_lock(&archive->lock);
 	if (rv < 0) {
 		goto out;
 	}
@@ -329,7 +329,7 @@ sqsh_archive_xattr_table(
 	}
 	*xattr_table = &archive->xattr_table;
 out:
-	sqsh_mutex_unlock(&archive->lock);
+	sqsh__mutex_unlock(&archive->lock);
 	return rv;
 }
 
@@ -364,7 +364,7 @@ sqsh__archive_cleanup(struct SqshArchive *archive) {
 	sqsh__superblock_cleanup(&archive->superblock);
 	sqsh__map_manager_cleanup(&archive->map_manager);
 
-	sqsh_mutex_destroy(&archive->lock);
+	sqsh__mutex_destroy(&archive->lock);
 
 	return rv;
 }

@@ -106,7 +106,8 @@ struct SqshExtractor {
  * @return pointer to the extractor implementation or NULL if the extraction
  * algorithm is not supported.
  */
-const struct SqshExtractorImpl *sqsh__extractor_impl_from_id(int id);
+SQSH_NO_EXPORT const struct SqshExtractorImpl *
+sqsh__extractor_impl_from_id(int id);
 
 /**
  * @internal
@@ -120,7 +121,7 @@ const struct SqshExtractorImpl *sqsh__extractor_impl_from_id(int id);
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__extractor_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__extractor_init(
 		struct SqshExtractor *extractor, struct SqshBuffer *buffer,
 		int algorithm_id, size_t block_size);
 
@@ -135,7 +136,7 @@ SQSH_NO_UNUSED int sqsh__extractor_init(
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__extractor_to_buffer(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__extractor_to_buffer(
 		const struct SqshExtractor *extractor, const uint8_t *compressed,
 		const size_t compressed_size);
 
@@ -148,7 +149,7 @@ SQSH_NO_UNUSED int sqsh__extractor_to_buffer(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__extractor_cleanup(struct SqshExtractor *extractor);
+SQSH_NO_EXPORT int sqsh__extractor_cleanup(struct SqshExtractor *extractor);
 
 /***************************************
  * extract/extract_manager.c
@@ -166,7 +167,7 @@ struct SqshExtractManager {
 	uint32_t block_size;
 	struct SqshMapManager *map_manager;
 	struct SqshLru lru;
-	sqsh_mutex_t lock;
+	sqsh__mutex_t lock;
 };
 
 /**
@@ -181,7 +182,7 @@ struct SqshExtractManager {
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__extract_manager_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__extract_manager_init(
 		struct SqshExtractManager *manager, struct SqshArchive *archive,
 		uint32_t block_size, size_t size);
 
@@ -196,7 +197,7 @@ SQSH_NO_UNUSED int sqsh__extract_manager_init(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__extract_manager_uncompress(
+SQSH_NO_EXPORT int sqsh__extract_manager_uncompress(
 		struct SqshExtractManager *manager, const struct SqshMapReader *reader,
 		const struct SqshBuffer **target);
 
@@ -210,7 +211,7 @@ int sqsh__extract_manager_uncompress(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__extract_manager_release(
+SQSH_NO_EXPORT int sqsh__extract_manager_release(
 		struct SqshExtractManager *manager, const struct SqshBuffer *buffer);
 
 /**
@@ -222,7 +223,8 @@ int sqsh__extract_manager_release(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__extract_manager_cleanup(struct SqshExtractManager *manager);
+SQSH_NO_EXPORT int
+sqsh__extract_manager_cleanup(struct SqshExtractManager *manager);
 
 /***************************************
  * extract/extract_view.c
@@ -252,7 +254,7 @@ struct SqshExtractView {
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__extract_view_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__extract_view_init(
 		struct SqshExtractView *view, struct SqshExtractManager *manager,
 		const struct SqshMapReader *reader);
 
@@ -265,7 +267,8 @@ SQSH_NO_UNUSED int sqsh__extract_view_init(
  *
  * @return the data of the view.
  */
-const uint8_t *sqsh__extract_view_data(const struct SqshExtractView *view);
+SQSH_NO_EXPORT const uint8_t *
+sqsh__extract_view_data(const struct SqshExtractView *view);
 
 /**
  * @internal
@@ -276,7 +279,8 @@ const uint8_t *sqsh__extract_view_data(const struct SqshExtractView *view);
  *
  * @return the size of the view.
  */
-size_t sqsh__extract_view_size(const struct SqshExtractView *view);
+SQSH_NO_EXPORT size_t
+sqsh__extract_view_size(const struct SqshExtractView *view);
 
 /**
  * @internal
@@ -287,7 +291,7 @@ size_t sqsh__extract_view_size(const struct SqshExtractView *view);
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__extract_view_cleanup(struct SqshExtractView *view);
+SQSH_NO_EXPORT int sqsh__extract_view_cleanup(struct SqshExtractView *view);
 
 /***************************************
  * extract/lz4.c
@@ -296,7 +300,7 @@ int sqsh__extract_view_cleanup(struct SqshExtractView *view);
 /**
  * @brief The implementation of the lz4 extractor.
  */
-extern const struct SqshExtractorImpl *const sqsh__impl_lz4;
+SQSH_NO_EXPORT extern const struct SqshExtractorImpl *const sqsh__impl_lz4;
 /***************************************
  * extract/lzma.c
  */
@@ -304,11 +308,11 @@ extern const struct SqshExtractorImpl *const sqsh__impl_lz4;
 /**
  * @brief The implementation of the lzma extractor.
  */
-extern const struct SqshExtractorImpl *const sqsh__impl_lzma;
+SQSH_NO_EXPORT extern const struct SqshExtractorImpl *const sqsh__impl_lzma;
 /**
  * @brief The implementation of the xz extractor.
  */
-extern const struct SqshExtractorImpl *const sqsh__impl_xz;
+SQSH_NO_EXPORT extern const struct SqshExtractorImpl *const sqsh__impl_xz;
 
 /***************************************
  * extract/zlib.c
@@ -317,7 +321,7 @@ extern const struct SqshExtractorImpl *const sqsh__impl_xz;
 /**
  * @brief The implementation of the zlib extractor.
  */
-extern const struct SqshExtractorImpl *const sqsh__impl_zlib;
+SQSH_NO_EXPORT extern const struct SqshExtractorImpl *const sqsh__impl_zlib;
 
 /***************************************
  * extract/zstd.c
@@ -326,7 +330,7 @@ extern const struct SqshExtractorImpl *const sqsh__impl_zlib;
 /**
  * @brief The implementation of the zstd extractor.
  */
-extern const struct SqshExtractorImpl *const sqsh__impl_zstd;
+SQSH_NO_EXPORT extern const struct SqshExtractorImpl *const sqsh__impl_zstd;
 
 #ifdef __cplusplus
 }

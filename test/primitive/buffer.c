@@ -35,7 +35,7 @@
 #include "../common.h"
 #include <testlib.h>
 
-#include <sqsh_primitive_private.h>
+#include "../../include/sqsh_primitive_private.h"
 
 static void
 init_buffer(void) {

@@ -74,7 +74,7 @@ struct SqshTreeWalker {
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh__tree_walker_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__tree_walker_init(
 		struct SqshTreeWalker *walker, struct SqshArchive *archive);
 
 /**
@@ -86,7 +86,7 @@ SQSH_NO_UNUSED int sqsh__tree_walker_init(
  *
  * @return 0 on success, less than 0 on error.
  */
-int sqsh__tree_walker_cleanup(struct SqshTreeWalker *walker);
+SQSH_NO_EXPORT int sqsh__tree_walker_cleanup(struct SqshTreeWalker *walker);
 
 #ifdef __cplusplus
 }

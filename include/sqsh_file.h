@@ -178,7 +178,7 @@ sqsh_file_iterator_data(const struct SqshFileIterator *iterator);
  * @return The size of the data currently in the file iterator.
  */
 SQSH_NO_UNUSED size_t
-sqsh__file_iterator_block_size(const struct SqshFileIterator *iterator);
+sqsh_file_iterator_block_size(const struct SqshFileIterator *iterator);
 
 /**
  * @brief Gets the size of the data currently in the file iterator.

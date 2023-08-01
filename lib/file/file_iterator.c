@@ -339,7 +339,7 @@ sqsh_file_iterator_data(const struct SqshFileIterator *iterator) {
 }
 
 size_t
-sqsh__file_iterator_block_size(const struct SqshFileIterator *iterator) {
+sqsh_file_iterator_block_size(const struct SqshFileIterator *iterator) {
 	return iterator->block_size;
 }
 

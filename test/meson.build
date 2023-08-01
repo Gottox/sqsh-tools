@@ -102,7 +102,8 @@ foreach p : sqsh_test
         sources,
         install: false,
         c_args: this_c_args,
-        dependencies: [libsqsh_dep, threads_dep, testlib_dep],
+        link_with: libsqsh.get_static_lib(),
+        dependencies: [threads_dep, testlib_dep],
     )
     test(p, t)
 endforeach

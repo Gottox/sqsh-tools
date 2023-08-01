@@ -35,7 +35,7 @@
 #include "../common.h"
 #include <testlib.h>
 
-#include <sqsh_mapper_private.h>
+#include "../../include/sqsh_mapper_private.h"
 #include <stdint.h>
 
 static void

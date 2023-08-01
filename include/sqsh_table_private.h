@@ -78,7 +78,7 @@ struct SqshTable {
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__table_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__table_init(
 		struct SqshTable *table, struct SqshArchive *sqsh, uint64_t start_block,
 		size_t element_size, size_t element_count);
 
@@ -91,7 +91,7 @@ SQSH_NO_UNUSED int sqsh__table_init(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__table_cleanup(struct SqshTable *table);
+SQSH_NO_EXPORT int sqsh__table_cleanup(struct SqshTable *table);
 
 /***************************************
  * table/id_table.c
@@ -117,7 +117,8 @@ struct SqshIdTable {
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__id_table_init(struct SqshIdTable *table, struct SqshArchive *sqsh);
+SQSH_NO_EXPORT int
+sqsh__id_table_init(struct SqshIdTable *table, struct SqshArchive *sqsh);
 
 /**
  * @internal
@@ -128,7 +129,7 @@ int sqsh__id_table_init(struct SqshIdTable *table, struct SqshArchive *sqsh);
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__id_table_cleanup(struct SqshIdTable *table);
+SQSH_NO_EXPORT int sqsh__id_table_cleanup(struct SqshIdTable *table);
 
 /***************************************
  * table/export_table.c
@@ -154,7 +155,7 @@ struct SqshExportTable {
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__export_table_init(
+SQSH_NO_EXPORT int sqsh__export_table_init(
 		struct SqshExportTable *table, struct SqshArchive *sqsh);
 
 /**
@@ -166,7 +167,7 @@ int sqsh__export_table_init(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__export_table_cleanup(struct SqshExportTable *table);
+SQSH_NO_EXPORT int sqsh__export_table_cleanup(struct SqshExportTable *table);
 
 /***************************************
  * file/fragment_table.c
@@ -193,7 +194,7 @@ struct SqshFragmentTable {
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__fragment_table_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__fragment_table_init(
 		struct SqshFragmentTable *table, struct SqshArchive *sqsh);
 
 /**
@@ -208,7 +209,7 @@ SQSH_NO_UNUSED int sqsh__fragment_table_init(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__fragment_table_get(
+SQSH_NO_EXPORT int sqsh__fragment_table_get(
 		const struct SqshFragmentTable *table, const struct SqshInode *inode,
 		struct SqshDataFragment *fragment);
 
@@ -221,7 +222,8 @@ int sqsh__fragment_table_get(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__fragment_table_cleanup(struct SqshFragmentTable *table);
+SQSH_NO_EXPORT int
+sqsh__fragment_table_cleanup(struct SqshFragmentTable *table);
 
 /***************************************
  * table/xattr_table.c

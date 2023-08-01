@@ -62,7 +62,7 @@ struct SqshCurlMapper {
 	uint64_t expected_time;
 	void *handle;
 	uint8_t *header_cache;
-	sqsh_mutex_t lock;
+	sqsh__mutex_t lock;
 };
 
 /***************************************
@@ -143,7 +143,7 @@ struct SqshMemoryMapperImpl {
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__mapper_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__mapper_init(
 		struct SqshMapper *mapper, const void *source,
 		const struct SqshConfig *config);
 
@@ -156,7 +156,7 @@ SQSH_NO_UNUSED int sqsh__mapper_init(
  *
  * @return The size of the input data in the mapper.
  */
-size_t sqsh__mapper_size(const struct SqshMapper *mapper);
+SQSH_NO_EXPORT size_t sqsh__mapper_size(const struct SqshMapper *mapper);
 
 /**
  * @internal
@@ -167,7 +167,7 @@ size_t sqsh__mapper_size(const struct SqshMapper *mapper);
  *
  * @return The size of the input data in the mapper.
  */
-size_t sqsh__mapper_block_size(const struct SqshMapper *mapper);
+SQSH_NO_EXPORT size_t sqsh__mapper_block_size(const struct SqshMapper *mapper);
 
 /**
  * @internal
@@ -178,7 +178,7 @@ size_t sqsh__mapper_block_size(const struct SqshMapper *mapper);
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__mapper_cleanup(struct SqshMapper *mapper);
+SQSH_NO_EXPORT int sqsh__mapper_cleanup(struct SqshMapper *mapper);
 
 /***************************************
  * mapper/map_slice.c
@@ -206,7 +206,8 @@ struct SqshMapSlice {
  *
  * @return The data in the mapping.
  */
-const uint8_t *sqsh__map_slice_data(const struct SqshMapSlice *mapping);
+SQSH_NO_EXPORT const uint8_t *
+sqsh__map_slice_data(const struct SqshMapSlice *mapping);
 
 /**
  * @internal
@@ -217,7 +218,7 @@ const uint8_t *sqsh__map_slice_data(const struct SqshMapSlice *mapping);
  *
  * @return The data in the mapping.
  */
-size_t sqsh__map_slice_size(const struct SqshMapSlice *mapping);
+SQSH_NO_EXPORT size_t sqsh__map_slice_size(const struct SqshMapSlice *mapping);
 
 /**
  * @internal
@@ -228,7 +229,7 @@ size_t sqsh__map_slice_size(const struct SqshMapSlice *mapping);
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__map_slice_cleanup(struct SqshMapSlice *mapping);
+SQSH_NO_EXPORT int sqsh__map_slice_cleanup(struct SqshMapSlice *mapping);
 /**
  * @internal
  * @memberof SqshMapper
@@ -241,7 +242,7 @@ int sqsh__map_slice_cleanup(struct SqshMapSlice *mapping);
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__map_slice_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__map_slice_init(
 		struct SqshMapSlice *mapping, struct SqshMapper *mapper,
 		sqsh_index_t offset, size_t size);
 
@@ -259,7 +260,7 @@ struct SqshMapManager {
 	struct SqshMapper mapper;
 	struct SqshLru lru;
 	struct SqshRcMap maps;
-	sqsh_mutex_t lock;
+	sqsh__mutex_t lock;
 };
 
 /**
@@ -273,7 +274,7 @@ struct SqshMapManager {
  *
  * @return Returns 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__map_manager_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__map_manager_init(
 		struct SqshMapManager *manager, const void *input,
 		const struct SqshConfig *config);
 
@@ -286,7 +287,8 @@ SQSH_NO_UNUSED int sqsh__map_manager_init(
  *
  * @return Returns the size of a chunk.
  */
-uint64_t sqsh__map_manager_size(const struct SqshMapManager *manager);
+SQSH_NO_EXPORT uint64_t
+sqsh__map_manager_size(const struct SqshMapManager *manager);
 
 /**
  * @internal
@@ -297,7 +299,8 @@ uint64_t sqsh__map_manager_size(const struct SqshMapManager *manager);
  *
  * @return Returns the size of a chunk.
  */
-size_t sqsh__map_manager_block_size(const struct SqshMapManager *manager);
+SQSH_NO_EXPORT size_t
+sqsh__map_manager_block_size(const struct SqshMapManager *manager);
 
 /**
  * @internal
@@ -308,7 +311,8 @@ size_t sqsh__map_manager_block_size(const struct SqshMapManager *manager);
  *
  * @return Returns the number of chunks in the file.
  */
-size_t sqsh__map_manager_block_count(const struct SqshMapManager *manager);
+SQSH_NO_EXPORT size_t
+sqsh__map_manager_block_count(const struct SqshMapManager *manager);
 
 /**
  * @internal
@@ -321,7 +325,7 @@ size_t sqsh__map_manager_block_count(const struct SqshMapManager *manager);
  *
  * @return Returns 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__map_manager_get(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__map_manager_get(
 		struct SqshMapManager *manager, sqsh_index_t index,
 		const struct SqshMapSlice **target);
 
@@ -335,7 +339,7 @@ SQSH_NO_UNUSED int sqsh__map_manager_get(
  *
  * @return Returns 0 on success, a negative value on error.
  */
-int sqsh__map_manager_release(
+SQSH_NO_EXPORT int sqsh__map_manager_release(
 		struct SqshMapManager *manager, const struct SqshMapSlice *mapping);
 /**
  * @internal
@@ -346,7 +350,7 @@ int sqsh__map_manager_release(
  *
  * @return Returns 0 on success, a negative value on error.
  */
-int sqsh__map_manager_cleanup(struct SqshMapManager *manager);
+SQSH_NO_EXPORT int sqsh__map_manager_cleanup(struct SqshMapManager *manager);
 
 /***************************************
  * mapper/map_iterator.c
@@ -378,7 +382,7 @@ struct SqshMapIterator {
  * @param[in] address The address to start the iterator at.
  * @return Returns 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__map_iterator_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__map_iterator_init(
 		struct SqshMapIterator *iterator, struct SqshMapManager *manager,
 		uint64_t address);
 
@@ -390,7 +394,8 @@ SQSH_NO_UNUSED int sqsh__map_iterator_init(
  * @param[in] iterator The SqshMapIterator instance.
  * @return Returns 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__map_iterator_next(struct SqshMapIterator *iterator);
+SQSH_NO_EXPORT SQSH_NO_UNUSED int
+sqsh__map_iterator_next(struct SqshMapIterator *iterator);
 
 /**
  * @internal
@@ -403,7 +408,7 @@ SQSH_NO_UNUSED int sqsh__map_iterator_next(struct SqshMapIterator *iterator);
  * @param[in] amount The number of chunks to skip.
  * @return Returns 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int
+SQSH_NO_EXPORT SQSH_NO_UNUSED int
 sqsh__map_iterator_skip(struct SqshMapIterator *iterator, size_t amount);
 
 /**
@@ -414,7 +419,8 @@ sqsh__map_iterator_skip(struct SqshMapIterator *iterator, size_t amount);
  * @param[in] iterator The SqshMapIterator instance.
  * @return the data for the current chunk.
  */
-const uint8_t *sqsh__map_iterator_data(const struct SqshMapIterator *iterator);
+SQSH_NO_EXPORT const uint8_t *
+sqsh__map_iterator_data(const struct SqshMapIterator *iterator);
 
 /**
  * @internal
@@ -424,7 +430,8 @@ const uint8_t *sqsh__map_iterator_data(const struct SqshMapIterator *iterator);
  * @param[in] iterator The SqshMapIterator instance.
  * @return the size of the current chunk.
  */
-size_t sqsh__map_iterator_block_size(const struct SqshMapIterator *iterator);
+SQSH_NO_EXPORT size_t
+sqsh__map_iterator_block_size(const struct SqshMapIterator *iterator);
 
 /**
  * @internal
@@ -434,7 +441,8 @@ size_t sqsh__map_iterator_block_size(const struct SqshMapIterator *iterator);
  * @param[in] iterator The SqshMapIterator instance.
  * @return the address of the current chunk.
  */
-sqsh_index_t sqsh__map_iterator_address(const struct SqshMapIterator *iterator);
+SQSH_NO_EXPORT sqsh_index_t
+sqsh__map_iterator_address(const struct SqshMapIterator *iterator);
 
 /**
  * @internal
@@ -444,7 +452,8 @@ sqsh_index_t sqsh__map_iterator_address(const struct SqshMapIterator *iterator);
  * @param[in] iterator The SqshMapIterator instance.
  * @return the size of the current chunk.
  */
-size_t sqsh__map_iterator_size(const struct SqshMapIterator *iterator);
+SQSH_NO_EXPORT size_t
+sqsh__map_iterator_size(const struct SqshMapIterator *iterator);
 
 /**
  * @internal
@@ -454,7 +463,7 @@ size_t sqsh__map_iterator_size(const struct SqshMapIterator *iterator);
  * @param[in] iterator The SqshMapIterator instance.
  * @return the index of the current chunk.
  */
-int sqsh__map_iterator_cleanup(struct SqshMapIterator *iterator);
+SQSH_NO_EXPORT int sqsh__map_iterator_cleanup(struct SqshMapIterator *iterator);
 
 /***************************************
  * mapper/map_reader.c
@@ -484,7 +493,7 @@ struct SqshMapReader {
  * @param upper_limit The upper limit of the reader
  * @return 0 on success, negative on error
  */
-SQSH_NO_UNUSED int sqsh__map_reader_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__map_reader_init(
 		struct SqshMapReader *reader, struct SqshMapManager *mapper,
 		const uint64_t start_address, uint64_t upper_limit);
 
@@ -496,7 +505,8 @@ SQSH_NO_UNUSED int sqsh__map_reader_init(
  * @param reader The reader to query
  * @return size of the remaining bytes
  */
-size_t sqsh__map_reader_remaining_direct(const struct SqshMapReader *reader);
+SQSH_NO_EXPORT size_t
+sqsh__map_reader_remaining_direct(const struct SqshMapReader *reader);
 
 /**
  * @internal
@@ -507,7 +517,7 @@ size_t sqsh__map_reader_remaining_direct(const struct SqshMapReader *reader);
  * @return the current address of the reader
  *
  */
-SQSH_NO_UNUSED uint64_t
+SQSH_NO_EXPORT SQSH_NO_UNUSED uint64_t
 sqsh__map_reader_address(const struct SqshMapReader *reader);
 
 /**
@@ -520,7 +530,7 @@ sqsh__map_reader_address(const struct SqshMapReader *reader);
  * @param size The size to advance
  * @return 0 on success, negative on error
  */
-SQSH_NO_UNUSED int sqsh__map_reader_advance(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__map_reader_advance(
 		struct SqshMapReader *reader, sqsh_index_t offset, size_t size);
 
 /**
@@ -532,7 +542,8 @@ SQSH_NO_UNUSED int sqsh__map_reader_advance(
  * @param reader The reader to advance
  * @return 0 on success, negative on error
  */
-SQSH_NO_UNUSED int sqsh__map_reader_all(struct SqshMapReader *reader);
+SQSH_NO_EXPORT SQSH_NO_UNUSED int
+sqsh__map_reader_all(struct SqshMapReader *reader);
 
 /**
  * @internal
@@ -542,7 +553,8 @@ SQSH_NO_UNUSED int sqsh__map_reader_all(struct SqshMapReader *reader);
  * @param reader The reader to get the data from
  * @return The current data of the reader
  */
-const uint8_t *sqsh__map_reader_data(const struct SqshMapReader *reader);
+SQSH_NO_EXPORT const uint8_t *
+sqsh__map_reader_data(const struct SqshMapReader *reader);
 
 /**
  * @internal
@@ -552,7 +564,7 @@ const uint8_t *sqsh__map_reader_data(const struct SqshMapReader *reader);
  * @param reader The reader to get the size from
  * @return The current size of the reader
  */
-size_t sqsh__map_reader_size(const struct SqshMapReader *reader);
+SQSH_NO_EXPORT size_t sqsh__map_reader_size(const struct SqshMapReader *reader);
 
 /**
  * @internal
@@ -562,7 +574,7 @@ size_t sqsh__map_reader_size(const struct SqshMapReader *reader);
  * @param reader The reader to clean up
  * @return 0 on success, negative on error
  */
-int sqsh__map_reader_cleanup(struct SqshMapReader *reader);
+SQSH_NO_EXPORT int sqsh__map_reader_cleanup(struct SqshMapReader *reader);
 
 #ifdef __cplusplus
 }

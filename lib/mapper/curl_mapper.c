@@ -206,7 +206,7 @@ sqsh_mapper_curl_init(
 	mapper->data.cl.url = strdup(input);
 	mapper->data.cl.handle = curl_easy_init();
 
-	rv = sqsh_mutex_init(&mapper->data.cl.lock);
+	rv = sqsh__mutex_init(&mapper->data.cl.lock);
 	if (rv < 0) {
 		goto out;
 	}
@@ -239,8 +239,8 @@ sqsh_mapper_curl_map(struct SqshMapSlice *mapping) {
 	uint64_t file_size = 0;
 	uint64_t file_time = 0;
 
-	sqsh_mutex_t *lock = &mapping->mapper->data.cl.lock;
-	rv = sqsh_mutex_lock(lock);
+	sqsh__mutex_t *lock = &mapping->mapper->data.cl.lock;
+	rv = sqsh__mutex_lock(lock);
 	if (rv < 0) {
 		goto out;
 	}
@@ -272,14 +272,14 @@ out:
 	if (rv < 0) {
 		sqsh__map_slice_cleanup(mapping);
 	}
-	sqsh_mutex_unlock(lock);
+	sqsh__mutex_unlock(lock);
 	return rv;
 }
 
 static int
 sqsh_mapper_curl_cleanup(struct SqshMapper *mapper) {
 	free(mapper->data.cl.url);
-	sqsh_mutex_destroy(&mapper->data.cl.lock);
+	sqsh__mutex_destroy(&mapper->data.cl.lock);
 	curl_easy_cleanup(mapper->data.cl.handle);
 	return 0;
 }

@@ -4,12 +4,12 @@
  * @created     : Wednesday Mar 29, 2023 18:37:10 CEST
  */
 
+#include "../include/sqsh_archive.h"
+#include "../include/sqsh_chrome.h"
+#include "../include/sqsh_error.h"
+#include "../include/sqsh_file.h"
+#include "../include/sqsh_inode.h"
 #include "sqsh_archive_private.h"
-#include <sqsh_archive.h>
-#include <sqsh_chrome.h>
-#include <sqsh_error.h>
-#include <sqsh_file.h>
-#include <sqsh_inode.h>
 
 #include <stdio.h>
 #include <stdlib.h>

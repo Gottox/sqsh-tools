@@ -32,10 +32,10 @@
  * @file         extract.c
  */
 
-#include "../common.h"
-#include <testlib.h>
 #include "../../include/sqsh_extract_private.h"
+#include "../common.h"
 #include <stdint.h>
+#include <testlib.h>
 
 static void
 decompress_test(

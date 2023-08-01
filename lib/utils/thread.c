@@ -42,7 +42,7 @@
 #include <stdlib.h>
 
 int
-sqsh_mutex_init(sqsh_mutex_t *mutex) {
+sqsh__mutex_init(sqsh__mutex_t *mutex) {
 	int rv = pthread_mutex_init(mutex, NULL);
 	if (rv != 0) {
 		return -SQSH_ERROR_MUTEX_INIT_FAILED;
@@ -51,7 +51,7 @@ sqsh_mutex_init(sqsh_mutex_t *mutex) {
 }
 
 int
-sqsh_mutex_init_recursive(sqsh_mutex_t *mutex) {
+sqsh__mutex_init_recursive(sqsh__mutex_t *mutex) {
 	pthread_mutexattr_t mutex_attr;
 	int rv = pthread_mutexattr_init(&mutex_attr);
 	if (rv != 0) {
@@ -72,7 +72,7 @@ out:
 }
 
 int
-sqsh_mutex_lock(sqsh_mutex_t *mutex) {
+sqsh__mutex_lock(sqsh__mutex_t *mutex) {
 	int rv = pthread_mutex_lock(mutex);
 	if (rv != 0) {
 		return -SQSH_ERROR_MUTEX_LOCK_FAILED;
@@ -82,7 +82,7 @@ sqsh_mutex_lock(sqsh_mutex_t *mutex) {
 }
 
 int
-sqsh_mutex_unlock(sqsh_mutex_t *mutex) {
+sqsh__mutex_unlock(sqsh__mutex_t *mutex) {
 	int rv = pthread_mutex_unlock(mutex);
 	if (rv != 0) {
 		return -SQSH_ERROR_MUTEX_LOCK_FAILED;
@@ -92,7 +92,7 @@ sqsh_mutex_unlock(sqsh_mutex_t *mutex) {
 }
 
 int
-sqsh_mutex_destroy(sqsh_mutex_t *mutex) {
+sqsh__mutex_destroy(sqsh__mutex_t *mutex) {
 	int rv = pthread_mutex_destroy(mutex);
 	if (rv != 0) {
 		return -SQSH_ERROR_MUTEX_DESTROY_FAILED;

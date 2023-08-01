@@ -59,6 +59,11 @@ extern "C" {
 #define SQSH_NO_UNUSED __attribute__((warn_unused_result))
 
 /**
+ * @brief Do not export symbol
+ */
+#define SQSH_NO_EXPORT __attribute__((visibility("hidden")))
+
+/**
  * @brief typedef used for indexing
  */
 typedef size_t sqsh_index_t;

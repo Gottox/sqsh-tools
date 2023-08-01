@@ -74,7 +74,7 @@ struct SqshXattrIterator {
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__xattr_iterator_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__xattr_iterator_init(
 		struct SqshXattrIterator *iterator, const struct SqshInode *inode);
 
 /**
@@ -86,7 +86,8 @@ SQSH_NO_UNUSED int sqsh__xattr_iterator_init(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__xattr_iterator_cleanup(struct SqshXattrIterator *iterator);
+SQSH_NO_EXPORT int
+sqsh__xattr_iterator_cleanup(struct SqshXattrIterator *iterator);
 
 /**
  * @internal
@@ -98,7 +99,7 @@ int sqsh__xattr_iterator_cleanup(struct SqshXattrIterator *iterator);
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__xattr_table_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__xattr_table_init(
 		struct SqshXattrTable *context, struct SqshArchive *sqsh);
 
 /**
@@ -110,7 +111,7 @@ SQSH_NO_UNUSED int sqsh__xattr_table_init(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__xattr_table_cleanup(struct SqshXattrTable *context);
+SQSH_NO_EXPORT int sqsh__xattr_table_cleanup(struct SqshXattrTable *context);
 
 #ifdef __cplusplus
 }

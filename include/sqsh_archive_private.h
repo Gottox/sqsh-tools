@@ -70,7 +70,7 @@ struct SqshTrailingContext {
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__trailing_init(
+SQSH_NO_UNUSED SQSH_NO_EXPORT int sqsh__trailing_init(
 		struct SqshTrailingContext *context, struct SqshArchive *sqsh);
 
 /**
@@ -82,7 +82,7 @@ SQSH_NO_UNUSED int sqsh__trailing_init(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__trailing_cleanup(struct SqshTrailingContext *context);
+SQSH_NO_EXPORT int sqsh__trailing_cleanup(struct SqshTrailingContext *context);
 
 /***************************************
  * archive/inode_map.c
@@ -111,7 +111,7 @@ struct SqshInodeMap {
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int
+SQSH_NO_UNUSED SQSH_NO_EXPORT int
 sqsh__inode_map_init(struct SqshInodeMap *map, struct SqshArchive *archive);
 
 /**
@@ -123,7 +123,7 @@ sqsh__inode_map_init(struct SqshInodeMap *map, struct SqshArchive *archive);
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__inode_map_cleanup(struct SqshInodeMap *map);
+SQSH_NO_EXPORT int sqsh__inode_map_cleanup(struct SqshInodeMap *map);
 
 /***************************************
  * archive/superblock.c
@@ -150,7 +150,7 @@ struct SqshSuperblock {
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__superblock_init(
+SQSH_NO_UNUSED SQSH_NO_EXPORT int sqsh__superblock_init(
 		struct SqshSuperblock *superblock, struct SqshMapManager *mapper);
 
 /**
@@ -162,7 +162,7 @@ SQSH_NO_UNUSED int sqsh__superblock_init(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__superblock_cleanup(struct SqshSuperblock *superblock);
+SQSH_NO_EXPORT int sqsh__superblock_cleanup(struct SqshSuperblock *superblock);
 
 /***************************************
  * archive/compression_options.c
@@ -189,7 +189,7 @@ struct SqshCompressionOptions {
  *
  * @return 0 on success, less than 0 on error
  */
-SQSH_NO_UNUSED int sqsh__compression_options_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__compression_options_init(
 		struct SqshCompressionOptions *compression_options,
 		struct SqshArchive *sqsh);
 
@@ -202,7 +202,7 @@ SQSH_NO_UNUSED int sqsh__compression_options_init(
  *
  * @return 0 on success, less than 0 on error
  */
-int sqsh__compression_options_cleanup(
+SQSH_NO_EXPORT int sqsh__compression_options_cleanup(
 		struct SqshCompressionOptions *compression_options);
 
 /***************************************
@@ -224,7 +224,7 @@ struct SqshArchive {
 	struct SqshInodeMap inode_map;
 	uint8_t initialized;
 	struct SqshConfig config;
-	sqsh_mutex_t lock;
+	sqsh__mutex_t lock;
 };
 
 /**
@@ -238,7 +238,7 @@ struct SqshArchive {
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh__archive_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__archive_init(
 		struct SqshArchive *sqsh, const void *source,
 		const struct SqshConfig *config);
 
@@ -253,7 +253,7 @@ SQSH_NO_UNUSED int sqsh__archive_init(
  *
  * @return 0 on success, less than 0 on error.
  */
-int sqsh__archive_data_extract_manager(
+SQSH_NO_EXPORT int sqsh__archive_data_extract_manager(
 		struct SqshArchive *archive,
 		struct SqshExtractManager **data_extract_manager);
 
@@ -267,7 +267,7 @@ int sqsh__archive_data_extract_manager(
  *
  * @return the SqshExtractManager.
  */
-struct SqshExtractManager *
+SQSH_NO_EXPORT struct SqshExtractManager *
 sqsh__archive_metablock_extract_manager(struct SqshArchive *archive);
 
 /**
@@ -279,7 +279,7 @@ sqsh__archive_metablock_extract_manager(struct SqshArchive *archive);
  * @param sqsh the Sqsh structure to cleanup.
  * @return 0 on success, less than 0 on error.
  */
-int sqsh__archive_cleanup(struct SqshArchive *sqsh);
+SQSH_NO_EXPORT int sqsh__archive_cleanup(struct SqshArchive *sqsh);
 
 #ifdef __cplusplus
 }

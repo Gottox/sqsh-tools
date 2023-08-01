@@ -37,10 +37,10 @@
 
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_data_private.h"
+#include "../../include/sqsh_inode.h"
 #include "../../include/sqsh_inode_private.h"
 #include "../../include/sqsh_tree_private.h"
 #include "../../lib/utils/utils.h"
-#include "sqsh_inode.h"
 
 static void
 walker_symlink_open(void) {

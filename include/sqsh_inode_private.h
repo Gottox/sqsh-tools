@@ -70,7 +70,7 @@ struct SqshInode {
  *
  * @return int 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh__inode_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__inode_init(
 		struct SqshInode *context, struct SqshArchive *sqsh,
 		uint64_t inode_ref);
 /**
@@ -82,7 +82,7 @@ SQSH_NO_UNUSED int sqsh__inode_init(
  *
  * @return int 0 on success, less than 0 on error.
  */
-int sqsh__inode_cleanup(struct SqshInode *context);
+SQSH_NO_EXPORT int sqsh__inode_cleanup(struct SqshInode *context);
 
 /***************************************
  * inode/directory_index_iterator.c
@@ -112,7 +112,7 @@ struct SqshDirectoryIndexIterator {
  *
  * @return 0 on success, negative value on error
  */
-SQSH_NO_UNUSED int sqsh__directory_index_iterator_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__directory_index_iterator_init(
 		struct SqshDirectoryIndexIterator *iterator, struct SqshArchive *sqsh,
 		uint64_t inode_ref);
 
@@ -125,7 +125,7 @@ SQSH_NO_UNUSED int sqsh__directory_index_iterator_init(
  *
  * @return 0 on success, negative value on error
  */
-SQSH_NO_UNUSED int sqsh__directory_index_iterator_next(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__directory_index_iterator_next(
 		struct SqshDirectoryIndexIterator *iterator);
 
 /**
@@ -137,7 +137,7 @@ SQSH_NO_UNUSED int sqsh__directory_index_iterator_next(
  *
  * @return The index of the current entry
  */
-uint32_t sqsh__directory_index_iterator_index(
+SQSH_NO_EXPORT uint32_t sqsh__directory_index_iterator_index(
 		const struct SqshDirectoryIndexIterator *iterator);
 
 /**
@@ -149,7 +149,7 @@ uint32_t sqsh__directory_index_iterator_index(
  *
  * @return The start offset of the current entry
  */
-uint32_t sqsh__directory_index_iterator_start(
+SQSH_NO_EXPORT uint32_t sqsh__directory_index_iterator_start(
 		const struct SqshDirectoryIndexIterator *iterator);
 
 /**
@@ -161,7 +161,7 @@ uint32_t sqsh__directory_index_iterator_start(
  *
  * @return The name size of the current entry
  */
-uint32_t sqsh__directory_index_iterator_name_size(
+SQSH_NO_EXPORT uint32_t sqsh__directory_index_iterator_name_size(
 		const struct SqshDirectoryIndexIterator *iterator);
 
 /**
@@ -173,7 +173,7 @@ uint32_t sqsh__directory_index_iterator_name_size(
  *
  * @return The name of the current entry
  */
-const char *sqsh__directory_index_iterator_name(
+SQSH_NO_EXPORT const char *sqsh__directory_index_iterator_name(
 		const struct SqshDirectoryIndexIterator *iterator);
 
 /**
@@ -185,7 +185,7 @@ const char *sqsh__directory_index_iterator_name(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__directory_index_iterator_cleanup(
+SQSH_NO_EXPORT int sqsh__directory_index_iterator_cleanup(
 		struct SqshDirectoryIndexIterator *iterator);
 
 #ifdef __cplusplus

@@ -73,7 +73,7 @@ struct SqshMetablockIterator {
  * @param[in] upper_limit The maximum address the iterator is allowed to read.
  * @return 0 on success, or a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__metablock_iterator_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__metablock_iterator_init(
 		struct SqshMetablockIterator *iterator, struct SqshArchive *sqsh,
 		uint64_t start_address, uint64_t upper_limit);
 
@@ -87,7 +87,7 @@ SQSH_NO_UNUSED int sqsh__metablock_iterator_init(
  * @param[in] amount The number of metablocks to skip.
  * @return 0 on success, or a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__metablock_iterator_skip(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__metablock_iterator_skip(
 		struct SqshMetablockIterator *iterator, size_t amount);
 
 /**
@@ -98,7 +98,7 @@ SQSH_NO_UNUSED int sqsh__metablock_iterator_skip(
  * @param[in,out] iterator The iterator to advance.
  * @return 0 on success, or a negative value on error.
  */
-SQSH_NO_UNUSED int
+SQSH_NO_EXPORT SQSH_NO_UNUSED int
 sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator);
 
 /**
@@ -109,7 +109,7 @@ sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator);
  * @param[in] iterator The iterator.
  * @return A pointer to the data of the current metablock.
  */
-const uint8_t *
+SQSH_NO_EXPORT const uint8_t *
 sqsh__metablock_iterator_data(const struct SqshMetablockIterator *iterator);
 
 /**
@@ -120,7 +120,7 @@ sqsh__metablock_iterator_data(const struct SqshMetablockIterator *iterator);
  * @param[in] iterator The iterator.
  * @return The size of the current metablock.
  */
-size_t
+SQSH_NO_EXPORT size_t
 sqsh__metablock_iterator_size(const struct SqshMetablockIterator *iterator);
 
 /**
@@ -131,7 +131,8 @@ sqsh__metablock_iterator_size(const struct SqshMetablockIterator *iterator);
  * @param[in,out] iterator The iterator to clean up.
  * @return 0 on success, or a negative value on error.
  */
-int sqsh__metablock_iterator_cleanup(struct SqshMetablockIterator *iterator);
+SQSH_NO_EXPORT int
+sqsh__metablock_iterator_cleanup(struct SqshMetablockIterator *iterator);
 
 /***************************************
  * metablock/metablock_reader.c
@@ -160,7 +161,7 @@ struct SqshMetablockReader {
  *
  * @return 0 on success, less than zero on error.
  */
-SQSH_NO_UNUSED int sqsh__metablock_reader_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__metablock_reader_init(
 		struct SqshMetablockReader *reader, struct SqshArchive *sqsh,
 		const uint64_t start_address, const uint64_t upper_limit);
 
@@ -175,7 +176,7 @@ SQSH_NO_UNUSED int sqsh__metablock_reader_init(
  *
  * @return 0 on success, less than zero on error.
  */
-SQSH_NO_UNUSED int sqsh__metablock_reader_advance(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__metablock_reader_advance(
 		struct SqshMetablockReader *reader, sqsh_index_t offset, size_t size);
 
 /**
@@ -188,7 +189,7 @@ SQSH_NO_UNUSED int sqsh__metablock_reader_advance(
  *
  * @return Pointer to the data at the current position of the metablock reader.
  */
-const uint8_t *
+SQSH_NO_EXPORT const uint8_t *
 sqsh__metablock_reader_data(const struct SqshMetablockReader *reader);
 
 /**
@@ -201,7 +202,8 @@ sqsh__metablock_reader_data(const struct SqshMetablockReader *reader);
  *
  * @return Size of the data at the current position of the metablock reader.
  */
-size_t sqsh__metablock_reader_size(const struct SqshMetablockReader *reader);
+SQSH_NO_EXPORT size_t
+sqsh__metablock_reader_size(const struct SqshMetablockReader *reader);
 
 /**
  * @internal
@@ -212,7 +214,8 @@ size_t sqsh__metablock_reader_size(const struct SqshMetablockReader *reader);
  *
  * @return 0 on success, less than zero on error.
  */
-int sqsh__metablock_reader_cleanup(struct SqshMetablockReader *reader);
+SQSH_NO_EXPORT int
+sqsh__metablock_reader_cleanup(struct SqshMetablockReader *reader);
 
 #ifdef __cplusplus
 }

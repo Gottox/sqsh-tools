@@ -63,14 +63,16 @@ struct SqshFragmentView {
 	size_t size;
 };
 
-int sqsh__fragment_view_init(
+SQSH_NO_EXPORT int sqsh__fragment_view_init(
 		struct SqshFragmentView *view, const struct SqshInode *inode);
 
-const uint8_t *sqsh__fragment_view_data(const struct SqshFragmentView *view);
+SQSH_NO_EXPORT const uint8_t *
+sqsh__fragment_view_data(const struct SqshFragmentView *view);
 
-size_t sqsh__fragment_view_size(const struct SqshFragmentView *view);
+SQSH_NO_EXPORT size_t
+sqsh__fragment_view_size(const struct SqshFragmentView *view);
 
-int sqsh__fragment_view_cleanup(struct SqshFragmentView *view);
+SQSH_NO_EXPORT int sqsh__fragment_view_cleanup(struct SqshFragmentView *view);
 
 /***************************************
  * file/file_iterator.c
@@ -105,7 +107,7 @@ struct SqshFileIterator {
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh__file_iterator_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_iterator_init(
 		struct SqshFileIterator *iterator, const struct SqshInode *inode);
 
 /**
@@ -117,7 +119,8 @@ SQSH_NO_UNUSED int sqsh__file_iterator_init(
  *
  * @return 0 on success, less than 0 on error.
  */
-int sqsh__file_iterator_cleanup(struct SqshFileIterator *iterator);
+SQSH_NO_EXPORT int
+sqsh__file_iterator_cleanup(struct SqshFileIterator *iterator);
 
 /***************************************
  * context/file_reader.c
@@ -144,7 +147,7 @@ struct SqshFileReader {
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh__file_reader_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_reader_init(
 		struct SqshFileReader *reader, const struct SqshInode *inode);
 
 /**
@@ -156,7 +159,7 @@ SQSH_NO_UNUSED int sqsh__file_reader_init(
  *
  * @return 0 on success, less than 0 on error.
  */
-int sqsh__file_reader_cleanup(struct SqshFileReader *reader);
+SQSH_NO_EXPORT int sqsh__file_reader_cleanup(struct SqshFileReader *reader);
 
 #ifdef __cplusplus
 }

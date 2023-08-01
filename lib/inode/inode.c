@@ -150,6 +150,7 @@ sqsh__inode_init(
 	const uint32_t outer_offset = sqsh_address_ref_outer_offset(inode_ref);
 	const uint16_t inner_offset = sqsh_address_ref_inner_offset(inode_ref);
 	uint64_t address_outer;
+	struct SqshInodeMap *inode_map;
 
 	int rv = 0;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
@@ -178,6 +179,14 @@ sqsh__inode_init(
 	inode->inode_ref = inode_ref;
 
 	rv = inode_load(inode);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh_archive_inode_map(archive, &inode_map);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh_inode_map_set(inode_map, sqsh_inode_number(inode), inode_ref);
 
 out:
 	if (rv < 0) {

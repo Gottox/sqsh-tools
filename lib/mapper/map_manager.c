@@ -84,7 +84,7 @@ sqsh__map_manager_init(
 	size_t map_size;
 	size_t lru_size = SQSH_CONFIG_DEFAULT(config->mapper_lru_size, 32);
 
-	rv = sqsh_mutex_init(&manager->lock);
+	rv = sqsh__mutex_init(&manager->lock);
 	if (rv < 0) {
 		goto out;
 	}
@@ -135,7 +135,7 @@ sqsh__map_manager_get(
 		const struct SqshMapSlice **target) {
 	int rv = 0;
 
-	rv = sqsh_mutex_lock(&manager->lock);
+	rv = sqsh__mutex_lock(&manager->lock);
 	if (rv < 0) {
 		goto out;
 	}
@@ -144,13 +144,13 @@ sqsh__map_manager_get(
 
 	if (*target == NULL) {
 		struct SqshMapSlice mapping = {0};
-		sqsh_mutex_unlock(&manager->lock);
+		sqsh__mutex_unlock(&manager->lock);
 		rv = load_mapping(&mapping, manager, index);
 		if (rv < 0) {
 			goto out;
 		}
 
-		rv = sqsh_mutex_lock(&manager->lock);
+		rv = sqsh__mutex_lock(&manager->lock);
 		if (rv < 0) {
 			goto out;
 		}
@@ -160,7 +160,7 @@ sqsh__map_manager_get(
 	rv = sqsh__lru_touch(&manager->lru, index);
 
 out:
-	sqsh_mutex_unlock(&manager->lock);
+	sqsh__mutex_unlock(&manager->lock);
 	return rv;
 }
 
@@ -170,14 +170,14 @@ sqsh__map_manager_release(
 	if (manager == NULL) {
 		return 0;
 	}
-	int rv = sqsh_mutex_lock(&manager->lock);
+	int rv = sqsh__mutex_lock(&manager->lock);
 	if (rv < 0) {
 		goto out;
 	}
 
 	rv = sqsh__rc_map_release(&manager->maps, mapping);
 
-	sqsh_mutex_unlock(&manager->lock);
+	sqsh__mutex_unlock(&manager->lock);
 out:
 	return rv;
 }
@@ -188,7 +188,7 @@ sqsh__map_manager_cleanup(struct SqshMapManager *manager) {
 	sqsh__rc_map_cleanup(&manager->maps);
 	sqsh__mapper_cleanup(&manager->mapper);
 
-	sqsh_mutex_destroy(&manager->lock);
+	sqsh__mutex_destroy(&manager->lock);
 
 	return 0;
 }

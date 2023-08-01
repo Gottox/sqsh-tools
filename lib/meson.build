@@ -1,13 +1,13 @@
-libsqsh_sources = [
+libsqsh_sources = files(
     'archive/archive.c',
     'archive/compression_options.c',
     'archive/inode_map.c',
     'archive/superblock.c',
     'archive/trailing_context.c',
     'chrome/archive.c',
-    'chrome/stream.c',
     'chrome/file.c',
     'chrome/inode.c',
+    'chrome/stream.c',
     'data/compression_options_data.c',
     'data/directory_data.c',
     'data/fragment_data.c',
@@ -52,7 +52,7 @@ libsqsh_sources = [
     'utils/error.c',
     'utils/thread.c',
     'xattr/xattr_iterator.c',
-]
+)
 
 libsqsh_headers_private = ['utils/utils.h']
 
@@ -88,7 +88,7 @@ if zstd_dep.found()
     c_args += '-DCONFIG_ZSTD'
 endif
 
-libsqsh = library(
+libsqsh = both_libraries(
     'sqsh',
     libsqsh_sources + libsqsh_headers_private,
     install: not meson.is_subproject(),

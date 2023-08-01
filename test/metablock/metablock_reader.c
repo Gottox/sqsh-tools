@@ -35,9 +35,9 @@
 #include "../common.h"
 #include <testlib.h>
 
-#include <sqsh_archive_private.h>
-#include <sqsh_data_private.h>
-#include <sqsh_metablock_private.h>
+#include "../../include/sqsh_archive_private.h"
+#include "../../include/sqsh_data_private.h"
+#include "../../include/sqsh_metablock_private.h"
 #include <stdint.h>
 
 static void

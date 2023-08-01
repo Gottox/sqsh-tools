@@ -50,7 +50,7 @@ file_iterator_skip(void *iterator, size_t amount, size_t desired_size) {
 }
 static size_t
 file_iterator_block_size(const void *iterator) {
-	return sqsh__file_iterator_block_size(iterator);
+	return sqsh_file_iterator_block_size(iterator);
 }
 static const uint8_t *
 file_iterator_data(const void *iterator) {

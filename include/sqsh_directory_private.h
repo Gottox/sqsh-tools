@@ -73,7 +73,7 @@ struct SqshDirectoryIterator {
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__directory_iterator_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__directory_iterator_init(
 		struct SqshDirectoryIterator *iterator, struct SqshInode *inode);
 
 /**
@@ -85,7 +85,8 @@ SQSH_NO_UNUSED int sqsh__directory_iterator_init(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__directory_iterator_cleanup(struct SqshDirectoryIterator *iterator);
+SQSH_NO_EXPORT int
+sqsh__directory_iterator_cleanup(struct SqshDirectoryIterator *iterator);
 
 #ifdef __cplusplus
 }

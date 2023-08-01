@@ -31,18 +31,18 @@
  * @file         integration.c
  */
 
+#include "../include/sqsh_archive_private.h"
+#include "../include/sqsh_chrome.h"
+#include "../include/sqsh_directory_private.h"
+#include "../include/sqsh_file_private.h"
+#include "../include/sqsh_inode_private.h"
+#include "../include/sqsh_tree.h"
+#include "../include/sqsh_tree_private.h"
 #include "common.h"
-#include "sqsh_tree.h"
-#include <testlib.h>
 #include <pthread.h>
-#include <sqsh_archive_private.h>
-#include <sqsh_chrome.h>
-#include <sqsh_directory_private.h>
-#include <sqsh_file_private.h>
-#include <sqsh_inode_private.h>
-#include <sqsh_tree_private.h>
 #include <sys/resource.h>
 #include <sys/time.h>
+#include <testlib.h>
 
 int LLVMFuzzerTestOneInput(char *data, size_t size);
 

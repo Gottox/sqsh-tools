@@ -36,10 +36,10 @@
 #include <testlib.h>
 
 #include "../../include/sqsh_archive_private.h"
+#include "../../include/sqsh_inode.h"
 #include "../../include/sqsh_inode_private.h"
 #include "../../include/sqsh_xattr.h"
 #include "../../lib/utils/utils.h"
-#include "sqsh_inode.h"
 
 static void
 load_xattr(void) {

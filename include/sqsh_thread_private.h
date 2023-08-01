@@ -45,53 +45,54 @@ extern "C" {
 /**
  * @brief sqsh_thread_t represents a thread.
  */
-typedef pthread_mutex_t sqsh_mutex_t;
+typedef pthread_mutex_t sqsh__mutex_t;
 
 /**
- * @brief sqsh_mutex_init initializes a mutex.
+ * @brief sqsh__mutex_init initializes a mutex.
  *
  * @param mutex the mutex to initialize.
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh_mutex_init(sqsh_mutex_t *mutex);
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__mutex_init(sqsh__mutex_t *mutex);
 
 /**
- * @brief sqsh_mutex_init initializes a mutex with support for
+ * @brief sqsh__mutex_init initializes a mutex with support for
  * recursive locking.
  *
  * @param mutex the mutex to initialize.
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh_mutex_init_recursive(sqsh_mutex_t *mutex);
+SQSH_NO_EXPORT SQSH_NO_UNUSED int
+sqsh__mutex_init_recursive(sqsh__mutex_t *mutex);
 
 /**
- * @brief sqsh_mutex_lock locks a mutex.
+ * @brief sqsh__mutex_lock locks a mutex.
  *
  * @param mutex the mutex to lock.
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh_mutex_lock(sqsh_mutex_t *mutex);
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__mutex_lock(sqsh__mutex_t *mutex);
 
 /**
- * @brief sqsh_mutex_lock unlocks a mutex.
+ * @brief sqsh__mutex_lock unlocks a mutex.
  *
  * @param mutex the mutex to lock.
  *
  * @return 0 on success, less than 0 on error.
  */
-int sqsh_mutex_unlock(sqsh_mutex_t *mutex);
+SQSH_NO_EXPORT int sqsh__mutex_unlock(sqsh__mutex_t *mutex);
 
 /**
- * @brief sqsh_mutex_unlock unlocks a mutex.
+ * @brief sqsh__mutex_unlock unlocks a mutex.
  *
  * @param mutex the mutex to unlock.
  *
  * @return 0 on success, less than 0 on error.
  */
-int sqsh_mutex_destroy(sqsh_mutex_t *mutex);
+SQSH_NO_EXPORT int sqsh__mutex_destroy(sqsh__mutex_t *mutex);
 
 #ifdef __cplusplus
 }

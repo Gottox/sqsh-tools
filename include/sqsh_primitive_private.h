@@ -68,7 +68,7 @@ struct SqshBuffer {
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh__buffer_init(struct SqshBuffer *buffer);
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__buffer_init(struct SqshBuffer *buffer);
 
 /**
  * @internal
@@ -85,7 +85,7 @@ SQSH_NO_UNUSED int sqsh__buffer_init(struct SqshBuffer *buffer);
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int
+SQSH_NO_EXPORT SQSH_NO_UNUSED int
 sqsh__buffer_add_size(struct SqshBuffer *buffer, size_t additional_size);
 
 /**
@@ -104,7 +104,7 @@ sqsh__buffer_add_size(struct SqshBuffer *buffer, size_t additional_size);
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh__buffer_add_capacity(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__buffer_add_capacity(
 		struct SqshBuffer *buffer, uint8_t **additional_buffer,
 		size_t additional_size);
 
@@ -119,7 +119,7 @@ SQSH_NO_UNUSED int sqsh__buffer_add_capacity(
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh__buffer_append(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__buffer_append(
 		struct SqshBuffer *buffer, const uint8_t *source,
 		const size_t source_size);
 
@@ -134,7 +134,7 @@ SQSH_NO_UNUSED int sqsh__buffer_append(
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int
+SQSH_NO_EXPORT SQSH_NO_UNUSED int
 sqsh__buffer_move(struct SqshBuffer *buffer, struct SqshBuffer *source);
 
 /**
@@ -144,7 +144,8 @@ sqsh__buffer_move(struct SqshBuffer *buffer, struct SqshBuffer *source);
  * @param[in] buffer The SqshBuffer to get the data from.
  * @return a pointer to the data of the SqshBuffer.
  */
-const uint8_t *sqsh__buffer_data(const struct SqshBuffer *buffer);
+SQSH_NO_EXPORT const uint8_t *
+sqsh__buffer_data(const struct SqshBuffer *buffer);
 
 /**
  * @internal
@@ -155,7 +156,7 @@ const uint8_t *sqsh__buffer_data(const struct SqshBuffer *buffer);
  *
  * @return the size of the SqshBuffer.
  */
-size_t sqsh__buffer_size(const struct SqshBuffer *buffer);
+SQSH_NO_EXPORT size_t sqsh__buffer_size(const struct SqshBuffer *buffer);
 
 /**
  * @internal
@@ -165,7 +166,7 @@ size_t sqsh__buffer_size(const struct SqshBuffer *buffer);
  *
  * @return 0 on success, less than 0 on error.
  */
-int sqsh__buffer_cleanup(struct SqshBuffer *buffer);
+SQSH_NO_EXPORT int sqsh__buffer_cleanup(struct SqshBuffer *buffer);
 
 /***************************************
  * primitive/rc_map.c
@@ -202,7 +203,7 @@ struct SqshRcMap {
  * @param cleanup The cleanup function.
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__rc_map_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__rc_map_init(
 		struct SqshRcMap *array, size_t size, size_t element_size,
 		sqsh_rc_map_cleanup_t cleanup);
 
@@ -214,7 +215,8 @@ SQSH_NO_UNUSED int sqsh__rc_map_init(
  * @param index The index to test.
  * @return True if the array is empty, false otherwise.
  */
-bool sqsh__rc_map_is_empty(struct SqshRcMap *array, sqsh_index_t index);
+SQSH_NO_EXPORT bool
+sqsh__rc_map_is_empty(struct SqshRcMap *array, sqsh_index_t index);
 
 /**
  * @internal
@@ -226,7 +228,7 @@ bool sqsh__rc_map_is_empty(struct SqshRcMap *array, sqsh_index_t index);
  * @param data The data to set.
  * @return 0 on success, a negative value on error.
  */
-const void *
+SQSH_NO_EXPORT const void *
 sqsh__rc_map_set(struct SqshRcMap *array, sqsh_index_t index, void *data);
 
 /**
@@ -237,7 +239,7 @@ sqsh__rc_map_set(struct SqshRcMap *array, sqsh_index_t index, void *data);
  * @param array The array to get the size of.
  * @return The size of the array.
  */
-size_t sqsh__rc_map_size(const struct SqshRcMap *array);
+SQSH_NO_EXPORT size_t sqsh__rc_map_size(const struct SqshRcMap *array);
 
 /**
  * @internal
@@ -248,7 +250,8 @@ size_t sqsh__rc_map_size(const struct SqshRcMap *array);
  * @param index The index of the data.
  * @return A pointer to the retained data.
  */
-const void *sqsh__rc_map_retain(struct SqshRcMap *array, sqsh_index_t index);
+SQSH_NO_EXPORT const void *
+sqsh__rc_map_retain(struct SqshRcMap *array, sqsh_index_t index);
 
 /**
  * @internal
@@ -260,7 +263,8 @@ const void *sqsh__rc_map_retain(struct SqshRcMap *array, sqsh_index_t index);
  * @param element The element to release.
  * @return 0 on success, a negative value on error.
  */
-int sqsh__rc_map_release(struct SqshRcMap *array, const void *element);
+SQSH_NO_EXPORT int
+sqsh__rc_map_release(struct SqshRcMap *array, const void *element);
 
 /**
  * @internal
@@ -272,7 +276,8 @@ int sqsh__rc_map_release(struct SqshRcMap *array, const void *element);
  * @param index The index of the data to release.
  * @return 0 on success, a negative value on error.
  */
-int sqsh__rc_map_release_index(struct SqshRcMap *array, sqsh_index_t index);
+SQSH_NO_EXPORT int
+sqsh__rc_map_release_index(struct SqshRcMap *array, sqsh_index_t index);
 
 /**
  * @internal
@@ -283,7 +288,8 @@ int sqsh__rc_map_release_index(struct SqshRcMap *array, sqsh_index_t index);
  * @param element The element to check.
  * @return True if the element is contained in the array, false otherwise.
  */
-bool sqsh__rc_map_contains(struct SqshRcMap *array, const void *element);
+SQSH_NO_EXPORT bool
+sqsh__rc_map_contains(struct SqshRcMap *array, const void *element);
 
 /**
  * @internal
@@ -293,7 +299,7 @@ bool sqsh__rc_map_contains(struct SqshRcMap *array, const void *element);
  * @param array The array to cleanup.
  * @return 0 on success, a negative value on error.
  */
-int sqsh__rc_map_cleanup(struct SqshRcMap *array);
+SQSH_NO_EXPORT int sqsh__rc_map_cleanup(struct SqshRcMap *array);
 
 /**
  * @internal
@@ -301,7 +307,7 @@ int sqsh__rc_map_cleanup(struct SqshRcMap *array);
  *
  * @brief An implementation table to use SqshRcMap as a SqshLruBackend.
  */
-extern const struct SqshLruBackendImpl sqsh__lru_rc_map;
+SQSH_NO_EXPORT extern const struct SqshLruBackendImpl sqsh__lru_rc_map;
 
 /***************************************
  * primitive/rc_hash_map.c
@@ -339,7 +345,7 @@ struct SqshRcHashMap {
  * @param cleanup The cleanup function.
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__rc_hash_map_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__rc_hash_map_init(
 		struct SqshRcHashMap *hash_map, size_t size, size_t element_size,
 		sqsh_rc_map_cleanup_t cleanup);
 
@@ -353,7 +359,7 @@ SQSH_NO_UNUSED int sqsh__rc_hash_map_init(
  * @param data The data to set.
  * @return 0 on success, a negative value on error.
  */
-const void *sqsh__rc_hash_map_put(
+SQSH_NO_EXPORT SQSH_NO_EXPORT const void *sqsh__rc_hash_map_put(
 		struct SqshRcHashMap *hash_map, sqsh_rc_map_key_t key, void *data);
 
 /**
@@ -364,7 +370,8 @@ const void *sqsh__rc_hash_map_put(
  * @param hash_map The hash map to get the size of.
  * @return The size of the hash map.
  */
-size_t sqsh__rc_hash_map_size(const struct SqshRcHashMap *hash_map);
+SQSH_NO_EXPORT size_t
+sqsh__rc_hash_map_size(const struct SqshRcHashMap *hash_map);
 
 /**
  * @internal
@@ -375,7 +382,7 @@ size_t sqsh__rc_hash_map_size(const struct SqshRcHashMap *hash_map);
  * @param key The key of the data.
  * @return A pointer to the retained data.
  */
-const void *
+SQSH_NO_EXPORT const void *
 sqsh__rc_hash_map_retain(struct SqshRcHashMap *hash_map, sqsh_rc_map_key_t key);
 
 /**
@@ -388,7 +395,7 @@ sqsh__rc_hash_map_retain(struct SqshRcHashMap *hash_map, sqsh_rc_map_key_t key);
  * @param element The element to release.
  * @return 0 on success, a negative value on error.
  */
-int
+SQSH_NO_EXPORT int
 sqsh__rc_hash_map_release(struct SqshRcHashMap *hash_map, const void *element);
 
 /**
@@ -401,7 +408,7 @@ sqsh__rc_hash_map_release(struct SqshRcHashMap *hash_map, const void *element);
  * @param key The key of the data to release.
  * @return 0 on success, a negative value on error.
  */
-int sqsh__rc_hash_map_release_key(
+SQSH_NO_EXPORT int sqsh__rc_hash_map_release_key(
 		struct SqshRcHashMap *hash_map, sqsh_rc_map_key_t key);
 
 /**
@@ -412,7 +419,7 @@ int sqsh__rc_hash_map_release_key(
  * @param hash_map The hash map to cleanup.
  * @return 0 on success, a negative value on error.
  */
-int sqsh__rc_hash_map_cleanup(struct SqshRcHashMap *hash_map);
+SQSH_NO_EXPORT int sqsh__rc_hash_map_cleanup(struct SqshRcHashMap *hash_map);
 
 /**
  * @internal
@@ -420,7 +427,7 @@ int sqsh__rc_hash_map_cleanup(struct SqshRcHashMap *hash_map);
  *
  * @brief An implementation table to use SqshRcHashap as a SqshLruBackend.
  */
-extern const struct SqshLruBackendImpl sqsh__lru_rc_hash_map;
+SQSH_NO_EXPORT extern const struct SqshLruBackendImpl sqsh__lru_rc_hash_map;
 
 /***************************************
  * primitive/lru.c
@@ -467,7 +474,7 @@ struct SqshLru {
  * @param backend The backend to use for the LRU cache.
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__lru_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__lru_init(
 		struct SqshLru *lru, size_t size, const struct SqshLruBackendImpl *impl,
 		void *backend);
 
@@ -479,7 +486,8 @@ SQSH_NO_UNUSED int sqsh__lru_init(
  * @param id The id of the item to touch
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t id);
+SQSH_NO_EXPORT SQSH_NO_UNUSED int
+sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t id);
 
 /**
  * @internal
@@ -490,7 +498,7 @@ SQSH_NO_UNUSED int sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t id);
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh__lru_cleanup(struct SqshLru *lru);
+SQSH_NO_EXPORT int sqsh__lru_cleanup(struct SqshLru *lru);
 
 /***************************************
  * primitive/reader.c
@@ -542,7 +550,7 @@ struct SqshReader {
  *
  * @return 0 on success, less than zero on error.
  */
-SQSH_NO_UNUSED int sqsh__reader_init(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__reader_init(
 		struct SqshReader *reader, const struct SqshIteratorImpl *impl,
 		void *iterator);
 
@@ -557,7 +565,7 @@ SQSH_NO_UNUSED int sqsh__reader_init(
  *
  * @return 0 on success, less than zero on error.
  */
-SQSH_NO_UNUSED int sqsh__reader_advance(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__reader_advance(
 		struct SqshReader *reader, sqsh_index_t offset, size_t size);
 
 /**
@@ -570,7 +578,8 @@ SQSH_NO_UNUSED int sqsh__reader_advance(
  *
  * @return Pointer to the data at the current position of the metablock reader.
  */
-const uint8_t *sqsh__reader_data(const struct SqshReader *reader);
+SQSH_NO_EXPORT const uint8_t *
+sqsh__reader_data(const struct SqshReader *reader);
 
 /**
  * @internal
@@ -582,7 +591,7 @@ const uint8_t *sqsh__reader_data(const struct SqshReader *reader);
  *
  * @return Size of the data at the current position of the metablock reader.
  */
-size_t sqsh__reader_size(const struct SqshReader *reader);
+SQSH_NO_EXPORT size_t sqsh__reader_size(const struct SqshReader *reader);
 
 /**
  * @internal
@@ -593,7 +602,7 @@ size_t sqsh__reader_size(const struct SqshReader *reader);
  *
  * @return 0 on success, less than zero on error.
  */
-int sqsh__reader_cleanup(struct SqshReader *reader);
+SQSH_NO_EXPORT int sqsh__reader_cleanup(struct SqshReader *reader);
 
 #ifdef __cplusplus
 }

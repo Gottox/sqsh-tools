@@ -35,13 +35,13 @@
 #	error "This file is C++ only"
 #endif
 
+#include "../include/sqsh_archive.h"
+#include "../include/sqsh_directory.h"
+#include "../include/sqsh_error.h"
+#include "../include/sqsh_mapper.h"
 #include "common.h"
-#include <testlib.h>
-#include <sqsh_archive.h>
-#include <sqsh_directory.h>
-#include <sqsh_error.h>
-#include <sqsh_mapper.h>
 #include <stdint.h>
+#include <testlib.h>
 
 static void
 sqsh_empty() {

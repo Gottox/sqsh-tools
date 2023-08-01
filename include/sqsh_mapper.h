@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_mapper_private.h
+ * @file         sqsh_mapper.h
  */
 
 #ifndef SQSH_MAPPER_H

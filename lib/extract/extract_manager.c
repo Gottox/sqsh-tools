@@ -89,8 +89,8 @@ sqsh__extract_manager_init(
 			SQSH_CONFIG_DEFAULT(config->compression_lru_size, 128);
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 
-	if (sqsh__extractor_impl_from_id(sqsh_superblock_compression_id(superblock)) ==
-			NULL) {
+	if (sqsh__extractor_impl_from_id(
+				sqsh_superblock_compression_id(superblock)) == NULL) {
 		return -SQSH_ERROR_COMPRESSION_UNSUPPORTED;
 	}
 
@@ -101,7 +101,7 @@ sqsh__extract_manager_init(
 	/* Give a bit of room to avoid too many key hash collisions */
 	size = find_next_maybe_prime(2 * size);
 
-	rv = sqsh_mutex_init(&manager->lock);
+	rv = sqsh__mutex_init(&manager->lock);
 	if (rv < 0) {
 		goto out;
 	}
@@ -142,7 +142,7 @@ sqsh__extract_manager_uncompress(
 			manager->compression_id;
 	const uint32_t block_size = manager->block_size;
 
-	rv = sqsh_mutex_lock(&manager->lock);
+	rv = sqsh__mutex_lock(&manager->lock);
 	if (rv < 0) {
 		goto out;
 	}
@@ -178,21 +178,21 @@ sqsh__extract_manager_uncompress(
 
 out:
 	sqsh__extractor_cleanup(&extractor);
-	sqsh_mutex_unlock(&manager->lock);
+	sqsh__mutex_unlock(&manager->lock);
 	return rv;
 }
 
 int
 sqsh__extract_manager_release(
 		struct SqshExtractManager *manager, const struct SqshBuffer *buffer) {
-	int rv = sqsh_mutex_lock(&manager->lock);
+	int rv = sqsh__mutex_lock(&manager->lock);
 	if (rv < 0) {
 		goto out;
 	}
 
 	rv = sqsh__rc_hash_map_release(&manager->hash_map, buffer);
 
-	sqsh_mutex_unlock(&manager->lock);
+	sqsh__mutex_unlock(&manager->lock);
 out:
 	return rv;
 }
@@ -201,7 +201,7 @@ int
 sqsh__extract_manager_cleanup(struct SqshExtractManager *manager) {
 	sqsh__lru_cleanup(&manager->lru);
 	sqsh__rc_hash_map_cleanup(&manager->hash_map);
-	sqsh_mutex_destroy(&manager->lock);
+	sqsh__mutex_destroy(&manager->lock);
 
 	return 0;
 }

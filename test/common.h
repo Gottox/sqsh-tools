@@ -35,10 +35,10 @@
 #define COMMON_H
 
 #include "../include/sqsh_archive.h"
+#include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
-#include <assert.h>
 
 /*
  *  _______________    __ byte 0

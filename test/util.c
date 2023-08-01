@@ -8,7 +8,7 @@
 
 #include "../include/sqsh_archive_private.h"
 #include "../include/sqsh_data_private.h"
-#include <sqsh_mapper.h>
+#include "../include/sqsh_mapper.h"
 
 #include <assert.h>
 #include <endian.h>
