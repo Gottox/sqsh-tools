@@ -210,7 +210,6 @@ sqsh_tree_walker_revert(struct SqshTreeWalker *walker) {
 	struct SqshInode *inode = &walker->directory;
 	struct SqshDirectoryIterator *iterator = &walker->iterator;
 
-	walker->begin_iterator = true;
 	sqsh__directory_iterator_cleanup(iterator);
 	walker->begin_iterator = true;
 	return sqsh__directory_iterator_init(iterator, inode);
@@ -237,6 +236,9 @@ sqsh_tree_walker_lookup(
 
 int
 sqsh_tree_walker_down(struct SqshTreeWalker *walker) {
+	if (walker->begin_iterator == true) {
+		return -SQSH_ERROR_WALKER_CANNOT_GO_DOWN;
+	}
 	const uint64_t child_inode_ref =
 			sqsh_directory_iterator_inode_ref(&walker->iterator);
 

@@ -122,6 +122,8 @@ sqsh_error_str(int error_code) {
 		return "Invalid argument";
 	case SQSH_ERROR_WALKER_CANNOT_GO_UP:
 		return "Walker cannot go up";
+	case SQSH_ERROR_WALKER_CANNOT_GO_DOWN:
+		return "Walker cannot go down";
 	case SQSH_ERROR_CORRUPTED_INODE:
 		return "Corrupted inode";
 	case SQSH_ERROR_INTERNAL:

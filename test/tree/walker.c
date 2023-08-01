@@ -53,7 +53,7 @@ walker_symlink_open(void) {
 			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
 			INODE_HEADER(1, 0, 0, 0, 0, 1),
 			INODE_BASIC_DIR(0, 1024, 0, 0),
-			[INODE_TABLE_OFFSET+2+128] = 
+			[INODE_TABLE_OFFSET+2+128] =
 			INODE_HEADER(3, 0, 0, 0, 0, 2),
 			INODE_BASIC_SYMLINK(3),
 			't', 'g', 't',
@@ -82,6 +82,120 @@ walker_symlink_open(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
+static void
+walker_directory_enter(void) {
+	int rv;
+	struct SqshArchive archive = {0};
+	struct SqshInode *inode = NULL;
+	uint8_t payload[] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
+			INODE_HEADER(1, 0, 0, 0, 0, 1),
+			INODE_BASIC_DIR(0, 1024, 0, 0),
+
+			[INODE_TABLE_OFFSET+2+128] = 
+			INODE_HEADER(1, 0, 0, 0, 0, 2),
+			INODE_BASIC_DIR(256, 1024, 0, 0),
+
+			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			DIRECTORY_HEADER(1, 0, 0),
+			DIRECTORY_ENTRY(128, 2, 1, 3),
+			'd', 'i', 'r',
+
+			[DIRECTORY_TABLE_OFFSET+256] = METABLOCK_HEADER(0, 128),
+			DIRECTORY_HEADER(0, 0, 0),
+
+			[FRAGMENT_TABLE_OFFSET] = 0,
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	struct SqshTreeWalker walker = {0};
+	rv = sqsh__tree_walker_init(&walker, &archive);
+	assert(rv == 0);
+
+	rv = sqsh_tree_walker_resolve(&walker, "dir", true);
+	assert(rv == 0);
+
+	inode = sqsh_tree_walker_inode_load(&walker, &rv);
+	assert(rv == 0);
+	assert(inode != NULL);
+	assert(sqsh_inode_number(inode) == 2);
+
+	rv = sqsh_tree_walker_up(&walker);
+	assert(rv == 0);
+
+	sqsh__tree_walker_cleanup(&walker);
+	sqsh__archive_cleanup(&archive);
+}
+
+static void
+walker_uninitialized_up(void) {
+	int rv;
+	struct SqshArchive archive = {0};
+	uint8_t payload[] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
+			INODE_HEADER(1, 0, 0, 0, 0, 1),
+			INODE_BASIC_DIR(0, 1024, 0, 0),
+
+			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			DIRECTORY_HEADER(0, 0, 0),
+
+			[FRAGMENT_TABLE_OFFSET] = 0,
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	struct SqshTreeWalker walker = {0};
+	rv = sqsh__tree_walker_init(&walker, &archive);
+	assert(rv == 0);
+
+	rv = sqsh_tree_walker_up(&walker);
+	assert(rv == -SQSH_ERROR_WALKER_CANNOT_GO_UP);
+
+	sqsh__tree_walker_cleanup(&walker);
+	sqsh__archive_cleanup(&archive);
+}
+
+static void
+walker_uninitialized_down(void) {
+	int rv;
+	struct SqshArchive archive = {0};
+	uint8_t payload[] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
+			INODE_HEADER(1, 0, 0, 0, 0, 1),
+			INODE_BASIC_DIR(0, 1024, 0, 0),
+
+			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			DIRECTORY_HEADER(0, 0, 0),
+
+			[FRAGMENT_TABLE_OFFSET] = 0,
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	struct SqshTreeWalker walker = {0};
+	rv = sqsh__tree_walker_init(&walker, &archive);
+	assert(rv == 0);
+
+	rv = sqsh_tree_walker_down(&walker);
+	assert(rv == -SQSH_ERROR_WALKER_CANNOT_GO_DOWN);
+
+	sqsh__tree_walker_cleanup(&walker);
+	sqsh__archive_cleanup(&archive);
+}
+
 DECLARE_TESTS
 TEST(walker_symlink_open)
+NO_TEST(walker_directory_enter)
+TEST(walker_uninitialized_down)
+TEST(walker_uninitialized_up)
 END_TESTS
