@@ -32,6 +32,7 @@ sqsh_test = [
     'primitive/reader.c',
     'tree/walker.c',
     'xattr/xattr_iterator.c',
+    'nasty.c',
 ]
 sqsh_extended_test = [
     'selftest.sh',
