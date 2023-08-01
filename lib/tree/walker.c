@@ -316,9 +316,10 @@ sqsh_tree_walker_resolve(
 		struct SqshTreeWalker *walker, const char *path, bool follow_links) {
 	int rv = 0;
 
-	char *current_path = sqsh_memdup(path, strlen(path));
+	char *current_path_buf = NULL;
+	const char *current_path = path;
 	for (int i = 0; i < 100; i++) {
-		rv = tree_walker_resolve(walker, path);
+		rv = tree_walker_resolve(walker, current_path);
 		if (rv < 0) {
 			goto out;
 		}
@@ -334,12 +335,12 @@ sqsh_tree_walker_resolve(
 		if (rv < 0) {
 			goto out;
 		}
-		free(current_path);
-		current_path = sqsh_inode_symlink_dup(&inode);
+		free(current_path_buf);
+		current_path = current_path_buf = sqsh_inode_symlink_dup(&inode);
 		sqsh__inode_cleanup(&inode);
 	}
 out:
-	free(current_path);
+	free(current_path_buf);
 	return rv;
 }
 
