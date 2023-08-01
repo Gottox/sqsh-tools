@@ -2,7 +2,7 @@ project(
     'libsqsh',
     ['c'],
     default_options: [
-        'c_std=c99',
+        'c_std=c11',
         'optimization=0',
         'warning_level=3',
     ],
