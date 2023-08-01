@@ -143,10 +143,6 @@ sqsh_tree_walker_up(struct SqshTreeWalker *walker) {
 	}
 	const uint64_t parent_inode_ref =
 			sqsh_inode_map_get(walker->inode_map, parent_inode);
-	if (parent_inode_ref == 0) {
-		rv = -SQSH_ERROR_INTERNAL;
-		goto out;
-	}
 
 	rv = enter_directory(walker, parent_inode_ref);
 	if (rv < 0) {

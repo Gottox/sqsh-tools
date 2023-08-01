@@ -115,7 +115,7 @@
 			UINT32_BYTES(block_offset), UINT32_BYTES(file_size)
 #define INODE_BASIC_DIR(block_index, file_size, block_offset, parent_inode) \
 	UINT32_BYTES(block_index), UINT32_BYTES(1 /* link count */), \
-			UINT32_BYTES(file_size), UINT32_BYTES(block_offset), \
+			UINT16_BYTES(file_size), UINT16_BYTES(block_offset), \
 			UINT32_BYTES(parent_inode)
 #define INODE_EXT_DIR( \
 		block_index, file_size, block_offset, parent_inode, index_count, \

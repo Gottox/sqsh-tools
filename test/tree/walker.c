@@ -97,15 +97,15 @@ walker_directory_enter(void) {
 
 			[INODE_TABLE_OFFSET+2+128] = 
 			INODE_HEADER(1, 0, 0, 0, 0, 2),
-			INODE_BASIC_DIR(256, 1024, 0, 0),
+			INODE_BASIC_DIR(256, 1024, 0, 1),
 
 			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
 			DIRECTORY_HEADER(1, 0, 0),
 			DIRECTORY_ENTRY(128, 2, 1, 3),
 			'd', 'i', 'r',
 
-			[DIRECTORY_TABLE_OFFSET+256] = METABLOCK_HEADER(0, 128),
-			DIRECTORY_HEADER(0, 0, 0),
+			[DIRECTORY_TABLE_OFFSET+128] = METABLOCK_HEADER(0, 128),
+			DIRECTORY_HEADER(0, 0, 1),
 
 			[FRAGMENT_TABLE_OFFSET] = 0,
 			/* clang-format on */
@@ -127,6 +127,7 @@ walker_directory_enter(void) {
 	rv = sqsh_tree_walker_up(&walker);
 	assert(rv == 0);
 
+	sqsh_inode_free(inode);
 	sqsh__tree_walker_cleanup(&walker);
 	sqsh__archive_cleanup(&archive);
 }
@@ -195,7 +196,7 @@ walker_uninitialized_down(void) {
 
 DECLARE_TESTS
 TEST(walker_symlink_open)
-NO_TEST(walker_directory_enter)
+TEST(walker_directory_enter)
 TEST(walker_uninitialized_down)
 TEST(walker_uninitialized_up)
 END_TESTS
