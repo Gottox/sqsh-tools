@@ -367,32 +367,59 @@ uint64_t sqsh_superblock_bytes_used(const struct SqshSuperblock *context);
  * archive/archive.c
  */
 
-#define SQSH_CONFIG_FIELDS \
-	uint64_t source_size; \
-	const struct SqshMemoryMapperImpl *source_mapper; \
-	int mapper_block_size; \
-	int mapper_lru_size; \
-	int compression_lru_size;
-/**
- * @internal
- */
-struct SqshConfig__internal {
-	SQSH_CONFIG_FIELDS
-	char _end;
-};
-
 /**
  * @brief The SqshConfig struct contains all the configuration options for
  * a sqsh session.
  */
 struct SqshConfig {
-	SQSH_CONFIG_FIELDS
 	/**
-	 * @brief padding to ensure that the size of the struct 128 bytes.
+	 * @brief source_size represents the size of the archive and may be used
+	 * to determine the size of the archive.
+	 *
+	 * mappers that honor this field:
+	 *
+	 * - `sqsh_mapper_impl_static`
 	 */
-	uint8_t _padding[128 - offsetof(struct SqshConfig__internal, _end)];
+	uint64_t source_size;
+
+	/**
+	 * @brief source_mapper is the memory mapper implementation that will be
+	 * used to map the archive.
+	 *
+	 * - `sqsh_mapper_impl_mmap`: the archive will be loaded from a file. The
+	 *    source will be interpreted as a file path. this is the default.
+	 * - `sqsh_mapper_impl_static`: the archive will be interpreted from a
+	 *    static buffer.
+	 * - `sqsh_mapper_impl_curl`: the archive will be loaded from a remote
+	 *   location. The source will be interpreted as a URL.
+	 */
+	const struct SqshMemoryMapperImpl *source_mapper;
+
+	/**
+	 * @brief the block size used to retrieve chunks of data from the mapper.
+	 * If unset or 0, the block size will be determined by the mapper.
+	 */
+	int mapper_block_size;
+
+	/**
+	 * @brief the size of the LRU cache used to cache chunks of data from the
+	 * mapper. If unset or 0, the LRU defaults to 32. if set to -1, the LRU
+	 * will be disabled.
+	 */
+	int mapper_lru_size;
+
+	/**
+	 * @brief the size of the LRU cache used to cache chunks of data from the
+	 * compression algorithm. If unset or 0, the LRU defaults to 128. if set to
+	 * -1, the LRU will be disabled.
+	 */
+	int compression_lru_size;
+
+	/**
+	 * @privatesection
+	 */
+	char _reserved[128];
 };
-#undef SQSH_CONFIG_FIELDS
 
 /**
  * @brief The Sqsh struct contains all information about the current
