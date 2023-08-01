@@ -300,7 +300,7 @@ main(int argc, char *argv[]) {
 	}
 
 	if (has_listed == false) {
-		rv = ls_path(archive, "");
+		rv = ls_path(archive, "/");
 		if (rv < 0) {
 			goto out;
 		}
