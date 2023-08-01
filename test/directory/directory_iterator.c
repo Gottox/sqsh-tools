@@ -43,6 +43,78 @@
 #include "../../lib/utils/utils.h"
 
 static void
+iter_invalid_file_name_with_0(void) {
+	int rv;
+	struct SqshArchive archive = {0};
+	uint8_t payload[] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
+			INODE_HEADER(1, 0, 0, 0, 0, 1),
+			INODE_BASIC_DIR(0, 1024, 0, 0),
+			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			DIRECTORY_HEADER(1, 0, 0),
+			DIRECTORY_ENTRY(128, 2, 3, 6),
+			'\0', 'H', 'e', 'l', 'l', 'o',
+			[FRAGMENT_TABLE_OFFSET] = 0,
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	struct SqshInode inode = {0};
+	rv = sqsh__inode_init(&inode, &archive, 0);
+	assert(rv == 0);
+
+	struct SqshDirectoryIterator iter = {0};
+	rv = sqsh__directory_iterator_init(&iter, &inode);
+	assert(rv == 0);
+
+	rv = sqsh_directory_iterator_next(&iter);
+	assert(rv == -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY);
+
+	sqsh__directory_iterator_cleanup(&iter);
+	sqsh__inode_cleanup(&inode);
+	sqsh__archive_cleanup(&archive);
+}
+
+static void
+iter_invalid_file_name_with_slash(void) {
+	int rv;
+	struct SqshArchive archive = {0};
+	uint8_t payload[] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
+			INODE_HEADER(1, 0, 0, 0, 0, 1),
+			INODE_BASIC_DIR(0, 1024, 0, 0),
+			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			DIRECTORY_HEADER(1, 0, 0),
+			DIRECTORY_ENTRY(128, 2, 3, 11),
+			'/', 'e', 't', 'c', '/', 'p', 'a', 's', 's', 'w', 'd',
+			[FRAGMENT_TABLE_OFFSET] = 0,
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	struct SqshInode inode = {0};
+	rv = sqsh__inode_init(&inode, &archive, 0);
+	assert(rv == 0);
+
+	struct SqshDirectoryIterator iter = {0};
+	rv = sqsh__directory_iterator_init(&iter, &inode);
+	assert(rv == 0);
+
+	rv = sqsh_directory_iterator_next(&iter);
+	assert(rv == -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY);
+
+	sqsh__directory_iterator_cleanup(&iter);
+	sqsh__inode_cleanup(&inode);
+	sqsh__archive_cleanup(&archive);
+}
+
+static void
 iter_two_files(void) {
 	int rv;
 	struct SqshArchive archive = {0};
@@ -102,4 +174,6 @@ iter_two_files(void) {
 
 DECLARE_TESTS
 TEST(iter_two_files)
+TEST(iter_invalid_file_name_with_slash)
+TEST(iter_invalid_file_name_with_0)
 END_TESTS

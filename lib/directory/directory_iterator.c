@@ -77,6 +77,19 @@ load_metablock(
 }
 
 static int
+check_consistency(struct SqshDirectoryIterator *iterator) {
+	const char *name = sqsh_directory_iterator_name(iterator);
+	const size_t name_len = sqsh_directory_iterator_name_size(iterator);
+
+	for (size_t i = 0; i < name_len; i++) {
+		if (name[i] == '\0' || name[i] == '/') {
+			return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
+		}
+	}
+	return 0;
+}
+
+static int
 directory_iterator_index_lookup(
 		struct SqshDirectoryIterator *iterator, const char *name,
 		const size_t name_len) {
@@ -154,7 +167,7 @@ sqsh_directory_iterator_lookup(
 			continue;
 		}
 		if (strncmp(name, (char *)entry_name, entry_name_size) == 0) {
-			return 0;
+			return check_consistency(iterator);
 		}
 	}
 
@@ -324,6 +337,10 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator) {
 	if (SQSH_SUB_OVERFLOW(
 				iterator->remaining_size, size, &iterator->remaining_size)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+	rv = check_consistency(iterator);
+	if (rv < 0) {
+		return rv;
 	}
 	return 1;
 }

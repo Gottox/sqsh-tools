@@ -126,6 +126,8 @@ sqsh_error_str(int error_code) {
 		return "Walker cannot go down";
 	case SQSH_ERROR_CORRUPTED_INODE:
 		return "Corrupted inode";
+	case SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY:
+		return "Corrupted directory entry";
 	case SQSH_ERROR_INTERNAL:
 		return "Internal error";
 	case SQSH_ERROR_INODE_MAP_IS_INCONSISTENT:
