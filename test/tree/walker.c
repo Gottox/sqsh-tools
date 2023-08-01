@@ -83,10 +83,20 @@ walker_symlink_open(void) {
 }
 
 static void
+expect_inode(struct SqshTreeWalker *walker, uint32_t inode_number) {
+	int rv;
+	struct SqshInode *inode = NULL;
+	inode = sqsh_tree_walker_inode_load(walker, &rv);
+	assert(rv == 0);
+	assert(inode != NULL);
+	assert(sqsh_inode_number(inode) == inode_number);
+	sqsh_inode_free(inode);
+}
+
+static void
 walker_directory_enter(void) {
 	int rv;
 	struct SqshArchive archive = {0};
-	struct SqshInode *inode = NULL;
 	uint8_t payload[] = {
 			/* clang-format off */
 			SQSH_HEADER,
@@ -118,16 +128,12 @@ walker_directory_enter(void) {
 
 	rv = sqsh_tree_walker_resolve(&walker, "dir", true);
 	assert(rv == 0);
-
-	inode = sqsh_tree_walker_inode_load(&walker, &rv);
-	assert(rv == 0);
-	assert(inode != NULL);
-	assert(sqsh_inode_number(inode) == 2);
+	expect_inode(&walker, 2);
 
 	rv = sqsh_tree_walker_up(&walker);
 	assert(rv == 0);
+	expect_inode(&walker, 1);
 
-	sqsh_inode_free(inode);
 	sqsh__tree_walker_cleanup(&walker);
 	sqsh__archive_cleanup(&archive);
 }
