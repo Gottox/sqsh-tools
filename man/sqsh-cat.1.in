@@ -6,11 +6,12 @@ archive.
 
 .SH SYNOPSIS
 .B sqsh-cat
+[\fB-o\fR \fIOFFSET\fR]
 [\fIFILESYSTEM\fR]
 [\fIPATH ...\fR]
 .br
 .B sqsh-cat
-[\fB-v\fR]
+[-v]
 
 .SH DESCRIPTION
 .B sqsh-cat
@@ -26,7 +27,11 @@ output.
 
 .SH OPTIONS
 .TP
-.BR -v
+.BR \-o " " \fIOFFSET\fR
+skip OFFSET bytes at start of FILESYSTEM.
+
+.TP
+.BR \-v
 Print the version of \fBsqsh-cat\fR and exit.
 
 .SH ARGUMENTS

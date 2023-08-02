@@ -6,6 +6,7 @@ filesystem itself in a squashfs archive.
 
 .SH SYNOPSIS
 .B sqsh-stat
+[\fB-o\fR \fIOFFSET\fR]
 \fIFILESYSTEM\fR
 [\fIPATH ...\fR]
 .br
@@ -27,6 +28,10 @@ inode number, mode, ownership, size, creation time, and compression
 type.
 
 .SH OPTIONS
+.TP
+.BR \-o " " \fIOFFSET\fR
+skip OFFSET bytes at start of FILESYSTEM.
+
 .TP
 .BR \-v
 Print the version of \fBsqsh-stat\fR and exit.

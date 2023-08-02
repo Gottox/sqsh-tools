@@ -47,7 +47,7 @@
 
 static int
 usage(char *arg0) {
-	printf("usage: %s FILESYSTEM PATH [PATH ...]\n", arg0);
+	printf("usage: %s [-o OFFSET] FILESYSTEM PATH [PATH ...]\n", arg0);
 	printf("       %s -v\n", arg0);
 	return EXIT_FAILURE;
 }
@@ -82,9 +82,13 @@ main(int argc, char *argv[]) {
 	int opt = 0;
 	const char *image_path;
 	struct SqshArchive *sqsh = NULL;
+	uint64_t offset = 0;
 
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
+	while ((opt = getopt(argc, argv, "o:vh")) != -1) {
 		switch (opt) {
+		case 'o':
+			offset = strtoull(optarg, NULL, 0);
+			break;
 		case 'v':
 			puts("sqsh-cat-" VERSION);
 			return 0;
@@ -100,7 +104,7 @@ main(int argc, char *argv[]) {
 	image_path = argv[optind];
 	optind++;
 
-	sqsh = open_archive(image_path, &rv);
+	sqsh = open_archive(image_path, offset, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, image_path);
 		rv = EXIT_FAILURE;

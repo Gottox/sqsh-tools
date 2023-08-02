@@ -63,7 +63,7 @@ extract(const char *filename, struct SqshInode *inode,
 
 static int
 usage(char *arg0) {
-	printf("usage: %s [-cV] FILESYSTEM [PATH] [TARGET DIR]\n", arg0);
+	printf("usage: %s [-o OFFSET] [-cV] FILESYSTEM [PATH] [TARGET DIR]\n", arg0);
 	printf("       %s -v\n", arg0);
 	return EXIT_FAILURE;
 }
@@ -325,17 +325,21 @@ main(int argc, char *argv[]) {
 	struct SqshArchive *sqsh;
 	struct SqshTreeWalker *walker = NULL;
 	struct SqshInode *inode = NULL;
+	uint64_t offset = 0;
 
-	while ((opt = getopt(argc, argv, "cvVh")) != -1) {
+	while ((opt = getopt(argc, argv, "co:vVh")) != -1) {
 		switch (opt) {
+		case 'c':
+			do_chown = true;
+			break;
+		case 'o':
+			offset = strtoull(optarg, NULL, 0);
+			break;
 		case 'v':
 			puts("sqsh-unpack-" VERSION);
 			return 0;
 		case 'V':
 			verbose = true;
-			break;
-		case 'c':
-			do_chown = true;
 			break;
 		default:
 			return usage(argv[0]);
@@ -355,7 +359,7 @@ main(int argc, char *argv[]) {
 		target_path = argv[optind + 2];
 	}
 
-	sqsh = open_archive(image_path, &rv);
+	sqsh = open_archive(image_path, offset, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, image_path);
 		rv = EXIT_FAILURE;

@@ -5,6 +5,7 @@ sqsh-unpack \- extract files and directories from a squashfs archive.
 
 .SH SYNOPSIS
 .B sqsh-unpack
+[\fB-o\fR \fIOFFSET\fR]
 [\fB-cV\fR]
 \fIFILESYSTEM\fR
 [\fIPATH\fR]
@@ -24,6 +25,10 @@ If no \fIPATH\fR is specified, it extracts all files and directories in
 the archive.
 
 .SH OPTIONS
+.TP
+.BR \-o " " \fIOFFSET\fR
+skip OFFSET bytes at start of FILESYSTEM.
+
 .TP
 .BR \-c
 Change the owner and group of extracted files to match the user and 

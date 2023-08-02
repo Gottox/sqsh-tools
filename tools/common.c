@@ -7,10 +7,11 @@
 #include "common.h"
 
 struct SqshArchive *
-open_archive(const char *image_path, int *err) {
+open_archive(const char *image_path, uint64_t offset, int *err) {
 	struct SqshConfig config = {
 			.source_mapper = NULL,
 			.mapper_block_size = 1024 * 256,
+			.archive_offset = offset,
 	};
 	if (sqsh_mapper_impl_curl != NULL) {
 		int i;

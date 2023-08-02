@@ -533,7 +533,7 @@ main(int argc, char *argv[]) {
 		goto out;
 	}
 
-	context.archive = open_archive(options.archive, &rv);
+	context.archive = open_archive(options.archive, options.offset, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, options.archive);
 		rv = EXIT_FAILURE;

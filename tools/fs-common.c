@@ -43,6 +43,7 @@
 	{ t, offsetof(struct SqshfsOptions, p), v }
 struct fuse_opt fs_common_opts[] = {
 		SQSHFS_OPT("archive=%s", archive, 0),
+		SQSHFS_OPT("offset=%s", offset, 0),
 		FUSE_OPT_KEY("--help", KEY_HELP),
 		FUSE_OPT_KEY("-h", KEY_HELP),
 		FUSE_OPT_KEY("-V", KEY_VERSION),
@@ -52,6 +53,7 @@ struct fuse_opt fs_common_opts[] = {
 void
 fs_common_help(void) {
 	printf("    -o archive=PATH        squashfs archive to be mounted\n");
+	printf("    -o offset=OFFSET       skip OFFSET at the start of archive\n");
 }
 
 void

@@ -5,6 +5,7 @@ sqsh-xattr \- list extended attributes of files in a squashfs archive.
 
 .SH SYNOPSIS
 .B sqsh-xattr
+[\fB-o\fR \fIOFFSET\fR]
 [\fB-v\fR]
 \fIFILESYSTEM\fR \fIPATH...\fR
 
@@ -20,6 +21,10 @@ The command operates in read-only mode.
 Print the version of \fBsqsh-xattr\fR.
 
 .SH ARGUMENTS
+.TP
+.BR \-o " " \fIOFFSET\fR
+skip OFFSET bytes at start of FILESYSTEM.
+
 .TP
 .BR FILESYSTEM
 The path to the squashfs archive to list extended attributes from.

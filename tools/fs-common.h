@@ -26,6 +26,7 @@ struct SqshfsOptions {
 	char *mountpoint;
 	int multithreaded;
 	int foreground;
+	int offset;
 };
 
 extern struct fuse_opt fs_common_opts[];

@@ -22,6 +22,7 @@
 #	define VERSION "0.0.0-unknown"
 #endif
 
-struct SqshArchive *open_archive(const char *image_path, int *err);
+struct SqshArchive *
+open_archive(const char *image_path, uint64_t offset, int *err);
 
 #endif /* TOOLS_COMMON_H */

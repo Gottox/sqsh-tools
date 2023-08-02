@@ -5,6 +5,7 @@ sqsh-ls \- list files and directories in a squashfs archive.
 
 .SH SYNOPSIS
 .B sqsh-ls
+[\fB-o\fR \fIOFFSET\fR]
 [\fB-r\fR]
 [\fB-l\fR]
 \fIFILESYSTEM\fR
@@ -22,6 +23,10 @@ If a \fIPATH\fR is specified, it lists the contents of that directory
 within the archive.
 
 .SH OPTIONS
+.TP
+.BR \-o " " \fIOFFSET\fR
+skip OFFSET bytes at start of FILESYSTEM.
+
 .TP
 .BR \-r
 Recursively list the contents of all subdirectories within the 
