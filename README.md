@@ -61,13 +61,14 @@ meson install
 
 ```c
 int rv;
-struct SqshArchive archive = sqsh_archive_new("/path/to/archive.squashfs", NULL, &rv);
+struct SqshArchive *archive =
+		sqsh_archive_new("/path/to/archive.squashfs", NULL, &rv);
 assert(rv == 0);
-struct SqshInode *file = sqsh_open(&archive, "/path/to/file", &rv);
+struct SqshInode *file = sqsh_open(archive, "/path/to/file", &rv);
 assert(rv == 0);
-struct SqshFileIterator *iterator = sqsh_file_iterator_new(file, &rv)
+struct SqshFileIterator *iterator = sqsh_file_iterator_new(file, &rv);
 assert(rv == 0);
-while(sqsh_file_iterator_next(iterator, 1) > 0) {
+while (sqsh_file_iterator_next(iterator, 1) > 0) {
 	const uint8_t *data = sqsh_file_iterator_data(iterator);
 	size_t size = sqsh_file_iterator_size(iterator);
 	printf("Chunk Size: %lu\n", size);
