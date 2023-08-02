@@ -5,6 +5,12 @@ executable(
     dependencies: libsqsh_dep,
 )
 executable(
+    'read_file',
+    'read_file.c',
+    install: false,
+    dependencies: libsqsh_dep,
+)
+executable(
     'list_files_ll',
     'list_files_ll.c',
     install: false,
