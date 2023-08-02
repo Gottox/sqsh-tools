@@ -1,6 +1,6 @@
 /**
  * @author Enno Boland (mail@eboland.de)
- * @file list_files.c
+ * @file list_dir.c
  *
  * This is an example program that lists the top level files in a squashfs
  * archive.

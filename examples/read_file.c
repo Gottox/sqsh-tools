@@ -1,6 +1,6 @@
 /**
  * @author Enno Boland (mail@eboland.de)
- * @file list_files.c
+ * @file read_file.c
  *
  * This is an example program that prints the content of a file in a squashfs
  * archive.
