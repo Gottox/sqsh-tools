@@ -1,13 +1,12 @@
 project(
     'libsqsh',
-    ['c'],
+    'c',
     default_options: [
         'c_std=c11',
         'optimization=0',
         'warning_level=3',
     ],
     version: '0.5.0',
-    meson_version: '>=0.57',
     license: [
         'BSD-2-Clause',
     ],
