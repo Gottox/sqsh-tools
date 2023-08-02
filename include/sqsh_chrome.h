@@ -56,10 +56,11 @@ struct SqshInode;
  * @brief opens a sqsh archive.
  *
  * @param[in] path The path to the sqsh archive.
+ * @param[out] err Pointer to an int where the error code will be stored.
  *
  * @return The sqsh archive context on success, NULL on error.
  */
-struct SqshArchive *sqsh_archive_open(const char *path);
+struct SqshArchive *sqsh_archive_open(const char *path, int *err);
 
 /**
  * @memberof SqshArchive

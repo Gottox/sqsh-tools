@@ -44,16 +44,8 @@
 #include "../../include/sqsh_archive.h"
 
 struct SqshArchive *
-sqsh_archive_open(const char *path) {
-	int rv = 0;
-
-	struct SqshArchive *archive = sqsh_archive_new(path, NULL, &rv);
-	if (rv < 0) {
-		sqsh_archive_free(archive);
-		return NULL;
-	}
-
-	return archive;
+sqsh_archive_open(const char *path, int *err) {
+	return sqsh_archive_new(path, NULL, err);
 }
 
 int
