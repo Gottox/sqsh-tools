@@ -136,7 +136,7 @@ bool sqsh_file_exists(struct SqshArchive *archive, const char *path);
  *
  * @return The content of the file on success, NULL on error.
  */
-char *sqsh_file_content(struct SqshArchive *archive, const char *path);
+uint8_t *sqsh_file_content(struct SqshArchive *archive, const char *path);
 
 /**
  * @brief retrieves the size of a file.

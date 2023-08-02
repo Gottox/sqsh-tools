@@ -64,12 +64,12 @@ out:
 	return exists;
 }
 
-char *
+uint8_t *
 sqsh_file_content(struct SqshArchive *archive, const char *path) {
 	int rv = 0;
 	struct SqshFileIterator iterator = {0};
 	struct SqshInode *inode = NULL;
-	char *content = NULL;
+	uint8_t *content = NULL;
 
 	inode = sqsh_open(archive, path, &rv);
 	if (rv < 0) {
@@ -82,7 +82,7 @@ sqsh_file_content(struct SqshArchive *archive, const char *path) {
 	}
 
 	size_t file_size = sqsh_inode_file_size(inode);
-	content = calloc(file_size + 1, sizeof(char));
+	content = calloc(file_size + 1, sizeof(*content));
 	if (content == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
