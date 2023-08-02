@@ -168,6 +168,24 @@ mode_t sqsh_file_permission(struct SqshArchive *archive, const char *path);
  */
 time_t sqsh_file_mtime(struct SqshArchive *archive, const char *path);
 
+/***************************************
+ * chrome/directory.c
+ */
+
+/**
+ * @brief retrieves the contents of a directory.
+ *
+ * The returned list needs to be released with `free()`.
+ *
+ * @param[in] archive  The sqsh archive context.
+ * @param[in] path     The path the file or directory.
+ * @param[out] err     Pointer to an int where the error code will be stored.
+ *
+ * @return A list of files and directories on success, NULL on error.
+ */
+char **
+sqsh_directory_list(struct SqshArchive *archive, const char *path, int *err);
+
 #ifdef __cplusplus
 }
 #endif

@@ -123,6 +123,15 @@ sqsh__buffer_size(const struct SqshBuffer *buffer) {
 	return buffer->size;
 }
 
+uint8_t *
+sqsh__buffer_unwrap(struct SqshBuffer *buffer) {
+	uint8_t *data = buffer->data;
+	buffer->data = NULL;
+	sqsh__buffer_cleanup(buffer);
+
+	return data;
+}
+
 int
 sqsh__buffer_cleanup(struct SqshBuffer *buffer) {
 	free(buffer->data);

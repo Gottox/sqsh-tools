@@ -161,6 +161,15 @@ SQSH_NO_EXPORT size_t sqsh__buffer_size(const struct SqshBuffer *buffer);
 /**
  * @internal
  * @memberof SqshBuffer
+ * @brief cleans up the buffer and returns the data.
+ * @param[in,out] buffer The SqshBuffer to unwrap.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_EXPORT uint8_t *sqsh__buffer_unwrap(struct SqshBuffer *buffer);
+/**
+ * @internal
+ * @memberof SqshBuffer
  * @brief sqsh__buffer_cleanup frees the memory managed by the SqshBuffer.
  * @param[in,out] buffer The SqshBuffer to cleanup.
  *

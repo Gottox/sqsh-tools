@@ -1,6 +1,7 @@
 add_languages('cpp', native: false)
 
 sqsh_test = [
+    'chrome/directory.c',
     'cpp-test.cpp',
     'directory/directory_iterator.c',
     'extract/extract.c',
@@ -25,6 +26,7 @@ sqsh_test = [
     'mapper/map_reader.c',
     'metablock/metablock_iterator.c',
     'metablock/metablock_reader.c',
+    'nasty.c',
     'primitive/buffer.c',
     'primitive/lru.c',
     'primitive/rc_hash_map.c',
@@ -32,7 +34,6 @@ sqsh_test = [
     'primitive/reader.c',
     'tree/walker.c',
     'xattr/xattr_iterator.c',
-    'nasty.c',
 ]
 sqsh_extended_test = [
     'selftest.sh',

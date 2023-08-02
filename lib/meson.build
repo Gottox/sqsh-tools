@@ -5,6 +5,7 @@ libsqsh_sources = files(
     'archive/superblock.c',
     'archive/trailing_context.c',
     'chrome/archive.c',
+    'chrome/directory.c',
     'chrome/file.c',
     'chrome/inode.c',
     'chrome/stream.c',
