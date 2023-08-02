@@ -116,7 +116,7 @@ sqsh_directory_list(struct SqshArchive *archive, const char *path, int *err) {
 
 	dir_list_data = (char **)sqsh__buffer_unwrap(&dir_list);
 
-	for(sqsh_index_t i = 0; i < elements; i++) {
+	for (sqsh_index_t i = 0; i < elements; i++) {
 		dir_list_data[i] += base_size + (uintptr_t)dir_list_data;
 	}
 

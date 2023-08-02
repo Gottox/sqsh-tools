@@ -118,7 +118,6 @@ sqsh__map_manager_init(
 
 	rv = sqsh__lru_init(
 			&manager->lru, lru_size, &sqsh__lru_rc_map, &manager->maps);
-
 out:
 	if (rv < 0) {
 		sqsh__map_manager_cleanup(manager);

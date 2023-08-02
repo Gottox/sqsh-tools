@@ -381,11 +381,12 @@ struct SqshConfig {
 	/**
 	 * @brief represents the addressable size of the source in bytes.
 	 *
-	 * Please note that this is not the size of the archive, but the size of the 
-	 * source. So that the maximal size of the archive is `source_size - archive_offset`.
+	 * Please note that this is not the size of the archive, but the size of the
+	 * source. So that the maximal size of the archive is `source_size -
+	 * archive_offset`.
 	 *
-	 * This field is only used when the source_mapper is unable to determine the size 
-	 * of the source itself. This is the case for the following mappers:
+	 * This field is only used when the source_mapper is unable to determine the
+	 * size of the source itself. This is the case for the following mappers:
 	 *
 	 * - `sqsh_mapper_impl_static`
 	 */
