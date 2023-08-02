@@ -18,13 +18,14 @@ main(int argc, char *argv[]) {
 		return 1;
 	}
 	struct SqshConfig config = {
-		// Read the header file to find documentation on these fields.
-		// It's safe to set them all to 0.
-		.source_mapper = sqsh_mapper_impl_mmap,
-		.source_size = 0,
-		.mapper_block_size = 0,
-		.mapper_lru_size = 0,
-		.compression_lru_size = 0,
+			// Read the header file to find documentation on these fields.
+			// It's safe to set them all to 0.
+			.source_mapper = sqsh_mapper_impl_mmap,
+			.source_size = 0,
+			.mapper_block_size = 0,
+			.mapper_lru_size = 0,
+			.compression_lru_size = 0,
+			.archive_offset = 0,
 	};
 	struct SqshArchive *archive =
 			sqsh_archive_new(argv[1], &config, &error_code);

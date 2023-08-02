@@ -17,10 +17,7 @@ main(int argc, char *argv[]) {
 		printf("Usage: %s <sqsh-file>\n", argv[0]);
 		return 1;
 	}
-	struct SqshConfig config = {
-		.archive_offset = 631200,
-	};
-	struct SqshArchive *archive = sqsh_archive_new(argv[1], &config, NULL);
+	struct SqshArchive *archive = sqsh_archive_new(argv[1], NULL, NULL);
 	assert(archive != NULL);
 
 	char **dir_list = sqsh_directory_list(archive, "/", NULL);
