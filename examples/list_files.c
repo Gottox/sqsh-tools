@@ -19,22 +19,14 @@ main(int argc, char *argv[]) {
 	}
 	struct SqshArchive *archive = sqsh_archive_new(argv[1], NULL, NULL);
 	assert(archive != NULL);
-	struct SqshInode *inode = sqsh_open(archive, "/", NULL);
-	assert(inode != NULL);
-	struct SqshDirectoryIterator *iterator =
-			sqsh_directory_iterator_new(inode, NULL);
-	assert(iterator != NULL);
 
-	while (sqsh_directory_iterator_next(iterator) > 0) {
-		/* Use the _dup() variant here because the _name() variant is not
-		 * null-terminated.
-		 */
-		char *name = sqsh_directory_iterator_name_dup(iterator);
-		puts(name);
-		free(name);
+	char **dir_list = sqsh_directory_list(archive, "/", NULL);
+	assert(dir_list != NULL);
+
+	for (int i = 0; dir_list[i] != NULL; i++) {
+		puts(dir_list[i]);
 	}
 
-	sqsh_directory_iterator_free(iterator);
-	sqsh_close(inode);
+	free(dir_list);
 	sqsh_archive_free(archive);
 }
