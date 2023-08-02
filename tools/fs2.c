@@ -380,7 +380,7 @@ init_context(struct fuse_args *args) {
 
 	////////////////////////////////////////
 	// Init archive
-	context.archive = open_archive(options.archive, &rv);
+	context.archive = open_archive(options.archive, options.offset, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, options.archive);
 		return rv;
