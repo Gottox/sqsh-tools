@@ -35,7 +35,11 @@
 
 #include "../../include/sqsh_data_private.h"
 
+#if defined(__FreeBSD__)
+#include <sys/endian.h>
+#else
 #include <endian.h>
+#endif
 
 struct SQSH_UNALIGNED SqshDataSuperblock {
 	uint32_t magic;
