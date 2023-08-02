@@ -2,6 +2,7 @@ add_languages('cpp', native: false)
 
 sqsh_test = [
     'chrome/directory.c',
+    'chrome/file.c',
     'cpp-test.cpp',
     'directory/directory_iterator.c',
     'extract/extract.c',
