@@ -17,10 +17,14 @@ seq 1 1050 | sed "s#.*#$tmp/large_dir/&#" | xargs touch
 #	-p '"large_dir" x user.force_extended=true' \
 #	-p '"a" x user.foo=1234567891234567891234567890001234567890' \
 #	-p '"b" x user.bar=1234567891234567891234567890001234567890' \
-$MKSQUASHFS "$tmp" "$out" \
+$MKSQUASHFS "$tmp" "$out.tmp" \
 	-nopad \
 	-force-uid 2020 \
 	-force-gid 202020 \
 	-Xcompression-level 1 \
 	-always-use-fragments \
 	-quiet -no-progress
+
+dd if=/dev/zero of="$out" bs=1 count=0 seek=1010 2>/dev/null
+cat "$out.tmp" >> "$out"
+rm "$out.tmp"

@@ -52,7 +52,7 @@ static void
 sqsh_empty(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
-	const struct SqshConfig config = DEFAULT_CONFIG(0);
+	struct SqshConfig config = DEFAULT_CONFIG(0);
 	rv = sqsh__archive_init(&sqsh, NULL, &config);
 	assert(rv == -SQSH_ERROR_SUPERBLOCK_TOO_SMALL);
 }
@@ -63,7 +63,8 @@ sqsh_get_nonexistant(void) {
 	struct SqshArchive sqsh = {0};
 	struct SqshTreeWalker walker = {0};
 
-	const struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	config.archive_offset = 1010;
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
@@ -86,7 +87,8 @@ tree_walker(void) {
 	struct SqshTreeWalker walker = {0};
 	struct SqshArchive sqsh = {0};
 	struct SqshInode *inode;
-	const struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	config.archive_offset = 1010;
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
@@ -121,7 +123,8 @@ sqsh_ls(void) {
 	struct SqshDirectoryIterator *iter = NULL;
 	struct SqshArchive sqsh = {0};
 	const struct SqshSuperblock *superblock;
-	const struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	config.archive_offset = 1010;
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
@@ -174,7 +177,8 @@ sqsh_read_content(void) {
 	int rv;
 	char *data;
 	struct SqshArchive archive = {0};
-	const struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	config.archive_offset = 1010;
 	rv = sqsh__archive_init(&archive, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
@@ -195,7 +199,8 @@ sqsh_cat_fragment(void) {
 	struct SqshFileReader reader = {0};
 	struct SqshArchive sqsh = {0};
 	struct SqshTreeWalker walker = {0};
-	const struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	config.archive_offset = 1010;
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
@@ -246,6 +251,7 @@ sqsh_cat_datablock_and_fragment(void) {
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = TEST_SQUASHFS_IMAGE_LEN,
+			.archive_offset = 1010,
 	};
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
@@ -299,6 +305,7 @@ sqsh_cat_size_overflow(void) {
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = TEST_SQUASHFS_IMAGE_LEN,
+			.archive_offset = 1010,
 	};
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
@@ -344,6 +351,7 @@ sqsh_test_uid_and_gid(void) {
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = TEST_SQUASHFS_IMAGE_LEN,
+			.archive_offset = 1010,
 	};
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
@@ -374,6 +382,7 @@ sqsh_test_extended_dir(void) {
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = TEST_SQUASHFS_IMAGE_LEN,
+			.archive_offset = 1010,
 	};
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
@@ -412,6 +421,7 @@ sqsh_test_xattr(void) {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = TEST_SQUASHFS_IMAGE_LEN,
 	};
+	config.archive_offset = 1010;
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
@@ -542,7 +552,8 @@ multithreaded(void) {
 	pthread_t threads[16] = {0};
 	struct SqshArchive sqsh = {0};
 
-	const struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	config.archive_offset = 1010;
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 

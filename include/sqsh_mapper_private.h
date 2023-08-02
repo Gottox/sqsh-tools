@@ -260,6 +260,7 @@ struct SqshMapManager {
 	struct SqshMapper mapper;
 	struct SqshLru lru;
 	struct SqshRcMap maps;
+	uint64_t archive_offset;
 	sqsh__mutex_t lock;
 };
 

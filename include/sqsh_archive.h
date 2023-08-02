@@ -373,10 +373,19 @@ uint64_t sqsh_superblock_bytes_used(const struct SqshSuperblock *context);
  */
 struct SqshConfig {
 	/**
-	 * @brief source_size represents the size of the archive and may be used
-	 * to determine the size of the archive.
+	 * @brief represents the offset in bytes where the sqsh_archive
+	 * will start.
+	 */
+	uint64_t archive_offset;
+
+	/**
+	 * @brief represents the addressable size of the source in bytes.
 	 *
-	 * mappers that honor this field:
+	 * Please note that this is not the size of the archive, but the size of the 
+	 * source. So that the maximal size of the archive is `source_size - archive_offset`.
+	 *
+	 * This field is only used when the source_mapper is unable to determine the size 
+	 * of the source itself. This is the case for the following mappers:
 	 *
 	 * - `sqsh_mapper_impl_static`
 	 */

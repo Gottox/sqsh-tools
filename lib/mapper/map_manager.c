@@ -53,7 +53,7 @@ load_mapping(
 
 	const size_t block_size = sqsh__mapper_block_size(&manager->mapper);
 	const size_t block_count = sqsh__map_manager_block_count(manager);
-	const size_t file_size = sqsh__map_manager_size(manager);
+	const size_t mapper_size = sqsh__map_manager_size(manager);
 	size_t size = block_size;
 	sqsh_index_t offset;
 	if (SQSH_MULT_OVERFLOW(index, block_size, &offset)) {
@@ -63,8 +63,12 @@ load_mapping(
 	/* If we're retrieving the last block, we need to make sure that we don't
 	 * read past the end of the file, so cap the size to the remaining bytes.
 	 */
-	if (index == block_count - 1 && file_size % block_size != 0) {
-		size = file_size % block_size;
+	if (index == block_count - 1 && mapper_size % block_size != 0) {
+		size = mapper_size % block_size;
+	}
+
+	if (SQSH_ADD_OVERFLOW(offset, manager->archive_offset, &offset)) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
 	rv = sqsh__map_slice_init(mapping, &manager->mapper, offset, size);
@@ -82,7 +86,8 @@ sqsh__map_manager_init(
 		const struct SqshConfig *config) {
 	int rv;
 	size_t map_size;
-	size_t lru_size = SQSH_CONFIG_DEFAULT(config->mapper_lru_size, 32);
+	const size_t lru_size = SQSH_CONFIG_DEFAULT(config->mapper_lru_size, 32);
+	const uint64_t archive_offset = config->archive_offset;
 
 	rv = sqsh__mutex_init(&manager->lock);
 	if (rv < 0) {
@@ -93,10 +98,17 @@ sqsh__map_manager_init(
 		goto out;
 	}
 
+	const size_t mapper_size = sqsh__mapper_size(&manager->mapper);
+
+	if (mapper_size < archive_offset) {
+		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
+		goto out;
+	}
 	map_size = SQSH_DIVIDE_CEIL(
-			sqsh__mapper_size(&manager->mapper),
+			mapper_size - archive_offset,
 			sqsh__mapper_block_size(&manager->mapper));
 
+	manager->archive_offset = archive_offset;
 	rv = sqsh__rc_map_init(
 			&manager->maps, map_size, sizeof(struct SqshMapSlice),
 			map_cleanup_cb);
@@ -116,7 +128,7 @@ out:
 
 uint64_t
 sqsh__map_manager_size(const struct SqshMapManager *manager) {
-	return sqsh__mapper_size(&manager->mapper);
+	return sqsh__mapper_size(&manager->mapper) - manager->archive_offset;
 }
 
 size_t
