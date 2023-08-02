@@ -49,11 +49,15 @@ main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	while (sqsh_directory_iterator_next(iterator) > 0) {
+	while ((error_code = sqsh_directory_iterator_next(iterator)) > 0) {
 		const char *name = sqsh_directory_iterator_name(iterator);
 		size_t size = sqsh_directory_iterator_name_size(iterator);
 		fwrite(name, size, 1, stdout);
 		fputc('\n', stdout);
+	}
+	if (error_code < 0) {
+		sqsh_perror(error_code, "sqsh_directory_iterator_next");
+		return 1;
 	}
 
 	sqsh_directory_iterator_free(iterator);

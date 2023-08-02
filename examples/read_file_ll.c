@@ -46,10 +46,14 @@ main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	while (sqsh_file_iterator_next(iterator, SIZE_MAX) > 0) {
+	while ((error_code = sqsh_file_iterator_next(iterator, SIZE_MAX)) > 0) {
 		const uint8_t *data = sqsh_file_iterator_data(iterator);
 		size_t size = sqsh_file_iterator_size(iterator);
 		fwrite(data, size, 1, stdout);
+	}
+	if (error_code < 0) {
+		sqsh_perror(error_code, "sqsh_file_iterator_next");
+		return 1;
 	}
 
 	sqsh_file_iterator_free(iterator);
