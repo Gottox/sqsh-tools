@@ -197,15 +197,21 @@ sqsh__directory_iterator_init(
 
 struct SqshDirectoryIterator *
 sqsh_directory_iterator_new(struct SqshInode *inode, int *err) {
+	int rv = 0;
 	struct SqshDirectoryIterator *iterator =
 			calloc(1, sizeof(struct SqshDirectoryIterator));
-	if (iterator == NULL) {
-		return NULL;
+	if (inode == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
 	}
-	*err = sqsh__directory_iterator_init(iterator, inode);
-	if (*err < 0) {
-		free(iterator);
-		return NULL;
+	rv = sqsh__directory_iterator_init(iterator, inode);
+	if (rv < 0) {
+		free(inode);
+		inode = NULL;
+	}
+out:
+	if (err != NULL) {
+		*err = rv;
 	}
 	return iterator;
 }

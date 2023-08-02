@@ -85,16 +85,22 @@ out:
 
 struct SqshFileReader *
 sqsh_file_reader_new(const struct SqshInode *inode, int *err) {
-	struct SqshFileReader *context = calloc(1, sizeof(struct SqshFileReader));
-	if (context == NULL) {
-		return NULL;
+	int rv = 0;
+	struct SqshFileReader *reader = calloc(1, sizeof(struct SqshFileReader));
+	if (reader == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
 	}
-	*err = sqsh__file_reader_init(context, inode);
-	if (*err < 0) {
-		free(context);
-		return NULL;
+	rv = sqsh__file_reader_init(reader, inode);
+	if (rv < 0) {
+		free(reader);
+		reader = NULL;
 	}
-	return context;
+out:
+	if (err != NULL) {
+		*err = rv;
+	}
+	return reader;
 }
 
 int

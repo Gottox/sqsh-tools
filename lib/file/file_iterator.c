@@ -75,15 +75,21 @@ out:
 
 struct SqshFileIterator *
 sqsh_file_iterator_new(const struct SqshInode *inode, int *err) {
+	int rv = 0;
 	struct SqshFileIterator *iterator =
 			calloc(1, sizeof(struct SqshFileIterator));
 	if (iterator == NULL) {
-		return NULL;
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
 	}
-	*err = sqsh__file_iterator_init(iterator, inode);
-	if (*err < 0) {
+	rv = sqsh__file_iterator_init(iterator, inode);
+	if (rv < 0) {
 		free(iterator);
-		return NULL;
+		iterator = NULL;
+	}
+out:
+	if (err != NULL) {
+		*err = rv;
 	}
 	return iterator;
 }

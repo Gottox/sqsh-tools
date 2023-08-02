@@ -77,14 +77,20 @@ get_data_segment_size(const struct SqshSuperblock *superblock) {
 struct SqshArchive *
 sqsh_archive_new(
 		const void *source, const struct SqshConfig *config, int *err) {
+	int rv = 0;
 	struct SqshArchive *archive = calloc(1, sizeof(struct SqshArchive));
 	if (archive == NULL) {
-		return NULL;
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
 	}
-	*err = sqsh__archive_init(archive, source, config);
-	if (*err < 0) {
+	rv = sqsh__archive_init(archive, source, config);
+	if (rv < 0) {
 		free(archive);
-		return NULL;
+		archive = NULL;
+	}
+out:
+	if (err != NULL) {
+		*err = rv;
 	}
 	return archive;
 }

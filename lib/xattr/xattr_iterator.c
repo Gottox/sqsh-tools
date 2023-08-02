@@ -110,15 +110,21 @@ out:
 
 struct SqshXattrIterator *
 sqsh_xattr_iterator_new(const struct SqshInode *inode, int *err) {
+	int rv = 0;
 	struct SqshXattrIterator *iterator =
 			calloc(1, sizeof(struct SqshXattrIterator));
 	if (iterator == NULL) {
-		return NULL;
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
 	}
-	*err = sqsh__xattr_iterator_init(iterator, inode);
-	if (*err < 0) {
+	rv = sqsh__xattr_iterator_init(iterator, inode);
+	if (rv < 0) {
 		free(iterator);
-		return NULL;
+		iterator = NULL;
+	}
+out:
+	if (err != NULL) {
+		*err = rv;
 	}
 	return iterator;
 }

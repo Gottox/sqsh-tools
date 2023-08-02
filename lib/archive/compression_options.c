@@ -48,17 +48,23 @@ compression_options(const struct SqshCompressionOptions *context) {
 
 struct SqshCompressionOptions *
 sqsh_compression_options_new(struct SqshArchive *sqsh, int *err) {
-	struct SqshCompressionOptions *context =
+	int rv = 0;
+	struct SqshCompressionOptions *compression_options =
 			calloc(1, sizeof(struct SqshCompressionOptions));
-	if (context == NULL) {
-		return NULL;
+	if (compression_options == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
 	}
-	*err = sqsh__compression_options_init(context, sqsh);
-	if (*err < 0) {
-		free(context);
-		return NULL;
+	rv = sqsh__compression_options_init(compression_options, sqsh);
+	if (rv < 0) {
+		free(compression_options);
+		compression_options = NULL;
 	}
-	return context;
+out:
+	if (err != NULL) {
+		*err = rv;
+	}
+	return compression_options;
 }
 
 int

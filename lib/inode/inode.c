@@ -197,16 +197,22 @@ out:
 
 struct SqshInode *
 sqsh_inode_new(struct SqshArchive *sqsh, uint64_t inode_ref, int *err) {
-	struct SqshInode *context = calloc(1, sizeof(struct SqshInode));
-	if (context == NULL) {
-		return NULL;
+	int rv = 0;
+	struct SqshInode *inode = calloc(1, sizeof(struct SqshInode));
+	if (inode == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
 	}
-	*err = sqsh__inode_init(context, sqsh, inode_ref);
-	if (*err < 0) {
-		free(context);
-		return NULL;
+	rv = sqsh__inode_init(inode, sqsh, inode_ref);
+	if (rv < 0) {
+		free(inode);
+		inode = NULL;
 	}
-	return context;
+out:
+	if (err != NULL) {
+		*err = rv;
+	}
+	return inode;
 }
 
 bool
