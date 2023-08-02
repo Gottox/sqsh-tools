@@ -128,6 +128,9 @@ bool sqsh_file_exists(struct SqshArchive *archive, const char *path);
 /**
  * @brief retrieves the content of a file.
  *
+ * The content is not null terminated. The size of the content can be retrieved
+ * with sqsh_file_size. The returned pointer needs to be released with `free()`.
+ *
  * @param[in] archive  The sqsh archive context.
  * @param[in] path     The path the file or directory.
  *
@@ -141,7 +144,7 @@ char *sqsh_file_content(struct SqshArchive *archive, const char *path);
  * @param[in] archive  The sqsh archive context.
  * @param[in] path     The path the file or directory.
  *
- * @return The size of the file on success, less than 0 on error.
+ * @return The size of the file on success, 0 on error.
  */
 size_t sqsh_file_size(struct SqshArchive *archive, const char *path);
 
@@ -151,7 +154,7 @@ size_t sqsh_file_size(struct SqshArchive *archive, const char *path);
  * @param[in] archive  The sqsh archive context.
  * @param[in] path     The path the file or directory.
  *
- * @return The unix permissions of the file on success, less than 0 on error.
+ * @return The unix permissions of the file on success, 0 on error.
  */
 mode_t sqsh_file_permission(struct SqshArchive *archive, const char *path);
 
@@ -161,7 +164,7 @@ mode_t sqsh_file_permission(struct SqshArchive *archive, const char *path);
  * @param[in] archive  The sqsh archive context.
  * @param[in] path     The path the file or directory.
  *
- * @return The modification time of the file on success, less than 0 on error.
+ * @return The modification time of the file on success, 0 on error.
  */
 time_t sqsh_file_mtime(struct SqshArchive *archive, const char *path);
 
