@@ -29,6 +29,12 @@ option(
     description: 'Generate documentation.',
 )
 option(
+    'examples',
+    type: 'boolean',
+    value: false,
+    description: 'Builds usage examples of libsqsh.',
+)
+option(
     'tools',
     type: 'boolean',
     value: true,

@@ -21,6 +21,7 @@ else
 	NINJA = ninja
 endif
 MESON_FLAGS += -Ddefault_library=static
+MESON_FLAGS += -Dexamples=true
 MESON_FLAGS += -Db_lundef=false
 #MESON_FLAGS += -Dtest=extended
 MESON_FLAGS += -Dtest=true

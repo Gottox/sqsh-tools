@@ -40,6 +40,10 @@ libsqsh_dep = declare_dependency(
     include_directories: libsqsh_include,
 )
 
+if get_option('examples')
+    subdir('examples')
+endif
+
 if get_option('tools')
     subdir('tools')
 endif

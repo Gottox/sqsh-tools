@@ -13,7 +13,7 @@ HAVE_DOT              = YES
 DOT_IMAGE_FORMAT      = svg
 INTERACTIVE_SVG       = YES
 FULL_PATH_NAMES       = YES
-STRIP_FROM_PATH       = @DOXYGEN_INPUT@/include/
+STRIP_FROM_PATH       = @DOXYGEN_INPUT@/
 INTERNAL_DOCS         = @DOXYGEN_INTERNAL_DOCS@
 
 # Warning and progress messages
@@ -26,9 +26,9 @@ WARN_AS_ERROR        = YES
 
 
 # Input files
-INPUT         = @DOXYGEN_INPUT@/README.md @DOXYGEN_INPUT@/include @DOXYGEN_INPUT@/doc
+INPUT         = @DOXYGEN_INPUT@/README.md @DOXYGEN_INPUT@/include @DOXYGEN_INPUT@/doc @DOXYGEN_INPUT@/examples
 EXCLUDE       = @DOXYGEN_INPUT@/include/sqsh_data_private.h
-FILE_PATTERNS = *.h *.md
+FILE_PATTERNS = *.c *.h *.md
 EXCLUDE_PATTERNS = *_internal.h
 RECURSIVE     = YES
 USE_MDFILE_AS_MAINPAGE = @DOXYGEN_INPUT@/README.md
