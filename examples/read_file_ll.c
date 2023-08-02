@@ -7,7 +7,6 @@
  */
 
 #include <sqsh.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -43,7 +42,7 @@ main(int argc, char *argv[]) {
 	struct SqshFileIterator *iterator =
 			sqsh_file_iterator_new(inode, &error_code);
 	if (error_code != 0) {
-		sqsh_perror(error_code, "sqsh_directory_iterator_new");
+		sqsh_perror(error_code, "sqsh_file_iterator_new");
 		return 1;
 	}
 
