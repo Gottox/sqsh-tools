@@ -248,7 +248,7 @@ struct SqshXattrTable {
  *
  * @return The starting offset of the table.
  */
-uint64_t sqsh_xattr_table_start(struct SqshXattrTable *table);
+SQSH_NO_EXPORT uint64_t sqsh__xattr_table_start(struct SqshXattrTable *table);
 
 /**
  * @memberof SqshXattrTable
@@ -262,7 +262,7 @@ uint64_t sqsh_xattr_table_start(struct SqshXattrTable *table);
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh_xattr_table_get(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__xattr_table_get(
 		const struct SqshXattrTable *table, sqsh_index_t index,
 		struct SqshDataXattrLookupTable *target);
 

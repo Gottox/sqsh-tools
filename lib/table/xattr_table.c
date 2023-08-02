@@ -84,13 +84,13 @@ out:
 }
 
 uint64_t
-sqsh_xattr_table_start(struct SqshXattrTable *table) {
+sqsh__xattr_table_start(struct SqshXattrTable *table) {
 	const struct SqshDataXattrIdTable *header = get_header(table);
 	return sqsh__data_xattr_id_table_xattr_table_start(header);
 }
 
 int
-sqsh_xattr_table_get(
+sqsh__xattr_table_get(
 		const struct SqshXattrTable *table, sqsh_index_t index,
 		struct SqshDataXattrLookupTable *target) {
 	return sqsh_table_get(&table->table, index, target);

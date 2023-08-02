@@ -70,7 +70,7 @@ sqsh__xattr_iterator_init(
 		return -SQSH_ERROR_CORRUPTED_INODE;
 	}
 
-	rv = sqsh_xattr_table_get(xattr_table, index, ref);
+	rv = sqsh__xattr_table_get(xattr_table, index, ref);
 	if (rv < 0) {
 		goto out;
 	}
@@ -81,7 +81,7 @@ sqsh__xattr_iterator_init(
 	const uint64_t outer_offset = sqsh_address_ref_outer_offset(address_ref);
 	const uint64_t archive_size = sqsh_superblock_bytes_used(superblock);
 
-	uint64_t start_block = sqsh_xattr_table_start(xattr_table);
+	uint64_t start_block = sqsh__xattr_table_start(xattr_table);
 	if (SQSH_ADD_OVERFLOW(start_block, outer_offset, &start_block)) {
 		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
@@ -161,7 +161,7 @@ xattr_value_indirect_load(struct SqshXattrIterator *iterator) {
 	uint64_t outer_offset = sqsh_address_ref_outer_offset(ref);
 	uint16_t inner_offset = sqsh_address_ref_inner_offset(ref);
 
-	uint64_t start_block = sqsh_xattr_table_start(iterator->context);
+	uint64_t start_block = sqsh__xattr_table_start(iterator->context);
 	size_t size = SQSH_SIZEOF_XATTR_VALUE;
 	if (SQSH_ADD_OVERFLOW(start_block, outer_offset, &start_block)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
