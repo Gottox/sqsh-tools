@@ -1,6 +1,7 @@
 headers = files(
     'sqsh.h',
     'sqsh_archive.h',
+    'sqsh_archive_private.h',
     'sqsh_chrome.h',
     'sqsh_common.h',
     'sqsh_data_private.h',
@@ -10,6 +11,8 @@ headers = files(
     'sqsh_extract_private.h',
     'sqsh_file.h',
     'sqsh_file_private.h',
+    'sqsh_inode.h',
+    'sqsh_inode_private.h',
     'sqsh_mapper.h',
     'sqsh_mapper_private.h',
     'sqsh_metablock_private.h',
@@ -17,6 +20,8 @@ headers = files(
     'sqsh_table.h',
     'sqsh_table_private.h',
     'sqsh_thread_private.h',
+    'sqsh_tree.h',
+    'sqsh_tree_private.h',
     'sqsh_xattr.h',
     'sqsh_xattr_private.h',
 )
