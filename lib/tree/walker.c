@@ -339,20 +339,30 @@ tree_walker_resolve(
 			is_dir = true;
 			rv = sqsh_tree_walker_up(walker);
 		} else {
-			is_dir = false;
 			rv = sqsh_tree_walker_lookup(walker, segment, segment_len);
 			if (rv < 0) {
 				goto out;
 			}
-			if (sqsh_tree_walker_type(walker) == SQSH_INODE_TYPE_SYMLINK) {
+			switch (sqsh_tree_walker_type(walker)) {
+			case SQSH_INODE_TYPE_SYMLINK:
 				rv = tree_walker_follow_symlink(walker, symlink_count);
 				if (rv < 0) {
 					goto out;
 				}
-			}
-			if (sqsh_tree_walker_type(walker) == SQSH_INODE_TYPE_DIRECTORY) {
+				if (sqsh_tree_walker_type(walker) ==
+					SQSH_INODE_TYPE_DIRECTORY) {
+					is_dir = true;
+				}
+				is_dir = sqsh_tree_walker_type(walker) ==
+						SQSH_INODE_TYPE_DIRECTORY;
+				break;
+			case SQSH_INODE_TYPE_DIRECTORY:
 				is_dir = true;
 				rv = sqsh_tree_walker_down(walker);
+				break;
+			default:
+				is_dir = false;
+				break;
 			}
 		}
 		if (rv < 0) {

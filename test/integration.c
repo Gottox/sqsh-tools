@@ -575,6 +575,29 @@ multithreaded(void) {
 	rv = sqsh__archive_cleanup(&sqsh);
 	assert(rv == 0);
 }
+static void
+test_follow_symlink(void) {
+	int rv;
+	struct SqshArchive sqsh = {0};
+
+	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	config.archive_offset = 1010;
+	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
+	assert(rv == 0);
+
+	char **dir_list = sqsh_directory_list(
+			&sqsh, "/large_dir/link/large_dir/link", &rv);
+	assert(rv == 0);
+
+	assert(strcmp(dir_list[0], "a") == 0);
+	assert(strcmp(dir_list[1], "b") == 0);
+	assert(strcmp(dir_list[2], "large_dir") == 0);
+	assert(dir_list[3] == NULL);
+	free(dir_list);
+
+	rv = sqsh__archive_cleanup(&sqsh);
+	assert(rv == 0);
+}
 
 DECLARE_TESTS
 TEST(sqsh_empty)
@@ -589,4 +612,5 @@ TEST(sqsh_test_uid_and_gid)
 TEST(sqsh_test_extended_dir)
 // TEST(sqsh_test_xattr);
 TEST(multithreaded)
+TEST(test_follow_symlink)
 END_TESTS

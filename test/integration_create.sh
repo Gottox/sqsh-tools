@@ -11,6 +11,7 @@ echo a > "$tmp/a"
 seq 1 1050000 | head -1050000 | tr -cd "\n" | tr '\n' b > "$tmp/b"
 mkdir -p "$tmp/large_dir"
 seq 1 1050 | sed "s#.*#$tmp/large_dir/&#" | xargs touch
+ln -s .. "$tmp/large_dir/link"
 [ -e "$out" ] && rm "$out"
 # xattr integration tests are disabled because they are not supported on all
 # platforms, notably OpenBSD which is used as baseline test.
