@@ -17,7 +17,7 @@ main(int argc, char *argv[]) {
 		printf("Usage: %s <sqsh-file>\n", argv[0]);
 		return 1;
 	}
-	struct SqshArchive *archive = sqsh_archive_open(argv[1], NULL);
+	struct SqshArchive *archive = sqsh_archive_new(argv[1], NULL, NULL);
 	assert(archive != NULL);
 	struct SqshInode *inode = sqsh_open(archive, "/", NULL);
 	assert(inode != NULL);
@@ -36,5 +36,5 @@ main(int argc, char *argv[]) {
 
 	sqsh_directory_iterator_free(iterator);
 	sqsh_close(inode);
-	sqsh_archive_close(archive);
+	sqsh_archive_free(archive);
 }
