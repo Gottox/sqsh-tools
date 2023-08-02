@@ -43,6 +43,41 @@
 #include "../../lib/utils/utils.h"
 
 static void
+walker_symlink_recursion(void) {
+	int rv;
+	struct SqshArchive archive = {0};
+	uint8_t payload[] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
+			INODE_HEADER(1, 0, 0, 0, 0, 1),
+			INODE_BASIC_DIR(0, 1024, 0, 0),
+			[INODE_TABLE_OFFSET+2+128] =
+			INODE_HEADER(3, 0, 0, 0, 0, 2),
+			INODE_BASIC_SYMLINK(3),
+			's', 'r', 'c',
+			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			DIRECTORY_HEADER(2, 0, 0),
+			DIRECTORY_ENTRY(128, 2, 3, 3),
+			's', 'r', 'c',
+			[FRAGMENT_TABLE_OFFSET] = 0,
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	struct SqshTreeWalker walker = {0};
+	rv = sqsh__tree_walker_init(&walker, &archive);
+	assert(rv == 0);
+
+	rv = sqsh_tree_walker_resolve(&walker, "src", true);
+	assert(rv == -SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED);
+
+	sqsh__tree_walker_cleanup(&walker);
+	sqsh__archive_cleanup(&archive);
+}
+
+static void
 walker_symlink_open(void) {
 	int rv;
 	struct SqshArchive archive = {0};
@@ -77,6 +112,11 @@ walker_symlink_open(void) {
 
 	rv = sqsh_tree_walker_resolve(&walker, "src", true);
 	assert(rv == 0);
+
+	const char *name = sqsh_tree_walker_name(&walker);
+	size_t name_size = sqsh_tree_walker_name_size(&walker);
+	assert(name_size == 3);
+	assert(memcmp(name, "tgt", name_size) == 0);
 
 	sqsh__tree_walker_cleanup(&walker);
 	sqsh__archive_cleanup(&archive);
@@ -202,6 +242,7 @@ walker_uninitialized_down(void) {
 
 DECLARE_TESTS
 TEST(walker_symlink_open)
+TEST(walker_symlink_recursion)
 TEST(walker_directory_enter)
 TEST(walker_uninitialized_down)
 TEST(walker_uninitialized_up)

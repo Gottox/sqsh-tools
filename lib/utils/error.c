@@ -136,6 +136,8 @@ sqsh_error_str(int error_code) {
 		return "Xattr size mismatch";
 	case SQSH_ERROR_UNSUPPORTED_VERSION:
 		return "Unsupported version";
+	case SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED:
+		return "Too many symlinks followed";
 	}
 	snprintf(err_str, sizeof(err_str), UNKOWN_ERROR_FORMAT, abs(error_code));
 	return err_str;

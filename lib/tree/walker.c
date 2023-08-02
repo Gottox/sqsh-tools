@@ -42,6 +42,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define SQSH_MAX_SYMLINKS_FOLLOWED 100
+
+SQSH_NO_UNUSED static int tree_walker_resolve(
+		struct SqshTreeWalker *walker, const char *path, int symlink_count);
+
 SQSH_NO_UNUSED int
 update_inode_from_iterator(struct SqshTreeWalker *walker) {
 	struct SqshDirectoryIterator *iterator = &walker->iterator;
@@ -278,9 +283,45 @@ path_segment_len(const char *segment) {
 }
 
 static int
-tree_walker_resolve(struct SqshTreeWalker *walker, const char *path) {
+tree_walker_follow_symlink(
+		struct SqshTreeWalker *walker, int symlinks_followed) {
+	struct SqshInode inode = {0};
+	int rv = 0;
+	char *symlink_target = NULL;
+	// if symlinks_followed is smaller than zero, the caller intends to disable
+	// symlink following
+	if (symlinks_followed < 0) {
+		return 0;
+	}
+	if (symlinks_followed == 0) {
+		return -SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED;
+	}
+
+	rv = sqsh__inode_init(&inode, walker->archive, walker->current_inode_ref);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = sqsh_tree_walker_revert(walker);
+	if (rv < 0) {
+		goto out;
+	}
+
+	symlink_target = sqsh_inode_symlink_dup(&inode);
+	rv = tree_walker_resolve(walker, symlink_target, symlinks_followed - 1);
+
+out:
+	free(symlink_target);
+	sqsh__inode_cleanup(&inode);
+	return rv;
+}
+
+static int
+tree_walker_resolve(
+		struct SqshTreeWalker *walker, const char *path, int symlink_count) {
 	int rv = 0;
 	const char *segment = path, *next_segment;
+	bool is_dir = true;
 	if (segment[0] == '/') {
 		rv = sqsh_tree_walker_to_root(walker);
 		if (rv < 0) {
@@ -292,22 +333,35 @@ tree_walker_resolve(struct SqshTreeWalker *walker, const char *path) {
 		const size_t segment_len = path_segment_len(segment);
 		next_segment = path_next_segment(segment);
 		if (strncmp(".", segment, segment_len) == 0 || segment_len == 0) {
+			is_dir = true;
 			continue;
 		} else if (strncmp("..", segment, segment_len) == 0) {
+			is_dir = true;
 			rv = sqsh_tree_walker_up(walker);
 		} else {
+			is_dir = false;
 			rv = sqsh_tree_walker_lookup(walker, segment, segment_len);
 			if (rv < 0) {
 				goto out;
 			}
+			if (sqsh_tree_walker_type(walker) == SQSH_INODE_TYPE_SYMLINK) {
+				rv = tree_walker_follow_symlink(walker, symlink_count);
+				if (rv < 0) {
+					goto out;
+				}
+			}
 			if (sqsh_tree_walker_type(walker) == SQSH_INODE_TYPE_DIRECTORY) {
+				is_dir = true;
 				rv = sqsh_tree_walker_down(walker);
 			}
 		}
 		if (rv < 0) {
 			goto out;
 		}
-	} while ((segment = next_segment));
+	} while ((segment = next_segment) && is_dir);
+	if (segment != NULL && is_dir == false) {
+		rv = -SQSH_ERROR_NOT_A_DIRECTORY;
+	}
 
 out:
 	return rv;
@@ -316,34 +370,8 @@ out:
 int
 sqsh_tree_walker_resolve(
 		struct SqshTreeWalker *walker, const char *path, bool follow_links) {
-	int rv = 0;
-
-	char *current_path_buf = NULL;
-	const char *current_path = path;
-	for (int i = 0; i < 100; i++) {
-		rv = tree_walker_resolve(walker, current_path);
-		if (rv < 0) {
-			goto out;
-		}
-		if (!follow_links) {
-			break;
-		}
-		if (sqsh_tree_walker_type(walker) != SQSH_INODE_TYPE_SYMLINK) {
-			break;
-		}
-		struct SqshInode inode = {0};
-		rv = sqsh__inode_init(
-				&inode, walker->archive, walker->current_inode_ref);
-		if (rv < 0) {
-			goto out;
-		}
-		free(current_path_buf);
-		current_path = current_path_buf = sqsh_inode_symlink_dup(&inode);
-		sqsh__inode_cleanup(&inode);
-	}
-out:
-	free(current_path_buf);
-	return rv;
+	int symlink_count = follow_links ? SQSH_MAX_SYMLINKS_FOLLOWED : 0;
+	return tree_walker_resolve(walker, path, symlink_count);
 }
 
 int
