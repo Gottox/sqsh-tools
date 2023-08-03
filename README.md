@@ -1,44 +1,60 @@
 # libsqsh
 [![CI](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml/badge.svg)](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml)
 
-squashfs is an open and free compressed read-only filesystem. It is used in
-embedded devices, live-CDs, or in packaging. It was original introduced into
-the kernel, but there are multiple user space implementations.
+squashfs is an open and free compressed read-only file system. It is used in
+embedded devices, live CDs, or in packaging. It was originally implemented in
+the kernel, but there are several userspace implementations.
 
-libsqsh is a purely 2-Clause BSD Licensed implementation of the squashfs
-filesystem. It covers the complete squashfs feature set, while still being
-as minimal as possible.
+*libsqsh* is a pure 2 clause BSD licensed implementation of the squashfs file
+system. It covers the complete squashfs feature set and is designed to be fast
+and memory efficient. fast and memory efficient.
 
-## Features
+It is written in modern C11 and can be used with C++ and C code. *libsqsh*
+supports a high-level API that focuses on ease of use, and a low-level API that
+provides zero-copy interfaces to the squashfs archives.
 
-*libsqsh* supports all features of the squashfs format. Keep in mind that this
-library only supports reading archives. If you need to create archives take a
-look at [squashfs-tools-ng](https://github.com/AgentD/squashfs-tools-ng/).
+## Example
 
-libsqsh is portable! It is tested and designed for posix compatible environments
-but should be easy to port to other systems too. With
-[sqsh.js](https://github.com/Gottox/sqsh.js) there's a wasm implementation of
-libsqsh with a Javascript API designed to run in browsers.
+```c
+struct SqshArchive *archive =
+		sqsh_archive_new("/path/to/archive.squashfs", NULL, NULL);
 
-* traverse directories
-* read file contents
-* open files by path
-* fast filename lookup
-* read metadata from inodes
-* read xattr from inodes
-* read symlinks from inodes
-* read device ids from inodes
-* open remote file systems through http (needs *libcurl*)
+uint8_t *contents = sqsh_file_content(archive, "/path/to/file");
+assert(contents != NULL);
+const size_t size = sqsh_file_size(archive, "/path/to/file");
+fwrite(contents, 1, size, stdout);
+free(contents);
 
-### LZO2
+char **files = sqsh_directory_list(archive, "/path/to/directory", NULL);
+assert(files != NULL);
+for (int i = 0; files[i] != NULL; i++) {
+	printf("%s\n", files[i]);
+}
+free(files);
 
-LZO2 is a fast compression algorithm. Unfortunately the current implementation
-is GPL licensed and therefore not included in this library. If you want to use 
-LZO2 there's and independent glue library called [libsqsh-lzo](https://github.com/Gottox/libsqsh-lzo).
+sqsh_archive_free(archive);
+```
 
-## building
+## Roadmap to 1.0
 
-### dependencies
+* [x] directory listing
+* [x] file content reading
+* [x] inode metadata
+* [x] path traversal
+* [x] xattr support
+* [x] symlink resolution for path traversal
+* [x] LRU cache for metadata
+* [x] LRU cache for file content
+* [x] thread safety
+* [x] fuse file system
+* [x] OpenBSD support
+* [x] FreeBSD support
+* [ ] refine the high-level API
+* [ ] refine the low-level API
+
+## Building
+
+### Dependencies
 
 * libc
 * libcurl *optional*
@@ -47,8 +63,9 @@ LZO2 there's and independent glue library called [libsqsh-lzo](https://github.co
 * liblzma *optional*
 * libzstd *optional*
 * fuse3 *optional*
+* fuse2 *optional*
 
-### compile & install
+### Compile & Install
 
 ```bash
 meson setup build
@@ -57,28 +74,11 @@ meson compile
 meson install
 ```
 
-## Example
+### LZO2
 
-```c
-int rv;
-struct SqshArchive *archive =
-		sqsh_archive_new("/path/to/archive.squashfs", NULL, &rv);
-assert(rv == 0);
-struct SqshInode *file = sqsh_open(archive, "/path/to/file", &rv);
-assert(rv == 0);
-struct SqshFileIterator *iterator = sqsh_file_iterator_new(file, &rv);
-assert(rv == 0);
-while (sqsh_file_iterator_next(iterator, 1) > 0) {
-	const uint8_t *data = sqsh_file_iterator_data(iterator);
-	size_t size = sqsh_file_iterator_size(iterator);
-	printf("Chunk Size: %lu\n", size);
-	puts("Data:");
-	fwrite(data, 1, size, stdout);
-}
-sqsh_file_iterator_free(iterator);
-sqsh_close(file);
-sqsh_archive_free(archive);
-```
+LZO2 is a fast compression algorithm. Unfortunately the current implementation
+is GPL licensed and therefore not included in this library. If you want to use 
+LZO2 there's and independent glue library called [libsqsh-lzo](https://github.com/Gottox/libsqsh-lzo).
 
 ## Resource
 

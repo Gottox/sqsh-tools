@@ -5,28 +5,29 @@
 
 #include <assert.h>
 #include <sqsh.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 int
 main(int argc, char *argv[]) {
 	(void)argc;
 	(void)argv;
 
-	int rv;
 	struct SqshArchive *archive =
-			sqsh_archive_new("/path/to/archive.squashfs", NULL, &rv);
-	assert(rv == 0);
-	struct SqshInode *file = sqsh_open(archive, "/path/to/file", &rv);
-	assert(rv == 0);
-	struct SqshFileIterator *iterator = sqsh_file_iterator_new(file, &rv);
-	assert(rv == 0);
-	while (sqsh_file_iterator_next(iterator, 1) > 0) {
-		const uint8_t *data = sqsh_file_iterator_data(iterator);
-		size_t size = sqsh_file_iterator_size(iterator);
-		printf("Chunk Size: %lu\n", size);
-		puts("Data:");
-		fwrite(data, 1, size, stdout);
+			sqsh_archive_new("/path/to/archive.squashfs", NULL, NULL);
+
+	uint8_t *contents = sqsh_file_content(archive, "/path/to/file");
+	assert(contents != NULL);
+	const size_t size = sqsh_file_size(archive, "/path/to/file");
+	fwrite(contents, 1, size, stdout);
+	free(contents);
+
+	char **files = sqsh_directory_list(archive, "/path/to/directory", NULL);
+	assert(files != NULL);
+	for (int i = 0; files[i] != NULL; i++) {
+		printf("%s\n", files[i]);
 	}
-	sqsh_file_iterator_free(iterator);
-	sqsh_close(file);
+	free(files);
+
 	sqsh_archive_free(archive);
 }
