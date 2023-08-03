@@ -26,6 +26,7 @@ main(int argc, char *argv[]) {
 			.mapper_lru_size = 0,
 			.compression_lru_size = 0,
 			.archive_offset = 0,
+			.max_symlink_depth = 0,
 	};
 	struct SqshArchive *archive =
 			sqsh_archive_new(argv[1], &config, &error_code);

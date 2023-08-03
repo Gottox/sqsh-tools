@@ -42,10 +42,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SQSH_MAX_SYMLINKS_FOLLOWED 100
+#define SQSH_DEFAULT_MAX_SYMLINKS_FOLLOWED 100
 
 SQSH_NO_UNUSED static int tree_walker_resolve(
-		struct SqshTreeWalker *walker, const char *path, int symlink_count);
+		struct SqshTreeWalker *walker, const char *path, size_t path_len,
+		int recursion);
 
 SQSH_NO_UNUSED int
 update_inode_from_iterator(struct SqshTreeWalker *walker) {
@@ -102,7 +103,10 @@ sqsh__tree_walker_init(
 		struct SqshTreeWalker *walker, struct SqshArchive *archive) {
 	int rv = 0;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
+	const struct SqshConfig *config = sqsh_archive_config(archive);
 
+	walker->max_symlink_depth = SQSH_CONFIG_DEFAULT(
+			config->max_symlink_depth, SQSH_DEFAULT_MAX_SYMLINKS_FOLLOWED);
 	walker->archive = archive;
 	walker->root_inode_ref = sqsh_superblock_inode_root_ref(superblock);
 	walker->begin_iterator = true;
@@ -262,38 +266,34 @@ sqsh_tree_walker_inode_load(const struct SqshTreeWalker *walker, int *err) {
 	return sqsh_inode_new(walker->archive, walker->current_inode_ref, err);
 }
 
-static const char *
-path_next_segment(const char *segment) {
-	segment = strchr(segment, '/');
-	if (segment == NULL) {
-		return NULL;
-	} else {
-		return segment + 1;
+size_t
+path_segment_len(const char *path, size_t path_len) {
+	sqsh_index_t len = 0;
+	for (; len < path_len && path[len] != '/'; len++) {
 	}
+	return len;
 }
 
-size_t
-path_segment_len(const char *segment) {
-	const char *next_segment = path_next_segment(segment);
-	if (next_segment == NULL) {
-		return strlen(segment);
+static const char *
+path_next_segment(const char *path, size_t path_len) {
+	sqsh_index_t current_segment_len = path_segment_len(path, path_len);
+	if (current_segment_len == path_len) {
+		return NULL;
 	} else {
-		return next_segment - segment - 1;
+		return &path[current_segment_len] + 1;
 	}
 }
 
 static int
-tree_walker_follow_symlink(
-		struct SqshTreeWalker *walker, int symlinks_followed) {
+tree_walker_follow_symlink(struct SqshTreeWalker *walker, int recursion) {
 	struct SqshInode inode = {0};
 	int rv = 0;
-	char *symlink_target = NULL;
 	// if symlinks_followed is smaller than zero, the caller intends to disable
 	// symlink following
-	if (symlinks_followed < 0) {
+	if (recursion < 0) {
 		return 0;
 	}
-	if (symlinks_followed == 0) {
+	if (recursion == 0) {
 		return -SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED;
 	}
 
@@ -307,20 +307,22 @@ tree_walker_follow_symlink(
 		goto out;
 	}
 
-	symlink_target = sqsh_inode_symlink_dup(&inode);
-	rv = tree_walker_resolve(walker, symlink_target, symlinks_followed - 1);
+	const char *symlink = sqsh_inode_symlink(&inode);
+	size_t symlink_len = sqsh_inode_symlink_size(&inode);
+	rv = tree_walker_resolve(walker, symlink, symlink_len, recursion - 1);
 
 out:
-	free(symlink_target);
 	sqsh__inode_cleanup(&inode);
 	return rv;
 }
 
 static int
 tree_walker_resolve(
-		struct SqshTreeWalker *walker, const char *path, int symlink_count) {
+		struct SqshTreeWalker *walker, const char *path, size_t path_len,
+		int recursion) {
 	int rv = 0;
 	const char *segment = path, *next_segment;
+	size_t remaining_path_len = path_len;
 	bool is_dir = true;
 	if (segment[0] == '/') {
 		rv = sqsh_tree_walker_to_root(walker);
@@ -330,8 +332,10 @@ tree_walker_resolve(
 	}
 
 	do {
-		const size_t segment_len = path_segment_len(segment);
-		next_segment = path_next_segment(segment);
+		const size_t segment_len =
+				path_segment_len(segment, remaining_path_len);
+		next_segment = path_next_segment(segment, remaining_path_len);
+		remaining_path_len -= segment_len + 1;
 		if (strncmp(".", segment, segment_len) == 0 || segment_len == 0) {
 			is_dir = true;
 			continue;
@@ -345,7 +349,7 @@ tree_walker_resolve(
 			}
 			switch (sqsh_tree_walker_type(walker)) {
 			case SQSH_INODE_TYPE_SYMLINK:
-				rv = tree_walker_follow_symlink(walker, symlink_count);
+				rv = tree_walker_follow_symlink(walker, recursion);
 				if (rv < 0) {
 					goto out;
 				}
@@ -380,8 +384,8 @@ out:
 int
 sqsh_tree_walker_resolve(
 		struct SqshTreeWalker *walker, const char *path, bool follow_links) {
-	int symlink_count = follow_links ? SQSH_MAX_SYMLINKS_FOLLOWED : 0;
-	return tree_walker_resolve(walker, path, symlink_count);
+	int recursion = follow_links ? (int)walker->max_symlink_depth : -1;
+	return tree_walker_resolve(walker, path, strlen(path), recursion);
 }
 
 int

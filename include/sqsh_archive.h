@@ -426,6 +426,12 @@ struct SqshConfig {
 	int compression_lru_size;
 
 	/**
+	 * @brief the maximum depth of symlinks that will be followed. If unset or
+	 * 0, the max symlink depth will be 100.
+	 */
+	size_t max_symlink_depth;
+
+	/**
 	 * @privatesection
 	 */
 	char _reserved[128];

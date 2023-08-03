@@ -61,6 +61,7 @@ struct SqshTreeWalker {
 	struct SqshInodeMap *inode_map;
 	struct SqshInode directory;
 	struct SqshDirectoryIterator iterator;
+	size_t max_symlink_depth;
 	bool begin_iterator;
 };
 
