@@ -87,7 +87,7 @@ SQSH_NO_UNUSED int sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator);
  *
  * @return The type of the current xattr.
  */
-uint16_t sqsh_xattr_iterator_type(struct SqshXattrIterator *iterator);
+uint16_t sqsh_xattr_iterator_type(const struct SqshXattrIterator *iterator);
 
 /**
  * @memberof SqshXattrIterator
@@ -97,7 +97,7 @@ uint16_t sqsh_xattr_iterator_type(struct SqshXattrIterator *iterator);
  *
  * @return true if the xattr is indirect, false otherwise.
  */
-bool sqsh_xattr_iterator_is_indirect(struct SqshXattrIterator *iterator);
+bool sqsh_xattr_iterator_is_indirect(const struct SqshXattrIterator *iterator);
 
 /**
  * @memberof SqshXattrIterator
@@ -108,7 +108,7 @@ bool sqsh_xattr_iterator_is_indirect(struct SqshXattrIterator *iterator);
  * @return The null terminated prefix of the current xattr. The returned pointer
  * is staticly allocated and must not be freed.
  */
-const char *sqsh_xattr_iterator_prefix(struct SqshXattrIterator *iterator);
+const char *sqsh_xattr_iterator_prefix(const struct SqshXattrIterator *iterator);
 
 /**
  * @memberof SqshXattrIterator
@@ -118,7 +118,7 @@ const char *sqsh_xattr_iterator_prefix(struct SqshXattrIterator *iterator);
  *
  * @return The size of the prefix of the current xattr.
  */
-uint16_t sqsh_xattr_iterator_prefix_size(struct SqshXattrIterator *iterator);
+uint16_t sqsh_xattr_iterator_prefix_size(const struct SqshXattrIterator *iterator);
 
 /**
  * @memberof SqshXattrIterator
@@ -132,7 +132,7 @@ uint16_t sqsh_xattr_iterator_prefix_size(struct SqshXattrIterator *iterator);
  *
  * @return The name of the current xattr.
  */
-const char *sqsh_xattr_iterator_name(struct SqshXattrIterator *iterator);
+const char *sqsh_xattr_iterator_name(const struct SqshXattrIterator *iterator);
 
 /**
  * @memberof SqshXattrIterator
@@ -142,7 +142,7 @@ const char *sqsh_xattr_iterator_name(struct SqshXattrIterator *iterator);
  *
  * @return The size of the name of the current xattr.
  */
-uint16_t sqsh_xattr_iterator_name_size(struct SqshXattrIterator *iterator);
+uint16_t sqsh_xattr_iterator_name_size(const struct SqshXattrIterator *iterator);
 
 /**
  * @memberof SqshXattrIterator
@@ -169,7 +169,7 @@ SQSH_NO_UNUSED int sqsh_xattr_iterator_lookup(
  *         name is greater than the given name.
  */
 SQSH_NO_UNUSED int sqsh_xattr_iterator_fullname_cmp(
-		struct SqshXattrIterator *iterator, const char *name);
+		const struct SqshXattrIterator *iterator, const char *name);
 
 /**
  * @memberof SqshXattrIterator
@@ -185,7 +185,7 @@ SQSH_NO_UNUSED int sqsh_xattr_iterator_fullname_cmp(
  * fails.
  */
 SQSH_NO_UNUSED char *
-sqsh_xattr_iterator_fullname_dup(struct SqshXattrIterator *iterator);
+sqsh_xattr_iterator_fullname_dup(const struct SqshXattrIterator *iterator);
 
 /**
  * @memberof SqshXattrIterator
@@ -202,7 +202,7 @@ sqsh_xattr_iterator_fullname_dup(struct SqshXattrIterator *iterator);
  * fails.
  */
 SQSH_NO_UNUSED char *
-sqsh_xattr_iterator_value_dup(struct SqshXattrIterator *iterator);
+sqsh_xattr_iterator_value_dup(const struct SqshXattrIterator *iterator);
 
 /**
  * @memberof SqshXattrIterator
@@ -219,7 +219,7 @@ sqsh_xattr_iterator_value_dup(struct SqshXattrIterator *iterator);
  * internally and only valid until the next call to sqsh_xattr_iterator_next().
  * It must not be freed.
  */
-const char *sqsh_xattr_iterator_value(struct SqshXattrIterator *iterator);
+const char *sqsh_xattr_iterator_value(const struct SqshXattrIterator *iterator);
 
 /**
  * @memberof SqshXattrIterator
@@ -229,7 +229,7 @@ const char *sqsh_xattr_iterator_value(struct SqshXattrIterator *iterator);
  *
  * @return The size of the value of the current xattr.
  */
-uint16_t sqsh_xattr_iterator_value_size(struct SqshXattrIterator *iterator);
+uint16_t sqsh_xattr_iterator_value_size(const struct SqshXattrIterator *iterator);
 
 /**
  * @memberof SqshXattrIterator

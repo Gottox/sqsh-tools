@@ -130,7 +130,7 @@ out:
 }
 
 static const struct SqshDataXattrValue *
-get_value(struct SqshXattrIterator *iterator) {
+get_value(const struct SqshXattrIterator *iterator) {
 	const struct SqshMetablockReader *source;
 
 	if (iterator->value_index == 0) {
@@ -144,7 +144,7 @@ get_value(struct SqshXattrIterator *iterator) {
 }
 
 static const struct SqshDataXattrKey *
-get_key(struct SqshXattrIterator *iterator) {
+get_key(const struct SqshXattrIterator *iterator) {
 	const uint8_t *data = sqsh__metablock_reader_data(&iterator->metablock);
 
 	return (const struct SqshDataXattrKey *)data;
@@ -258,22 +258,22 @@ out:
 }
 
 uint16_t
-sqsh_xattr_iterator_type(struct SqshXattrIterator *iterator) {
+sqsh_xattr_iterator_type(const struct SqshXattrIterator *iterator) {
 	return sqsh__data_xattr_key_type(get_key(iterator)) & ~0x0100;
 }
 
 bool
-sqsh_xattr_iterator_is_indirect(struct SqshXattrIterator *iterator) {
+sqsh_xattr_iterator_is_indirect(const struct SqshXattrIterator *iterator) {
 	return (sqsh__data_xattr_key_type(get_key(iterator)) & 0x0100) != 0;
 }
 
 const char *
-sqsh_xattr_iterator_name(struct SqshXattrIterator *iterator) {
+sqsh_xattr_iterator_name(const struct SqshXattrIterator *iterator) {
 	return (const char *)sqsh__data_xattr_key_name(get_key(iterator));
 }
 
 const char *
-sqsh_xattr_iterator_prefix(struct SqshXattrIterator *iterator) {
+sqsh_xattr_iterator_prefix(const struct SqshXattrIterator *iterator) {
 	switch (sqsh_xattr_iterator_type(iterator)) {
 	case SQSH_XATTR_USER:
 		return "user.";
@@ -286,7 +286,7 @@ sqsh_xattr_iterator_prefix(struct SqshXattrIterator *iterator) {
 }
 
 uint16_t
-sqsh_xattr_iterator_prefix_size(struct SqshXattrIterator *iterator) {
+sqsh_xattr_iterator_prefix_size(const struct SqshXattrIterator *iterator) {
 	switch (sqsh_xattr_iterator_type(iterator)) {
 	case SQSH_XATTR_USER:
 		return 5;
@@ -319,7 +319,7 @@ sqsh_xattr_iterator_lookup(
 }
 int
 sqsh_xattr_iterator_fullname_cmp(
-		struct SqshXattrIterator *iterator, const char *name) {
+		const struct SqshXattrIterator *iterator, const char *name) {
 	int rv = 0;
 	const char *prefix = sqsh_xattr_iterator_prefix(iterator);
 	int prefix_len = strlen(prefix);
@@ -339,7 +339,7 @@ sqsh_xattr_iterator_fullname_cmp(
 }
 
 char *
-sqsh_xattr_iterator_fullname_dup(struct SqshXattrIterator *iterator) {
+sqsh_xattr_iterator_fullname_dup(const struct SqshXattrIterator *iterator) {
 	const char *prefix = sqsh_xattr_iterator_prefix(iterator);
 	const char *name = sqsh_xattr_iterator_name(iterator);
 
@@ -357,12 +357,12 @@ sqsh_xattr_iterator_fullname_dup(struct SqshXattrIterator *iterator) {
 }
 
 uint16_t
-sqsh_xattr_iterator_name_size(struct SqshXattrIterator *iterator) {
+sqsh_xattr_iterator_name_size(const struct SqshXattrIterator *iterator) {
 	return sqsh__data_xattr_key_name_size(get_key(iterator));
 }
 
 char *
-sqsh_xattr_iterator_value_dup(struct SqshXattrIterator *iterator) {
+sqsh_xattr_iterator_value_dup(const struct SqshXattrIterator *iterator) {
 	const size_t size = sqsh_xattr_iterator_value_size(iterator);
 	const char *value = sqsh_xattr_iterator_value(iterator);
 
@@ -370,12 +370,12 @@ sqsh_xattr_iterator_value_dup(struct SqshXattrIterator *iterator) {
 }
 
 const char *
-sqsh_xattr_iterator_value(struct SqshXattrIterator *iterator) {
+sqsh_xattr_iterator_value(const struct SqshXattrIterator *iterator) {
 	return (const char *)sqsh__data_xattr_value(get_value(iterator));
 }
 
 uint16_t
-sqsh_xattr_iterator_value_size(struct SqshXattrIterator *iterator) {
+sqsh_xattr_iterator_value_size(const struct SqshXattrIterator *iterator) {
 	return sqsh__data_xattr_value_size(get_value(iterator));
 }
 
