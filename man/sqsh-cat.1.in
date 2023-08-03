@@ -11,7 +11,7 @@ archive.
 [\fIPATH ...\fR]
 .br
 .B sqsh-cat
-[-v]
+[\fB-v\fR]
 
 .SH DESCRIPTION
 .B sqsh-cat
