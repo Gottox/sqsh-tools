@@ -60,4 +60,5 @@ main(int argc, char *argv[]) {
 	sqsh_file_iterator_free(iterator);
 	sqsh_inode_free(inode);
 	sqsh_archive_close(archive);
+	return 0;
 }

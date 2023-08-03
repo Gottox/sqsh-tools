@@ -30,4 +30,5 @@ main(int argc, char *argv[]) {
 	free(files);
 
 	sqsh_archive_free(archive);
+	return 0;
 }

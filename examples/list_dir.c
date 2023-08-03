@@ -29,4 +29,5 @@ main(int argc, char *argv[]) {
 
 	free(dir_list);
 	sqsh_archive_free(archive);
+	return 0;
 }
