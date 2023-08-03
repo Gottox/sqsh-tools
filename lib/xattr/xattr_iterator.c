@@ -287,7 +287,15 @@ sqsh_xattr_iterator_prefix(struct SqshXattrIterator *iterator) {
 
 uint16_t
 sqsh_xattr_iterator_prefix_size(struct SqshXattrIterator *iterator) {
-	return strlen(sqsh_xattr_iterator_prefix(iterator));
+	switch (sqsh_xattr_iterator_type(iterator)) {
+	case SQSH_XATTR_USER:
+		return 5;
+	case SQSH_XATTR_TRUSTED:
+		return 8;
+	case SQSH_XATTR_SECURITY:
+		return 9;
+	}
+	return 0;
 }
 
 int
