@@ -63,7 +63,8 @@ extract(const char *filename, struct SqshInode *inode,
 
 static int
 usage(char *arg0) {
-	printf("usage: %s [-o OFFSET] [-cV] FILESYSTEM [PATH] [TARGET DIR]\n", arg0);
+	printf("usage: %s [-o OFFSET] [-cV] FILESYSTEM [PATH] [TARGET DIR]\n",
+		   arg0);
 	printf("       %s -v\n", arg0);
 	return EXIT_FAILURE;
 }

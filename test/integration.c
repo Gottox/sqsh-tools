@@ -585,8 +585,8 @@ test_follow_symlink(void) {
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
-	char **dir_list = sqsh_directory_list(
-			&sqsh, "/large_dir/link/large_dir/link", &rv);
+	char **dir_list =
+			sqsh_directory_list(&sqsh, "/large_dir/link/large_dir/link", &rv);
 	assert(rv == 0);
 
 	assert(strcmp(dir_list[0], "a") == 0);

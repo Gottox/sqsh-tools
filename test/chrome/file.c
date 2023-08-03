@@ -35,8 +35,8 @@
 #include "../common.h"
 #include <testlib.h>
 
-#include "../../include/sqsh_chrome.h"
 #include "../../include/sqsh_archive_private.h"
+#include "../../include/sqsh_chrome.h"
 #include "../../include/sqsh_tree_private.h"
 #include "../../lib/utils/utils.h"
 
