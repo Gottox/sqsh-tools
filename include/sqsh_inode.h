@@ -269,8 +269,11 @@ enum SqshInodeType sqsh_inode_type(const struct SqshInode *context);
 /**
  * @memberof SqshInode
  * @brief returns the target of a symbolic link. Be aware that the returned
- * value is not zero terminated. If you need a zero terminated string use
- * sqsh_inode_symlink_dup().
+ * value is not zero terminated.
+ *
+ * To get the length of the target use sqsh_inode_symlink_size().
+ *
+ * If you need a zero terminated string use sqsh_inode_symlink_dup().
  *
  * @param[in] context The inode context.
  *
@@ -280,8 +283,11 @@ const char *sqsh_inode_symlink(const struct SqshInode *context);
 
 /**
  * @memberof SqshInode
- * @brief sets a heap allocated, zero terminated string of the target of a
- * symbolic link.
+ * @brief creates a heap allocated copy of the target of a symbolic link.
+ *
+ * The caller is responsible for calling free() on the returned pointer.
+ *
+ * The returned string is 0 terminated.
  *
  * @param[in] context The inode context.
  *

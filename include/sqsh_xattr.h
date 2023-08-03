@@ -103,6 +103,14 @@ bool sqsh_xattr_iterator_is_indirect(const struct SqshXattrIterator *iterator);
  * @memberof SqshXattrIterator
  * @brief Retrieves the prefix of the current xattr.
  *
+ * There are three possible prefixes that can be returned:
+ *
+ * - "user."
+ * - "trusted."
+ * - "security."
+ *
+ * The returned pointer is staticly allocated and must not be freed.
+ *
  * @param[in] iterator The iterator to use.
  *
  * @return The null terminated prefix of the current xattr. The returned pointer
@@ -122,7 +130,7 @@ uint16_t sqsh_xattr_iterator_prefix_size(const struct SqshXattrIterator *iterato
 
 /**
  * @memberof SqshXattrIterator
- * @brief Retrieves the name of the current xattr.
+ * @brief Retrieves the name of the current xattr excluding the prefix.
  *
  * The returned pointer is allocated internally and only valid until the next
  * call to sqsh_xattr_iterator_next(). It must not be freed. The string is not 0
@@ -174,10 +182,10 @@ SQSH_NO_UNUSED int sqsh_xattr_iterator_fullname_cmp(
 /**
  * @memberof SqshXattrIterator
  * @brief creates a heap allocated copy of the full name of the current entry.
- * The caller is responsible for freeing the memory.
  *
- * The user is responsible for freeing the memory. The returned string is 0
- * terminated.
+ * The caller is responsible for calling free() on the returned pointer.
+ *
+ * The returned string is 0 terminated.
  *
  * @param[in]  iterator        The iterator to use.
  *
@@ -190,11 +198,11 @@ sqsh_xattr_iterator_fullname_dup(const struct SqshXattrIterator *iterator);
 /**
  * @memberof SqshXattrIterator
  * @brief creates a heap allocated copy of the value of the current entry.
- * The caller is responsible for freeing the memory.
  *
- * The user is responsible for freeing the memory. The returned string is 0
- * terminated, but may contain binary data. Use sqsh_xattr_iterator_value_size()
- * to get the size of the value.
+ * The caller is responsible for calling free() on the returned pointer.
+ *
+ * The returned string is 0 terminated.
+
  *
  * @param[in]  iterator    The iterator to use.
  *

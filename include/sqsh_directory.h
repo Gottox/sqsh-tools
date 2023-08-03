@@ -160,8 +160,9 @@ sqsh_directory_iterator_name(const struct SqshDirectoryIterator *iterator);
  * @memberof SqshDirectoryIterator
  * @brief creates a heap allocated copy of the name of the current entry.
  *
- * The caller is responsible for freeing the memory. The returned string is 0
- * terminated.
+ * The caller is responsible for calling free() on the returned pointer.
+ *
+ * The returned string is 0 terminated.
  *
  * @param[in]  iterator    The iterator to use.
  *

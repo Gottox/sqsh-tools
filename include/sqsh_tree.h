@@ -104,8 +104,8 @@ enum SqshInodeType sqsh_tree_walker_type(const struct SqshTreeWalker *walker);
 const char *sqsh_tree_walker_name(const struct SqshTreeWalker *walker);
 
 /**
- * @brief Returns the size of the name of the current entry.
  * @memberof SqshTreeWalker
+ * @brief Returns the size of the name of the current entry.
  *
  * @param[in]   walker  The walker to use
  *
@@ -114,9 +114,12 @@ const char *sqsh_tree_walker_name(const struct SqshTreeWalker *walker);
 uint16_t sqsh_tree_walker_name_size(const struct SqshTreeWalker *walker);
 
 /**
- * @brief Returns the name of the current entry. This entry is zero terminated.
- * The user is responsible for freeing the memory.
  * @memberof SqshTreeWalker
+ * @brief creates a heap allocated copy of the name of the current entry.
+ *
+ * The caller is responsible for calling free() on the returned pointer.
+ *
+ * The returned string is 0 terminated.
  *
  * @param[in]   walker  The walker to use
  *
