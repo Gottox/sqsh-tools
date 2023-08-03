@@ -16,6 +16,8 @@
 * mapper: add support for files that have an archive embedded in them.
 * examples: add example to list the contents of a directory.
 * examples: add example to read a file from an archive.
+* tree\_walker: Improved symlink handling.
+* tree\_walker: Do not duplicate symlink target when resolving paths.
 
 
 ## v0.5.0
