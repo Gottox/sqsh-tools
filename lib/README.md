@@ -5,10 +5,10 @@
 This directory contains the general sqsh archive handling. It contains 
 functionality to open/instantiate and close squashfs images.
 
-### [chrome](./chrome)
+### [easy](./easy)
 
 This directory contains code that eases the usage of this library. It wraps
-functionality like opening file contents by path.
+complex functionality into easy to use functions.
 
 ### [data](./data)
 
@@ -26,12 +26,9 @@ as well as buffer and cache handling for decompressed data.
 
 ### [file](./file)
 
-This directory contains code to handle file contents.
-
-### [inode](./inode)
-
 This directory contains code to handle informations stored in the
 [inode table](https://dr-emann.github.io/squashfs/squashfs.html#_inode_table)
+and file contents.
 
 ### [mapper](./mapper)
 

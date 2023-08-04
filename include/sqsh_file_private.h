@@ -38,6 +38,7 @@
 
 #include "sqsh_extract_private.h"
 #include "sqsh_mapper_private.h"
+#include "sqsh_metablock_private.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,7 +65,7 @@ struct SqshFragmentView {
 };
 
 SQSH_NO_EXPORT int sqsh__fragment_view_init(
-		struct SqshFragmentView *view, const struct SqshInode *inode);
+		struct SqshFragmentView *view, const struct SqshFile *file);
 
 SQSH_NO_EXPORT const uint8_t *
 sqsh__fragment_view_data(const struct SqshFragmentView *view);
@@ -85,7 +86,7 @@ struct SqshFileIterator {
 	/**
 	 * @privatesection
 	 */
-	const struct SqshInode *inode;
+	const struct SqshFile *file;
 	struct SqshExtractManager *compression_manager;
 	struct SqshMapReader map_reader;
 	struct SqshExtractView extract_view;
@@ -103,12 +104,12 @@ struct SqshFileIterator {
  * @brief Initializes a file iterator to iterate over the contents of a file.
  *
  * @param[in,out] iterator The file iterator to initialize.
- * @param[in] inode The inode context containing the file to iterate over.
+ * @param[in] file The file to iterate over.
  *
  * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_iterator_init(
-		struct SqshFileIterator *iterator, const struct SqshInode *inode);
+		struct SqshFileIterator *iterator, const struct SqshFile *file);
 
 /**
  * @internal
@@ -143,12 +144,12 @@ struct SqshFileReader {
  * @brief Initializes a SqshFileReader struct.
  *
  * @param[out] reader The file reader to initialize.
- * @param[in] inode    The inode context to retrieve the file contents from.
+ * @param[in] file    The file context to retrieve the contents from.
  *
  * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_reader_init(
-		struct SqshFileReader *reader, const struct SqshInode *inode);
+		struct SqshFileReader *reader, const struct SqshFile *file);
 
 /**
  * @internal
@@ -160,6 +161,48 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_reader_init(
  * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_EXPORT int sqsh__file_reader_cleanup(struct SqshFileReader *reader);
+
+/***************************************
+ * file/file.c
+ */
+
+/**
+ * @brief The Inode context
+ */
+struct SqshFile {
+	/**
+	 * @privatesection
+	 */
+	uint64_t inode_ref;
+	struct SqshMetablockReader metablock;
+	struct SqshArchive *archive;
+};
+
+/**
+ * @internal
+ * @memberof SqshFile
+ * @brief Initialize the file context from a inode reference. inode references
+ * are descriptors of the physical location of an inode inside the inode table.
+ * They are diffrent from the inode number. In doubt use the inode number.
+ *
+ * @param context The file context to initialize.
+ * @param sqsh The sqsh context.
+ * @param inode_ref The inode reference.
+ *
+ * @return int 0 on success, less than 0 on error.
+ */
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_init(
+		struct SqshFile *context, struct SqshArchive *sqsh, uint64_t inode_ref);
+/**
+ * @internal
+ * @memberof SqshFile
+ * @brief cleans up the file context.
+ *
+ * @param context The file context.
+ *
+ * @return int 0 on success, less than 0 on error.
+ */
+SQSH_NO_EXPORT int sqsh__file_cleanup(struct SqshFile *context);
 
 #ifdef __cplusplus
 }

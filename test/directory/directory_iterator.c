@@ -39,7 +39,6 @@
 #include "../../include/sqsh_data_private.h"
 #include "../../include/sqsh_directory.h"
 #include "../../include/sqsh_directory_private.h"
-#include "../../include/sqsh_inode_private.h"
 #include "../../lib/utils/utils.h"
 
 static void
@@ -62,19 +61,19 @@ iter_invalid_file_name_with_0(void) {
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	struct SqshInode inode = {0};
-	rv = sqsh__inode_init(&inode, &archive, 0);
+	struct SqshFile file = {0};
+	rv = sqsh__file_init(&file, &archive, 0);
 	assert(rv == 0);
 
 	struct SqshDirectoryIterator iter = {0};
-	rv = sqsh__directory_iterator_init(&iter, &inode);
+	rv = sqsh__directory_iterator_init(&iter, &file);
 	assert(rv == 0);
 
 	rv = sqsh_directory_iterator_next(&iter);
 	assert(rv == -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY);
 
 	sqsh__directory_iterator_cleanup(&iter);
-	sqsh__inode_cleanup(&inode);
+	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -98,19 +97,19 @@ iter_invalid_file_name_with_slash(void) {
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	struct SqshInode inode = {0};
-	rv = sqsh__inode_init(&inode, &archive, 0);
+	struct SqshFile file = {0};
+	rv = sqsh__file_init(&file, &archive, 0);
 	assert(rv == 0);
 
 	struct SqshDirectoryIterator iter = {0};
-	rv = sqsh__directory_iterator_init(&iter, &inode);
+	rv = sqsh__directory_iterator_init(&iter, &file);
 	assert(rv == 0);
 
 	rv = sqsh_directory_iterator_next(&iter);
 	assert(rv == -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY);
 
 	sqsh__directory_iterator_cleanup(&iter);
-	sqsh__inode_cleanup(&inode);
+	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -143,12 +142,12 @@ iter_two_files(void) {
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	struct SqshInode inode = {0};
-	rv = sqsh__inode_init(&inode, &archive, 0);
+	struct SqshFile file = {0};
+	rv = sqsh__file_init(&file, &archive, 0);
 	assert(rv == 0);
 
 	struct SqshDirectoryIterator iter = {0};
-	rv = sqsh__directory_iterator_init(&iter, &inode);
+	rv = sqsh__directory_iterator_init(&iter, &file);
 	assert(rv == 0);
 
 	rv = sqsh_directory_iterator_next(&iter);
@@ -168,7 +167,7 @@ iter_two_files(void) {
 	assert(name[0] == '2');
 
 	sqsh__directory_iterator_cleanup(&iter);
-	sqsh__inode_cleanup(&inode);
+	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 

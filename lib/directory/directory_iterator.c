@@ -36,7 +36,7 @@
 #include "../../include/sqsh_archive.h"
 #include "../../include/sqsh_data_private.h"
 #include "../../include/sqsh_error.h"
-#include "../../include/sqsh_inode_private.h"
+#include "../../include/sqsh_file_private.h"
 #include "../utils/utils.h"
 
 static uint64_t
@@ -54,8 +54,8 @@ static int
 load_metablock(
 		struct SqshDirectoryIterator *iterator, const uint64_t outer_offset,
 		uint32_t inner_offset) {
-	struct SqshInode *inode = iterator->inode;
-	struct SqshArchive *archive = inode->archive;
+	struct SqshFile *file = iterator->file;
+	struct SqshArchive *archive = file->archive;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 
 	uint64_t start_address = sqsh_superblock_directory_table_start(superblock);
@@ -64,8 +64,7 @@ load_metablock(
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
-	if (SQSH_SUB_OVERFLOW(
-				sqsh_inode_file_size(inode), 3, &iterator->remaining_size)) {
+	if (SQSH_SUB_OVERFLOW(sqsh_file_size(file), 3, &iterator->remaining_size)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
@@ -95,13 +94,13 @@ directory_iterator_index_lookup(
 		const size_t name_len) {
 	int rv = 0;
 	struct SqshDirectoryIndexIterator index_iterator = {0};
-	struct SqshInode *inode = iterator->inode;
-	const uint64_t inode_ref = sqsh_inode_ref(inode);
-	uint64_t outer_offset = sqsh_inode_directory_block_start(inode);
-	uint32_t inner_offset = sqsh_inode_directory_block_offset(inode);
+	struct SqshFile *file = iterator->file;
+	const uint64_t inode_ref = sqsh_file_inode_ref(file);
+	uint64_t outer_offset = sqsh_file_directory_block_start(file);
+	uint32_t inner_offset = sqsh_file_directory_block_offset(file);
 
 	rv = sqsh__directory_index_iterator_init(
-			&index_iterator, inode->archive, inode_ref);
+			&index_iterator, file->archive, inode_ref);
 	if (rv < 0) {
 		goto out;
 	}
@@ -152,7 +151,7 @@ sqsh_directory_iterator_lookup(
 		const size_t name_len) {
 	int rv = 0;
 
-	if (sqsh_inode_is_extended(iterator->inode)) {
+	if (sqsh_file_is_extended(iterator->file)) {
 		rv = directory_iterator_index_lookup(iterator, name, name_len);
 		if (rv < 0) {
 			return rv;
@@ -176,17 +175,17 @@ sqsh_directory_iterator_lookup(
 
 int
 sqsh__directory_iterator_init(
-		struct SqshDirectoryIterator *iterator, struct SqshInode *inode) {
+		struct SqshDirectoryIterator *iterator, struct SqshFile *file) {
 	int rv = 0;
 
-	if (sqsh_inode_type(inode) != SQSH_INODE_TYPE_DIRECTORY) {
+	if (sqsh_file_type(file) != SQSH_FILE_TYPE_DIRECTORY) {
 		return -SQSH_ERROR_NOT_A_DIRECTORY;
 	}
 
-	iterator->inode = inode;
+	iterator->file = file;
 
-	const uint64_t outer_offset = sqsh_inode_directory_block_start(inode);
-	const uint32_t inner_offset = sqsh_inode_directory_block_offset(inode);
+	const uint64_t outer_offset = sqsh_file_directory_block_start(file);
+	const uint32_t inner_offset = sqsh_file_directory_block_offset(file);
 	rv = load_metablock(iterator, outer_offset, inner_offset);
 	if (rv < 0) {
 		return rv;
@@ -196,18 +195,18 @@ sqsh__directory_iterator_init(
 }
 
 struct SqshDirectoryIterator *
-sqsh_directory_iterator_new(struct SqshInode *inode, int *err) {
+sqsh_directory_iterator_new(struct SqshFile *file, int *err) {
 	int rv = 0;
 	struct SqshDirectoryIterator *iterator =
 			calloc(1, sizeof(struct SqshDirectoryIterator));
-	if (inode == NULL) {
+	if (file == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
-	rv = sqsh__directory_iterator_init(iterator, inode);
+	rv = sqsh__directory_iterator_init(iterator, file);
 	if (rv < 0) {
-		free(inode);
-		inode = NULL;
+		free(file);
+		file = NULL;
 	}
 out:
 	if (err != NULL) {
@@ -244,35 +243,35 @@ sqsh_directory_iterator_inode_number(
 	return inode_base + inode_offset;
 }
 
-enum SqshInodeType
-sqsh_directory_iterator_inode_type(
+enum SqshFileType
+sqsh_directory_iterator_file_type(
 		const struct SqshDirectoryIterator *iterator) {
 	switch (sqsh__data_directory_entry_type(get_entry(iterator))) {
 	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
-		return SQSH_INODE_TYPE_DIRECTORY;
+		return SQSH_FILE_TYPE_DIRECTORY;
 	case SQSH_INODE_TYPE_BASIC_FILE:
-		return SQSH_INODE_TYPE_FILE;
+		return SQSH_FILE_TYPE_FILE;
 	case SQSH_INODE_TYPE_BASIC_SYMLINK:
-		return SQSH_INODE_TYPE_SYMLINK;
+		return SQSH_FILE_TYPE_SYMLINK;
 	case SQSH_INODE_TYPE_BASIC_BLOCK:
-		return SQSH_INODE_TYPE_BLOCK;
+		return SQSH_FILE_TYPE_BLOCK;
 	case SQSH_INODE_TYPE_BASIC_CHAR:
-		return SQSH_INODE_TYPE_CHAR;
+		return SQSH_FILE_TYPE_CHAR;
 	case SQSH_INODE_TYPE_BASIC_FIFO:
-		return SQSH_INODE_TYPE_FIFO;
+		return SQSH_FILE_TYPE_FIFO;
 	case SQSH_INODE_TYPE_BASIC_SOCKET:
-		return SQSH_INODE_TYPE_SOCKET;
+		return SQSH_FILE_TYPE_SOCKET;
 	}
-	return SQSH_INODE_TYPE_UNKNOWN;
+	return SQSH_FILE_TYPE_UNKNOWN;
 }
 
-struct SqshInode *
-sqsh_directory_iterator_inode_load(
+struct SqshFile *
+sqsh_directory_iterator_open_file(
 		const struct SqshDirectoryIterator *iterator, int *err) {
 	const uint64_t inode_ref = sqsh_directory_iterator_inode_ref(iterator);
-	struct SqshArchive *archive = iterator->inode->archive;
+	struct SqshArchive *archive = iterator->file->archive;
 
-	return sqsh_inode_new(archive, inode_ref, err);
+	return sqsh_open_by_ref(archive, inode_ref, err);
 }
 
 static int

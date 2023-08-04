@@ -32,10 +32,8 @@
  */
 
 #include "../include/sqsh_archive_private.h"
-#include "../include/sqsh_chrome.h"
 #include "../include/sqsh_directory_private.h"
 #include "../include/sqsh_file_private.h"
-#include "../include/sqsh_inode_private.h"
 #include "../include/sqsh_tree.h"
 #include "../include/sqsh_tree_private.h"
 #include "common.h"
@@ -888,18 +886,18 @@ fuzz_oom_1(void) {
 			0xff, 0xff, 0x61};
 
 	struct SqshArchive *archive;
-	struct SqshInode *inode = NULL;
+	struct SqshFile *file = NULL;
 	const struct SqshConfig config = DEFAULT_CONFIG(sizeof(input));
-	archive = sqsh_archive_new(input, &config, &rv);
+	archive = sqsh_archive_open(input, &config, &rv);
 	assert(rv == 0);
 
 	uint64_t inode_ref =
 			sqsh_superblock_inode_root_ref(sqsh_archive_superblock(archive));
-	inode = sqsh_inode_new(archive, inode_ref, &rv);
+	file = sqsh_open_by_ref(archive, inode_ref, &rv);
 	assert(rv != 0);
 
-	sqsh_inode_free(inode);
-	sqsh_archive_free(archive);
+	sqsh_close(file);
+	sqsh_archive_close(archive);
 }
 
 DECLARE_TESTS

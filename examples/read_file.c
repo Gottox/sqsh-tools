@@ -17,16 +17,16 @@ main(int argc, char *argv[]) {
 		printf("Usage: %s <sqsh-file> <path>\n", argv[0]);
 		return 1;
 	}
-	struct SqshArchive *archive = sqsh_archive_new(argv[1], NULL, NULL);
+	struct SqshArchive *archive = sqsh_archive_open(argv[1], NULL, NULL);
 	assert(archive != NULL);
 
-	uint8_t *content = sqsh_file_content(archive, argv[2]);
+	uint8_t *content = sqsh_easy_file_content(archive, argv[2]);
 	assert(content != NULL);
-	size_t size = sqsh_file_size(archive, argv[2]);
+	size_t size = sqsh_easy_file_size(archive, argv[2]);
 
 	fwrite(content, size, 1, stdout);
 
 	free(content);
-	sqsh_archive_free(archive);
+	sqsh_archive_close(archive);
 	return 0;
 }

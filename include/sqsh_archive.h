@@ -453,8 +453,8 @@ struct SqshArchive;
  *
  * @return a pointer to the archive context or NULL if an error occurred.
  */
-SQSH_NO_UNUSED struct SqshArchive *
-sqsh_archive_new(const void *source, const struct SqshConfig *config, int *err);
+SQSH_NO_UNUSED struct SqshArchive *sqsh_archive_open(
+		const void *source, const struct SqshConfig *config, int *err);
 
 /**
  * @memberof SqshArchive
@@ -566,7 +566,7 @@ SQSH_NO_UNUSED int sqsh_archive_xattr_table(
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh_archive_free(struct SqshArchive *archive);
+int sqsh_archive_close(struct SqshArchive *archive);
 
 /***************************************
  * archive/compression_options_context.c

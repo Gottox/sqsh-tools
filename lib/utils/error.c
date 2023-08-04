@@ -78,8 +78,8 @@ sqsh_error_str(int error_code) {
 		return "Compression init";
 	case SQSH_ERROR_COMPRESSION_DECOMPRESS:
 		return "Compression decompress";
-	case SQSH_ERROR_UNKOWN_INODE_TYPE:
-		return "Unkown inode type";
+	case SQSH_ERROR_UNKOWN_FILE_TYPE:
+		return "Unkown file type";
 	case SQSH_ERROR_NOT_A_DIRECTORY:
 		return "Not a directory";
 	case SQSH_ERROR_NOT_A_FILE:

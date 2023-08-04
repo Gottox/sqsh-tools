@@ -31,9 +31,10 @@
  * @file         file.c
  */
 
+#include <stdint.h>
 #define _DEFAULT_SOURCE
 
-#include "../../include/sqsh_chrome.h"
+#include "../../include/sqsh_easy.h"
 
 #include <errno.h>
 #include <pthread.h>
@@ -41,14 +42,91 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../include/sqsh_archive.h"
+#include "../../include/sqsh_error.h"
+#include "../../include/sqsh_file_private.h"
+#include "../../include/sqsh_tree_private.h"
 
-struct SqshArchive *
-sqsh_archive_open(const char *path, int *err) {
-	return sqsh_archive_new(path, NULL, err);
-}
+char **
+sqsh_easy_directory_list(
+		struct SqshArchive *archive, const char *path, int *err) {
+	int rv = 0;
+	static const uintptr_t nullptr = 0;
+	struct SqshBuffer dir_list = {0};
+	struct SqshBuffer dir_list_names = {0};
+	size_t elements = 0;
+	struct SqshFile *file = NULL;
+	struct SqshDirectoryIterator *iterator = NULL;
+	char **dir_list_data = NULL;
 
-int
-sqsh_archive_close(struct SqshArchive *archive) {
-	return sqsh_archive_free(archive);
+	file = sqsh_open(archive, path, &rv);
+	if (rv < 0) {
+		goto out;
+	}
+
+	if (sqsh_file_type(file) != SQSH_FILE_TYPE_DIRECTORY) {
+		rv = -SQSH_ERROR_NOT_A_DIRECTORY;
+		goto out;
+	}
+
+	rv = sqsh__buffer_init(&dir_list);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh__buffer_init(&dir_list_names);
+	if (rv < 0) {
+		goto out;
+	}
+
+	iterator = sqsh_directory_iterator_new(file, &rv);
+	if (rv < 0) {
+		goto out;
+	}
+
+	while ((rv = sqsh_directory_iterator_next(iterator)) > 0) {
+		const char *name = sqsh_directory_iterator_name(iterator);
+		size_t name_len = sqsh_directory_iterator_name_size(iterator);
+		size_t index = sqsh__buffer_size(&dir_list_names);
+		char *index_ptr = (void *)index;
+		elements++;
+		rv = sqsh__buffer_append(
+				&dir_list, (uint8_t *)&index_ptr, sizeof(char *));
+		if (rv < 0) {
+			goto out;
+		}
+		rv = sqsh__buffer_append(&dir_list_names, (uint8_t *)name, name_len);
+		if (rv < 0) {
+			goto out;
+		}
+		rv = sqsh__buffer_append(
+				&dir_list_names, (uint8_t *)&nullptr, sizeof(char));
+		if (rv < 0) {
+			goto out;
+		}
+	}
+
+	rv = sqsh__buffer_append(&dir_list, (uint8_t *)&nullptr, sizeof(char *));
+	size_t base_size = sqsh__buffer_size(&dir_list);
+
+	const uint8_t *names_data = sqsh__buffer_data(&dir_list_names);
+	size_t names_size = sqsh__buffer_size(&dir_list_names);
+	rv = sqsh__buffer_append(&dir_list, names_data, names_size);
+	if (rv < 0) {
+		goto out;
+	}
+
+	dir_list_data = (char **)sqsh__buffer_unwrap(&dir_list);
+
+	for (sqsh_index_t i = 0; i < elements; i++) {
+		dir_list_data[i] += base_size + (uintptr_t)dir_list_data;
+	}
+
+out:
+	sqsh_directory_iterator_free(iterator);
+	sqsh__buffer_cleanup(&dir_list);
+	sqsh__buffer_cleanup(&dir_list_names);
+	sqsh_close(file);
+	if (err) {
+		*err = rv;
+	}
+	return dir_list_data;
 }

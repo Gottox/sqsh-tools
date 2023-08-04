@@ -37,8 +37,6 @@
 
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_data_private.h"
-#include "../../include/sqsh_inode.h"
-#include "../../include/sqsh_inode_private.h"
 #include "../../include/sqsh_tree_private.h"
 #include "../../lib/utils/utils.h"
 
@@ -125,12 +123,12 @@ walker_symlink_open(void) {
 static void
 expect_inode(struct SqshTreeWalker *walker, uint32_t inode_number) {
 	int rv;
-	struct SqshInode *inode = NULL;
-	inode = sqsh_tree_walker_inode_load(walker, &rv);
+	struct SqshFile *file = NULL;
+	file = sqsh_tree_walker_open_file(walker, &rv);
 	assert(rv == 0);
-	assert(inode != NULL);
-	assert(sqsh_inode_number(inode) == inode_number);
-	sqsh_inode_free(inode);
+	assert(file != NULL);
+	assert(sqsh_file_inode(file) == inode_number);
+	sqsh_close(file);
 }
 
 static void

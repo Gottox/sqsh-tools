@@ -33,11 +33,6 @@
 
 #include "common.h"
 
-#include "../include/sqsh_chrome.h"
-#include "../include/sqsh_file.h"
-#include "../include/sqsh_inode.h"
-#include "../include/sqsh_tree.h"
-
 #include <assert.h>
 #include <limits.h>
 #include <stdint.h>
@@ -54,17 +49,17 @@ usage(char *arg0) {
 
 static int
 cat_path(struct SqshArchive *archive, char *path) {
-	struct SqshInode *inode = NULL;
+	struct SqshFile *file = NULL;
 
 	int rv = 0;
-	inode = sqsh_open(archive, path, &rv);
+	file = sqsh_open(archive, path, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	rv = sqsh_file_to_stream(inode, stdout);
+	rv = sqsh_file_to_stream(file, stdout);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		rv = EXIT_FAILURE;
@@ -72,7 +67,7 @@ cat_path(struct SqshArchive *archive, char *path) {
 	}
 
 out:
-	sqsh_inode_free(inode);
+	sqsh_close(file);
 	return rv;
 }
 
@@ -119,6 +114,6 @@ main(int argc, char *argv[]) {
 	}
 
 out:
-	sqsh_archive_free(sqsh);
+	sqsh_archive_close(sqsh);
 	return rv;
 }

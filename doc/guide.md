@@ -9,7 +9,7 @@ created by calling
 @ref SqshArchive::sqsh_archive_open "sqsh_archive_open()" and is destroyed by calling
 @ref SqshArchive::sqsh_archive_close "sqsh_archive_close()". If you need better control
 over the archive creation you can use the 
-@ref SqshArchive::sqsh_archive_new "sqsh_archive_new()" function, which accepts
+@ref SqshArchive::sqsh_archive_open "sqsh_archive_open()" function, which accepts
 a @ref SqshConfig struct that gives you more control over the archive and better
 error reporting.
 
@@ -40,15 +40,15 @@ if (err != 0) {
 ## Simple
 
 The simplest way to read a file in the archive is to use
-@ref sqsh_file_content "sqsh_file_content()". This function 
+@ref sqsh_easy_file_content "sqsh_easy_file_content()". This function 
 returns a pointer to the contents of the file in the archive. The pointer 
 is heap allocated and must be freed by the caller. The allocated buffer is
 null terminated. If the file itself contains null bytes, you can get the 
-file size by calling @ref sqsh_file_size "sqsh_file_size()".
+file size by calling @ref sqsh_easy_file_size "sqsh_easy_file_size()".
 
 ```c
-char *content = sqsh_file_content(archive, "/path/to/file.txt");
-size_t size = sqsh_file_size(archive, "/path/to/file.txt");
+char *content = sqsh_easy_file_content(archive, "/path/to/file.txt");
+size_t size = sqsh_easy_file_size(archive, "/path/to/file.txt");
 fwrite(content, 1, size, stdout);
 free(content);
 ```

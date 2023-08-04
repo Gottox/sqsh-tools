@@ -75,7 +75,7 @@ get_data_segment_size(const struct SqshSuperblock *superblock) {
 }
 
 struct SqshArchive *
-sqsh_archive_new(
+sqsh_archive_open(
 		const void *source, const struct SqshConfig *config, int *err) {
 	int rv = 0;
 	struct SqshArchive *archive = calloc(1, sizeof(struct SqshArchive));
@@ -300,7 +300,7 @@ sqsh_archive_inode_map(
 		goto out;
 	}
 	if (!(archive->initialized & INITIALIZED_INODE_MAP)) {
-		rv = sqsh__inode_map_init(&archive->inode_map, archive);
+		rv = sqsh_inode_map_init(&archive->inode_map, archive);
 		if (rv < 0) {
 			goto out;
 		}
@@ -364,7 +364,7 @@ sqsh__archive_cleanup(struct SqshArchive *archive) {
 		sqsh__extract_manager_cleanup(&archive->data_extract_manager);
 	}
 	if (is_initialized(archive, INITIALIZED_INODE_MAP)) {
-		sqsh__inode_map_cleanup(&archive->inode_map);
+		sqsh_inode_map_cleanup(&archive->inode_map);
 	}
 	sqsh__extract_manager_cleanup(&archive->metablock_extract_manager);
 	sqsh__superblock_cleanup(&archive->superblock);
@@ -376,7 +376,7 @@ sqsh__archive_cleanup(struct SqshArchive *archive) {
 }
 
 int
-sqsh_archive_free(struct SqshArchive *archive) {
+sqsh_archive_close(struct SqshArchive *archive) {
 	if (archive == NULL) {
 		return 0;
 	}

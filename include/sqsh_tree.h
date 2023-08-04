@@ -36,7 +36,7 @@
 
 #include "sqsh_common.h"
 
-#include "sqsh_inode.h"
+#include "sqsh_file.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -90,7 +90,7 @@ SQSH_NO_UNUSED int sqsh_tree_walker_next(struct SqshTreeWalker *walker);
  *
  * @return the inode type of the current entry.
  */
-enum SqshInodeType sqsh_tree_walker_type(const struct SqshTreeWalker *walker);
+enum SqshFileType sqsh_tree_walker_type(const struct SqshTreeWalker *walker);
 
 /**
  * @brief Returns the name of the current entry. This entry is not zero
@@ -181,8 +181,8 @@ SQSH_NO_UNUSED int sqsh_tree_walker_to_root(struct SqshTreeWalker *walker);
  *
  * @return the inode of the current entry.
  */
-SQSH_NO_UNUSED struct SqshInode *
-sqsh_tree_walker_inode_load(const struct SqshTreeWalker *walker, int *err);
+SQSH_NO_UNUSED struct SqshFile *
+sqsh_tree_walker_open_file(const struct SqshTreeWalker *walker, int *err);
 
 /**
  * @brief Resolve a path with the tree walker.

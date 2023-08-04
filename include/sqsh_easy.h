@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_chrome.h
+ * @file         sqsh_easy.h
  */
 
 #ifndef SQSH_CHROME_H
@@ -45,57 +45,7 @@ extern "C" {
 #endif
 
 struct SqshArchive;
-struct SqshInode;
-
-/***************************************
- * chrome/archive.c
- */
-
-/**
- * @memberof SqshArchive
- * @brief opens a sqsh archive.
- *
- * @param[in] path The path to the sqsh archive.
- * @param[out] err Pointer to an int where the error code will be stored.
- *
- * @return The sqsh archive context on success, NULL on error.
- */
-struct SqshArchive *sqsh_archive_open(const char *path, int *err);
-
-/**
- * @memberof SqshArchive
- * @brief closes a sqsh archive.
- *
- * @param[in] archive The sqsh archive context.
- *
- * @return 0 on success, less than 0 on error.
- */
-int sqsh_archive_close(struct SqshArchive *archive);
-
-/***************************************
- * chrome/inode.c
- */
-
-/**
- * @brief Initialize the inode context from a path.
- *
- * @param[in] archive The sqsh archive context.
- * @param[in] path The path the file or directory.
- * @param[out] err Pointer to an int where the error code will be stored.
- *
- * @return 0 on success, less than 0 on error.
- */
-struct SqshInode *
-sqsh_open(struct SqshArchive *archive, const char *path, int *err);
-
-/**
- * @brief cleans up a the inode context.
- *
- * @param[in] inode The inode context.
- *
- * @return 0 on success, less than 0 on error.
- */
-int sqsh_close(struct SqshInode *inode);
+struct SqshFile;
 
 /***************************************
  * chrome/stream.c
@@ -104,12 +54,12 @@ int sqsh_close(struct SqshInode *inode);
 /**
  * @brief writes data to a file descriptor.
  *
- * @param[in] inode The inode context.
- * @param[in] file The file descriptor.
+ * @param[in] file The file context.
+ * @param[in] stream The descriptor to write the file contents to.
  *
  * @return The number of bytes read on success, less than 0 on error.
  */
-int sqsh_file_to_stream(const struct SqshInode *inode, FILE *file);
+int sqsh_file_to_stream(const struct SqshFile *file, FILE *stream);
 
 /***************************************
  * chrome/file.c
@@ -123,7 +73,7 @@ int sqsh_file_to_stream(const struct SqshInode *inode, FILE *file);
  *
  * @return true if the file exists, false otherwise.
  */
-bool sqsh_file_exists(struct SqshArchive *archive, const char *path);
+bool sqsh_easy_file_exists(struct SqshArchive *archive, const char *path);
 
 /**
  * @brief retrieves the content of a file.
@@ -136,7 +86,7 @@ bool sqsh_file_exists(struct SqshArchive *archive, const char *path);
  *
  * @return The content of the file on success, NULL on error.
  */
-uint8_t *sqsh_file_content(struct SqshArchive *archive, const char *path);
+uint8_t *sqsh_easy_file_content(struct SqshArchive *archive, const char *path);
 
 /**
  * @brief retrieves the size of a file.
@@ -146,7 +96,7 @@ uint8_t *sqsh_file_content(struct SqshArchive *archive, const char *path);
  *
  * @return The size of the file on success, 0 on error.
  */
-size_t sqsh_file_size(struct SqshArchive *archive, const char *path);
+size_t sqsh_easy_file_size(struct SqshArchive *archive, const char *path);
 
 /**
  * @brief retrieves unix permissions of a file.
@@ -156,7 +106,7 @@ size_t sqsh_file_size(struct SqshArchive *archive, const char *path);
  *
  * @return The unix permissions of the file on success, 0 on error.
  */
-mode_t sqsh_file_permission(struct SqshArchive *archive, const char *path);
+mode_t sqsh_easy_file_permission(struct SqshArchive *archive, const char *path);
 
 /**
  * @brief retrieves the modification time of a file.
@@ -166,7 +116,7 @@ mode_t sqsh_file_permission(struct SqshArchive *archive, const char *path);
  *
  * @return The modification time of the file on success, 0 on error.
  */
-time_t sqsh_file_mtime(struct SqshArchive *archive, const char *path);
+time_t sqsh_easy_file_mtime(struct SqshArchive *archive, const char *path);
 
 /***************************************
  * chrome/directory.c
@@ -183,8 +133,8 @@ time_t sqsh_file_mtime(struct SqshArchive *archive, const char *path);
  *
  * @return A list of files and directories on success, NULL on error.
  */
-char **
-sqsh_directory_list(struct SqshArchive *archive, const char *path, int *err);
+char **sqsh_easy_directory_list(
+		struct SqshArchive *archive, const char *path, int *err);
 
 #ifdef __cplusplus
 }

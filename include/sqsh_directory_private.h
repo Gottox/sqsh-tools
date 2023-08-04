@@ -35,6 +35,8 @@
 #define SQSH_ITERATOR_PRIVATE_H
 
 #include "sqsh_directory.h"
+
+#include "sqsh_file_private.h"
 #include "sqsh_metablock_private.h"
 
 #ifdef __cplusplus
@@ -52,7 +54,7 @@ struct SqshDirectoryIterator {
 	/**
 	 * @privatesection
 	 */
-	struct SqshInode *inode;
+	struct SqshFile *file;
 	uint32_t remaining_size;
 
 	struct SqshMetablockReader metablock;
@@ -74,7 +76,7 @@ struct SqshDirectoryIterator {
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__directory_iterator_init(
-		struct SqshDirectoryIterator *iterator, struct SqshInode *inode);
+		struct SqshDirectoryIterator *iterator, struct SqshFile *inode);
 
 /**
  * @internal
@@ -87,6 +89,110 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__directory_iterator_init(
  */
 SQSH_NO_EXPORT int
 sqsh__directory_iterator_cleanup(struct SqshDirectoryIterator *iterator);
+
+/***************************************
+ * inode/directory_index_iterator.c
+ */
+
+/**
+ * @brief Iterator for directory indexes
+ */
+struct SqshDirectoryIndexIterator {
+	/**
+	 * @privatesection
+	 */
+	struct SqshFile file;
+	size_t remaining_entries;
+	sqsh_index_t next_offset;
+};
+
+/**
+ * @internal
+ * @memberof SqshDirectoryIndexIterator
+ *
+ * @brief Initializes an iterator for a directory index
+ *
+ * @param[out] iterator  The iterator to initialize
+ * @param[in] sqsh      The sqsh context
+ * @param[in] inode_ref The inode ref for the directory to iterate over
+ *
+ * @return 0 on success, negative value on error
+ */
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__directory_index_iterator_init(
+		struct SqshDirectoryIndexIterator *iterator, struct SqshArchive *sqsh,
+		uint64_t inode_ref);
+
+/**
+ * @internal
+ * @memberof SqshDirectoryIndexIterator
+ * @brief Advances the iterator to the next entry in the directory index
+ *
+ * @param[in] iterator The iterator to advance
+ *
+ * @return 0 on success, negative value on error
+ */
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__directory_index_iterator_next(
+		struct SqshDirectoryIndexIterator *iterator);
+
+/**
+ * @internal
+ * @memberof SqshDirectoryIndexIterator
+ * @brief Gets the index of the current entry in the directory index
+ *
+ * @param[in] iterator The iterator to get the index from
+ *
+ * @return The index of the current entry
+ */
+SQSH_NO_EXPORT uint32_t sqsh__directory_index_iterator_index(
+		const struct SqshDirectoryIndexIterator *iterator);
+
+/**
+ * @internal
+ * @memberof SqshDirectoryIndexIterator
+ * @brief Gets the start offset of the current entry in the directory index
+ *
+ * @param[in] iterator The iterator to get the start offset from
+ *
+ * @return The start offset of the current entry
+ */
+SQSH_NO_EXPORT uint32_t sqsh__directory_index_iterator_start(
+		const struct SqshDirectoryIndexIterator *iterator);
+
+/**
+ * @internal
+ * @memberof SqshDirectoryIndexIterator
+ * @brief Gets the name size of the current entry in the directory index
+ *
+ * @param[in] iterator The iterator to get the name size from
+ *
+ * @return The name size of the current entry
+ */
+SQSH_NO_EXPORT uint32_t sqsh__directory_index_iterator_name_size(
+		const struct SqshDirectoryIndexIterator *iterator);
+
+/**
+ * @internal
+ * @memberof SqshDirectoryIndexIterator
+ * @brief Gets the name of the current entry in the directory index
+ *
+ * @param[in] iterator The iterator to get the name from
+ *
+ * @return The name of the current entry
+ */
+SQSH_NO_EXPORT const char *sqsh__directory_index_iterator_name(
+		const struct SqshDirectoryIndexIterator *iterator);
+
+/**
+ * @internal
+ * @memberof SqshDirectoryIndexIterator
+ * @brief Cleans up an iterator for a directory index
+ *
+ * @param[in] iterator The iterator to clean up
+ *
+ * @return 0 on success, a negative value on error.
+ */
+SQSH_NO_EXPORT int sqsh__directory_index_iterator_cleanup(
+		struct SqshDirectoryIndexIterator *iterator);
 
 #ifdef __cplusplus
 }

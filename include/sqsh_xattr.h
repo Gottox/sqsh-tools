@@ -40,7 +40,7 @@
 extern "C" {
 #endif
 
-struct SqshInode;
+struct SqshFile;
 
 /***************************************
  * xattr/xattr_iterator.c
@@ -61,13 +61,13 @@ struct SqshXattrIterator;
  * @memberof SqshXattrIterator
  * @brief Allocates and initializes a new xattr iterator.
  *
- * @param[in]  inode  The inode to iterate through xattrs.
+ * @param[in]  file   The file context to iterate through xattrs.
  * @param[out] err    Pointer to an int where the error code will be stored.
  *
  * @return The new iterator on success, NULL on error.
  */
 SQSH_NO_UNUSED struct SqshXattrIterator *
-sqsh_xattr_iterator_new(const struct SqshInode *inode, int *err);
+sqsh_xattr_iterator_new(const struct SqshFile *file, int *err);
 
 /**
  * @memberof SqshXattrIterator
@@ -116,7 +116,8 @@ bool sqsh_xattr_iterator_is_indirect(const struct SqshXattrIterator *iterator);
  * @return The null terminated prefix of the current xattr. The returned pointer
  * is staticly allocated and must not be freed.
  */
-const char *sqsh_xattr_iterator_prefix(const struct SqshXattrIterator *iterator);
+const char *
+sqsh_xattr_iterator_prefix(const struct SqshXattrIterator *iterator);
 
 /**
  * @memberof SqshXattrIterator
@@ -126,7 +127,8 @@ const char *sqsh_xattr_iterator_prefix(const struct SqshXattrIterator *iterator)
  *
  * @return The size of the prefix of the current xattr.
  */
-uint16_t sqsh_xattr_iterator_prefix_size(const struct SqshXattrIterator *iterator);
+uint16_t
+sqsh_xattr_iterator_prefix_size(const struct SqshXattrIterator *iterator);
 
 /**
  * @memberof SqshXattrIterator
@@ -150,7 +152,8 @@ const char *sqsh_xattr_iterator_name(const struct SqshXattrIterator *iterator);
  *
  * @return The size of the name of the current xattr.
  */
-uint16_t sqsh_xattr_iterator_name_size(const struct SqshXattrIterator *iterator);
+uint16_t
+sqsh_xattr_iterator_name_size(const struct SqshXattrIterator *iterator);
 
 /**
  * @memberof SqshXattrIterator
@@ -237,7 +240,8 @@ const char *sqsh_xattr_iterator_value(const struct SqshXattrIterator *iterator);
  *
  * @return The size of the value of the current xattr.
  */
-uint16_t sqsh_xattr_iterator_value_size(const struct SqshXattrIterator *iterator);
+uint16_t
+sqsh_xattr_iterator_value_size(const struct SqshXattrIterator *iterator);
 
 /**
  * @memberof SqshXattrIterator

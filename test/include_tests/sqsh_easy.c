@@ -28,43 +28,14 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         file.c
+ * @file         sqsh_chrome.c
  */
 
-#define _DEFAULT_SOURCE
-
-#include "../../include/sqsh_chrome.h"
-
-#include <errno.h>
-#include <pthread.h>
-#include <stdatomic.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "../../include/sqsh_error.h"
-#include "../../include/sqsh_file_private.h"
+#include "../../include/sqsh_easy.h"
 
 int
-sqsh_file_to_stream(const struct SqshInode *inode, FILE *file) {
-	int rv = 0;
-	struct SqshFileIterator iterator = {0};
-
-	rv = sqsh__file_iterator_init(&iterator, inode);
-	if (rv < 0) {
-		goto out;
-	}
-
-	while ((rv = sqsh_file_iterator_next(&iterator, SIZE_MAX)) > 0) {
-		const uint8_t *data = sqsh_file_iterator_data(&iterator);
-		const size_t size = sqsh_file_iterator_size(&iterator);
-		rv = fwrite(data, sizeof(uint8_t), size, file);
-		if (rv > 0 && (size_t)rv != size) {
-			rv = -errno;
-			goto out;
-		}
-	}
-
-out:
-	sqsh__file_iterator_cleanup(&iterator);
-	return rv;
+main(int argc, char *argv[]) {
+	(void)argc;
+	(void)argv;
+	return 0;
 }

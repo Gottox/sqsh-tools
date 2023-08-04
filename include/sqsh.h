@@ -32,12 +32,11 @@
  */
 
 #include "sqsh_archive.h"
-#include "sqsh_chrome.h"
 #include "sqsh_common.h"
 #include "sqsh_directory.h"
+#include "sqsh_easy.h"
 #include "sqsh_error.h"
 #include "sqsh_file.h"
-#include "sqsh_inode.h"
 #include "sqsh_mapper.h"
 #include "sqsh_table.h"
 #include "sqsh_tree.h"

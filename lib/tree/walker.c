@@ -36,7 +36,7 @@
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_directory_private.h"
 #include "../../include/sqsh_error.h"
-#include "../../include/sqsh_inode_private.h"
+#include "../../include/sqsh_file_private.h"
 #include "../utils/utils.h"
 
 #include <stdlib.h>
@@ -50,6 +50,7 @@ SQSH_NO_UNUSED static int tree_walker_resolve(
 
 SQSH_NO_UNUSED int
 update_inode_from_iterator(struct SqshTreeWalker *walker) {
+	// TODO: this should be done from sqsh__file_init.
 	struct SqshDirectoryIterator *iterator = &walker->iterator;
 	uint64_t inode_number = sqsh_directory_iterator_inode_number(iterator);
 	uint64_t inode_ref = sqsh_directory_iterator_inode_ref(iterator);
@@ -61,10 +62,10 @@ update_inode_from_iterator(struct SqshTreeWalker *walker) {
 static int
 enter_directory(struct SqshTreeWalker *walker, uint64_t inode_ref) {
 	int rv = 0;
-	struct SqshInode *inode = &walker->directory;
+	struct SqshFile *cwd = &walker->cwd;
 	struct SqshDirectoryIterator *iterator = &walker->iterator;
 
-	rv = sqsh__inode_cleanup(inode);
+	rv = sqsh__file_cleanup(cwd);
 	if (rv < 0) {
 		goto out;
 	}
@@ -74,23 +75,23 @@ enter_directory(struct SqshTreeWalker *walker, uint64_t inode_ref) {
 		goto out;
 	}
 
-	rv = sqsh__inode_init(inode, walker->archive, inode_ref);
+	rv = sqsh__file_init(cwd, walker->archive, inode_ref);
 	if (rv < 0) {
 		goto out;
 	}
 
-	if (sqsh_inode_type(inode) != SQSH_INODE_TYPE_DIRECTORY) {
+	if (sqsh_file_type(cwd) != SQSH_FILE_TYPE_DIRECTORY) {
 		rv = -SQSH_ERROR_NOT_A_DIRECTORY;
 		goto out;
 	}
 
 	walker->begin_iterator = true;
-	rv = sqsh__directory_iterator_init(iterator, inode);
+	rv = sqsh__directory_iterator_init(iterator, cwd);
 	if (rv < 0) {
 		goto out;
 	}
 
-	const uint64_t inode_number = sqsh_inode_number(inode);
+	const uint64_t inode_number = sqsh_file_inode(cwd);
 	walker->current_inode_ref = inode_ref;
 	rv = sqsh_inode_map_set(walker->inode_map, inode_number, inode_ref);
 
@@ -143,15 +144,15 @@ out:
 int
 sqsh_tree_walker_up(struct SqshTreeWalker *walker) {
 	int rv = 0;
-	const struct SqshInode *inode = &walker->directory;
+	const struct SqshFile *cwd = &walker->cwd;
 	/* We do not use the parent inode to check if it is the root node.
 	 * According to the documentationen it *should* be zero. That's vague.
 	 */
 
-	if (sqsh_inode_ref(inode) == walker->root_inode_ref) {
+	if (sqsh_file_inode_ref(cwd) == walker->root_inode_ref) {
 		return -SQSH_ERROR_WALKER_CANNOT_GO_UP;
 	}
-	const uint64_t parent_inode = sqsh_inode_directory_parent_inode(inode);
+	const uint64_t parent_inode = sqsh_file_directory_parent_inode(cwd);
 	if (parent_inode <= 0) {
 		rv = -SQSH_ERROR_CORRUPTED_INODE;
 		goto out;
@@ -180,12 +181,12 @@ sqsh_tree_walker_next(struct SqshTreeWalker *walker) {
 	return update_inode_from_iterator(walker);
 }
 
-enum SqshInodeType
+enum SqshFileType
 sqsh_tree_walker_type(const struct SqshTreeWalker *walker) {
 	if (walker->begin_iterator == true) {
-		return sqsh_inode_type(&walker->directory);
+		return sqsh_file_type(&walker->cwd);
 	} else {
-		return sqsh_directory_iterator_inode_type(&walker->iterator);
+		return sqsh_directory_iterator_file_type(&walker->iterator);
 	}
 }
 
@@ -218,7 +219,7 @@ sqsh_tree_walker_name_dup(const struct SqshTreeWalker *walker) {
 
 int
 sqsh_tree_walker_revert(struct SqshTreeWalker *walker) {
-	struct SqshInode *inode = &walker->directory;
+	struct SqshFile *inode = &walker->cwd;
 	struct SqshDirectoryIterator *iterator = &walker->iterator;
 
 	sqsh__directory_iterator_cleanup(iterator);
@@ -261,9 +262,9 @@ sqsh_tree_walker_to_root(struct SqshTreeWalker *walker) {
 	return enter_directory(walker, walker->root_inode_ref);
 }
 
-struct SqshInode *
-sqsh_tree_walker_inode_load(const struct SqshTreeWalker *walker, int *err) {
-	return sqsh_inode_new(walker->archive, walker->current_inode_ref, err);
+struct SqshFile *
+sqsh_tree_walker_open_file(const struct SqshTreeWalker *walker, int *err) {
+	return sqsh_open_by_ref(walker->archive, walker->current_inode_ref, err);
 }
 
 size_t
@@ -286,7 +287,7 @@ path_next_segment(const char *path, size_t path_len) {
 
 static int
 tree_walker_follow_symlink(struct SqshTreeWalker *walker, int recursion) {
-	struct SqshInode inode = {0};
+	struct SqshFile inode = {0};
 	int rv = 0;
 	// if symlinks_followed is smaller than zero, the caller intends to disable
 	// symlink following
@@ -297,7 +298,7 @@ tree_walker_follow_symlink(struct SqshTreeWalker *walker, int recursion) {
 		return -SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED;
 	}
 
-	rv = sqsh__inode_init(&inode, walker->archive, walker->current_inode_ref);
+	rv = sqsh__file_init(&inode, walker->archive, walker->current_inode_ref);
 	if (rv < 0) {
 		goto out;
 	}
@@ -307,12 +308,12 @@ tree_walker_follow_symlink(struct SqshTreeWalker *walker, int recursion) {
 		goto out;
 	}
 
-	const char *symlink = sqsh_inode_symlink(&inode);
-	size_t symlink_len = sqsh_inode_symlink_size(&inode);
+	const char *symlink = sqsh_file_symlink(&inode);
+	size_t symlink_len = sqsh_file_symlink_size(&inode);
 	rv = tree_walker_resolve(walker, symlink, symlink_len, recursion - 1);
 
 out:
-	sqsh__inode_cleanup(&inode);
+	sqsh__file_cleanup(&inode);
 	return rv;
 }
 
@@ -348,19 +349,18 @@ tree_walker_resolve(
 				goto out;
 			}
 			switch (sqsh_tree_walker_type(walker)) {
-			case SQSH_INODE_TYPE_SYMLINK:
+			case SQSH_FILE_TYPE_SYMLINK:
 				rv = tree_walker_follow_symlink(walker, recursion);
 				if (rv < 0) {
 					goto out;
 				}
-				if (sqsh_tree_walker_type(walker) ==
-					SQSH_INODE_TYPE_DIRECTORY) {
+				if (sqsh_tree_walker_type(walker) == SQSH_FILE_TYPE_DIRECTORY) {
 					is_dir = true;
 				}
 				is_dir = sqsh_tree_walker_type(walker) ==
-						SQSH_INODE_TYPE_DIRECTORY;
+						SQSH_FILE_TYPE_DIRECTORY;
 				break;
-			case SQSH_INODE_TYPE_DIRECTORY:
+			case SQSH_FILE_TYPE_DIRECTORY:
 				is_dir = true;
 				rv = sqsh_tree_walker_down(walker);
 				break;
@@ -390,7 +390,7 @@ sqsh_tree_walker_resolve(
 
 int
 sqsh__tree_walker_cleanup(struct SqshTreeWalker *walker) {
-	sqsh__inode_cleanup(&walker->directory);
+	sqsh__file_cleanup(&walker->cwd);
 	sqsh__directory_iterator_cleanup(&walker->iterator);
 	return 0;
 }

@@ -35,12 +35,6 @@
 
 #include "fs-common.h"
 
-#include "../include/sqsh_archive.h"
-#include "../include/sqsh_chrome.h"
-#include "../include/sqsh_directory.h"
-#include "../include/sqsh_file.h"
-#include "../include/sqsh_xattr.h"
-
 #include <errno.h>
 #include <fcntl.h>
 #include <fuse.h>
@@ -63,8 +57,8 @@ struct Context {
 static struct Context context = {0};
 static struct SqshfsOptions options = {0};
 
-static struct SqshInode *
-fs_inode_open(const char *path, int *err) {
+static struct SqshFile *
+fs_file_open(const char *path, int *err) {
 	return sqsh_open(context.archive, path, err);
 }
 
@@ -72,14 +66,14 @@ static int
 fs_access(const char *path, int mask) {
 	int rv = 0;
 
-	struct SqshInode *inode = fs_inode_open(path, &rv);
+	struct SqshFile *file = fs_file_open(path, &rv);
 	if (rv < 0) {
 		return rv;
 	}
 
-	const uint16_t permission = sqsh_inode_permission(inode);
+	const uint16_t permission = sqsh_file_permission(file);
 
-	sqsh_inode_free(inode);
+	sqsh_close(file);
 	return permission & mask ? 0 : -EACCES;
 }
 
@@ -87,14 +81,14 @@ static int
 fs_getattr(const char *path, struct stat *stbuf) {
 	int rv = 0;
 
-	struct SqshInode *inode = sqsh_open(context.archive, path, &rv);
+	struct SqshFile *file = sqsh_open(context.archive, path, &rv);
 	if (rv < 0) {
 		return rv;
 	}
 
-	fs_common_getattr(inode, NULL, stbuf);
+	fs_common_getattr(file, NULL, stbuf);
 
-	sqsh_inode_free(inode);
+	sqsh_close(file);
 	return rv;
 }
 
@@ -102,7 +96,7 @@ static int
 fs_readdir_item(
 		void *buf, struct SqshDirectoryIterator *iterator,
 		fuse_fill_dir_t filler) {
-	struct SqshInode *inode = NULL;
+	struct SqshFile *file = NULL;
 	int rv = 0;
 	char *name = NULL;
 	struct stat stbuf = {0};
@@ -112,17 +106,17 @@ fs_readdir_item(
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
-	inode = sqsh_directory_iterator_inode_load(iterator, &rv);
+	file = sqsh_directory_iterator_open_file(iterator, &rv);
 	if (rv < 0) {
 		goto out;
 	}
-	fs_common_getattr(inode, NULL, &stbuf);
+	fs_common_getattr(file, NULL, &stbuf);
 
 	filler(buf, name, &stbuf, 0);
 
 out:
 	free(name);
-	sqsh_inode_free(inode);
+	sqsh_close(file);
 	return fs_common_map_err(rv);
 }
 
@@ -134,13 +128,13 @@ fs_readdir(
 	(void)fi;
 	int rv = 0;
 
-	struct SqshInode *inode = sqsh_open(context.archive, path, &rv);
+	struct SqshFile *file = sqsh_open(context.archive, path, &rv);
 	if (rv < 0) {
 		return rv;
 	}
 
 	struct SqshDirectoryIterator *iterator =
-			sqsh_directory_iterator_new(inode, &rv);
+			sqsh_directory_iterator_new(file, &rv);
 	if (rv < 0) {
 		goto out;
 	}
@@ -155,7 +149,7 @@ fs_readdir(
 
 out:
 	sqsh_directory_iterator_free(iterator);
-	sqsh_inode_free(inode);
+	sqsh_close(file);
 	return 0;
 }
 
@@ -163,16 +157,16 @@ static int
 fs_open(const char *path, struct fuse_file_info *fi) {
 	int rv = 0;
 
-	struct SqshInode *inode = sqsh_open(context.archive, path, &rv);
+	struct SqshFile *file = sqsh_open(context.archive, path, &rv);
 	if (rv < 0) {
 		goto out;
 	}
 
-	fi->fh = (uint64_t)inode;
+	fi->fh = (uint64_t)file;
 
 out:
 	if (rv < 0) {
-		sqsh_inode_free(inode);
+		sqsh_close(file);
 	}
 	return fs_common_map_err(rv);
 }
@@ -182,10 +176,10 @@ fs_read(const char *path, char *buf, size_t size, off_t offset,
 		struct fuse_file_info *fi) {
 	(void)path;
 	int rv = 0;
-	struct SqshInode *inode = (struct SqshInode *)fi->fh;
+	struct SqshFile *file = (struct SqshFile *)fi->fh;
 	struct SqshFileReader *reader = NULL;
 
-	rv = fs_common_read(&reader, inode, offset, size);
+	rv = fs_common_read(&reader, file, offset, size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -204,9 +198,9 @@ out:
 static int
 fs_release(const char *path, struct fuse_file_info *fi) {
 	(void)path;
-	struct SqshInode *inode = (struct SqshInode *)fi->fh;
+	struct SqshFile *file = (struct SqshFile *)fi->fh;
 
-	sqsh_inode_free(inode);
+	sqsh_close(file);
 	return 0;
 }
 
@@ -216,13 +210,13 @@ fs_readlink(const char *path, char *buf, size_t size) {
 	const char *link = NULL;
 	size_t link_len = 0;
 
-	struct SqshInode *inode = fs_inode_open(path, &rv);
+	struct SqshFile *file = fs_file_open(path, &rv);
 	if (rv < 0) {
 		goto out;
 	}
 
-	link = sqsh_inode_symlink(inode);
-	link_len = sqsh_inode_symlink_size(inode);
+	link = sqsh_file_symlink(file);
+	link_len = sqsh_file_symlink_size(file);
 	if (link == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
@@ -235,7 +229,7 @@ fs_readlink(const char *path, char *buf, size_t size) {
 	buf[size - 1] = '\0';
 
 out:
-	sqsh_inode_free(inode);
+	sqsh_close(file);
 	return fs_common_map_err(rv);
 }
 
@@ -245,12 +239,12 @@ fs_listxattr(const char *path, char *buf, size_t size) {
 	int pos = 0;
 	struct SqshXattrIterator *iterator = NULL;
 
-	struct SqshInode *inode = fs_inode_open(path, &rv);
+	struct SqshFile *file = fs_file_open(path, &rv);
 	if (rv < 0) {
 		goto out;
 	}
 
-	iterator = sqsh_xattr_iterator_new(inode, &rv);
+	iterator = sqsh_xattr_iterator_new(file, &rv);
 	while ((rv = sqsh_xattr_iterator_next(iterator)) > 0) {
 		const char *prefix = sqsh_xattr_iterator_prefix(iterator);
 		size_t prefix_len = sqsh_xattr_iterator_prefix_size(iterator);
@@ -271,7 +265,7 @@ fs_listxattr(const char *path, char *buf, size_t size) {
 	rv = pos;
 out:
 	sqsh_xattr_iterator_free(iterator);
-	sqsh_inode_free(inode);
+	sqsh_close(file);
 	return rv;
 }
 
@@ -280,12 +274,12 @@ fs_getxattr(const char *path, const char *name, char *buf, size_t size) {
 	int rv = 0;
 	struct SqshXattrIterator *iterator = NULL;
 
-	struct SqshInode *inode = fs_inode_open(path, &rv);
+	struct SqshFile *file = fs_file_open(path, &rv);
 	if (rv < 0) {
 		goto out;
 	}
 
-	iterator = sqsh_xattr_iterator_new(inode, &rv);
+	iterator = sqsh_xattr_iterator_new(file, &rv);
 	if (rv < 0) {
 		goto out;
 	}
@@ -308,7 +302,7 @@ fs_getxattr(const char *path, const char *name, char *buf, size_t size) {
 
 out:
 	sqsh_xattr_iterator_free(iterator);
-	sqsh_inode_free(inode);
+	sqsh_close(file);
 	return fs_common_map_err(rv);
 }
 
@@ -447,7 +441,7 @@ main(int argc, char *argv[]) {
 	}
 
 out:
-	sqsh_archive_free(context.archive);
+	sqsh_archive_close(context.archive);
 	cleanup_fuse();
 
 	fuse_opt_free_args(&args);

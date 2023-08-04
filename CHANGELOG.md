@@ -3,7 +3,7 @@
 * **[API BREAK]** do not export private symbols to the shared library
 * **[API BREAK]** `sqsh_export_table_resolve_inode` gets an inode as `uint64_t`
   instead of `uint32_t`
-* **[API BREAK]** `sqsh_inode_file_block_is_compressed` gets index as
+* **[API BREAK]** `sqsh_file_file_block_is_compressed` gets index as
   `uint32_t` instead of `int`
 * **[API BREAK]** `sqsh_archive_open` gets an extra parameter `int *err` to
   return an error code.

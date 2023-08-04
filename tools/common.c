@@ -22,5 +22,5 @@ open_archive(const char *image_path, uint64_t offset, int *err) {
 		}
 	}
 
-	return sqsh_archive_new(image_path, &config, err);
+	return sqsh_archive_open(image_path, &config, err);
 }

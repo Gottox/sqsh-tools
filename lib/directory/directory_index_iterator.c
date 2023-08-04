@@ -31,7 +31,7 @@
  * @file         directory_index_iterator.c
  */
 
-#include "../../include/sqsh_inode_private.h"
+#include "../../include/sqsh_directory_private.h"
 
 #include "../../include/sqsh_data_private.h"
 #include "../../include/sqsh_error.h"
@@ -44,14 +44,14 @@ static const uint64_t INODE_HEADER_SIZE =
 static const struct SqshDataInodeDirectoryIndex *
 get_directory_index(const struct SqshDirectoryIndexIterator *iterator) {
 	const uint8_t *data =
-			sqsh__metablock_reader_data(&iterator->inode.metablock);
+			sqsh__metablock_reader_data(&iterator->file.metablock);
 	return (const struct SqshDataInodeDirectoryIndex *)data;
 }
 
 static const struct SqshDataInode *
 get_inode(const struct SqshDirectoryIndexIterator *iterator) {
 	const uint8_t *data =
-			sqsh__metablock_reader_data(&iterator->inode.metablock);
+			sqsh__metablock_reader_data(&iterator->file.metablock);
 	return (const struct SqshDataInode *)data;
 }
 
@@ -60,15 +60,15 @@ sqsh__directory_index_iterator_init(
 		struct SqshDirectoryIndexIterator *iterator, struct SqshArchive *sqsh,
 		uint64_t inode_ref) {
 	int rv;
-	struct SqshInode *inode = &iterator->inode;
+	struct SqshFile *file = &iterator->file;
 
-	rv = sqsh__inode_init(inode, sqsh, inode_ref);
+	rv = sqsh__file_init(file, sqsh, inode_ref);
 	if (rv < 0) {
 		goto out;
 	}
 
-	if (sqsh_inode_type(inode) != SQSH_INODE_TYPE_DIRECTORY ||
-		sqsh_inode_is_extended(inode) == false) {
+	if (sqsh_file_type(file) != SQSH_FILE_TYPE_DIRECTORY ||
+		sqsh_file_is_extended(file) == false) {
 		rv = -SQSH_ERROR_NO_EXTENDED_DIRECTORY;
 		goto out;
 	}
@@ -103,14 +103,14 @@ sqsh__directory_index_iterator_next(
 	/* Make sure next entry is loaded: */
 	size = SQSH_SIZEOF_INODE_DIRECTORY_INDEX;
 	rv = sqsh__metablock_reader_advance(
-			&iterator->inode.metablock, iterator->next_offset, size);
+			&iterator->file.metablock, iterator->next_offset, size);
 	if (rv < 0) {
 		return rv;
 	}
 
 	/* Make sure current index has its name populated */
 	size += sqsh__directory_index_iterator_name_size(iterator);
-	rv = sqsh__metablock_reader_advance(&iterator->inode.metablock, 0, size);
+	rv = sqsh__metablock_reader_advance(&iterator->file.metablock, 0, size);
 	if (rv < 0) {
 		return rv;
 	}
@@ -151,6 +151,6 @@ sqsh__directory_index_iterator_name(
 int
 sqsh__directory_index_iterator_cleanup(
 		struct SqshDirectoryIndexIterator *iterator) {
-	sqsh__inode_cleanup(&iterator->inode);
+	sqsh__file_cleanup(&iterator->file);
 	return 0;
 }

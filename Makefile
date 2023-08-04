@@ -34,6 +34,7 @@ MESON_FLAGS += -Dlz4=enabled
 MESON_FLAGS += -Dlzma=enabled
 MESON_FLAGS += -Dzstd=enabled
 MESON_FLAGS += -Dfuse=enabled
+MESON_FLAGS += -Dfuse-old=enabled
 MESON_FLAGS += -Db_coverage=true
 
 SANATIZE = 1

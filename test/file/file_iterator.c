@@ -37,7 +37,6 @@
 
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_data_private.h"
-#include "../../include/sqsh_inode_private.h"
 #include "../../lib/utils/utils.h"
 
 static const size_t BLOCK_SIZE = 32768;
@@ -47,7 +46,7 @@ static void
 load_segment_from_compressed_data_block(void) {
 	int rv;
 	struct SqshArchive archive = {0};
-	struct SqshInode inode = {0};
+	struct SqshFile file = {0};
 	uint8_t payload[8192] = {
 			/* clang-format off */
 			SQSH_HEADER,
@@ -63,14 +62,14 @@ load_segment_from_compressed_data_block(void) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint64_t inode_ref = sqsh_address_ref_create(256, 3);
-	rv = sqsh__inode_init(&inode, &archive, inode_ref);
+	rv = sqsh__file_init(&file, &archive, inode_ref);
 	assert(rv == 0);
 
-	assert(sqsh_inode_type(&inode) == SQSH_INODE_TYPE_FILE);
-	assert(sqsh_inode_file_has_fragment(&inode) == false);
+	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
+	assert(sqsh_file_has_fragment(&file) == false);
 
 	struct SqshFileIterator iter = {0};
-	rv = sqsh__file_iterator_init(&iter, &inode);
+	rv = sqsh__file_iterator_init(&iter, &file);
 	assert(rv == 0);
 
 	rv = sqsh_file_iterator_next(&iter, 1);
@@ -93,7 +92,7 @@ load_segment_from_compressed_data_block(void) {
 	assert(data == NULL);
 
 	sqsh__file_iterator_cleanup(&iter);
-	sqsh__inode_cleanup(&inode);
+	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -101,7 +100,7 @@ static void
 load_two_segments_from_uncompressed_data_block(void) {
 	int rv;
 	struct SqshArchive archive = {0};
-	struct SqshInode inode = {0};
+	struct SqshFile file = {0};
 	uint8_t payload[] = {
 			/* clang-format off */
 			SQSH_HEADER,
@@ -119,14 +118,14 @@ load_two_segments_from_uncompressed_data_block(void) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
-	rv = sqsh__inode_init(&inode, &archive, inode_ref);
+	rv = sqsh__file_init(&file, &archive, inode_ref);
 	assert(rv == 0);
 
-	assert(sqsh_inode_type(&inode) == SQSH_INODE_TYPE_FILE);
-	assert(sqsh_inode_file_has_fragment(&inode) == false);
+	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
+	assert(sqsh_file_has_fragment(&file) == false);
 
 	struct SqshFileIterator iter = {0};
-	rv = sqsh__file_iterator_init(&iter, &inode);
+	rv = sqsh__file_iterator_init(&iter, &file);
 	assert(rv == 0);
 
 	rv = sqsh_file_iterator_next(&iter, 1);
@@ -180,7 +179,7 @@ load_two_segments_from_uncompressed_data_block(void) {
 	assert(data == NULL);
 
 	sqsh__file_iterator_cleanup(&iter);
-	sqsh__inode_cleanup(&inode);
+	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -188,7 +187,7 @@ static void
 load_segment_from_uncompressed_data_block(void) {
 	int rv;
 	struct SqshArchive archive = {0};
-	struct SqshInode inode = {0};
+	struct SqshFile file = {0};
 	uint8_t payload[8192] = {
 			/* clang-format off */
 			SQSH_HEADER,
@@ -204,14 +203,14 @@ load_segment_from_uncompressed_data_block(void) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
-	rv = sqsh__inode_init(&inode, &archive, inode_ref);
+	rv = sqsh__file_init(&file, &archive, inode_ref);
 	assert(rv == 0);
 
-	assert(sqsh_inode_type(&inode) == SQSH_INODE_TYPE_FILE);
-	assert(sqsh_inode_file_has_fragment(&inode) == false);
+	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
+	assert(sqsh_file_has_fragment(&file) == false);
 
 	struct SqshFileIterator iter = {0};
-	rv = sqsh__file_iterator_init(&iter, &inode);
+	rv = sqsh__file_iterator_init(&iter, &file);
 	assert(rv == 0);
 
 	rv = sqsh_file_iterator_next(&iter, 1);
@@ -235,7 +234,7 @@ load_segment_from_uncompressed_data_block(void) {
 	assert(data == NULL);
 
 	sqsh__file_iterator_cleanup(&iter);
-	sqsh__inode_cleanup(&inode);
+	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -243,7 +242,7 @@ static void
 load_zero_padding(void) {
 	int rv;
 	struct SqshArchive archive = {0};
-	struct SqshInode inode = {0};
+	struct SqshFile file = {0};
 	uint8_t payload[8192] = {
 			/* clang-format off */
 			SQSH_HEADER,
@@ -258,14 +257,14 @@ load_zero_padding(void) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
-	rv = sqsh__inode_init(&inode, &archive, inode_ref);
+	rv = sqsh__file_init(&file, &archive, inode_ref);
 	assert(rv == 0);
 
-	assert(sqsh_inode_type(&inode) == SQSH_INODE_TYPE_FILE);
-	assert(sqsh_inode_file_has_fragment(&inode) == false);
+	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
+	assert(sqsh_file_has_fragment(&file) == false);
 
 	struct SqshFileIterator iter = {0};
-	rv = sqsh__file_iterator_init(&iter, &inode);
+	rv = sqsh__file_iterator_init(&iter, &file);
 	assert(rv == 0);
 
 	rv = sqsh_file_iterator_next(&iter, 1);
@@ -295,7 +294,7 @@ load_zero_padding(void) {
 	assert(data == NULL);
 
 	sqsh__file_iterator_cleanup(&iter);
-	sqsh__inode_cleanup(&inode);
+	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -303,7 +302,7 @@ static void
 load_zero_big_padding(void) {
 	int rv;
 	struct SqshArchive archive = {0};
-	struct SqshInode inode = {0};
+	struct SqshFile file = {0};
 	uint8_t payload[8192] = {
 			/* clang-format off */
 			SQSH_HEADER,
@@ -318,14 +317,14 @@ load_zero_big_padding(void) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
-	rv = sqsh__inode_init(&inode, &archive, inode_ref);
+	rv = sqsh__file_init(&file, &archive, inode_ref);
 	assert(rv == 0);
 
-	assert(sqsh_inode_type(&inode) == SQSH_INODE_TYPE_FILE);
-	assert(sqsh_inode_file_has_fragment(&inode) == false);
+	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
+	assert(sqsh_file_has_fragment(&file) == false);
 
 	struct SqshFileIterator iter = {0};
-	rv = sqsh__file_iterator_init(&iter, &inode);
+	rv = sqsh__file_iterator_init(&iter, &file);
 	assert(rv == 0);
 
 	rv = sqsh_file_iterator_next(&iter, 1);
@@ -355,7 +354,7 @@ load_zero_big_padding(void) {
 	assert(data == NULL);
 
 	sqsh__file_iterator_cleanup(&iter);
-	sqsh__inode_cleanup(&inode);
+	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 

@@ -33,11 +33,6 @@
 
 #include "common.h"
 
-#include "../include/sqsh_chrome.h"
-#include "../include/sqsh_directory.h"
-#include "../include/sqsh_file.h"
-#include "sqsh_tree_private.h"
-
 #include <errno.h>
 #include <fcntl.h>
 #include <libgen.h>
@@ -58,7 +53,7 @@ struct PathStack {
 };
 
 static int
-extract(const char *filename, struct SqshInode *inode,
+extract(const char *filename, struct SqshFile *file,
 		const struct PathStack *path_stack);
 
 static int
@@ -96,32 +91,32 @@ extract_directory_entry(
 		struct SqshDirectoryIterator *iter,
 		const struct PathStack *path_stack) {
 	int rv;
-	struct SqshInode *inode = NULL;
+	struct SqshFile *file = NULL;
 	const char *filename_ptr = sqsh_directory_iterator_name(iter);
 	size_t size = sqsh_directory_iterator_name_size(iter);
 	char filename[size + 1];
 	memcpy(filename, filename_ptr, size);
 	filename[size] = '\0';
 
-	inode = sqsh_directory_iterator_inode_load(iter, &rv);
+	file = sqsh_directory_iterator_open_file(iter, &rv);
 	if (rv < 0) {
-		print_err(rv, "sqsh_directory_iterator_inode_load", path_stack);
+		print_err(rv, "sqsh_directory_iterator_open_file", path_stack);
 		goto out;
 	}
-	rv = extract(filename, inode, path_stack);
+	rv = extract(filename, file, path_stack);
 out:
-	sqsh_inode_free(inode);
+	sqsh_close(file);
 	return rv;
 }
 
 static int
 extract_directory(
-		const char *filename, struct SqshInode *inode,
+		const char *filename, struct SqshFile *file,
 		const struct PathStack *path_stack) {
 	int rv;
 	char cwd[PATH_MAX] = {0};
 	struct SqshDirectoryIterator *iter = NULL;
-	uint16_t mode = sqsh_inode_permission(inode);
+	uint16_t mode = sqsh_file_permission(file);
 
 	if (getcwd(cwd, sizeof(cwd)) == NULL) {
 		print_err(rv = -errno, "getcwd", path_stack);
@@ -138,7 +133,7 @@ extract_directory(
 		goto out;
 	}
 
-	iter = sqsh_directory_iterator_new(inode, &rv);
+	iter = sqsh_directory_iterator_new(file, &rv);
 	if (rv < 0) {
 		print_err(rv, "sqsh_directory_iterator_new", path_stack);
 		goto out;
@@ -164,35 +159,35 @@ out:
 
 static int
 extract_file(
-		const char *filename, struct SqshInode *inode,
+		const char *filename, struct SqshFile *file,
 		const struct PathStack *path_stack) {
 	int rv = 0;
-	FILE *file = NULL;
+	FILE *stream = NULL;
 
-	file = fopen(filename, "w");
-	if (file == NULL) {
+	stream = fopen(filename, "w");
+	if (stream == NULL) {
 		print_err(rv = -errno, "fopen", path_stack);
 		goto out;
 	}
 
-	rv = sqsh_file_to_stream(inode, file);
+	rv = sqsh_file_to_stream(file, stream);
 	if (rv < 0) {
 		print_err(rv, "sqsh_file_to_stream", path_stack);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
-	fclose(file);
+	fclose(stream);
 out:
 	return rv;
 }
 
 static int
 extract_symlink(
-		const char *filename, struct SqshInode *inode,
+		const char *filename, struct SqshFile *file,
 		const struct PathStack *path_stack) {
 	int rv;
-	const char *target_ptr = sqsh_inode_symlink(inode);
-	size_t size = sqsh_inode_symlink_size(inode);
+	const char *target_ptr = sqsh_file_symlink(file);
+	size_t size = sqsh_file_symlink_size(file);
 	char target[size + 1];
 	memcpy(target, target_ptr, size);
 	target[size] = '\0';
@@ -209,21 +204,21 @@ out:
 
 static int
 extract_device(
-		const char *filename, struct SqshInode *inode,
+		const char *filename, struct SqshFile *file,
 		const struct PathStack *path_stack) {
 	int rv = 0;
-	uint16_t mode = sqsh_inode_permission(inode);
-	switch (sqsh_inode_type(inode)) {
-	case SQSH_INODE_TYPE_BLOCK:
+	uint16_t mode = sqsh_file_permission(file);
+	switch (sqsh_file_type(file)) {
+	case SQSH_FILE_TYPE_BLOCK:
 		mode |= S_IFCHR;
 		break;
-	case SQSH_INODE_TYPE_CHAR:
+	case SQSH_FILE_TYPE_CHAR:
 		mode |= S_IFBLK;
 		break;
-	case SQSH_INODE_TYPE_FIFO:
+	case SQSH_FILE_TYPE_FIFO:
 		mode |= S_IFIFO;
 		break;
-	case SQSH_INODE_TYPE_SOCKET:
+	case SQSH_FILE_TYPE_SOCKET:
 		mode |= S_IFSOCK;
 		break;
 	default:
@@ -232,7 +227,7 @@ extract_device(
 		goto out;
 	}
 
-	rv = mknod(filename, mode, sqsh_inode_device_id(inode));
+	rv = mknod(filename, mode, sqsh_file_device_id(file));
 	if (rv < 0) {
 		print_err(rv = -errno, "mknod", path_stack);
 		goto out;
@@ -242,22 +237,22 @@ out:
 }
 
 static int
-extract(const char *filename, struct SqshInode *inode,
+extract(const char *filename, struct SqshFile *file,
 		const struct PathStack *path_stack) {
 	const struct PathStack new_path_stack = {
 			.segment = filename, .prev = path_stack};
 	int rv = 0;
 	uint32_t fuid, fgid;
-	const enum SqshInodeType type = sqsh_inode_type(inode);
-	const uint16_t mode = sqsh_inode_permission(inode);
+	const enum SqshFileType type = sqsh_file_type(file);
+	const uint16_t mode = sqsh_file_permission(file);
 	struct utimbuf times;
 
 	if (verbose) {
 		print_path(&new_path_stack, "\n", stderr);
 	}
 
-	if (type == SQSH_INODE_TYPE_DIRECTORY) {
-		rv = extract_directory(filename, inode, &new_path_stack);
+	if (type == SQSH_FILE_TYPE_DIRECTORY) {
+		rv = extract_directory(filename, file, &new_path_stack);
 	} else {
 		rv = unlink(filename);
 		if (rv < 0 && errno != ENOENT) {
@@ -266,17 +261,17 @@ extract(const char *filename, struct SqshInode *inode,
 		}
 
 		switch (type) {
-		case SQSH_INODE_TYPE_FILE:
-			rv = extract_file(filename, inode, &new_path_stack);
+		case SQSH_FILE_TYPE_FILE:
+			rv = extract_file(filename, file, &new_path_stack);
 			break;
-		case SQSH_INODE_TYPE_SYMLINK:
-			rv = extract_symlink(filename, inode, &new_path_stack);
+		case SQSH_FILE_TYPE_SYMLINK:
+			rv = extract_symlink(filename, file, &new_path_stack);
 			break;
-		case SQSH_INODE_TYPE_BLOCK:
-		case SQSH_INODE_TYPE_CHAR:
-		case SQSH_INODE_TYPE_FIFO:
-		case SQSH_INODE_TYPE_SOCKET:
-			rv = extract_device(filename, inode, &new_path_stack);
+		case SQSH_FILE_TYPE_BLOCK:
+		case SQSH_FILE_TYPE_CHAR:
+		case SQSH_FILE_TYPE_FIFO:
+		case SQSH_FILE_TYPE_SOCKET:
+			rv = extract_device(filename, file, &new_path_stack);
 			break;
 		default:
 			print_err(-EINVAL, "extract", &new_path_stack);
@@ -287,8 +282,8 @@ extract(const char *filename, struct SqshInode *inode,
 		goto out;
 	}
 
-	if (type != SQSH_INODE_TYPE_SYMLINK) {
-		times.actime = times.modtime = sqsh_inode_modified_time(inode);
+	if (type != SQSH_FILE_TYPE_SYMLINK) {
+		times.actime = times.modtime = sqsh_file_modified_time(file);
 		rv = utime(filename, &times);
 		if (rv < 0) {
 			print_err(rv = -errno, "utime", &new_path_stack);
@@ -303,8 +298,8 @@ extract(const char *filename, struct SqshInode *inode,
 	}
 
 	if (do_chown) {
-		fuid = sqsh_inode_uid(inode);
-		fgid = sqsh_inode_gid(inode);
+		fuid = sqsh_file_uid(file);
+		fgid = sqsh_file_gid(file);
 		rv = fchownat(AT_FDCWD, filename, fuid, fgid, AT_SYMLINK_NOFOLLOW);
 		if (rv < 0) {
 			print_err(rv = -errno, "chown", &new_path_stack);
@@ -325,7 +320,7 @@ main(int argc, char *argv[]) {
 	char *target_path = NULL;
 	struct SqshArchive *sqsh;
 	struct SqshTreeWalker *walker = NULL;
-	struct SqshInode *inode = NULL;
+	struct SqshFile *file = NULL;
 	uint64_t offset = 0;
 
 	while ((opt = getopt(argc, argv, "co:vVh")) != -1) {
@@ -379,7 +374,7 @@ main(int argc, char *argv[]) {
 		rv = EXIT_FAILURE;
 		goto out;
 	}
-	inode = sqsh_tree_walker_inode_load(walker, &rv);
+	file = sqsh_tree_walker_open_file(walker, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, src_path);
 		rv = EXIT_FAILURE;
@@ -391,7 +386,7 @@ main(int argc, char *argv[]) {
 		if (strcmp(target_path, "/") == 0) {
 			target_path = ".";
 		}
-	} else if (sqsh_inode_type(inode) != SQSH_INODE_TYPE_DIRECTORY) {
+	} else if (sqsh_file_type(file) != SQSH_FILE_TYPE_DIRECTORY) {
 		struct stat st = {0};
 		rv = stat(target_path, &st);
 		if (rv < 0) {
@@ -413,14 +408,14 @@ main(int argc, char *argv[]) {
 		}
 	}
 
-	rv = extract(target_path, inode, NULL);
+	rv = extract(target_path, file, NULL);
 	if (rv < 0) {
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 out:
-	sqsh_inode_free(inode);
+	sqsh_close(file);
 	sqsh_tree_walker_free(walker);
-	sqsh_archive_free(sqsh);
+	sqsh_archive_close(sqsh);
 	return rv;
 }

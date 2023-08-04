@@ -33,7 +33,7 @@
 
 #include "../../include/sqsh_archive.h"
 #include "../../include/sqsh_data_private.h"
-#include "../../include/sqsh_inode.h"
+#include "../../include/sqsh_file_private.h"
 #include "../../include/sqsh_table_private.h"
 
 int
@@ -50,9 +50,9 @@ sqsh__fragment_table_init(
 
 int
 sqsh__fragment_table_get(
-		const struct SqshFragmentTable *table, const struct SqshInode *inode,
+		const struct SqshFragmentTable *table, const struct SqshFile *file,
 		struct SqshDataFragment *fragment) {
-	uint32_t index = sqsh_inode_file_fragment_block_index(inode);
+	uint32_t index = sqsh_file_fragment_block_index(file);
 	return sqsh_table_get(&table->table, index, fragment);
 }
 

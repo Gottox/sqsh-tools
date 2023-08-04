@@ -71,23 +71,23 @@ fs_common_version(const char *progname) {
 }
 
 mode_t
-fs_common_mode_type(enum SqshInodeType type) {
+fs_common_mode_type(enum SqshFileType type) {
 	switch (type) {
-	case SQSH_INODE_TYPE_DIRECTORY:
+	case SQSH_FILE_TYPE_DIRECTORY:
 		return S_IFDIR;
-	case SQSH_INODE_TYPE_FILE:
+	case SQSH_FILE_TYPE_FILE:
 		return S_IFREG;
-	case SQSH_INODE_TYPE_SYMLINK:
+	case SQSH_FILE_TYPE_SYMLINK:
 		return S_IFLNK;
-	case SQSH_INODE_TYPE_BLOCK:
+	case SQSH_FILE_TYPE_BLOCK:
 		return S_IFBLK;
-	case SQSH_INODE_TYPE_CHAR:
+	case SQSH_FILE_TYPE_CHAR:
 		return S_IFCHR;
-	case SQSH_INODE_TYPE_FIFO:
+	case SQSH_FILE_TYPE_FIFO:
 		return S_IFIFO;
-	case SQSH_INODE_TYPE_SOCKET:
+	case SQSH_FILE_TYPE_SOCKET:
 		return S_IFSOCK;
-	case SQSH_INODE_TYPE_UNKNOWN:
+	case SQSH_FILE_TYPE_UNKNOWN:
 		return 0;
 	}
 	return 0;
@@ -107,9 +107,9 @@ fs_common_inode_sqsh_from_ino(uint_fast64_t st_ino) {
 }
 
 mode_t
-fs_common_inode_mode(struct SqshInode *inode) {
-	mode_t mode = sqsh_inode_permission(inode);
-	return mode | fs_common_mode_type(sqsh_inode_type(inode));
+fs_common_inode_mode(struct SqshFile *inode) {
+	mode_t mode = sqsh_file_permission(inode);
+	return mode | fs_common_mode_type(sqsh_file_type(inode));
 }
 
 int
@@ -132,7 +132,7 @@ fs_common_map_err(int rv) {
 
 int
 fs_common_read(
-		struct SqshFileReader **reader, struct SqshInode *inode, off_t offset,
+		struct SqshFileReader **reader, struct SqshFile *inode, off_t offset,
 		size_t size) {
 	int rv = 0;
 	*reader = sqsh_file_reader_new(inode, &rv);
@@ -140,7 +140,7 @@ fs_common_read(
 		goto out;
 	}
 
-	uint64_t file_size = sqsh_inode_file_size(inode);
+	uint64_t file_size = sqsh_file_size(inode);
 	if (size > file_size - offset) {
 		size = file_size - offset;
 	}
@@ -156,19 +156,18 @@ out:
 
 void
 fs_common_getattr(
-		struct SqshInode *inode, const struct SqshSuperblock *superblock,
+		struct SqshFile *inode, const struct SqshSuperblock *superblock,
 		struct stat *st) {
-	const uint64_t inode_number = sqsh_inode_number(inode);
+	const uint64_t inode_number = sqsh_file_inode(inode);
 
 	st->st_dev = 0;
 	st->st_ino = fs_common_inode_sqsh_to_ino(inode_number);
 	st->st_mode = fs_common_inode_mode(inode);
-	st->st_nlink = sqsh_inode_hard_link_count(inode);
-	st->st_uid = sqsh_inode_uid(inode);
-	st->st_gid = sqsh_inode_gid(inode);
-	st->st_size = sqsh_inode_file_size(inode);
-	st->st_atime = st->st_mtime = st->st_ctime =
-			sqsh_inode_modified_time(inode);
+	st->st_nlink = sqsh_file_hard_link_count(inode);
+	st->st_uid = sqsh_file_uid(inode);
+	st->st_gid = sqsh_file_gid(inode);
+	st->st_size = sqsh_file_size(inode);
+	st->st_atime = st->st_mtime = st->st_ctime = sqsh_file_modified_time(inode);
 	if (superblock != NULL) {
 		st->st_blksize = sqsh_superblock_block_size(superblock);
 	}

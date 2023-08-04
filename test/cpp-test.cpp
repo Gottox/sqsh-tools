@@ -51,7 +51,7 @@ sqsh_empty() {
 	config.source_mapper = sqsh_mapper_impl_static;
 	config.mapper_block_size = 1;
 	config.source_size = 0;
-	archive = sqsh_archive_new(NULL, &config, &rv);
+	archive = sqsh_archive_open(NULL, &config, &rv);
 	assert(rv == -SQSH_ERROR_SUPERBLOCK_TOO_SMALL);
 	assert(archive == NULL);
 }

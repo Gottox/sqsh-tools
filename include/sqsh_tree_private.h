@@ -35,7 +35,7 @@
 #define SQSH_TREE_PRIVATE_H
 
 #include "sqsh_directory_private.h"
-#include "sqsh_inode_private.h"
+#include "sqsh_file_private.h"
 #include "sqsh_tree.h"
 
 #ifdef __cplusplus
@@ -59,7 +59,7 @@ struct SqshTreeWalker {
 	uint64_t current_inode_ref;
 	struct SqshArchive *archive;
 	struct SqshInodeMap *inode_map;
-	struct SqshInode directory;
+	struct SqshFile cwd;
 	struct SqshDirectoryIterator iterator;
 	size_t max_symlink_depth;
 	bool begin_iterator;

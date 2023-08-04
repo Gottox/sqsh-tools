@@ -29,55 +29,57 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         file.c
+ * @file         directory.c
  */
 
 #include "../common.h"
 #include <testlib.h>
 
 #include "../../include/sqsh_archive_private.h"
-#include "../../include/sqsh_chrome.h"
-#include "../../include/sqsh_tree_private.h"
+#include "../../include/sqsh_easy.h"
 #include "../../lib/utils/utils.h"
 
 static void
-test_file_get_content_through_symlink(void) {
+list_two_files(void) {
+	int rv = 0;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
 			/* clang-format off */
 			SQSH_HEADER,
-			[1024] = '1', '2', '3', '4', '5', '6', '7', '8',
 			/* inode */
 			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
 			INODE_HEADER(1, 0, 0, 0, 0, 1),
 			INODE_BASIC_DIR(0, 1024, 0, 0),
-			[INODE_TABLE_OFFSET+2+128] =
+			[INODE_TABLE_OFFSET+2+128] = 
 			INODE_HEADER(3, 0, 0, 0, 0, 2),
 			INODE_BASIC_SYMLINK(3),
 			't', 'g', 't',
 			[INODE_TABLE_OFFSET+2+256] =
 			INODE_HEADER(2, 0, 0, 0, 0, 3),
-			INODE_BASIC_FILE(1024, 0xFFFFFFFF, 0, 8),
-			DATA_BLOCK_REF(8, 0),
+			INODE_BASIC_FILE(0, 0xFFFFFFFF, 0, 0),
 			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
 			DIRECTORY_HEADER(2, 0, 0),
-			DIRECTORY_ENTRY(128, 2, 3, 3),
-			's', 'r', 'c',
-			DIRECTORY_ENTRY(256, 3, 2, 3),
-			't', 'g', 't',
+			DIRECTORY_ENTRY(128, 2, 3, 1),
+			'1',
+			DIRECTORY_ENTRY(256, 3, 2, 1),
+			'2',
 			[FRAGMENT_TABLE_OFFSET] = 0,
 			/* clang-format on */
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	uint8_t *content = sqsh_file_content(&archive, "/src");
-	assert(content != NULL);
-	assert(strcmp((char *)content, "12345678") == 0);
-	free(content);
+	char **dir_list = sqsh_easy_directory_list(&archive, "/", &rv);
+	assert(rv == 0);
+	assert(dir_list != NULL);
 
+	assert(strcmp(dir_list[0], "1") == 0);
+	assert(strcmp(dir_list[1], "2") == 0);
+	assert(dir_list[2] == NULL);
+
+	free(dir_list);
 	sqsh__archive_cleanup(&archive);
 }
 
 DECLARE_TESTS
-TEST(test_file_get_content_through_symlink)
+TEST(list_two_files)
 END_TESTS

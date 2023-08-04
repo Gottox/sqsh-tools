@@ -53,7 +53,7 @@ struct SqshXattrIterator {
 	/**
 	 * @privatesection
 	 */
-	struct SqshArchive *sqsh;
+	struct SqshArchive *archive;
 	struct SqshMetablockReader metablock;
 	struct SqshMetablockReader out_of_line_value;
 	struct SqshXattrTable *context;
@@ -70,12 +70,12 @@ struct SqshXattrIterator {
  * @brief Initializes a new xattr iterator.
  *
  * @param[out] iterator The iterator to initialize.
- * @param[in]  inode    The inode to iterate through xattrs.
+ * @param[in]  file     The file context to iterate through xattrs.
  *
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__xattr_iterator_init(
-		struct SqshXattrIterator *iterator, const struct SqshInode *inode);
+		struct SqshXattrIterator *iterator, const struct SqshFile *file);
 
 /**
  * @internal

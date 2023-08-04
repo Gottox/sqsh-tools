@@ -37,7 +37,6 @@
 
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_error.h"
-#include "../../include/sqsh_inode_private.h"
 #include "../utils/utils.h"
 #ifdef __linux__
 #	include <alloca.h>
@@ -46,11 +45,11 @@
 static int
 apply_fragment(
 		struct SqshFragmentView *view, const struct SqshArchive *archive,
-		const struct SqshInode *inode, const uint8_t *data, size_t data_size) {
+		const struct SqshFile *file, const uint8_t *data, size_t data_size) {
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 	uint32_t block_size = sqsh_superblock_block_size(superblock);
-	uint32_t offset = sqsh_inode_file_fragment_block_offset(inode);
-	uint32_t size = sqsh_inode_file_size(inode) % block_size;
+	uint32_t offset = sqsh_file_fragment_block_offset(file);
+	uint32_t size = sqsh_file_size(file) % block_size;
 	uint32_t end_offset;
 
 	if (SQSH_ADD_OVERFLOW(offset, size, &end_offset)) {
@@ -69,7 +68,7 @@ apply_fragment(
 static int
 read_fragment_compressed(
 		struct SqshFragmentView *view, struct SqshArchive *archive,
-		const struct SqshInode *inode) {
+		const struct SqshFile *file) {
 	int rv = 0;
 	struct SqshExtractView *extract_view = &view->extract_view;
 	struct SqshMapReader *reader = &view->map_reader;
@@ -86,7 +85,7 @@ read_fragment_compressed(
 	}
 	const uint8_t *data = sqsh__extract_view_data(extract_view);
 	const size_t size = sqsh__extract_view_size(extract_view);
-	rv = apply_fragment(view, archive, inode, data, size);
+	rv = apply_fragment(view, archive, file, data, size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -97,13 +96,13 @@ out:
 static int
 read_fragment_uncompressed(
 		struct SqshFragmentView *view, struct SqshArchive *archive,
-		const struct SqshInode *inode) {
+		const struct SqshFile *file) {
 	int rv = 0;
 	struct SqshMapReader *reader = &view->map_reader;
 	const uint8_t *data = sqsh__map_reader_data(reader);
 	const size_t size = sqsh__map_reader_size(reader);
 
-	rv = apply_fragment(view, archive, inode, data, size);
+	rv = apply_fragment(view, archive, file, data, size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -113,8 +112,8 @@ out:
 
 int
 sqsh__fragment_view_init(
-		struct SqshFragmentView *view, const struct SqshInode *inode) {
-	struct SqshArchive *archive = inode->archive;
+		struct SqshFragmentView *view, const struct SqshFile *file) {
+	struct SqshArchive *archive = file->archive;
 	struct SqshMapReader *reader = &view->map_reader;
 	struct SqshFragmentTable *table = NULL;
 
@@ -125,7 +124,7 @@ sqsh__fragment_view_init(
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__fragment_table_get(table, inode, fragment_info);
+	rv = sqsh__fragment_table_get(table, file, fragment_info);
 	if (rv < 0) {
 		goto out;
 	}
@@ -148,9 +147,9 @@ sqsh__fragment_view_init(
 	}
 
 	if (is_compressed) {
-		rv = read_fragment_compressed(view, archive, inode);
+		rv = read_fragment_compressed(view, archive, file);
 	} else {
-		rv = read_fragment_uncompressed(view, archive, inode);
+		rv = read_fragment_uncompressed(view, archive, file);
 	}
 	if (rv < 0) {
 		goto out;

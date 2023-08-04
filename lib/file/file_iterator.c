@@ -37,7 +37,7 @@
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_primitive_private.h"
 
-#include "../../include/sqsh_inode_private.h"
+#include "../../include/sqsh_file_private.h"
 #include "../utils/utils.h"
 #include <stdint.h>
 
@@ -47,12 +47,12 @@ static const uint8_t ZERO_BLOCK[16384] = {0};
 
 int
 sqsh__file_iterator_init(
-		struct SqshFileIterator *iterator, const struct SqshInode *inode) {
+		struct SqshFileIterator *iterator, const struct SqshFile *file) {
 	int rv = 0;
-	struct SqshArchive *archive = inode->archive;
+	struct SqshArchive *archive = file->archive;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(archive);
-	uint64_t block_address = sqsh_inode_file_blocks_start(inode);
+	uint64_t block_address = sqsh_file_blocks_start(file);
 	const uint64_t upper_limit = sqsh_superblock_bytes_used(superblock);
 	rv = sqsh__archive_data_extract_manager(
 			archive, &iterator->compression_manager);
@@ -67,14 +67,14 @@ sqsh__file_iterator_init(
 
 	iterator->block_index = 0;
 	iterator->block_size = sqsh_superblock_block_size(superblock);
-	iterator->inode = inode;
+	iterator->file = file;
 	iterator->sparse_size = 0;
 out:
 	return rv;
 }
 
 struct SqshFileIterator *
-sqsh_file_iterator_new(const struct SqshInode *inode, int *err) {
+sqsh_file_iterator_new(const struct SqshFile *file, int *err) {
 	int rv = 0;
 	struct SqshFileIterator *iterator =
 			calloc(1, sizeof(struct SqshFileIterator));
@@ -82,7 +82,7 @@ sqsh_file_iterator_new(const struct SqshInode *inode, int *err) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
-	rv = sqsh__file_iterator_init(iterator, inode);
+	rv = sqsh__file_iterator_init(iterator, file);
 	if (rv < 0) {
 		free(iterator);
 		iterator = NULL;
@@ -100,11 +100,11 @@ map_block_compressed(
 	int rv = 0;
 	struct SqshExtractManager *compression_manager =
 			iterator->compression_manager;
-	const struct SqshInode *inode = iterator->inode;
+	const struct SqshFile *file = iterator->file;
 	struct SqshExtractView *extract_view = &iterator->extract_view;
 	const sqsh_index_t block_index = iterator->block_index;
 	const sqsh_index_t data_block_size =
-			sqsh_inode_file_block_size(inode, block_index);
+			sqsh_file_block_size(file, block_index);
 
 	rv = sqsh__map_reader_advance(
 			&iterator->map_reader, next_offset, data_block_size);
@@ -134,7 +134,7 @@ map_block_uncompressed(
 		struct SqshFileIterator *iterator, sqsh_index_t next_offset,
 		size_t desired_size) {
 	int rv = 0;
-	const struct SqshInode *inode = iterator->inode;
+	const struct SqshFile *file = iterator->file;
 
 	sqsh_index_t block_index = iterator->block_index;
 	struct SqshMapReader *reader = &iterator->map_reader;
@@ -142,19 +142,19 @@ map_block_uncompressed(
 		goto out;
 	}
 
-	const uint64_t block_count = sqsh_inode_file_block_count(inode);
+	const uint64_t block_count = sqsh_file_block_count(file);
 	uint64_t outer_size = 0;
 	const size_t remaining_direct = sqsh__map_reader_remaining_direct(reader);
 	for (; iterator->sparse_size == 0 && block_index < block_count;
 		 block_index++) {
-		if (sqsh_inode_file_block_is_compressed(inode, block_index)) {
+		if (sqsh_file_block_is_compressed(file, block_index)) {
 			break;
 		}
 		if (outer_size >= desired_size) {
 			break;
 		}
 		const uint32_t data_block_size =
-				sqsh_inode_file_block_size(inode, block_index);
+				sqsh_file_block_size(file, block_index);
 		/* Set the sparse size only if we are not at the last block. */
 		if (block_index + 1 != block_count) {
 			iterator->sparse_size = iterator->block_size - data_block_size;
@@ -190,12 +190,12 @@ out:
 
 static int
 map_zero_block(struct SqshFileIterator *iterator) {
-	const struct SqshInode *inode = iterator->inode;
+	const struct SqshFile *file = iterator->file;
 
 	const sqsh_index_t block_index = iterator->block_index;
-	const bool has_fragment = sqsh_inode_file_has_fragment(inode);
-	const size_t block_count = sqsh_inode_file_block_count(inode);
-	const size_t file_size = sqsh_inode_file_size(inode);
+	const bool has_fragment = sqsh_file_has_fragment(file);
+	const size_t block_count = sqsh_file_block_count(file);
+	const size_t file_size = sqsh_file_size(file);
 	const size_t sparse_size = iterator->sparse_size;
 
 	size_t size;
@@ -222,13 +222,11 @@ map_zero_block(struct SqshFileIterator *iterator) {
 static int
 map_block(struct SqshFileIterator *iterator, size_t desired_size) {
 	int rv = 0;
-	const struct SqshInode *inode = iterator->inode;
+	const struct SqshFile *file = iterator->file;
 
 	const sqsh_index_t block_index = iterator->block_index;
-	const bool is_compressed =
-			sqsh_inode_file_block_is_compressed(inode, block_index);
-	const size_t data_block_size =
-			sqsh_inode_file_block_size(inode, block_index);
+	const bool is_compressed = sqsh_file_block_is_compressed(file, block_index);
+	const size_t data_block_size = sqsh_file_block_size(file, block_index);
 	const sqsh_index_t next_offset =
 			sqsh__map_reader_size(&iterator->map_reader);
 
@@ -246,8 +244,8 @@ map_block(struct SqshFileIterator *iterator, size_t desired_size) {
 static int
 map_fragment(struct SqshFileIterator *iterator) {
 	int rv = 0;
-	const struct SqshInode *inode = iterator->inode;
-	struct SqshArchive *archive = inode->archive;
+	const struct SqshFile *file = iterator->file;
+	struct SqshArchive *archive = file->archive;
 	struct SqshFragmentTable *fragment_table = NULL;
 	struct SqshFragmentView *fragment_view = &iterator->fragment_view;
 	rv = sqsh_archive_fragment_table(archive, &fragment_table);
@@ -255,7 +253,7 @@ map_fragment(struct SqshFileIterator *iterator) {
 		goto out;
 	}
 
-	rv = sqsh__fragment_view_init(fragment_view, inode);
+	rv = sqsh__fragment_view_init(fragment_view, file);
 	if (rv < 0) {
 		goto out;
 	}
@@ -273,9 +271,9 @@ out:
 int
 sqsh_file_iterator_next(
 		struct SqshFileIterator *iterator, size_t desired_size) {
-	const struct SqshInode *inode = iterator->inode;
-	size_t block_count = sqsh_inode_file_block_count(inode);
-	const bool has_fragment = sqsh_inode_file_has_fragment(inode);
+	const struct SqshFile *file = iterator->file;
+	size_t block_count = sqsh_file_block_count(file);
+	const bool has_fragment = sqsh_file_has_fragment(file);
 
 	sqsh__extract_view_cleanup(&iterator->extract_view);
 
@@ -300,6 +298,7 @@ sqsh_file_iterator_skip(
 		return 0;
 	}
 
+	// TODO: do not actually map the blocks, just skip them
 	for (size_t i = 0; i < amount - 1; i++) {
 		rv = sqsh_file_iterator_next(iterator, 1);
 		if (rv < 0) {
@@ -319,24 +318,6 @@ sqsh_file_iterator_skip(
 	}
 out:
 	return rv;
-
-#if 0
-	int rv = 0;
-	const struct SqshInode *inode = iterator->inode;
-
-	for (sqsh_index_t i = 0; i < amount; i++, iterator->block_index++) {
-		const uint32_t block_size =
-				sqsh_inode_file_block_size(inode, iterator->block_index);
-
-		rv = sqsh__map_reader_advance(&iterator->map_reader, block_size, 0);
-		if (rv < 0) {
-			goto out;
-		}
-	}
-
-out:
-	return rv;
-#endif
 }
 
 const uint8_t *

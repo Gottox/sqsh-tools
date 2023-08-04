@@ -33,9 +33,6 @@
 
 #include "common.h"
 
-#include "../include/sqsh_chrome.h"
-#include "../include/sqsh_directory.h"
-
 #include <assert.h>
 #include <inttypes.h>
 #include <limits.h>
@@ -54,7 +51,7 @@ static int (*print_item)(const struct SqshDirectoryIterator *, const char *) =
 		print_simple;
 
 static int
-ls(struct SqshArchive *archive, const char *path, struct SqshInode *inode);
+ls(struct SqshArchive *archive, const char *path, struct SqshFile *file);
 
 static int
 usage(char *arg0) {
@@ -71,38 +68,38 @@ print_simple(const struct SqshDirectoryIterator *iter, const char *path) {
 }
 
 void
-print_detail_inode(struct SqshInode *inode, const char *path) {
+print_detail_file(struct SqshFile *file, const char *path) {
 	int mode;
 	char xchar, unxchar;
 
-	switch (sqsh_inode_type(inode)) {
-	case SQSH_INODE_TYPE_UNKNOWN:
+	switch (sqsh_file_type(file)) {
+	case SQSH_FILE_TYPE_UNKNOWN:
 		putchar('?');
 		break;
-	case SQSH_INODE_TYPE_DIRECTORY:
+	case SQSH_FILE_TYPE_DIRECTORY:
 		putchar('d');
 		break;
-	case SQSH_INODE_TYPE_FILE:
+	case SQSH_FILE_TYPE_FILE:
 		putchar('-');
 		break;
-	case SQSH_INODE_TYPE_SYMLINK:
+	case SQSH_FILE_TYPE_SYMLINK:
 		putchar('l');
 		break;
-	case SQSH_INODE_TYPE_BLOCK:
+	case SQSH_FILE_TYPE_BLOCK:
 		putchar('b');
 		break;
-	case SQSH_INODE_TYPE_CHAR:
+	case SQSH_FILE_TYPE_CHAR:
 		putchar('c');
 		break;
-	case SQSH_INODE_TYPE_FIFO:
+	case SQSH_FILE_TYPE_FIFO:
 		putchar('p');
 		break;
-	case SQSH_INODE_TYPE_SOCKET:
+	case SQSH_FILE_TYPE_SOCKET:
 		putchar('s');
 		break;
 	}
 
-	mode = sqsh_inode_permission(inode);
+	mode = sqsh_file_permission(file);
 #define PRINT_MODE(t) \
 	{ \
 		putchar((S_IR##t & mode) ? 'r' : '-'); \
@@ -121,14 +118,14 @@ print_detail_inode(struct SqshInode *inode, const char *path) {
 	PRINT_MODE(OTH);
 #undef PRINT_MODE
 
-	time_t mtime = sqsh_inode_modified_time(inode);
-	printf(" %6u %6u %10" PRIu64 " %s %s", sqsh_inode_uid(inode),
-		   sqsh_inode_gid(inode), sqsh_inode_file_size(inode),
+	time_t mtime = sqsh_file_modified_time(file);
+	printf(" %6u %6u %10" PRIu64 " %s %s", sqsh_file_uid(file),
+		   sqsh_file_gid(file), sqsh_file_size(file),
 		   strtok(ctime(&mtime), "\n"), path);
 
-	if (sqsh_inode_type(inode) == SQSH_INODE_TYPE_SYMLINK) {
+	if (sqsh_file_type(file) == SQSH_FILE_TYPE_SYMLINK) {
 		fputs(" -> ", stdout);
-		fwrite(sqsh_inode_symlink(inode), sqsh_inode_symlink_size(inode),
+		fwrite(sqsh_file_symlink(file), sqsh_file_symlink_size(file),
 			   sizeof(char), stdout);
 	}
 
@@ -138,15 +135,15 @@ print_detail_inode(struct SqshInode *inode, const char *path) {
 static int
 print_detail(const struct SqshDirectoryIterator *iter, const char *path) {
 	int rv = 0;
-	struct SqshInode *inode = NULL;
+	struct SqshFile *file = NULL;
 
-	inode = sqsh_directory_iterator_inode_load(iter, &rv);
+	file = sqsh_directory_iterator_open_file(iter, &rv);
 	if (rv < 0) {
 		goto out;
 	}
-	print_detail_inode(inode, path);
+	print_detail_file(file, path);
 out:
-	sqsh_inode_free(inode);
+	sqsh_close(file);
 	return rv;
 }
 
@@ -154,7 +151,7 @@ static int
 ls_item(struct SqshArchive *archive, const char *path,
 		struct SqshDirectoryIterator *iter) {
 	int rv = 0;
-	struct SqshInode *entry_inode = NULL;
+	struct SqshFile *entry = NULL;
 	const char *name = sqsh_directory_iterator_name(iter);
 	const int name_size = sqsh_directory_iterator_name_size(iter);
 	const size_t path_len = path ? strlen(path) : 0;
@@ -175,16 +172,16 @@ ls_item(struct SqshArchive *archive, const char *path,
 	print_item(iter, current_path);
 
 	if (recursive &&
-		sqsh_directory_iterator_inode_type(iter) == SQSH_INODE_TYPE_DIRECTORY) {
-		entry_inode = sqsh_directory_iterator_inode_load(iter, &rv);
+		sqsh_directory_iterator_file_type(iter) == SQSH_FILE_TYPE_DIRECTORY) {
+		entry = sqsh_directory_iterator_open_file(iter, &rv);
 		if (rv < 0) {
 			goto out;
 		}
-		rv = ls(archive, current_path, entry_inode);
+		rv = ls(archive, current_path, entry);
 		if (rv < 0) {
 			goto out;
 		}
-		sqsh_inode_free(entry_inode);
+		sqsh_close(entry);
 	}
 
 out:
@@ -193,11 +190,11 @@ out:
 }
 
 static int
-ls(struct SqshArchive *archive, const char *path, struct SqshInode *inode) {
+ls(struct SqshArchive *archive, const char *path, struct SqshFile *file) {
 	int rv = 0;
 	struct SqshDirectoryIterator *iter = NULL;
 
-	iter = sqsh_directory_iterator_new(inode, &rv);
+	iter = sqsh_directory_iterator_new(file, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, "sqsh_directory_iterator_new");
 		rv = EXIT_FAILURE;
@@ -220,22 +217,22 @@ out:
 
 static int
 ls_path(struct SqshArchive *archive, char *path) {
-	struct SqshInode *inode = NULL;
+	struct SqshFile *file = NULL;
 	int rv = 0;
 
-	inode = sqsh_open(archive, path, &rv);
+	file = sqsh_open(archive, path, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		goto out;
 	}
-	if (sqsh_inode_type(inode) == SQSH_INODE_TYPE_DIRECTORY) {
+	if (sqsh_file_type(file) == SQSH_FILE_TYPE_DIRECTORY) {
 		if (rv < 0) {
 			sqsh_perror(rv, path);
 			rv = EXIT_FAILURE;
 			goto out;
 		}
 
-		rv = ls(archive, path, inode);
+		rv = ls(archive, path, file);
 		if (rv < 0) {
 			sqsh_perror(rv, path);
 			rv = EXIT_FAILURE;
@@ -243,13 +240,13 @@ ls_path(struct SqshArchive *archive, char *path) {
 		}
 	} else {
 		if (print_item == print_detail) {
-			print_detail_inode(inode, path);
+			print_detail_file(file, path);
 		} else {
 			puts(path);
 		}
 	}
 out:
-	sqsh_inode_free(inode);
+	sqsh_close(file);
 	return rv;
 }
 
@@ -311,6 +308,6 @@ main(int argc, char *argv[]) {
 	}
 
 out:
-	sqsh_archive_free(archive);
+	sqsh_archive_close(archive);
 	return rv;
 }

@@ -34,7 +34,7 @@
 #ifndef SQSH_DIRECTORY_H
 #define SQSH_DIRECTORY_H
 
-#include "sqsh_inode.h"
+#include "sqsh_file.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,13 +50,13 @@ struct SqshDirectoryIterator;
  * @memberof SqshDirectoryIterator
  * @brief Allocates and initializes a new directory iterator.
  *
- * @param[in]  inode      The inode to iterate through.
+ * @param[in]  file       file context of a directory to iterate over.
  * @param[out] err        Pointer to an int where the error code will be stored.
  *
  * @return The new iterator on success, NULL on error.
  */
 SQSH_NO_UNUSED struct SqshDirectoryIterator *
-sqsh_directory_iterator_new(struct SqshInode *inode, int *err);
+sqsh_directory_iterator_new(struct SqshFile *file, int *err);
 
 /**
  * @memberof SqshDirectoryIterator
@@ -125,8 +125,8 @@ sqsh_directory_iterator_inode_ref(const struct SqshDirectoryIterator *iterator);
  *
  * @return The inode type on success, SQSH_INODE_TYPE_UNKNOWN on error.
  */
-enum SqshInodeType sqsh_directory_iterator_inode_type(
-		const struct SqshDirectoryIterator *iterator);
+enum SqshFileType
+sqsh_directory_iterator_file_type(const struct SqshDirectoryIterator *iterator);
 
 /**
  * @memberof SqshDirectoryIterator
@@ -137,7 +137,7 @@ enum SqshInodeType sqsh_directory_iterator_inode_type(
  *
  * @return The loaded inode on success, NULL on error.
  */
-SQSH_NO_UNUSED struct SqshInode *sqsh_directory_iterator_inode_load(
+SQSH_NO_UNUSED struct SqshFile *sqsh_directory_iterator_open_file(
 		const struct SqshDirectoryIterator *iterator, int *err);
 
 /**

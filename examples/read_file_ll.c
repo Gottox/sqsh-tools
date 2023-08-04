@@ -29,19 +29,19 @@ main(int argc, char *argv[]) {
 			.max_symlink_depth = 0,
 	};
 	struct SqshArchive *archive =
-			sqsh_archive_new(argv[1], &config, &error_code);
+			sqsh_archive_open(argv[1], &config, &error_code);
 	if (error_code != 0) {
 		sqsh_perror(error_code, "sqsh_archive_new");
 		return 1;
 	}
-	struct SqshInode *inode = sqsh_open(archive, argv[2], &error_code);
+	struct SqshFile *file = sqsh_open(archive, argv[2], &error_code);
 	if (error_code != 0) {
 		sqsh_perror(error_code, "sqsh_open");
 		return 1;
 	}
 
 	struct SqshFileIterator *iterator =
-			sqsh_file_iterator_new(inode, &error_code);
+			sqsh_file_iterator_new(file, &error_code);
 	if (error_code != 0) {
 		sqsh_perror(error_code, "sqsh_file_iterator_new");
 		return 1;
@@ -58,7 +58,7 @@ main(int argc, char *argv[]) {
 	}
 
 	sqsh_file_iterator_free(iterator);
-	sqsh_inode_free(inode);
+	sqsh_close(file);
 	sqsh_archive_close(archive);
 	return 0;
 }

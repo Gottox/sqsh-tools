@@ -62,18 +62,18 @@ nasty_sqfs(void) {
 			.source_mapper = sqsh_mapper_impl_static,
 	};
 
-	struct SqshArchive *archive = sqsh_archive_new(nasty_sqfs, &config, &rv);
+	struct SqshArchive *archive = sqsh_archive_open(nasty_sqfs, &config, &rv);
 	assert(rv == 0);
 	assert(archive != NULL);
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 	uint64_t inode_ref = sqsh_superblock_inode_root_ref(superblock);
 
-	struct SqshInode *root_inode = sqsh_inode_new(archive, inode_ref, &rv);
+	struct SqshFile *root_dir = sqsh_open_by_ref(archive, inode_ref, &rv);
 	assert(rv != 0);
-	assert(root_inode == NULL);
+	assert(root_dir == NULL);
 
-	sqsh_inode_free(root_inode);
-	sqsh_archive_free(archive);
+	sqsh_close(root_dir);
+	sqsh_archive_close(archive);
 }
 
 DECLARE_TESTS

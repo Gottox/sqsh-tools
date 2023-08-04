@@ -32,10 +32,9 @@
  */
 
 #include "../include/sqsh_archive_private.h"
-#include "../include/sqsh_chrome.h"
 #include "../include/sqsh_directory_private.h"
+#include "../include/sqsh_easy.h"
 #include "../include/sqsh_file_private.h"
-#include "../include/sqsh_inode_private.h"
 #include "../include/sqsh_tree.h"
 #include "../include/sqsh_tree_private.h"
 #include "common.h"
@@ -86,7 +85,7 @@ tree_walker(void) {
 	int rv;
 	struct SqshTreeWalker walker = {0};
 	struct SqshArchive sqsh = {0};
-	struct SqshInode *inode;
+	struct SqshFile *file;
 	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
 	config.archive_offset = 1010;
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
@@ -101,11 +100,11 @@ tree_walker(void) {
 	rv = sqsh_tree_walker_resolve(&walker, "999", false);
 	assert(rv == 0);
 
-	inode = sqsh_tree_walker_inode_load(&walker, &rv);
-	assert(inode != NULL);
+	file = sqsh_tree_walker_open_file(&walker, &rv);
+	assert(file != NULL);
 	assert(rv == 0);
 
-	rv = sqsh_inode_free(inode);
+	rv = sqsh_close(file);
 	assert(rv == 0);
 
 	rv = sqsh__tree_walker_cleanup(&walker);
@@ -119,7 +118,7 @@ static void
 sqsh_ls(void) {
 	int rv;
 	char *name;
-	struct SqshInode inode = {0};
+	struct SqshFile file = {0};
 	struct SqshDirectoryIterator *iter = NULL;
 	struct SqshArchive sqsh = {0};
 	const struct SqshSuperblock *superblock;
@@ -129,11 +128,11 @@ sqsh_ls(void) {
 	assert(rv == 0);
 
 	superblock = sqsh_archive_superblock(&sqsh);
-	rv = sqsh__inode_init(
-			&inode, &sqsh, sqsh_superblock_inode_root_ref(superblock));
+	rv = sqsh__file_init(
+			&file, &sqsh, sqsh_superblock_inode_root_ref(superblock));
 	assert(rv == 0);
 
-	iter = sqsh_directory_iterator_new(&inode, &rv);
+	iter = sqsh_directory_iterator_new(&file, &rv);
 	assert(iter != NULL);
 	assert(rv == 0);
 
@@ -165,7 +164,7 @@ sqsh_ls(void) {
 	rv = sqsh_directory_iterator_free(iter);
 	assert(rv == 0);
 
-	rv = sqsh__inode_cleanup(&inode);
+	rv = sqsh__file_cleanup(&file);
 	assert(rv == 0);
 
 	rv = sqsh__archive_cleanup(&sqsh);
@@ -182,7 +181,7 @@ sqsh_read_content(void) {
 	rv = sqsh__archive_init(&archive, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
-	data = sqsh_file_content(&archive, "/a");
+	data = (char *)sqsh_easy_file_content(&archive, "/a");
 	assert(strcmp(data, "a\n") == 0);
 	free(data);
 
@@ -195,7 +194,7 @@ sqsh_cat_fragment(void) {
 	int rv;
 	const uint8_t *data;
 	size_t size;
-	struct SqshInode *inode = NULL;
+	struct SqshFile *file = NULL;
 	struct SqshFileReader reader = {0};
 	struct SqshArchive sqsh = {0};
 	struct SqshTreeWalker walker = {0};
@@ -210,14 +209,14 @@ sqsh_cat_fragment(void) {
 	rv = sqsh_tree_walker_resolve(&walker, "a", false);
 	assert(rv == 0);
 
-	inode = sqsh_tree_walker_inode_load(&walker, &rv);
-	assert(inode != NULL);
+	file = sqsh_tree_walker_open_file(&walker, &rv);
+	assert(file != NULL);
 	assert(rv == 0);
 
-	rv = sqsh__file_reader_init(&reader, inode);
+	rv = sqsh__file_reader_init(&reader, file);
 	assert(rv == 0);
 
-	size = sqsh_inode_file_size(inode);
+	size = sqsh_file_size(file);
 	assert(size == 2);
 
 	rv = sqsh_file_reader_advance(&reader, 0, size);
@@ -229,7 +228,7 @@ sqsh_cat_fragment(void) {
 	rv = sqsh__file_reader_cleanup(&reader);
 	assert(rv == 0);
 
-	rv = sqsh_inode_free(inode);
+	rv = sqsh_close(file);
 	assert(rv == 0);
 
 	rv = sqsh__tree_walker_cleanup(&walker);
@@ -244,7 +243,7 @@ sqsh_cat_datablock_and_fragment(void) {
 	int rv;
 	const uint8_t *data;
 	size_t size;
-	struct SqshInode *inode = NULL;
+	struct SqshFile *file = NULL;
 	struct SqshFileReader reader = {0};
 	struct SqshArchive sqsh = {0};
 	struct SqshTreeWalker walker = {0};
@@ -262,14 +261,14 @@ sqsh_cat_datablock_and_fragment(void) {
 	rv = sqsh_tree_walker_resolve(&walker, "b", false);
 	assert(rv == 0);
 
-	inode = sqsh_tree_walker_inode_load(&walker, &rv);
-	assert(inode != NULL);
+	file = sqsh_tree_walker_open_file(&walker, &rv);
+	assert(file != NULL);
 	assert(rv == 0);
 
-	rv = sqsh__file_reader_init(&reader, inode);
+	rv = sqsh__file_reader_init(&reader, file);
 	assert(rv == 0);
 
-	size = sqsh_inode_file_size(inode);
+	size = sqsh_file_size(file);
 	assert(size == 1050000);
 
 	rv = sqsh_file_reader_advance(&reader, 0, size);
@@ -284,7 +283,7 @@ sqsh_cat_datablock_and_fragment(void) {
 	rv = sqsh__file_reader_cleanup(&reader);
 	assert(rv == 0);
 
-	rv = sqsh_inode_free(inode);
+	rv = sqsh_close(file);
 	assert(rv == 0);
 
 	rv = sqsh__tree_walker_cleanup(&walker);
@@ -298,7 +297,7 @@ static void
 sqsh_cat_size_overflow(void) {
 	int rv;
 	size_t size;
-	struct SqshInode *inode = NULL;
+	struct SqshFile *file = NULL;
 	struct SqshFileReader reader = {0};
 	struct SqshArchive sqsh = {0};
 	struct SqshTreeWalker walker = {0};
@@ -316,13 +315,13 @@ sqsh_cat_size_overflow(void) {
 	rv = sqsh_tree_walker_resolve(&walker, "b", false);
 	assert(rv == 0);
 
-	inode = sqsh_tree_walker_inode_load(&walker, &rv);
-	assert(inode != NULL);
+	file = sqsh_tree_walker_open_file(&walker, &rv);
+	assert(file != NULL);
 	assert(rv == 0);
 
-	rv = sqsh__file_reader_init(&reader, inode);
+	rv = sqsh__file_reader_init(&reader, file);
 	assert(rv == 0);
-	size = sqsh_inode_file_size(inode);
+	size = sqsh_file_size(file);
 	assert(size == 1050000);
 
 	rv = sqsh_file_reader_advance(&reader, 0, size + 4096);
@@ -331,7 +330,7 @@ sqsh_cat_size_overflow(void) {
 	rv = sqsh__file_reader_cleanup(&reader);
 	assert(rv == 0);
 
-	rv = sqsh_inode_free(inode);
+	rv = sqsh_close(file);
 	assert(rv == 0);
 
 	rv = sqsh__tree_walker_cleanup(&walker);
@@ -345,7 +344,7 @@ static void
 sqsh_test_uid_and_gid(void) {
 	int rv;
 	uint32_t uid, gid;
-	struct SqshInode inode = {0};
+	struct SqshFile file = {0};
 	struct SqshArchive sqsh = {0};
 	const struct SqshSuperblock *superblock;
 	const struct SqshConfig config = {
@@ -357,16 +356,16 @@ sqsh_test_uid_and_gid(void) {
 	assert(rv == 0);
 
 	superblock = sqsh_archive_superblock(&sqsh);
-	rv = sqsh__inode_init(
-			&inode, &sqsh, sqsh_superblock_inode_root_ref(superblock));
+	rv = sqsh__file_init(
+			&file, &sqsh, sqsh_superblock_inode_root_ref(superblock));
 	assert(rv == 0);
 
-	uid = sqsh_inode_uid(&inode);
+	uid = sqsh_file_uid(&file);
 	assert(uid == 2020);
-	gid = sqsh_inode_gid(&inode);
+	gid = sqsh_file_gid(&file);
 	assert(gid == 202020);
 
-	rv = sqsh__inode_cleanup(&inode);
+	rv = sqsh__file_cleanup(&file);
 	assert(rv == 0);
 
 	rv = sqsh__archive_cleanup(&sqsh);
@@ -376,7 +375,7 @@ sqsh_test_uid_and_gid(void) {
 static void
 sqsh_test_extended_dir(void) {
 	int rv;
-	struct SqshInode *inode = NULL;
+	struct SqshFile *file = NULL;
 	struct SqshArchive sqsh = {0};
 	struct SqshTreeWalker walker = {0};
 	const struct SqshConfig config = {
@@ -393,10 +392,10 @@ sqsh_test_extended_dir(void) {
 	rv = sqsh_tree_walker_resolve(&walker, "/large_dir/999", false);
 	assert(rv == 0);
 
-	inode = sqsh_tree_walker_inode_load(&walker, &rv);
-	assert(inode != NULL);
+	file = sqsh_tree_walker_open_file(&walker, &rv);
+	assert(file != NULL);
 
-	rv = sqsh_inode_free(inode);
+	rv = sqsh_close(file);
 	assert(rv == 0);
 
 	rv = sqsh__tree_walker_cleanup(&walker);
@@ -411,26 +410,26 @@ sqsh_test_xattr(void) {
 	const char *expected_value = "1234567891234567891234567890001234567890";
 	int rv;
 	char *name, *value;
-	struct SqshInode inode = {0};
-	struct SqshInode *entry_inode = NULL;
+	struct SqshFile *file = NULL;
+	struct SqshFile *entry_file = NULL;
 	struct SqshDirectoryIterator *dir_iter = NULL;
 	struct SqshXattrIterator *xattr_iter = NULL;
 	struct SqshArchive sqsh = {0};
 	const struct SqshSuperblock *superblock;
-	const struct SqshConfig config = {
+	struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = TEST_SQUASHFS_IMAGE_LEN,
+			.archive_offset = 1010,
 	};
-	config.archive_offset = 1010;
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
 	superblock = sqsh_archive_superblock(&sqsh);
-	rv = sqsh__inode_init(
-			&inode, &sqsh, sqsh_superblock_inode_root_ref(superblock));
+	file = sqsh_file_new(
+			&sqsh, sqsh_superblock_inode_root_ref(superblock), &rv);
 	assert(rv == 0);
 
-	xattr_iter = sqsh_xattr_iterator_new(&inode, &rv);
+	xattr_iter = sqsh_xattr_iterator_new(file, &rv);
 	assert(xattr_iter != NULL);
 	assert(rv == 0);
 	rv = sqsh_xattr_iterator_next(xattr_iter);
@@ -438,7 +437,7 @@ sqsh_test_xattr(void) {
 	rv = sqsh_xattr_iterator_free(xattr_iter);
 	assert(rv == 0);
 
-	dir_iter = sqsh_directory_iterator_new(&inode, &rv);
+	dir_iter = sqsh_directory_iterator_new(file, &rv);
 	assert(dir_iter != NULL);
 	assert(rv == 0);
 
@@ -448,9 +447,9 @@ sqsh_test_xattr(void) {
 	assert(name != NULL);
 	assert(strcmp("a", name) == 0);
 	free(name);
-	entry_inode = sqsh_directory_iterator_inode_load(dir_iter, &rv);
+	entry_file = sqsh_directory_iterator_open_file(dir_iter, &rv);
 	assert(rv == 0);
-	xattr_iter = sqsh_xattr_iterator_new(entry_inode, &rv);
+	xattr_iter = sqsh_xattr_iterator_new(entry_file, &rv);
 	assert(xattr_iter != NULL);
 	assert(rv == 0);
 	rv = sqsh_xattr_iterator_next(xattr_iter);
@@ -468,7 +467,7 @@ sqsh_test_xattr(void) {
 	assert(rv == 0);
 	rv = sqsh_xattr_iterator_free(xattr_iter);
 	assert(rv == 0);
-	rv = sqsh_inode_free(entry_inode);
+	rv = sqsh_close(entry_file);
 	assert(rv == 0);
 
 	rv = sqsh_directory_iterator_next(dir_iter);
@@ -477,9 +476,9 @@ sqsh_test_xattr(void) {
 	assert(name != NULL);
 	assert(strcmp("b", name) == 0);
 	free(name);
-	entry_inode = sqsh_directory_iterator_inode_load(dir_iter, &rv);
+	entry_file = sqsh_directory_iterator_open_file(dir_iter, &rv);
 	assert(rv == 0);
-	xattr_iter = sqsh_xattr_iterator_new(entry_inode, &rv);
+	xattr_iter = sqsh_xattr_iterator_new(entry_file, &rv);
 	assert(xattr_iter != NULL);
 	assert(rv == 0);
 	rv = sqsh_xattr_iterator_next(xattr_iter);
@@ -497,13 +496,13 @@ sqsh_test_xattr(void) {
 	assert(rv == 0);
 	rv = sqsh_xattr_iterator_free(xattr_iter);
 	assert(rv == 0);
-	rv = sqsh_inode_free(entry_inode);
+	rv = sqsh_close(entry_file);
 	assert(rv == 0);
 
 	rv = sqsh_directory_iterator_free(dir_iter);
 	assert(rv == 0);
 
-	rv = sqsh__inode_cleanup(&inode);
+	rv = sqsh_file_cleanup(file);
 	assert(rv == 0);
 
 	rv = sqsh__archive_cleanup(&sqsh);
@@ -524,25 +523,25 @@ multithreaded_walker(void *arg) {
 			.sqsh = walker->sqsh,
 	};
 
-	struct SqshInode *inode =
-			sqsh_inode_new(walker->sqsh, walker->inode_number, &rv);
+	struct SqshFile *file =
+			sqsh_open_by_ref(walker->sqsh, walker->inode_number, &rv);
 
-	if (sqsh_inode_type(inode) == SQSH_INODE_TYPE_DIRECTORY) {
+	if (sqsh_file_type(file) == SQSH_FILE_TYPE_DIRECTORY) {
 		struct SqshDirectoryIterator *iter =
-				sqsh_directory_iterator_new(inode, &rv);
+				sqsh_directory_iterator_new(file, &rv);
 		while (sqsh_directory_iterator_next(iter) > 0) {
 			multithreaded_walker(&my_walker);
 		}
 		sqsh_directory_iterator_free(iter);
 	} else {
-		struct SqshFileReader *reader = sqsh_file_reader_new(inode, &rv);
-		size_t size = sqsh_inode_file_size(inode);
+		struct SqshFileReader *reader = sqsh_file_reader_new(file, &rv);
+		size_t size = sqsh_file_size(file);
 		rv = sqsh_file_reader_advance(reader, 0, size);
 		assert(rv == 0);
 		sqsh_file_reader_free(reader);
 	}
 
-	sqsh_inode_free(inode);
+	sqsh_close(file);
 
 	return 0;
 }
@@ -585,8 +584,8 @@ test_follow_symlink(void) {
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
-	char **dir_list =
-			sqsh_directory_list(&sqsh, "/large_dir/link/large_dir/link", &rv);
+	char **dir_list = sqsh_easy_directory_list(
+			&sqsh, "/large_dir/link/large_dir/link", &rv);
 	assert(rv == 0);
 
 	assert(strcmp(dir_list[0], "a") == 0);

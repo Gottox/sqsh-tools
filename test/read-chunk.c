@@ -5,10 +5,9 @@
  */
 
 #include "../include/sqsh_archive.h"
-#include "../include/sqsh_chrome.h"
+#include "../include/sqsh_easy.h"
 #include "../include/sqsh_error.h"
 #include "../include/sqsh_file.h"
-#include "../include/sqsh_inode.h"
 #include "sqsh_archive_private.h"
 
 #include <stdio.h>
@@ -22,19 +21,19 @@ main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	struct SqshArchive *archive = sqsh_archive_new(argv[1], NULL, &rv);
+	struct SqshArchive *archive = sqsh_archive_open(argv[1], NULL, &rv);
 	if (archive == NULL) {
 		sqsh_perror(rv, "sqsh_archive_open");
 		return EXIT_FAILURE;
 	}
 
-	struct SqshInode *inode = sqsh_open(archive, argv[2], &rv);
-	if (inode == NULL) {
+	struct SqshFile *file = sqsh_open(archive, argv[2], &rv);
+	if (file == NULL) {
 		sqsh_perror(rv, "sqsh_open");
 		return EXIT_FAILURE;
 	}
 
-	struct SqshFileReader *reader = sqsh_file_reader_new(inode, &rv);
+	struct SqshFileReader *reader = sqsh_file_reader_new(file, &rv);
 	if (reader == NULL) {
 		sqsh_perror(rv, "sqsh_file_reader_new");
 		return EXIT_FAILURE;
@@ -55,7 +54,7 @@ main(int argc, char *argv[]) {
 	}
 
 	sqsh_file_reader_free(reader);
-	sqsh_inode_free(inode);
-	sqsh_archive_free(archive);
+	sqsh_close(file);
+	sqsh_archive_close(archive);
 	return EXIT_SUCCESS;
 }

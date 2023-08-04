@@ -42,7 +42,7 @@
 extern "C" {
 #endif
 
-struct SqshInode;
+struct SqshFile;
 struct SqshDataFragment;
 struct SqshDataXattrLookupTable;
 
@@ -210,7 +210,7 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__fragment_table_init(
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_EXPORT int sqsh__fragment_table_get(
-		const struct SqshFragmentTable *table, const struct SqshInode *inode,
+		const struct SqshFragmentTable *table, const struct SqshFile *inode,
 		struct SqshDataFragment *fragment);
 
 /**

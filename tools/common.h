@@ -11,9 +11,7 @@
 #	define _DEFAULT_SOURCE
 #endif
 
-#include "../include/sqsh_archive.h"
-#include "../include/sqsh_error.h"
-#include "../include/sqsh_mapper.h"
+#include "../include/sqsh.h"
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>

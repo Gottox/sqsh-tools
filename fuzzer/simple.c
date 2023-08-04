@@ -8,7 +8,6 @@
 #include "../include/sqsh_archive_private.h"
 #include "../include/sqsh_directory_private.h"
 #include "../include/sqsh_file_private.h"
-#include "../include/sqsh_inode_private.h"
 #include "../include/sqsh_xattr_private.h"
 #include <stdint.h>
 #include <stdlib.h>
@@ -17,11 +16,11 @@
 
 static int
 read_file(struct SqshDirectoryIterator *iter) {
-	struct SqshInode *inode = NULL;
+	struct SqshFile *inode = NULL;
 	struct SqshFileReader file = {0};
 	int rv;
 
-	inode = sqsh_directory_iterator_inode_load(iter, &rv);
+	inode = sqsh_directory_iterator_open_file(iter, &rv);
 	if (rv < 0) {
 		goto out;
 	}
@@ -31,7 +30,7 @@ read_file(struct SqshDirectoryIterator *iter) {
 		goto out;
 	}
 
-	size_t size = sqsh_inode_file_size(inode);
+	size_t size = sqsh_file_size(inode);
 	size_t chunk_size = 0;
 	for (; size > 0; size -= chunk_size) {
 		const size_t advance = chunk_size;
@@ -61,7 +60,7 @@ read_file(struct SqshDirectoryIterator *iter) {
 	}
 
 out:
-	sqsh_inode_free(inode);
+	sqsh_close(inode);
 	sqsh__file_reader_cleanup(&file);
 	return 0;
 }
@@ -70,11 +69,11 @@ int
 LLVMFuzzerTestOneInput(char *data, size_t size) {
 	int rv = 0;
 	struct SqshArchive *archive = NULL;
-	struct SqshInode *inode = NULL;
+	struct SqshFile *inode = NULL;
 	struct SqshDirectoryIterator *iter = NULL;
 	const struct SqshSuperblock *superblock = NULL;
 
-	archive = sqsh_archive_new(
+	archive = sqsh_archive_open(
 			(uint8_t *)data,
 			&(struct SqshConfig){
 					.source_mapper = sqsh_mapper_impl_static,
@@ -87,7 +86,7 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 
 	superblock = sqsh_archive_superblock(archive);
 	uint64_t inode_ref = sqsh_superblock_inode_root_ref(superblock);
-	inode = sqsh_inode_new(archive, inode_ref, &rv);
+	inode = sqsh_open_by_ref(archive, inode_ref, &rv);
 	if (rv < 0) {
 		goto out;
 	}
@@ -104,8 +103,8 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 out:
 
 	sqsh_directory_iterator_free(iter);
-	sqsh_inode_free(inode);
-	sqsh_archive_free(archive);
+	sqsh_close(inode);
+	sqsh_archive_close(archive);
 
 	(void)rv;
 	return 0; // Non-zero return values are reserved for future use.

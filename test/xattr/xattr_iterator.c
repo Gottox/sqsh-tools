@@ -36,8 +36,7 @@
 #include <testlib.h>
 
 #include "../../include/sqsh_archive_private.h"
-#include "../../include/sqsh_inode.h"
-#include "../../include/sqsh_inode_private.h"
+#include "../../include/sqsh_file_private.h"
 #include "../../include/sqsh_xattr.h"
 #include "../../lib/utils/utils.h"
 
@@ -45,7 +44,7 @@ static void
 load_xattr(void) {
 	int rv;
 	struct SqshArchive archive = {0};
-	struct SqshInode inode = {0};
+	struct SqshFile file = {0};
 	uint8_t payload[8192] = {
 			/* clang-format off */
 			SQSH_HEADER,
@@ -80,13 +79,13 @@ load_xattr(void) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
-	rv = sqsh__inode_init(&inode, &archive, inode_ref);
+	rv = sqsh__file_init(&file, &archive, inode_ref);
 	assert(rv == 0);
 
-	assert(sqsh_inode_type(&inode) == SQSH_INODE_TYPE_DIRECTORY);
-	assert(sqsh_inode_is_extended(&inode) == true);
+	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_DIRECTORY);
+	assert(sqsh_file_is_extended(&file) == true);
 
-	struct SqshXattrIterator *iterator = sqsh_xattr_iterator_new(&inode, &rv);
+	struct SqshXattrIterator *iterator = sqsh_xattr_iterator_new(&file, &rv);
 	assert(rv == 0);
 	assert(iterator != NULL);
 
@@ -133,7 +132,7 @@ load_xattr(void) {
 	assert(rv == 0);
 
 	sqsh_xattr_iterator_free(iterator);
-	sqsh__inode_cleanup(&inode);
+	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -141,7 +140,7 @@ static void
 load_xattr_indirect(void) {
 	int rv;
 	struct SqshArchive archive = {0};
-	struct SqshInode inode = {0};
+	struct SqshFile file = {0};
 	uint8_t payload[8192] = {
 			/* clang-format off */
 			SQSH_HEADER,
@@ -171,13 +170,13 @@ load_xattr_indirect(void) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
-	rv = sqsh__inode_init(&inode, &archive, inode_ref);
+	rv = sqsh__file_init(&file, &archive, inode_ref);
 	assert(rv == 0);
 
-	assert(sqsh_inode_type(&inode) == SQSH_INODE_TYPE_DIRECTORY);
-	assert(sqsh_inode_is_extended(&inode) == true);
+	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_DIRECTORY);
+	assert(sqsh_file_is_extended(&file) == true);
 
-	struct SqshXattrIterator *iterator = sqsh_xattr_iterator_new(&inode, &rv);
+	struct SqshXattrIterator *iterator = sqsh_xattr_iterator_new(&file, &rv);
 	assert(rv == 0);
 	assert(iterator != NULL);
 
@@ -196,7 +195,7 @@ load_xattr_indirect(void) {
 	assert(rv == 0);
 
 	sqsh_xattr_iterator_free(iterator);
-	sqsh__inode_cleanup(&inode);
+	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 

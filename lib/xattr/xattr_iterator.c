@@ -42,18 +42,18 @@
 #endif
 
 #include "../../include/sqsh_data_private.h"
-#include "../../include/sqsh_inode_private.h"
+#include "../../include/sqsh_file_private.h"
 
 int
 sqsh__xattr_iterator_init(
-		struct SqshXattrIterator *iterator, const struct SqshInode *inode) {
+		struct SqshXattrIterator *iterator, const struct SqshFile *file) {
 	int rv;
 	struct SqshDataXattrLookupTable *ref =
 			alloca(SQSH_SIZEOF_XATTR_LOOKUP_TABLE);
 	struct SqshXattrTable *xattr_table = NULL;
-	struct SqshArchive *sqsh = inode->archive;
+	struct SqshArchive *sqsh = file->archive;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
-	uint32_t index = sqsh_inode_xattr_index(inode);
+	uint32_t index = sqsh_file_xattr_index(file);
 
 	if (index == SQSH_INODE_NO_XATTR ||
 		sqsh_superblock_has_xattr_table(superblock) == false) {
@@ -98,7 +98,7 @@ sqsh__xattr_iterator_init(
 	iterator->next_offset = inner_offset;
 	iterator->value_index = 0;
 	iterator->context = xattr_table;
-	iterator->sqsh = sqsh;
+	iterator->archive = sqsh;
 	iterator->upper_limit = archive_size;
 
 out:
@@ -109,7 +109,7 @@ out:
 }
 
 struct SqshXattrIterator *
-sqsh_xattr_iterator_new(const struct SqshInode *inode, int *err) {
+sqsh_xattr_iterator_new(const struct SqshFile *file, int *err) {
 	int rv = 0;
 	struct SqshXattrIterator *iterator =
 			calloc(1, sizeof(struct SqshXattrIterator));
@@ -117,7 +117,7 @@ sqsh_xattr_iterator_new(const struct SqshInode *inode, int *err) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
-	rv = sqsh__xattr_iterator_init(iterator, inode);
+	rv = sqsh__xattr_iterator_init(iterator, file);
 	if (rv < 0) {
 		free(iterator);
 		iterator = NULL;
@@ -167,7 +167,7 @@ xattr_value_indirect_load(struct SqshXattrIterator *iterator) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	rv = sqsh__metablock_reader_init(
-			&iterator->out_of_line_value, iterator->sqsh, start_block,
+			&iterator->out_of_line_value, iterator->archive, start_block,
 			iterator->upper_limit);
 	if (rv < 0) {
 		goto out;

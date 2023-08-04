@@ -37,14 +37,14 @@
 
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_data_private.h"
-#include "../../include/sqsh_inode_private.h"
+#include "../../include/sqsh_file_private.h"
 #include "../../lib/utils/utils.h"
 
 static void
-load_inode(void) {
+load_file(void) {
 	int rv;
 	struct SqshArchive archive = {0};
-	struct SqshInode inode = {0};
+	struct SqshFile file = {0};
 	uint8_t payload[8192] = {
 			SQSH_HEADER,
 			/* inode */
@@ -60,22 +60,22 @@ load_inode(void) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint64_t inode_ref = sqsh_address_ref_create(15, 3);
-	rv = sqsh__inode_init(&inode, &archive, inode_ref);
+	rv = sqsh__file_init(&file, &archive, inode_ref);
 	assert(rv == 0);
 
-	assert(sqsh_inode_type(&inode) == SQSH_INODE_TYPE_FILE);
-	assert(sqsh_inode_permission(&inode) == 0666);
-	assert(sqsh_inode_modified_time(&inode) == 4242);
-	assert(sqsh_inode_file_blocks_start(&inode) == 1024);
-	assert(sqsh_inode_file_has_fragment(&inode) == false);
+	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
+	assert(sqsh_file_permission(&file) == 0666);
+	assert(sqsh_file_modified_time(&file) == 4242);
+	assert(sqsh_file_blocks_start(&file) == 1024);
+	assert(sqsh_file_has_fragment(&file) == false);
 
-	assert(sqsh_inode_file_block_count(&inode) == 1);
-	assert(sqsh_inode_file_block_size(&inode, 0) == 42);
+	assert(sqsh_file_block_count(&file) == 1);
+	assert(sqsh_file_block_size(&file, 0) == 42);
 
-	sqsh__inode_cleanup(&inode);
+	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
 DECLARE_TESTS
-TEST(load_inode)
+TEST(load_file)
 END_TESTS

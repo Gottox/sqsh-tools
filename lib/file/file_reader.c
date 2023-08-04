@@ -37,7 +37,6 @@
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_primitive_private.h"
 
-#include "../../include/sqsh_inode_private.h"
 #include "../utils/utils.h"
 
 static int
@@ -71,9 +70,9 @@ static const struct SqshIteratorImpl file_reader_impl = {
 
 int
 sqsh__file_reader_init(
-		struct SqshFileReader *reader, const struct SqshInode *inode) {
+		struct SqshFileReader *reader, const struct SqshFile *file) {
 	int rv = 0;
-	rv = sqsh__file_iterator_init(&reader->iterator, inode);
+	rv = sqsh__file_iterator_init(&reader->iterator, file);
 	if (rv < 0) {
 		goto out;
 	}
@@ -84,14 +83,14 @@ out:
 }
 
 struct SqshFileReader *
-sqsh_file_reader_new(const struct SqshInode *inode, int *err) {
+sqsh_file_reader_new(const struct SqshFile *file, int *err) {
 	int rv = 0;
 	struct SqshFileReader *reader = calloc(1, sizeof(struct SqshFileReader));
 	if (reader == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
-	rv = sqsh__file_reader_init(reader, inode);
+	rv = sqsh__file_reader_init(reader, file);
 	if (rv < 0) {
 		free(reader);
 		reader = NULL;

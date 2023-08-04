@@ -40,7 +40,8 @@
 extern "C" {
 #endif
 
-struct SqshInode;
+struct SqshFile;
+struct SqshArchive;
 
 /***************************************
  * context/file_reader.c
@@ -56,13 +57,13 @@ struct SqshFileReader;
  * @brief Initializes a SqshFileReader struct.
  * @memberof SqshFileReader
  *
- * @param[in] inode The inode context to retrieve the file contents from.
+ * @param[in] file The file context to retrieve the file contents from.
  * @param[out] err Pointer to an int where the error code will be stored.
  *
  * @return a new file reader.
  */
 struct SqshFileReader *
-sqsh_file_reader_new(const struct SqshInode *inode, int *err);
+sqsh_file_reader_new(const struct SqshFile *file, int *err);
 
 /**
  * @brief Advances the file reader by a certain amount of data and presents
@@ -118,14 +119,14 @@ struct SqshFileIterator;
  * @brief Creates a new SqshFileIterator struct and initializes it.
  * @memberof SqshFileIterator
  *
- * @param[in] inode The inode context to retrieve the file contents from.
+ * @param[in] file The file context to retrieve the file contents from.
  * @param[out] err Pointer to an int where the error code will be stored.
  *
  * @return A pointer to the newly created and initialized SqshFileIterator
  * struct.
  */
 SQSH_NO_UNUSED struct SqshFileIterator *
-sqsh_file_iterator_new(const struct SqshInode *inode, int *err);
+sqsh_file_iterator_new(const struct SqshFile *file, int *err);
 
 /**
  * @brief Skips a certain amount of data in the file iterator. Keep in mind
@@ -200,6 +201,362 @@ sqsh_file_iterator_size(const struct SqshFileIterator *iterator);
  * @return 0 on success, less than 0 on error.
  */
 int sqsh_file_iterator_free(struct SqshFileIterator *iterator);
+
+/***************************************
+ * file/file.c
+ */
+
+/**
+ * @brief Value that indicates the absence of a fragment.
+ */
+#define SQSH_INODE_NO_FRAGMENT 0xFFFFFFFF
+/**
+ * @brief Value that indicates the absence of an xattr table.
+ */
+#define SQSH_INODE_NO_XATTR 0xFFFFFFFF
+
+/**
+ * @brief enum that represents the file type.
+ */
+enum SqshFileType {
+	SQSH_FILE_TYPE_UNKNOWN = -1,
+	/* avoid overlapping with the types in inode_data.h */
+	SQSH_FILE_TYPE_DIRECTORY = 1 + (1 << 8),
+	SQSH_FILE_TYPE_FILE,
+	SQSH_FILE_TYPE_SYMLINK,
+	SQSH_FILE_TYPE_BLOCK,
+	SQSH_FILE_TYPE_CHAR,
+	SQSH_FILE_TYPE_FIFO,
+	SQSH_FILE_TYPE_SOCKET
+};
+
+/**
+ * @memberof SqshFile
+ * @brief Initialize the file context from a path.
+ *
+ * @param[in] archive The sqsh archive context.
+ * @param[in] path The path the file or directory.
+ * @param[out] err Pointer to an int where the error code will be stored.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED struct SqshFile *
+sqsh_open(struct SqshArchive *archive, const char *path, int *err);
+
+/**
+ * @memberof SqshFile
+ * @brief Initializes a file context in heap
+ *
+ * @param archive The sqsh context to use.
+ * @param inode_ref The inode reference to initialize the context with.
+ * @param[out] err Pointer to an int where the error code will be stored.
+ *
+ * @return a pointer to the sqsh context or NULL if an error occurred.
+ */
+SQSH_NO_UNUSED struct SqshFile *
+sqsh_open_by_ref(struct SqshArchive *archive, uint64_t inode_ref, int *err);
+
+/**
+ * @memberof SqshFile
+ * @brief returns whether the file is an extended structure.
+ *
+ * @param[in] context The file context.
+ *
+ * @return true if the file is an extended structure.
+ */
+bool sqsh_file_is_extended(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief Getter for the inode hard link count.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the amount of hard links to the inode.
+ */
+uint32_t sqsh_file_hard_link_count(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief Getter for the file size. 0 if the file has no size.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the file type.
+ */
+uint64_t sqsh_file_size(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief Getter for the permissions of the file.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the permissions of the file.
+ */
+uint16_t sqsh_file_permission(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief Getter for the inode number.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the inode number.
+ */
+uint32_t sqsh_file_inode(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief Getter for the file modification time.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the file modification time.
+ */
+uint32_t sqsh_file_modified_time(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief Getter for the start block of the file content. This is only
+ * internally used and will be used while retrieving the file content.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the start block of the file content or UINT64_MAX if the type
+ * is not SQSH_FILE_TYPE_FILE.
+ */
+uint64_t sqsh_file_blocks_start(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief Getter for the amount of blocks of the file content. This is only
+ * internally used and will be used while retrieving the file content.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the amount of blocks of the file content. If the file is not of
+ * of type SQSH_FILE_TYPE_FILE, UINT32_MAX will be returned.
+ */
+uint32_t sqsh_file_block_count(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief Getter the size of a block of the file content. This is only
+ * internally used and will be used while retrieving the file content.
+ *
+ * @param[in] context The file context.
+ * @param index The index of the block.
+ *
+ * @return the size of the block with the index.
+ */
+uint32_t sqsh_file_block_size(const struct SqshFile *context, uint32_t index);
+
+/**
+ * @memberof SqshFile
+ * @brief Checks whether a certain block is compressed.
+ *
+ * @param[in] context The file context.
+ * @param index The index of the block.
+ *
+ * @return true if the block is compressed, false otherwise.
+ */
+bool
+sqsh_file_block_is_compressed(const struct SqshFile *context, uint32_t index);
+
+/**
+ * @memberof SqshFile
+ * @brief retrieve the fragment block index. This is only internally used
+ *
+ * and will be used while retrieving the file content.
+ * @param[in] context The file context.
+ *
+ * @return the fragment block index.
+ */
+uint32_t sqsh_file_fragment_block_index(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief retrieve the fragment block offset. This is only internally used
+ * and will be used while retrieving the file content.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the offset inside of the fragment block.
+ */
+uint32_t sqsh_file_fragment_block_offset(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief retrieve the directory block start. This is only internally used
+ * and will be used while iterating over the directory entries.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the directory block start.
+ */
+uint32_t sqsh_file_directory_block_start(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief retrieve the directory block offset. This is only internally used
+ * and will be used while iterating over the directory entries.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the directory block offset.
+ */
+uint32_t sqsh_file_directory_block_offset(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief retrieve the parent inode of the directory.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the directory block offset.
+ */
+uint32_t sqsh_file_directory_parent_inode(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief returns true if the file has a fragment block.
+ *
+ * @param[in] context The file context.
+ *
+ * @return true if the file has a fragment block, false otherwise.
+ */
+bool sqsh_file_has_fragment(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief returns the type of the file.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the type of the file.
+ */
+enum SqshFileType sqsh_file_type(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief returns the target of a symbolic link. Be aware that the returned
+ * value is not zero terminated.
+ *
+ * To get the length of the target use sqsh_file_symlink_size().
+ *
+ * If you need a zero terminated string use sqsh_file_symlink_dup().
+ *
+ * @param[in] context The file context.
+ *
+ * @return the target of a symbolic link, NULL if the file is not a symbolic
+ * link.
+ */
+const char *sqsh_file_symlink(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief creates a heap allocated copy of the target of a symbolic link.
+ *
+ * The caller is responsible for calling free() on the returned pointer.
+ *
+ * The returned string is 0 terminated.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the target of a symbolic link, NULL if the file is not a symbolic
+ * link.
+ */
+SQSH_NO_UNUSED char *sqsh_file_symlink_dup(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief returns the length of the target of a symbolic link in bytes.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the length of the target of a symbolic link in bytes or 0 if the
+ * file is not a symbolic link.
+ */
+uint32_t sqsh_file_symlink_size(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ *
+ * @brief returns the device id of the device inode.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the device id of the device inode or 0 if the file is not a device.
+ */
+uint32_t sqsh_file_device_id(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief returns the owner user id of the file.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the owner uid of the file.
+ */
+uint32_t sqsh_file_uid(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief returns the owner group id of the file.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the owner gid of the file.
+ */
+uint32_t sqsh_file_gid(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief returns the inode reference to this file.
+ *
+ * The owner reference is an encoded physical location of the inode inside of
+ * the archive.
+ *
+ * To decode this value use the following code:
+ *
+ * ```
+ * uint64_t ref = sqsh_file_ref(context);
+ * uint64_t outer_address = ref >> 16;
+ * uint64_t inner_address = ref & 0xffff;
+ * ```
+ *
+ * The outer address is the physical location of the metablock within the
+ * archive.
+ *
+ * The inner address is the physical location of the inode inside of the
+ * decompressed metablock.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the reference to this file.
+ */
+uint64_t sqsh_file_inode_ref(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief returns index of the extended attribute inside of the xattr table.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the index of the extended attribute inside of the xattr table.
+ */
+uint32_t sqsh_file_xattr_index(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief cleans up an file context and frees the memory.
+ *
+ * @param[in] file The file context.
+ *
+ * @return int 0 on success, less than 0 on error.
+ */
+int sqsh_close(struct SqshFile *file);
 
 #ifdef __cplusplus
 }

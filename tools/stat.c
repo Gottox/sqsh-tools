@@ -33,10 +33,6 @@
 
 #include "common.h"
 
-#include "../include/sqsh_chrome.h"
-#include "../include/sqsh_directory.h"
-#include "../include/sqsh_tree.h"
-
 #include <assert.h>
 #include <inttypes.h>
 #include <limits.h>
@@ -247,19 +243,19 @@ stat_image(struct SqshArchive *sqsh) {
 static char *
 inode_type_name(int type) {
 	switch (type) {
-	case SQSH_INODE_TYPE_FILE:
+	case SQSH_FILE_TYPE_FILE:
 		return "file";
-	case SQSH_INODE_TYPE_DIRECTORY:
+	case SQSH_FILE_TYPE_DIRECTORY:
 		return "directory";
-	case SQSH_INODE_TYPE_SYMLINK:
+	case SQSH_FILE_TYPE_SYMLINK:
 		return "symlink";
-	case SQSH_INODE_TYPE_FIFO:
+	case SQSH_FILE_TYPE_FIFO:
 		return "fifo";
-	case SQSH_INODE_TYPE_SOCKET:
+	case SQSH_FILE_TYPE_SOCKET:
 		return "socket";
-	case SQSH_INODE_TYPE_BLOCK:
+	case SQSH_FILE_TYPE_BLOCK:
 		return "block device";
-	case SQSH_INODE_TYPE_CHAR:
+	case SQSH_FILE_TYPE_CHAR:
 		return "character device";
 	default:
 		return "unknown";
@@ -267,60 +263,59 @@ inode_type_name(int type) {
 }
 
 static int
-stat_file(struct SqshTreeWalker *walker, const char *path) {
+stat_file(struct SqshArchive *archive, const char *path) {
 	int rv = 0;
-	struct SqshInode *inode = NULL;
+	struct SqshFile *file = NULL;
 	bool has_fragment = false;
-	rv = sqsh_tree_walker_resolve(walker, path, false);
-	inode = sqsh_tree_walker_inode_load(walker, &rv);
+	file = sqsh_open(archive, path, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		return rv;
 	}
 
-	int inode_type = sqsh_inode_type(inode);
-	printf("          inode ref: %" PRIu64 "\n", sqsh_inode_ref(inode));
+	int inode_type = sqsh_file_type(file);
+	printf("          inode ref: %" PRIu64 "\n", sqsh_file_inode_ref(file));
 	printf("         inode type: %s\n", inode_type_name(inode_type));
 	printf(" extended structure: %s\n",
-		   sqsh_inode_is_extended(inode) ? "yes" : "no");
-	printf("       inode number: %i\n", sqsh_inode_number(inode));
-	printf("        permissions: %04o\n", sqsh_inode_permission(inode));
-	printf("                uid: %i\n", sqsh_inode_uid(inode));
-	printf("                gid: %i\n", sqsh_inode_gid(inode));
-	printf("    hard link count: %i\n", sqsh_inode_hard_link_count(inode));
-	printf("          file size: %" PRIu64 "\n", sqsh_inode_file_size(inode));
+		   sqsh_file_is_extended(file) ? "yes" : "no");
+	printf("       inode number: %i\n", sqsh_file_inode(file));
+	printf("        permissions: %04o\n", sqsh_file_permission(file));
+	printf("                uid: %i\n", sqsh_file_uid(file));
+	printf("                gid: %i\n", sqsh_file_gid(file));
+	printf("    hard link count: %i\n", sqsh_file_hard_link_count(file));
+	printf("          file size: %" PRIu64 "\n", sqsh_file_size(file));
 	switch (inode_type) {
-	case SQSH_INODE_TYPE_FILE:
-		has_fragment = sqsh_inode_file_has_fragment(inode);
+	case SQSH_FILE_TYPE_FILE:
+		has_fragment = sqsh_file_has_fragment(file);
 		printf("       has fragment: %s\n", has_fragment ? "yes" : "no");
 		if (has_fragment) {
 			printf("     fragment index: %i\n",
-				   sqsh_inode_file_fragment_block_index(inode));
+				   sqsh_file_fragment_block_index(file));
 			printf("    fragment offset: %i\n",
-				   sqsh_inode_file_fragment_block_offset(inode));
+				   sqsh_file_fragment_block_offset(file));
 		}
-		printf("   number of blocks: %i\n", sqsh_inode_file_block_count(inode));
-		for (uint32_t i = 0; i < sqsh_inode_file_block_count(inode); i++) {
-			bool is_compressed = sqsh_inode_file_block_is_compressed(inode, i);
-			uint32_t size = sqsh_inode_file_block_size(inode, i);
+		printf("   number of blocks: %i\n", sqsh_file_block_count(file));
+		for (uint32_t i = 0; i < sqsh_file_block_count(file); i++) {
+			bool is_compressed = sqsh_file_block_is_compressed(file, i);
+			uint32_t size = sqsh_file_block_size(file, i);
 
 			printf("          % 9i - %i (compressed: %s)\n", i, size,
 				   is_compressed ? "yes" : "no");
 		}
 		break;
-	case SQSH_INODE_TYPE_SYMLINK:
-		printf("     symlink target: %.*s\n", sqsh_inode_symlink_size(inode),
-			   sqsh_inode_symlink(inode));
+	case SQSH_FILE_TYPE_SYMLINK:
+		printf("     symlink target: %.*s\n", sqsh_file_symlink_size(file),
+			   sqsh_file_symlink(file));
 		break;
-	case SQSH_INODE_TYPE_BLOCK:
-	case SQSH_INODE_TYPE_CHAR:
+	case SQSH_FILE_TYPE_BLOCK:
+	case SQSH_FILE_TYPE_CHAR:
 		printf("       device major: %i\n",
-			   (sqsh_inode_device_id(inode) & 0xFFF00) >> 8);
-		printf("       device minor: %i\n", sqsh_inode_device_id(inode) & 0xFF);
+			   (sqsh_file_device_id(file) & 0xFFF00) >> 8);
+		printf("       device minor: %i\n", sqsh_file_device_id(file) & 0xFF);
 		break;
 	}
 
-	sqsh_inode_free(inode);
+	sqsh_close(file);
 	return rv;
 }
 
@@ -329,8 +324,7 @@ main(int argc, char *argv[]) {
 	int rv = 0;
 	int opt = 0;
 	const char *image_path;
-	struct SqshArchive *sqsh;
-	struct SqshTreeWalker *walker = NULL;
+	struct SqshArchive *archive;
 	uint64_t offset = 0;
 
 	while ((opt = getopt(argc, argv, "o:vh")) != -1) {
@@ -353,13 +347,7 @@ main(int argc, char *argv[]) {
 	image_path = argv[optind];
 	optind++;
 
-	sqsh = open_archive(image_path, offset, &rv);
-	if (rv < 0) {
-		sqsh_perror(rv, image_path);
-		rv = EXIT_FAILURE;
-		goto out;
-	}
-	walker = sqsh_tree_walker_new(sqsh, &rv);
+	archive = open_archive(image_path, offset, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, image_path);
 		rv = EXIT_FAILURE;
@@ -367,15 +355,14 @@ main(int argc, char *argv[]) {
 	}
 
 	if (optind == argc) {
-		rv = stat_image(sqsh);
+		rv = stat_image(archive);
 	} else if (optind + 1 == argc) {
-		rv = stat_file(walker, argv[optind]);
+		rv = stat_file(archive, argv[optind]);
 	} else {
 		rv = usage(argv[0]);
 	}
 
 out:
-	sqsh_tree_walker_free(walker);
-	sqsh_archive_free(sqsh);
+	sqsh_archive_close(archive);
 	return rv;
 }
