@@ -51,7 +51,7 @@ sqsh_archive_close(archive);
 * [x] OpenBSD support
 * [x] FreeBSD support
 * [ ] refine the high-level API
-* [ ] refine the low-level API
+* [x] refine the low-level API
 
 ## Building
 
