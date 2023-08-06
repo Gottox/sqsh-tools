@@ -64,15 +64,53 @@ struct SqshFragmentView {
 	size_t size;
 };
 
+/**
+ * @internal
+ * @memberof SqshFragmentView
+ * @brief Initializes a fragment view to access the fragment contents of a
+single file.
+ *
+ * @param[in,out] view The fragment view to initialize.
+ * @param[in] file The file to retrieve the fragment contents from.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
 SQSH_NO_EXPORT int sqsh__fragment_view_init(
 		struct SqshFragmentView *view, const struct SqshFile *file);
 
+/**
+ * @internal
+ * @memberof SqshFragmentView 
+ * @brief Retrieves the fragment data.
+ *
+ * @param[in] view The fragment view to retrieve the data from.
+ *
+ * @return The fragment data.
+ */
 SQSH_NO_EXPORT const uint8_t *
 sqsh__fragment_view_data(const struct SqshFragmentView *view);
 
+/**
+ * @internal
+ * @memberof SqshFragmentView 
+ * @brief Retrieves the fragment size.
+ *
+ * @param[in] view The fragment view to retrieve the size from.
+ *
+ * @return The fragment size.
+ */
 SQSH_NO_EXPORT size_t
 sqsh__fragment_view_size(const struct SqshFragmentView *view);
 
+/**
+ * @internal
+ * @memberof SqshFragmentView
+ * @brief Cleans up resources used by a fragment view.
+ *
+ * @param[in] view The fragment view to clean up.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
 SQSH_NO_EXPORT int sqsh__fragment_view_cleanup(struct SqshFragmentView *view);
 
 /***************************************
