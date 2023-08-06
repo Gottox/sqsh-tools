@@ -325,7 +325,7 @@ sqsh_cat_size_overflow(void) {
 	assert(size == 1050000);
 
 	rv = sqsh_file_reader_advance(&reader, 0, size + 4096);
-	assert(rv != 0); // TODO: check for correct error code
+	assert(rv == -SQSH_ERROR_OUT_OF_BOUNDS);
 
 	rv = sqsh__file_reader_cleanup(&reader);
 	assert(rv == 0);
