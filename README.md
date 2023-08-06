@@ -17,22 +17,23 @@ provides zero-copy interfaces to the squashfs archives.
 
 ```c
 struct SqshArchive *archive =
-		sqsh_archive_new("/path/to/archive.squashfs", NULL, NULL);
+		sqsh_archive_open("/path/to/archive.squashfs", NULL, NULL);
 
-uint8_t *contents = sqsh_file_content(archive, "/path/to/file");
+uint8_t *contents = sqsh_easy_file_content(archive, "/path/to/file");
 assert(contents != NULL);
-const size_t size = sqsh_file_size(archive, "/path/to/file");
+const size_t size = sqsh_easy_file_size(archive, "/path/to/file");
 fwrite(contents, 1, size, stdout);
 free(contents);
 
-char **files = sqsh_directory_list(archive, "/path/to/directory", NULL);
+char **files =
+		sqsh_easy_directory_list(archive, "/path/to/directory", NULL);
 assert(files != NULL);
 for (int i = 0; files[i] != NULL; i++) {
 	printf("%s\n", files[i]);
 }
 free(files);
 
-sqsh_archive_free(archive);
+sqsh_archive_close(archive);
 ```
 
 ## Roadmap to 1.0
