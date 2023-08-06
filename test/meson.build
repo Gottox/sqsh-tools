@@ -1,6 +1,7 @@
 add_languages('cpp', native: false)
 
 sqsh_test = [
+    'archive/compression_options.c',
     'easy/directory.c',
     'easy/file.c',
     'cpp-test.cpp',

@@ -60,6 +60,7 @@ sqsh_compression_options_new(struct SqshArchive *sqsh, int *err) {
 		free(compression_options);
 		compression_options = NULL;
 	}
+	rv = 0;
 out:
 	if (err != NULL) {
 		*err = rv;
