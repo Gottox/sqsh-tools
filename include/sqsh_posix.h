@@ -28,43 +28,33 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         file.c
+ * @file         sqsh_posix.h
  */
 
-#define _DEFAULT_SOURCE
+#ifndef SQSH_POSIX_H
+#define SQSH_POSIX_H
 
-#include "../../include/sqsh_easy.h"
+#include "sqsh_common.h"
+#include <stdio.h>
 
-#include <errno.h>
-#include <pthread.h>
-#include <stdatomic.h>
-#include <stdlib.h>
-#include <string.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include "../../include/sqsh_error.h"
-#include "../../include/sqsh_file_private.h"
+struct SqshFile;
 
-int
-sqsh_file_to_stream(const struct SqshFile *file, FILE *stream) {
-	int rv = 0;
-	struct SqshFileIterator iterator = {0};
+/**
+ * @memberof SqshFile
+ * @brief writes data to a file descriptor.
+ *
+ * @param[in] file The file context.
+ * @param[in] stream The descriptor to write the file contents to.
+ *
+ * @return The number of bytes read on success, less than 0 on error.
+ */
+int sqsh_file_to_stream(const struct SqshFile *file, FILE *stream);
 
-	rv = sqsh__file_iterator_init(&iterator, file);
-	if (rv < 0) {
-		goto out;
-	}
-
-	while ((rv = sqsh_file_iterator_next(&iterator, SIZE_MAX)) > 0) {
-		const uint8_t *data = sqsh_file_iterator_data(&iterator);
-		const size_t size = sqsh_file_iterator_size(&iterator);
-		rv = fwrite(data, sizeof(uint8_t), size, stream);
-		if (rv > 0 && (size_t)rv != size) {
-			rv = -errno;
-			goto out;
-		}
-	}
-
-out:
-	sqsh__file_iterator_cleanup(&iterator);
-	return rv;
+#ifdef __cplusplus
 }
+#endif
+#endif /* SQSH_POSIX_H */

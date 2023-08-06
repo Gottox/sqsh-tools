@@ -48,20 +48,6 @@ struct SqshArchive;
 struct SqshFile;
 
 /***************************************
- * chrome/stream.c
- */
-
-/**
- * @brief writes data to a file descriptor.
- *
- * @param[in] file The file context.
- * @param[in] stream The descriptor to write the file contents to.
- *
- * @return The number of bytes read on success, less than 0 on error.
- */
-int sqsh_file_to_stream(const struct SqshFile *file, FILE *stream);
-
-/***************************************
  * chrome/file.c
  */
 

@@ -28,17 +28,40 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh.h
+ * @file         thread.c
  */
 
-#include "sqsh_archive.h"
-#include "sqsh_common.h"
-#include "sqsh_directory.h"
-#include "sqsh_easy.h"
-#include "sqsh_error.h"
-#include "sqsh_file.h"
-#include "sqsh_mapper.h"
-#include "sqsh_table.h"
-#include "sqsh_tree.h"
-#include "sqsh_xattr.h"
-#include "sqsh_posix.h"
+#define _DEFAULT_SOURCE
+
+#include "../../include/sqsh_file_private.h"
+#include "../../include/sqsh_posix.h"
+
+#include <errno.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+int
+sqsh_file_to_stream(const struct SqshFile *file, FILE *stream) {
+	int rv = 0;
+	struct SqshFileIterator iterator = {0};
+
+	rv = sqsh__file_iterator_init(&iterator, file);
+	if (rv < 0) {
+		goto out;
+	}
+
+	while ((rv = sqsh_file_iterator_next(&iterator, SIZE_MAX)) > 0) {
+		const uint8_t *data = sqsh_file_iterator_data(&iterator);
+		const size_t size = sqsh_file_iterator_size(&iterator);
+		rv = fwrite(data, sizeof(uint8_t), size, stream);
+		if (rv > 0 && (size_t)rv != size) {
+			rv = -errno;
+			goto out;
+		}
+	}
+
+out:
+	sqsh__file_iterator_cleanup(&iterator);
+	return rv;
+}
+
