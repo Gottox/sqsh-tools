@@ -207,13 +207,13 @@ skip_over_zero_page() {
 	rv = sqsh__file_reader_init(&reader, &file);
 	assert(rv == 0);
 
-	rv = sqsh_file_reader_advance(&reader, 32768 - 1, 7);
+	rv = sqsh_file_reader_advance(&reader, 32768, 6);
 	assert(rv == 0);
 
 	size_t size = sqsh_file_reader_size(&reader);
-	assert(size == 7);
+	assert(size == 6);
 	const uint8_t *data = sqsh_file_reader_data(&reader);
-	assert(memcmp(data, "\0foobar", 6) == 0);
+	assert(memcmp(data, "foobar", 6) == 0);
 
 	sqsh__file_reader_cleanup(&reader);
 	sqsh__file_cleanup(&file);
