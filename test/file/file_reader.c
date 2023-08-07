@@ -176,8 +176,53 @@ load_file_from_uncompressed_data_block(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
+static void
+skip_over_zero_page() {
+	int rv;
+	struct SqshArchive archive = {0};
+	struct SqshFile file = {0};
+	uint8_t payload[8192] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* datablock */
+			[1024] = 'f', 'o', 'o', 'b', 'a', 'r',
+			/* inode */
+			[INODE_TABLE_OFFSET + 256] = METABLOCK_HEADER(0, 128),
+			INODE_HEADER(2, 0, 0, 0, 0, 1),
+			INODE_BASIC_FILE(1024, 0xFFFFFFFF, 0, 32768 + 6),
+			DATA_BLOCK_REF(0, 0), /* zero page */
+			DATA_BLOCK_REF(6, 0),
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	uint64_t inode_ref = sqsh_address_ref_create(256, 0);
+	rv = sqsh__file_init(&file, &archive, inode_ref);
+	assert(rv == 0);
+
+	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
+	assert(sqsh_file_has_fragment(&file) == false);
+
+	struct SqshFileReader reader = {0};
+	rv = sqsh__file_reader_init(&reader, &file);
+	assert(rv == 0);
+
+	rv = sqsh_file_reader_advance(&reader, 32768 - 1, 7);
+	assert(rv == 0);
+
+	size_t size = sqsh_file_reader_size(&reader);
+	assert(size == 7);
+	const uint8_t *data = sqsh_file_reader_data(&reader);
+	assert(memcmp(data, "\0foobar", 6) == 0);
+
+	sqsh__file_reader_cleanup(&reader);
+	sqsh__file_cleanup(&file);
+	sqsh__archive_cleanup(&archive);
+}
+
 DECLARE_TESTS
 TEST(load_file_from_uncompressed_data_block)
 TEST(load_file_from_compressed_data_block)
 TEST(load_file_from_compressed_data_block_with_offset)
+TEST(skip_over_zero_page)
 END_TESTS
