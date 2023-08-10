@@ -16,9 +16,9 @@ main(int argc, char *argv[]) {
 	struct SqshArchive *archive =
 			sqsh_archive_open("/path/to/archive.squashfs", NULL, NULL);
 
-	uint8_t *contents = sqsh_easy_file_content(archive, "/path/to/file");
+	uint8_t *contents = sqsh_easy_file_content(archive, "/path/to/file", NULL);
 	assert(contents != NULL);
-	const size_t size = sqsh_easy_file_size(archive, "/path/to/file");
+	const size_t size = sqsh_easy_file_size(archive, "/path/to/file", NULL);
 	fwrite(contents, 1, size, stdout);
 	free(contents);
 

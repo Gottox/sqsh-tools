@@ -70,7 +70,7 @@ test_file_get_content_through_symlink(void) {
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	uint8_t *content = sqsh_easy_file_content(&archive, "/src");
+	uint8_t *content = sqsh_easy_file_content(&archive, "/src", NULL);
 	assert(content != NULL);
 	assert(strcmp((char *)content, "12345678") == 0);
 	free(content);

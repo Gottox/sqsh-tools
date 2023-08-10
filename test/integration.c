@@ -181,7 +181,7 @@ sqsh_read_content(void) {
 	rv = sqsh__archive_init(&archive, (char *)TEST_SQUASHFS_IMAGE, &config);
 	assert(rv == 0);
 
-	data = (char *)sqsh_easy_file_content(&archive, "/a");
+	data = (char *)sqsh_easy_file_content(&archive, "/a", NULL);
 	assert(strcmp(data, "a\n") == 0);
 	free(data);
 

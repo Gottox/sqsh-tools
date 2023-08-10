@@ -20,9 +20,9 @@ main(int argc, char *argv[]) {
 	struct SqshArchive *archive = sqsh_archive_open(argv[1], NULL, NULL);
 	assert(archive != NULL);
 
-	uint8_t *content = sqsh_easy_file_content(archive, argv[2]);
+	uint8_t *content = sqsh_easy_file_content(archive, argv[2], NULL);
 	assert(content != NULL);
-	size_t size = sqsh_easy_file_size(archive, argv[2]);
+	size_t size = sqsh_easy_file_size(archive, argv[2], NULL);
 
 	fwrite(content, size, 1, stdout);
 

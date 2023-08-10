@@ -56,10 +56,11 @@ struct SqshFile;
  *
  * @param[in] archive  The sqsh archive context.
  * @param[in] path     The path the file or directory.
+ * @param[out] err     Pointer to an int where the error code will be stored.
  *
  * @return true if the file exists, false otherwise.
  */
-bool sqsh_easy_file_exists(struct SqshArchive *archive, const char *path);
+bool sqsh_easy_file_exists(struct SqshArchive *archive, const char *path, int *err);
 
 /**
  * @brief retrieves the content of a file.
@@ -69,40 +70,44 @@ bool sqsh_easy_file_exists(struct SqshArchive *archive, const char *path);
  *
  * @param[in] archive  The sqsh archive context.
  * @param[in] path     The path the file or directory.
+ * @param[out] err     Pointer to an int where the error code will be stored.
  *
  * @return The content of the file on success, NULL on error.
  */
-uint8_t *sqsh_easy_file_content(struct SqshArchive *archive, const char *path);
+uint8_t *sqsh_easy_file_content(struct SqshArchive *archive, const char *path, int *err);
 
 /**
  * @brief retrieves the size of a file.
  *
  * @param[in] archive  The sqsh archive context.
  * @param[in] path     The path the file or directory.
+ * @param[out] err     Pointer to an int where the error code will be stored.
  *
  * @return The size of the file on success, 0 on error.
  */
-size_t sqsh_easy_file_size(struct SqshArchive *archive, const char *path);
+size_t sqsh_easy_file_size(struct SqshArchive *archive, const char *path, int *err);
 
 /**
  * @brief retrieves unix permissions of a file.
  *
  * @param[in] archive  The sqsh archive context.
  * @param[in] path     The path the file or directory.
+ * @param[out] err     Pointer to an int where the error code will be stored.
  *
  * @return The unix permissions of the file on success, 0 on error.
  */
-mode_t sqsh_easy_file_permission(struct SqshArchive *archive, const char *path);
+mode_t sqsh_easy_file_permission(struct SqshArchive *archive, const char *path, int *err);
 
 /**
  * @brief retrieves the modification time of a file.
  *
  * @param[in] archive  The sqsh archive context.
  * @param[in] path     The path the file or directory.
+ * @param[out] err     Pointer to an int where the error code will be stored.
  *
  * @return The modification time of the file on success, 0 on error.
  */
-time_t sqsh_easy_file_mtime(struct SqshArchive *archive, const char *path);
+time_t sqsh_easy_file_mtime(struct SqshArchive *archive, const char *path, int *err);
 
 /***************************************
  * chrome/directory.c

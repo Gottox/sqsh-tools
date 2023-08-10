@@ -46,25 +46,34 @@
 #include "../../include/sqsh_tree_private.h"
 
 bool
-sqsh_easy_file_exists(struct SqshArchive *archive, const char *path) {
+sqsh_easy_file_exists(struct SqshArchive *archive, const char *path, int *err) {
 	int rv = 0;
-	struct SqshFile *file = NULL;
+	struct SqshTreeWalker walker = {0};
 	bool exists = false;
 
-	file = sqsh_open(archive, path, &rv);
+	rv = sqsh__tree_walker_init(&walker, archive);
+	if (rv == -SQSH_ERROR_NO_SUCH_FILE) {
+		rv = 0;
+		goto out;
+	} else if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh_tree_walker_resolve(&walker, path, true);
 	if (rv < 0) {
 		goto out;
 	}
 
-	exists = true;
-
 out:
-	sqsh_close(file);
+	sqsh__tree_walker_cleanup(&walker);
+	if (err != NULL) {
+		*err = rv;
+	}
 	return exists;
 }
 
 uint8_t *
-sqsh_easy_file_content(struct SqshArchive *archive, const char *path) {
+sqsh_easy_file_content(
+		struct SqshArchive *archive, const char *path, int *err) {
 	int rv = 0;
 	struct SqshFileIterator iterator = {0};
 	struct SqshFile *file = NULL;
@@ -102,11 +111,14 @@ out:
 		free(content);
 		content = NULL;
 	}
+	if (err != NULL) {
+		*err = rv;
+	}
 	return content;
 }
 
 size_t
-sqsh_easy_file_size(struct SqshArchive *archive, const char *path) {
+sqsh_easy_file_size(struct SqshArchive *archive, const char *path, int *err) {
 	int rv = 0;
 	struct SqshFile *file = NULL;
 	size_t file_size = 0;
@@ -120,11 +132,15 @@ sqsh_easy_file_size(struct SqshArchive *archive, const char *path) {
 
 out:
 	sqsh_close(file);
+	if (err != NULL) {
+		*err = rv;
+	}
 	return file_size;
 }
 
 mode_t
-sqsh_easy_file_permission(struct SqshArchive *archive, const char *path) {
+sqsh_easy_file_permission(
+		struct SqshArchive *archive, const char *path, int *err) {
 	int rv = 0;
 	struct SqshFile *file = NULL;
 	mode_t permission = 0;
@@ -138,11 +154,14 @@ sqsh_easy_file_permission(struct SqshArchive *archive, const char *path) {
 
 out:
 	sqsh_close(file);
+	if (err != NULL) {
+		*err = rv;
+	}
 	return permission;
 }
 
 time_t
-sqsh_easy_file_mtime(struct SqshArchive *archive, const char *path) {
+sqsh_easy_file_mtime(struct SqshArchive *archive, const char *path, int *err) {
 	int rv = 0;
 	struct SqshFile *file = NULL;
 	time_t modified = 0;
@@ -156,5 +175,8 @@ sqsh_easy_file_mtime(struct SqshArchive *archive, const char *path) {
 
 out:
 	sqsh_close(file);
+	if (err != NULL) {
+		*err = rv;
+	}
 	return modified;
 }
