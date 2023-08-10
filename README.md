@@ -1,13 +1,13 @@
 # libsqsh
 [![CI](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml/badge.svg)](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml)
 
-squashfs is an open and free compressed read-only file system. It is used in
+*squashfs* is an open and free compressed read-only file system. It is used in
 embedded devices, live CDs, or in packaging. It was originally implemented in
 the kernel, but there are several userspace implementations.
 
 *libsqsh* is a pure 2 clause BSD licensed implementation of the squashfs file
 system. It covers the complete squashfs feature set and is designed to be fast
-and memory efficient. fast and memory efficient.
+and memory efficient.
 
 It is written in modern C11 and can be used with C++ and C code. *libsqsh*
 supports a high-level API that focuses on ease of use, and a low-level API that
