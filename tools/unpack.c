@@ -186,7 +186,7 @@ extract_file(
 
 	rv = rename(tmp_filename, filename);
 	if (rv < 0 && errno != ENOENT) {
-		print_err(rv = -errno, "unlink", path_stack);
+		print_err(rv = -errno, "rename", path_stack);
 		goto out;
 	}
 out:
