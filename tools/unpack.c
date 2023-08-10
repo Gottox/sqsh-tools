@@ -163,10 +163,16 @@ extract_file(
 		const struct PathStack *path_stack) {
 	int rv = 0;
 	FILE *stream = NULL;
+	char tmp_filename[] = ".sqsh-unpack-XXXXXX";
 
-	stream = fopen(filename, "w");
+	int fd = mkstemp(tmp_filename);
+	if (fd < 0) {
+		print_err(rv = -errno, "mkstemp", path_stack);
+		goto out;
+	}
+	stream = fdopen(fd, "w");
 	if (stream == NULL) {
-		print_err(rv = -errno, "fopen", path_stack);
+		print_err(rv = -errno, "fdopen", path_stack);
 		goto out;
 	}
 
@@ -177,6 +183,12 @@ extract_file(
 		goto out;
 	}
 	fclose(stream);
+
+	rv = rename(tmp_filename, filename);
+	if (rv < 0 && errno != ENOENT) {
+		print_err(rv = -errno, "unlink", path_stack);
+		goto out;
+	}
 out:
 	return rv;
 }
