@@ -42,6 +42,7 @@ sqsh_extended_test = [
     'tools/cat/large-file-uncompressed.sh',
     'tools/read-chunk/tail.sh',
     'tools/unpack/repack.sh',
+    'tools/unpack/pathtraversal/pathtraversal.sh',
 ]
 sqsh_extended_fs_test = [
     'tools/fs/large-file.sh',
