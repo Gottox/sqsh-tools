@@ -15,7 +15,12 @@
 : "${SQSHFS:?SQSHFS is not set}"
 
 unmount() {
-	fusermount -u "$1" || umount "$1"
+	for _ in 1 2 3 4 5; do
+		if fusermount -uz "$1" || umount "$1"; then
+			return
+		fi
+		sleep 0.5
+	done
 }
 
 MKSQUASHFS_OPTS="-no-xattrs -noappend -mkfs-time 0"
