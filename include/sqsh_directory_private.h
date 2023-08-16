@@ -54,7 +54,7 @@ struct SqshDirectoryIterator {
 	/**
 	 * @privatesection
 	 */
-	struct SqshFile *file;
+	const struct SqshFile *file;
 	uint32_t remaining_size;
 
 	struct SqshMetablockReader metablock;
@@ -76,7 +76,7 @@ struct SqshDirectoryIterator {
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__directory_iterator_init(
-		struct SqshDirectoryIterator *iterator, struct SqshFile *inode);
+		struct SqshDirectoryIterator *iterator, const struct SqshFile *inode);
 
 /**
  * @internal
