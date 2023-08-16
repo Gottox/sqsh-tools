@@ -54,7 +54,7 @@ static int
 load_metablock(
 		struct SqshDirectoryIterator *iterator, const uint64_t outer_offset,
 		uint32_t inner_offset) {
-	struct SqshFile *file = iterator->file;
+	const struct SqshFile *file = iterator->file;
 	struct SqshArchive *archive = file->archive;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 
@@ -94,7 +94,7 @@ directory_iterator_index_lookup(
 		const size_t name_len) {
 	int rv = 0;
 	struct SqshDirectoryIndexIterator index_iterator = {0};
-	struct SqshFile *file = iterator->file;
+	const struct SqshFile *file = iterator->file;
 	const uint64_t inode_ref = sqsh_file_inode_ref(file);
 	uint64_t outer_offset = sqsh_file_directory_block_start(file);
 	uint32_t inner_offset = sqsh_file_directory_block_offset(file);
@@ -175,7 +175,7 @@ sqsh_directory_iterator_lookup(
 
 int
 sqsh__directory_iterator_init(
-		struct SqshDirectoryIterator *iterator, struct SqshFile *file) {
+		struct SqshDirectoryIterator *iterator, const struct SqshFile *file) {
 	int rv = 0;
 
 	if (sqsh_file_type(file) != SQSH_FILE_TYPE_DIRECTORY) {
@@ -205,8 +205,8 @@ sqsh_directory_iterator_new(struct SqshFile *file, int *err) {
 	}
 	rv = sqsh__directory_iterator_init(iterator, file);
 	if (rv < 0) {
-		free(file);
-		file = NULL;
+		free(iterator);
+		iterator = NULL;
 	}
 out:
 	if (err != NULL) {
