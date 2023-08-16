@@ -1,4 +1,5 @@
 libsqsh_sources = files(
+    'reader/reader2.c',
     'archive/archive.c',
     'archive/compression_options.c',
     'archive/inode_map.c',

@@ -28,6 +28,7 @@ sqsh_test = [
     'metablock/metablock_iterator.c',
     'metablock/metablock_reader.c',
     'nasty.c',
+    'reader/reader2.c',
     'primitive/buffer.c',
     'primitive/lru.c',
     'primitive/rc_hash_map.c',
