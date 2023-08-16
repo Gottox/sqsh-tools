@@ -116,13 +116,12 @@ extract_directory(
 	int rv;
 	char cwd[PATH_MAX] = {0};
 	struct SqshDirectoryIterator *iter = NULL;
-	uint16_t mode = sqsh_file_permission(file);
 
 	if (getcwd(cwd, sizeof(cwd)) == NULL) {
 		print_err(rv = -errno, "getcwd", path_stack);
 		goto out;
 	}
-	rv = mkdir(filename, mode);
+	rv = mkdir(filename, 0700);
 	if (rv < 0 && errno != EEXIST) {
 		print_err(rv = -errno, "mkdir", path_stack);
 		goto out;
@@ -263,32 +262,33 @@ extract(const char *filename, struct SqshFile *file,
 		print_path(&new_path_stack, "\n", stderr);
 	}
 
-	if (type == SQSH_FILE_TYPE_DIRECTORY) {
-		rv = extract_directory(filename, file, &new_path_stack);
-	} else {
+	if (type != SQSH_FILE_TYPE_DIRECTORY) {
 		rv = unlink(filename);
 		if (rv < 0 && errno != ENOENT) {
 			print_err(rv = -errno, "unlink", path_stack);
 			goto out;
 		}
+	}
 
-		switch (type) {
-		case SQSH_FILE_TYPE_FILE:
-			rv = extract_file(filename, file, &new_path_stack);
-			break;
-		case SQSH_FILE_TYPE_SYMLINK:
-			rv = extract_symlink(filename, file, &new_path_stack);
-			break;
-		case SQSH_FILE_TYPE_BLOCK:
-		case SQSH_FILE_TYPE_CHAR:
-		case SQSH_FILE_TYPE_FIFO:
-		case SQSH_FILE_TYPE_SOCKET:
-			rv = extract_device(filename, file, &new_path_stack);
-			break;
-		default:
-			print_err(-EINVAL, "extract", &new_path_stack);
-			rv = -EINVAL;
-		}
+	switch (type) {
+	case SQSH_FILE_TYPE_DIRECTORY:
+		rv = extract_directory(filename, file, &new_path_stack);
+		break;
+	case SQSH_FILE_TYPE_FILE:
+		rv = extract_file(filename, file, &new_path_stack);
+		break;
+	case SQSH_FILE_TYPE_SYMLINK:
+		rv = extract_symlink(filename, file, &new_path_stack);
+		break;
+	case SQSH_FILE_TYPE_BLOCK:
+	case SQSH_FILE_TYPE_CHAR:
+	case SQSH_FILE_TYPE_FIFO:
+	case SQSH_FILE_TYPE_SOCKET:
+		rv = extract_device(filename, file, &new_path_stack);
+		break;
+	default:
+		print_err(-EINVAL, "extract", &new_path_stack);
+		rv = -EINVAL;
 	}
 	if (rv < 0) {
 		goto out;
