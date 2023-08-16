@@ -35,21 +35,13 @@
 
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_error.h"
-#include "../../include/sqsh_primitive_private.h"
+#include "../../include/sqsh_reader_private.h"
 
 #include "../utils/utils.h"
 
 static int
 file_iterator_next(void *iterator, size_t desired_size) {
 	return sqsh_file_iterator_next(iterator, desired_size);
-}
-static int
-file_iterator_skip(void *iterator, size_t amount, size_t desired_size) {
-	return sqsh_file_iterator_skip(iterator, amount, desired_size);
-}
-static size_t
-file_iterator_block_size(const void *iterator) {
-	return sqsh_file_iterator_block_size(iterator);
 }
 static const uint8_t *
 file_iterator_data(const void *iterator) {
@@ -60,10 +52,8 @@ file_iterator_size(const void *iterator) {
 	return sqsh_file_iterator_size(iterator);
 }
 
-static const struct SqshIteratorImpl file_reader_impl = {
+static const struct SqshReader2IteratorImpl file_reader_impl = {
 		.next = file_iterator_next,
-		.skip = file_iterator_skip,
-		.block_size = file_iterator_block_size,
 		.data = file_iterator_data,
 		.size = file_iterator_size,
 };
@@ -76,7 +66,7 @@ sqsh__file_reader_init(
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__reader_init(
+	rv = sqsh__reader2_init(
 			&reader->reader, &file_reader_impl, &reader->iterator);
 out:
 	return rv;
@@ -105,22 +95,22 @@ out:
 int
 sqsh_file_reader_advance(
 		struct SqshFileReader *reader, sqsh_index_t offset, size_t size) {
-	return sqsh__reader_advance(&reader->reader, offset, size);
+	return sqsh__reader2_advance(&reader->reader, offset, size);
 }
 
 const uint8_t *
 sqsh_file_reader_data(const struct SqshFileReader *reader) {
-	return sqsh__reader_data(&reader->reader);
+	return sqsh__reader2_data(&reader->reader);
 }
 
 size_t
 sqsh_file_reader_size(const struct SqshFileReader *reader) {
-	return sqsh__reader_size(&reader->reader);
+	return sqsh__reader2_size(&reader->reader);
 }
 
 int
 sqsh__file_reader_cleanup(struct SqshFileReader *reader) {
-	sqsh__reader_cleanup(&reader->reader);
+	sqsh__reader2_cleanup(&reader->reader);
 	sqsh__file_iterator_cleanup(&reader->iterator);
 
 	return 0;

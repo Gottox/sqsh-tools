@@ -39,6 +39,7 @@
 #include "sqsh_extract_private.h"
 #include "sqsh_mapper_private.h"
 #include "sqsh_metablock_private.h"
+#include "sqsh_reader_private.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -173,7 +174,7 @@ struct SqshFileReader {
 	 * @privatesection
 	 */
 	struct SqshFileIterator iterator;
-	struct SqshReader reader;
+	struct SqshReader2 reader;
 };
 
 /**
