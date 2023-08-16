@@ -37,6 +37,7 @@
 #include "sqsh_mapper.h"
 
 #include "sqsh_primitive_private.h"
+#include "sqsh_reader_private.h"
 #include "sqsh_thread_private.h"
 #include <sys/wait.h>
 
@@ -480,7 +481,7 @@ struct SqshMapReader {
 	uint64_t address;
 	uint64_t upper_limit;
 	struct SqshMapIterator iterator;
-	struct SqshReader reader;
+	struct SqshReader2 reader;
 };
 
 /**

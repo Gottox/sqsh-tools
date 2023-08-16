@@ -41,15 +41,6 @@ map_iterator_next(void *iterator, size_t desired_size) {
 	(void)desired_size;
 	return sqsh__map_iterator_next(iterator);
 }
-static int
-map_iterator_skip(void *iterator, size_t amount, size_t desired_size) {
-	(void)desired_size;
-	return sqsh__map_iterator_skip(iterator, amount);
-}
-static size_t
-map_iterator_block_size(const void *iterator) {
-	return sqsh__map_iterator_block_size(iterator);
-}
 static const uint8_t *
 map_iterator_data(const void *iterator) {
 	return sqsh__map_iterator_data(iterator);
@@ -59,10 +50,8 @@ map_iterator_size(const void *iterator) {
 	return sqsh__map_iterator_size(iterator);
 }
 
-static const struct SqshIteratorImpl map_reader_impl = {
+static const struct SqshReader2IteratorImpl map_reader_impl = {
 		.next = map_iterator_next,
-		.skip = map_iterator_skip,
-		.block_size = map_iterator_block_size,
 		.data = map_iterator_data,
 		.size = map_iterator_size,
 };
@@ -85,7 +74,7 @@ sqsh__map_reader_init(
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__reader_init(
+	rv = sqsh__reader2_init(
 			&reader->reader, &map_reader_impl, &reader->iterator);
 	if (rv < 0) {
 		goto out;
@@ -93,7 +82,7 @@ sqsh__map_reader_init(
 	reader->upper_limit = upper_limit;
 	reader->address = start_address;
 
-	rv = sqsh__reader_advance(&reader->reader, offset, 0);
+	rv = sqsh__reader2_advance(&reader->reader, offset, 0);
 out:
 	if (rv < 0) {
 		sqsh__map_reader_cleanup(reader);
@@ -117,7 +106,7 @@ int
 sqsh__map_reader_advance(
 		struct SqshMapReader *reader, sqsh_index_t offset, size_t size) {
 	reader->address += offset;
-	return sqsh__reader_advance(&reader->reader, offset, size);
+	return sqsh__reader2_advance(&reader->reader, offset, size);
 }
 
 int
@@ -128,17 +117,17 @@ sqsh__map_reader_all(struct SqshMapReader *reader) {
 
 const uint8_t *
 sqsh__map_reader_data(const struct SqshMapReader *reader) {
-	return sqsh__reader_data(&reader->reader);
+	return sqsh__reader2_data(&reader->reader);
 }
 
 size_t
 sqsh__map_reader_size(const struct SqshMapReader *reader) {
-	return sqsh__reader_size(&reader->reader);
+	return sqsh__reader2_size(&reader->reader);
 }
 
 int
 sqsh__map_reader_cleanup(struct SqshMapReader *reader) {
-	sqsh__reader_cleanup(&reader->reader);
+	sqsh__reader2_cleanup(&reader->reader);
 	sqsh__map_iterator_cleanup(&reader->iterator);
 
 	return 0;
