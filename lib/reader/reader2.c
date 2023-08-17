@@ -143,6 +143,7 @@ reader_fill_buffer(struct SqshReader2 *reader, size_t size) {
 	reader->offset = 0;
 	reader->data = sqsh__buffer_data(buffer);
 	reader->size = size;
+	assert(reader->iterator_offset != 0);
 out:
 	return rv;
 }
@@ -199,7 +200,7 @@ handle_mapped(struct SqshReader2 *reader, sqsh_index_t offset, size_t size) {
 		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
-	if (end_offset < impl->size(iterator)) {
+	if (end_offset <= impl->size(iterator)) {
 		const uint8_t *data = impl->data(iterator);
 		reader->data = &data[offset];
 		reader->size = size;

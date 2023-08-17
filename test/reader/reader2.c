@@ -31,6 +31,7 @@
  * @file         integration.c
  */
 
+#include "../include/sqsh_error.h"
 #include "../include/sqsh_reader_private.h"
 #include "common.h"
 #include <sys/wait.h>
@@ -38,21 +39,24 @@
 
 struct TestIterator {
 	char *data;
+	char *current_data;
 	int remaining;
-	int block_size;
-	int size;
 };
 
 static const uint8_t *
 test_iter_data(const void *data) {
 	struct TestIterator *iter = (struct TestIterator *)data;
-	return (uint8_t *)iter->data;
+	return (uint8_t *)iter->current_data;
 }
 
 static size_t
 test_iter_size(const void *data) {
 	struct TestIterator *iter = (struct TestIterator *)data;
-	return iter->size;
+	if (iter->current_data == NULL) {
+		return 0;
+	} else {
+		return strlen(iter->current_data);
+	}
 }
 
 static int
@@ -60,12 +64,12 @@ test_iter_next(void *data, size_t desired_size) {
 	struct TestIterator *iter = (struct TestIterator *)data;
 	(void)desired_size;
 	if (iter->remaining == 0) {
-		iter->data = "";
+		iter->current_data = "";
 		return 0;
 	}
+	iter->current_data = iter->data;
 	iter->remaining--;
-	iter->size = strlen(iter->data);
-	return iter->size;
+	return strlen(iter->current_data);
 }
 
 static const struct SqshReader2IteratorImpl test_iter = {
@@ -286,7 +290,6 @@ test_reader2_advance_with_zero_size() {
 	rv = sqsh__reader2_advance(&reader, 3, 0);
 	assert(rv == 0);
 
-	const uint8_t *data = sqsh__reader2_data(&reader);
 	size_t size = sqsh__reader2_size(&reader);
 	assert(size == 0);
 
@@ -294,7 +297,7 @@ test_reader2_advance_with_zero_size() {
 	rv = sqsh__reader2_advance(&reader, 0, 4);
 	assert(rv == 0);
 
-	data = sqsh__reader2_data(&reader);
+	const uint8_t *data = sqsh__reader2_data(&reader);
 	size = sqsh__reader2_size(&reader);
 	assert(size == 4);
 	assert(memcmp(data, "ttes", 4) == 0);
@@ -515,6 +518,42 @@ test_reader2_map_into_buffer_twice(void) {
 	sqsh__reader2_cleanup(&reader);
 }
 
+static void
+test_reader2_extend_size_till_end(void) {
+	int rv;
+	struct SqshReader2 reader = {0};
+	struct TestIterator iter = {.data = "0123456789", .remaining = 2};
+
+	rv = sqsh__reader2_init(&reader, &test_iter, &iter);
+	assert(rv == 0);
+
+	rv = sqsh__reader2_advance(&reader, 4, 4);
+	assert(rv == 0);
+
+	const uint8_t *data = sqsh__reader2_data(&reader);
+	assert(sqsh__reader2_size(&reader) == 4);
+	assert(memcmp(data, "4567", 4) == 0);
+
+	rv = sqsh__reader2_advance(&reader, 0, 6);
+	assert(rv == 0);
+
+	data = sqsh__reader2_data(&reader);
+	assert(sqsh__reader2_size(&reader) == 6);
+	assert(memcmp(data, "456789", 6) == 0);
+
+	iter.data = "ABCDEF";
+
+	rv = sqsh__reader2_advance(&reader, 0, 12);
+	data = sqsh__reader2_data(&reader);
+	assert(sqsh__reader2_size(&reader) == 12);
+	assert(memcmp(data, "456789ABCDEF", 12) == 0);
+
+	// rv = sqsh__reader2_advance(&reader, 0, 13);
+	// assert(rv == -SQSH_ERROR_OUT_OF_BOUNDS);
+
+	sqsh__reader2_cleanup(&reader);
+}
+
 DECLARE_TESTS
 TEST(test_reader2_init)
 TEST(test_reader2_advance_to_block)
@@ -536,4 +575,5 @@ TEST(test_reader2_initial_advance_2)
 TEST(test_reader2_error_1)
 TEST(test_reader2_map_into_buffer)
 TEST(test_reader2_map_into_buffer_twice)
+TEST(test_reader2_extend_size_till_end)
 END_TESTS
