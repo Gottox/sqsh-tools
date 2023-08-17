@@ -60,7 +60,8 @@ struct SqshFile;
  *
  * @return true if the file exists, false otherwise.
  */
-bool sqsh_easy_file_exists(struct SqshArchive *archive, const char *path, int *err);
+bool
+sqsh_easy_file_exists(struct SqshArchive *archive, const char *path, int *err);
 
 /**
  * @brief retrieves the content of a file.
@@ -74,7 +75,8 @@ bool sqsh_easy_file_exists(struct SqshArchive *archive, const char *path, int *e
  *
  * @return The content of the file on success, NULL on error.
  */
-uint8_t *sqsh_easy_file_content(struct SqshArchive *archive, const char *path, int *err);
+uint8_t *
+sqsh_easy_file_content(struct SqshArchive *archive, const char *path, int *err);
 
 /**
  * @brief retrieves the size of a file.
@@ -85,7 +87,8 @@ uint8_t *sqsh_easy_file_content(struct SqshArchive *archive, const char *path, i
  *
  * @return The size of the file on success, 0 on error.
  */
-size_t sqsh_easy_file_size(struct SqshArchive *archive, const char *path, int *err);
+size_t
+sqsh_easy_file_size(struct SqshArchive *archive, const char *path, int *err);
 
 /**
  * @brief retrieves unix permissions of a file.
@@ -96,7 +99,8 @@ size_t sqsh_easy_file_size(struct SqshArchive *archive, const char *path, int *e
  *
  * @return The unix permissions of the file on success, 0 on error.
  */
-mode_t sqsh_easy_file_permission(struct SqshArchive *archive, const char *path, int *err);
+mode_t sqsh_easy_file_permission(
+		struct SqshArchive *archive, const char *path, int *err);
 
 /**
  * @brief retrieves the modification time of a file.
@@ -107,7 +111,8 @@ mode_t sqsh_easy_file_permission(struct SqshArchive *archive, const char *path, 
  *
  * @return The modification time of the file on success, 0 on error.
  */
-time_t sqsh_easy_file_mtime(struct SqshArchive *archive, const char *path, int *err);
+time_t
+sqsh_easy_file_mtime(struct SqshArchive *archive, const char *path, int *err);
 
 /***************************************
  * chrome/directory.c

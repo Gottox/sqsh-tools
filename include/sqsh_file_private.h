@@ -81,7 +81,7 @@ SQSH_NO_EXPORT int sqsh__fragment_view_init(
 
 /**
  * @internal
- * @memberof SqshFragmentView 
+ * @memberof SqshFragmentView
  * @brief Retrieves the fragment data.
  *
  * @param[in] view The fragment view to retrieve the data from.
@@ -93,7 +93,7 @@ sqsh__fragment_view_data(const struct SqshFragmentView *view);
 
 /**
  * @internal
- * @memberof SqshFragmentView 
+ * @memberof SqshFragmentView
  * @brief Retrieves the fragment size.
  *
  * @param[in] view The fragment view to retrieve the size from.
