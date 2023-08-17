@@ -52,7 +52,7 @@ file_iterator_size(const void *iterator) {
 	return sqsh_file_iterator_size(iterator);
 }
 
-static const struct SqshReader2IteratorImpl file_reader_impl = {
+static const struct SqshReaderIteratorImpl file_reader_impl = {
 		.next = file_iterator_next,
 		.data = file_iterator_data,
 		.size = file_iterator_size,
@@ -66,7 +66,7 @@ sqsh__file_reader_init(
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__reader2_init(
+	rv = sqsh__reader_init(
 			&reader->reader, &file_reader_impl, &reader->iterator);
 out:
 	return rv;
@@ -95,22 +95,22 @@ out:
 int
 sqsh_file_reader_advance(
 		struct SqshFileReader *reader, sqsh_index_t offset, size_t size) {
-	return sqsh__reader2_advance(&reader->reader, offset, size);
+	return sqsh__reader_advance(&reader->reader, offset, size);
 }
 
 const uint8_t *
 sqsh_file_reader_data(const struct SqshFileReader *reader) {
-	return sqsh__reader2_data(&reader->reader);
+	return sqsh__reader_data(&reader->reader);
 }
 
 size_t
 sqsh_file_reader_size(const struct SqshFileReader *reader) {
-	return sqsh__reader2_size(&reader->reader);
+	return sqsh__reader_size(&reader->reader);
 }
 
 int
 sqsh__file_reader_cleanup(struct SqshFileReader *reader) {
-	sqsh__reader2_cleanup(&reader->reader);
+	sqsh__reader_cleanup(&reader->reader);
 	sqsh__file_iterator_cleanup(&reader->iterator);
 
 	return 0;

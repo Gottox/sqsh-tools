@@ -39,7 +39,7 @@
 #include <assert.h>
 
 static int
-reader_iterator_next(struct SqshReader2 *reader, size_t desired_size) {
+reader_iterator_next(struct SqshReader *reader, size_t desired_size) {
 	int rv = reader->iterator_impl->next(reader->iterator, desired_size);
 	if (rv == 0) {
 		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
@@ -63,10 +63,10 @@ reader_iterator_next(struct SqshReader2 *reader, size_t desired_size) {
  */
 static int
 reader_iterator_skip(
-		struct SqshReader2 *reader, sqsh_index_t *offset, size_t desired_size) {
+		struct SqshReader *reader, sqsh_index_t *offset, size_t desired_size) {
 	int rv = 0;
 	void *iterator = reader->iterator;
-	const struct SqshReader2IteratorImpl *impl = reader->iterator_impl;
+	const struct SqshReaderIteratorImpl *impl = reader->iterator_impl;
 
 	size_t current_size = impl->size(iterator);
 
@@ -85,9 +85,9 @@ out:
 }
 
 int
-sqsh__reader2_init(
-		struct SqshReader2 *reader,
-		const struct SqshReader2IteratorImpl *iterator_impl, void *iterator) {
+sqsh__reader_init(
+		struct SqshReader *reader,
+		const struct SqshReaderIteratorImpl *iterator_impl, void *iterator) {
 	reader->data = NULL;
 	reader->size = 0;
 	reader->offset = 0;
@@ -108,10 +108,10 @@ sqsh__reader2_init(
  * @return     0 on success, negative on error.
  */
 static int
-reader_fill_buffer(struct SqshReader2 *reader, size_t size) {
+reader_fill_buffer(struct SqshReader *reader, size_t size) {
 	int rv = 0;
 	void *iterator = reader->iterator;
-	const struct SqshReader2IteratorImpl *impl = reader->iterator_impl;
+	const struct SqshReaderIteratorImpl *impl = reader->iterator_impl;
 	struct SqshBuffer *buffer = &reader->buffer;
 	sqsh_index_t offset = reader->offset;
 
@@ -149,7 +149,7 @@ out:
 }
 
 static int
-handle_buffered(struct SqshReader2 *reader, sqsh_index_t offset, size_t size) {
+handle_buffered(struct SqshReader *reader, sqsh_index_t offset, size_t size) {
 	int rv = 0;
 	struct SqshBuffer new_buffer = {0};
 	sqsh_index_t iterator_offset = reader->iterator_offset;
@@ -179,10 +179,10 @@ out:
 }
 
 static int
-handle_mapped(struct SqshReader2 *reader, sqsh_index_t offset, size_t size) {
+handle_mapped(struct SqshReader *reader, sqsh_index_t offset, size_t size) {
 	int rv = 0;
 	void *iterator = reader->iterator;
-	const struct SqshReader2IteratorImpl *impl = reader->iterator_impl;
+	const struct SqshReaderIteratorImpl *impl = reader->iterator_impl;
 
 	if (SQSH_ADD_OVERFLOW(offset, reader->offset, &offset)) {
 		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
@@ -215,8 +215,8 @@ out:
 }
 
 int
-sqsh__reader2_advance(
-		struct SqshReader2 *reader, sqsh_index_t offset, size_t size) {
+sqsh__reader_advance(
+		struct SqshReader *reader, sqsh_index_t offset, size_t size) {
 	if (offset >= reader->iterator_offset) {
 		offset -= reader->iterator_offset;
 		reader->iterator_offset = 0;
@@ -227,16 +227,16 @@ sqsh__reader2_advance(
 }
 
 const uint8_t *
-sqsh__reader2_data(const struct SqshReader2 *reader) {
+sqsh__reader_data(const struct SqshReader *reader) {
 	return reader->data;
 }
 
 size_t
-sqsh__reader2_size(const struct SqshReader2 *reader) {
+sqsh__reader_size(const struct SqshReader *reader) {
 	return reader->size;
 }
 
 int
-sqsh__reader2_cleanup(struct SqshReader2 *reader) {
+sqsh__reader_cleanup(struct SqshReader *reader) {
 	return sqsh__buffer_cleanup(&reader->buffer);
 }

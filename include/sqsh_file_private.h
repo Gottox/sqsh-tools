@@ -174,7 +174,7 @@ struct SqshFileReader {
 	 * @privatesection
 	 */
 	struct SqshFileIterator iterator;
-	struct SqshReader2 reader;
+	struct SqshReader reader;
 };
 
 /**

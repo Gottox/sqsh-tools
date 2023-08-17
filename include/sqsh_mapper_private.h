@@ -481,7 +481,7 @@ struct SqshMapReader {
 	uint64_t address;
 	uint64_t upper_limit;
 	struct SqshMapIterator iterator;
-	struct SqshReader2 reader;
+	struct SqshReader reader;
 };
 
 /**
