@@ -140,6 +140,19 @@ sqsh__buffer_move(struct SqshBuffer *buffer, struct SqshBuffer *source);
 /**
  * @internal
  * @memberof SqshBuffer
+ * @brief resets the buffer size to 0.
+ *
+ * This does not free the memory allocated by the buffer so that
+ * the buffer can be reused.
+ *
+ * @param[in,out] buffer The SqshBuffer to drain.
+ */
+
+void sqsh__buffer_drain(struct SqshBuffer *buffer);
+
+/**
+ * @internal
+ * @memberof SqshBuffer
  * @brief sqsh__buffer_data returns the data of the SqshBuffer.
  * @param[in] buffer The SqshBuffer to get the data from.
  * @return a pointer to the data of the SqshBuffer.
@@ -508,110 +521,6 @@ sqsh__lru_touch(struct SqshLru *lru, sqsh_index_t id);
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_EXPORT int sqsh__lru_cleanup(struct SqshLru *lru);
-
-/***************************************
- * primitive/reader.c
- */
-
-/**
- * @internal
- * @brief A buffer that is used to read data from a SqshReader.
- */
-struct SqshIteratorImpl {
-	/**
-	 * @privatesection
-	 */
-	int (*next)(void *iterator, size_t desired_size);
-	int (*skip)(void *iterator, size_t amount, size_t desired_size);
-	size_t (*block_size)(const void *iterator);
-	const uint8_t *(*data)(const void *iterator);
-	size_t (*size)(const void *iterator);
-};
-
-/**
- * @internal
- * @brief A buffer that is used to read data from a SqshReader.
- */
-struct SqshReader {
-	/**
-	 * @privatesection
-	 */
-	const struct SqshIteratorImpl *impl;
-	void *iterator;
-
-	sqsh_index_t iterator_offset;
-	sqsh_index_t buffer_offset;
-	sqsh_index_t data_offset;
-	size_t size;
-	size_t data_size;
-	struct SqshBuffer buffer;
-	const uint8_t *data;
-};
-
-/**
- * @internal
- * @memberof SqshReader
- * @brief Initializes a reader.
- *
- * @param[out] reader    Pointer to the metablock reader to be initialized.
- * @param[in]  impl      Implementation of the iterator.
- * @param[in]  iterator  Iterator to use for the reader.
- *
- * @return 0 on success, less than zero on error.
- */
-SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__reader_init(
-		struct SqshReader *reader, const struct SqshIteratorImpl *impl,
-		void *iterator);
-
-/**
- * @internal
- * @memberof SqshReader
- * @brief Advances the reader by the given offset and size.
- *
- * @param[in,out] reader  Pointer to the metablock reader to be advanced.
- * @param[in] offset      Offset to advance the reader by.
- * @param[in] size        Size of the block to advance the reader by.
- *
- * @return 0 on success, less than zero on error.
- */
-SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__reader_advance(
-		struct SqshReader *reader, sqsh_index_t offset, size_t size);
-
-/**
- * @internal
- * @memberof SqshReader
- * @brief Returns a pointer to the data at the current position of the metablock
- * reader.
- *
- * @param[in] reader  Pointer to the metablock reader.
- *
- * @return Pointer to the data at the current position of the metablock reader.
- */
-SQSH_NO_EXPORT const uint8_t *
-sqsh__reader_data(const struct SqshReader *reader);
-
-/**
- * @internal
- * @memberof SqshReader
- * @brief Returns the size of the data at the current position of the metablock
- * reader.
- *
- * @param[in] reader Pointer to the metablock reader.
- *
- * @return Size of the data at the current position of the metablock reader.
- */
-SQSH_NO_EXPORT size_t sqsh__reader_size(const struct SqshReader *reader);
-
-/**
- * @internal
- * @memberof SqshReader
- * @brief Cleans up and frees the resources used by the metablock reader.
- *
- * @param[in,out] reader Pointer to the metablock reader to be cleaned up.
- *
- * @return 0 on success, less than zero on error.
- */
-SQSH_NO_EXPORT int sqsh__reader_cleanup(struct SqshReader *reader);
 
 #ifdef __cplusplus
 }

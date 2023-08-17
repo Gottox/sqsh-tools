@@ -35,21 +35,13 @@
 
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_error.h"
-#include "../../include/sqsh_primitive_private.h"
+#include "../../include/sqsh_reader_private.h"
 
 #include "../utils/utils.h"
 
 static int
 file_iterator_next(void *iterator, size_t desired_size) {
 	return sqsh_file_iterator_next(iterator, desired_size);
-}
-static int
-file_iterator_skip(void *iterator, size_t amount, size_t desired_size) {
-	return sqsh_file_iterator_skip(iterator, amount, desired_size);
-}
-static size_t
-file_iterator_block_size(const void *iterator) {
-	return sqsh_file_iterator_block_size(iterator);
 }
 static const uint8_t *
 file_iterator_data(const void *iterator) {
@@ -60,10 +52,8 @@ file_iterator_size(const void *iterator) {
 	return sqsh_file_iterator_size(iterator);
 }
 
-static const struct SqshIteratorImpl file_reader_impl = {
+static const struct SqshReaderIteratorImpl file_reader_impl = {
 		.next = file_iterator_next,
-		.skip = file_iterator_skip,
-		.block_size = file_iterator_block_size,
 		.data = file_iterator_data,
 		.size = file_iterator_size,
 };

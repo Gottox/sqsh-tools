@@ -1,4 +1,5 @@
 libsqsh_sources = files(
+    'reader/reader.c',
     'archive/archive.c',
     'archive/compression_options.c',
     'archive/inode_map.c',
@@ -40,7 +41,6 @@ libsqsh_sources = files(
     'primitive/lru.c',
     'primitive/rc_hash_map.c',
     'primitive/rc_map.c',
-    'primitive/reader.c',
     'table/export_table.c',
     'table/fragment_table.c',
     'table/id_table.c',

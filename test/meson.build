@@ -28,11 +28,11 @@ sqsh_test = [
     'metablock/metablock_iterator.c',
     'metablock/metablock_reader.c',
     'nasty.c',
+    'reader/reader.c',
     'primitive/buffer.c',
     'primitive/lru.c',
     'primitive/rc_hash_map.c',
     'primitive/rc_map.c',
-    'primitive/reader.c',
     'tree/walker.c',
     'xattr/xattr_iterator.c',
 ]

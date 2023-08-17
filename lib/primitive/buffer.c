@@ -114,6 +114,11 @@ sqsh__buffer_move(struct SqshBuffer *buffer, struct SqshBuffer *source) {
 	return 0;
 }
 
+void
+sqsh__buffer_drain(struct SqshBuffer *buffer) {
+	buffer->size = 0;
+}
+
 const uint8_t *
 sqsh__buffer_data(const struct SqshBuffer *buffer) {
 	return buffer->data;

@@ -39,6 +39,7 @@
 #include "sqsh_extract_private.h"
 #include "sqsh_mapper_private.h"
 #include "sqsh_metablock_private.h"
+#include "sqsh_reader_private.h"
 
 #ifdef __cplusplus
 extern "C" {
