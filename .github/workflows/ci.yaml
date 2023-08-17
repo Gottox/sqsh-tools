@@ -90,13 +90,18 @@ jobs:
 
   build-openbsd:
     runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' }}
+    strategy:
+      matrix:
+        arch:
+          - x86_64
+          - arm64
     steps:
     - uses: actions/checkout@v3
-    - uses: "cross-platform-actions/action@v0.15.0"
-      continue-on-error: true
+    - uses: "cross-platform-actions/action@v0.19.0"
       with:
         operating_system: openbsd
-        architecture: x86-64
+        architecture: ${{ matrix.arch }}
         version: 7.2
         run: |
           sudo pkg_add git meson squashfs-tools curl lz4 xz zstd
