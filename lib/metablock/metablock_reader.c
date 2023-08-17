@@ -45,16 +45,6 @@ metablock_iterator_next(void *iterator, size_t desired_size) {
 	(void)desired_size;
 	return sqsh__metablock_iterator_next(iterator);
 }
-static int
-metablock_iterator_skip(void *iterator, size_t amount, size_t desired_size) {
-	(void)desired_size;
-	return sqsh__metablock_iterator_skip(iterator, amount);
-}
-static size_t
-metablock_iterator_block_size(const void *iterator) {
-	(void)iterator;
-	return SQSH_METABLOCK_BLOCK_SIZE;
-}
 static const uint8_t *
 metablock_iterator_data(const void *iterator) {
 	return sqsh__metablock_iterator_data(iterator);
@@ -64,10 +54,8 @@ metablock_iterator_size(const void *iterator) {
 	return sqsh__metablock_iterator_size(iterator);
 }
 
-static const struct SqshIteratorImpl metablock_reader_impl = {
+static const struct SqshReader2IteratorImpl metablock_reader_impl = {
 		.next = metablock_iterator_next,
-		.skip = metablock_iterator_skip,
-		.block_size = metablock_iterator_block_size,
 		.data = metablock_iterator_data,
 		.size = metablock_iterator_size,
 };
@@ -82,7 +70,7 @@ sqsh__metablock_reader_init(
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__reader_init(
+	rv = sqsh__reader2_init(
 			&reader->reader, &metablock_reader_impl, &reader->iterator);
 out:
 	return rv;
@@ -91,22 +79,22 @@ out:
 int
 sqsh__metablock_reader_advance(
 		struct SqshMetablockReader *reader, sqsh_index_t offset, size_t size) {
-	return sqsh__reader_advance(&reader->reader, offset, size);
+	return sqsh__reader2_advance(&reader->reader, offset, size);
 }
 
 const uint8_t *
 sqsh__metablock_reader_data(const struct SqshMetablockReader *reader) {
-	return sqsh__reader_data(&reader->reader);
+	return sqsh__reader2_data(&reader->reader);
 }
 
 size_t
 sqsh__metablock_reader_size(const struct SqshMetablockReader *reader) {
-	return sqsh__reader_size(&reader->reader);
+	return sqsh__reader2_size(&reader->reader);
 }
 
 int
 sqsh__metablock_reader_cleanup(struct SqshMetablockReader *reader) {
-	sqsh__reader_cleanup(&reader->reader);
+	sqsh__reader2_cleanup(&reader->reader);
 	sqsh__metablock_iterator_cleanup(&reader->iterator);
 
 	return 0;

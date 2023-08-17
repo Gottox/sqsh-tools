@@ -145,7 +145,7 @@ struct SqshMetablockReader {
 	/**
 	 * @privatesection
 	 */
-	struct SqshReader reader;
+	struct SqshReader2 reader;
 	struct SqshMetablockIterator iterator;
 };
 
