@@ -37,8 +37,8 @@
 #include "../../include/sqsh_posix.h"
 
 #include <errno.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 int
 sqsh_file_to_stream(const struct SqshFile *file, FILE *stream) {
@@ -64,4 +64,3 @@ out:
 	sqsh__file_iterator_cleanup(&iterator);
 	return rv;
 }
-

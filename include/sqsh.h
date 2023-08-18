@@ -38,7 +38,7 @@
 #include "sqsh_error.h"
 #include "sqsh_file.h"
 #include "sqsh_mapper.h"
+#include "sqsh_posix.h"
 #include "sqsh_table.h"
 #include "sqsh_tree.h"
 #include "sqsh_xattr.h"
-#include "sqsh_posix.h"
