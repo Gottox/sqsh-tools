@@ -114,36 +114,38 @@ reader_fill_buffer(struct SqshReader *reader, size_t size) {
 	const struct SqshReaderIteratorImpl *impl = reader->iterator_impl;
 	struct SqshBuffer *buffer = &reader->buffer;
 	sqsh_index_t offset = reader->offset;
+	sqsh_index_t iterator_offset = reader->iterator_offset;
 
-	size_t buffer_size = sqsh__buffer_size(buffer);
+	size_t remaining_size = size - sqsh__buffer_size(buffer);
 	for (;;) {
 		const uint8_t *data = impl->data(iterator);
 		const size_t data_size = impl->size(iterator);
-		const size_t copy_size =
-				SQSH_MIN(data_size - offset, size - buffer_size);
+		const size_t copy_size = SQSH_MIN(data_size - offset, remaining_size);
 		rv = sqsh__buffer_append(buffer, &data[offset], copy_size);
 		if (rv < 0) {
 			goto out;
 		}
 
 		offset = 0;
-		buffer_size += copy_size;
-		if (size <= buffer_size) {
-			assert(size == buffer_size);
+		remaining_size -= copy_size;
+		if (remaining_size == 0) {
 			break;
 		}
 
-		rv = reader_iterator_next(reader, size);
+		iterator_offset = size - remaining_size;
+		rv = reader_iterator_next(reader, remaining_size);
 		if (rv < 0) {
 			goto out;
 		}
-		reader->iterator_offset = buffer_size;
 	}
 
+	assert(size == sqsh__buffer_size(buffer));
+	assert(iterator_offset != 0);
+
+	reader->iterator_offset = iterator_offset;
 	reader->offset = 0;
 	reader->data = sqsh__buffer_data(buffer);
 	reader->size = size;
-	assert(reader->iterator_offset != 0);
 out:
 	return rv;
 }
