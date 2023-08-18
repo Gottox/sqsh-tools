@@ -156,7 +156,8 @@ handle_buffered(struct SqshReader *reader, sqsh_index_t offset, size_t size) {
 
 	struct SqshBuffer *buffer = &reader->buffer;
 	const uint8_t *buffer_data = sqsh__buffer_data(buffer);
-	const size_t copy_size = iterator_offset - offset;
+	size_t buffer_size = sqsh__buffer_size(buffer);
+	const size_t copy_size = buffer_size - offset;
 
 	if (offset != 0) {
 		rv = sqsh__buffer_init(&new_buffer);
@@ -172,6 +173,8 @@ handle_buffered(struct SqshReader *reader, sqsh_index_t offset, size_t size) {
 			goto out;
 		}
 	}
+
+	reader->offset = buffer_size - iterator_offset;
 	rv = reader_fill_buffer(reader, size);
 
 out:
