@@ -135,16 +135,12 @@ map_block_uncompressed(
 		size_t desired_size) {
 	int rv = 0;
 	const struct SqshFile *file = iterator->file;
-
 	sqsh_index_t block_index = iterator->block_index;
 	struct SqshMapReader *reader = &iterator->map_reader;
-	if (rv < 0) {
-		goto out;
-	}
-
 	const uint64_t block_count = sqsh_file_block_count(file);
 	uint64_t outer_size = 0;
 	const size_t remaining_direct = sqsh__map_reader_remaining_direct(reader);
+
 	for (; iterator->sparse_size == 0 && block_index < block_count;
 		 block_index++) {
 		if (sqsh_file_block_is_compressed(file, block_index)) {
@@ -276,6 +272,14 @@ sqsh_file_iterator_next(
 	const bool has_fragment = sqsh_file_has_fragment(file);
 
 	sqsh__extract_view_cleanup(&iterator->extract_view);
+
+	// Desired size of 0 would result in a noop for uncompressed blocks,
+	// resulting in inconsistend behavior depending whether the block is
+	// compressed, which ignores the desired size, or uncompressed, which
+	// honors the desired size.
+	if (desired_size == 0) {
+		desired_size = 1;
+	}
 
 	if (iterator->sparse_size > 0) {
 		return map_zero_block(iterator);
