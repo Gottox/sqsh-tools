@@ -150,6 +150,7 @@ fs_common_read(
 	// Reading a 0 size at the end of the file will return
 	// SQSH_ERROR_OUT_OF_BOUNDS. This should succeed instead,
 	// providing an empty buffer.
+	// TODO: Fix this in lib/reader/reader.c
 	if (size == 0) {
 		return 0;
 	}
