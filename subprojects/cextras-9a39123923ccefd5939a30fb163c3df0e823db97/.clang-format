@@ -1,0 +1,13 @@
+---
+AlignAfterOpenBracket: AlwaysBreak
+AlignEscapedNewlines: DontAlign
+AlignOperands: DontAlign
+AlwaysBreakAfterReturnType: AllDefinitions
+ContinuationIndentWidth: 8
+IndentWidth: 4
+KeepEmptyLinesAtTheStartOfBlocks: false
+TabWidth: 4
+UseTab: ForContinuationAndIndentation
+AlignTrailingComments: false
+IndentPPDirectives: AfterHash
+...

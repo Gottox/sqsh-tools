@@ -1,0 +1,19 @@
+name: CI
+on:
+- push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - uses: BSFishy/meson-build@v1.0.3
+      with:
+        action: test
+        setup-options: >
+          -Db_coverage=true
+          -Dwerror=true
+          -Dtest=true
+          -Db_sanitize=address,undefined
+
