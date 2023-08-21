@@ -25,7 +25,7 @@ main(int argc, char *argv[]) {
 	char **files = sqsh_easy_directory_list(archive, "/path/to/dir", NULL);
 	assert(files != NULL);
 	for (int i = 0; files[i] != NULL; i++) {
-		printf("%s\n", files[i]);
+		puts(files[i]);
 	}
 	free(files);
 

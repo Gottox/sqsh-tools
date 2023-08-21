@@ -1,17 +1,24 @@
-# libsqsh
-[![CI](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml/badge.svg)](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml)
+# libsqsh [![CI](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml/badge.svg)](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml)
 
-*squashfs* is an open and free compressed read-only file system. It is used in
-embedded devices, live CDs, or in packaging. It was originally implemented in
-the kernel, but there are several userspace implementations.
+A fresh squashfs implementation. BSD-2 licensed.
 
-*libsqsh* is a pure 2 clause BSD licensed implementation of the squashfs file
-system. It covers the complete squashfs feature set and is designed to be fast
-and memory efficient.
+## Features
 
-It is written in modern C11 and can be used with C++ and C code. *libsqsh*
-supports a high-level API that focuses on ease of use, and a low-level API that
-provides zero-copy interfaces to the squashfs archives.
+* **Complete feature set**: libsqsh supports all features of the squashfs file 
+  system.
+
+* **Modern C11 implementation**: Written in modern C11, libsqsh is designed for
+  efficiency and compatibility with C++, C, and other languages.
+
+* **High-Level API**: The high-level API provides easy-to-use functions to 
+  access the contents of a to the contents of a squashfs archive. It is designed
+  for ease of use and interface to the squashfs archive.
+
+* **Low-Level API**: The low-level API provides zero-copy interfaces to the 
+  squashfs archive. It is designed to be both memory and CPU efficient.
+
+* **Pure 2-Clause-BSD License**: libsqsh is licensed under the 2-Clause BSD
+  license. This allows you to use libsqsh in any project, even commercial ones.
 
 ## Example
 
@@ -31,7 +38,7 @@ free(contents);
 char **files = sqsh_easy_directory_list(archive, "/path/to/dir", NULL);
 assert(files != NULL);
 for (int i = 0; files[i] != NULL; i++) {
-	printf("%s\n", files[i]);
+	puts(files[i]);
 }
 free(files);
 
@@ -44,14 +51,22 @@ Find further examples in the [examples](examples) directory.
 
 ### Dependencies
 
-* libc
-* libcurl *optional*
-* zlib *optional*
-* liblz4 *optional*
-* liblzma *optional*
-* libzstd *optional*
-* fuse3 *optional*
-* fuse2 *optional*
+* **libc**: both [musl](https://www.musl-libc.org/) and
+  [glibc](https://www.gnu.org/software/libc/) are supported.
+* [**zlib**](https://zlib.net/) *optional*: For gzip compression support.
+* [**liblz4**](https://lz4.org/) *optional*: For lz4 compression support.
+* [**liblzma**](https://tukaani.org/xz) *optional*: For lzma compression support.
+* [**libzstd**](https://facebook.github.io/zstd/) *optional*: For zstd compression
+  support.
+* [**fuse3**](https://libfuse.github.io/) *optional*: For mounting squashfs
+  archives.
+* [**fuse2**](https://libfuse.github.io/) *optional*: For mounting squashfs 
+  archives on systems that don't support fuse3. e.g. OpenBSD.
+* [**libcurl**](https://curl.se/) *optional*: For transparently reading squashfs
+  archives from the internet without downloading them first.
+
+Note that to do anything useful with *libsqsh*, you need to have at least one of the
+compression libraries enabled.
 
 ### Compile & Install
 
@@ -70,6 +85,10 @@ LZO2 there's and independent glue library called [libsqsh-lzo](https://github.co
 
 ## Resource
 
-* https://dr-emann.github.io/squashfs/
-* https://dr-emann.github.io/squashfs/squashfs.html
-* https://www.kernel.org/doc/Documentation/filesystems/squashfs.txt (useless)
+* https://dr-emann.github.io/squashfs/squashfs.html - A detailed description of
+  the squashfs file format.
+* https://github.com/plougher/squashfs-tools/ - The original squashfs-tools
+  implementation.
+* https://github.com/AgentD/squashfs-tools-ng/ - A rewrite of the squashfs-tools
+  implementation with library support. In contrast to libsqsh, this library is
+  able to write squashfs archives.
