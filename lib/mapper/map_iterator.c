@@ -72,9 +72,10 @@ sqsh__map_iterator_init(
 	return 0;
 }
 
-int
-sqsh__map_iterator_next(struct SqshMapIterator *iterator) {
+bool
+sqsh__map_iterator_next(struct SqshMapIterator *iterator, int *err) {
 	int rv;
+	bool has_next = false;
 
 	iterator->index++;
 	if (iterator->mapping == NULL) {
@@ -95,10 +96,14 @@ sqsh__map_iterator_next(struct SqshMapIterator *iterator) {
 		goto out;
 	}
 
-	iterator->size = rv = sqsh__map_slice_size(iterator->mapping);
+	iterator->size = sqsh__map_slice_size(iterator->mapping);
 	iterator->data = sqsh__map_slice_data(iterator->mapping);
+	has_next = iterator->size > 0;
 out:
-	return rv;
+	if (err != NULL) {
+		*err = rv;
+	}
+	return has_next;
 }
 
 const uint8_t *

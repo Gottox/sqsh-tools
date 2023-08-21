@@ -393,11 +393,16 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__map_iterator_init(
  * @memberof SqshMapIterator
  * @brief Moves the iterator to the next chunk.
  *
- * @param[in] iterator The SqshMapIterator instance.
- * @return Returns 0 on success, a negative value on error.
+ * @param[in]  iterator  The SqshMapIterator instance.
+ * @param[out] err       Pointer to an int where the error code will be stored.
+
+ *
+ * @retval true When the iterator was moved to the next chunk.
+ * @retval false When the iterator reached the end of the mapable area or if an
+ * error occurred.
  */
-SQSH_NO_EXPORT SQSH_NO_UNUSED int
-sqsh__map_iterator_next(struct SqshMapIterator *iterator);
+SQSH_NO_EXPORT SQSH_NO_UNUSED bool
+sqsh__map_iterator_next(struct SqshMapIterator *iterator, int *err);
 
 /**
  * @internal
