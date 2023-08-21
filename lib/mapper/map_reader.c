@@ -36,10 +36,12 @@
 #include "../../include/sqsh_error.h"
 #include "../utils/utils.h"
 
-static int
-map_iterator_next(void *iterator, size_t desired_size) {
+static bool
+map_iterator_next(void *iterator, size_t desired_size, int *err) {
 	(void)desired_size;
-	return sqsh__map_iterator_next(iterator);
+	int rv = sqsh__map_iterator_next(iterator);
+	*err = rv;
+	return rv > 0;
 }
 static const uint8_t *
 map_iterator_data(const void *iterator) {
