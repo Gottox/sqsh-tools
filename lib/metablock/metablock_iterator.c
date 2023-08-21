@@ -119,46 +119,6 @@ out:
 	return rv;
 }
 
-int
-sqsh__metablock_iterator_skip(
-		struct SqshMetablockIterator *iterator, size_t amount) {
-	int rv = 0;
-	uint16_t size = iterator->outer_size;
-
-	if (amount == 0) {
-		return 0;
-	}
-
-	for (sqsh_index_t i = 0; i < amount - 1; i++) {
-		int rv = 0;
-
-		rv = sqsh__map_reader_advance(
-				&iterator->reader, size, SQSH_SIZEOF_METABLOCK);
-		if (rv < 0) {
-			goto out;
-		}
-
-		const struct SqshDataMetablock *metablock =
-				(struct SqshDataMetablock *)sqsh__map_reader_data(
-						&iterator->reader);
-		size = sqsh__data_metablock_size(metablock);
-		if (size > SQSH_METABLOCK_BLOCK_SIZE) {
-			rv = -SQSH_ERROR_SIZE_MISMATCH;
-			goto out;
-		}
-		rv = sqsh__map_reader_advance(
-				&iterator->reader, SQSH_SIZEOF_METABLOCK, 0);
-		if (rv < 0) {
-			goto out;
-		}
-	}
-	iterator->outer_size = size;
-
-	rv = sqsh__metablock_iterator_next(iterator);
-out:
-	return rv;
-}
-
 const uint8_t *
 sqsh__metablock_iterator_data(const struct SqshMetablockIterator *iterator) {
 	return iterator->data;

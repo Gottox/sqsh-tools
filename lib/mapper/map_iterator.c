@@ -74,17 +74,9 @@ sqsh__map_iterator_init(
 
 int
 sqsh__map_iterator_next(struct SqshMapIterator *iterator) {
-	return sqsh__map_iterator_skip(iterator, 1);
-}
-
-int
-sqsh__map_iterator_skip(struct SqshMapIterator *iterator, size_t amount) {
 	int rv;
 
-	if (amount == 0) {
-		return 1;
-	}
-	iterator->index += amount;
+	iterator->index++;
 	if (iterator->mapping == NULL) {
 		iterator->index -= 1;
 	}

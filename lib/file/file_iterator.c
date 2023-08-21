@@ -294,36 +294,6 @@ sqsh_file_iterator_next(
 	}
 }
 
-int
-sqsh_file_iterator_skip(
-		struct SqshFileIterator *iterator, size_t amount, size_t desired_size) {
-	int rv = 0;
-	if (amount == 0) {
-		return 0;
-	}
-
-	// TODO: do not actually map the blocks, just skip them
-	for (size_t i = 0; i < amount - 1; i++) {
-		rv = sqsh_file_iterator_next(iterator, 1);
-		if (rv < 0) {
-			goto out;
-		} else if (rv == 0) {
-			rv = -SQSH_ERROR_OUT_OF_BOUNDS;
-			goto out;
-		}
-	}
-
-	rv = sqsh_file_iterator_next(iterator, desired_size);
-	if (rv < 0) {
-		goto out;
-	} else if (rv == 0) {
-		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
-		goto out;
-	}
-out:
-	return rv;
-}
-
 const uint8_t *
 sqsh_file_iterator_data(const struct SqshFileIterator *iterator) {
 	return iterator->data;

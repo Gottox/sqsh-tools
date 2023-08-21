@@ -402,20 +402,6 @@ sqsh__map_iterator_next(struct SqshMapIterator *iterator);
 /**
  * @internal
  * @memberof SqshMapIterator
- * @brief Moves the iterator an arbitrary number of chunks forward.
- * `sqsh__map_iterator_skip(iter, 1);` is equivalent to
- * `sqsh__map_iterator_next(iter);`.
- *
- * @param[in] iterator The SqshMapIterator instance.
- * @param[in] amount The number of chunks to skip.
- * @return Returns 0 on success, a negative value on error.
- */
-SQSH_NO_EXPORT SQSH_NO_UNUSED int
-sqsh__map_iterator_skip(struct SqshMapIterator *iterator, size_t amount);
-
-/**
- * @internal
- * @memberof SqshMapIterator
  * @brief returns the data for the current chunk.
  *
  * @param[in] iterator The SqshMapIterator instance.
