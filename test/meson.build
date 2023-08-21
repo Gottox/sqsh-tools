@@ -29,10 +29,6 @@ sqsh_test = [
     'metablock/metablock_reader.c',
     'nasty.c',
     'reader/reader.c',
-    'primitive/buffer.c',
-    'primitive/lru.c',
-    'primitive/rc_hash_map.c',
-    'primitive/rc_map.c',
     'tree/walker.c',
     'xattr/xattr_iterator.c',
 ]
@@ -107,7 +103,7 @@ foreach p : sqsh_test
         install: false,
         c_args: this_c_args,
         link_with: libsqsh.get_static_lib(),
-        dependencies: [threads_dep, testlib_dep],
+        dependencies: [threads_dep, testlib_dep, cextras_dep],
     )
     test(p, t)
 endforeach

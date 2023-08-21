@@ -37,10 +37,6 @@ libsqsh_sources = files(
     'mapper/static_mapper.c',
     'metablock/metablock_iterator.c',
     'metablock/metablock_reader.c',
-    'primitive/buffer.c',
-    'primitive/lru.c',
-    'primitive/rc_hash_map.c',
-    'primitive/rc_map.c',
     'table/export_table.c',
     'table/fragment_table.c',
     'table/id_table.c',
@@ -55,7 +51,9 @@ libsqsh_sources = files(
 
 libsqsh_headers_private = ['utils/utils.h']
 
-libsqsh_dependencies = []
+libsqsh_dependencies = [
+    cextras_dep,
+]
 
 c_args = []
 if threads_dep.found()

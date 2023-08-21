@@ -35,7 +35,7 @@
 
 #include "../../include/sqsh_archive.h"
 #include "../../include/sqsh_error.h"
-#include "../../include/sqsh_primitive_private.h"
+#include <cextras/collection.h>
 
 const struct SqshExtractorImpl *const __attribute__((weak)) sqsh__impl_lzo =
 		NULL;
@@ -62,7 +62,7 @@ sqsh__extractor_impl_from_id(int id) {
 
 int
 sqsh__extractor_init(
-		struct SqshExtractor *extractor, struct SqshBuffer *buffer,
+		struct SqshExtractor *extractor, struct CxBuffer *buffer,
 		int algorithm_id, size_t block_size) {
 	const struct SqshExtractorImpl *impl =
 			sqsh__extractor_impl_from_id(algorithm_id);
@@ -85,9 +85,9 @@ sqsh__extractor_to_buffer(
 	uint8_t *decompressed = NULL;
 	const struct SqshExtractorImpl *impl = extractor->impl;
 	sqsh__extractor_context_t extractor_context = {0};
-	struct SqshBuffer *buffer = extractor->buffer;
+	struct CxBuffer *buffer = extractor->buffer;
 
-	rv = sqsh__buffer_add_capacity(buffer, &decompressed, max_size);
+	rv = cx_buffer_add_capacity(buffer, &decompressed, max_size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -114,7 +114,7 @@ sqsh__extractor_to_buffer(
 		rv = -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 		goto out;
 	}
-	rv = sqsh__buffer_add_size(buffer, size);
+	rv = cx_buffer_add_size(buffer, size);
 
 out:
 	return rv;

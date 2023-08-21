@@ -27,6 +27,7 @@ lz4_dep = dependency('liblz4', required: get_option('lz4'))
 lzma_dep = dependency('liblzma', required: get_option('lzma'))
 zlib_dep = dependency('zlib', required: get_option('zlib'))
 zstd_dep = dependency('libzstd', required: get_option('zstd'))
+cextras_dep = subproject('cextras').get_variable('cextras_dep')
 
 subdir('include')
 

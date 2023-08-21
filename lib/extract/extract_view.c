@@ -50,7 +50,7 @@ sqsh__extract_view_init(
 		goto out;
 	}
 
-	view->size = sqsh__buffer_size(view->buffer);
+	view->size = cx_buffer_size(view->buffer);
 
 out:
 	if (rv < 0) {
@@ -61,7 +61,7 @@ out:
 
 const uint8_t *
 sqsh__extract_view_data(const struct SqshExtractView *view) {
-	const uint8_t *data = sqsh__buffer_data(view->buffer);
+	const uint8_t *data = cx_buffer_data(view->buffer);
 	return &data[view->offset];
 }
 

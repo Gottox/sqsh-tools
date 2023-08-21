@@ -36,9 +36,9 @@
 
 #include "sqsh_mapper.h"
 
-#include "sqsh_primitive_private.h"
 #include "sqsh_reader_private.h"
 #include "sqsh_thread_private.h"
+#include <cextras/collection.h>
 #include <sys/wait.h>
 
 #ifdef __cplusplus
@@ -259,8 +259,8 @@ struct SqshMapManager {
 	 * @privatesection
 	 */
 	struct SqshMapper mapper;
-	struct SqshLru lru;
-	struct SqshRcMap maps;
+	struct CxLru lru;
+	struct CxRcMap maps;
 	uint64_t archive_offset;
 	sqsh__mutex_t lock;
 };

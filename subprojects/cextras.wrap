@@ -1,6 +1,6 @@
 [wrap-git]
 url=https://github.com/Gottox/cextras.git
-revision=main
+revision=9a39123923ccefd5939a30fb163c3df0e823db97
 depth=1
 
 [provide]

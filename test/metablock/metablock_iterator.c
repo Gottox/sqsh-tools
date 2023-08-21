@@ -59,7 +59,6 @@ next_once(void) {
 	assert(rv == 0);
 	assert(has_next);
 
-
 	assert(sqsh__metablock_iterator_size(&iter) == 4);
 
 	p = sqsh__metablock_iterator_data(&iter);

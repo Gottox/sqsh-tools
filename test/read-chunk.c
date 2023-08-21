@@ -8,7 +8,6 @@
 #include "../include/sqsh_easy.h"
 #include "../include/sqsh_error.h"
 #include "../include/sqsh_file.h"
-#include "sqsh_archive_private.h"
 
 #include <stdio.h>
 #include <stdlib.h>

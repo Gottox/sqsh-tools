@@ -35,7 +35,7 @@
 
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_error.h"
-#include "../../include/sqsh_primitive_private.h"
+#include <cextras/collection.h>
 
 #include "../../include/sqsh_file_private.h"
 #include "../utils/utils.h"

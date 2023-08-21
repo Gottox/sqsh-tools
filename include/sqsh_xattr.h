@@ -78,7 +78,8 @@ sqsh_xattr_iterator_new(const struct SqshFile *file, int *err);
  * stored.
  *
  * @retval true  When the iterator was advanced.
- * @retval false When the end of the xattrs list was reached or an error occured.
+ * @retval false When the end of the xattrs list was reached or an error
+ * occured.
  */
 SQSH_NO_UNUSED bool
 sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator, int *err);
