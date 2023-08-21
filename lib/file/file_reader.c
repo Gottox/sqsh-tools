@@ -43,6 +43,27 @@ static bool
 file_iterator_next(void *iterator, size_t desired_size, int *err) {
 	return sqsh_file_iterator_next(iterator, desired_size, err);
 }
+static int
+file_iterator_skip(void *iterator, sqsh_index_t *offset, size_t desired_size) {
+	int rv = 0;
+
+	size_t current_size = sqsh_file_iterator_size(iterator);
+	while (current_size <= *offset) {
+		*offset -= current_size;
+		bool has_next = sqsh_file_iterator_next(iterator, desired_size, &rv);
+		if (rv < 0) {
+			goto out;
+		} else if (!has_next) {
+			rv = -SQSH_ERROR_OUT_OF_BOUNDS;
+			goto out;
+		}
+		current_size = sqsh_file_iterator_size(iterator);
+	}
+
+	rv = 0;
+out:
+	return rv;
+}
 static const uint8_t *
 file_iterator_data(const void *iterator) {
 	return sqsh_file_iterator_data(iterator);
@@ -54,6 +75,7 @@ file_iterator_size(const void *iterator) {
 
 static const struct SqshReaderIteratorImpl file_reader_impl = {
 		.next = file_iterator_next,
+		.skip = file_iterator_skip,
 		.data = file_iterator_data,
 		.size = file_iterator_size,
 };
