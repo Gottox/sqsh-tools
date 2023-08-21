@@ -80,19 +80,6 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__metablock_iterator_init(
 /**
  * @internal
  * @memberof SqshMetablockIterator
- * @brief skip several metablocks. sqsh__metablock_iterator_skip(i, 1) is
- * equivalent to sqsh__metablock_iterator_next(i).
- *
- * @param[in,out] iterator The iterator to advance.
- * @param[in] amount The number of metablocks to skip.
- * @return 0 on success, or a negative value on error.
- */
-SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__metablock_iterator_skip(
-		struct SqshMetablockIterator *iterator, size_t amount);
-
-/**
- * @internal
- * @memberof SqshMetablockIterator
  * @brief Moves the iterator to the next metablock.
  *
  * @param[in,out] iterator The iterator to advance.
