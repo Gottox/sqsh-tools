@@ -354,9 +354,6 @@ tree_walker_resolve(
 				if (rv < 0) {
 					goto out;
 				}
-				if (sqsh_tree_walker_type(walker) == SQSH_FILE_TYPE_DIRECTORY) {
-					is_dir = true;
-				}
 				is_dir = sqsh_tree_walker_type(walker) ==
 						SQSH_FILE_TYPE_DIRECTORY;
 				break;
