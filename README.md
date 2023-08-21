@@ -15,6 +15,9 @@ provides zero-copy interfaces to the squashfs archives.
 
 ## Example
 
+This is a simple example that a) prints the content of a file and b) lists the
+content of a directory.
+
 ```c
 struct SqshArchive *archive =
 		sqsh_archive_open("/path/to/archive.squashfs", NULL, NULL);
@@ -25,8 +28,7 @@ const size_t size = sqsh_easy_file_size(archive, "/path/to/file", NULL);
 fwrite(contents, 1, size, stdout);
 free(contents);
 
-char **files =
-		sqsh_easy_directory_list(archive, "/path/to/directory", NULL);
+char **files = sqsh_easy_directory_list(archive, "/path/to/dir", NULL);
 assert(files != NULL);
 for (int i = 0; files[i] != NULL; i++) {
 	printf("%s\n", files[i]);
@@ -36,22 +38,7 @@ free(files);
 sqsh_archive_close(archive);
 ```
 
-## Roadmap to 1.0
-
-* [x] directory listing
-* [x] file content reading
-* [x] inode metadata
-* [x] path traversal
-* [x] xattr support
-* [x] symlink resolution for path traversal
-* [x] LRU cache for metadata
-* [x] LRU cache for file content
-* [x] thread safety
-* [x] fuse file system
-* [x] OpenBSD support
-* [x] FreeBSD support
-* [ ] refine the high-level API
-* [x] refine the low-level API
+Find further examples in the [examples](examples) directory.
 
 ## Building
 
