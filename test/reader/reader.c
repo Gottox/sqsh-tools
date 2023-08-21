@@ -549,8 +549,8 @@ test_reader_extend_size_till_end(void) {
 	assert(memcmp(data, "456789ABCDEF", 12) == 0);
 	assert(rv == 0);
 
-	// rv = sqsh__reader_advance(&reader, 0, 13);
-	// assert(rv == -SQSH_ERROR_OUT_OF_BOUNDS);
+	rv = sqsh__reader_advance(&reader, 0, 13);
+	assert(rv == -SQSH_ERROR_OUT_OF_BOUNDS);
 
 	sqsh__reader_cleanup(&reader);
 }
