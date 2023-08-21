@@ -56,11 +56,6 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-### Meson ###
-# subproject directories
-/subprojects/*
-!/subprojects/*.wrap
-
 # Meson Directories
 meson-logs
 meson-private

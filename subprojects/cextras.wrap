@@ -1,7 +1,9 @@
-[wrap-git]
-url=https://github.com/Gottox/cextras.git
-revision=9a39123923ccefd5939a30fb163c3df0e823db97
-depth=1
+[wrap-file]
+directory = cextras-9a39123923ccefd5939a30fb163c3df0e823db97
+
+source_url = https://github.com/Gottox/cextras/archive/9a39123923ccefd5939a30fb163c3df0e823db97.tar.gz
+source_filename = cextras-9a39123923ccefd5939a30fb163c3df0e823db97.tar.gz
+source_hash = 8466e13d59da79ac485614377a8550aa573beb9989c8a3d0925d290025d01c30
 
 [provide]
 cextras=cextras_dep
