@@ -87,11 +87,12 @@ out:
 	return rv;
 }
 
-int
+bool
 sqsh__directory_index_iterator_next(
-		struct SqshDirectoryIndexIterator *iterator) {
+		struct SqshDirectoryIndexIterator *iterator, int *err) {
 	int rv = 0;
 	size_t size;
+	bool has_next = false;
 
 	if (iterator->remaining_entries == 0) {
 		return 0;
@@ -105,18 +106,23 @@ sqsh__directory_index_iterator_next(
 	rv = sqsh__metablock_reader_advance(
 			&iterator->file.metablock, iterator->next_offset, size);
 	if (rv < 0) {
-		return rv;
+		goto out;
 	}
 
 	/* Make sure current index has its name populated */
 	size += sqsh__directory_index_iterator_name_size(iterator);
 	rv = sqsh__metablock_reader_advance(&iterator->file.metablock, 0, size);
 	if (rv < 0) {
-		return rv;
+		goto out;
 	}
 
 	iterator->next_offset = size;
-	return remaining_entries;
+	has_next = remaining_entries > 0;
+out:
+	if (err != NULL) {
+		*err = rv;
+	}
+	return has_next;
 }
 
 uint32_t

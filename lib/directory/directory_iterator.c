@@ -104,7 +104,7 @@ directory_iterator_index_lookup(
 	if (rv < 0) {
 		goto out;
 	}
-	while ((rv = sqsh__directory_index_iterator_next(&index_iterator)) > 0) {
+	while (sqsh__directory_index_iterator_next(&index_iterator, &rv)) {
 		const char *index_name =
 				sqsh__directory_index_iterator_name(&index_iterator);
 		const uint32_t index_name_size =
