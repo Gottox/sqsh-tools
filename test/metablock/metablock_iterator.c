@@ -55,8 +55,10 @@ next_once(void) {
 			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
 	assert(rv == 0);
 
-	rv = sqsh__metablock_iterator_next(&iter);
-	assert(rv == 4);
+	bool has_next = sqsh__metablock_iterator_next(&iter, &rv);
+	assert(rv == 0);
+	assert(has_next);
+
 
 	assert(sqsh__metablock_iterator_size(&iter) == 4);
 
@@ -84,8 +86,9 @@ next_failing_with_no_compression(void) {
 			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
 	assert(rv == 0);
 
-	rv = sqsh__metablock_iterator_next(&iter);
+	bool has_next = sqsh__metablock_iterator_next(&iter, &rv);
 	assert(rv != 0);
+	assert(!has_next);
 
 	rv = sqsh__metablock_iterator_cleanup(&iter);
 	assert(rv == 0);
@@ -114,8 +117,9 @@ next_twice(void) {
 			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
 	assert(rv == 0);
 
-	rv = sqsh__metablock_iterator_next(&iter);
-	assert(rv == 4);
+	bool has_next = sqsh__metablock_iterator_next(&iter, &rv);
+	assert(rv == 0);
+	assert(has_next);
 
 	assert(sqsh__metablock_iterator_size(&iter) == 4);
 
@@ -123,8 +127,9 @@ next_twice(void) {
 	assert(p != NULL);
 	assert(memcmp(p, "abcd", 4) == 0);
 
-	rv = sqsh__metablock_iterator_next(&iter);
-	assert(rv == 4);
+	has_next = sqsh__metablock_iterator_next(&iter, &rv);
+	assert(rv == 0);
+	assert(has_next);
 
 	assert(sqsh__metablock_iterator_size(&iter) == 4);
 
@@ -156,8 +161,9 @@ next_compressed(void) {
 			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
 	assert(rv == 0);
 
-	rv = sqsh__metablock_iterator_next(&iter);
-	assert(rv == 4);
+	bool has_next = sqsh__metablock_iterator_next(&iter, &rv);
+	assert(rv == 0);
+	assert(has_next);
 
 	assert(sqsh__metablock_iterator_size(&iter) == 4);
 
@@ -165,8 +171,9 @@ next_compressed(void) {
 	assert(p != NULL);
 	assert(memcmp(p, "abcd", 4) == 0);
 
-	rv = sqsh__metablock_iterator_next(&iter);
-	assert(rv == 4);
+	has_next = sqsh__metablock_iterator_next(&iter, &rv);
+	assert(rv == 0);
+	assert(has_next);
 
 	assert(sqsh__metablock_iterator_size(&iter) == 4);
 

@@ -67,8 +67,9 @@ out:
 	return rv;
 }
 
-int
-sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator) {
+bool
+sqsh__metablock_iterator_next(
+		struct SqshMetablockIterator *iterator, int *err) {
 	int rv = 0;
 
 	sqsh__extract_view_cleanup(&iterator->extract_view);
@@ -114,9 +115,16 @@ sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator) {
 		iterator->data = sqsh__map_reader_data(&iterator->reader);
 		iterator->inner_size = iterator->outer_size;
 	}
-	rv = sqsh__metablock_iterator_size(iterator);
+
+	rv = 0;
 out:
-	return rv;
+	if (err != NULL) {
+		*err = rv;
+	}
+	/* metablock iterators have no way to see if there is a next block. this
+	 * needs to be by the caller.
+	 */
+	return rv == 0;
 }
 
 const uint8_t *

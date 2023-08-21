@@ -43,9 +43,7 @@
 static bool
 metablock_iterator_next(void *iterator, size_t desired_size, int *err) {
 	(void)desired_size;
-	int rv = sqsh__metablock_iterator_next(iterator);
-	*err = rv;
-	return rv > 0;
+	return sqsh__metablock_iterator_next(iterator, err);
 }
 static const uint8_t *
 metablock_iterator_data(const void *iterator) {
