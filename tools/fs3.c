@@ -421,7 +421,7 @@ fs_listxattr(fuse_req_t req, fuse_ino_t ino, size_t size) {
 	}
 
 	p = buf;
-	while ((rv = sqsh_xattr_iterator_next(iterator)) > 0) {
+	while (sqsh_xattr_iterator_next(iterator, &rv)) {
 		prefix = sqsh_xattr_iterator_prefix(iterator);
 		if (prefix == NULL) {
 			fuse_reply_err(req, EIO);

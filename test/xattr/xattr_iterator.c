@@ -89,8 +89,9 @@ load_xattr(void) {
 	assert(rv == 0);
 	assert(iterator != NULL);
 
-	rv = sqsh_xattr_iterator_next(iterator);
-	assert(rv > 0);
+	bool has_next = sqsh_xattr_iterator_next(iterator, &rv);
+	assert(rv == 0);
+	assert(has_next == true);
 	size_t size = sqsh_xattr_iterator_name_size(iterator);
 	assert(size == 3);
 	const char *name = sqsh_xattr_iterator_name(iterator);
@@ -102,8 +103,9 @@ load_xattr(void) {
 	const char *prefix = sqsh_xattr_iterator_prefix(iterator);
 	assert(strcmp(prefix, "user.") == 0);
 
-	rv = sqsh_xattr_iterator_next(iterator);
-	assert(rv > 0);
+	has_next = sqsh_xattr_iterator_next(iterator, &rv);
+	assert(rv == 0);
+	assert(has_next == true);
 	size = sqsh_xattr_iterator_name_size(iterator);
 	assert(size == 3);
 	name = sqsh_xattr_iterator_name(iterator);
@@ -115,8 +117,9 @@ load_xattr(void) {
 	prefix = sqsh_xattr_iterator_prefix(iterator);
 	assert(strcmp(prefix, "trusted.") == 0);
 
-	rv = sqsh_xattr_iterator_next(iterator);
-	assert(rv > 0);
+	has_next = sqsh_xattr_iterator_next(iterator, &rv);
+	assert(rv == 0);
+	assert(has_next == true);
 	size = sqsh_xattr_iterator_name_size(iterator);
 	assert(size == 3);
 	name = sqsh_xattr_iterator_name(iterator);
@@ -128,8 +131,9 @@ load_xattr(void) {
 	prefix = sqsh_xattr_iterator_prefix(iterator);
 	assert(strcmp(prefix, "security.") == 0);
 
-	rv = sqsh_xattr_iterator_next(iterator);
+	has_next = sqsh_xattr_iterator_next(iterator, &rv);
 	assert(rv == 0);
+	assert(has_next == false);
 
 	sqsh_xattr_iterator_free(iterator);
 	sqsh__file_cleanup(&file);
@@ -180,8 +184,9 @@ load_xattr_indirect(void) {
 	assert(rv == 0);
 	assert(iterator != NULL);
 
-	rv = sqsh_xattr_iterator_next(iterator);
-	assert(rv > 0);
+	bool has_next = sqsh_xattr_iterator_next(iterator, &rv);
+	assert(rv == 0);
+	assert(has_next == true);
 	size_t size = sqsh_xattr_iterator_name_size(iterator);
 	assert(size == 3);
 	const char *name = sqsh_xattr_iterator_name(iterator);
@@ -191,8 +196,9 @@ load_xattr_indirect(void) {
 	const char *value = sqsh_xattr_iterator_value(iterator);
 	assert(memcmp(value, "123", size) == 0);
 
-	rv = sqsh_xattr_iterator_next(iterator);
+	has_next = sqsh_xattr_iterator_next(iterator, &rv);
 	assert(rv == 0);
+	assert(has_next == false);
 
 	sqsh_xattr_iterator_free(iterator);
 	sqsh__file_cleanup(&file);
