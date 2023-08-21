@@ -138,12 +138,16 @@ extract_directory(
 		goto out;
 	}
 
-	while (sqsh_directory_iterator_next(iter) > 0) {
+	while (sqsh_directory_iterator_next(iter, &rv)) {
 		rv = extract_directory_entry(iter, path_stack);
 		// Don't stop on error, but continue with next entry.
 		/*if (rv < 0) {
 			goto out;
 		}*/
+	}
+	if (rv < 0) {
+		print_err(rv, "sqsh_directory_iterator_next", path_stack);
+		goto out;
 	}
 
 	rv = chdir(cwd);

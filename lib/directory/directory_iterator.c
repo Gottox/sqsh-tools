@@ -158,7 +158,7 @@ sqsh_directory_iterator_lookup(
 		}
 	}
 
-	while (sqsh_directory_iterator_next(iterator) > 0) {
+	while (sqsh_directory_iterator_next(iterator, &rv) > 0) {
 		const size_t entry_name_size =
 				sqsh_directory_iterator_name_size(iterator);
 		const char *entry_name = sqsh_directory_iterator_name(iterator);
@@ -170,7 +170,11 @@ sqsh_directory_iterator_lookup(
 		}
 	}
 
-	return -SQSH_ERROR_NO_SUCH_FILE;
+	if (rv < 0) {
+		return rv;
+	} else {
+		return -SQSH_ERROR_NO_SUCH_FILE;
+	}
 }
 
 int
@@ -301,18 +305,19 @@ process_fragment(struct SqshDirectoryIterator *iterator) {
 	return rv;
 }
 
-int
-sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator) {
+bool
+sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator, int *err) {
 	int rv = 0;
 	size_t size;
+	bool has_next = false;
 
 	if (iterator->remaining_size == 0) {
-		return 0;
+		goto out;
 	} else if (iterator->remaining_entries == 0) {
 		/*  New fragment begins */
 		rv = process_fragment(iterator);
 		if (rv < 0) {
-			return rv;
+			goto out;
 		}
 	}
 
@@ -323,19 +328,20 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator) {
 	rv = sqsh__metablock_reader_advance(
 			&iterator->metablock, iterator->next_offset, size);
 	if (rv < 0) {
-		return rv;
+		goto out;
 	}
 
 	/*  Make sure next entry has its name populated */
 	if (SQSH_ADD_OVERFLOW(
 				size, sqsh_directory_iterator_name_size(iterator), &size)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
 	}
 	/*  May invalidate pointers into directory entries. that's why the */
 	/*  get_entry() call is repeated below. */
 	rv = sqsh__metablock_reader_advance(&iterator->metablock, 0, size);
 	if (rv < 0) {
-		return rv;
+		goto out;
 	}
 
 	iterator->next_offset = size;
@@ -345,9 +351,15 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator) {
 	}
 	rv = check_consistency(iterator);
 	if (rv < 0) {
-		return rv;
+		goto out;
 	}
-	return 1;
+
+	has_next = true;
+out:
+	if (err != NULL) {
+		*err = rv;
+	}
+	return has_next;
 }
 
 const char *

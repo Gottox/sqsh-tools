@@ -261,11 +261,11 @@ fs_readdir(
 	struct FsDirHandle *handle = get_dir_handle(fi);
 	char buf[size];
 
-	rv = sqsh_directory_iterator_next(handle->iterator);
+	bool has_next = sqsh_directory_iterator_next(handle->iterator, &rv);
 	if (rv < 0) {
 		fuse_reply_err(req, -fs_common_map_err(rv));
 		goto out;
-	} else if (rv == 0) {
+	} else if (has_next == false) {
 		fuse_reply_buf(req, NULL, 0);
 		goto out;
 	}

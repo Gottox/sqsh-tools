@@ -201,12 +201,15 @@ ls(struct SqshArchive *archive, const char *path, struct SqshFile *file) {
 		goto out;
 	}
 
-	while (sqsh_directory_iterator_next(iter) > 0) {
+	while (sqsh_directory_iterator_next(iter, &rv)) {
 		rv = ls_item(archive, path, iter);
 		if (rv < 0) {
-			rv = EXIT_FAILURE;
-			goto out;
+			break;
 		}
+	}
+	if (rv < 0) {
+		rv = EXIT_FAILURE;
+		goto out;
 	}
 
 out:

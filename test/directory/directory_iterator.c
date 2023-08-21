@@ -69,8 +69,9 @@ iter_invalid_file_name_with_0(void) {
 	rv = sqsh__directory_iterator_init(&iter, &file);
 	assert(rv == 0);
 
-	rv = sqsh_directory_iterator_next(&iter);
+	bool has_next = sqsh_directory_iterator_next(&iter, &rv);
 	assert(rv == -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY);
+	assert(has_next == false);
 
 	sqsh__directory_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
@@ -105,8 +106,9 @@ iter_invalid_file_name_with_slash(void) {
 	rv = sqsh__directory_iterator_init(&iter, &file);
 	assert(rv == 0);
 
-	rv = sqsh_directory_iterator_next(&iter);
+	bool has_next = sqsh_directory_iterator_next(&iter, &rv);
 	assert(rv == -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY);
+	assert(has_next == false);
 
 	sqsh__directory_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
@@ -150,16 +152,18 @@ iter_two_files(void) {
 	rv = sqsh__directory_iterator_init(&iter, &file);
 	assert(rv == 0);
 
-	rv = sqsh_directory_iterator_next(&iter);
-	assert(rv > 0);
+	bool has_next = sqsh_directory_iterator_next(&iter, &rv);
+	assert(rv == 0);
+	assert(has_next == true);
 
 	const char *name = sqsh_directory_iterator_name(&iter);
 	size_t size = sqsh_directory_iterator_name_size(&iter);
 	assert(size == 1);
 	assert(name[0] == '1');
 
-	rv = sqsh_directory_iterator_next(&iter);
-	assert(rv > 0);
+	has_next = sqsh_directory_iterator_next(&iter, &rv);
+	assert(rv == 0);
+	assert(has_next == true);
 
 	name = sqsh_directory_iterator_name(&iter);
 	size = sqsh_directory_iterator_name_size(&iter);

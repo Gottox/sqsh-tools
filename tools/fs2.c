@@ -140,11 +140,14 @@ fs_readdir(
 	}
 	filler(buf, ".", NULL, 0);
 	filler(buf, "..", NULL, 0);
-	while ((rv = sqsh_directory_iterator_next(iterator)) > 0) {
+	while (sqsh_directory_iterator_next(iterator, &rv)) {
 		rv = fs_readdir_item(buf, iterator, filler);
 		if (rv < 0) {
-			goto out;
+			break;
 		}
+	}
+	if (rv < 0) {
+		goto out;
 	}
 
 out:

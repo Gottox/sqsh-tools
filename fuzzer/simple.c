@@ -95,7 +95,7 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 	if (iter == NULL) {
 		goto out;
 	}
-	while ((rv = sqsh_directory_iterator_next(iter)) > 0) {
+	while (sqsh_directory_iterator_next(iter, &rv)) {
 		if (read_file(iter) < 0)
 			break;
 	}
