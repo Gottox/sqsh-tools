@@ -97,7 +97,7 @@ sqsh__reader_init(
 	reader->iterator_offset = 0;
 	reader->iterator_impl = iterator_impl;
 	reader->iterator = iterator;
-	return sqsh__buffer_init(&reader->buffer);
+	return cx_buffer_init(&reader->buffer);
 }
 
 /**
@@ -115,16 +115,16 @@ reader_fill_buffer(struct SqshReader *reader, size_t size) {
 	int rv = 0;
 	void *iterator = reader->iterator;
 	const struct SqshReaderIteratorImpl *impl = reader->iterator_impl;
-	struct SqshBuffer *buffer = &reader->buffer;
+	struct CxBuffer *buffer = &reader->buffer;
 	sqsh_index_t offset = reader->offset;
 	sqsh_index_t iterator_offset = reader->iterator_offset;
 
-	size_t remaining_size = size - sqsh__buffer_size(buffer);
+	size_t remaining_size = size - cx_buffer_size(buffer);
 	for (;;) {
 		const uint8_t *data = impl->data(iterator);
 		const size_t data_size = impl->size(iterator);
 		const size_t copy_size = SQSH_MIN(data_size - offset, remaining_size);
-		rv = sqsh__buffer_append(buffer, &data[offset], copy_size);
+		rv = cx_buffer_append(buffer, &data[offset], copy_size);
 		if (rv < 0) {
 			goto out;
 		}
@@ -142,12 +142,12 @@ reader_fill_buffer(struct SqshReader *reader, size_t size) {
 		}
 	}
 
-	assert(size == sqsh__buffer_size(buffer));
+	assert(size == cx_buffer_size(buffer));
 	assert(iterator_offset != 0);
 
 	reader->iterator_offset = iterator_offset;
 	reader->offset = 0;
-	reader->data = sqsh__buffer_data(buffer);
+	reader->data = cx_buffer_data(buffer);
 	reader->size = size;
 out:
 	return rv;
@@ -156,24 +156,24 @@ out:
 static int
 handle_buffered(struct SqshReader *reader, sqsh_index_t offset, size_t size) {
 	int rv = 0;
-	struct SqshBuffer new_buffer = {0};
+	struct CxBuffer new_buffer = {0};
 	sqsh_index_t iterator_offset = reader->iterator_offset;
 
-	struct SqshBuffer *buffer = &reader->buffer;
-	const uint8_t *buffer_data = sqsh__buffer_data(buffer);
-	size_t buffer_size = sqsh__buffer_size(buffer);
+	struct CxBuffer *buffer = &reader->buffer;
+	const uint8_t *buffer_data = cx_buffer_data(buffer);
+	size_t buffer_size = cx_buffer_size(buffer);
 	const size_t copy_size = buffer_size - offset;
 
 	if (offset != 0) {
-		rv = sqsh__buffer_init(&new_buffer);
+		rv = cx_buffer_init(&new_buffer);
 		if (rv < 0) {
 			goto out;
 		}
-		rv = sqsh__buffer_append(&new_buffer, &buffer_data[offset], copy_size);
+		rv = cx_buffer_append(&new_buffer, &buffer_data[offset], copy_size);
 		if (rv < 0) {
 			goto out;
 		}
-		rv = sqsh__buffer_move(buffer, &new_buffer);
+		rv = cx_buffer_move(buffer, &new_buffer);
 		if (rv < 0) {
 			goto out;
 		}
@@ -213,8 +213,8 @@ handle_mapped(struct SqshReader *reader, sqsh_index_t offset, size_t size) {
 		reader->data = &data[offset];
 		reader->size = size;
 	} else {
-		struct SqshBuffer *buffer = &reader->buffer;
-		sqsh__buffer_drain(buffer);
+		struct CxBuffer *buffer = &reader->buffer;
+		cx_buffer_drain(buffer);
 		rv = reader_fill_buffer(reader, size);
 	}
 
@@ -246,5 +246,5 @@ sqsh__reader_size(const struct SqshReader *reader) {
 
 int
 sqsh__reader_cleanup(struct SqshReader *reader) {
-	return sqsh__buffer_cleanup(&reader->buffer);
+	return cx_buffer_cleanup(&reader->buffer);
 }

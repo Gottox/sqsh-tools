@@ -35,7 +35,7 @@
 #define SQSH_READER_PRIVATE_H
 
 #include "sqsh_common.h"
-#include "sqsh_primitive_private.h"
+#include <cextras/collection.h>
 #include <sys/wait.h>
 
 #ifdef __cplusplus
@@ -106,7 +106,7 @@ struct SqshReader {
 	/**
 	 * @brief The buffer to store data in if they cannot be directly mapped.
 	 */
-	struct SqshBuffer buffer;
+	struct CxBuffer buffer;
 
 	/**
 	 * @brief The data that is presented to the user.

@@ -39,7 +39,7 @@
 
 #include "../../include/sqsh_mapper.h"
 #include "../../include/sqsh_mapper_private.h"
-#include "../../include/sqsh_primitive_private.h"
+#include <cextras/collection.h>
 
 /**
  * Calculates pow(x,y) % mod
@@ -76,7 +76,7 @@ find_next_maybe_prime(size_t n) {
 
 static void
 buffer_cleanup(void *buffer) {
-	sqsh__buffer_cleanup(buffer);
+	cx_buffer_cleanup(buffer);
 }
 
 SQSH_NO_UNUSED int
@@ -105,15 +105,13 @@ sqsh__extract_manager_init(
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__rc_hash_map_init(
-			&manager->hash_map, size, sizeof(struct SqshBuffer),
-			buffer_cleanup);
+	rv = cx_rc_hash_map_init(
+			&manager->hash_map, size, sizeof(struct CxBuffer), buffer_cleanup);
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__lru_init(
-			&manager->lru, lru_size, &sqsh__lru_rc_hash_map,
-			&manager->hash_map);
+	rv = cx_lru_init(
+			&manager->lru, lru_size, &cx_lru_rc_hash_map, &manager->hash_map);
 	if (rv < 0) {
 		goto out;
 	}
@@ -135,7 +133,7 @@ out:
 int
 sqsh__extract_manager_uncompress(
 		struct SqshExtractManager *manager, const struct SqshMapReader *reader,
-		const struct SqshBuffer **target) {
+		const struct CxBuffer **target) {
 	int rv = 0;
 	struct SqshExtractor extractor = {0};
 	const enum SqshSuperblockCompressionId compression_id =
@@ -150,11 +148,11 @@ sqsh__extract_manager_uncompress(
 	const uint64_t address = sqsh__map_reader_address(reader);
 	const size_t size = sqsh__map_reader_size(reader);
 
-	*target = sqsh__rc_hash_map_retain(&manager->hash_map, address);
+	*target = cx_rc_hash_map_retain(&manager->hash_map, address);
 
 	if (*target == NULL) {
-		struct SqshBuffer buffer = {0};
-		rv = sqsh__buffer_init(&buffer);
+		struct CxBuffer buffer = {0};
+		rv = cx_buffer_init(&buffer);
 		if (rv < 0) {
 			goto out;
 		}
@@ -168,13 +166,13 @@ sqsh__extract_manager_uncompress(
 
 		rv = sqsh__extractor_to_buffer(&extractor, data, size);
 		if (rv < 0) {
-			sqsh__buffer_cleanup(&buffer);
+			cx_buffer_cleanup(&buffer);
 			goto out;
 		}
 
-		*target = sqsh__rc_hash_map_put(&manager->hash_map, address, &buffer);
+		*target = cx_rc_hash_map_put(&manager->hash_map, address, &buffer);
 	}
-	rv = sqsh__lru_touch(&manager->lru, address);
+	rv = cx_lru_touch(&manager->lru, address);
 
 out:
 	sqsh__extractor_cleanup(&extractor);
@@ -184,13 +182,13 @@ out:
 
 int
 sqsh__extract_manager_release(
-		struct SqshExtractManager *manager, const struct SqshBuffer *buffer) {
+		struct SqshExtractManager *manager, const struct CxBuffer *buffer) {
 	int rv = sqsh__mutex_lock(&manager->lock);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = sqsh__rc_hash_map_release(&manager->hash_map, buffer);
+	rv = cx_rc_hash_map_release(&manager->hash_map, buffer);
 
 	sqsh__mutex_unlock(&manager->lock);
 out:
@@ -199,8 +197,8 @@ out:
 
 int
 sqsh__extract_manager_cleanup(struct SqshExtractManager *manager) {
-	sqsh__lru_cleanup(&manager->lru);
-	sqsh__rc_hash_map_cleanup(&manager->hash_map);
+	cx_lru_cleanup(&manager->lru);
+	cx_rc_hash_map_cleanup(&manager->hash_map);
 	sqsh__mutex_destroy(&manager->lock);
 
 	return 0;

@@ -34,7 +34,7 @@
 #ifndef SQSH_EXTRACT_PRIVATE_H
 #define SQSH_EXTRACT_PRIVATE_H
 
-#include "sqsh_primitive_private.h"
+#include <cextras/collection.h>
 
 #include "sqsh_thread_private.h"
 
@@ -91,7 +91,7 @@ struct SqshExtractor {
 	/**
 	 * @privatesection
 	 */
-	struct SqshBuffer *buffer;
+	struct CxBuffer *buffer;
 	const struct SqshExtractorImpl *impl;
 	size_t block_size;
 };
@@ -122,7 +122,7 @@ sqsh__extractor_impl_from_id(int id);
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__extractor_init(
-		struct SqshExtractor *extractor, struct SqshBuffer *buffer,
+		struct SqshExtractor *extractor, struct CxBuffer *buffer,
 		int algorithm_id, size_t block_size);
 
 /**
@@ -162,11 +162,11 @@ struct SqshExtractManager {
 	/**
 	 * @privatesection
 	 */
-	struct SqshRcHashMap hash_map;
+	struct CxRcHashMap hash_map;
 	unsigned int compression_id;
 	uint32_t block_size;
 	struct SqshMapManager *map_manager;
-	struct SqshLru lru;
+	struct CxLru lru;
 	sqsh__mutex_t lock;
 };
 
@@ -199,7 +199,7 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__extract_manager_init(
  */
 SQSH_NO_EXPORT int sqsh__extract_manager_uncompress(
 		struct SqshExtractManager *manager, const struct SqshMapReader *reader,
-		const struct SqshBuffer **target);
+		const struct CxBuffer **target);
 
 /**
  * @internal
@@ -212,7 +212,7 @@ SQSH_NO_EXPORT int sqsh__extract_manager_uncompress(
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_EXPORT int sqsh__extract_manager_release(
-		struct SqshExtractManager *manager, const struct SqshBuffer *buffer);
+		struct SqshExtractManager *manager, const struct CxBuffer *buffer);
 
 /**
  * @internal
@@ -238,7 +238,7 @@ struct SqshExtractView {
 	 * @privatesection
 	 */
 	struct SqshExtractManager *manager;
-	const struct SqshBuffer *buffer;
+	const struct CxBuffer *buffer;
 	size_t offset;
 	size_t size;
 };

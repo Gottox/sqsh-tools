@@ -15,7 +15,6 @@ headers = files(
     'sqsh_mapper_private.h',
     'sqsh_metablock_private.h',
     'sqsh_posix.h',
-    'sqsh_primitive_private.h',
     'sqsh_reader_private.h',
     'sqsh_table.h',
     'sqsh_table_private.h',
