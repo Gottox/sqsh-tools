@@ -40,7 +40,8 @@
 
 static bool
 reader_iterator_next(struct SqshReader *reader, size_t desired_size, int *err) {
-	bool has_next = reader->iterator_impl->next(reader->iterator, desired_size, err);
+	bool has_next =
+			reader->iterator_impl->next(reader->iterator, desired_size, err);
 	if (has_next == false && *err == 0) {
 		*err = -SQSH_ERROR_OUT_OF_BOUNDS;
 		return false;

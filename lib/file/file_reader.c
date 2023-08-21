@@ -41,9 +41,7 @@
 
 static bool
 file_iterator_next(void *iterator, size_t desired_size, int *err) {
-	int rv = sqsh_file_iterator_next(iterator, desired_size);
-	*err = rv;
-	return rv > 0;
+	return sqsh_file_iterator_next(iterator, desired_size, err);
 }
 static const uint8_t *
 file_iterator_data(const void *iterator) {

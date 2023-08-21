@@ -135,11 +135,14 @@ sqsh_file_iterator_new(const struct SqshFile *file, int *err);
  * @param[in,out] iterator The file iterator to read data from.
  * @param[in] desired_size The desired size of the data to read. May be more or
  * less than the actual size of the data read.
+ * @param[out] err Pointer to an int where the error code will be stored.
  *
- * @return The number of bytes read on success, less than 0 on error.
+ * @retval true  When the iterator was advanced
+ * @retval false When the iterator is at the end and no more entries are
+ * available or if an error occured.
  */
-SQSH_NO_UNUSED int
-sqsh_file_iterator_next(struct SqshFileIterator *iterator, size_t desired_size);
+SQSH_NO_UNUSED bool sqsh_file_iterator_next(
+		struct SqshFileIterator *iterator, size_t desired_size, int *err);
 
 /**
  * @brief Gets a pointer to the current data in the file iterator.
