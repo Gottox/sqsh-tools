@@ -52,16 +52,18 @@ sqsh_easy_file_exists(struct SqshArchive *archive, const char *path, int *err) {
 	bool exists = false;
 
 	rv = sqsh__tree_walker_init(&walker, archive);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh_tree_walker_resolve(&walker, path, true);
 	if (rv == -SQSH_ERROR_NO_SUCH_FILE) {
 		rv = 0;
 		goto out;
 	} else if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh_tree_walker_resolve(&walker, path, true);
-	if (rv < 0) {
-		goto out;
-	}
+
+	exists = true;
 
 out:
 	sqsh__tree_walker_cleanup(&walker);
