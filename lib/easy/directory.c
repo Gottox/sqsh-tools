@@ -82,7 +82,7 @@ sqsh_easy_directory_list(
 		goto out;
 	}
 
-	while ((rv = sqsh_directory_iterator_next(iterator)) > 0) {
+	while (sqsh_directory_iterator_next(iterator, &rv)) {
 		const char *name = sqsh_directory_iterator_name(iterator);
 		size_t name_len = sqsh_directory_iterator_name_size(iterator);
 		size_t index = sqsh__buffer_size(&dir_list_names);

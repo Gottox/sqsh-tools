@@ -140,11 +140,14 @@ fs_readdir(
 	}
 	filler(buf, ".", NULL, 0);
 	filler(buf, "..", NULL, 0);
-	while ((rv = sqsh_directory_iterator_next(iterator)) > 0) {
+	while (sqsh_directory_iterator_next(iterator, &rv)) {
 		rv = fs_readdir_item(buf, iterator, filler);
 		if (rv < 0) {
-			goto out;
+			break;
 		}
+	}
+	if (rv < 0) {
+		goto out;
 	}
 
 out:
@@ -245,7 +248,7 @@ fs_listxattr(const char *path, char *buf, size_t size) {
 	}
 
 	iterator = sqsh_xattr_iterator_new(file, &rv);
-	while ((rv = sqsh_xattr_iterator_next(iterator)) > 0) {
+	while (sqsh_xattr_iterator_next(iterator, &rv) > 0) {
 		const char *prefix = sqsh_xattr_iterator_prefix(iterator);
 		size_t prefix_len = sqsh_xattr_iterator_prefix_size(iterator);
 		const char *name = sqsh_xattr_iterator_name(iterator);
@@ -260,6 +263,9 @@ fs_listxattr(const char *path, char *buf, size_t size) {
 		pos += name_len;
 		buf[pos] = '\0';
 		pos++;
+	}
+	if (rv < 0) {
+		goto out;
 	}
 
 	rv = pos;

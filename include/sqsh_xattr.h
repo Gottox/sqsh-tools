@@ -74,10 +74,14 @@ sqsh_xattr_iterator_new(const struct SqshFile *file, int *err);
  * @brief Advances the iterator to the next xattr.
  *
  * @param[in,out] iterator The iterator to advance.
+ * @param[out]    err      Pointer to an int where the error code will be
+ * stored.
  *
- * @return 0 on success, a negative value on error.
+ * @retval true  When the iterator was advanced.
+ * @retval false When the end of the xattrs list was reached or an error occured.
  */
-SQSH_NO_UNUSED int sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator);
+SQSH_NO_UNUSED bool
+sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator, int *err);
 
 /**
  * @memberof SqshXattrIterator

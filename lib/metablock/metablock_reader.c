@@ -40,10 +40,10 @@
 #include "../../include/sqsh_error.h"
 #include "../utils/utils.h"
 
-static int
-metablock_iterator_next(void *iterator, size_t desired_size) {
+static bool
+metablock_iterator_next(void *iterator, size_t desired_size, int *err) {
 	(void)desired_size;
-	return sqsh__metablock_iterator_next(iterator);
+	return sqsh__metablock_iterator_next(iterator, err);
 }
 static const uint8_t *
 metablock_iterator_data(const void *iterator) {

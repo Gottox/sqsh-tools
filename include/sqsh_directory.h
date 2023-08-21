@@ -63,12 +63,15 @@ sqsh_directory_iterator_new(struct SqshFile *file, int *err);
  * @brief Advances the iterator to the next entry.
  *
  * @param[in,out] iterator The iterator to advance.
+ * @param[out]    err      Pointer to an int where the error code will be
+ * stored.
  *
- * @return amount of bytes available in the current block on success, 0 if the
- * end of the directory has been reached, a negative value on error.
+ * @retval true When the iterator has been advanced
+ * @retval false When the iterator has reached the end of the directory or if an
+ * error occured.
  */
-SQSH_NO_UNUSED int
-sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator);
+SQSH_NO_UNUSED bool
+sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator, int *err);
 
 /**
  * @memberof SqshDirectoryIterator

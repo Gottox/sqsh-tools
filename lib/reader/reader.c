@@ -38,13 +38,16 @@
 
 #include <assert.h>
 
-static int
-reader_iterator_next(struct SqshReader *reader, size_t desired_size) {
-	int rv = reader->iterator_impl->next(reader->iterator, desired_size);
-	if (rv == 0) {
-		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
+static bool
+reader_iterator_next(struct SqshReader *reader, size_t desired_size, int *err) {
+	bool has_next =
+			reader->iterator_impl->next(reader->iterator, desired_size, err);
+	if (has_next == false && *err == 0) {
+		*err = -SQSH_ERROR_OUT_OF_BOUNDS;
+		return false;
+	} else {
+		return has_next;
 	}
-	return rv;
 }
 
 /**
@@ -72,7 +75,7 @@ reader_iterator_skip(
 
 	while (current_size <= *offset) {
 		*offset -= current_size;
-		rv = reader_iterator_next(reader, desired_size);
+		reader_iterator_next(reader, desired_size, &rv);
 		if (rv < 0) {
 			goto out;
 		}
@@ -133,7 +136,7 @@ reader_fill_buffer(struct SqshReader *reader, size_t size) {
 		}
 
 		iterator_offset = size - remaining_size;
-		rv = reader_iterator_next(reader, remaining_size);
+		reader_iterator_next(reader, remaining_size, &rv);
 		if (rv < 0) {
 			goto out;
 		}

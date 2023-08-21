@@ -136,30 +136,34 @@ sqsh_ls(void) {
 	assert(iter != NULL);
 	assert(rv == 0);
 
-	rv = sqsh_directory_iterator_next(iter);
-	assert(rv > 0);
+	bool has_next = sqsh_directory_iterator_next(iter, &rv);
+	assert(rv == 0);
+	assert(has_next);
 	name = sqsh_directory_iterator_name_dup(iter);
 	assert(name != NULL);
 	assert(strcmp("a", name) == 0);
 	free(name);
 
-	rv = sqsh_directory_iterator_next(iter);
+	has_next = sqsh_directory_iterator_next(iter, &rv);
 	assert(rv >= 0);
+	assert(has_next == true);
 	name = sqsh_directory_iterator_name_dup(iter);
 	assert(name != NULL);
 	assert(strcmp("b", name) == 0);
 	free(name);
 
-	rv = sqsh_directory_iterator_next(iter);
-	assert(rv >= 0);
+	has_next = sqsh_directory_iterator_next(iter, &rv);
+	assert(rv == 0);
+	assert(has_next == true);
 	name = sqsh_directory_iterator_name_dup(iter);
 	assert(name != NULL);
 	assert(strcmp("large_dir", name) == 0);
 	free(name);
 
-	rv = sqsh_directory_iterator_next(iter);
+	has_next = sqsh_directory_iterator_next(iter, &rv);
 	// End of file list
 	assert(rv == 0);
+	assert(has_next == false);
 
 	rv = sqsh_directory_iterator_free(iter);
 	assert(rv == 0);
@@ -529,7 +533,7 @@ multithreaded_walker(void *arg) {
 	if (sqsh_file_type(file) == SQSH_FILE_TYPE_DIRECTORY) {
 		struct SqshDirectoryIterator *iter =
 				sqsh_directory_iterator_new(file, &rv);
-		while (sqsh_directory_iterator_next(iter) > 0) {
+		while (sqsh_directory_iterator_next(iter, &rv) > 0) {
 			multithreaded_walker(&my_walker);
 		}
 		sqsh_directory_iterator_free(iter);

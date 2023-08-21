@@ -191,19 +191,19 @@ out:
 	return rv;
 }
 
-int
-sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator) {
+bool
+sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator, int *err) {
 	int rv = 0;
 	size_t size = SQSH_SIZEOF_XATTR_KEY + SQSH_SIZEOF_XATTR_VALUE;
+	bool has_next = false;
 
 	sqsh__metablock_reader_cleanup(&iterator->out_of_line_value);
 
 	if (iterator->remaining_entries == 0) {
 		if (iterator->remaining_size != 0) {
 			rv = -SQSH_ERROR_XATTR_SIZE_MISMATCH;
-			goto out;
 		}
-		return 0;
+		goto out;
 	}
 
 	/* Load Key Header */
@@ -250,11 +250,13 @@ sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator) {
 		goto out;
 	}
 
-	rv = iterator->remaining_entries;
-
 	iterator->remaining_entries--;
+	has_next = true;
 out:
-	return rv;
+	if (err != NULL) {
+		*err = rv;
+	}
+	return has_next;
 }
 
 uint16_t
@@ -303,7 +305,7 @@ sqsh_xattr_iterator_lookup(
 		struct SqshXattrIterator *iterator, const char *name) {
 	int rv = 0, rv_cmp = 0;
 
-	while ((rv = sqsh_xattr_iterator_next(iterator)) > 0) {
+	while (sqsh_xattr_iterator_next(iterator, &rv)) {
 		rv_cmp = sqsh_xattr_iterator_fullname_cmp(iterator, name);
 		if (rv_cmp == 0) {
 			return 0;

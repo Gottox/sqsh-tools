@@ -264,12 +264,14 @@ out:
 	}
 }
 
-int
+bool
 sqsh_file_iterator_next(
-		struct SqshFileIterator *iterator, size_t desired_size) {
+		struct SqshFileIterator *iterator, size_t desired_size, int *err) {
+	int rv = 0;
 	const struct SqshFile *file = iterator->file;
 	size_t block_count = sqsh_file_block_count(file);
 	const bool has_fragment = sqsh_file_has_fragment(file);
+	bool has_next = true;
 
 	sqsh__extract_view_cleanup(&iterator->extract_view);
 
@@ -282,16 +284,22 @@ sqsh_file_iterator_next(
 	}
 
 	if (iterator->sparse_size > 0) {
-		return map_zero_block(iterator);
+		rv = map_zero_block(iterator);
 	} else if (iterator->block_index < block_count) {
-		return map_block(iterator, desired_size);
+		rv = map_block(iterator, desired_size);
 	} else if (has_fragment && iterator->block_index == block_count) {
-		return map_fragment(iterator);
+		rv = map_fragment(iterator);
 	} else {
 		iterator->data = NULL;
 		iterator->size = 0;
-		return 0;
+		rv = 0;
+		has_next = false;
 	}
+
+	if (err != NULL) {
+		*err = rv;
+	}
+	return has_next;
 }
 
 const uint8_t *

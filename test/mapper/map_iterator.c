@@ -74,8 +74,9 @@ next_once(void) {
 	rv = sqsh__map_iterator_init(&cursor, &mapper, 0);
 	assert(rv == 0);
 
-	rv = sqsh__map_iterator_next(&cursor);
-	assert(rv == sizeof(buffer) - 1);
+	bool has_next = sqsh__map_iterator_next(&cursor, &rv);
+	assert(rv == 0);
+	assert(has_next);
 
 	const uint8_t *data = sqsh__map_iterator_data(&cursor);
 	assert(data == buffer);
@@ -102,20 +103,22 @@ next_twice(void) {
 	rv = sqsh__map_iterator_init(&cursor, &mapper, 0);
 	assert(rv == 0);
 
-	rv = sqsh__map_iterator_next(&cursor);
-	assert(rv == 12);
+	bool has_next = sqsh__map_iterator_next(&cursor, &rv);
+	assert(rv == 0);
 
 	const uint8_t *data = sqsh__map_iterator_data(&cursor);
 	assert(data == &buffer[0]);
 
-	rv = sqsh__map_iterator_next(&cursor);
-	assert(rv == 9);
+	has_next = sqsh__map_iterator_next(&cursor, &rv);
+	assert(rv == 0);
+	assert(has_next);
 
 	data = sqsh__map_iterator_data(&cursor);
 	assert(data == &buffer[12]);
 
-	rv = sqsh__map_iterator_next(&cursor);
+	has_next = sqsh__map_iterator_next(&cursor, &rv);
 	assert(rv == 0);
+	assert(has_next == false);
 
 	data = sqsh__map_iterator_data(&cursor);
 	assert(data == NULL);

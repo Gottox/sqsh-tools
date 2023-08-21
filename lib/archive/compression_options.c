@@ -83,7 +83,7 @@ sqsh__compression_options_init(
 		goto out;
 	}
 
-	rv = sqsh__metablock_iterator_next(&context->metablock);
+	sqsh__metablock_iterator_next(&context->metablock, &rv);
 	if (rv < 0) {
 		goto out;
 	}

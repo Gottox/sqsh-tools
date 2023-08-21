@@ -127,12 +127,15 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__directory_index_iterator_init(
  * @memberof SqshDirectoryIndexIterator
  * @brief Advances the iterator to the next entry in the directory index
  *
- * @param[in] iterator The iterator to advance
+ * @param[in]  iterator  The iterator to advance
+ * @param[out] err       Pointer to an int where the error code will be stored.
  *
- * @return 0 on success, negative value on error
+ * @retval true  When the iterator was advanced
+ * @retval false When the iterator is at the end and no more entries are
+ * available or if an error occured.
  */
-SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__directory_index_iterator_next(
-		struct SqshDirectoryIndexIterator *iterator);
+SQSH_NO_EXPORT SQSH_NO_UNUSED bool sqsh__directory_index_iterator_next(
+		struct SqshDirectoryIndexIterator *iterator, int *err);
 
 /**
  * @internal

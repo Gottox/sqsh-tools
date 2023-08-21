@@ -172,13 +172,19 @@ out:
 int
 sqsh_tree_walker_next(struct SqshTreeWalker *walker) {
 	struct SqshDirectoryIterator *iterator = &walker->iterator;
-	int rv = sqsh_directory_iterator_next(iterator);
+	int rv = 0;
 	walker->begin_iterator = false;
+
+	bool has_next = sqsh_directory_iterator_next(iterator, &rv);
 	if (rv < 0) {
 		return rv;
 	}
 
-	return update_inode_from_iterator(walker);
+	if (has_next == false) {
+		return 0;
+	} else {
+		return update_inode_from_iterator(walker);
+	}
 }
 
 enum SqshFileType

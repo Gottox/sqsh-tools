@@ -47,7 +47,7 @@ main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	while ((error_code = sqsh_file_iterator_next(iterator, SIZE_MAX)) > 0) {
+	while (sqsh_file_iterator_next(iterator, SIZE_MAX, &error_code)) {
 		const uint8_t *data = sqsh_file_iterator_data(iterator);
 		size_t size = sqsh_file_iterator_size(iterator);
 		fwrite(data, size, 1, stdout);

@@ -53,7 +53,7 @@ read_file(struct SqshDirectoryIterator *iter) {
 	if (rv < 0) {
 		goto out;
 	}
-	while ((rv = sqsh_xattr_iterator_next(&xattr_iter)) > 0) {
+	while (sqsh_xattr_iterator_next(&xattr_iter, &rv)) {
 		char *fullname = sqsh_xattr_iterator_fullname_dup(&xattr_iter);
 		free(fullname);
 		sqsh_xattr_iterator_value(&xattr_iter);
@@ -95,7 +95,7 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 	if (iter == NULL) {
 		goto out;
 	}
-	while ((rv = sqsh_directory_iterator_next(iter)) > 0) {
+	while (sqsh_directory_iterator_next(iter, &rv)) {
 		if (read_file(iter) < 0)
 			break;
 	}

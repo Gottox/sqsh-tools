@@ -39,9 +39,9 @@
 
 #include "../utils/utils.h"
 
-static int
-file_iterator_next(void *iterator, size_t desired_size) {
-	return sqsh_file_iterator_next(iterator, desired_size);
+static bool
+file_iterator_next(void *iterator, size_t desired_size, int *err) {
+	return sqsh_file_iterator_next(iterator, desired_size, err);
 }
 static const uint8_t *
 file_iterator_data(const void *iterator) {

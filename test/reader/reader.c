@@ -59,17 +59,19 @@ test_iter_size(const void *data) {
 	}
 }
 
-static int
-test_iter_next(void *data, size_t desired_size) {
+static bool
+test_iter_next(void *data, size_t desired_size, int *err) {
 	struct TestIterator *iter = (struct TestIterator *)data;
 	(void)desired_size;
+	(void)err;
 	if (iter->remaining == 0) {
 		iter->current_data = "";
-		return 0;
+		return false;
 	}
 	iter->current_data = iter->data;
 	iter->remaining--;
-	return strlen(iter->current_data);
+
+	return true;
 }
 
 static const struct SqshReaderIteratorImpl test_iter = {

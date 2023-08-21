@@ -72,8 +72,9 @@ load_segment_from_compressed_data_block(void) {
 	rv = sqsh__file_iterator_init(&iter, &file);
 	assert(rv == 0);
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
+	assert(has_next == true);
 
 	size_t size = sqsh_file_iterator_size(&iter);
 	assert(size == 4);
@@ -83,8 +84,9 @@ load_segment_from_compressed_data_block(void) {
 	assert(data[2] == 'c');
 	assert(data[3] == 'd');
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv == 0);
+	assert(has_next == false);
 
 	size = sqsh_file_iterator_size(&iter);
 	assert(size == 0);
@@ -128,8 +130,9 @@ load_two_segments_from_uncompressed_data_block(void) {
 	rv = sqsh__file_iterator_init(&iter, &file);
 	assert(rv == 0);
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
+	assert(has_next == true);
 
 	size_t size = sqsh_file_iterator_size(&iter);
 	assert(size == 1000);
@@ -138,8 +141,9 @@ load_two_segments_from_uncompressed_data_block(void) {
 		assert(data[i] == 0xa1);
 	}
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
+	assert(has_next == true);
 
 	size = sqsh_file_iterator_size(&iter);
 	assert(size == ZERO_BLOCK_SIZE);
@@ -148,8 +152,9 @@ load_two_segments_from_uncompressed_data_block(void) {
 		assert(data[i] == 0);
 	}
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
+	assert(has_next == true);
 
 	size = sqsh_file_iterator_size(&iter);
 	assert(size == ZERO_BLOCK_SIZE - 1000);
@@ -158,8 +163,9 @@ load_two_segments_from_uncompressed_data_block(void) {
 		assert(data[i] == 0);
 	}
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
+	assert(has_next == true);
 
 	size = sqsh_file_iterator_size(&iter);
 	assert(size == 5);
@@ -170,8 +176,9 @@ load_two_segments_from_uncompressed_data_block(void) {
 	assert(data[3] == 4);
 	assert(data[4] == 5);
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv == 0);
+	assert(has_next == false);
 
 	size = sqsh_file_iterator_size(&iter);
 	assert(size == 0);
@@ -213,8 +220,9 @@ load_segment_from_uncompressed_data_block(void) {
 	rv = sqsh__file_iterator_init(&iter, &file);
 	assert(rv == 0);
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
+	assert(has_next == true);
 
 	size_t size = sqsh_file_iterator_size(&iter);
 	assert(size == 5);
@@ -225,8 +233,9 @@ load_segment_from_uncompressed_data_block(void) {
 	assert(data[3] == 4);
 	assert(data[4] == 5);
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv == 0);
+	assert(has_next == false);
 
 	size = sqsh_file_iterator_size(&iter);
 	assert(size == 0);
@@ -267,14 +276,16 @@ load_zero_padding(void) {
 	rv = sqsh__file_iterator_init(&iter, &file);
 	assert(rv == 0);
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
+	assert(has_next == true);
 
 	size_t size = sqsh_file_iterator_size(&iter);
 	assert(size == BLOCK_SIZE);
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
+	assert(has_next == true);
 
 	size = sqsh_file_iterator_size(&iter);
 	assert(size == 5);
@@ -285,8 +296,9 @@ load_zero_padding(void) {
 	assert(data[3] == 0);
 	assert(data[4] == 0);
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv == 0);
+	assert(has_next == false);
 
 	size = sqsh_file_iterator_size(&iter);
 	assert(size == 0);
@@ -327,14 +339,16 @@ load_zero_big_padding(void) {
 	rv = sqsh__file_iterator_init(&iter, &file);
 	assert(rv == 0);
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
+	assert(has_next == true);
 
 	size_t size = sqsh_file_iterator_size(&iter);
 	assert(size == BLOCK_SIZE);
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
+	assert(has_next == true);
 
 	size = sqsh_file_iterator_size(&iter);
 	assert(size == 5);
@@ -345,8 +359,9 @@ load_zero_big_padding(void) {
 	assert(data[3] == 0);
 	assert(data[4] == 0);
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv == 0);
+	assert(has_next == false);
 
 	size = sqsh_file_iterator_size(&iter);
 	assert(size == 0);
@@ -386,8 +401,9 @@ load_zero_block(void) {
 	rv = sqsh__file_iterator_init(&iter, &file);
 	assert(rv == 0);
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
+	assert(has_next == true);
 
 	size_t size = sqsh_file_iterator_size(&iter);
 	assert(size == ZERO_BLOCK_SIZE);
@@ -397,8 +413,9 @@ load_zero_block(void) {
 		assert(data[i] == 0);
 	}
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv == 0);
+	assert(has_next == false);
 
 	sqsh__file_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
@@ -433,8 +450,9 @@ load_two_zero_blocks(void) {
 	rv = sqsh__file_iterator_init(&iter, &file);
 	assert(rv == 0);
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
+	assert(has_next == true);
 
 	size_t size = sqsh_file_iterator_size(&iter);
 	assert(size == ZERO_BLOCK_SIZE);
@@ -444,8 +462,9 @@ load_two_zero_blocks(void) {
 		assert(data[i] == 0);
 	}
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
+	assert(has_next == true);
 
 	size = sqsh_file_iterator_size(&iter);
 	assert(size == ZERO_BLOCK_SIZE);
@@ -455,8 +474,9 @@ load_two_zero_blocks(void) {
 		assert(data[i] == 0);
 	}
 
-	rv = sqsh_file_iterator_next(&iter, 1);
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv == 0);
+	assert(has_next == false);
 
 	sqsh__file_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);

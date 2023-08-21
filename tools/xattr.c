@@ -82,7 +82,7 @@ fattr_path(struct SqshArchive *archive, char *path) {
 		goto out;
 	}
 
-	while ((rv = sqsh_xattr_iterator_next(iter)) > 0) {
+	while (sqsh_xattr_iterator_next(iter, &rv)) {
 		const char *prefix = sqsh_xattr_iterator_prefix(iter);
 		uint16_t prefix_len = sqsh_xattr_iterator_prefix_size(iter);
 		const char *name = sqsh_xattr_iterator_name(iter);

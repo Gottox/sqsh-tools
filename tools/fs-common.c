@@ -145,7 +145,6 @@ fs_common_read(
 		size = file_size - offset;
 	}
 
-
 	// This works around a bug in sqsh_file_reader_advance:
 	// Reading a 0 size at the end of the file will return
 	// SQSH_ERROR_OUT_OF_BOUNDS. This should succeed instead,

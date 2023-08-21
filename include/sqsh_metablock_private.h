@@ -82,11 +82,15 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__metablock_iterator_init(
  * @memberof SqshMetablockIterator
  * @brief Moves the iterator to the next metablock.
  *
- * @param[in,out] iterator The iterator to advance.
- * @return 0 on success, or a negative value on error.
+ * @param[in,out] iterator  The iterator to advance.
+ * @param[out]    err       Pointer to an int where the error code will be
+ * stored.
+ *
+ * @retval true  When the iterator was moved to the next metablock
+ * @retval false When an error occured. See err for details.
  */
-SQSH_NO_EXPORT SQSH_NO_UNUSED int
-sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator);
+SQSH_NO_EXPORT bool
+sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator, int *err);
 
 /**
  * @internal

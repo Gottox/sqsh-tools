@@ -50,7 +50,7 @@ sqsh_file_to_stream(const struct SqshFile *file, FILE *stream) {
 		goto out;
 	}
 
-	while ((rv = sqsh_file_iterator_next(&iterator, SIZE_MAX)) > 0) {
+	while (sqsh_file_iterator_next(&iterator, SIZE_MAX, &rv)) {
 		const uint8_t *data = sqsh_file_iterator_data(&iterator);
 		const size_t size = sqsh_file_iterator_size(&iterator);
 		rv = fwrite(data, sizeof(uint8_t), size, stream);
