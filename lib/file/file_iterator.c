@@ -35,15 +35,26 @@
 
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_error.h"
-#include <cextras/collection.h>
-
-#include "../../include/sqsh_file_private.h"
 #include "../utils/utils.h"
-#include <stdint.h>
+#include <cextras/collection.h>
 
 #define BLOCK_INDEX_FINISHED UINT32_MAX
 
 static const uint8_t ZERO_BLOCK[16384] = {0};
+
+static bool
+is_last_block(const struct SqshFileIterator *iterator) {
+	const struct SqshFile *file = iterator->file;
+	const bool has_fragment = sqsh_file_has_fragment(file);
+	const sqsh_index_t block_index = iterator->block_index;
+	const size_t block_count = sqsh_file_block_count(file);
+
+	if (has_fragment) {
+		return block_index == block_count;
+	} else {
+		return block_index == block_count - 1;
+	}
+}
 
 int
 sqsh__file_iterator_init(
@@ -186,33 +197,17 @@ out:
 
 static int
 map_zero_block(struct SqshFileIterator *iterator) {
-	const struct SqshFile *file = iterator->file;
+	size_t current_sparse_size = iterator->sparse_size;
 
-	const sqsh_index_t block_index = iterator->block_index;
-	const bool has_fragment = sqsh_file_has_fragment(file);
-	const size_t block_count = sqsh_file_block_count(file);
-	const size_t file_size = sqsh_file_size(file);
-	const size_t sparse_size = iterator->sparse_size;
-
-	size_t size;
-	if (file_size == 0) {
-		size = 0;
-	} else if (sparse_size > 0) {
-		size = SQSH_MIN(sizeof(ZERO_BLOCK), sparse_size);
-		iterator->sparse_size -= size;
-	} else if (has_fragment || block_index != block_count - 1) {
-		size = iterator->block_size;
-	} else {
-		size = file_size % iterator->block_size;
-		if (size == 0) {
-			size = iterator->block_size;
-		}
+	if (current_sparse_size > sizeof(ZERO_BLOCK)) {
+		current_sparse_size = sizeof(ZERO_BLOCK);
 	}
+	iterator->sparse_size -= current_sparse_size;
 
-	iterator->size = size;
+	iterator->size = current_sparse_size;
 	iterator->data = ZERO_BLOCK;
 
-	return size;
+	return current_sparse_size;
 }
 
 static int
@@ -221,12 +216,19 @@ map_block(struct SqshFileIterator *iterator, size_t desired_size) {
 	const struct SqshFile *file = iterator->file;
 
 	const sqsh_index_t block_index = iterator->block_index;
+	const size_t block_size = iterator->block_size;
 	const bool is_compressed = sqsh_file_block_is_compressed(file, block_index);
+	const size_t file_size = sqsh_file_size(file);
 	const size_t data_block_size = sqsh_file_block_size(file, block_index);
 	const sqsh_index_t next_offset =
 			sqsh__map_reader_size(&iterator->map_reader);
 
 	if (data_block_size == 0) {
+		if (is_last_block(iterator) == false || file_size == block_size) {
+			iterator->sparse_size = block_size;
+		} else {
+			iterator->sparse_size = file_size % block_size;
+		}
 		rv = map_zero_block(iterator);
 		iterator->block_index++;
 	} else if (is_compressed) {

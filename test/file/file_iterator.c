@@ -276,9 +276,14 @@ load_zero_padding(void) {
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
 	assert(has_next == true);
-
 	size_t size = sqsh_file_iterator_size(&iter);
-	assert(size == BLOCK_SIZE);
+	assert(size == ZERO_BLOCK_SIZE);
+
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
+	assert(rv > 0);
+	assert(has_next == true);
+	size = sqsh_file_iterator_size(&iter);
+	assert(size == ZERO_BLOCK_SIZE);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
@@ -339,9 +344,14 @@ load_zero_big_padding(void) {
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
 	assert(has_next == true);
-
 	size_t size = sqsh_file_iterator_size(&iter);
-	assert(size == BLOCK_SIZE);
+	assert(size == ZERO_BLOCK_SIZE);
+
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
+	assert(rv > 0);
+	assert(has_next == true);
+	size = sqsh_file_iterator_size(&iter);
+	assert(size == ZERO_BLOCK_SIZE);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
@@ -480,5 +490,5 @@ TEST(load_segment_from_compressed_data_block)
 TEST(load_zero_padding)
 TEST(load_zero_big_padding)
 TEST(load_zero_block)
-NO_TEST(load_two_zero_blocks)
+TEST(load_two_zero_blocks)
 END_TESTS
