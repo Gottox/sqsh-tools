@@ -57,6 +57,7 @@ struct SqshMetablockIterator {
 	struct SqshMapReader reader;
 	struct SqshExtractManager *compression_manager;
 	struct SqshExtractView extract_view;
+	bool is_compressed;
 	uint16_t outer_size;
 	uint16_t inner_size;
 	const uint8_t *data;
@@ -91,6 +92,21 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__metablock_iterator_init(
  */
 SQSH_NO_EXPORT bool
 sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator, int *err);
+
+/**
+ * @memberof SqshMetablockIterator
+ * @brief Skips blocks until the block containing the offset is reached.
+ * Note that calling this function will invalidate the data pointer returned by
+ * sqsh_metablock_iterator_data().
+ *
+ * @param[in,out] iterator      The metablock iterator to skip data in.
+ * @param[in]     offset        The offset that is contained in the block to
+ * skip to.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int sqsh__metablock_iterator_skip(
+		struct SqshMetablockIterator *iterator, sqsh_index_t *offset);
 
 /**
  * @internal

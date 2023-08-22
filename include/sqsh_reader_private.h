@@ -48,6 +48,7 @@ extern "C" {
 
 struct SqshReaderIteratorImpl {
 	bool (*next)(void *iterator, size_t desired_size, int *err);
+	int (*skip)(void *iterator, sqsh_index_t *offset, size_t desired_size);
 	const uint8_t *(*data)(const void *iterator);
 	size_t (*size)(const void *iterator);
 };

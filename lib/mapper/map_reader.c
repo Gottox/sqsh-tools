@@ -41,6 +41,11 @@ map_iterator_next(void *iterator, size_t desired_size, int *err) {
 	(void)desired_size;
 	return sqsh__map_iterator_next(iterator, err);
 }
+static int
+map_iterator_skip(void *iterator, sqsh_index_t *offset, size_t desired_size) {
+	(void)desired_size;
+	return sqsh__map_iterator_skip(iterator, offset);
+}
 static const uint8_t *
 map_iterator_data(const void *iterator) {
 	return sqsh__map_iterator_data(iterator);
@@ -52,6 +57,7 @@ map_iterator_size(const void *iterator) {
 
 static const struct SqshReaderIteratorImpl map_reader_impl = {
 		.next = map_iterator_next,
+		.skip = map_iterator_skip,
 		.data = map_iterator_data,
 		.size = map_iterator_size,
 };

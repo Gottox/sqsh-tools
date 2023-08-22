@@ -366,7 +366,7 @@ struct SqshMapIterator {
 	/**
 	 * @privatesection
 	 */
-	sqsh_index_t index;
+	sqsh_index_t next_index;
 	sqsh_index_t segment_count;
 	struct SqshMapManager *map_manager;
 	const struct SqshMapSlice *mapping;
@@ -403,6 +403,21 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__map_iterator_init(
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED bool
 sqsh__map_iterator_next(struct SqshMapIterator *iterator, int *err);
+
+/**
+ * @memberof SqshMapIterator
+ * @brief Skips blocks until the block containing the offset is reached.
+ * Note that calling this function will invalidate the data pointer returned by
+ * sqsh_map_iterator_data().
+ *
+ * @param[in,out] iterator      The map iterator to skip data in.
+ * @param[in]     offset        The offset that is contained in the block to
+ * skip to.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_EXPORT SQSH_NO_UNUSED int
+sqsh__map_iterator_skip(struct SqshMapIterator *iterator, sqsh_index_t *offset);
 
 /**
  * @internal

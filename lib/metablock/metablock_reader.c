@@ -45,6 +45,12 @@ metablock_iterator_next(void *iterator, size_t desired_size, int *err) {
 	(void)desired_size;
 	return sqsh__metablock_iterator_next(iterator, err);
 }
+static int
+metablock_iterator_skip(
+		void *iterator, sqsh_index_t *offset, size_t desired_size) {
+	(void)desired_size;
+	return sqsh__metablock_iterator_skip(iterator, offset);
+}
 static const uint8_t *
 metablock_iterator_data(const void *iterator) {
 	return sqsh__metablock_iterator_data(iterator);
@@ -56,6 +62,7 @@ metablock_iterator_size(const void *iterator) {
 
 static const struct SqshReaderIteratorImpl metablock_reader_impl = {
 		.next = metablock_iterator_next,
+		.skip = metablock_iterator_skip,
 		.data = metablock_iterator_data,
 		.size = metablock_iterator_size,
 };

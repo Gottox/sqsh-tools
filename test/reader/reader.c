@@ -74,8 +74,31 @@ test_iter_next(void *data, size_t desired_size, int *err) {
 	return true;
 }
 
+static int
+test_iter_skip(void *iterator, sqsh_index_t *offset, size_t desired_size) {
+	int rv = 0;
+
+	size_t current_size = test_iter_size(iterator);
+	while (current_size <= *offset) {
+		*offset -= current_size;
+		bool has_next = test_iter_next(iterator, desired_size, &rv);
+		if (rv < 0) {
+			goto out;
+		} else if (!has_next) {
+			rv = -SQSH_ERROR_OUT_OF_BOUNDS;
+			goto out;
+		}
+		current_size = test_iter_size(iterator);
+	}
+
+	rv = 0;
+out:
+	return rv;
+}
+
 static const struct SqshReaderIteratorImpl test_iter = {
 		.next = test_iter_next,
+		.skip = test_iter_skip,
 		.data = test_iter_data,
 		.size = test_iter_size,
 };

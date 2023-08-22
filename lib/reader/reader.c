@@ -50,43 +50,6 @@ reader_iterator_next(struct SqshReader *reader, size_t desired_size, int *err) {
 	}
 }
 
-/**
- * @brief      Skips the iterator until the offset is reached.
- *
- * This is a naiv implementation that just calls next until the offset is
- * reached.
- *
- * TODO: Implement a iterator specific skip function.
- *
- * @param      reader        The reader
- * @param      offset        The offset
- * @param[in]  desired_size  The desired size
- *
- * @return     0 on success, negative on error.
- */
-static int
-reader_iterator_skip(
-		struct SqshReader *reader, sqsh_index_t *offset, size_t desired_size) {
-	int rv = 0;
-	void *iterator = reader->iterator;
-	const struct SqshReaderIteratorImpl *impl = reader->iterator_impl;
-
-	size_t current_size = impl->size(iterator);
-
-	while (current_size <= *offset) {
-		*offset -= current_size;
-		reader_iterator_next(reader, desired_size, &rv);
-		if (rv < 0) {
-			goto out;
-		}
-		current_size = impl->size(iterator);
-	}
-
-	rv = 0;
-out:
-	return rv;
-}
-
 int
 sqsh__reader_init(
 		struct SqshReader *reader,
@@ -197,7 +160,7 @@ handle_mapped(struct SqshReader *reader, sqsh_index_t offset, size_t size) {
 		goto out;
 	}
 
-	rv = reader_iterator_skip(reader, &offset, size);
+	rv = impl->skip(iterator, &offset, size);
 	if (rv < 0) {
 		goto out;
 	}

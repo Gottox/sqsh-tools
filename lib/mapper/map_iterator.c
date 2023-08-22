@@ -63,7 +63,7 @@ sqsh__map_iterator_init(
 	}
 
 	iterator->map_manager = manager;
-	iterator->index = address_to_index(iterator, start_address);
+	iterator->next_index = address_to_index(iterator, start_address);
 	iterator->mapping = NULL;
 	iterator->data = NULL;
 	iterator->size = 0;
@@ -72,17 +72,52 @@ sqsh__map_iterator_init(
 	return 0;
 }
 
+#include <stdio.h>
+int
+sqsh__map_iterator_skip(
+		struct SqshMapIterator *iterator, sqsh_index_t *offset) {
+	int rv = 0;
+	sqsh_index_t index = iterator->next_index;
+	size_t block_size = sqsh__map_manager_block_size(iterator->map_manager);
+
+	size_t current_size = sqsh__map_iterator_size(iterator);
+	if (*offset < current_size) {
+		goto out;
+	}
+
+	index = iterator->next_index + (*offset / block_size);
+	if (current_size > 0) {
+		/* If there is a segment currently mapped, we need don't need to skip
+		 * that one, hence reduce the index by one.
+		 */
+		index--;
+	}
+
+	iterator->next_index = index;
+	bool has_next = sqsh__map_iterator_next(iterator, &rv);
+	if (rv < 0) {
+		goto out;
+	} else if (has_next == false) {
+		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
+		goto out;
+	}
+
+	*offset %= block_size;
+	if (*offset > sqsh__map_iterator_size(iterator)) {
+		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
+		goto out;
+	}
+	rv = 0;
+out:
+	return rv;
+}
+
 bool
 sqsh__map_iterator_next(struct SqshMapIterator *iterator, int *err) {
 	int rv;
 	bool has_next = false;
 
-	iterator->index++;
-	if (iterator->mapping == NULL) {
-		iterator->index -= 1;
-	}
-
-	if (iterator->index >= iterator->segment_count) {
+	if (iterator->next_index >= iterator->segment_count) {
 		rv = 0;
 		iterator->data = NULL;
 		iterator->size = 0;
@@ -91,7 +126,7 @@ sqsh__map_iterator_next(struct SqshMapIterator *iterator, int *err) {
 
 	sqsh__map_manager_release(iterator->map_manager, iterator->mapping);
 	rv = sqsh__map_manager_get(
-			iterator->map_manager, iterator->index, &iterator->mapping);
+			iterator->map_manager, iterator->next_index, &iterator->mapping);
 	if (rv < 0) {
 		goto out;
 	}
@@ -99,6 +134,8 @@ sqsh__map_iterator_next(struct SqshMapIterator *iterator, int *err) {
 	iterator->size = sqsh__map_slice_size(iterator->mapping);
 	iterator->data = sqsh__map_slice_data(iterator->mapping);
 	has_next = iterator->size > 0;
+
+	iterator->next_index++;
 out:
 	if (err != NULL) {
 		*err = rv;
@@ -118,7 +155,7 @@ sqsh__map_iterator_block_size(const struct SqshMapIterator *iterator) {
 
 sqsh_index_t
 sqsh__map_iterator_address(const struct SqshMapIterator *iterator) {
-	return index_to_address(iterator, iterator->index);
+	return index_to_address(iterator, iterator->next_index);
 }
 
 size_t

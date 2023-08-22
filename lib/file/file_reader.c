@@ -43,6 +43,10 @@ static bool
 file_iterator_next(void *iterator, size_t desired_size, int *err) {
 	return sqsh_file_iterator_next(iterator, desired_size, err);
 }
+static int
+file_iterator_skip(void *iterator, sqsh_index_t *offset, size_t desired_size) {
+	return sqsh_file_iterator_skip(iterator, offset, desired_size);
+}
 static const uint8_t *
 file_iterator_data(const void *iterator) {
 	return sqsh_file_iterator_data(iterator);
@@ -54,6 +58,7 @@ file_iterator_size(const void *iterator) {
 
 static const struct SqshReaderIteratorImpl file_reader_impl = {
 		.next = file_iterator_next,
+		.skip = file_iterator_skip,
 		.data = file_iterator_data,
 		.size = file_iterator_size,
 };
