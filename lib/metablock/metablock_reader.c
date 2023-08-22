@@ -46,26 +46,10 @@ metablock_iterator_next(void *iterator, size_t desired_size, int *err) {
 	return sqsh__metablock_iterator_next(iterator, err);
 }
 static int
-metablock_iterator_skip(void *iterator, sqsh_index_t *offset, size_t desired_size) {
+metablock_iterator_skip(
+		void *iterator, sqsh_index_t *offset, size_t desired_size) {
 	(void)desired_size;
-	int rv = 0;
-
-	size_t current_size = sqsh__metablock_iterator_size(iterator);
-	while (current_size <= *offset) {
-		*offset -= current_size;
-		bool has_next = sqsh__metablock_iterator_next(iterator, &rv);
-		if (rv < 0) {
-			goto out;
-		} else if (!has_next) {
-			rv = -SQSH_ERROR_OUT_OF_BOUNDS;
-			goto out;
-		}
-		current_size = sqsh__metablock_iterator_size(iterator);
-	}
-
-	rv = 0;
-out:
-	return rv;
+	return sqsh__metablock_iterator_skip(iterator, offset);
 }
 static const uint8_t *
 metablock_iterator_data(const void *iterator) {

@@ -42,6 +42,7 @@
 
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_extract_private.h"
+#include "../utils/utils.h"
 
 int
 sqsh__metablock_iterator_init(
@@ -67,12 +68,9 @@ out:
 	return rv;
 }
 
-bool
-sqsh__metablock_iterator_next(
-		struct SqshMetablockIterator *iterator, int *err) {
+static int
+process_next_header(struct SqshMetablockIterator *iterator) {
 	int rv = 0;
-
-	sqsh__extract_view_cleanup(&iterator->extract_view);
 
 	rv = sqsh__map_reader_advance(
 			&iterator->reader, iterator->outer_size, SQSH_SIZEOF_METABLOCK);
@@ -89,12 +87,20 @@ sqsh__metablock_iterator_next(
 		rv = -SQSH_ERROR_SIZE_MISMATCH;
 		goto out;
 	}
+	iterator->is_compressed = is_compressed;
 	iterator->outer_size = outer_size;
-
 	if (iterator->outer_size > SQSH_METABLOCK_BLOCK_SIZE) {
 		rv = -SQSH_ERROR_SIZE_MISMATCH;
 		goto out;
 	}
+
+out:
+	return rv;
+}
+
+static int
+map_data(struct SqshMetablockIterator *iterator) {
+	int rv = 0;
 
 	rv = sqsh__map_reader_advance(
 			&iterator->reader, SQSH_SIZEOF_METABLOCK, iterator->outer_size);
@@ -102,7 +108,7 @@ sqsh__metablock_iterator_next(
 		goto out;
 	}
 
-	if (is_compressed) {
+	if (iterator->is_compressed) {
 		rv = sqsh__extract_view_init(
 				&iterator->extract_view, iterator->compression_manager,
 				&iterator->reader);
@@ -116,7 +122,23 @@ sqsh__metablock_iterator_next(
 		iterator->inner_size = iterator->outer_size;
 	}
 
-	rv = 0;
+out:
+	return rv;
+}
+
+bool
+sqsh__metablock_iterator_next(
+		struct SqshMetablockIterator *iterator, int *err) {
+	int rv = 0;
+
+	sqsh__extract_view_cleanup(&iterator->extract_view);
+
+	rv = process_next_header(iterator);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = map_data(iterator);
 out:
 	if (err != NULL) {
 		*err = rv;
@@ -125,6 +147,60 @@ out:
 	 * needs to be by the caller.
 	 */
 	return rv == 0;
+}
+
+int
+sqsh__metablock_iterator_skip(
+		struct SqshMetablockIterator *iterator, sqsh_index_t *offset) {
+	int rv = 0;
+
+	size_t current_size = sqsh__metablock_iterator_size(iterator);
+	if (*offset < current_size) {
+		return 0;
+	}
+
+	for (;;) {
+		*offset -= current_size;
+		current_size = SQSH_METABLOCK_BLOCK_SIZE;
+		rv = process_next_header(iterator);
+		if (rv < 0) {
+			goto out;
+		}
+		if (*offset < current_size) {
+			break;
+		}
+
+		sqsh_index_t skip_size;
+		if (SQSH_ADD_OVERFLOW(
+					iterator->outer_size, SQSH_SIZEOF_METABLOCK, &skip_size)) {
+			rv = -SQSH_ERROR_OUT_OF_BOUNDS;
+			goto out;
+		}
+		rv = sqsh__map_reader_advance(&iterator->reader, skip_size, 0);
+		if (rv < 0) {
+			goto out;
+		}
+		iterator->outer_size = 0;
+	}
+
+	rv = map_data(iterator);
+	if (rv < 0) {
+		goto out;
+	}
+
+	/* When the iterator is skipped, we assume that the offset is within the
+	 * logical size of a series of metablocks of the maximal metablock size.
+	 * We cannot check this, because that would require us to decompress every
+	 * metablock in the series. So we just sanity check the last metablock
+	 * and assume that the caller does the sanity checks.
+	 */
+	if (*offset >= sqsh__metablock_iterator_size(iterator)) {
+		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
+		goto out;
+	}
+
+out:
+	return rv;
 }
 
 const uint8_t *
