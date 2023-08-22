@@ -56,6 +56,10 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
+### Meson ###
+# subproject directories
+/subprojects/packagecache
+
 # Meson Directories
 meson-logs
 meson-private
