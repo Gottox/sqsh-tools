@@ -40,7 +40,8 @@
 #include "../../lib/utils/utils.h"
 
 static const size_t BLOCK_SIZE = 32768;
-static const size_t ZERO_BLOCK_SIZE = 16384;
+#define ZERO_BLOCK_SIZE 16384
+uint8_t ZERO_BLOCK[ZERO_BLOCK_SIZE] = {0};
 
 static void
 load_segment_from_compressed_data_block(void) {
@@ -148,9 +149,7 @@ load_two_segments_from_uncompressed_data_block(void) {
 	size = sqsh_file_iterator_size(&iter);
 	assert(size == ZERO_BLOCK_SIZE);
 	data = sqsh_file_iterator_data(&iter);
-	for (size_t i = 0; i < ZERO_BLOCK_SIZE; i++) {
-		assert(data[i] == 0);
-	}
+	assert(memcmp(data, ZERO_BLOCK, size) == 0);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
@@ -159,9 +158,7 @@ load_two_segments_from_uncompressed_data_block(void) {
 	size = sqsh_file_iterator_size(&iter);
 	assert(size == ZERO_BLOCK_SIZE - 1000);
 	data = sqsh_file_iterator_data(&iter);
-	for (size_t i = 0; i < ZERO_BLOCK_SIZE - 1000; i++) {
-		assert(data[i] == 0);
-	}
+	assert(memcmp(data, ZERO_BLOCK, size) == 0);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
@@ -279,9 +276,14 @@ load_zero_padding(void) {
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
 	assert(has_next == true);
-
 	size_t size = sqsh_file_iterator_size(&iter);
-	assert(size == BLOCK_SIZE);
+	assert(size == ZERO_BLOCK_SIZE);
+
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
+	assert(rv > 0);
+	assert(has_next == true);
+	size = sqsh_file_iterator_size(&iter);
+	assert(size == ZERO_BLOCK_SIZE);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
@@ -342,9 +344,14 @@ load_zero_big_padding(void) {
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
 	assert(has_next == true);
-
 	size_t size = sqsh_file_iterator_size(&iter);
-	assert(size == BLOCK_SIZE);
+	assert(size == ZERO_BLOCK_SIZE);
+
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
+	assert(rv > 0);
+	assert(has_next == true);
+	size = sqsh_file_iterator_size(&iter);
+	assert(size == ZERO_BLOCK_SIZE);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
@@ -408,10 +415,8 @@ load_zero_block(void) {
 	size_t size = sqsh_file_iterator_size(&iter);
 	assert(size == ZERO_BLOCK_SIZE);
 
-	for (size_t i = 0; i < ZERO_BLOCK_SIZE; i++) {
-		const uint8_t *data = sqsh_file_iterator_data(&iter);
-		assert(data[i] == 0);
-	}
+	const uint8_t *data = sqsh_file_iterator_data(&iter);
+	assert(memcmp(data, ZERO_BLOCK, size) == 0);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv == 0);
@@ -457,10 +462,8 @@ load_two_zero_blocks(void) {
 	size_t size = sqsh_file_iterator_size(&iter);
 	assert(size == ZERO_BLOCK_SIZE);
 
-	for (size_t i = 0; i < ZERO_BLOCK_SIZE; i++) {
-		const uint8_t *data = sqsh_file_iterator_data(&iter);
-		assert(data[i] == 0);
-	}
+	const uint8_t *data = sqsh_file_iterator_data(&iter);
+	assert(memcmp(data, ZERO_BLOCK, size) == 0);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
@@ -469,10 +472,7 @@ load_two_zero_blocks(void) {
 	size = sqsh_file_iterator_size(&iter);
 	assert(size == ZERO_BLOCK_SIZE);
 
-	for (size_t i = 0; i < ZERO_BLOCK_SIZE; i++) {
-		const uint8_t *data = sqsh_file_iterator_data(&iter);
-		assert(data[i] == 0);
-	}
+	assert(memcmp(data, ZERO_BLOCK, size) == 0);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv == 0);
@@ -490,5 +490,5 @@ TEST(load_segment_from_compressed_data_block)
 TEST(load_zero_padding)
 TEST(load_zero_big_padding)
 TEST(load_zero_block)
-NO_TEST(load_two_zero_blocks)
+TEST(load_two_zero_blocks)
 END_TESTS
