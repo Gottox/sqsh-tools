@@ -302,6 +302,58 @@ sqsh_file_iterator_next(
 	return has_next;
 }
 
+int
+sqsh_file_iterator_skip(
+		struct SqshFileIterator *iterator, sqsh_index_t *offset,
+		size_t desired_size) {
+	int rv = 0;
+	const size_t block_size = iterator->block_size;
+	const sqsh_index_t skip_index = *offset / block_size;
+	*offset = *offset % block_size;
+
+	if (skip_index == 0 && iterator->block_index != 0) {
+		goto out;
+	}
+
+	sqsh_index_t reader_forward = 0;
+	sqsh_index_t block_index = iterator->block_index;
+	for (sqsh_index_t i = 0; i < skip_index; i++) {
+		reader_forward += sqsh_file_block_size(iterator->file, block_index);
+		block_index += 1;
+	}
+	rv = sqsh__map_reader_advance(&iterator->map_reader, reader_forward, 0);
+	if (rv < 0) {
+		goto out;
+	}
+	iterator->sparse_size = 0;
+	iterator->block_index = block_index;
+
+	/* In general we will get directly the block containing the offset, but if
+	 * the offset points to a block with sparse sections, we iterate over them
+	 * until we reach the desired offset.
+	 *
+	 * TODO: We could analyze iterator->sparse_size and directly skip to the
+	 *       desired block.
+	 */
+	size_t current_size = sqsh_file_iterator_size(iterator);
+	while (current_size <= *offset) {
+		*offset -= current_size;
+		bool has_next = sqsh_file_iterator_next(iterator, desired_size, &rv);
+		if (rv < 0) {
+			goto out;
+		} else if (!has_next) {
+			rv = -SQSH_ERROR_OUT_OF_BOUNDS;
+			goto out;
+		}
+		current_size = sqsh_file_iterator_size(iterator);
+	}
+
+	rv = 0;
+
+out:
+	return rv;
+}
+
 const uint8_t *
 sqsh_file_iterator_data(const struct SqshFileIterator *iterator) {
 	return iterator->data;
