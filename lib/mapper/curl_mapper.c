@@ -33,13 +33,13 @@
 
 #define _DEFAULT_SOURCE
 
-#include "../../include/sqsh_mapper_private.h"
-
-#include "../../include/sqsh_data_private.h"
-#include "../../include/sqsh_error.h"
-#include "../utils/utils.h"
-
 #ifdef CONFIG_CURL
+
+#	include "../../include/sqsh_mapper_private.h"
+
+#	include "../../include/sqsh_data_private.h"
+#	include "../../include/sqsh_error.h"
+#	include "../utils/utils.h"
 
 #	include <curl/curl.h>
 #	include <inttypes.h>
@@ -279,6 +279,7 @@ out:
 static int
 sqsh_mapper_curl_cleanup(struct SqshMapper *mapper) {
 	free(mapper->data.cl.url);
+	free(mapper->data.cl.header_cache);
 	sqsh__mutex_destroy(&mapper->data.cl.lock);
 	curl_easy_cleanup(mapper->data.cl.handle);
 	return 0;
