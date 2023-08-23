@@ -32,6 +32,7 @@
  */
 
 #define _DEFAULT_SOURCE
+#include <stddef.h>
 
 #ifdef CONFIG_CURL
 
