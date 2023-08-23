@@ -77,7 +77,7 @@ int
 sqsh__map_iterator_skip(
 		struct SqshMapIterator *iterator, sqsh_index_t *offset) {
 	int rv = 0;
-	sqsh_index_t index = iterator->next_index;
+	sqsh_index_t index;
 	size_t block_size = sqsh__map_manager_block_size(iterator->map_manager);
 
 	size_t current_size = sqsh__map_iterator_size(iterator);
