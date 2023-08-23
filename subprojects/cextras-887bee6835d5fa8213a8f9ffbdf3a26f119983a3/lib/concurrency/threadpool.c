@@ -125,6 +125,9 @@ worker_run(void *data) {
 			break;
 		}
 		rv = pthread_cond_wait(&threadpool->worker_cond, &threadpool->mutex);
+		if (rv < 0) {
+			goto out;
+		}
 	}
 out:
 	worker->rv = rv;
@@ -175,7 +178,9 @@ cx_threadpool_init(size_t nthreads) {
 
 out:
 	if (rv < 0) {
-		free(threadpool->workers);
+		if (threadpool) {
+			free(threadpool->workers);
+		}
 		free(threadpool);
 		threadpool = NULL;
 	}
@@ -222,12 +227,16 @@ cx_threadpool_schedule(
 
 	rv = pthread_mutex_unlock(&threadpool->mutex);
 out:
+	if (rv < 0) {
+		free(task);
+	}
 	return rv;
 }
 
 int
 threadpool_wait(struct CxThreadpool *threadpool, uintptr_t group) {
 	int rv = 0;
+	bool found;
 
 	rv = pthread_mutex_lock(&threadpool->mutex);
 	if (rv < 0) {
@@ -235,23 +244,25 @@ threadpool_wait(struct CxThreadpool *threadpool, uintptr_t group) {
 	}
 
 	while (true) {
-		bool found = false;
-		for (size_t i = 0; i < threadpool->nthreads; i++) {
-			struct CxThreadpoolWorker *worker = &threadpool->workers[i];
-			if (worker->group == group) {
-				found = true;
-				break;
-			}
+		// Search for a worker that is currently working on a task in the
+		// group.
+		found = false;
+		for (size_t i = 0; i < threadpool->nthreads && !found; i++) {
+			const struct CxThreadpoolWorker *worker = &threadpool->workers[i];
+			found = worker->group == group;
 		}
 		if (found == false) {
 			break;
 		}
+
+		// Search for a task that is currently in the queue.
+		found = false;
 		for (struct CxThreadpoolTask *task = threadpool->task_queue;
-			 task != NULL; task = task->next) {
-			if (task->group == group) {
-				found = true;
-				break;
-			}
+			 task != NULL && !found; task = task->next) {
+			found = task->group == group;
+		}
+		if (found == false) {
+			break;
 		}
 		rv = pthread_cond_wait(
 				&threadpool->controller_cond, &threadpool->mutex);
@@ -275,7 +286,13 @@ cx_threadpool_destroy(struct CxThreadpool *threadpool) {
 
 	threadpool->run = false;
 	rv = pthread_cond_broadcast(&threadpool->worker_cond);
+	if (rv < 0) {
+		goto out;
+	}
 	rv = pthread_mutex_unlock(&threadpool->mutex);
+	if (rv < 0) {
+		goto out;
+	}
 
 	for (size_t i = 0; i < threadpool->nthreads; i++) {
 		struct CxThreadpoolWorker *worker = &threadpool->workers[i];
