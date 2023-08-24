@@ -1,6 +1,8 @@
 name: Docker Build utils
 on:
   push:
+    branches:
+      - main
     paths:
       - utils/*
 
