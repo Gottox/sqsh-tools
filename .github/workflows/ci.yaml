@@ -107,7 +107,6 @@ jobs:
   doxygen:
     needs:
     - build
-    - build-openbsd
     - test
     runs-on: ubuntu-latest
     container: gottox/sqsh-build:latest
