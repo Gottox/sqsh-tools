@@ -53,7 +53,7 @@ decompress_test(
 
 	rv = impl->init(context, output, output_size);
 	assert(rv >= 0);
-	rv = impl->extract(context, input, input_size);
+	rv = impl->write(context, input, input_size);
 	assert(rv >= 0);
 	rv = impl->finish(context, output, &output_size);
 	assert(rv >= 0);
@@ -81,9 +81,9 @@ decompress_test_split(
 
 		rv = impl->init(context, output, output_size);
 		assert(rv >= 0);
-		rv = impl->extract(context, input, offset);
+		rv = impl->write(context, input, offset);
 		assert(rv >= 0);
-		rv = impl->extract(context, &input[offset], input_size - offset);
+		rv = impl->write(context, &input[offset], input_size - offset);
 		assert(rv >= 0);
 		rv = impl->finish(context, output, &output_size);
 		assert(rv >= 0);

@@ -85,7 +85,7 @@ sqsh_lz4_finish(void *context, uint8_t *target, size_t *target_size) {
 
 static const struct SqshExtractorImpl impl_lz4 = {
 		.init = sqsh_lz4_init,
-		.extract = sqsh_lz4_decompress,
+		.write = sqsh_lz4_decompress,
 		.finish = sqsh_lz4_finish,
 };
 

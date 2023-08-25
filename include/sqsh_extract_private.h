@@ -75,7 +75,7 @@ struct SqshExtractorImpl {
 	/**
 	 * @brief Function that is called when new data is available.
 	 */
-	int (*extract)(
+	int (*write)(
 			void *context, const uint8_t *compressed,
 			const size_t compressed_size);
 	/**
