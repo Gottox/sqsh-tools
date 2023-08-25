@@ -98,7 +98,7 @@ out:
 
 static const struct SqshExtractorImpl impl_zlib = {
 		.init = sqsh_zlib_init,
-		.extract = sqsh_zlib_decompress,
+		.write = sqsh_zlib_decompress,
 		.finish = sqsh_zlib_finish,
 };
 

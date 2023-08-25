@@ -122,7 +122,7 @@ sqsh_lzma_finish(void *context, uint8_t *target, size_t *target_size) {
 
 static const struct SqshExtractorImpl impl_xz = {
 		.init = sqsh_lzma_init_xz,
-		.extract = sqsh_lzma_decompress,
+		.write = sqsh_lzma_decompress,
 		.finish = sqsh_lzma_finish,
 };
 
@@ -130,7 +130,7 @@ const struct SqshExtractorImpl *const sqsh__impl_xz = &impl_xz;
 
 static const struct SqshExtractorImpl impl_lzma = {
 		.init = sqsh_lzma_init_alone,
-		.extract = sqsh_lzma_decompress,
+		.write = sqsh_lzma_decompress,
 		.finish = sqsh_lzma_finish,
 };
 

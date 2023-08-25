@@ -98,7 +98,7 @@ sqsh__extractor_to_buffer(
 	}
 
 	size = max_size;
-	rv = impl->extract(&extractor_context, compressed, compressed_size);
+	rv = impl->write(&extractor_context, compressed, compressed_size);
 	if (rv < 0) {
 		/* Make sure we finish the stream even it failed before. */
 		impl->finish(&extractor_context, decompressed, &size);

@@ -95,7 +95,7 @@ sqsh_zstd_finish(void *context, uint8_t *target, size_t *target_size) {
 
 static const struct SqshExtractorImpl impl_zstd = {
 		.init = sqsh_zstd_init,
-		.extract = sqsh_zstd_decompress,
+		.write = sqsh_zstd_decompress,
 		.finish = sqsh_zstd_finish,
 };
 
