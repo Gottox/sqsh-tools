@@ -76,7 +76,7 @@ load_metablock(
 }
 
 static int
-check_consistency(struct SqshDirectoryIterator *iterator) {
+check_consistency(const struct SqshDirectoryIterator *iterator) {
 	const char *name = sqsh_directory_iterator_name(iterator);
 	const size_t name_len = sqsh_directory_iterator_name_size(iterator);
 
@@ -269,13 +269,48 @@ sqsh_directory_iterator_file_type(
 	return SQSH_FILE_TYPE_UNKNOWN;
 }
 
+static int
+check_file_consistency(
+		const struct SqshDirectoryIterator *iterator,
+		const struct SqshFile *file) {
+	const uint64_t file_inode = sqsh_file_inode(file);
+	const uint64_t iter_inode = sqsh_directory_iterator_inode_number(iterator);
+	if (iter_inode != file_inode) {
+		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
+	}
+
+	enum SqshFileType file_type = sqsh_file_type(file);
+	enum SqshFileType iter_type = sqsh_directory_iterator_file_type(iterator);
+	if (iter_type != file_type) {
+		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
+	}
+	return 0;
+}
+
 struct SqshFile *
 sqsh_directory_iterator_open_file(
 		const struct SqshDirectoryIterator *iterator, int *err) {
+	int rv = 0;
+	struct SqshFile *file = NULL;
 	const uint64_t inode_ref = sqsh_directory_iterator_inode_ref(iterator);
 	struct SqshArchive *archive = iterator->file->archive;
 
-	return sqsh_open_by_ref(archive, inode_ref, err);
+	file = sqsh_open_by_ref(archive, inode_ref, &rv);
+	if (file == NULL) {
+		goto out;
+	}
+
+	rv = check_file_consistency(iterator, file);
+
+out:
+	if (rv < 0) {
+		sqsh_close(file);
+		file = NULL;
+	}
+	if (err != NULL) {
+		*err = rv;
+	}
+	return file;
 }
 
 static int
