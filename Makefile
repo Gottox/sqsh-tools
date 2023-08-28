@@ -5,7 +5,7 @@
 ######################################################################
 
 NINJA_TARGETS := test benchmark install dist scan-build clang-format uninstall \
-	all clang-tidy doc coverage-html
+	all clang-tidy doc/html coverage-html
 
 ifeq ($(32BIT),1)
 	ARCH = i386
@@ -64,6 +64,10 @@ endif
 
 $(NINJA_TARGETS): $(BUILD_DIR)
 	$W $(NINJA) -C $< $@
+
+.PHONY: doc
+
+doc: doc/html
 
 $(BUILD_DIR): meson.build Makefile
 	[ "$(PODMAN)" ] && meson wrap update-db || true
