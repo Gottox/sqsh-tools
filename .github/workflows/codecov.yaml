@@ -40,9 +40,15 @@ jobs:
           -Dthreads=enabled \
           -Dfuse-old=enabled \
           -Dtest=extended
+    - name: Build
+      run: |
+         meson compile -C build
     - name: Test
       run: |
-         ninja -C build test coverage-xml
+         MESON_TESTTHREADS=1 meson test -C build
+    - name: Generate Reports
+      run: |
+         ninja -C build coverage-xml
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
       env:
