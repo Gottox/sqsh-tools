@@ -1,0 +1,49 @@
+name: CodeCov
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+jobs:
+  codecov:
+    name: CodeCov
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Install tools
+      run: |
+        sudo apt update
+        sudo apt install --yes \
+          build-essential \
+          gcovr \
+          meson \
+          pkg-config \
+          libfuse-dev \
+          libfuse3-dev \
+          liblz4-dev \
+          liblzma-dev \
+          zlib1g-dev \
+          libzstd-dev \
+          squashfs-tools
+    - name: Configure
+      run: |
+        CC=gcc meson setup build \
+          -Db_coverage=true \
+          -Dwerror=true \
+          -Dexamples=true  \
+          -Dzlib=enabled \
+          -Dlz4=enabled \
+          -Dlzma=enabled  \
+          -Dzstd=enabled  \
+          -Dthreads=enabled \
+          -Dfuse-old=enabled \
+          -Dtest=extended
+    - name: Test
+      run: |
+         ninja -C build test coverage-xml
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
