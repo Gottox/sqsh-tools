@@ -312,6 +312,16 @@ out:
 	return fs_common_map_err(rv);
 }
 
+#ifdef __APPLE__
+static int
+fs_mac_getxattr(
+		const char *path, const char *name, char *buf, size_t size,
+		uint32_t position) {
+	(void)position;
+	return fs_getxattr(path, name, buf, size);
+}
+#endif
+
 static struct fuse_operations fs_oper = {
 		.access = fs_access,
 		.getattr = fs_getattr,
@@ -321,7 +331,13 @@ static struct fuse_operations fs_oper = {
 		.release = fs_release,
 		.readlink = fs_readlink,
 		.listxattr = fs_listxattr,
+#ifdef __APPLE__
+		// Dear macfuse developers, this ifdef is on you. I really try very hard
+		// to keep my source clean, but this is on you.
+		.getxattr = fs_mac_getxattr,
+#else
 		.getxattr = fs_getxattr,
+#endif
 };
 
 static int

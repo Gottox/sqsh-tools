@@ -28,28 +28,30 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         fragment_data.c
+ * @file         collection.h
  */
 
-#define _DEFAULT_SOURCE
+#ifndef CEXTRA_ENDIAN_COMPAT_H
+#define CEXTRA_ENDIAN_COMPAT_H
 
-#include "../../include/sqsh_data_private.h"
+#if defined(__APPLE__)
+#	include <libkern/OSByteOrder.h>
+#	define be16toh(x) OSSwapBigToHostInt16(x)
+#	define be32toh(x) OSSwapBigToHostInt32(x)
+#	define be64toh(x) OSSwapBigToHostInt64(x)
+#	define htobe16(x) OSSwapHostToBigInt16(x)
+#	define htobe32(x) OSSwapHostToBigInt32(x)
+#	define htobe64(x) OSSwapHostToBigInt64(x)
+#	define htole16(x) OSSwapHostToLittleInt16(x)
+#	define htole32(x) OSSwapHostToLittleInt32(x)
+#	define htole64(x) OSSwapHostToLittleInt64(x)
+#	define le16toh(x) OSSwapLittleToHostInt16(x)
+#	define le32toh(x) OSSwapLittleToHostInt32(x)
+#	define le64toh(x) OSSwapLittleToHostInt64(x)
+#elif defined(__FreeBSD__)
+#	include <sys/endian.h>
+#else
+#	include <endian.h>
+#endif
 
-#include <cextras/endian_compat.h>
-
-struct SQSH_UNALIGNED SqshDataFragment {
-	uint64_t start;
-	uint32_t size_info;
-	uint32_t unused;
-};
-SQSH_STATIC_ASSERT(sizeof(struct SqshDataFragment) == SQSH_SIZEOF_FRAGMENT);
-
-uint64_t
-sqsh__data_fragment_start(const struct SqshDataFragment *fragment) {
-	return le64toh(fragment->start);
-}
-
-uint32_t
-sqsh__data_fragment_size_info(const struct SqshDataFragment *fragment) {
-	return le32toh(fragment->size_info);
-}
+#endif /* CEXTRA_ENDIAN_COMPAT_H */
