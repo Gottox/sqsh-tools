@@ -2,6 +2,24 @@
 
 A fresh squashfs implementation. BSD-2 licensed.
 
+squashfs is an open and free compressed read-only filesystem. It is used in
+embedded devices, live-CDs, or in packaging. It was original introduced into
+the kernel, but there are multiple user space implementations.
+
+*libsqsh* is a purely 2-Clause BSD Licensed implementation of the squashfs
+filesystem in C11. It covers the complete squashfs feature set, while still
+being as minimal as possible.
+
+*libsqsh* consists of a C library and a command line tools to interact with
+squashfs archives.
+
+Note that *libsqsh* only supports reading squashfs archives. If you want to create
+squashfs archives, you can either use
+[squashfs-tools](https://github.com/plougher/squashfs-tools/), which provides a
+command line interface, or
+[squashfs-tools-ng](https://github.com/AgentD/squashfs-tools-ng/), which provides both
+which provides both a command-line interface and a C library interface.
+
 ## Features
 
 * **Complete feature set**: libsqsh supports all features of the squashfs file 
@@ -10,7 +28,7 @@ A fresh squashfs implementation. BSD-2 licensed.
 * **Modern C11 implementation**: Written in modern C11, libsqsh is designed for
   efficiency and compatibility with C++, C, and other languages.
 
-* **High-Level API**: The high-level API provides easy-to-use functions to 
+* **High-Level API**: The high-level API provides easy-to-use functions to
   access the contents of a to the contents of a squashfs archive. It is designed
   for ease of use and interface to the squashfs archive.
 
