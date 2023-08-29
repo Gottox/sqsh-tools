@@ -142,7 +142,7 @@ if get_option('test') == 'extended'
     if fuse3_dep.found()
         fs_impl += tools['sqshfs']
     endif
-    if fuse2_dep.found()
+    if fuse2_dep.found() and host_machine.system() != 'darwin'
         fs_impl += tools['sqshfs2']
     endif
 
