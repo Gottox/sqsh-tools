@@ -6,6 +6,7 @@ tests = [
     'concurrency/threadpool_test.c',
     'concurrency/future_test.c',
     'collection/buffer_test.c',
+    'collection/collector.c',
     'collection/lru_test.c',
     'collection/rc_hash_map_test.c',
     'collection/rc_map_test.c',
