@@ -104,6 +104,34 @@ jobs:
           # fuse needs root privileges on OpenBSD
           sudo meson test -C /tmp/build -t 5
 
+  build-mac:
+    runs-on: macos-latest
+    if: ${{ github.ref == 'refs/heads/main' }}
+    strategy:
+      matrix:
+        arch:
+          - x86_64
+          - arm64
+    steps:
+    - uses: actions/checkout@v3
+    - run: |
+          brew install git meson squashfs curl lz4 xz zstd macfuse
+    - run: |
+          meson setup /tmp/build \
+            -Dwerror=true \
+            -Dexamples=true \
+            -Dcurl=enabled \
+            -Dzlib=enabled \
+            -Dlz4=enabled \
+            -Dlzma=enabled \
+            -Dzstd=enabled \
+            -Dfuse-old=enabled \
+            -Dfuse=disabled \
+            -Dtest=extended \
+            -Ddoc=false
+    - run: |
+          meson test -C /tmp/build -t 5
+
   doxygen:
     needs:
     - build
