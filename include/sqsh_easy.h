@@ -48,7 +48,7 @@ struct SqshArchive;
 struct SqshFile;
 
 /***************************************
- * chrome/file.c
+ * easy/file.c
  */
 
 /**
@@ -115,7 +115,7 @@ time_t
 sqsh_easy_file_mtime(struct SqshArchive *archive, const char *path, int *err);
 
 /***************************************
- * chrome/directory.c
+ * easy/directory.c
  */
 
 /**
@@ -131,6 +131,40 @@ sqsh_easy_file_mtime(struct SqshArchive *archive, const char *path, int *err);
  */
 char **sqsh_easy_directory_list(
 		struct SqshArchive *archive, const char *path, int *err);
+
+/***************************************
+ * easy/xattr.c
+ */
+
+/**
+ * @brief retrieves all xattr keys of a file or directory.
+ *
+ * The returned list needs to be released with `free()`.
+ *
+ * @param[in]  archive  The sqsh archive context.
+ * @param[in]  path     The path the file or directory.
+ * @param[out] err     Pointer to an int where the error code will be stored.
+ *
+ * @return A list of xattr keys on success, NULL on error.
+ */
+char **
+sqsh_easy_xattr_keys(struct SqshArchive *archive, const char *path, int *err);
+
+/**
+ * @brief retrieves the value of a xattr key of a file or directory.
+ *
+ * The returned pointer needs to be released with `free()`.
+ *
+ * @param[in]  archive  The sqsh archive context.
+ * @param[in]  path     The path the file or directory.
+ * @param[in]  key      The xattr key.
+ * @param[out] err     Pointer to an int where the error code will be stored.
+ *
+ * @return The value of the given xattr key on success, NULL on error.
+ */
+char *sqsh_easy_xattr_get(
+		struct SqshArchive *archive, const char *path, const char *key,
+		int *err);
 
 #ifdef __cplusplus
 }
