@@ -23,6 +23,18 @@ executable(
     dependencies: libsqsh_dep,
 )
 executable(
+    'list_xattrs',
+    'list_xattrs.c',
+    install: false,
+    dependencies: libsqsh_dep,
+)
+executable(
+    'list_xattrs_ll',
+    'list_xattrs_ll.c',
+    install: false,
+    dependencies: libsqsh_dep,
+)
+executable(
     'readme_example',
     'readme_example.c',
     install: false,
