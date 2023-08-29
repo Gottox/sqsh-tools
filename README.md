@@ -18,7 +18,7 @@ squashfs archives, you can either use
 [squashfs-tools](https://github.com/plougher/squashfs-tools/), which provides a
 command line interface, or
 [squashfs-tools-ng](https://github.com/AgentD/squashfs-tools-ng/), which provides both
-which provides both a command-line interface and a C library interface.
+a command-line interface and a C library interface.
 
 ## Features
 
