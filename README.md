@@ -1,4 +1,4 @@
-# libsqsh [![CI](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml/badge.svg)](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml)
+# libsqsh [![CI](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml/badge.svg)](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml) [![codecov](https://codecov.io/github/Gottox/libsqsh/graph/badge.svg?token=AM5COPDMH0)](https://codecov.io/github/Gottox/libsqsh)
 
 A fresh squashfs implementation. BSD-2 licensed.
 
