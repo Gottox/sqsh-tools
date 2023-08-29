@@ -52,12 +52,15 @@ sqsh_test_util = [
     'util.c',
 ]
 test_c_args = []
+test_cpp_args = []
 
 cc = meson.get_compiler('c')
 if cc.get_id() == 'gcc'
     test_c_args += '-Wno-pedantic'
 elif cc.get_id() == 'clang'
     test_c_args += '-Wno-gnu-designator'
+    test_cpp_args += '-Wno-variadic-macros'
+    test_cpp_args += '-Wno-c++11-extensions'
 endif
 
 mksquashfs = find_program('mksquashfs')
@@ -97,11 +100,14 @@ foreach p : sqsh_test
     endif
     this_c_args = []
     this_c_args += test_c_args
+    this_cpp_args = []
+    this_cpp_args += test_cpp_args
     t = executable(
         p.underscorify(),
         sources,
         install: false,
         c_args: this_c_args,
+        cpp_args: this_cpp_args,
         link_with: libsqsh.get_static_lib(),
         dependencies: [threads_dep, testlib_dep, cextras_dep],
     )

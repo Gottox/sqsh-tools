@@ -11,7 +11,6 @@
 #include "../include/sqsh_mapper.h"
 
 #include <assert.h>
-#include <endian.h>
 
 const uint8_t *
 mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size) {

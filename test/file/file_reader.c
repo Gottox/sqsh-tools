@@ -177,7 +177,7 @@ load_file_from_uncompressed_data_block(void) {
 }
 
 static void
-skip_over_zero_page() {
+skip_over_zero_page(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};

@@ -162,7 +162,7 @@ test_reader_advance_to_block(void) {
 }
 
 static void
-test_reader_advance_to_two_blocks() {
+test_reader_advance_to_two_blocks(void) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -184,7 +184,7 @@ test_reader_advance_to_two_blocks() {
 }
 
 static void
-test_reader_advance_to_two_blocks_with_offset() {
+test_reader_advance_to_two_blocks_with_offset(void) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -206,7 +206,7 @@ test_reader_advance_to_two_blocks_with_offset() {
 }
 
 static void
-test_reader_from_buffered_to_mapped() {
+test_reader_from_buffered_to_mapped(void) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -238,7 +238,7 @@ test_reader_from_buffered_to_mapped() {
 }
 
 static void
-test_reader_from_buffered_to_buffered() {
+test_reader_from_buffered_to_buffered(void) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -270,7 +270,7 @@ test_reader_from_buffered_to_buffered() {
 }
 
 static void
-test_reader_advance_inside_buffered() {
+test_reader_advance_inside_buffered(void) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -302,7 +302,7 @@ test_reader_advance_inside_buffered() {
 }
 
 static void
-test_reader_advance_with_zero_size() {
+test_reader_advance_with_zero_size(void) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
