@@ -29,57 +29,76 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         directory.c
+ * @file         rc_map.c
  */
 
-#include "../common.h"
+#include <assert.h>
+#include <cextras/collection.h>
+#include <cextras/types.h>
+#include <stdlib.h>
+#include <string.h>
 #include <testlib.h>
 
-#include "../../include/sqsh_archive_private.h"
-#include "../../include/sqsh_easy.h"
-#include "../../lib/utils/utils.h"
+#define LENGTH(x) (sizeof(x) / sizeof(*x))
+
+struct TestCollectIter {
+	cx_index_t index;
+	char **array;
+	size_t size;
+	int rv;
+};
+
+static int
+test_collect_next(void *iter, const char **value, size_t *size) {
+	struct TestCollectIter *i = iter;
+	if (i->index >= i->size) {
+		return i->rv;
+	}
+	*value = i->array[i->index];
+	*size = strlen(i->array[i->index]);
+	i->index++;
+	return i->rv;
+}
 
 static void
-list_two_files(void) {
+collector(void) {
 	int rv = 0;
-	struct SqshArchive archive = {0};
-	uint8_t payload[] = {
-			/* clang-format off */
-			SQSH_HEADER,
-			/* inode */
-			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
-			INODE_HEADER(1, 0, 0, 0, 0, 1),
-			INODE_BASIC_DIR(0, 33, 0, 0),
-			[INODE_TABLE_OFFSET+2+128] = 
-			INODE_HEADER(3, 0, 0, 0, 0, 2),
-			INODE_BASIC_SYMLINK(3),
-			't', 'g', 't',
-			[INODE_TABLE_OFFSET+2+256] =
-			INODE_HEADER(2, 0, 0, 0, 0, 3),
-			INODE_BASIC_FILE(0, 0xFFFFFFFF, 0, 0),
-			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
-			DIRECTORY_HEADER(2, 0, 0),
-			DIRECTORY_ENTRY(128, 2, 3, 1),
-			'1',
-			DIRECTORY_ENTRY(256, 3, 2, 1),
-			'2',
-			[FRAGMENT_TABLE_OFFSET] = 0,
-			/* clang-format on */
+	char *values[] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};
+	char **target = NULL;
+	struct TestCollectIter iter = {
+			.index = 0,
+			.array = values,
+			.size = LENGTH(values),
 	};
-	mk_stub(&archive, payload, sizeof(payload));
 
-	char **dir_list = sqsh_easy_directory_list(&archive, "/", &rv);
+	rv = cx_collect(&target, test_collect_next, &iter);
 	assert(rv == 0);
-	assert(dir_list != NULL);
 
-	assert(strcmp(dir_list[0], "1") == 0);
-	assert(strcmp(dir_list[1], "2") == 0);
-	assert(dir_list[2] == NULL);
+	for (size_t i = 0; i < LENGTH(values); i++) {
+		assert(strcmp(values[i], target[i]) == 0);
+	}
+	assert(target[LENGTH(values)] == NULL);
+	free(target);
+}
 
-	free(dir_list);
-	sqsh__archive_cleanup(&archive);
+static void
+collector_fail(void) {
+	int rv = 0;
+	char *values[] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"};
+	char **target = NULL;
+	struct TestCollectIter iter = {
+			.index = 0,
+			.array = values,
+			.size = LENGTH(values),
+			.rv = -1,
+	};
+
+	rv = cx_collect(&target, test_collect_next, &iter);
+	assert(rv == -1);
+	assert(target == NULL);
 }
 
 DECLARE_TESTS
-TEST(list_two_files)
+TEST(collector)
+TEST(collector_fail)
 END_TESTS

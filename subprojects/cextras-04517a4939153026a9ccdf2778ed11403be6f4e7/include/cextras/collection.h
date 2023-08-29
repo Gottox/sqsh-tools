@@ -518,7 +518,7 @@ CX_NO_UNUSED int cx_lru_touch(struct CxLru *lru, size_t id);
 int cx_lru_cleanup(struct CxLru *lru);
 
 /***************************************
- * primitive/reader.c
+ * collection/reader.c
  */
 
 /**
@@ -555,6 +555,15 @@ struct CxReader {
 	struct CxBuffer buffer;
 	const uint8_t *data;
 };
+
+/***************************************
+ * collection/collector.c
+ */
+
+typedef int (*cx_collector_next_t)(
+		void *iterator, const char **value, size_t *size);
+
+int cx_collect(char ***target, cx_collector_next_t next, void *iterator);
 
 #ifdef __cplusplus
 }
