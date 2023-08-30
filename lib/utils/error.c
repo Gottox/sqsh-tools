@@ -31,6 +31,11 @@
  * @file         error.c
  */
 
+#ifdef _GNU_SOURCE
+// We do _not_ want the gnu specific strerror_r, which returns a string, and sometimes doesn't use the passed buffer
+#undef _GNU_SOURCE
+#endif
+#define _DEFAULT_SOURCE
 #include "../../include/sqsh_error.h"
 
 #include <stdio.h>
@@ -39,8 +44,7 @@
 
 #define UNKNOWN_ERROR_FORMAT "Unknown error %i"
 
-static __thread char
-		err_str[sizeof(UNKNOWN_ERROR_FORMAT "18446744073709551615")] = {0};
+static __thread char err_str[512] = {0};
 
 void
 sqsh_perror(int error_code, const char *msg) {
@@ -57,7 +61,8 @@ sqsh_error_str(int error_code) {
 	error_code = abs(error_code);
 
 	if (error_code < SQSH_ERROR_SECTION_START) {
-		return strerror(error_code);
+        strerror_r(error_code, err_str, sizeof(err_str));
+        return err_str;
 	}
 	switch ((enum SqshError)error_code) {
 	case SQSH_ERROR_SECTION_START:
@@ -139,6 +144,6 @@ sqsh_error_str(int error_code) {
 	case SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED:
 		return "Too many symlinks followed";
 	}
-	snprintf(err_str, sizeof(err_str), UNKNOWN_ERROR_FORMAT, abs(error_code));
+	snprintf(err_str, sizeof(err_str), UNKNOWN_ERROR_FORMAT, error_code);
 	return err_str;
 }

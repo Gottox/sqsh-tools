@@ -107,6 +107,9 @@ void sqsh_perror(int error_code, const char *msg);
 /**
  * @brief Get the error message for the given error code.
  *
+ * This function is thread safe, but the returned string may be overwritten by the next call
+ * to this function on this thread.
+ *
  * @param error_code The error code.
  * @return The error message.
  */
