@@ -1,3 +1,15 @@
+ignore:
+  - "examples/"
+  - "fuzzer/"
+  - "subprojects/"
+  - "test/"
+parsers:
+  gcov:
+    branch_detection:
+      conditional: no
+      loop: no
+      method: no
+      macro: no
 coverage:
   status:
     project:
