@@ -90,7 +90,7 @@ inode_load(struct SqshFile *context) {
 		size += SQSH_SIZEOF_INODE_IPC_EXT;
 		break;
 	default:
-		return -SQSH_ERROR_UNKOWN_FILE_TYPE;
+		return -SQSH_ERROR_UNKNOWN_FILE_TYPE;
 	}
 	rv = sqsh__metablock_reader_advance(&context->metablock, 0, size);
 	if (rv < 0) {
@@ -279,7 +279,7 @@ sqsh_file_hard_link_count(const struct SqshFile *context) {
 		return sqsh__data_inode_ipc_ext_hard_link_count(
 				sqsh__data_inode_ipc_ext(inode));
 	}
-	return -SQSH_ERROR_UNKOWN_FILE_TYPE;
+	return -SQSH_ERROR_UNKNOWN_FILE_TYPE;
 }
 
 uint64_t
