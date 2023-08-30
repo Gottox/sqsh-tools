@@ -69,6 +69,9 @@ sqsh_lz4_decompress(
 	int size = LZ4_decompress_safe_continue(
 			ctx->stream, (const char *)compressed, (char *)ctx->target,
 			compressed_size, ctx->target_size - ctx->offset);
+	if (size < 0) {
+		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
+	}
 	ctx->offset += size;
 	return 0;
 }

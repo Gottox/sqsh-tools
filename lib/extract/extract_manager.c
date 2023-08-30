@@ -135,7 +135,7 @@ sqsh__extract_manager_uncompress(
 		struct SqshExtractManager *manager, const struct SqshMapReader *reader,
 		const struct CxBuffer **target) {
 	int rv = 0;
-	struct SqshExtractor extractor = {0};
+	struct SqshExtractor2 extractor = {0};
 	const enum SqshSuperblockCompressionId compression_id =
 			manager->compression_id;
 	const uint32_t block_size = manager->block_size;
@@ -158,24 +158,26 @@ sqsh__extract_manager_uncompress(
 		}
 		const uint8_t *data = sqsh__map_reader_data(reader);
 
-		rv = sqsh__extractor_init(
+		rv = sqsh__extractor2_init(
 				&extractor, &buffer, compression_id, block_size);
 		if (rv < 0) {
 			goto out;
 		}
 
-		rv = sqsh__extractor_to_buffer(&extractor, data, size);
+		rv = sqsh__extractor2_write(&extractor, data, size);
 		if (rv < 0) {
 			cx_buffer_cleanup(&buffer);
 			goto out;
 		}
+
+		rv = sqsh__extractor2_finish(&extractor);
 
 		*target = cx_rc_hash_map_put(&manager->hash_map, address, &buffer);
 	}
 	rv = cx_lru_touch(&manager->lru, address);
 
 out:
-	sqsh__extractor_cleanup(&extractor);
+	sqsh__extractor2_cleanup(&extractor);
 	sqsh__mutex_unlock(&manager->lock);
 	return rv;
 }
