@@ -37,10 +37,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define UNKOWN_ERROR_FORMAT "Unknown error %i"
+#define UNKNOWN_ERROR_FORMAT "Unknown error %i"
 
 static __thread char
-		err_str[sizeof(UNKOWN_ERROR_FORMAT "18446744073709551615")] = {0};
+		err_str[sizeof(UNKNOWN_ERROR_FORMAT "18446744073709551615")] = {0};
 
 void
 sqsh_perror(int error_code, const char *msg) {
@@ -79,7 +79,7 @@ sqsh_error_str(int error_code) {
 	case SQSH_ERROR_COMPRESSION_DECOMPRESS:
 		return "Compression decompress";
 	case SQSH_ERROR_UNKOWN_FILE_TYPE:
-		return "Unkown file type";
+		return "Unknown file type";
 	case SQSH_ERROR_NOT_A_DIRECTORY:
 		return "Not a directory";
 	case SQSH_ERROR_NOT_A_FILE:
@@ -113,7 +113,7 @@ sqsh_error_str(int error_code) {
 	case SQSH_ERROR_MAPPER_MAP:
 		return "Mapper mapping error";
 	case SQSH_ERROR_COMPRESSION_UNSUPPORTED:
-		return "Compression unkown";
+		return "Compression unknown";
 	case SQSH_ERROR_CURL_INVALID_RANGE_HEADER:
 		return "Invalid range header";
 	case SQSL_ERROR_ELEMENT_NOT_FOUND:
@@ -139,6 +139,6 @@ sqsh_error_str(int error_code) {
 	case SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED:
 		return "Too many symlinks followed";
 	}
-	snprintf(err_str, sizeof(err_str), UNKOWN_ERROR_FORMAT, abs(error_code));
+	snprintf(err_str, sizeof(err_str), UNKNOWN_ERROR_FORMAT, abs(error_code));
 	return err_str;
 }
