@@ -15,6 +15,8 @@
 const uint8_t *
 mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size) {
 	int rv;
+	const int compression_id =
+			payload[20] ? payload[20] : SQSH_COMPRESSION_GZIP;
 	uint8_t superblock[SQSH_SIZEOF_SUPERBLOCK] = {
 			/* magic */
 			UINT32_BYTES(SQSH_SUPERBLOCK_MAGIC),
@@ -27,7 +29,7 @@ mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size) {
 			/* fragment_entry_count */
 			UINT32_BYTES(0),
 			/* compression_id */
-			UINT16_BYTES(SQSH_COMPRESSION_GZIP),
+			UINT16_BYTES(compression_id),
 			/* block_log */
 			UINT16_BYTES(15),
 			/* flags */
