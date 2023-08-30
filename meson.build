@@ -13,7 +13,11 @@ project(
 )
 
 threads_dep = dependency('threads', required: get_option('threads'))
-curl_dep = dependency('libcurl', required: get_option('curl'))
+curl_dep = dependency(
+    'libcurl',
+    version: '>=7.83.0',
+    required: get_option('curl'),
+)
 fuse3_dep = dependency(
     'fuse3',
     required: get_option('fuse'),
