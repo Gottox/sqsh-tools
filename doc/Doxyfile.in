@@ -15,6 +15,10 @@ INTERACTIVE_SVG       = YES
 FULL_PATH_NAMES       = YES
 STRIP_FROM_PATH       = @DOXYGEN_INPUT@/
 INTERNAL_DOCS         = @DOXYGEN_INTERNAL_DOCS@
+ENABLE_PREPROCESSING  = YES
+MACRO_EXPANSION       = YES
+EXPAND_ONLY_PREDEF    = YES
+PREDEFINED            = __attribute__(x)=
 
 # Warning and progress messages
 QUIET                = YES
