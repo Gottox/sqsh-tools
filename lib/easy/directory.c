@@ -57,7 +57,8 @@ directory_collector_next(void *iterator, const char **value, size_t *size) {
 }
 
 char **
-sqsh_easy_directory_list(struct SqshArchive *archive, const char *path, int *err) {
+sqsh_easy_directory_list(
+		struct SqshArchive *archive, const char *path, int *err) {
 	int rv = 0;
 	struct SqshFile *file = NULL;
 	struct SqshDirectoryIterator iterator = {0};

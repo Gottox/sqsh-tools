@@ -113,7 +113,6 @@ walker_symlink_alternating_recursion(void) {
 
 	sqsh__tree_walker_cleanup(&walker);
 	sqsh__archive_cleanup(&archive);
-
 }
 
 static void

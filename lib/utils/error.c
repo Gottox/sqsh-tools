@@ -32,8 +32,9 @@
  */
 
 #ifdef _GNU_SOURCE
-// We do _not_ want the gnu specific strerror_r, which returns a string, and sometimes doesn't use the passed buffer
-#undef _GNU_SOURCE
+// We do _not_ want the gnu specific strerror_r, which returns a string, and
+// sometimes doesn't use the passed buffer
+#	undef _GNU_SOURCE
 #endif
 #define _DEFAULT_SOURCE
 #include "../../include/sqsh_error.h"
@@ -61,8 +62,8 @@ sqsh_error_str(int error_code) {
 	error_code = abs(error_code);
 
 	if (error_code < SQSH_ERROR_SECTION_START) {
-        strerror_r(error_code, err_str, sizeof(err_str));
-        return err_str;
+		strerror_r(error_code, err_str, sizeof(err_str));
+		return err_str;
 	}
 	switch ((enum SqshError)error_code) {
 	case SQSH_ERROR_SECTION_START:
