@@ -335,7 +335,7 @@ process_fragment(struct SqshDirectoryIterator *iterator) {
 	if (SQSH_SUB_OVERFLOW(
 				iterator->remaining_size, SQSH_SIZEOF_DIRECTORY_FRAGMENT,
 				&iterator->remaining_size)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_CORRUPTED_DIRECTORY_HEADER;
 	}
 	return rv;
 }
@@ -347,6 +347,9 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator, int *err) {
 	bool has_next = false;
 
 	if (iterator->remaining_size == 0) {
+		if (iterator->remaining_entries != 0) {
+			rv = -SQSH_ERROR_CORRUPTED_DIRECTORY_HEADER;
+		}
 		goto out;
 	} else if (iterator->remaining_entries == 0) {
 		/*  New fragment begins */

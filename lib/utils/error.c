@@ -144,6 +144,8 @@ sqsh_error_str(int error_code) {
 		return "Unsupported version";
 	case SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED:
 		return "Too many symlinks followed";
+	case SQSH_ERROR_CORRUPTED_DIRECTORY_HEADER:
+		return "Corrupted directory header";
 	}
 	snprintf(err_str, sizeof(err_str), UNKNOWN_ERROR_FORMAT, error_code);
 	return err_str;
