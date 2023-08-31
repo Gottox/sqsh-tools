@@ -4,6 +4,7 @@ sqsh_test = [
     'archive/compression_options.c',
     'easy/directory.c',
     'easy/file.c',
+    'easy/xattr.c',
     'cpp-test.cpp',
     'directory/directory_iterator.c',
     'extract/extract.c',
