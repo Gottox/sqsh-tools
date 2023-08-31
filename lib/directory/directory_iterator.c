@@ -76,7 +76,7 @@ load_metablock(
 }
 
 static int
-check_consistency(const struct SqshDirectoryIterator *iterator) {
+check_entry_consistency(const struct SqshDirectoryIterator *iterator) {
 	const char *name = sqsh_directory_iterator_name(iterator);
 	const size_t name_len = sqsh_directory_iterator_name_size(iterator);
 
@@ -166,7 +166,11 @@ sqsh_directory_iterator_lookup(
 			continue;
 		}
 		if (strncmp(name, (char *)entry_name, entry_name_size) == 0) {
-			return check_consistency(iterator);
+			/* We can directly return with a success result here.
+			 * check_entry_consistency() was already called by
+			 * sqsh_directory_iterator_next().
+			 */
+			return 0;
 		}
 	}
 
@@ -387,7 +391,7 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator, int *err) {
 				iterator->remaining_size, size, &iterator->remaining_size)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
-	rv = check_consistency(iterator);
+	rv = check_entry_consistency(iterator);
 	if (rv < 0) {
 		goto out;
 	}
