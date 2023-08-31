@@ -125,7 +125,7 @@ iter_two_files(void) {
 			/* inode */
 			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
 			INODE_HEADER(1, 0, 0, 0, 0, 1),
-			INODE_BASIC_DIR(0, 1024, 0, 0),
+			INODE_BASIC_DIR(0, 33, 0, 0),
 			[INODE_TABLE_OFFSET+2+128] =
 			INODE_HEADER(3, 0, 0, 0, 0, 2),
 			INODE_BASIC_SYMLINK(3),
@@ -169,6 +169,10 @@ iter_two_files(void) {
 	size = sqsh_directory_iterator_name_size(&iter);
 	assert(size == 1);
 	assert(name[0] == '2');
+
+	has_next = sqsh_directory_iterator_next(&iter, &rv);
+	assert(rv == 0);
+	assert(has_next == false);
 
 	sqsh__directory_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
@@ -252,10 +256,50 @@ iter_inconsistent_file_type(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
+static void
+iter_over_corrupt_header_too_small(void) {
+	int rv;
+	struct SqshArchive archive = {0};
+	uint8_t payload[] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
+			INODE_HEADER(1, 0, 0, 0, 0, 1),
+			INODE_BASIC_DIR(0, 10, 0, 0),
+			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			DIRECTORY_HEADER(2, 0, 0),
+			DIRECTORY_ENTRY(128, 2, 3, 1),
+			'1',
+			DIRECTORY_ENTRY(256, 3, 2, 1),
+			'2',
+			[FRAGMENT_TABLE_OFFSET] = 0,
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	struct SqshFile file = {0};
+	rv = sqsh__file_init(&file, &archive, 0);
+	assert(rv == 0);
+
+	struct SqshDirectoryIterator iter = {0};
+	rv = sqsh__directory_iterator_init(&iter, &file);
+	assert(rv == 0);
+
+	bool has_next = sqsh_directory_iterator_next(&iter, &rv);
+	assert(rv == -SQSH_ERROR_CORRUPTED_DIRECTORY_HEADER);
+	assert(has_next == false);
+
+	sqsh__directory_iterator_cleanup(&iter);
+	sqsh__file_cleanup(&file);
+	sqsh__archive_cleanup(&archive);
+}
+
 DECLARE_TESTS
 TEST(iter_two_files)
 TEST(iter_invalid_file_name_with_slash)
 TEST(iter_invalid_file_name_with_0)
 TEST(iter_invalid_file_type)
 TEST(iter_inconsistent_file_type)
+TEST(iter_over_corrupt_header_too_small)
 END_TESTS

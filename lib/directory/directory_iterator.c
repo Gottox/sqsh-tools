@@ -76,7 +76,7 @@ load_metablock(
 }
 
 static int
-check_consistency(const struct SqshDirectoryIterator *iterator) {
+check_entry_consistency(const struct SqshDirectoryIterator *iterator) {
 	const char *name = sqsh_directory_iterator_name(iterator);
 	const size_t name_len = sqsh_directory_iterator_name_size(iterator);
 
@@ -166,7 +166,11 @@ sqsh_directory_iterator_lookup(
 			continue;
 		}
 		if (strncmp(name, (char *)entry_name, entry_name_size) == 0) {
-			return check_consistency(iterator);
+			/* We can directly return with a success result here.
+			 * check_entry_consistency() was already called by
+			 * sqsh_directory_iterator_next().
+			 */
+			return 0;
 		}
 	}
 
@@ -325,8 +329,12 @@ process_fragment(struct SqshDirectoryIterator *iterator) {
 	}
 
 	const struct SqshDataDirectoryFragment *fragment = get_fragment(iterator);
-	iterator->remaining_entries =
-			sqsh__data_directory_fragment_count(fragment) + 1;
+	/* entry count is 1-based. That means, that the actual amount of entries
+	 * is one less than the value in the fragment header. We use this fact and
+	 * don't decrease remaining_entries in the first iteration in a fragment.
+	 * See _next() for details.
+	 */
+	iterator->remaining_entries = sqsh__data_directory_fragment_count(fragment);
 	iterator->start_base = sqsh__data_directory_fragment_start(fragment);
 	iterator->inode_base = sqsh__data_directory_fragment_inode_number(fragment);
 
@@ -335,7 +343,7 @@ process_fragment(struct SqshDirectoryIterator *iterator) {
 	if (SQSH_SUB_OVERFLOW(
 				iterator->remaining_size, SQSH_SIZEOF_DIRECTORY_FRAGMENT,
 				&iterator->remaining_size)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
+		return -SQSH_ERROR_CORRUPTED_DIRECTORY_HEADER;
 	}
 	return rv;
 }
@@ -347,6 +355,9 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator, int *err) {
 	bool has_next = false;
 
 	if (iterator->remaining_size == 0) {
+		if (iterator->remaining_entries != 0) {
+			rv = -SQSH_ERROR_CORRUPTED_DIRECTORY_HEADER;
+		}
 		goto out;
 	} else if (iterator->remaining_entries == 0) {
 		/*  New fragment begins */
@@ -354,9 +365,9 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator, int *err) {
 		if (rv < 0) {
 			goto out;
 		}
+	} else {
+		iterator->remaining_entries--;
 	}
-
-	iterator->remaining_entries--;
 
 	/*  Make sure next entry is loaded: */
 	size = SQSH_SIZEOF_DIRECTORY_ENTRY;
@@ -384,7 +395,7 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator, int *err) {
 				iterator->remaining_size, size, &iterator->remaining_size)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
-	rv = check_consistency(iterator);
+	rv = check_entry_consistency(iterator);
 	if (rv < 0) {
 		goto out;
 	}
