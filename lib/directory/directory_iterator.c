@@ -329,8 +329,12 @@ process_fragment(struct SqshDirectoryIterator *iterator) {
 	}
 
 	const struct SqshDataDirectoryFragment *fragment = get_fragment(iterator);
-	iterator->remaining_entries =
-			sqsh__data_directory_fragment_count(fragment) + 1;
+	/* entry count is 1-based. That means, that the actual amount of entries
+	 * is one less than the value in the fragment header. We use this fact and
+	 * don't decrease remaining_entries in the first iteration in a fragment.
+	 * See _next() for details.
+	 */
+	iterator->remaining_entries = sqsh__data_directory_fragment_count(fragment);
 	iterator->start_base = sqsh__data_directory_fragment_start(fragment);
 	iterator->inode_base = sqsh__data_directory_fragment_inode_number(fragment);
 
@@ -361,9 +365,9 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator, int *err) {
 		if (rv < 0) {
 			goto out;
 		}
+	} else {
+		iterator->remaining_entries--;
 	}
-
-	iterator->remaining_entries--;
 
 	/*  Make sure next entry is loaded: */
 	size = SQSH_SIZEOF_DIRECTORY_ENTRY;
