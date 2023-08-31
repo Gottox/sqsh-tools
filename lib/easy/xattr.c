@@ -95,7 +95,7 @@ xattr_collector_next(void *iterator, const char **value, size_t *size) {
 		i->key_buffer = sqsh_xattr_iterator_fullname_dup(&i->iterator);
 
 		*value = i->key_buffer;
-		*size = (size_t)sqsh_xattr_iterator_value_size(&i->iterator);
+		*size = (size_t)strlen(i->key_buffer);
 	}
 	return rv;
 }
