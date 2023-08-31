@@ -8,7 +8,33 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
+  format-check:
+    runs-on: ubuntu-latest
+    container:
+      image: gottox/sqsh-build:x86_64
+    steps:
+    - uses: actions/checkout@v3
+    - name: configure
+      run: |
+        apk add clang16-extra-tools
+        meson setup /tmp/build \
+          -Dwerror=true \
+          -Dexamples=true  \
+          -Dcurl=disabled  \
+          -Dzlib=disabled \
+          -Dlz4=disabled \
+          -Dlzma=disabled  \
+          -Dzstd=disabled  \
+          -Dthreads=disabled \
+          -Dfuse-old=disabled \
+          -Dtest=false \
+          -Ddoc=false
+    - name: format-check
+      run: |
+        ninja -C /tmp/build clang-format-check
   test:
+    needs:
+    - format-check
     strategy:
       matrix:
         arch:
@@ -20,8 +46,6 @@ jobs:
       options: --privileged
     steps:
     - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
     - name: configure
       run: |
         apk add zlib-dev lz4-dev xz-dev zstd-dev
@@ -42,6 +66,8 @@ jobs:
          ninja -C /tmp/build test
 
   build:
+    needs:
+    - format-check
     runs-on: ubuntu-latest
     container: gottox/sqsh-build:${{ matrix.arch }}
     strategy:
@@ -76,6 +102,8 @@ jobs:
         ninja -C /tmp/build
 
   build-openbsd:
+    needs:
+    - format-check
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     strategy:
@@ -108,6 +136,8 @@ jobs:
           sudo meson test -C /tmp/build -t 5
 
   build-mac:
+    needs:
+    - format-check
     runs-on: macos-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     strategy:
