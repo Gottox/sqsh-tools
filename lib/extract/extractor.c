@@ -64,65 +64,84 @@ int
 sqsh__extractor_init(
 		struct SqshExtractor *extractor, struct CxBuffer *buffer,
 		int algorithm_id, size_t block_size) {
+	int rv = 0;
 	const struct SqshExtractorImpl *impl =
 			sqsh__extractor_impl_from_id(algorithm_id);
 	if (impl == NULL) {
-		return -SQSH_ERROR_COMPRESSION_UNSUPPORTED;
+		rv = -SQSH_ERROR_COMPRESSION_UNSUPPORTED;
+		goto out;
 	}
 	extractor->impl = impl;
 	extractor->block_size = block_size;
 	extractor->buffer = buffer;
+	rv = cx_buffer_add_capacity(buffer, &extractor->target, block_size);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = impl->init(&extractor->context, extractor->target, block_size);
+	if (rv < 0) {
+		goto out;
+	}
+
+out:
 	return 0;
 }
 
 int
-sqsh__extractor_to_buffer(
-		const struct SqshExtractor *extractor, const uint8_t *compressed,
+sqsh__extractor_write(
+		struct SqshExtractor *extractor, const uint8_t *compressed,
 		const size_t compressed_size) {
 	int rv = 0;
-	size_t max_size = extractor->block_size;
-	size_t size = 0;
-	uint8_t *decompressed = NULL;
 	const struct SqshExtractorImpl *impl = extractor->impl;
-	sqsh__extractor_context_t extractor_context = {0};
-	struct CxBuffer *buffer = extractor->buffer;
+	sqsh__extractor_context_t *context = &extractor->context;
+	if (impl == NULL) {
+		rv = -SQSH_ERROR_COMPRESSION_FINISHED;
+		goto out;
+	}
 
-	rv = cx_buffer_add_capacity(buffer, &decompressed, max_size);
+	rv = impl->write(context, compressed, compressed_size);
+out:
+	return rv;
+}
+
+int
+sqsh__extractor_finish(struct SqshExtractor *extractor) {
+	const struct SqshExtractorImpl *impl = extractor->impl;
+	sqsh__extractor_context_t *context = &extractor->context;
+	int rv = 0;
+	size_t size = extractor->block_size;
+	if (impl == NULL) {
+		rv = -SQSH_ERROR_COMPRESSION_FINISHED;
+		goto out;
+	}
+
+	rv = impl->finish(context, extractor->target, &size);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = impl->init(&extractor_context, decompressed, max_size);
+	rv = cx_buffer_add_size(extractor->buffer, size);
 	if (rv < 0) {
 		goto out;
 	}
-
-	size = max_size;
-	rv = impl->write(&extractor_context, compressed, compressed_size);
-	if (rv < 0) {
-		/* Make sure we finish the stream even it failed before. */
-		impl->finish(&extractor_context, decompressed, &size);
-		goto out;
-	}
-
-	rv = impl->finish(&extractor_context, decompressed, &size);
-	if (rv < 0) {
-		goto out;
-	}
-
-	if (size > max_size) {
-		rv = -SQSH_ERROR_COMPRESSION_DECOMPRESS;
-		goto out;
-	}
-	rv = cx_buffer_add_size(buffer, size);
-
+	extractor->impl = NULL;
 out:
 	return rv;
 }
 
 int
 sqsh__extractor_cleanup(struct SqshExtractor *extractor) {
+	const struct SqshExtractorImpl *impl = extractor->impl;
+	sqsh__extractor_context_t *context = &extractor->context;
+	int rv = 0;
+	// Make sure we cleanup the compressor in an error case.
+	if (extractor->impl != NULL) {
+		size_t dummy_size = 0;
+		rv = impl->finish(context, extractor->target, &dummy_size);
+	}
 	extractor->impl = NULL;
 	extractor->block_size = 0;
-	return 0;
+	extractor->buffer = NULL;
+	return rv;
 }

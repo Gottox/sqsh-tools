@@ -146,6 +146,8 @@ sqsh_error_str(int error_code) {
 		return "Too many symlinks followed";
 	case SQSH_ERROR_CORRUPTED_DIRECTORY_HEADER:
 		return "Corrupted directory header";
+	case SQSH_ERROR_COMPRESSION_FINISHED:
+		return "Compression already finished";
 	}
 	snprintf(err_str, sizeof(err_str), UNKNOWN_ERROR_FORMAT, error_code);
 	return err_str;

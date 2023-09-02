@@ -46,7 +46,7 @@ struct SqshArchive;
 struct SqshMapReader;
 
 /***************************************
- * extract/extract.c
+ * extract/extractor2.c
  */
 
 /**
@@ -93,6 +93,8 @@ struct SqshExtractor {
 	 */
 	struct CxBuffer *buffer;
 	const struct SqshExtractorImpl *impl;
+	sqsh__extractor_context_t context;
+	uint8_t *target;
 	size_t block_size;
 };
 
@@ -136,9 +138,20 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__extractor_init(
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__extractor_to_buffer(
-		const struct SqshExtractor *extractor, const uint8_t *compressed,
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__extractor_write(
+		struct SqshExtractor *extractor, const uint8_t *compressed,
 		const size_t compressed_size);
+
+/**
+ * @internal
+ * @memberof SqshExtractor
+ * @brief Cleans up a extractor context.
+ *
+ * @param[in] extractor The context to clean up.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+SQSH_NO_EXPORT int sqsh__extractor_finish(struct SqshExtractor *extractor);
 
 /**
  * @internal

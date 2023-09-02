@@ -164,11 +164,13 @@ sqsh__extract_manager_uncompress(
 			goto out;
 		}
 
-		rv = sqsh__extractor_to_buffer(&extractor, data, size);
+		rv = sqsh__extractor_write(&extractor, data, size);
 		if (rv < 0) {
 			cx_buffer_cleanup(&buffer);
 			goto out;
 		}
+
+		rv = sqsh__extractor_finish(&extractor);
 
 		*target = cx_rc_hash_map_put(&manager->hash_map, address, &buffer);
 	}
