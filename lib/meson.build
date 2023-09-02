@@ -18,7 +18,7 @@ libsqsh_sources = files(
     'easy/xattr.c',
     'extract/extract_manager.c',
     'extract/extract_view.c',
-    'extract/extractor2.c',
+    'extract/extractor.c',
     'extract/lz4.c',
     'extract/lzma.c',
     'extract/zlib.c',

@@ -85,9 +85,9 @@ struct SqshExtractorImpl {
 };
 
 /**
- * @brief The SqshExtractor2 struct is used to decompress data.
+ * @brief The SqshExtractor struct is used to decompress data.
  */
-struct SqshExtractor2 {
+struct SqshExtractor {
 	/**
 	 * @privatesection
 	 */
@@ -100,7 +100,7 @@ struct SqshExtractor2 {
 
 /**
  * @internal
- * @memberof SqshExtractor2
+ * @memberof SqshExtractor
  * @brief Returns the extractor implementation for a given id.
  *
  * @param[in]  id   The id of the compression algorithm to use.
@@ -109,11 +109,11 @@ struct SqshExtractor2 {
  * algorithm is not supported.
  */
 SQSH_NO_EXPORT const struct SqshExtractorImpl *
-sqsh__extractor2_impl_from_id(int id);
+sqsh__extractor_impl_from_id(int id);
 
 /**
  * @internal
- * @memberof SqshExtractor2
+ * @memberof SqshExtractor
  * @brief Initializes a extractor context.
  *
  * @param[out] extractor      The context to initialize.
@@ -123,13 +123,13 @@ sqsh__extractor2_impl_from_id(int id);
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__extractor2_init(
-		struct SqshExtractor2 *extractor, struct CxBuffer *buffer,
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__extractor_init(
+		struct SqshExtractor *extractor, struct CxBuffer *buffer,
 		int algorithm_id, size_t block_size);
 
 /**
  * @internal
- * @memberof SqshExtractor2
+ * @memberof SqshExtractor
  * @brief Decompresses data to a buffer.
  *
  * @param[in]     extractor       The extractor context to use.
@@ -138,31 +138,31 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__extractor2_init(
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__extractor2_write(
-		struct SqshExtractor2 *extractor, const uint8_t *compressed,
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__extractor_write(
+		struct SqshExtractor *extractor, const uint8_t *compressed,
 		const size_t compressed_size);
 
 /**
  * @internal
- * @memberof SqshExtractor2
+ * @memberof SqshExtractor
  * @brief Cleans up a extractor context.
  *
  * @param[in] extractor The context to clean up.
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_EXPORT int sqsh__extractor2_finish(struct SqshExtractor2 *extractor);
+SQSH_NO_EXPORT int sqsh__extractor_finish(struct SqshExtractor *extractor);
 
 /**
  * @internal
- * @memberof SqshExtractor2
+ * @memberof SqshExtractor
  * @brief Cleans up a extractor context.
  *
  * @param[in] extractor The context to clean up.
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_EXPORT int sqsh__extractor2_cleanup(struct SqshExtractor2 *extractor);
+SQSH_NO_EXPORT int sqsh__extractor_cleanup(struct SqshExtractor *extractor);
 
 /***************************************
  * extract/extract_manager.c

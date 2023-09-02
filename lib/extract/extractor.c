@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         extractor2.c
+ * @file         extractor.c
  */
 
 #include "../../include/sqsh_extract_private.h"
@@ -41,7 +41,7 @@ const struct SqshExtractorImpl *const __attribute__((weak)) sqsh__impl_lzo =
 		NULL;
 
 const struct SqshExtractorImpl *
-sqsh__extractor2_impl_from_id(int id) {
+sqsh__extractor_impl_from_id(int id) {
 	switch ((enum SqshSuperblockCompressionId)id) {
 	case SQSH_COMPRESSION_GZIP:
 		return sqsh__impl_zlib;
@@ -61,12 +61,12 @@ sqsh__extractor2_impl_from_id(int id) {
 }
 
 int
-sqsh__extractor2_init(
-		struct SqshExtractor2 *extractor, struct CxBuffer *buffer,
+sqsh__extractor_init(
+		struct SqshExtractor *extractor, struct CxBuffer *buffer,
 		int algorithm_id, size_t block_size) {
 	int rv = 0;
 	const struct SqshExtractorImpl *impl =
-			sqsh__extractor2_impl_from_id(algorithm_id);
+			sqsh__extractor_impl_from_id(algorithm_id);
 	if (impl == NULL) {
 		rv = -SQSH_ERROR_COMPRESSION_UNSUPPORTED;
 		goto out;
@@ -89,8 +89,8 @@ out:
 }
 
 int
-sqsh__extractor2_write(
-		struct SqshExtractor2 *extractor, const uint8_t *compressed,
+sqsh__extractor_write(
+		struct SqshExtractor *extractor, const uint8_t *compressed,
 		const size_t compressed_size) {
 	int rv = 0;
 	const struct SqshExtractorImpl *impl = extractor->impl;
@@ -106,7 +106,7 @@ out:
 }
 
 int
-sqsh__extractor2_finish(struct SqshExtractor2 *extractor) {
+sqsh__extractor_finish(struct SqshExtractor *extractor) {
 	const struct SqshExtractorImpl *impl = extractor->impl;
 	sqsh__extractor_context_t *context = &extractor->context;
 	int rv = 0;
@@ -131,7 +131,7 @@ out:
 }
 
 int
-sqsh__extractor2_cleanup(struct SqshExtractor2 *extractor) {
+sqsh__extractor_cleanup(struct SqshExtractor *extractor) {
 	const struct SqshExtractorImpl *impl = extractor->impl;
 	sqsh__extractor_context_t *context = &extractor->context;
 	int rv = 0;

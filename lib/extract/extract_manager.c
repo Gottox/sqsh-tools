@@ -89,7 +89,7 @@ sqsh__extract_manager_init(
 			SQSH_CONFIG_DEFAULT(config->compression_lru_size, 128);
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 
-	if (sqsh__extractor2_impl_from_id(
+	if (sqsh__extractor_impl_from_id(
 				sqsh_superblock_compression_id(superblock)) == NULL) {
 		return -SQSH_ERROR_COMPRESSION_UNSUPPORTED;
 	}
@@ -135,7 +135,7 @@ sqsh__extract_manager_uncompress(
 		struct SqshExtractManager *manager, const struct SqshMapReader *reader,
 		const struct CxBuffer **target) {
 	int rv = 0;
-	struct SqshExtractor2 extractor = {0};
+	struct SqshExtractor extractor = {0};
 	const enum SqshSuperblockCompressionId compression_id =
 			manager->compression_id;
 	const uint32_t block_size = manager->block_size;
@@ -158,26 +158,26 @@ sqsh__extract_manager_uncompress(
 		}
 		const uint8_t *data = sqsh__map_reader_data(reader);
 
-		rv = sqsh__extractor2_init(
+		rv = sqsh__extractor_init(
 				&extractor, &buffer, compression_id, block_size);
 		if (rv < 0) {
 			goto out;
 		}
 
-		rv = sqsh__extractor2_write(&extractor, data, size);
+		rv = sqsh__extractor_write(&extractor, data, size);
 		if (rv < 0) {
 			cx_buffer_cleanup(&buffer);
 			goto out;
 		}
 
-		rv = sqsh__extractor2_finish(&extractor);
+		rv = sqsh__extractor_finish(&extractor);
 
 		*target = cx_rc_hash_map_put(&manager->hash_map, address, &buffer);
 	}
 	rv = cx_lru_touch(&manager->lru, address);
 
 out:
-	sqsh__extractor2_cleanup(&extractor);
+	sqsh__extractor_cleanup(&extractor);
 	sqsh__mutex_unlock(&manager->lock);
 	return rv;
 }
