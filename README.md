@@ -1,8 +1,8 @@
 # libsqsh [![CI](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml/badge.svg)](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml) [![codecov](https://codecov.io/github/Gottox/libsqsh/graph/badge.svg?token=AM5COPDMH0)](https://codecov.io/github/Gottox/libsqsh) [![License](https://img.shields.io/badge/License-BSD_2--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
 
 squashfs is an open and free compressed read-only filesystem. It is used in
-embedded devices, live-CDs, or in packaging. It was original introduced into
-the kernel, but there are multiple user space implementations.
+embedded devices, live-CDs, or in packaging. The original implementation
+resides in the linux kernel, but there are also userspace implementations.
 
 *libsqsh* is a purely 2-Clause BSD Licensed implementation of the squashfs
 filesystem in C11. It covers the complete squashfs feature set, while still
