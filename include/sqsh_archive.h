@@ -84,7 +84,7 @@ const uint8_t *sqsh_trailing_data(const struct SqshTrailingContext *context);
  * @param[in] map The context to use.
  * @param[in] inode_number The inode number to get the reference for.
  *
- * @return The inode reference on success, a negative value on error.
+ * @return The inode reference on success, 0 on error.
  */
 SQSH_NO_UNUSED uint64_t
 sqsh_inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number);
