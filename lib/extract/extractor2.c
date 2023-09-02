@@ -66,7 +66,7 @@ sqsh__extractor2_init(
 		int algorithm_id, size_t block_size) {
 	int rv = 0;
 	const struct SqshExtractorImpl *impl =
-			sqsh__extractor_impl_from_id(algorithm_id);
+			sqsh__extractor2_impl_from_id(algorithm_id);
 	if (impl == NULL) {
 		rv = -SQSH_ERROR_COMPRESSION_UNSUPPORTED;
 		goto out;
