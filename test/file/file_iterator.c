@@ -483,6 +483,38 @@ load_two_zero_blocks(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
+static void
+open_directory_with_file_iterator(void) {
+	int rv;
+	struct SqshArchive archive = {0};
+	struct SqshFile file = {0};
+	uint8_t payload[8192] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			INODE_HEADER(1, 0, 0, 0, 0, 1),
+			INODE_BASIC_DIR(512, 104, 0, 0),
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
+	rv = sqsh__file_init(&file, &archive, inode_ref);
+	assert(rv == 0);
+
+	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_DIRECTORY);
+	assert(sqsh_file_has_fragment(&file) == false);
+
+	struct SqshFileIterator iter = {0};
+	rv = sqsh__file_iterator_init(&iter, &file);
+	assert(rv == -SQSH_ERROR_NOT_A_FILE);
+
+	sqsh__file_iterator_cleanup(&iter);
+	sqsh__file_cleanup(&file);
+	sqsh__archive_cleanup(&archive);
+}
+
 DECLARE_TESTS
 TEST(load_two_segments_from_uncompressed_data_block)
 TEST(load_segment_from_uncompressed_data_block)
@@ -491,4 +523,5 @@ TEST(load_zero_padding)
 TEST(load_zero_big_padding)
 TEST(load_zero_block)
 TEST(load_two_zero_blocks)
+TEST(open_directory_with_file_iterator)
 END_TESTS
