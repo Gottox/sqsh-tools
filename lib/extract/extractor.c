@@ -85,7 +85,7 @@ sqsh__extractor_init(
 	}
 
 out:
-	return 0;
+	return rv;
 }
 
 int
