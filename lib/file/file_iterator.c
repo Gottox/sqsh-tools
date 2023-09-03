@@ -60,11 +60,18 @@ int
 sqsh__file_iterator_init(
 		struct SqshFileIterator *iterator, const struct SqshFile *file) {
 	int rv = 0;
+	enum SqshFileType file_type = sqsh_file_type(file);
+	if (file_type != SQSH_FILE_TYPE_FILE) {
+		rv = -SQSH_ERROR_NOT_A_FILE;
+		goto out;
+	}
+
 	struct SqshArchive *archive = file->archive;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(archive);
 	uint64_t block_address = sqsh_file_blocks_start(file);
 	const uint64_t upper_limit = sqsh_superblock_bytes_used(superblock);
+
 	rv = sqsh__archive_data_extract_manager(
 			archive, &iterator->compression_manager);
 	if (rv < 0) {
