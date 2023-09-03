@@ -171,6 +171,10 @@ sqsh__extract_manager_uncompress(
 		}
 
 		rv = sqsh__extractor_finish(&extractor);
+		if (rv < 0) {
+			cx_buffer_cleanup(&buffer);
+			goto out;
+		}
 
 		*target = cx_rc_hash_map_put(&manager->hash_map, address, &buffer);
 	}
