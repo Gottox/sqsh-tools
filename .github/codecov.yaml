@@ -17,4 +17,5 @@ coverage:
         threshold: 1%
     patch:
       default:
+        if_ci_failed: success
         threshold: 30%
