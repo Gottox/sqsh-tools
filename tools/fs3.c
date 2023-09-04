@@ -271,7 +271,7 @@ fs_readdir(
 	}
 
 	handle->current_stat.st_ino = fs_common_inode_sqsh_to_ino(
-			sqsh_directory_iterator_inode_number(handle->iterator));
+			sqsh_directory_iterator_inode(handle->iterator));
 
 	handle->current_stat.st_mode = fs_common_mode_type(
 			sqsh_directory_iterator_file_type(handle->iterator));
