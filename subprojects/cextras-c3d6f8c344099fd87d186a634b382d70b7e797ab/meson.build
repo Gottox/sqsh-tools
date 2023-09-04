@@ -23,5 +23,5 @@ cextras_dep = declare_dependency(
 subdir('testlib')
 
 if get_option('test')
-    subdir('tests')
+    subdir('test')
 endif

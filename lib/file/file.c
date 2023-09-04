@@ -37,6 +37,7 @@
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_table.h"
 #include "../utils/utils.h"
+#include <cextras/utils.h>
 
 #include "../../include/sqsh_data_private.h"
 #include "../../include/sqsh_tree_private.h"
@@ -514,7 +515,7 @@ sqsh_file_symlink_dup(const struct SqshFile *inode) {
 	const size_t size = sqsh_file_symlink_size(inode);
 	const char *link_target = sqsh_file_symlink(inode);
 
-	return sqsh_memdup(link_target, size);
+	return cx_memdup(link_target, size);
 }
 
 uint32_t

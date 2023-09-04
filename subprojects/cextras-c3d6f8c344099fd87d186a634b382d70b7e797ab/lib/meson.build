@@ -2,7 +2,9 @@ subdir('collection')
 
 subdir('concurrency')
 
-src = [concurrency_src, collection_src]
+subdir('utils')
+
+src = [concurrency_src, collection_src, utils_src]
 
 cextras = static_library(
     'cextras',

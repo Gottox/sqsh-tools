@@ -38,6 +38,7 @@
 #include "../../include/sqsh_error.h"
 #include "../../include/sqsh_file_private.h"
 #include "../utils/utils.h"
+#include <cextras/utils.h>
 
 static uint64_t
 get_upper_limit(const struct SqshSuperblock *superblock) {
@@ -434,14 +435,12 @@ sqsh_directory_iterator_name_dup(const struct SqshDirectoryIterator *iterator) {
 	int size = sqsh_directory_iterator_name_size(iterator);
 	const char *entry_name = sqsh_directory_iterator_name(iterator);
 
-	return sqsh_memdup(entry_name, size);
+	return cx_memdup(entry_name, size);
 }
 
 int
 sqsh__directory_iterator_cleanup(struct SqshDirectoryIterator *iterator) {
-	int rv = 0;
-	rv = sqsh__metablock_reader_cleanup(&iterator->metablock);
-	return rv;
+	return sqsh__metablock_reader_cleanup(&iterator->metablock);
 }
 
 int

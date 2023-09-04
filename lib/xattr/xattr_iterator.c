@@ -36,6 +36,7 @@
 #include "../../include/sqsh_archive.h"
 #include "../../include/sqsh_error.h"
 #include "../utils/utils.h"
+#include <cextras/utils.h>
 
 #ifdef __linux__
 #	include <alloca.h>
@@ -368,7 +369,7 @@ sqsh_xattr_iterator_value_dup(const struct SqshXattrIterator *iterator) {
 	const size_t size = sqsh_xattr_iterator_value_size(iterator);
 	const char *value = sqsh_xattr_iterator_value(iterator);
 
-	return sqsh_memdup(value, size);
+	return cx_memdup(value, size);
 }
 
 const char *
