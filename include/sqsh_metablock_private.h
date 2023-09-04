@@ -105,7 +105,7 @@ sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator, int *err);
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh__metablock_iterator_skip(
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__metablock_iterator_skip(
 		struct SqshMetablockIterator *iterator, sqsh_index_t *offset);
 
 /**
