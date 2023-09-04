@@ -121,7 +121,7 @@ test_file_exists_through_symlink(void) {
 			/* inode */
 			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
 			INODE_HEADER(1, 0, 0, 0, 0, 1),
-			INODE_BASIC_DIR(0, 1024, 0, 0),
+			INODE_BASIC_DIR(0, 37, 0, 0),
 			[INODE_TABLE_OFFSET+2+128] =
 			INODE_HEADER(3, 0, 0, 0, 0, 2),
 			INODE_BASIC_SYMLINK(3),
@@ -145,6 +145,115 @@ test_file_exists_through_symlink(void) {
 	assert(exists);
 	assert(rv == 0);
 
+	exists = sqsh_easy_file_exists(&archive, "/file_not_found", &rv);
+	assert(rv == 0);
+	assert(exists == false);
+
+	sqsh__archive_cleanup(&archive);
+}
+
+static void
+test_file_size(void) {
+	struct SqshArchive archive = {0};
+	int rv = 0;
+	uint8_t payload[] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
+			INODE_HEADER(1, 0, 0, 0, 0, 1),
+			INODE_BASIC_DIR(0, 27, 0, 0),
+			[INODE_TABLE_OFFSET+2+128] =
+			INODE_HEADER(2, 0, 0, 0, 0, 3),
+			INODE_BASIC_FILE(1024, 0xFFFFFFFF, 0, 424242),
+			DATA_BLOCK_REF(8, 0),
+			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			DIRECTORY_HEADER(1, 0, 0),
+			DIRECTORY_ENTRY(128, 2, 2, 4),
+			'f', 'i', 'l', 'e',
+			[FRAGMENT_TABLE_OFFSET] = 0,
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	size_t file_size = sqsh_easy_file_size(&archive, "/file", &rv);
+	assert(rv == 0);
+	assert(file_size == 424242);
+
+	file_size = sqsh_easy_file_size(&archive, "/file_not_found", &rv);
+	assert(rv == -SQSH_ERROR_NO_SUCH_FILE);
+	assert(file_size == 0);
+
+	sqsh__archive_cleanup(&archive);
+}
+
+static void
+test_file_permission(void) {
+	struct SqshArchive archive = {0};
+	int rv = 0;
+	uint8_t payload[] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
+			INODE_HEADER(1, 0, 0, 0, 0, 1),
+			INODE_BASIC_DIR(0, 27, 0, 0),
+			[INODE_TABLE_OFFSET+2+128] =
+			INODE_HEADER(2, 0666, 0, 0, 0, 3),
+			INODE_BASIC_FILE(1024, 0xFFFFFFFF, 0, 424242),
+			DATA_BLOCK_REF(8, 0),
+			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			DIRECTORY_HEADER(1, 0, 0),
+			DIRECTORY_ENTRY(128, 2, 2, 4),
+			'f', 'i', 'l', 'e',
+			[FRAGMENT_TABLE_OFFSET] = 0,
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	mode_t permission = sqsh_easy_file_permission(&archive, "/file", &rv);
+	assert(rv == 0);
+	assert(permission == 0666);
+
+	permission = sqsh_easy_file_permission(&archive, "/file_not_found", &rv);
+	assert(rv == -SQSH_ERROR_NO_SUCH_FILE);
+	assert(permission == 0);
+
+	sqsh__archive_cleanup(&archive);
+}
+
+static void
+test_file_mtime(void) {
+	struct SqshArchive archive = {0};
+	int rv = 0;
+	uint8_t payload[] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
+			INODE_HEADER(1, 0, 0, 0, 0, 1),
+			INODE_BASIC_DIR(0, 27, 0, 0),
+			[INODE_TABLE_OFFSET+2+128] =
+			INODE_HEADER(2, 0666, 0, 0, 42424242, 3),
+			INODE_BASIC_FILE(1024, 0xFFFFFFFF, 0, 424242),
+			DATA_BLOCK_REF(8, 0),
+			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			DIRECTORY_HEADER(1, 0, 0),
+			DIRECTORY_ENTRY(128, 2, 2, 4),
+			'f', 'i', 'l', 'e',
+			[FRAGMENT_TABLE_OFFSET] = 0,
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	time_t mtime = sqsh_easy_file_mtime(&archive, "/file", &rv);
+	assert(rv == 0);
+	assert(mtime == 42424242);
+
+	mtime = sqsh_easy_file_mtime(&archive, "/file_not_found", &rv);
+	assert(rv == -SQSH_ERROR_NO_SUCH_FILE);
+	assert(mtime == 0);
+
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -152,4 +261,7 @@ DECLARE_TESTS
 TEST(test_file_get_content_through_symlink)
 TEST(test_file_exists_through_dead_symlink)
 TEST(test_file_exists_through_symlink)
+TEST(test_file_size)
+TEST(test_file_permission)
+TEST(test_file_mtime)
 END_TESTS
