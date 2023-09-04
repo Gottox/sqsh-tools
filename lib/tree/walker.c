@@ -52,7 +52,7 @@ SQSH_NO_UNUSED int
 update_inode_from_iterator(struct SqshTreeWalker *walker) {
 	// TODO: this should be done from sqsh__file_init.
 	struct SqshDirectoryIterator *iterator = &walker->iterator;
-	uint64_t inode_number = sqsh_directory_iterator_inode_number(iterator);
+	uint32_t inode_number = sqsh_directory_iterator_inode(iterator);
 	uint64_t inode_ref = sqsh_directory_iterator_inode_ref(iterator);
 
 	walker->current_inode_ref = inode_ref;

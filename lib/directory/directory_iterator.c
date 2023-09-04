@@ -75,8 +75,25 @@ load_metablock(
 			&iterator->metablock, archive, start_address, upper_limit);
 }
 
+static struct SqshDataDirectoryEntry *
+get_entry(const struct SqshDirectoryIterator *iterator) {
+	const uint8_t *data = sqsh__metablock_reader_data(&iterator->metablock);
+	return (struct SqshDataDirectoryEntry *)data;
+}
+
+static struct SqshDataDirectoryFragment *
+get_fragment(const struct SqshDirectoryIterator *iterator) {
+	const uint8_t *data = sqsh__metablock_reader_data(&iterator->metablock);
+	return (struct SqshDataDirectoryFragment *)data;
+}
+
 static int
 check_entry_consistency(const struct SqshDirectoryIterator *iterator) {
+	const struct SqshDataDirectoryEntry *entry = get_entry(iterator);
+	uint32_t dummy = 0;
+	const uint32_t inode_base = iterator->inode_base;
+	const uint16_t inode_offset =
+			sqsh__data_directory_entry_inode_offset(entry);
 	const char *name = sqsh_directory_iterator_name(iterator);
 	const size_t name_len = sqsh_directory_iterator_name_size(iterator);
 
@@ -85,6 +102,11 @@ check_entry_consistency(const struct SqshDirectoryIterator *iterator) {
 			return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
 		}
 	}
+
+	if (SQSH_ADD_OVERFLOW(inode_base, inode_offset, &dummy)) {
+		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
+	}
+
 	return 0;
 }
 
@@ -131,18 +153,6 @@ directory_iterator_index_lookup(
 out:
 	sqsh__directory_index_iterator_cleanup(&index_iterator);
 	return rv;
-}
-
-static struct SqshDataDirectoryEntry *
-get_entry(const struct SqshDirectoryIterator *iterator) {
-	const uint8_t *data = sqsh__metablock_reader_data(&iterator->metablock);
-	return (struct SqshDataDirectoryEntry *)data;
-}
-
-static struct SqshDataDirectoryFragment *
-get_fragment(const struct SqshDirectoryIterator *iterator) {
-	const uint8_t *data = sqsh__metablock_reader_data(&iterator->metablock);
-	return (struct SqshDataDirectoryFragment *)data;
 }
 
 int
@@ -240,9 +250,8 @@ sqsh_directory_iterator_inode_ref(
 	return sqsh_address_ref_create(block_index, block_offset);
 }
 
-uint64_t
-sqsh_directory_iterator_inode_number(
-		const struct SqshDirectoryIterator *iterator) {
+uint32_t
+sqsh_directory_iterator_inode(const struct SqshDirectoryIterator *iterator) {
 	const struct SqshDataDirectoryEntry *entry = get_entry(iterator);
 	const uint32_t inode_base = iterator->inode_base;
 	const uint16_t inode_offset =
@@ -277,8 +286,8 @@ static int
 check_file_consistency(
 		const struct SqshDirectoryIterator *iterator,
 		const struct SqshFile *file) {
-	const uint64_t file_inode = sqsh_file_inode(file);
-	const uint64_t iter_inode = sqsh_directory_iterator_inode_number(iterator);
+	const uint32_t file_inode = sqsh_file_inode(file);
+	const uint32_t iter_inode = sqsh_directory_iterator_inode(iterator);
 	if (iter_inode != file_inode) {
 		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
 	}
