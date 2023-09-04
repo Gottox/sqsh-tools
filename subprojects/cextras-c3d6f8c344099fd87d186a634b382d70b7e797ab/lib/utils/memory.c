@@ -26,27 +26,21 @@
  *                                                                            *
  ******************************************************************************/
 
-/**
- * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_primitive_private.h
- */
+#include "../../include/cextras/utils.h"
+#include <pthread.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-#ifndef CEXTRA_ERROR_H
-#define CEXTRA_ERROR_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-enum CxError {
-	CX_SUCCESS,
-	CX_ERR_INTEGER_OVERFLOW,
-	CX_ERR_BUFFER_OVERFLOW,
-	CX_ERR_NOT_FOUND,
-	CX_ERR_ALLOC,
-};
-
-#ifdef __cplusplus
+void *
+cx_memdup(const void *source, size_t size) {
+	if (source == NULL) {
+		return NULL;
+	}
+	void *target = calloc(size + 1, sizeof(uint8_t));
+	if (target == NULL) {
+		return NULL;
+	}
+	return memcpy(target, source, size);
 }
-#endif
-#endif /* CEXTRA_ERROR_H */

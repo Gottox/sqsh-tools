@@ -1,0 +1,40 @@
+name: CodeCov
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+jobs:
+  codecov:
+    name: CodeCov
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Install tools
+      run: |
+        sudo apt update
+        sudo apt install --yes \
+          build-essential \
+          gcovr \
+          meson
+    - name: Configure
+      run: |
+        CC=gcc meson setup build \
+          -Db_coverage=true \
+          -Dwerror=true \
+          -Dtest=true
+    - name: Build
+      run: |
+         meson compile -C build
+    - name: Test
+      run: |
+         MESON_TESTTHREADS=1 meson test -C build
+    - name: Generate Reports
+      run: |
+         ninja -C build coverage-xml
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

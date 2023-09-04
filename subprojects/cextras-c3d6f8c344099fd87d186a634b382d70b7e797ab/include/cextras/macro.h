@@ -28,21 +28,26 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_primitive_private.h
+ * @file         macro.h
  */
 
-#ifndef CEXTRA_TYPES_H
-#define CEXTRA_TYPES_H
-
-#include <stddef.h>
+#ifndef CEXTRA_MACRO_H
+#define CEXTRA_MACRO_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef size_t cx_index_t;
+#define CX_NO_UNUSED __attribute__((warn_unused_result))
+
+#define CX_ADD_OVERFLOW(a, b, result) __builtin_add_overflow(a, b, result)
+#define CX_SUB_OVERFLOW(a, b, result) __builtin_sub_overflow(a, b, result)
+#define CX_MUL_OVERFLOW(a, b, result) __builtin_mul_overflow(a, b, result)
+
+#define CX_MIN(a, b) ((a) < (b) ? (a) : (b))
+#define CX_MAX(a, b) ((a) > (b) ? (a) : (b))
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* CEXTRA_TYPES_H */
+#endif /* CEXTRA_MACRO_H */

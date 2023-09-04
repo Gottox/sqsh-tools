@@ -55,6 +55,9 @@ cx_collect(char ***target, cx_collector_next_t next, void *iterator) {
 	}
 
 	rv = cx_buffer_append(&list, (uint8_t *)&nullptr, sizeof(char *));
+	if (rv < 0) {
+		goto out;
+	}
 	size_t base_size = cx_buffer_size(&list);
 
 	const uint8_t *values_data = cx_buffer_data(&list_values);

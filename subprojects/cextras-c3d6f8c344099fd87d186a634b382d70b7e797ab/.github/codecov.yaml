@@ -1,0 +1,18 @@
+ignore:
+  - "test/"
+  - "testlib/"
+parsers:
+  gcov:
+    branch_detection:
+      conditional: no
+      loop: no
+      method: no
+      macro: no
+coverage:
+  status:
+    project:
+      default:
+        threshold: 1%
+    patch:
+      default:
+        threshold: 30%

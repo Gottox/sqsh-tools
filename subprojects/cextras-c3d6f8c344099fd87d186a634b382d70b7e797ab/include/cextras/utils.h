@@ -31,11 +31,12 @@
  * @file         utils.h
  */
 
-#ifndef SQSH_UTILS_H
-#define SQSH_UTILS_H
+#ifndef CEXTRA_UTILS_H
+#define CEXTRA_UTILS_H
 
-#include "../../include/sqsh_common.h"
-
+#include "macro.h"
+#include "types.h"
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -43,45 +44,9 @@
 extern "C" {
 #endif
 
-#define SQSH_MIN(a, b) ((a) < (b) ? (a) : (b))
-#define SQSH_MAX(a, b) ((a) > (b) ? (a) : (b))
-
-#define SQSH_ADD_OVERFLOW(a, b, res) __builtin_add_overflow(a, b, res)
-#define SQSH_SUB_OVERFLOW(a, b, res) __builtin_sub_overflow(a, b, res)
-#define SQSH_MULT_OVERFLOW(a, b, res) __builtin_mul_overflow(a, b, res)
-
-// Does not work for x == 0
-#define SQSH_DIVIDE_CEIL(x, y) ((x) == 0 ? 0 : (((x)-1) / (y)) + 1)
-#define SQSH_PADDING(x, p) SQSH_DIVIDE_CEIL(x, p) * p
-
-#define SQSH_CONFIG_DEFAULT(x, d) (size_t)(x == 0 ? (d) : SQSH_MAX(x, 0))
-
-SQSH_NO_UNUSED static inline uint64_t
-sqsh_address_ref_outer_offset(uint64_t ref) {
-	return ref >> 16;
-}
-
-SQSH_NO_UNUSED static inline uint16_t
-sqsh_address_ref_inner_offset(uint64_t ref) {
-	return ref & 0xFFFF;
-}
-
-SQSH_NO_UNUSED static inline uint64_t
-sqsh_address_ref_create(uint32_t outer_offset, uint16_t inner_offset) {
-	return ((uint64_t)outer_offset << 16) | inner_offset;
-}
-
-SQSH_NO_UNUSED static inline uint32_t
-sqsh_datablock_size(uint32_t size_info) {
-	return size_info & ~(1 << 24);
-}
-
-SQSH_NO_UNUSED static inline bool
-sqsh_datablock_is_compressed(uint32_t size_info) {
-	return !(size_info & (1 << 24));
-}
+CX_NO_UNUSED void *cx_memdup(const void *source, size_t size);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* end of include guard SQSH_UTILS_H */
+#endif /* CEXTRA_UTILS_H */

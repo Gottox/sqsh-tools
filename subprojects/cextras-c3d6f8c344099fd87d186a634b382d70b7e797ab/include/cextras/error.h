@@ -28,26 +28,25 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_primitive_private.h
+ * @file         error.h
  */
 
-#ifndef CEXTRA_MACRO_H
-#define CEXTRA_MACRO_H
+#ifndef CEXTRA_ERROR_H
+#define CEXTRA_ERROR_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define CX_NO_UNUSED __attribute__((warn_unused_result))
-
-#define CX_ADD_OVERFLOW(a, b, result) __builtin_add_overflow(a, b, result)
-#define CX_SUB_OVERFLOW(a, b, result) __builtin_sub_overflow(a, b, result)
-#define CX_MUL_OVERFLOW(a, b, result) __builtin_mul_overflow(a, b, result)
-
-#define CX_MIN(a, b) ((a) < (b) ? (a) : (b))
-#define CX_MAX(a, b) ((a) > (b) ? (a) : (b))
+enum CxError {
+	CX_SUCCESS,
+	CX_ERR_INTEGER_OVERFLOW,
+	CX_ERR_BUFFER_OVERFLOW,
+	CX_ERR_NOT_FOUND,
+	CX_ERR_ALLOC,
+};
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* CEXTRA_MACRO_H */
+#endif /* CEXTRA_ERROR_H */
