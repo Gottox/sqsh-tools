@@ -119,12 +119,9 @@ sqsh_directory_iterator_inode(const struct SqshDirectoryIterator *iterator);
  * @return The inode number.
  */
 __attribute__((deprecated("Since 1.2.0. Use sqsh_directory_iterator_inode() "
-						  "instead"))) inline uint64_t
+						  "instead"))) uint64_t
 sqsh_directory_iterator_inode_number(
-		const struct SqshDirectoryIterator *iterator) {
-	return sqsh_directory_iterator_inode(iterator);
-}
-
+		const struct SqshDirectoryIterator *iterator);
 /**
  * @memberof SqshDirectoryIterator
  * @brief Retrieves the inode reference of the current entry.

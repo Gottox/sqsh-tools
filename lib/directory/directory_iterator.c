@@ -260,6 +260,12 @@ sqsh_directory_iterator_inode(const struct SqshDirectoryIterator *iterator) {
 	return inode_base + inode_offset;
 }
 
+uint64_t
+sqsh_directory_iterator_inode_number(
+		const struct SqshDirectoryIterator *iterator) {
+	return sqsh_directory_iterator_inode(iterator);
+}
+
 enum SqshFileType
 sqsh_directory_iterator_file_type(
 		const struct SqshDirectoryIterator *iterator) {
