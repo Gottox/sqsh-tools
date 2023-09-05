@@ -56,7 +56,7 @@ update_inode_from_iterator(struct SqshTreeWalker *walker) {
 	uint64_t inode_ref = sqsh_directory_iterator_inode_ref(iterator);
 
 	walker->current_inode_ref = inode_ref;
-	return sqsh_inode_map_set(walker->inode_map, inode_number, inode_ref);
+	return sqsh_inode_map_set2(walker->inode_map, inode_number, inode_ref);
 }
 
 static int
@@ -93,7 +93,7 @@ enter_directory(struct SqshTreeWalker *walker, uint64_t inode_ref) {
 
 	const uint64_t inode_number = sqsh_file_inode(cwd);
 	walker->current_inode_ref = inode_ref;
-	rv = sqsh_inode_map_set(walker->inode_map, inode_number, inode_ref);
+	rv = sqsh_inode_map_set2(walker->inode_map, inode_number, inode_ref);
 
 out:
 	return rv;

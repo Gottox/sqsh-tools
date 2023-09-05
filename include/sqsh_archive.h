@@ -102,7 +102,23 @@ sqsh_inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number);
  * @return The inode reference on success, 0 on error.
  */
 SQSH_NO_UNUSED uint64_t sqsh_inode_map_get2(
-		const struct SqshInodeMap *map, uint64_t inode_number, int *err);
+		const struct SqshInodeMap *map, uint32_t inode_number, int *err);
+
+/**
+ * @deprecated Since 1.2.0. Use sqsh_inode_map_set2() instead.
+ * @memberof SqshInodeMap
+ * @brief Sets the inode reference for a given inode number.
+ *
+ * @param[in] map The context to use.
+ * @param[in] inode_number The inode number to set the reference for.
+ * @param[in] inode_ref The inode reference to set.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+__attribute__((deprecated("Since 1.2.0. Use sqsh_inode_map_set2() "
+						  "instead."))) SQSH_NO_UNUSED int
+sqsh_inode_map_set(
+		struct SqshInodeMap *map, uint64_t inode_number, uint64_t inode_ref);
 
 /**
  * @memberof SqshInodeMap
@@ -114,8 +130,8 @@ SQSH_NO_UNUSED uint64_t sqsh_inode_map_get2(
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_UNUSED int sqsh_inode_map_set(
-		struct SqshInodeMap *map, uint64_t inode_number, uint64_t inode_ref);
+SQSH_NO_UNUSED int sqsh_inode_map_set2(
+		struct SqshInodeMap *map, uint32_t inode_number, uint64_t inode_ref);
 
 /***************************************
  * archive/superblock_context.c

@@ -79,7 +79,7 @@ out:
 
 uint64_t
 sqsh_inode_map_get2(
-		const struct SqshInodeMap *map, uint64_t inode_number, int *err) {
+		const struct SqshInodeMap *map, uint32_t inode_number, int *err) {
 	int rv = 0;
 	uint64_t inode_ref = 0;
 	atomic_uint_fast64_t *inode_refs = map->inode_refs;
@@ -109,14 +109,9 @@ out:
 	return inode_ref;
 }
 
-uint64_t
-sqsh_inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number) {
-	return sqsh_inode_map_get2(map, inode_number, NULL);
-}
-
 int
-sqsh_inode_map_set(
-		struct SqshInodeMap *map, uint64_t inode_number, uint64_t inode_ref) {
+sqsh_inode_map_set2(
+		struct SqshInodeMap *map, uint32_t inode_number, uint64_t inode_ref) {
 	uint64_t old_value;
 	atomic_uint_fast64_t *inode_refs = map->inode_refs;
 
@@ -131,6 +126,17 @@ sqsh_inode_map_set(
 		}
 	}
 	return 0;
+}
+
+uint64_t
+sqsh_inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number) {
+	return sqsh_inode_map_get2(map, inode_number, NULL);
+}
+
+int
+sqsh_inode_map_set(
+		struct SqshInodeMap *map, uint64_t inode_number, uint64_t inode_ref) {
+	return sqsh_inode_map_set2(map, inode_number, inode_ref);
 }
 
 int
