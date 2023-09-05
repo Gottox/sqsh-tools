@@ -109,8 +109,88 @@ insert_invalid_inode_ref(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
+static void
+get_invalid_inode(void) {
+	int rv = 0;
+	uint64_t inode_ref = 4242;
+	uint8_t payload[8192] = {
+			SQSH_HEADER,
+	};
+	struct SqshArchive archive = {0};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	struct SqshInodeMap map = {0};
+
+	rv = sqsh_inode_map_init(&map, &archive);
+	assert(rv == 0);
+
+	inode_ref = sqsh_inode_map_get2(&map, 424242, &rv);
+	assert(rv == -SQSH_ERROR_OUT_OF_BOUNDS);
+	assert(inode_ref == 0);
+
+	inode_ref = sqsh_inode_map_get2(&map, 0, &rv);
+	assert(rv == -SQSH_ERROR_OUT_OF_BOUNDS);
+	assert(inode_ref == 0);
+
+	sqsh_inode_map_cleanup(&map);
+	sqsh__archive_cleanup(&archive);
+}
+
+static void
+get_unknown_inode_ref(void) {
+	int rv = 0;
+	uint64_t inode_ref = 4242;
+	uint8_t payload[8192] = {
+			SQSH_HEADER,
+	};
+	struct SqshArchive archive = {0};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	struct SqshInodeMap map = {0};
+
+	rv = sqsh_inode_map_init(&map, &archive);
+	assert(rv == 0);
+
+	inode_ref = sqsh_inode_map_get2(&map, 1, &rv);
+	assert(rv == -SQSH_ERROR_NO_SUCH_ELEMENT);
+	assert(inode_ref == 0);
+
+	sqsh_inode_map_cleanup(&map);
+	sqsh__archive_cleanup(&archive);
+}
+
+static void
+insert_inconsistent_mapping(void) {
+	int rv = 0;
+	uint8_t payload[8192] = {
+			SQSH_HEADER,
+	};
+	struct SqshArchive archive = {0};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	struct SqshInodeMap map = {0};
+
+	rv = sqsh_inode_map_init(&map, &archive);
+	assert(rv == 0);
+
+	rv = sqsh_inode_map_set(&map, 1, 4242);
+	assert(rv == 0);
+
+	rv = sqsh_inode_map_set(&map, 1, 4242);
+	assert(rv == 0);
+
+	rv = sqsh_inode_map_set(&map, 1, 2424);
+	assert(rv == -SQSH_ERROR_INODE_MAP_IS_INCONSISTENT);
+
+	sqsh_inode_map_cleanup(&map);
+	sqsh__archive_cleanup(&archive);
+}
+
 DECLARE_TESTS
 TEST(insert_inode_ref)
 TEST(insert_invalid_inode)
 TEST(insert_invalid_inode_ref)
+TEST(get_invalid_inode)
+TEST(get_unknown_inode_ref)
+TEST(insert_inconsistent_mapping)
 END_TESTS
