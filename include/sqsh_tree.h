@@ -89,7 +89,6 @@ __attribute__((deprecated("Since 1.2.0. Use sqsh_directory_walker_next2() "
 sqsh_tree_walker_next(struct SqshTreeWalker *walker);
 
 /**
- * @deprecated Since 1.2.0. Use sqsh_tree_walker_next2() instead.
  * @memberof SqshTreeWalker
  * @brief Moves the walker to the next entry int the current directory.
  *
@@ -99,6 +98,7 @@ sqsh_tree_walker_next(struct SqshTreeWalker *walker);
  *
  * @retval true if the walker was moved to the next entry.
  * @retval false if the walker has no more entries to move to or an error
+ * occured.
  */
 SQSH_NO_UNUSED bool
 sqsh_tree_walker_next2(struct SqshTreeWalker *walker, int *err);
