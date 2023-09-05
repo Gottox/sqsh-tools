@@ -153,7 +153,7 @@ fs_lookup(fuse_req_t req, fuse_ino_t parent, const char *name) {
 		goto out;
 	}
 
-	rv = sqsh_inode_map_set(context.inode_map, inode_number, inode_ref);
+	rv = sqsh_inode_map_set2(context.inode_map, inode_number, inode_ref);
 	if (rv < 0) {
 		fuse_reply_err(req, -fs_common_map_err(rv));
 		goto out;

@@ -50,7 +50,7 @@ insert_inode_ref(void) {
 
 	struct SqshInodeMap map = {0};
 
-	rv = sqsh_inode_map_init(&map, &archive);
+	rv = sqsh__inode_map_init(&map, &archive);
 	assert(rv == 0);
 
 	rv = sqsh_inode_map_set(&map, 1, 4242);
@@ -60,7 +60,7 @@ insert_inode_ref(void) {
 	assert(rv == 0);
 	assert(inode_ref == 4242);
 
-	sqsh_inode_map_cleanup(&map);
+	sqsh__inode_map_cleanup(&map);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -75,7 +75,7 @@ insert_invalid_inode(void) {
 
 	struct SqshInodeMap map = {0};
 
-	rv = sqsh_inode_map_init(&map, &archive);
+	rv = sqsh__inode_map_init(&map, &archive);
 	assert(rv == 0);
 
 	rv = sqsh_inode_map_set(&map, 0, 4242);
@@ -84,7 +84,7 @@ insert_invalid_inode(void) {
 	rv = sqsh_inode_map_set(&map, 1000, 4242);
 	assert(rv == -SQSH_ERROR_OUT_OF_BOUNDS);
 
-	sqsh_inode_map_cleanup(&map);
+	sqsh__inode_map_cleanup(&map);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -99,13 +99,13 @@ insert_invalid_inode_ref(void) {
 
 	struct SqshInodeMap map = {0};
 
-	rv = sqsh_inode_map_init(&map, &archive);
+	rv = sqsh__inode_map_init(&map, &archive);
 	assert(rv == 0);
 
 	rv = sqsh_inode_map_set(&map, 1, UINT64_MAX);
 	assert(rv == -SQSH_ERROR_INVALID_ARGUMENT);
 
-	sqsh_inode_map_cleanup(&map);
+	sqsh__inode_map_cleanup(&map);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -121,7 +121,7 @@ get_invalid_inode(void) {
 
 	struct SqshInodeMap map = {0};
 
-	rv = sqsh_inode_map_init(&map, &archive);
+	rv = sqsh__inode_map_init(&map, &archive);
 	assert(rv == 0);
 
 	inode_ref = sqsh_inode_map_get2(&map, 424242, &rv);
@@ -132,7 +132,7 @@ get_invalid_inode(void) {
 	assert(rv == -SQSH_ERROR_OUT_OF_BOUNDS);
 	assert(inode_ref == 0);
 
-	sqsh_inode_map_cleanup(&map);
+	sqsh__inode_map_cleanup(&map);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -148,14 +148,14 @@ get_unknown_inode_ref(void) {
 
 	struct SqshInodeMap map = {0};
 
-	rv = sqsh_inode_map_init(&map, &archive);
+	rv = sqsh__inode_map_init(&map, &archive);
 	assert(rv == 0);
 
 	inode_ref = sqsh_inode_map_get2(&map, 1, &rv);
 	assert(rv == -SQSH_ERROR_NO_SUCH_ELEMENT);
 	assert(inode_ref == 0);
 
-	sqsh_inode_map_cleanup(&map);
+	sqsh__inode_map_cleanup(&map);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -170,7 +170,7 @@ insert_inconsistent_mapping(void) {
 
 	struct SqshInodeMap map = {0};
 
-	rv = sqsh_inode_map_init(&map, &archive);
+	rv = sqsh__inode_map_init(&map, &archive);
 	assert(rv == 0);
 
 	rv = sqsh_inode_map_set(&map, 1, 4242);
@@ -182,7 +182,7 @@ insert_inconsistent_mapping(void) {
 	rv = sqsh_inode_map_set(&map, 1, 2424);
 	assert(rv == -SQSH_ERROR_INODE_MAP_IS_INCONSISTENT);
 
-	sqsh_inode_map_cleanup(&map);
+	sqsh__inode_map_cleanup(&map);
 	sqsh__archive_cleanup(&archive);
 }
 

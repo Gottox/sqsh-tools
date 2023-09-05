@@ -188,7 +188,7 @@ sqsh__file_init(
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh_inode_map_set(inode_map, sqsh_file_inode(inode), inode_ref);
+	rv = sqsh_inode_map_set2(inode_map, sqsh_file_inode(inode), inode_ref);
 
 out:
 	if (rv < 0) {
