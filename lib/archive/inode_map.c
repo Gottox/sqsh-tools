@@ -52,7 +52,7 @@
 // empty inodes without memset()ing the inode map to all `UINT64_MAX`s.
 
 int
-sqsh_inode_map_init(struct SqshInodeMap *map, struct SqshArchive *archive) {
+sqsh__inode_map_init(struct SqshInodeMap *map, struct SqshArchive *archive) {
 	int rv = 0;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 	const uint32_t inode_count = sqsh_superblock_inode_count(superblock);
@@ -140,7 +140,7 @@ sqsh_inode_map_set(
 }
 
 int
-sqsh_inode_map_cleanup(struct SqshInodeMap *map) {
+sqsh__inode_map_cleanup(struct SqshInodeMap *map) {
 	free(map->inode_refs);
 	return 0;
 }

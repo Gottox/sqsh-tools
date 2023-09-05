@@ -112,7 +112,7 @@ struct SqshInodeMap {
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_UNUSED SQSH_NO_EXPORT int
-sqsh_inode_map_init(struct SqshInodeMap *map, struct SqshArchive *archive);
+sqsh__inode_map_init(struct SqshInodeMap *map, struct SqshArchive *archive);
 
 /**
  * @internal
@@ -123,7 +123,7 @@ sqsh_inode_map_init(struct SqshInodeMap *map, struct SqshArchive *archive);
  *
  * @return 0 on success, a negative value on error.
  */
-SQSH_NO_EXPORT int sqsh_inode_map_cleanup(struct SqshInodeMap *map);
+SQSH_NO_EXPORT int sqsh__inode_map_cleanup(struct SqshInodeMap *map);
 
 /***************************************
  * archive/superblock.c

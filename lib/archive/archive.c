@@ -300,7 +300,7 @@ sqsh_archive_inode_map(
 		goto out;
 	}
 	if (!(archive->initialized & INITIALIZED_INODE_MAP)) {
-		rv = sqsh_inode_map_init(&archive->inode_map, archive);
+		rv = sqsh__inode_map_init(&archive->inode_map, archive);
 		if (rv < 0) {
 			goto out;
 		}
@@ -364,7 +364,7 @@ sqsh__archive_cleanup(struct SqshArchive *archive) {
 		sqsh__extract_manager_cleanup(&archive->data_extract_manager);
 	}
 	if (is_initialized(archive, INITIALIZED_INODE_MAP)) {
-		sqsh_inode_map_cleanup(&archive->inode_map);
+		sqsh__inode_map_cleanup(&archive->inode_map);
 	}
 	sqsh__extract_manager_cleanup(&archive->metablock_extract_manager);
 	sqsh__superblock_cleanup(&archive->superblock);
