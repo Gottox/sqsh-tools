@@ -171,24 +171,40 @@ out:
 
 int
 sqsh_tree_walker_next(struct SqshTreeWalker *walker) {
+	int rv = 0;
+	bool has_next = sqsh_tree_walker_next2(walker, &rv);
+	if (rv < 0) {
+		return rv;
+	}
+	return has_next ? 1 : 0;
+}
+
+bool
+sqsh_tree_walker_next2(struct SqshTreeWalker *walker, int *err) {
 	struct SqshDirectoryIterator *iterator = &walker->iterator;
 	int rv = 0;
 	walker->begin_iterator = false;
 
 	bool has_next = sqsh_directory_iterator_next(iterator, &rv);
 	if (rv < 0) {
-		return rv;
+		goto out;
+	}
+	if (has_next != false) {
+		rv = update_inode_from_iterator(walker);
+		if (rv < 0) {
+			goto out;
+		}
 	}
 
-	if (has_next == false) {
-		return 0;
-	} else {
-		rv = update_inode_from_iterator(walker);
+out:
+	if (err != NULL) {
+		*err = rv;
 	}
 	if (rv < 0) {
-		return rv;
+		return false;
+	} else {
+		return has_next;
 	}
-	return 1;
 }
 
 enum SqshFileType
