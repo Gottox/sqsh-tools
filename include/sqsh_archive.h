@@ -77,7 +77,7 @@ const uint8_t *sqsh_trailing_data(const struct SqshTrailingContext *context);
  */
 
 /**
- * @internal
+ * @deprecated Since 1.2.0. Use sqsh_inode_map_get2() instead.
  * @memberof SqshInodeMap
  * @brief Gets the inode reference for a given inode number.
  *
@@ -86,11 +86,25 @@ const uint8_t *sqsh_trailing_data(const struct SqshTrailingContext *context);
  *
  * @return The inode reference on success, 0 on error.
  */
-SQSH_NO_UNUSED uint64_t
+__attribute__((deprecated("Since 1.2.0. Use sqsh_inode_map_get2() "
+						  "instead."))) SQSH_NO_UNUSED uint64_t
 sqsh_inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number);
 
 /**
- * @internal
+ * @memberof SqshInodeMap
+ * @brief Gets the inode reference for a given inode number.
+ *
+ * @param[in]  map           The context to use.
+ * @param[in]  inode_number  The inode number to get the reference for.
+ * @param[out] err           Pointer to an int where the error code will be
+ * stored.
+ *
+ * @return The inode reference on success, 0 on error.
+ */
+SQSH_NO_UNUSED uint64_t sqsh_inode_map_get2(
+		const struct SqshInodeMap *map, uint64_t inode_number, int *err);
+
+/**
  * @memberof SqshInodeMap
  * @brief Sets the inode reference for a given inode number.
  *

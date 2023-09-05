@@ -60,7 +60,7 @@ struct fuse_cmdline_opts fuse_options = {0};
 struct SqshfsOptions options = {0};
 
 static uint64_t
-fs_common_context_inode_ref(fuse_ino_t fuse_inode) {
+fs_common_context_inode_ref(fuse_ino_t fuse_inode, int *err) {
 	uint64_t sqsh_inode = fs_common_inode_sqsh_from_ino(fuse_inode);
 	struct SqshArchive *archive = context.archive;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
@@ -69,7 +69,7 @@ fs_common_context_inode_ref(fuse_ino_t fuse_inode) {
 		return sqsh_superblock_inode_root_ref(superblock);
 	}
 
-	return sqsh_inode_map_get(context.inode_map, sqsh_inode);
+	return sqsh_inode_map_get2(context.inode_map, sqsh_inode, err);
 }
 
 static struct FsDirHandle *
@@ -88,7 +88,10 @@ fs_init(void *userdata, struct fuse_conn_info *conn) {
 
 static struct SqshFile *
 fs_file_open(fuse_ino_t ino, int *err) {
-	const uint64_t inode_ref = fs_common_context_inode_ref(ino);
+	const uint64_t inode_ref = fs_common_context_inode_ref(ino, err);
+	if (*err < 0) {
+		return NULL;
+	}
 	return sqsh_open_by_ref(context.archive, inode_ref, err);
 }
 

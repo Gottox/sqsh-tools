@@ -157,8 +157,12 @@ sqsh_tree_walker_up(struct SqshTreeWalker *walker) {
 		rv = -SQSH_ERROR_CORRUPTED_INODE;
 		goto out;
 	}
+
 	const uint64_t parent_inode_ref =
-			sqsh_inode_map_get(walker->inode_map, parent_inode);
+			sqsh_inode_map_get2(walker->inode_map, parent_inode, &rv);
+	if (rv < 0) {
+		goto out;
+	}
 
 	rv = enter_directory(walker, parent_inode_ref);
 	if (rv < 0) {

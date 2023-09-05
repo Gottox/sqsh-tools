@@ -39,6 +39,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define EMPTY_INODE_REF UINT64_MAX
+
+// Funfact: In older versions of this library, the inode map used `0` as the
+// sentinal value for empty inodes. It turned out that this was a bad idea,
+// because `0` is a valid inode_ref (even if it is an invalid inode number
+// though).
+//
+// We fixed this by not storing the inode_ref directly, but instead storing the
+// complement of the inode_ref. This way, we can use `0` as a inode_ref and
+// still have `UINT64_MAX` - an unlikely inode_ref - as the sentinal value for
+// empty inodes without memset()ing the inode map to all `UINT64_MAX`s.
+
 int
 sqsh_inode_map_init(struct SqshInodeMap *map, struct SqshArchive *archive) {
 	int rv = 0;
@@ -64,38 +76,57 @@ sqsh_inode_map_init(struct SqshInodeMap *map, struct SqshArchive *archive) {
 out:
 	return rv;
 }
+
 uint64_t
-sqsh_inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number) {
-	int rv;
+sqsh_inode_map_get2(
+		const struct SqshInodeMap *map, uint64_t inode_number, int *err) {
+	int rv = 0;
 	uint64_t inode_ref = 0;
 	atomic_uint_fast64_t *inode_refs = map->inode_refs;
-	if (inode_number - 1 >= map->inode_count) {
-		return 0;
-	} else if (inode_number == 0) {
-		return 0;
+
+	if (inode_number == 0 || inode_number - 1 >= map->inode_count) {
+		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
+		goto out;
 	} else if (map->export_table != NULL) {
 		rv = sqsh_export_table_resolve_inode(
 				map->export_table, inode_number, &inode_ref);
 		if (rv < 0) {
-			return 0;
+			goto out;
 		}
 	} else {
-		inode_ref = atomic_load(&inode_refs[inode_number - 1]);
+		inode_ref = ~atomic_load(&inode_refs[inode_number - 1]);
+		if (inode_ref == EMPTY_INODE_REF) {
+			rv = -SQSH_ERROR_NO_SUCH_ELEMENT;
+			inode_ref = 0;
+			goto out;
+		}
+	}
+
+out:
+	if (err != NULL) {
+		*err = rv;
 	}
 	return inode_ref;
+}
+
+uint64_t
+sqsh_inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number) {
+	return sqsh_inode_map_get2(map, inode_number, NULL);
 }
 
 int
 sqsh_inode_map_set(
 		struct SqshInodeMap *map, uint64_t inode_number, uint64_t inode_ref) {
-	uint_fast64_t old_value;
+	uint64_t old_value;
 	atomic_uint_fast64_t *inode_refs = map->inode_refs;
 
-	if (inode_number - 1 >= map->inode_count) {
+	if (inode_ref == EMPTY_INODE_REF) {
+		return -SQSH_ERROR_INVALID_ARGUMENT;
+	} else if (inode_number == 0 || inode_number - 1 >= map->inode_count) {
 		return -SQSH_ERROR_OUT_OF_BOUNDS;
 	} else if (inode_number != 0 && map->export_table == NULL) {
-		old_value = atomic_exchange(&inode_refs[inode_number - 1], inode_ref);
-		if (old_value != 0 && old_value != inode_ref) {
+		old_value = ~atomic_exchange(&inode_refs[inode_number - 1], ~inode_ref);
+		if (old_value != EMPTY_INODE_REF && old_value != inode_ref) {
 			return -SQSH_ERROR_INODE_MAP_IS_INCONSISTENT;
 		}
 	}
