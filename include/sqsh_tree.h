@@ -73,14 +73,35 @@ sqsh_tree_walker_new(struct SqshArchive *archive, int *err);
 SQSH_NO_UNUSED int sqsh_tree_walker_up(struct SqshTreeWalker *walker);
 
 /**
- * @brief Moves the walker to the next entry int the current directory.
+ * @deprecated Since 1.2.0. Use sqsh_tree_walker_next2() instead.
  * @memberof SqshTreeWalker
+ * @brief Moves the walker to the next entry int the current directory.
+ *
+ * This function was deprecated to align the API with other iterator APIs. The
+ * `sqsh_tree_walker_next2()` uses the same signature as the other iterator.
  *
  * @param[in,out]   walker  The walker to use
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh_tree_walker_next(struct SqshTreeWalker *walker);
+__attribute__((deprecated("Since 1.2.0. Use sqsh_directory_walker_next2() "
+						  "instead."))) SQSH_NO_UNUSED int
+sqsh_tree_walker_next(struct SqshTreeWalker *walker);
+
+/**
+ * @deprecated Since 1.2.0. Use sqsh_tree_walker_next2() instead.
+ * @memberof SqshTreeWalker
+ * @brief Moves the walker to the next entry int the current directory.
+ *
+ * @param[in,out]   walker  The walker to use
+ * @param[out]      err     Pointer to an int where the error code will be
+ * stored.
+ *
+ * @retval true if the walker was moved to the next entry.
+ * @retval false if the walker has no more entries to move to or an error
+ */
+SQSH_NO_UNUSED bool
+sqsh_tree_walker_next2(struct SqshTreeWalker *walker, int *err);
 
 /**
  * @brief Returns the inode type of the current entry.

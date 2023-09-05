@@ -326,6 +326,61 @@ walker_next(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
+static void
+walker_next2(void) {
+	int rv;
+	struct SqshArchive archive = {0};
+	uint8_t payload[] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
+			INODE_HEADER(1, 0, 0, 0, 0, 1),
+			INODE_BASIC_DIR(0, 45, 0, 0),
+
+			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			DIRECTORY_HEADER(3, 0, 0),
+			DIRECTORY_ENTRY(128, 2, 1, 2),
+			'e', '1',
+			DIRECTORY_ENTRY(128, 2, 1, 2),
+			'e', '2',
+			DIRECTORY_ENTRY(128, 2, 1, 2),
+			'e', '3',
+			[FRAGMENT_TABLE_OFFSET] = 0,
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	struct SqshTreeWalker walker = {0};
+	rv = sqsh__tree_walker_init(&walker, &archive);
+	assert(rv == 0);
+
+	rv = sqsh_tree_walker_to_root(&walker);
+	assert(rv == 0);
+
+	bool has_next = sqsh_tree_walker_next2(&walker, &rv);
+	assert(rv == 0);
+	assert(has_next);
+
+	has_next = sqsh_tree_walker_next2(&walker, &rv);
+	assert(rv == 0);
+	assert(has_next);
+
+	has_next = sqsh_tree_walker_next2(&walker, &rv);
+	assert(rv == 0);
+	assert(has_next);
+
+	has_next = sqsh_tree_walker_next2(&walker, &rv);
+	assert(rv == 0);
+	assert(has_next == false);
+
+	rv = sqsh_tree_walker_next2(&walker, &rv);
+	assert(rv == 0);
+
+	sqsh__tree_walker_cleanup(&walker);
+	sqsh__archive_cleanup(&archive);
+}
+
 DECLARE_TESTS
 TEST(walker_symlink_open)
 TEST(walker_symlink_recursion)
@@ -334,4 +389,5 @@ TEST(walker_directory_enter)
 TEST(walker_uninitialized_down)
 TEST(walker_uninitialized_up)
 TEST(walker_next)
+TEST(walker_next2)
 END_TESTS
