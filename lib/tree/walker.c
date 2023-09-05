@@ -183,8 +183,12 @@ sqsh_tree_walker_next(struct SqshTreeWalker *walker) {
 	if (has_next == false) {
 		return 0;
 	} else {
-		return update_inode_from_iterator(walker);
+		rv = update_inode_from_iterator(walker);
 	}
+	if (rv < 0) {
+		return rv;
+	}
+	return 1;
 }
 
 enum SqshFileType
