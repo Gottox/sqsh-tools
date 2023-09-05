@@ -28,7 +28,7 @@ a command-line interface and a C library interface.
 
 * **High-Level API**: The high-level API provides easy-to-use functions to
   access the contents of a to the contents of a squashfs archive. It is designed
-  for ease of use and interface to the squashfs archive.
+  to be easy to use and fast to develop with.
 
 * **Low-Level API**: The low-level API provides zero-copy interfaces to the 
   squashfs archive. It is designed to be both memory and CPU efficient.
