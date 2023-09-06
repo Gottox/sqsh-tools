@@ -51,7 +51,7 @@ struct SqshArchive;
 struct SqshTreeWalker;
 
 /**
- * @brief Initializes a SqshTreeWalker struct.
+ * @brief Creates a new SqshTreeWalker object at the root inode.
  * @memberof SqshTreeWalker
  *
  * @param[in]   archive  The archive to use
@@ -206,8 +206,11 @@ SQSH_NO_UNUSED struct SqshFile *
 sqsh_tree_walker_open_file(const struct SqshTreeWalker *walker, int *err);
 
 /**
- * @brief Resolve a path with the tree walker.
  * @memberof SqshTreeWalker
+ * @brief Resolve a path with the tree walker.
+ *
+ * This function will resolve the given path with the tree walker. The base is
+ * the current directory.
  *
  * @param[in,out]   walker           The walker to use
  * @param[in]       path             The path to resolve.
