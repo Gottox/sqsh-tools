@@ -52,7 +52,7 @@ advance_once(void) {
 	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_reader_init(
-			&cursor, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&cursor, &sqsh, sizeof(struct SqshDataSuperblock), sizeof(payload));
 	assert(rv == 0);
 
 	rv = sqsh__metablock_reader_advance(&cursor, 0, 4);

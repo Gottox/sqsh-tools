@@ -74,13 +74,15 @@ sqsh__superblock_init(
 	int rv = 0;
 	memset(superblock, 0, sizeof(*superblock));
 
-	if (sqsh__map_manager_size(map_manager) < SQSH_SIZEOF_SUPERBLOCK) {
+	if (sqsh__map_manager_size(map_manager) <
+		sizeof(struct SqshDataSuperblock)) {
 		rv = -SQSH_ERROR_SUPERBLOCK_TOO_SMALL;
 		goto out;
 	}
 
 	rv = sqsh__map_reader_init(
-			&superblock->cursor, map_manager, 0, SQSH_SIZEOF_SUPERBLOCK);
+			&superblock->cursor, map_manager, 0,
+			sizeof(struct SqshDataSuperblock));
 	if (rv < 0) {
 		goto out;
 	}

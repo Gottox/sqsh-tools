@@ -53,7 +53,8 @@ decompress(void) {
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(&archive);
 	struct SqshMapReader reader = {0};
 	rv = sqsh__map_reader_init(
-			&reader, map_manager, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&reader, map_manager, sizeof(struct SqshDataSuperblock),
+			sizeof(payload));
 	assert(rv == 0);
 
 	rv = sqsh__map_reader_advance(&reader, 0, CHUNK_SIZE(ZLIB_ABCD));
@@ -88,7 +89,8 @@ decompress_and_cached(void) {
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(&archive);
 	struct SqshMapReader reader = {0};
 	rv = sqsh__map_reader_init(
-			&reader, map_manager, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&reader, map_manager, sizeof(struct SqshDataSuperblock),
+			sizeof(payload));
 	assert(rv == 0);
 
 	rv = sqsh__map_reader_advance(&reader, 0, CHUNK_SIZE(ZLIB_ABCD));

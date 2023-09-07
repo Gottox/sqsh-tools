@@ -434,8 +434,6 @@ sqsh__data_metablock_size(const struct SqshDataMetablock *metablock);
  * data/superblock_data.c
  */
 
-#define SQSH_SIZEOF_SUPERBLOCK 96
-
 #define SQSH_SUPERBLOCK_MAGIC 0x73717368
 
 struct SQSH_UNALIGNED SqshDataSuperblock {
@@ -459,7 +457,6 @@ struct SQSH_UNALIGNED SqshDataSuperblock {
 	uint64_t fragment_table_start;
 	uint64_t export_table_start;
 };
-SQSH_STATIC_ASSERT(sizeof(struct SqshDataSuperblock) == SQSH_SIZEOF_SUPERBLOCK);
 
 SQSH_NO_EXPORT uint32_t
 sqsh__data_superblock_magic(const struct SqshDataSuperblock *superblock);

@@ -68,7 +68,8 @@ get_data_segment_size(const struct SqshSuperblock *superblock) {
 	 * compression options. This is not a problem for the current implementation
 	 * as this size is only used for finding upper limits for the extract
 	 * manager. */
-	if (SQSH_SUB_OVERFLOW(inode_table_start, SQSH_SIZEOF_SUPERBLOCK, &res)) {
+	if (SQSH_SUB_OVERFLOW(
+				inode_table_start, sizeof(struct SqshDataSuperblock), &res)) {
 		return inode_table_start;
 	}
 	return res;
