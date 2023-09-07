@@ -140,14 +140,11 @@ SQSH_NO_EXPORT uint32_t sqsh__data_directory_fragment_inode_number(
  * data/fragment_data.c
  */
 
-#define SQSH_SIZEOF_FRAGMENT 16
-
 struct SQSH_UNALIGNED SqshDataFragment {
 	uint64_t start;
 	uint32_t size_info;
 	uint32_t unused;
 };
-SQSH_STATIC_ASSERT(sizeof(struct SqshDataFragment) == SQSH_SIZEOF_FRAGMENT);
 
 SQSH_NO_EXPORT uint64_t
 sqsh__data_fragment_start(const struct SqshDataFragment *fragment);

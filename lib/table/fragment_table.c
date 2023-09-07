@@ -45,7 +45,8 @@ sqsh__fragment_table_init(
 	const uint16_t count = sqsh_superblock_fragment_entry_count(superblock);
 
 	return sqsh__table_init(
-			&table->table, sqsh, table_start, SQSH_SIZEOF_FRAGMENT, count);
+			&table->table, sqsh, table_start, sizeof(struct SqshDataFragment),
+			count);
 }
 
 int

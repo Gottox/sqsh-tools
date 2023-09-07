@@ -118,7 +118,8 @@ sqsh__fragment_view_init(
 	struct SqshFragmentTable *table = NULL;
 
 	int rv = 0;
-	struct SqshDataFragment *fragment_info = alloca(SQSH_SIZEOF_FRAGMENT);
+	struct SqshDataFragment *fragment_info =
+			alloca(sizeof(struct SqshDataFragment));
 
 	rv = sqsh_archive_fragment_table(archive, &table);
 	if (rv < 0) {
