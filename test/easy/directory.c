@@ -37,7 +37,7 @@
 
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_easy.h"
-#include "../../lib/utils/utils.h"
+#include "../../lib/read/utils/utils.h"
 
 static void
 list_two_files(void) {

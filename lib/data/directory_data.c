@@ -33,7 +33,7 @@
 
 #define _DEFAULT_SOURCE
 
-#include "../../include/sqsh_data_private.h"
+#include "../../../include/sqsh_data_private.h"
 
 #include <cextras/endian_compat.h>
 
@@ -45,7 +45,7 @@ sqsh__data_directory_entry_offset(const struct SqshDataDirectoryEntry *entry) {
 int16_t
 sqsh__data_directory_entry_inode_offset(
 		const struct SqshDataDirectoryEntry *entry) {
-	return le16toh(entry->inode_offset);
+	return (int16_t)le16toh((uint16_t)entry->inode_offset);
 }
 
 uint16_t

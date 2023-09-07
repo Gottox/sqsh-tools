@@ -39,7 +39,7 @@
 #include "../../include/sqsh_data_private.h"
 #include "../../include/sqsh_directory.h"
 #include "../../include/sqsh_directory_private.h"
-#include "../../lib/utils/utils.h"
+#include "../../lib/read/utils/utils.h"
 
 static void
 iter_invalid_file_name_with_0(void) {

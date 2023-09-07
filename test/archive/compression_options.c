@@ -36,7 +36,7 @@
 #include <testlib.h>
 
 #include "../../include/sqsh_archive_private.h"
-#include "../../lib/utils/utils.h"
+#include "../../lib/read/utils/utils.h"
 
 #define GZIP_OPTIONS(level, winsize, strategy) \
 	UINT32_BYTES(level), UINT16_BYTES(winsize), UINT16_BYTES(strategy)

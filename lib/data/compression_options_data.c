@@ -33,7 +33,7 @@
 
 #define _DEFAULT_SOURCE
 
-#include "../../include/sqsh_data_private.h"
+#include "../../../include/sqsh_data_private.h"
 
 #include <cextras/endian_compat.h>
 
