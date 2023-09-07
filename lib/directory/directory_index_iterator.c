@@ -38,8 +38,8 @@
 
 #include <stdlib.h>
 
-static const uint64_t INODE_HEADER_SIZE =
-		SQSH_SIZEOF_INODE_HEADER + SQSH_SIZEOF_INODE_DIRECTORY_EXT;
+static const uint64_t INODE_HEADER_SIZE = sizeof(struct SqshDataInodeHeader) +
+		sizeof(struct SqshDataInodeDirectoryExt);
 
 static const struct SqshDataInodeDirectoryIndex *
 get_directory_index(const struct SqshDirectoryIndexIterator *iterator) {
@@ -102,7 +102,7 @@ sqsh__directory_index_iterator_next(
 	iterator->remaining_entries--;
 
 	/* Make sure next entry is loaded: */
-	size = SQSH_SIZEOF_INODE_DIRECTORY_INDEX;
+	size = sizeof(struct SqshDataInodeDirectoryIndex);
 	rv = sqsh__metablock_reader_advance(
 			&iterator->file.metablock, iterator->next_offset, size);
 	if (rv < 0) {

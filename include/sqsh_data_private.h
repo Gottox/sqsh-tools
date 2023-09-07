@@ -158,20 +158,6 @@ sqsh__data_fragment_size_info(const struct SqshDataFragment *fragment);
  * data/inode_data.c
  */
 
-#define SQSH_SIZEOF_INODE_DIRECTORY_INDEX 12
-#define SQSH_SIZEOF_INODE_DIRECTORY 16
-#define SQSH_SIZEOF_INODE_DIRECTORY_EXT 24
-#define SQSH_SIZEOF_INODE_FILE 16
-#define SQSH_SIZEOF_INODE_FILE_EXT 40
-#define SQSH_SIZEOF_INODE_SYMLINK 8
-#define SQSH_SIZEOF_INODE_SYMLINK_EXT 8
-#define SQSH_SIZEOF_INODE_SYMLINK_EXT_TAIL 4
-#define SQSH_SIZEOF_INODE_DEVICE 8
-#define SQSH_SIZEOF_INODE_DEVICE_EXT 12
-#define SQSH_SIZEOF_INODE_IPC 4
-#define SQSH_SIZEOF_INODE_IPC_EXT 8
-#define SQSH_SIZEOF_INODE_HEADER 16
-
 enum SqshDataInodeType {
 	SQSH_INODE_TYPE_BASIC_DIRECTORY = 1,
 	SQSH_INODE_TYPE_BASIC_FILE = 2,
@@ -195,9 +181,6 @@ struct SQSH_UNALIGNED SqshDataInodeDirectoryIndex {
 	uint32_t name_size;
 	/* uint8_t name[0]; // [name_size + 1] */
 };
-SQSH_STATIC_ASSERT(
-		sizeof(struct SqshDataInodeDirectoryIndex) ==
-		SQSH_SIZEOF_INODE_DIRECTORY_INDEX);
 
 struct SQSH_UNALIGNED SqshDataInodeDirectory {
 	uint32_t block_start;
@@ -206,8 +189,6 @@ struct SQSH_UNALIGNED SqshDataInodeDirectory {
 	uint16_t block_offset;
 	uint32_t parent_inode_number;
 };
-SQSH_STATIC_ASSERT(
-		sizeof(struct SqshDataInodeDirectory) == SQSH_SIZEOF_INODE_DIRECTORY);
 
 struct SQSH_UNALIGNED SqshDataInodeDirectoryExt {
 	uint32_t hard_link_count;
@@ -219,9 +200,6 @@ struct SQSH_UNALIGNED SqshDataInodeDirectoryExt {
 	uint32_t xattr_idx;
 	/* struct SqshDataInodeDirectoryIndex index[0]; // [index_count] */
 };
-SQSH_STATIC_ASSERT(
-		sizeof(struct SqshDataInodeDirectoryExt) ==
-		SQSH_SIZEOF_INODE_DIRECTORY_EXT);
 
 struct SQSH_UNALIGNED SqshDataInodeFile {
 	uint32_t blocks_start;
@@ -230,7 +208,6 @@ struct SQSH_UNALIGNED SqshDataInodeFile {
 	uint32_t file_size;
 	/* uint32_t block_sizes[0]; */
 };
-SQSH_STATIC_ASSERT(sizeof(struct SqshDataInodeFile) == SQSH_SIZEOF_INODE_FILE);
 
 struct SQSH_UNALIGNED SqshDataInodeFileExt {
 	uint64_t blocks_start;
@@ -242,59 +219,42 @@ struct SQSH_UNALIGNED SqshDataInodeFileExt {
 	uint32_t xattr_idx;
 	/* uint32_t block_sizes[0]; */
 };
-SQSH_STATIC_ASSERT(
-		sizeof(struct SqshDataInodeFileExt) == SQSH_SIZEOF_INODE_FILE_EXT);
 
 struct SQSH_UNALIGNED SqshDataInodeSymlink {
 	uint32_t hard_link_count;
 	uint32_t target_size;
 	/* uint8_t target_path[0]; // [target_size] */
 };
-SQSH_STATIC_ASSERT(
-		sizeof(struct SqshDataInodeSymlink) == SQSH_SIZEOF_INODE_SYMLINK);
 
 struct SQSH_UNALIGNED SqshDataInodeSymlinkExt {
 	uint32_t hard_link_count;
 	uint32_t target_size;
 	/* uint8_t target_path[0]; // [target_size] */
 };
-SQSH_STATIC_ASSERT(
-		sizeof(struct SqshDataInodeSymlinkExt) ==
-		SQSH_SIZEOF_INODE_SYMLINK_EXT);
 
 struct SQSH_UNALIGNED SqshDataInodeSymlinkExtTail {
 	uint32_t xattr_idx;
 };
-SQSH_STATIC_ASSERT(
-		sizeof(struct SqshDataInodeSymlinkExtTail) ==
-		SQSH_SIZEOF_INODE_SYMLINK_EXT_TAIL);
 
 struct SQSH_UNALIGNED SqshDataInodeDevice {
 	uint32_t hard_link_count;
 	uint32_t device;
 };
-SQSH_STATIC_ASSERT(
-		sizeof(struct SqshDataInodeDevice) == SQSH_SIZEOF_INODE_DEVICE);
 
 struct SQSH_UNALIGNED SqshDataInodeDeviceExt {
 	uint32_t hard_link_count;
 	uint32_t device;
 	uint32_t xattr_idx;
 };
-SQSH_STATIC_ASSERT(
-		sizeof(struct SqshDataInodeDeviceExt) == SQSH_SIZEOF_INODE_DEVICE_EXT);
 
 struct SQSH_UNALIGNED SqshDataInodeIpc {
 	uint32_t hard_link_count;
 };
-SQSH_STATIC_ASSERT(sizeof(struct SqshDataInodeIpc) == SQSH_SIZEOF_INODE_IPC);
 
 struct SQSH_UNALIGNED SqshDataInodeIpcExt {
 	uint32_t hard_link_count;
 	uint32_t xattr_idx;
 };
-SQSH_STATIC_ASSERT(
-		sizeof(struct SqshDataInodeIpcExt) == SQSH_SIZEOF_INODE_IPC_EXT);
 
 struct SQSH_UNALIGNED SqshDataInodeHeader {
 	uint16_t type;
@@ -304,8 +264,6 @@ struct SQSH_UNALIGNED SqshDataInodeHeader {
 	uint32_t modified_time;
 	uint32_t inode_number;
 };
-SQSH_STATIC_ASSERT(
-		sizeof(struct SqshDataInodeHeader) == SQSH_SIZEOF_INODE_HEADER);
 
 struct SQSH_UNALIGNED SqshDataInode {
 	struct SqshDataInodeHeader header;

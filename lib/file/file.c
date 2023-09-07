@@ -51,44 +51,44 @@ get_inode(const struct SqshFile *inode) {
 static int
 inode_load(struct SqshFile *context) {
 	int rv = 0;
-	size_t size = SQSH_SIZEOF_INODE_HEADER;
+	size_t size = sizeof(struct SqshDataInodeHeader);
 
 	const struct SqshDataInode *inode = get_inode(context);
 	const enum SqshDataInodeType type = sqsh__data_inode_type(inode);
 	switch (type) {
 	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
-		size += SQSH_SIZEOF_INODE_DIRECTORY;
+		size += sizeof(struct SqshDataInodeDirectory);
 		break;
 	case SQSH_INODE_TYPE_BASIC_FILE:
-		size += SQSH_SIZEOF_INODE_FILE;
+		size += sizeof(struct SqshDataInodeFile);
 		break;
 	case SQSH_INODE_TYPE_BASIC_SYMLINK:
-		size += SQSH_SIZEOF_INODE_SYMLINK;
+		size += sizeof(struct SqshDataInodeSymlink);
 		break;
 	case SQSH_INODE_TYPE_BASIC_BLOCK:
 	case SQSH_INODE_TYPE_BASIC_CHAR:
-		size += SQSH_SIZEOF_INODE_DEVICE;
+		size += sizeof(struct SqshDataInodeDevice);
 		break;
 	case SQSH_INODE_TYPE_BASIC_FIFO:
 	case SQSH_INODE_TYPE_BASIC_SOCKET:
-		size += SQSH_SIZEOF_INODE_IPC;
+		size += sizeof(struct SqshDataInodeIpc);
 		break;
 	case SQSH_INODE_TYPE_EXTENDED_DIRECTORY:
-		size += SQSH_SIZEOF_INODE_DIRECTORY_EXT;
+		size += sizeof(struct SqshDataInodeDirectoryExt);
 		break;
 	case SQSH_INODE_TYPE_EXTENDED_FILE:
-		size += SQSH_SIZEOF_INODE_FILE_EXT;
+		size += sizeof(struct SqshDataInodeFileExt);
 		break;
 	case SQSH_INODE_TYPE_EXTENDED_SYMLINK:
-		size += SQSH_SIZEOF_INODE_SYMLINK_EXT;
+		size += sizeof(struct SqshDataInodeSymlinkExt);
 		break;
 	case SQSH_INODE_TYPE_EXTENDED_BLOCK:
 	case SQSH_INODE_TYPE_EXTENDED_CHAR:
-		size += SQSH_SIZEOF_INODE_DEVICE_EXT;
+		size += sizeof(struct SqshDataInodeDeviceExt);
 		break;
 	case SQSH_INODE_TYPE_EXTENDED_FIFO:
 	case SQSH_INODE_TYPE_EXTENDED_SOCKET:
-		size += SQSH_SIZEOF_INODE_IPC_EXT;
+		size += sizeof(struct SqshDataInodeIpcExt);
 		break;
 	default:
 		return -SQSH_ERROR_UNKNOWN_FILE_TYPE;
@@ -172,7 +172,8 @@ sqsh__file_init(
 		goto out;
 	}
 	rv = sqsh__metablock_reader_advance(
-			&inode->metablock, inner_offset, SQSH_SIZEOF_INODE_HEADER);
+			&inode->metablock, inner_offset,
+			sizeof(struct SqshDataInodeHeader));
 	if (rv < 0) {
 		goto out;
 	}
