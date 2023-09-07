@@ -339,7 +339,7 @@ process_fragment(struct SqshDirectoryIterator *iterator) {
 
 	rv = sqsh__metablock_reader_advance(
 			&iterator->metablock, iterator->next_offset,
-			SQSH_SIZEOF_DIRECTORY_FRAGMENT);
+			sizeof(struct SqshDataDirectoryFragment));
 	if (rv < 0) {
 		return rv;
 	}
@@ -354,10 +354,11 @@ process_fragment(struct SqshDirectoryIterator *iterator) {
 	iterator->start_base = sqsh__data_directory_fragment_start(fragment);
 	iterator->inode_base = sqsh__data_directory_fragment_inode_number(fragment);
 
-	iterator->next_offset = SQSH_SIZEOF_DIRECTORY_FRAGMENT;
+	iterator->next_offset = sizeof(struct SqshDataDirectoryFragment);
 
 	if (SQSH_SUB_OVERFLOW(
-				iterator->remaining_size, SQSH_SIZEOF_DIRECTORY_FRAGMENT,
+				iterator->remaining_size,
+				sizeof(struct SqshDataDirectoryFragment),
 				&iterator->remaining_size)) {
 		return -SQSH_ERROR_CORRUPTED_DIRECTORY_HEADER;
 	}
@@ -386,7 +387,7 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator, int *err) {
 	}
 
 	/*  Make sure next entry is loaded: */
-	size = SQSH_SIZEOF_DIRECTORY_ENTRY;
+	size = sizeof(struct SqshDataDirectoryEntry);
 	rv = sqsh__metablock_reader_advance(
 			&iterator->metablock, iterator->next_offset, size);
 	if (rv < 0) {
