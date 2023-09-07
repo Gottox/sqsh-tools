@@ -60,6 +60,7 @@ struct SqshDirectoryIterator {
 	struct SqshMetablockReader metablock;
 	size_t remaining_entries;
 	sqsh_index_t next_offset;
+	uint32_t current_inode;
 
 	uint32_t start_base;
 	uint32_t inode_base;

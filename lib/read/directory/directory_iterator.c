@@ -89,12 +89,7 @@ get_fragment(const struct SqshDirectoryIterator *iterator) {
 }
 
 static int
-check_entry_consistency(const struct SqshDirectoryIterator *iterator) {
-	const struct SqshDataDirectoryEntry *entry = get_entry(iterator);
-	uint32_t dummy = 0;
-	const uint32_t inode_base = iterator->inode_base;
-	const uint16_t inode_offset =
-			sqsh__data_directory_entry_inode_offset(entry);
+check_entry_name_consistency(const struct SqshDirectoryIterator *iterator) {
 	const char *name = sqsh_directory_iterator_name(iterator);
 	const size_t name_len = sqsh_directory_iterator_name_size(iterator);
 
@@ -102,10 +97,6 @@ check_entry_consistency(const struct SqshDirectoryIterator *iterator) {
 		if (name[i] == '\0' || name[i] == '/') {
 			return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
 		}
-	}
-
-	if (SQSH_ADD_OVERFLOW(inode_base, inode_offset, &dummy)) {
-		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
 	}
 
 	return 0;
@@ -253,12 +244,7 @@ sqsh_directory_iterator_inode_ref(
 
 uint32_t
 sqsh_directory_iterator_inode(const struct SqshDirectoryIterator *iterator) {
-	const struct SqshDataDirectoryEntry *entry = get_entry(iterator);
-	const uint32_t inode_base = iterator->inode_base;
-	const uint16_t inode_offset =
-			sqsh__data_directory_entry_inode_offset(entry);
-
-	return inode_base + inode_offset;
+	return iterator->current_inode;
 }
 
 uint64_t
@@ -365,6 +351,24 @@ process_fragment(struct SqshDirectoryIterator *iterator) {
 	return rv;
 }
 
+static int
+update_inode(struct SqshDirectoryIterator *iterator) {
+	const struct SqshDataDirectoryEntry *entry = get_entry(iterator);
+	const uint32_t inode_base = iterator->inode_base;
+	const int16_t inode_offset = sqsh__data_directory_entry_inode_offset(entry);
+
+	uint32_t inode;
+	if (SQSH_ADD_OVERFLOW(inode_base, inode_offset, &inode)) {
+		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
+	}
+	if (inode == 0) {
+		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
+	}
+
+	iterator->current_inode = (uint32_t)inode;
+	return 0;
+}
+
 bool
 sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator, int *err) {
 	int rv = 0;
@@ -412,7 +416,12 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator, int *err) {
 				iterator->remaining_size, size, &iterator->remaining_size)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
-	rv = check_entry_consistency(iterator);
+	rv = check_entry_name_consistency(iterator);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = update_inode(iterator);
 	if (rv < 0) {
 		goto out;
 	}
