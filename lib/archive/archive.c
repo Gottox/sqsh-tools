@@ -148,7 +148,8 @@ sqsh__archive_init(
 		return rv;
 	}
 	const size_t metablock_capacity = SQSH_DIVIDE_CEIL(
-			range, SQSH_SIZEOF_METABLOCK + SQSH_METABLOCK_BLOCK_SIZE);
+			range,
+			sizeof(struct SqshDataMetablock) + SQSH_METABLOCK_BLOCK_SIZE);
 
 	rv = sqsh__extract_manager_init(
 			&archive->metablock_extract_manager, archive,

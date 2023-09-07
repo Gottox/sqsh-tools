@@ -75,8 +75,8 @@ sqsh__compression_options_init(
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
 	memset(context, 0, sizeof(*context));
 
-	uint64_t upper_limit = SQSH_SIZEOF_SUPERBLOCK + SQSH_SIZEOF_METABLOCK +
-			SQSH_METABLOCK_BLOCK_SIZE;
+	uint64_t upper_limit = SQSH_SIZEOF_SUPERBLOCK +
+			sizeof(struct SqshDataMetablock) + SQSH_METABLOCK_BLOCK_SIZE;
 	rv = sqsh__metablock_iterator_init(
 			&context->metablock, sqsh, SQSH_SIZEOF_SUPERBLOCK, upper_limit);
 	if (rv < 0) {

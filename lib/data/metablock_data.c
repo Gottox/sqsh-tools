@@ -37,8 +37,6 @@
 
 #include <cextras/endian_compat.h>
 
-SQSH_STATIC_ASSERT(sizeof(struct SqshDataMetablock) == SQSH_SIZEOF_METABLOCK);
-
 int
 sqsh__data_metablock_is_compressed(const struct SqshDataMetablock *metablock) {
 	return !(htole16(metablock->header) & 0x8000);

@@ -73,7 +73,8 @@ process_next_header(struct SqshMetablockIterator *iterator) {
 	int rv = 0;
 
 	rv = sqsh__map_reader_advance(
-			&iterator->reader, iterator->outer_size, SQSH_SIZEOF_METABLOCK);
+			&iterator->reader, iterator->outer_size,
+			sizeof(struct SqshDataMetablock));
 	if (rv < 0) {
 		goto out;
 	}
@@ -103,7 +104,8 @@ map_data(struct SqshMetablockIterator *iterator) {
 	int rv = 0;
 
 	rv = sqsh__map_reader_advance(
-			&iterator->reader, SQSH_SIZEOF_METABLOCK, iterator->outer_size);
+			&iterator->reader, sizeof(struct SqshDataMetablock),
+			iterator->outer_size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -172,7 +174,8 @@ sqsh__metablock_iterator_skip(
 
 		sqsh_index_t skip_size;
 		if (SQSH_ADD_OVERFLOW(
-					iterator->outer_size, SQSH_SIZEOF_METABLOCK, &skip_size)) {
+					iterator->outer_size, sizeof(struct SqshDataMetablock),
+					&skip_size)) {
 			rv = -SQSH_ERROR_OUT_OF_BOUNDS;
 			goto out;
 		}
