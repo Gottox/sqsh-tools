@@ -54,7 +54,8 @@ sqsh__xattr_table_init(
 			sqsh_superblock_xattr_id_table_start(superblock);
 	uint64_t upper_limit;
 	if (SQSH_ADD_OVERFLOW(
-				xattr_address, SQSH_SIZEOF_XATTR_ID_TABLE, &upper_limit)) {
+				xattr_address, sizeof(struct SqshDataXattrIdTable),
+				&upper_limit)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	rv = sqsh__map_reader_init(
@@ -70,8 +71,9 @@ sqsh__xattr_table_init(
 	const struct SqshDataXattrIdTable *header = get_header(context);
 
 	rv = sqsh__table_init(
-			&context->table, sqsh, xattr_address + SQSH_SIZEOF_XATTR_ID_TABLE,
-			SQSH_SIZEOF_XATTR_LOOKUP_TABLE,
+			&context->table, sqsh,
+			xattr_address + sizeof(struct SqshDataXattrIdTable),
+			sizeof(struct SqshDataXattrLookupTable),
 			sqsh__data_xattr_id_table_xattr_ids(header));
 	if (rv < 0) {
 		goto out;

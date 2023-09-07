@@ -50,7 +50,7 @@ sqsh__xattr_iterator_init(
 		struct SqshXattrIterator *iterator, const struct SqshFile *file) {
 	int rv;
 	struct SqshDataXattrLookupTable *ref =
-			alloca(SQSH_SIZEOF_XATTR_LOOKUP_TABLE);
+			alloca(sizeof(struct SqshDataXattrLookupTable));
 	struct SqshXattrTable *xattr_table = NULL;
 	struct SqshArchive *sqsh = file->archive;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
@@ -163,7 +163,7 @@ xattr_value_indirect_load(struct SqshXattrIterator *iterator) {
 	uint16_t inner_offset = sqsh_address_ref_inner_offset(ref);
 
 	uint64_t start_block = sqsh__xattr_table_start(iterator->context);
-	size_t size = SQSH_SIZEOF_XATTR_VALUE;
+	size_t size = sizeof(struct SqshDataXattrValue);
 	if (SQSH_ADD_OVERFLOW(start_block, outer_offset, &start_block)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
@@ -195,7 +195,8 @@ out:
 bool
 sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator, int *err) {
 	int rv = 0;
-	size_t size = SQSH_SIZEOF_XATTR_KEY + SQSH_SIZEOF_XATTR_VALUE;
+	size_t size =
+			sizeof(struct SqshDataXattrKey) + sizeof(struct SqshDataXattrValue);
 	bool has_next = false;
 
 	sqsh__metablock_reader_cleanup(&iterator->out_of_line_value);
@@ -209,7 +210,8 @@ sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator, int *err) {
 
 	/* Load Key Header */
 	rv = sqsh__metablock_reader_advance(
-			&iterator->metablock, iterator->next_offset, SQSH_SIZEOF_XATTR_KEY);
+			&iterator->metablock, iterator->next_offset,
+			sizeof(struct SqshDataXattrKey));
 	if (rv < 0) {
 		goto out;
 	}
@@ -223,7 +225,7 @@ sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator, int *err) {
 	}
 
 	/* Load Value Header */
-	iterator->value_index = SQSH_SIZEOF_XATTR_KEY + name_size;
+	iterator->value_index = sizeof(struct SqshDataXattrKey) + name_size;
 
 	/* Load Value */
 	const uint16_t value_size = sqsh_xattr_iterator_value_size(iterator);
