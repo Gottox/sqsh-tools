@@ -37,28 +37,6 @@
 
 #include <cextras/endian_compat.h>
 
-struct SQSH_UNALIGNED SqshDataDirectoryEntry {
-	uint16_t offset;
-	int16_t inode_offset;
-	uint16_t type;
-	uint16_t name_size;
-	/* uint8_t name[0]; // [name_size + 1] */
-};
-
-SQSH_STATIC_ASSERT(
-		sizeof(struct SqshDataDirectoryEntry) == SQSH_SIZEOF_DIRECTORY_ENTRY);
-
-struct SQSH_UNALIGNED SqshDataDirectoryFragment {
-	uint32_t count;
-	uint32_t start;
-	uint32_t inode_number;
-	/* struct SqshDataDirectoryEntry entries[0]; // [count + 1] */
-};
-
-SQSH_STATIC_ASSERT(
-		sizeof(struct SqshDataDirectoryFragment) ==
-		SQSH_SIZEOF_DIRECTORY_FRAGMENT);
-
 uint16_t
 sqsh__data_directory_entry_offset(const struct SqshDataDirectoryEntry *entry) {
 	return le16toh(entry->offset);
