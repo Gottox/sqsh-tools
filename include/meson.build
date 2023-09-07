@@ -3,6 +3,7 @@ headers = files(
     'sqsh_archive.h',
     'sqsh_archive_private.h',
     'sqsh_common.h',
+    'sqsh_data.h',
     'sqsh_data_private.h',
     'sqsh_directory.h',
     'sqsh_directory_private.h',
