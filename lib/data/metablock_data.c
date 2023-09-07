@@ -39,10 +39,10 @@
 
 int
 sqsh__data_metablock_is_compressed(const struct SqshDataMetablock *metablock) {
-	return !(htole16(metablock->header) & 0x8000);
+	return !(le16toh(metablock->header) & 0x8000);
 }
 
 uint16_t
 sqsh__data_metablock_size(const struct SqshDataMetablock *metablock) {
-	return htole16(metablock->header) & 0x7FFF;
+	return le16toh(metablock->header) & 0x7FFF;
 }

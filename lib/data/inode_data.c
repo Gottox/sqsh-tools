@@ -39,45 +39,45 @@
 
 uint16_t
 sqsh__data_inode_type(const struct SqshDataInode *inode) {
-	return htole16(inode->header.type);
+	return le16toh(inode->header.type);
 }
 uint16_t
 sqsh__data_inode_permissions(const struct SqshDataInode *inode) {
-	return htole16(inode->header.permissions);
+	return le16toh(inode->header.permissions);
 }
 uint16_t
 sqsh__data_inode_uid_idx(const struct SqshDataInode *inode) {
-	return htole16(inode->header.uid_idx);
+	return le16toh(inode->header.uid_idx);
 }
 uint16_t
 sqsh__data_inode_gid_idx(const struct SqshDataInode *inode) {
-	return htole16(inode->header.gid_idx);
+	return le16toh(inode->header.gid_idx);
 }
 uint32_t
 sqsh__data_inode_modified_time(const struct SqshDataInode *inode) {
-	return htole32(inode->header.modified_time);
+	return le32toh(inode->header.modified_time);
 }
 uint32_t
 sqsh__data_inode_number(const struct SqshDataInode *inode) {
-	return htole32(inode->header.inode_number);
+	return le32toh(inode->header.inode_number);
 }
 
 uint32_t
 sqsh__data_inode_file_blocks_start(const struct SqshDataInodeFile *file) {
-	return htole32(file->blocks_start);
+	return le32toh(file->blocks_start);
 }
 uint32_t
 sqsh__data_inode_file_fragment_block_index(
 		const struct SqshDataInodeFile *file) {
-	return htole32(file->fragment_block_index);
+	return le32toh(file->fragment_block_index);
 }
 uint32_t
 sqsh__data_inode_file_block_offset(const struct SqshDataInodeFile *file) {
-	return htole32(file->block_offset);
+	return le32toh(file->block_offset);
 }
 uint32_t
 sqsh__data_inode_file_size(const struct SqshDataInodeFile *file) {
-	return htole32(file->file_size);
+	return le32toh(file->file_size);
 }
 uint32_t
 sqsh__data_inode_file_block_size_info(
@@ -85,41 +85,41 @@ sqsh__data_inode_file_block_size_info(
 	const struct {
 		uint32_t b;
 	} SQSH_UNALIGNED *block_sizes = (const void *)&file[1];
-	return htole32(block_sizes[index].b);
+	return le32toh(block_sizes[index].b);
 }
 
 uint64_t
 sqsh__data_inode_file_ext_blocks_start(
 		const struct SqshDataInodeFileExt *file_ext) {
-	return htole64(file_ext->blocks_start);
+	return le64toh(file_ext->blocks_start);
 }
 uint64_t
 sqsh__data_inode_file_ext_size(const struct SqshDataInodeFileExt *file_ext) {
-	return htole64(file_ext->file_size);
+	return le64toh(file_ext->file_size);
 }
 uint64_t
 sqsh__data_inode_file_ext_sparse(const struct SqshDataInodeFileExt *file_ext) {
-	return htole64(file_ext->sparse);
+	return le64toh(file_ext->sparse);
 }
 uint32_t
 sqsh__data_inode_file_ext_hard_link_count(
 		const struct SqshDataInodeFileExt *file_ext) {
-	return htole32(file_ext->hard_link_count);
+	return le32toh(file_ext->hard_link_count);
 }
 uint32_t
 sqsh__data_inode_file_ext_fragment_block_index(
 		const struct SqshDataInodeFileExt *file_ext) {
-	return htole32(file_ext->fragment_block_index);
+	return le32toh(file_ext->fragment_block_index);
 }
 uint32_t
 sqsh__data_inode_file_ext_block_offset(
 		const struct SqshDataInodeFileExt *file_ext) {
-	return htole32(file_ext->block_offset);
+	return le32toh(file_ext->block_offset);
 }
 uint32_t
 sqsh__data_inode_file_ext_xattr_idx(
 		const struct SqshDataInodeFileExt *file_ext) {
-	return htole32(file_ext->xattr_idx);
+	return le32toh(file_ext->xattr_idx);
 }
 uint32_t
 sqsh__data_inode_file_ext_block_size_info(
@@ -127,7 +127,7 @@ sqsh__data_inode_file_ext_block_size_info(
 	const struct {
 		uint32_t b;
 	} SQSH_UNALIGNED *block_sizes = (const void *)&file_ext[1];
-	return htole32(block_sizes[index].b);
+	return le32toh(block_sizes[index].b);
 }
 
 const struct SqshDataInodeDirectory *
@@ -174,63 +174,63 @@ sqsh__data_inode_ipc_ext(const struct SqshDataInode *inode) {
 uint32_t
 sqsh__data_inode_directory_block_start(
 		const struct SqshDataInodeDirectory *directory) {
-	return htole32(directory->block_start);
+	return le32toh(directory->block_start);
 }
 uint32_t
 sqsh__data_inode_directory_hard_link_count(
 		const struct SqshDataInodeDirectory *directory) {
-	return htole32(directory->hard_link_count);
+	return le32toh(directory->hard_link_count);
 }
 uint16_t
 sqsh__data_inode_directory_file_size(
 		const struct SqshDataInodeDirectory *directory) {
-	return htole16(directory->file_size);
+	return le16toh(directory->file_size);
 }
 uint16_t
 sqsh__data_inode_directory_block_offset(
 		const struct SqshDataInodeDirectory *directory) {
-	return htole16(directory->block_offset);
+	return le16toh(directory->block_offset);
 }
 uint32_t
 sqsh__data_inode_directory_parent_inode_number(
 		const struct SqshDataInodeDirectory *directory) {
-	return htole32(directory->parent_inode_number);
+	return le32toh(directory->parent_inode_number);
 }
 
 uint32_t
 sqsh__data_inode_directory_ext_hard_link_count(
 		const struct SqshDataInodeDirectoryExt *directory_ext) {
-	return htole32(directory_ext->hard_link_count);
+	return le32toh(directory_ext->hard_link_count);
 }
 uint32_t
 sqsh__data_inode_directory_ext_file_size(
 		const struct SqshDataInodeDirectoryExt *directory_ext) {
-	return htole32(directory_ext->file_size);
+	return le32toh(directory_ext->file_size);
 }
 uint32_t
 sqsh__data_inode_directory_ext_block_start(
 		const struct SqshDataInodeDirectoryExt *directory_ext) {
-	return htole32(directory_ext->block_start);
+	return le32toh(directory_ext->block_start);
 }
 uint32_t
 sqsh__data_inode_directory_ext_parent_inode_number(
 		const struct SqshDataInodeDirectoryExt *directory_ext) {
-	return htole32(directory_ext->parent_inode_number);
+	return le32toh(directory_ext->parent_inode_number);
 }
 uint16_t
 sqsh__data_inode_directory_ext_index_count(
 		const struct SqshDataInodeDirectoryExt *directory_ext) {
-	return htole16(directory_ext->index_count);
+	return le16toh(directory_ext->index_count);
 }
 uint16_t
 sqsh__data_inode_directory_ext_block_offset(
 		const struct SqshDataInodeDirectoryExt *directory_ext) {
-	return htole16(directory_ext->block_offset);
+	return le16toh(directory_ext->block_offset);
 }
 uint32_t
 sqsh__data_inode_directory_ext_xattr_idx(
 		const struct SqshDataInodeDirectoryExt *directory_ext) {
-	return htole32(directory_ext->xattr_idx);
+	return le32toh(directory_ext->xattr_idx);
 }
 const uint8_t *
 sqsh__data_inode_directory_ext_index(
