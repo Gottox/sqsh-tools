@@ -72,7 +72,7 @@ doc: doc/html
 $(BUILD_DIR): meson.build Makefile
 	[ "$(PODMAN)" ] && meson wrap update-db || true
 	[ -d "$@" ] && rm -rf "$@" || true
-	$W CC=$(CC) $(MESON) setup $(MESON_FLAGS) "$@"
+	$W CC="ccache $(CC)" $(MESON) setup $(MESON_FLAGS) "$@"
 
 .PHONY: clean
 
