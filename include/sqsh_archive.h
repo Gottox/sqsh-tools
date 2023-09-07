@@ -35,6 +35,7 @@
 #define SQSH_ARCHIVE_H
 
 #include "sqsh_common.h"
+#include "sqsh_data.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -136,36 +137,6 @@ SQSH_NO_UNUSED int sqsh_inode_map_set2(
 /***************************************
  * archive/superblock_context.c
  */
-
-/**
- * @brief The compression used in the archive.
- */
-enum SqshSuperblockCompressionId {
-	SQSH_COMPRESSION_GZIP = 1,
-	SQSH_COMPRESSION_LZMA = 2,
-	SQSH_COMPRESSION_LZO = 3,
-	SQSH_COMPRESSION_XZ = 4,
-	SQSH_COMPRESSION_LZ4 = 5,
-	SQSH_COMPRESSION_ZSTD = 6
-};
-
-/**
- * @brief The flags used in the superblock.
- */
-enum SqshSuperblockFlags {
-	SQSH_SUPERBLOCK_UNCOMPRESSED_INODES = 0x0001,
-	SQSH_SUPERBLOCK_UNCOMPRESSED_DATA = 0x0002,
-	SQSH_SUPERBLOCK_CHECK = 0x0004,
-	SQSH_SUPERBLOCK_UNCOMPRESSED_FRAGMENTS = 0x0008,
-	SQSH_SUPERBLOCK_NO_FRAGMENTS = 0x0010,
-	SQSH_SUPERBLOCK_ALWAYS_FRAGMENTS = 0x0020,
-	SQSH_SUPERBLOCK_DUPLICATES = 0x0040,
-	SQSH_SUPERBLOCK_EXPORTABLE = 0x0080,
-	SQSH_SUPERBLOCK_UNCOMPRESSED_XATTRS = 0x0100,
-	SQSH_SUPERBLOCK_NO_XATTRS = 0x0200,
-	SQSH_SUPERBLOCK_COMPRESSOR_OPTIONS = 0x0400,
-	SQSH_SUPERBLOCK_UNCOMPRESSED_IDS = 0x0800
-};
 
 struct SqshSuperblock;
 
@@ -601,47 +572,6 @@ int sqsh_archive_close(struct SqshArchive *archive);
 /***************************************
  * archive/compression_options_context.c
  */
-
-/**
- * @brief definitions of gzip strategies
- */
-enum SqshGzipStrategies {
-	SQSH_GZIP_STRATEGY_NONE = 0x0,
-	SQSH_GZIP_STRATEGY_DEFAULT = 0x0001,
-	SQSH_GZIP_STRATEGY_FILTERED = 0x0002,
-	SQSH_GZIP_STRATEGY_HUFFMAN_ONLY = 0x0004,
-	SQSH_GZIP_STRATEGY_RLE = 0x0008,
-	SQSH_GZIP_STRATEGY_FIXED = 0x0010
-};
-/**
- * @brief definitions xz filters
- */
-enum SqshXzFilters {
-	SQSH_XZ_FILTER_NONE = 0x0,
-	SQSH_XZ_FILTER_X86 = 0x0001,
-	SQSH_XZ_FILTER_POWERPC = 0x0002,
-	SQSH_XZ_FILTER_IA64 = 0x0004,
-	SQSH_XZ_FILTER_ARM = 0x0008,
-	SQSH_XZ_FILTER_ARMTHUMB = 0x0010,
-	SQSH_XZ_FILTER_SPARC = 0x0020
-};
-/**
- * @brief definitions of lz4 flags
- */
-enum SqshLz4Flags {
-	SQS_LZ4_FLAG_NONE = 0x0,
-	SQSH_LZ4_HIGH_COMPRESSION = 0x0001
-};
-/**
- * @brief definitions of Lzo algorithms
- */
-enum SqshLzoAlgorithm {
-	SQSH_LZO_ALGORITHM_LZO1X_1 = 0x0000,
-	SQSH_LZO_ALGORITHM_LZO1X_1_11 = 0x0001,
-	SQSH_LZO_ALGORITHM_LZO1X_1_12 = 0x0002,
-	SQSH_LZO_ALGORITHM_LZO1X_1_15 = 0x0003,
-	SQSH_LZO_ALGORITHM_LZO1X_999 = 0x0004
-};
 
 /**
  * @memberof SqshCompressionOptions

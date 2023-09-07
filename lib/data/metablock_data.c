@@ -33,15 +33,9 @@
 
 #define _DEFAULT_SOURCE
 
-#include "../../include/sqsh_data_private.h"
+#include "../../../include/sqsh_data_private.h"
 
 #include <cextras/endian_compat.h>
-
-struct SQSH_UNALIGNED SqshDataMetablock {
-	uint16_t header;
-	/* uint8_t data[0]; */
-};
-SQSH_STATIC_ASSERT(sizeof(struct SqshDataMetablock) == SQSH_SIZEOF_METABLOCK);
 
 int
 sqsh__data_metablock_is_compressed(const struct SqshDataMetablock *metablock) {

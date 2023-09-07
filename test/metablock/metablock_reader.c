@@ -52,7 +52,7 @@ advance_once(void) {
 	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_reader_init(
-			&cursor, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&cursor, &sqsh, sizeof(struct SqshDataSuperblock), sizeof(payload));
 	assert(rv == 0);
 
 	rv = sqsh__metablock_reader_advance(&cursor, 0, 4);
@@ -80,7 +80,7 @@ advance_twice(void) {
 			SQSH_HEADER, 
 			[1024] = METABLOCK_HEADER(0, 8192),
 			'a', 'b', 'c', 'd',
-			[1024 + SQSH_SIZEOF_METABLOCK + 8192] = METABLOCK_HEADER(0, 4),
+			[1024 + sizeof(struct SqshDataMetablock) + 8192] = METABLOCK_HEADER(0, 4),
 			'e', 'f', 'g', 'h',
 			/* clang-format on */
 	};
@@ -124,9 +124,9 @@ advance_overlapping(void) {
 			SQSH_HEADER,
 			[1024] = METABLOCK_HEADER(0, 8192),
 			'a', 'b', 'c', 'd',
-			[1024 + SQSH_SIZEOF_METABLOCK + 8192] = METABLOCK_HEADER(0, 8192),
+			[1024 + sizeof(struct SqshDataMetablock) + 8192] = METABLOCK_HEADER(0, 8192),
 			'e', 'f', 'g', 'h',
-			[1024 + 2*(SQSH_SIZEOF_METABLOCK + 8192)-1] = 0,
+			[1024 + 2*(sizeof(struct SqshDataMetablock) + 8192)-1] = 0,
 			/* clang-format on */
 	};
 	uint8_t expected[] = {
@@ -165,10 +165,10 @@ advance_overlapping_2(void) {
 			/* clang-format off */
 			SQSH_HEADER,
 			[1024] = METABLOCK_HEADER(0, 8192),
-			[1024 + SQSH_SIZEOF_METABLOCK + 8192 - 4] = 'a', 'b', 'c', 'd',
-			[1024 + SQSH_SIZEOF_METABLOCK + 8192] = METABLOCK_HEADER(0, 8192),
+			[1024 + sizeof(struct SqshDataMetablock) + 8192 - 4] = 'a', 'b', 'c', 'd',
+			[1024 + sizeof(struct SqshDataMetablock) + 8192] = METABLOCK_HEADER(0, 8192),
 			'e', 'f', 'g', 'h',
-			[1024 + 2*(SQSH_SIZEOF_METABLOCK + 8192)-1] = 0,
+			[1024 + 2*(sizeof(struct SqshDataMetablock) + 8192)-1] = 0,
 			/* clang-format on */
 	};
 	const uint8_t *p;
@@ -206,9 +206,9 @@ advance_overlapping_3(void) {
 			/* clang-format off */
 			SQSH_HEADER,
 			[1024] = METABLOCK_HEADER(0, 8192),
-			[1024 + SQSH_SIZEOF_METABLOCK+8180] =
+			[1024 + sizeof(struct SqshDataMetablock)+8180] =
 			1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-			[1024 + SQSH_SIZEOF_METABLOCK + 8192] = METABLOCK_HEADER(0, 32 - 12),
+			[1024 + sizeof(struct SqshDataMetablock) + 8192] = METABLOCK_HEADER(0, 32 - 12),
 			13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
 			/* clang-format on */
 	};
@@ -250,8 +250,8 @@ advance_skip(void) {
 			/* clang-format off */
 			SQSH_HEADER,
 			[1024] = METABLOCK_HEADER(0, 8192),
-			[1024 + SQSH_SIZEOF_METABLOCK] = 'a', 'b', 'c', 'd',
-			[1024 + SQSH_SIZEOF_METABLOCK + 8192] = METABLOCK_HEADER(0, 4),
+			[1024 + sizeof(struct SqshDataMetablock)] = 'a', 'b', 'c', 'd',
+			[1024 + sizeof(struct SqshDataMetablock) + 8192] = METABLOCK_HEADER(0, 4),
 			'e', 'f', 'g', 'h',
 			/* clang-format on */
 	};
@@ -283,12 +283,12 @@ advance_skip_2(void) {
 			/* clang-format off */
 			SQSH_HEADER,
 			[1024] = METABLOCK_HEADER(0, 8192),
-			[1024 + SQSH_SIZEOF_METABLOCK] = 'a', 'b', 'c', 'd',
-			[1024 + SQSH_SIZEOF_METABLOCK + 8192] = METABLOCK_HEADER(0, 8192),
+			[1024 + sizeof(struct SqshDataMetablock)] = 'a', 'b', 'c', 'd',
+			[1024 + sizeof(struct SqshDataMetablock) + 8192] = METABLOCK_HEADER(0, 8192),
 			'e', 'f', 'g', 'h',
-			[1024 + 2*(SQSH_SIZEOF_METABLOCK + 8192)] = METABLOCK_HEADER(0, 8192),
+			[1024 + 2*(sizeof(struct SqshDataMetablock) + 8192)] = METABLOCK_HEADER(0, 8192),
 			'i', 'j', 'k', 'l',
-			[1024 + 3*(SQSH_SIZEOF_METABLOCK + 8192)] = METABLOCK_HEADER(0, 4),
+			[1024 + 3*(sizeof(struct SqshDataMetablock) + 8192)] = METABLOCK_HEADER(0, 4),
 			'm', 'n', 'o', 'p',
 			/* clang-format on */
 	};
@@ -327,7 +327,7 @@ advance_overflow(void) {
 			/* clang-format off */
 			SQSH_HEADER,
 			[1024] = METABLOCK_HEADER(0, 8192),
-			[1024 + SQSH_SIZEOF_METABLOCK + 8192 - 1] = 0,
+			[1024 + sizeof(struct SqshDataMetablock) + 8192 - 1] = 0,
 			/* clang-format on */
 	};
 	mk_stub(&sqsh, payload, sizeof(payload));

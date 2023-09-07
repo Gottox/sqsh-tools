@@ -37,7 +37,7 @@
 
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_data_private.h"
-#include "../../lib/utils/utils.h"
+#include "../../lib/read/utils/utils.h"
 
 static const size_t BLOCK_SIZE = 32768;
 #define ZERO_BLOCK_SIZE 16384

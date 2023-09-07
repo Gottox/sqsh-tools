@@ -38,7 +38,7 @@
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_easy.h"
 #include "../../include/sqsh_tree_private.h"
-#include "../../lib/utils/utils.h"
+#include "../../lib/read/utils/utils.h"
 
 static void
 test_file_get_content_through_symlink(void) {

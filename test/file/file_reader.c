@@ -38,7 +38,7 @@
 #include "../../include/sqsh_archive_private.h"
 #include "../../include/sqsh_data_private.h"
 #include "../../include/sqsh_file.h"
-#include "../../lib/utils/utils.h"
+#include "../../lib/read/utils/utils.h"
 
 static void
 load_file_from_compressed_data_block(void) {

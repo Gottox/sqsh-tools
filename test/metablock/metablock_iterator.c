@@ -52,7 +52,7 @@ next_once(void) {
 	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_iterator_init(
-			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&iter, &sqsh, sizeof(struct SqshDataSuperblock), sizeof(payload));
 	assert(rv == 0);
 
 	bool has_next = sqsh__metablock_iterator_next(&iter, &rv);
@@ -82,7 +82,7 @@ next_failing_with_no_compression(void) {
 	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_iterator_init(
-			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&iter, &sqsh, sizeof(struct SqshDataSuperblock), sizeof(payload));
 	assert(rv == 0);
 
 	bool has_next = sqsh__metablock_iterator_next(&iter, &rv);
@@ -113,7 +113,7 @@ next_twice(void) {
 	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_iterator_init(
-			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&iter, &sqsh, sizeof(struct SqshDataSuperblock), sizeof(payload));
 	assert(rv == 0);
 
 	bool has_next = sqsh__metablock_iterator_next(&iter, &rv);
@@ -157,7 +157,7 @@ next_compressed(void) {
 	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_iterator_init(
-			&iter, &sqsh, SQSH_SIZEOF_SUPERBLOCK, sizeof(payload));
+			&iter, &sqsh, sizeof(struct SqshDataSuperblock), sizeof(payload));
 	assert(rv == 0);
 
 	bool has_next = sqsh__metablock_iterator_next(&iter, &rv);

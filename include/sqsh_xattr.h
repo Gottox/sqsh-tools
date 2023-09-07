@@ -35,6 +35,7 @@
 #define SQSH_XATTR_H
 
 #include "sqsh_common.h"
+#include "sqsh_data.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,15 +46,6 @@ struct SqshFile;
 /***************************************
  * xattr/xattr_iterator.c
  */
-
-/**
- * @brief The type of an external attribute.
- */
-enum SqshXattrType {
-	SQSH_XATTR_USER = 0,
-	SQSH_XATTR_TRUSTED = 1,
-	SQSH_XATTR_SECURITY = 2
-};
 
 struct SqshXattrIterator;
 

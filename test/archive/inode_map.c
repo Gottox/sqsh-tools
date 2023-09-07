@@ -36,7 +36,7 @@
 #include <testlib.h>
 
 #include "../../include/sqsh_archive_private.h"
-#include "../../lib/utils/utils.h"
+#include "../../lib/read/utils/utils.h"
 
 static void
 insert_inode_ref(void) {

@@ -17,7 +17,7 @@ mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size) {
 	int rv;
 	const int compression_id =
 			payload[20] ? payload[20] : SQSH_COMPRESSION_GZIP;
-	uint8_t superblock[SQSH_SIZEOF_SUPERBLOCK] = {
+	uint8_t superblock[sizeof(struct SqshDataSuperblock)] = {
 			/* magic */
 			UINT32_BYTES(SQSH_SUPERBLOCK_MAGIC),
 			/* inode_count */
@@ -62,7 +62,7 @@ mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size) {
 			UINT64_BYTES((uint64_t)EXPORT_TABLE_OFFSET),
 	};
 
-	memcpy(payload, &superblock, SQSH_SIZEOF_SUPERBLOCK);
+	memcpy(payload, &superblock, sizeof(struct SqshDataSuperblock));
 
 	const struct SqshConfig config = DEFAULT_CONFIG(payload_size);
 	rv = sqsh__archive_init(sqsh, payload, &config);

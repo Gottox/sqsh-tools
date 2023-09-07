@@ -33,16 +33,9 @@
 
 #define _DEFAULT_SOURCE
 
-#include "../../include/sqsh_data_private.h"
+#include "../../../include/sqsh_data_private.h"
 
 #include <cextras/endian_compat.h>
-
-struct SQSH_UNALIGNED SqshDataFragment {
-	uint64_t start;
-	uint32_t size_info;
-	uint32_t unused;
-};
-SQSH_STATIC_ASSERT(sizeof(struct SqshDataFragment) == SQSH_SIZEOF_FRAGMENT);
 
 uint64_t
 sqsh__data_fragment_start(const struct SqshDataFragment *fragment) {
