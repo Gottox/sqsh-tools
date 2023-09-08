@@ -83,7 +83,7 @@ libsqsh = both_libraries(
     'sqsh',
     libsqsh_sources + libsqsh_headers_private,
     install: not meson.is_subproject(),
-    link_with: [ libsqsh_data],
+    link_with: [libsqsh_data],
     c_args: libsqsh_c_args,
     dependencies: libsqsh_dependencies,
     version: meson.project_version(),

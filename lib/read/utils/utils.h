@@ -56,6 +56,15 @@ extern "C" {
 
 #define SQSH_CONFIG_DEFAULT(x, d) (size_t)(x == 0 ? (d) : SQSH_MAX(x, 0))
 
+SQSH_NO_UNUSED static inline uint16_t
+sqsh_log2_u32(uint32_t x) {
+	if (x == 0) {
+		return UINT16_MAX;
+	} else {
+		return sizeof(uint32_t) * 8 - 1 - __builtin_clz(x);
+	}
+}
+
 SQSH_NO_UNUSED static inline uint64_t
 sqsh_address_ref_outer_offset(uint64_t ref) {
 	return ref >> 16;

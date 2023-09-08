@@ -37,6 +37,8 @@
 
 #include "../../../include/sqsh_data_private.h"
 
+#include "../utils/utils.h"
+
 #include <string.h>
 
 enum SqshInitialized {
@@ -45,15 +47,6 @@ enum SqshInitialized {
 	SQSH_INITIALIZED_XATTR_TABLE = 1 << 3,
 	SQSH_INITIALIZED_FRAGMENT_TABLE = 1 << 4,
 };
-
-static uint16_t
-log2_u32(uint32_t x) {
-	if (x == 0) {
-		return UINT16_MAX;
-	} else {
-		return sizeof(uint32_t) * 8 - 1 - __builtin_clz(x);
-	}
-}
 
 static const struct SqshDataSuperblock *
 get_header(const struct SqshSuperblock *superblock) {
@@ -103,7 +96,7 @@ sqsh__superblock_init(
 		goto out;
 	}
 
-	if (sqsh__data_superblock_block_log(header) != log2_u32(block_size)) {
+	if (sqsh__data_superblock_block_log(header) != sqsh_log2_u32(block_size)) {
 		rv = -SQSH_ERROR_BLOCKSIZE_MISMATCH;
 		goto out;
 	}
