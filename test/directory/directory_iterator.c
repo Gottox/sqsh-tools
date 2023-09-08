@@ -143,8 +143,7 @@ iter_two_files(void) {
 			[FRAGMENT_TABLE_OFFSET] = 0,
 			/* clang-format on */
 	};
-	mk_symlink(
-			"tgt", 2, INODE_TABLE_OFFSET + 2 + 128, payload, sizeof(payload));
+	mk_symlink("tgt", 2, INODE_TABLE_OFFSET + 128, payload, sizeof(payload));
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshFile file = {0};
@@ -190,7 +189,7 @@ iter_invalid_file_type(void) {
 			/* clang-format off */
 			SQSH_HEADER,
 			/* inode */
-			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
+			//[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
 			//INODE_HEADER(3, 0, 0, 0, 0, 1),
 			//INODE_BASIC_SYMLINK(3),
 			//'t', 'g', 't',
@@ -198,7 +197,7 @@ iter_invalid_file_type(void) {
 			[FRAGMENT_TABLE_OFFSET] = 0,
 			/* clang-format on */
 	};
-	mk_symlink("tgt", 1, INODE_TABLE_OFFSET + 2, payload, sizeof(payload));
+	mk_symlink("tgt", 1, INODE_TABLE_OFFSET, payload, sizeof(payload));
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshFile file = {0};
@@ -237,8 +236,7 @@ iter_inconsistent_file_type(void) {
 			[FRAGMENT_TABLE_OFFSET] = 0,
 			/* clang-format on */
 	};
-	mk_symlink(
-			"tgt", 2, INODE_TABLE_OFFSET + 2 + 128, payload, sizeof(payload));
+	mk_symlink("tgt", 2, INODE_TABLE_OFFSET + 128, payload, sizeof(payload));
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshFile file = {0};

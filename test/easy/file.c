@@ -68,8 +68,7 @@ test_file_get_content_through_symlink(void) {
 			[FRAGMENT_TABLE_OFFSET] = 0,
 			/* clang-format on */
 	};
-	mk_symlink(
-			"tgt", 2, INODE_TABLE_OFFSET + 2 + 128, payload, sizeof(payload));
+	mk_symlink("tgt", 2, INODE_TABLE_OFFSET + 128, payload, sizeof(payload));
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint8_t *content = sqsh_easy_file_content(&archive, "/src", NULL);
@@ -103,8 +102,7 @@ test_file_exists_through_dead_symlink(void) {
 			[FRAGMENT_TABLE_OFFSET] = 0,
 			/* clang-format on */
 	};
-	mk_symlink(
-			"tgt", 2, INODE_TABLE_OFFSET + 2 + 128, payload, sizeof(payload));
+	mk_symlink("tgt", 2, INODE_TABLE_OFFSET + 128, payload, sizeof(payload));
 	mk_stub(&archive, payload, sizeof(payload));
 
 	bool exists = sqsh_easy_file_exists(&archive, "/src", &rv);
@@ -143,8 +141,7 @@ test_file_exists_through_symlink(void) {
 			[FRAGMENT_TABLE_OFFSET] = 0,
 			/* clang-format on */
 	};
-	mk_symlink(
-			"tgt", 2, INODE_TABLE_OFFSET + 2 + 128, payload, sizeof(payload));
+	mk_symlink("tgt", 2, INODE_TABLE_OFFSET + 128, payload, sizeof(payload));
 	mk_stub(&archive, payload, sizeof(payload));
 
 	bool exists = sqsh_easy_file_exists(&archive, "/src", &rv);

@@ -1,6 +1,7 @@
 libsqsh_builder_sources = files(
     'archive/superblock_builder.c',
     'file/inode_builder.c',
+    'metablock/metablock_builder.c',
 )
 
 libsqsh_builder_headers_private = []

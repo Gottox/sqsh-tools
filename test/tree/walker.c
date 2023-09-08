@@ -62,8 +62,7 @@ walker_symlink_recursion(void) {
 			[FRAGMENT_TABLE_OFFSET] = 0,
 			/* clang-format on */
 	};
-	mk_symlink(
-			"src", 2, INODE_TABLE_OFFSET + 2 + 128, payload, sizeof(payload));
+	mk_symlink("src", 2, INODE_TABLE_OFFSET + 128, payload, sizeof(payload));
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshTreeWalker walker = {0};

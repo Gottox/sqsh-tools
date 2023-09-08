@@ -5,6 +5,7 @@ libsqsh_data_sources = files(
     'inode_data.c',
     'inode_set.c',
     'metablock_data.c',
+    'metablock_set.c',
     'superblock_data.c',
     'superblock_set.c',
     'xattr_data.c',
