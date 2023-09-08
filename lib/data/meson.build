@@ -3,6 +3,7 @@ libsqsh_data_sources = files(
     'directory_data.c',
     'fragment_data.c',
     'inode_data.c',
+    'inode_set.c',
     'metablock_data.c',
     'superblock_data.c',
     'superblock_set.c',

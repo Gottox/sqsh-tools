@@ -14,6 +14,7 @@
 #include "../include/sqsh_mapper.h"
 #include "../lib/build/sqsh_archive_builder.h"
 #include "../lib/build/sqsh_file_builder.h"
+#include "../lib/build/sqsh_metablock_builder.h"
 
 #include <assert.h>
 
@@ -23,6 +24,7 @@ mk_symlink(
 		size_t payload_size) {
 	int rv;
 	struct SqshInodeBuilder builder = {0};
+	struct SqshMetablockBuilder metablock = {0};
 	FILE *archive = fmemopen(payload, payload_size, "r+");
 	assert(archive);
 	rv = fseek(archive, offset, SEEK_SET);
@@ -33,10 +35,19 @@ mk_symlink(
 	assert(rv == 0);
 	rv = sqsh__inode_builder_symlink(&builder, target);
 	assert(rv == 0);
-	rv = sqsh__inode_builder_write(&builder, archive);
+
+	rv = sqsh__metablock_builder_init(&metablock, archive);
+	assert(rv == 0);
+	rv = sqsh__inode_builder_write(&builder, &metablock);
 	// TODO: Calculate actual size;
 	assert(rv > 0);
 	rv = sqsh__inode_builder_cleanup(&builder);
+	assert(rv == 0);
+	rv = sqsh__metablock_builder_flush(&metablock);
+	assert(rv == 0);
+
+	rv = sqsh__metablock_builder_cleanup(&metablock);
+	assert(rv == 0);
 	fclose(archive);
 }
 

@@ -168,4 +168,8 @@
 const uint8_t *
 mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size);
 
+void mk_symlink(
+		char *target, uint32_t inode, sqsh_index_t offset, uint8_t *payload,
+		size_t payload_size);
+
 #endif /* !COMMON_H */

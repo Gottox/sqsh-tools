@@ -50,10 +50,10 @@ list_two_files(void) {
 			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
 			INODE_HEADER(1, 0, 0, 0, 0, 1),
 			INODE_BASIC_DIR(0, 33, 0, 0),
-			[INODE_TABLE_OFFSET+2+128] = 
-			INODE_HEADER(3, 0, 0, 0, 0, 2),
-			INODE_BASIC_SYMLINK(3),
-			't', 'g', 't',
+			//[INODE_TABLE_OFFSET+2+128] = 
+			//INODE_HEADER(3, 0, 0, 0, 0, 2),
+			//INODE_BASIC_SYMLINK(3),
+			//'t', 'g', 't',
 			[INODE_TABLE_OFFSET+2+256] =
 			INODE_HEADER(2, 0, 0, 0, 0, 3),
 			INODE_BASIC_FILE(0, 0xFFFFFFFF, 0, 0),
@@ -66,6 +66,8 @@ list_two_files(void) {
 			[FRAGMENT_TABLE_OFFSET] = 0,
 			/* clang-format on */
 	};
+	mk_symlink(
+			"tgt", 2, INODE_TABLE_OFFSET + 2 + 128, payload, sizeof(payload));
 	mk_stub(&archive, payload, sizeof(payload));
 
 	char **dir_list = sqsh_easy_directory_list(&archive, "/", &rv);

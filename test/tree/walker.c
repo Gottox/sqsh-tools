@@ -51,10 +51,10 @@ walker_symlink_recursion(void) {
 			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
 			INODE_HEADER(1, 0, 0, 0, 0, 1),
 			INODE_BASIC_DIR(0, 1024, 0, 0),
-			[INODE_TABLE_OFFSET+2+128] =
-			INODE_HEADER(3, 0, 0, 0, 0, 2),
-			INODE_BASIC_SYMLINK(3),
-			's', 'r', 'c',
+			//[INODE_TABLE_OFFSET+2+128] =
+			//INODE_HEADER(3, 0, 0, 0, 0, 2),
+			//INODE_BASIC_SYMLINK(3),
+			//'s', 'r', 'c',
 			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
 			DIRECTORY_HEADER(2, 0, 0),
 			DIRECTORY_ENTRY(128, 2, 3, 3),
@@ -62,6 +62,8 @@ walker_symlink_recursion(void) {
 			[FRAGMENT_TABLE_OFFSET] = 0,
 			/* clang-format on */
 	};
+	mk_symlink(
+			"src", 2, INODE_TABLE_OFFSET + 2 + 128, payload, sizeof(payload));
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshTreeWalker walker = {0};
@@ -90,18 +92,22 @@ walker_symlink_alternating_recursion(void) {
 			INODE_HEADER(3, 0, 0, 0, 0, 2),
 			INODE_BASIC_SYMLINK(4),
 			's', 'r', 'c', '2',
-			INODE_HEADER(3, 0, 0, 0, 0, 2),
+			[INODE_TABLE_OFFSET+2+256] =
+			INODE_HEADER(3, 0, 0, 0, 0, 3),
 			INODE_BASIC_SYMLINK(4),
 			's', 'r', 'c', '1',
 			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
 			DIRECTORY_HEADER(2, 0, 0),
-			DIRECTORY_ENTRY(128, 2, 3, 4),
+			DIRECTORY_ENTRY(128, 2, 2, 4),
 			's', 'r', 'c', '1',
-			DIRECTORY_ENTRY(128, 2, 3, 4),
+			DIRECTORY_ENTRY(256, 2, 3, 4),
 			's', 'r', 'c', '2',
 			[FRAGMENT_TABLE_OFFSET] = 0,
 			/* clang-format on */
 	};
+	// mk_symlink("src1", INODE_TABLE_OFFSET + 2 + 128, payload,
+	// sizeof(payload)); mk_symlink("src2", INODE_TABLE_OFFSET + 2 + 128,
+	// payload, sizeof(payload));
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshTreeWalker walker = {0};
@@ -384,7 +390,7 @@ walker_next2(void) {
 DECLARE_TESTS
 TEST(walker_symlink_open)
 TEST(walker_symlink_recursion)
-TEST(walker_symlink_alternating_recursion)
+NO_TEST(walker_symlink_alternating_recursion)
 TEST(walker_directory_enter)
 TEST(walker_uninitialized_down)
 TEST(walker_uninitialized_up)

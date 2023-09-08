@@ -51,10 +51,10 @@ test_file_get_content_through_symlink(void) {
 			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
 			INODE_HEADER(1, 0, 0, 0, 0, 1),
 			INODE_BASIC_DIR(0, 1024, 0, 0),
-			[INODE_TABLE_OFFSET+2+128] =
-			INODE_HEADER(3, 0, 0, 0, 0, 2),
-			INODE_BASIC_SYMLINK(3),
-			't', 'g', 't',
+			//[INODE_TABLE_OFFSET+2+128] =
+			//INODE_HEADER(3, 0, 0, 0, 0, 2),
+			//INODE_BASIC_SYMLINK(3),
+			//'t', 'g', 't',
 			[INODE_TABLE_OFFSET+2+256] =
 			INODE_HEADER(2, 0, 0, 0, 0, 3),
 			INODE_BASIC_FILE(1024, 0xFFFFFFFF, 0, 8),
@@ -68,6 +68,8 @@ test_file_get_content_through_symlink(void) {
 			[FRAGMENT_TABLE_OFFSET] = 0,
 			/* clang-format on */
 	};
+	mk_symlink(
+			"tgt", 2, INODE_TABLE_OFFSET + 2 + 128, payload, sizeof(payload));
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint8_t *content = sqsh_easy_file_content(&archive, "/src", NULL);
@@ -90,10 +92,10 @@ test_file_exists_through_dead_symlink(void) {
 			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
 			INODE_HEADER(1, 0, 0, 0, 0, 1),
 			INODE_BASIC_DIR(0, 26, 0, 0),
-			[INODE_TABLE_OFFSET+2+128] =
-			INODE_HEADER(3, 0, 0, 0, 0, 2),
-			INODE_BASIC_SYMLINK(3),
-			't', 'g', 't',
+			//[INODE_TABLE_OFFSET+2+128] =
+			//INODE_HEADER(3, 0, 0, 0, 0, 2),
+			//INODE_BASIC_SYMLINK(3),
+			//'t', 'g', 't',
 			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
 			DIRECTORY_HEADER(1, 0, 0),
 			DIRECTORY_ENTRY(128, 2, 3, 3),
@@ -101,6 +103,8 @@ test_file_exists_through_dead_symlink(void) {
 			[FRAGMENT_TABLE_OFFSET] = 0,
 			/* clang-format on */
 	};
+	mk_symlink(
+			"tgt", 2, INODE_TABLE_OFFSET + 2 + 128, payload, sizeof(payload));
 	mk_stub(&archive, payload, sizeof(payload));
 
 	bool exists = sqsh_easy_file_exists(&archive, "/src", &rv);
@@ -122,10 +126,10 @@ test_file_exists_through_symlink(void) {
 			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
 			INODE_HEADER(1, 0, 0, 0, 0, 1),
 			INODE_BASIC_DIR(0, 37, 0, 0),
-			[INODE_TABLE_OFFSET+2+128] =
-			INODE_HEADER(3, 0, 0, 0, 0, 2),
-			INODE_BASIC_SYMLINK(3),
-			't', 'g', 't',
+			//[INODE_TABLE_OFFSET+2+128] =
+			//INODE_HEADER(3, 0, 0, 0, 0, 2),
+			//INODE_BASIC_SYMLINK(3),
+			//'t', 'g', 't',
 			[INODE_TABLE_OFFSET+2+256] =
 			INODE_HEADER(2, 0, 0, 0, 0, 3),
 			INODE_BASIC_FILE(1024, 0xFFFFFFFF, 0, 8),
@@ -139,6 +143,8 @@ test_file_exists_through_symlink(void) {
 			[FRAGMENT_TABLE_OFFSET] = 0,
 			/* clang-format on */
 	};
+	mk_symlink(
+			"tgt", 2, INODE_TABLE_OFFSET + 2 + 128, payload, sizeof(payload));
 	mk_stub(&archive, payload, sizeof(payload));
 
 	bool exists = sqsh_easy_file_exists(&archive, "/src", &rv);
