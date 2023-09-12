@@ -25,7 +25,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.               *
  *                                                                            *
  ******************************************************************************/
-
 /**
  * @author       Enno Boland (mail@eboland.de)
  * @file         inode_builder.c
@@ -33,178 +32,241 @@
 
 #define _DEFAULT_SOURCE
 
-#include "../../../include/sqsh_data.h"
+#include "../../../include/sqsh_common.h"
+#include "../../../include/sqsh_data_private.h"
 #include "../../../include/sqsh_data_set.h"
 #include "../../../include/sqsh_error.h"
-#include "../../read/utils/utils.h"
 #include "../sqsh_file_builder.h"
-#include "../sqsh_metablock_builder.h"
+#include <stdlib.h>
 #include <string.h>
 
+#define XATTR_UNSET 0xFFFFFFFF
+
 int
-sqsh__inode_builder_init(struct SqshInodeBuilder *inode) {
-	memset(inode, 0, sizeof(*inode));
+sqsh__inode_builder_init(struct SqshInodeBuilder *builder) {
+	memset(builder, 0, sizeof(*builder));
+	cx_rc_init(&builder->rc);
+	return 0;
+}
+
+int
+sqsh__inode_builder_cleanup(struct SqshInodeBuilder *builder) {
+	int rv = 0;
+	if (builder->payload != NULL) {
+		rv = builder->payload->free(builder->payload_data);
+		if (rv < 0) {
+			goto out;
+		}
+		builder->payload = NULL;
+		builder->payload_data = NULL;
+	}
+out:
+	return rv;
+}
+
+struct SqshInodeBuilder *
+sqsh__inode_builder_new(int *err) {
+	int rv = 0;
+	struct SqshInodeBuilder *builder =
+			calloc(1, sizeof(struct SqshInodeBuilder));
+	if (builder == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
+	}
+	rv = sqsh__inode_builder_init(builder);
+	if (rv < 0) {
+		free(builder);
+		builder = NULL;
+	}
+out:
+	if (err != NULL) {
+		*err = rv;
+	}
+	return builder;
+}
+
+int
+sqsh__inode_builder_type(
+		struct SqshInodeBuilder *inode, enum SqshDataInodeType type) {
+	inode->type = type;
+	sqsh__data_inode_type_set(&inode->inode, type);
 	return 0;
 }
 
 int
 sqsh__inode_builder_permission(
 		struct SqshInodeBuilder *inode, uint16_t permission) {
-	sqsh__data_inode_permissions_set(&inode->data, permission);
+	sqsh__data_inode_permissions_set(&inode->inode, permission);
 	return 0;
 }
 
 int
-sqsh__inode_builder_uid_idx(struct SqshInodeBuilder *inode, uint16_t uid) {
-	sqsh__data_inode_uid_idx_set(&inode->data, uid);
+sqsh__inode_builder_uid(struct SqshInodeBuilder *inode, uint32_t uid) {
+	// TODO
+	inode->uid = uid;
 	return 0;
 }
 
 int
-sqsh__inode_builder_gid_idx(struct SqshInodeBuilder *inode, uint16_t gid) {
-	sqsh__data_inode_gid_idx_set(&inode->data, gid);
+sqsh__inode_builder_gid(struct SqshInodeBuilder *inode, uint32_t gid) {
+	// TODO
+	inode->gid = gid;
 	return 0;
 }
 
 int
 sqsh__inode_builder_modification_time(
-		struct SqshInodeBuilder *inode, uint32_t mtime) {
-	sqsh__data_inode_modified_time_set(&inode->data, mtime);
+		struct SqshInodeBuilder *inode, uint32_t modification_time) {
+	sqsh__data_inode_modified_time_set(&inode->inode, modification_time);
 	return 0;
 }
 
 int
-sqsh__inode_builder_inode_number(
+sqsh__inode_builder_number(
 		struct SqshInodeBuilder *inode, uint32_t inode_number) {
-	sqsh__data_inode_number_set(&inode->data, inode_number);
+	inode->inode_number = inode_number;
+	sqsh__data_inode_number_set(&inode->inode, inode_number);
 	return 0;
+}
+
+struct SqshDataInodeDirectory *
+sqsh__inode_builder_directory(struct SqshInodeBuilder *inode) {
+	return sqsh__data_inode_directory_mut(&inode->inode);
+}
+
+struct SqshDataInodeFile *
+sqsh__inode_builder_file(struct SqshInodeBuilder *inode) {
+	return sqsh__data_inode_file_mut(&inode->inode);
+}
+
+struct SqshDataInodeSymlink *
+sqsh__inode_builder_symlink(struct SqshInodeBuilder *inode) {
+	return sqsh__data_inode_symlink_mut(&inode->inode);
+}
+
+struct SqshDataInodeDevice *
+sqsh__inode_builder_device(struct SqshInodeBuilder *inode) {
+	return sqsh__data_inode_device_mut(&inode->inode);
+}
+
+struct SqshDataInodeIpc *
+sqsh__inode_builder_ipc(struct SqshInodeBuilder *inode) {
+	return sqsh__data_inode_ipc_mut(&inode->inode);
+}
+
+struct SqshDataInodeDirectoryExt *
+sqsh__inode_builder_directory_ext(struct SqshInodeBuilder *inode) {
+	return sqsh__data_inode_directory_ext_mut(&inode->inode);
+}
+
+struct SqshDataInodeFileExt *
+sqsh__inode_builder_file_ext(struct SqshInodeBuilder *inode) {
+	return sqsh__data_inode_file_ext_mut(&inode->inode);
+}
+
+struct SqshDataInodeSymlinkExt *
+sqsh__inode_builder_symlink_ext(struct SqshInodeBuilder *inode) {
+	return sqsh__data_inode_symlink_ext_mut(&inode->inode);
+}
+
+struct SqshDataInodeDeviceExt *
+sqsh__inode_builder_device_ext(struct SqshInodeBuilder *inode) {
+	return sqsh__data_inode_device_ext_mut(&inode->inode);
+}
+
+struct SqshDataInodeIpcExt *
+sqsh__inode_builder_ipc_ext(struct SqshInodeBuilder *inode) {
+	return sqsh__data_inode_ipc_ext_mut(&inode->inode);
 }
 
 int
-sqsh__inode_builder_symlink(
-		struct SqshInodeBuilder *inode, const char *symlink) {
-	inode->type = SQSH_INODE_TYPE_BASIC_SYMLINK;
-	return cx_buffer_append(
-			&inode->post_data, (const uint8_t *)symlink, strlen(symlink));
+sqsh__inode_builder_payload(
+		struct SqshInodeBuilder *inode,
+		const struct SqshInodeBuilderPayloadImpl *payload, void *data) {
+	inode->payload = payload;
+	inode->payload_data = data;
+
 	return 0;
-}
-
-int
-sqsh__inode_builder_xattr_index(
-		struct SqshInodeBuilder *inode, uint32_t index) {
-	inode->xattr_index = index;
-	return 0;
-}
-
-int
-sqsh__inode_builder_extend(struct SqshInodeBuilder *inode) {
-	switch (inode->type) {
-	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
-		inode->type = SQSH_INODE_TYPE_EXTENDED_DIRECTORY;
-		break;
-	case SQSH_INODE_TYPE_BASIC_FILE:
-		inode->type = SQSH_INODE_TYPE_EXTENDED_FILE;
-		break;
-	case SQSH_INODE_TYPE_BASIC_SYMLINK:
-		inode->type = SQSH_INODE_TYPE_EXTENDED_SYMLINK;
-		break;
-	case SQSH_INODE_TYPE_BASIC_BLOCK:
-		inode->type = SQSH_INODE_TYPE_EXTENDED_BLOCK;
-		break;
-	case SQSH_INODE_TYPE_BASIC_CHAR:
-		inode->type = SQSH_INODE_TYPE_EXTENDED_CHAR;
-		break;
-	case SQSH_INODE_TYPE_BASIC_FIFO:
-		inode->type = SQSH_INODE_TYPE_EXTENDED_FIFO;
-		break;
-	case SQSH_INODE_TYPE_BASIC_SOCKET:
-		inode->type = SQSH_INODE_TYPE_EXTENDED_SOCKET;
-		break;
-	default:
-		break;
-	}
-	return 0;
-}
-
-static size_t
-prepare_symlink(struct SqshInodeBuilder *inode) {
-	struct SqshDataInodeSymlink *data =
-			sqsh__data_inode_symlink_mut(&inode->data);
-	const size_t post_data_size = cx_buffer_size(&inode->post_data);
-
-	sqsh__data_inode_symlink_hard_link_count_set(data, inode->inode_count);
-	sqsh__data_inode_symlink_target_size_set(data, post_data_size);
-
-	return sizeof(struct SqshDataInodeHeader) +
-			sizeof(struct SqshDataInodeSymlink);
-}
-
-static size_t
-prepare_symlink_ext(struct SqshInodeBuilder *inode) {
-	struct SqshDataInodeSymlinkExt *data =
-			sqsh__data_inode_symlink_ext_mut(&inode->data);
-	const size_t post_data_size = cx_buffer_size(&inode->post_data);
-
-	sqsh__data_inode_symlink_ext_hard_link_count_set(data, inode->inode_count);
-	sqsh__data_inode_symlink_ext_target_size_set(data, post_data_size);
-
-	return sizeof(struct SqshDataInodeHeader) +
-			sizeof(struct SqshDataInodeSymlinkExt);
 }
 
 int
 sqsh__inode_builder_write(
-		struct SqshInodeBuilder *inode, struct SqshMetablockBuilder *output) {
+		struct SqshInodeBuilder *builder,
+		struct SqshMetablockBuilder *metablock) {
 	int rv = 0;
-	size_t data_size = 0;
-	sqsh__data_inode_type_set(&inode->data, inode->type);
-
-	switch (inode->type) {
+	struct SqshDataInode *inode = &builder->inode;
+	size_t size;
+	switch (builder->type) {
+	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
+		size = sizeof(struct SqshDataInodeDirectory);
+		break;
+	case SQSH_INODE_TYPE_BASIC_FILE:
+		size = sizeof(struct SqshDataInodeFile);
+		break;
 	case SQSH_INODE_TYPE_BASIC_SYMLINK:
-		data_size = prepare_symlink(inode);
+		size = sizeof(struct SqshDataInodeSymlink);
+		break;
+	case SQSH_INODE_TYPE_BASIC_BLOCK:
+	case SQSH_INODE_TYPE_BASIC_CHAR:
+		size = sizeof(struct SqshDataInodeDevice);
+		break;
+	case SQSH_INODE_TYPE_BASIC_FIFO:
+	case SQSH_INODE_TYPE_BASIC_SOCKET:
+		size = sizeof(struct SqshDataInodeIpc);
+		break;
+	case SQSH_INODE_TYPE_EXTENDED_DIRECTORY:
+		size = sizeof(struct SqshDataInodeDirectoryExt);
+		break;
+	case SQSH_INODE_TYPE_EXTENDED_FILE:
+		size = sizeof(struct SqshDataInodeFileExt);
 		break;
 	case SQSH_INODE_TYPE_EXTENDED_SYMLINK:
-		data_size = prepare_symlink_ext(inode);
+		size = sizeof(struct SqshDataInodeSymlinkExt);
 		break;
-	default:
-		// TODO: Not implemented
-		abort();
+	case SQSH_INODE_TYPE_EXTENDED_BLOCK:
+	case SQSH_INODE_TYPE_EXTENDED_CHAR:
+		size = sizeof(struct SqshDataInodeDeviceExt);
+		break;
+	case SQSH_INODE_TYPE_EXTENDED_FIFO:
+	case SQSH_INODE_TYPE_EXTENDED_SOCKET:
+		size = sizeof(struct SqshDataInodeIpcExt);
+		break;
 	}
+	size += sizeof(struct SqshDataInodeHeader);
 
-	const uint8_t *data = (uint8_t *)&inode->data;
-	rv = sqsh__metablock_builder_write(output, data, data_size);
+	rv = sqsh__metablock_builder_write(metablock, (uint8_t *)inode, size);
 	if (rv < 0) {
 		goto out;
 	}
-	data = cx_buffer_data(&inode->post_data);
-	data_size = cx_buffer_size(&inode->post_data);
-	rv = sqsh__metablock_builder_write(output, data, data_size);
-	if (rv < 0) {
-		goto out;
-	}
 
-	// The extended symlink is unique in that it has an additional field
-	// after the post data.
-	if (inode->type == SQSH_INODE_TYPE_EXTENDED_SYMLINK) {
-		struct SqshDataInodeSymlinkExtTail tail = {0};
-		sqsh__data_inode_symlink_ext_tail_xattr_idx_set(
-				&tail, inode->xattr_index);
-
-		data = (uint8_t *)&tail;
-		data_size = sizeof(tail);
-		rv = sqsh__metablock_builder_write(output, data, data_size);
+	if (builder->payload != NULL) {
+		rv = builder->payload->write(metablock, builder->payload_data);
 		if (rv < 0) {
 			goto out;
 		}
 	}
 
-	rv = data_size + cx_buffer_size(&inode->post_data);
 out:
 	return rv;
 }
 
 int
-sqsh__inode_builder_cleanup(struct SqshInodeBuilder *inode) {
-	cx_buffer_cleanup(&inode->post_data);
+inode_builder_free(struct SqshInodeBuilder *builder) {
+	if (builder == NULL) {
+		return 0;
+	}
+	int rv = sqsh__inode_builder_cleanup(builder);
+	free(builder);
+	return rv;
+}
+
+int
+sqsh__inode_builder_release(struct SqshInodeBuilder *inode) {
+	if (inode == NULL) {
+		return 0;
+	}
+	if (cx_rc_release(&inode->rc)) {
+		return inode_builder_free(inode);
+	}
 	return 0;
 }
