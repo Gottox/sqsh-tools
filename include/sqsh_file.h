@@ -150,11 +150,30 @@ SQSH_NO_UNUSED bool sqsh_file_iterator_next(
  * Note that calling this function will invalidate the data pointer returned by
  * sqsh_file_iterator_data().
  *
- * @param[in,out] iterator The file iterator to skip data in.
- * @param[in] offset        The offset that is contained in the block to skip
- * to.
- * @param[in] desired_size  The desired size of the data to read. May be more or
- * less than the actual size of the data read.
+ * The offset is relative to the beginning of the current block or, if the
+ * iterator hasn't been forwarded with previous calls to
+ * sqsh_file_iterator_skip() or sqsh_file_iterator_next() the beginning of the
+ * first block.
+ *
+ * After calling this function `offset` is updated to the same position relative
+ * to the new block. See this visualisation:
+ *
+ * ```
+ * current_block: |<--- block 8000 --->|
+ *                           offset = 10000 --^
+ * -->  sqsh_file_iterator_skip(i, &offset, 1)
+ * current_block:                      |<--- block 8000 --->|
+ *                            offset = 2000 --^
+ * ```
+ *
+ * If libsqsh can map more than one block at once, it will do so until
+ * `desired_size` is reached. Note that `desired_size` is only a hint and
+ * libsqsh may return more or less data than requested.
+ *
+ * @param[in,out] iterator      The file iterator to skip data in.
+ * @param[in,out] offset        The offset that is contained in the block to
+ * skip to.
+ * @param[in] desired_size      The desired size of the data to read.
  *
  * @return 0 on success, less than 0 on error.
  */
