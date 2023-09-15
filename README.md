@@ -1,4 +1,4 @@
-# libsqsh [![CI](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml/badge.svg)](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml) [![codecov](https://codecov.io/github/Gottox/libsqsh/graph/badge.svg?token=AM5COPDMH0)](https://codecov.io/github/Gottox/libsqsh) [![License](https://img.shields.io/badge/License-BSD_2--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
+# libsqsh [![CI](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml/badge.svg)](https://github.com/Gottox/libsqsh/actions/workflows/ci.yaml) [![codecov](https://codecov.io/github/Gottox/libsqsh/graph/badge.svg?token=AM5COPDMH0)](https://codecov.io/github/Gottox/libsqsh) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Gottox_libsqsh&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Gottox_libsqsh) [![License](https://img.shields.io/badge/License-BSD_2--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
 
 squashfs is an open and free compressed read-only filesystem. It is used in
 embedded devices, live-CDs, or in packaging. The original implementation
