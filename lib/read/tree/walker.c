@@ -123,22 +123,7 @@ out:
 
 struct SqshTreeWalker *
 sqsh_tree_walker_new(struct SqshArchive *archive, int *err) {
-	int rv = 0;
-	struct SqshTreeWalker *walker = calloc(1, sizeof(struct SqshTreeWalker));
-	if (walker == NULL) {
-		rv = -SQSH_ERROR_MALLOC_FAILED;
-		goto out;
-	}
-	rv = sqsh__tree_walker_init(walker, archive);
-	if (rv < 0) {
-		free(walker);
-		walker = NULL;
-	}
-out:
-	if (err != NULL) {
-		*err = rv;
-	}
-	return walker;
+	SQSH_NEW_IMPL(sqsh__tree_walker_init, struct SqshTreeWalker, archive);
 }
 
 int
@@ -424,10 +409,5 @@ sqsh__tree_walker_cleanup(struct SqshTreeWalker *walker) {
 
 int
 sqsh_tree_walker_free(struct SqshTreeWalker *walker) {
-	if (walker == NULL) {
-		return 0;
-	}
-	int rv = sqsh__tree_walker_cleanup(walker);
-	free(walker);
-	return rv;
+	SQSH_FREE_IMPL(sqsh__tree_walker_cleanup, walker);
 }
