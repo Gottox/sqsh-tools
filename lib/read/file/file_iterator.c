@@ -93,23 +93,7 @@ out:
 
 struct SqshFileIterator *
 sqsh_file_iterator_new(const struct SqshFile *file, int *err) {
-	int rv = 0;
-	struct SqshFileIterator *iterator =
-			calloc(1, sizeof(struct SqshFileIterator));
-	if (iterator == NULL) {
-		rv = -SQSH_ERROR_MALLOC_FAILED;
-		goto out;
-	}
-	rv = sqsh__file_iterator_init(iterator, file);
-	if (rv < 0) {
-		free(iterator);
-		iterator = NULL;
-	}
-out:
-	if (err != NULL) {
-		*err = rv;
-	}
-	return iterator;
+	SQSH_NEW_IMPL(sqsh__file_iterator_init, struct SqshFileIterator, file);
 }
 
 static int
@@ -388,10 +372,5 @@ sqsh__file_iterator_cleanup(struct SqshFileIterator *iterator) {
 
 int
 sqsh_file_iterator_free(struct SqshFileIterator *iterator) {
-	if (iterator == NULL) {
-		return 0;
-	}
-	int rv = sqsh__file_iterator_cleanup(iterator);
-	free(iterator);
-	return rv;
+	SQSH_FREE_IMPL(sqsh__file_iterator_cleanup, iterator);
 }

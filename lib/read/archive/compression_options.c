@@ -36,6 +36,7 @@
 #include "../../../include/sqsh_archive.h"
 #include "../../../include/sqsh_data_private.h"
 #include "../../../include/sqsh_error.h"
+#include "../utils/utils.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -48,24 +49,9 @@ compression_options(const struct SqshCompressionOptions *context) {
 
 struct SqshCompressionOptions *
 sqsh_compression_options_new(struct SqshArchive *sqsh, int *err) {
-	int rv = 0;
-	struct SqshCompressionOptions *compression_options =
-			calloc(1, sizeof(struct SqshCompressionOptions));
-	if (compression_options == NULL) {
-		rv = -SQSH_ERROR_MALLOC_FAILED;
-		goto out;
-	}
-	rv = sqsh__compression_options_init(compression_options, sqsh);
-	if (rv < 0) {
-		free(compression_options);
-		compression_options = NULL;
-	}
-	rv = 0;
-out:
-	if (err != NULL) {
-		*err = rv;
-	}
-	return compression_options;
+	SQSH_NEW_IMPL(
+			sqsh__compression_options_init, struct SqshCompressionOptions,
+			sqsh);
 }
 
 int
@@ -207,10 +193,5 @@ sqsh__compression_options_cleanup(struct SqshCompressionOptions *context) {
 
 int
 sqsh_compression_options_free(struct SqshCompressionOptions *context) {
-	if (context == NULL) {
-		return 0;
-	}
-	int rv = sqsh__compression_options_cleanup(context);
-	free(context);
-	return rv;
+	SQSH_FREE_IMPL(sqsh__compression_options_cleanup, context);
 }

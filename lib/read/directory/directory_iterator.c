@@ -206,23 +206,8 @@ sqsh__directory_iterator_init(
 
 struct SqshDirectoryIterator *
 sqsh_directory_iterator_new(struct SqshFile *file, int *err) {
-	int rv = 0;
-	struct SqshDirectoryIterator *iterator =
-			calloc(1, sizeof(struct SqshDirectoryIterator));
-	if (file == NULL) {
-		rv = -SQSH_ERROR_MALLOC_FAILED;
-		goto out;
-	}
-	rv = sqsh__directory_iterator_init(iterator, file);
-	if (rv < 0) {
-		free(iterator);
-		iterator = NULL;
-	}
-out:
-	if (err != NULL) {
-		*err = rv;
-	}
-	return iterator;
+	SQSH_NEW_IMPL(
+			sqsh__directory_iterator_init, struct SqshDirectoryIterator, file);
 }
 
 uint16_t
@@ -455,10 +440,5 @@ sqsh__directory_iterator_cleanup(struct SqshDirectoryIterator *iterator) {
 
 int
 sqsh_directory_iterator_free(struct SqshDirectoryIterator *iterator) {
-	if (iterator == NULL) {
-		return 0;
-	}
-	int rv = sqsh__directory_iterator_cleanup(iterator);
-	free(iterator);
-	return rv;
+	SQSH_FREE_IMPL(sqsh__directory_iterator_cleanup, iterator);
 }

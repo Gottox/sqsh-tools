@@ -79,22 +79,7 @@ out:
 
 struct SqshFileReader *
 sqsh_file_reader_new(const struct SqshFile *file, int *err) {
-	int rv = 0;
-	struct SqshFileReader *reader = calloc(1, sizeof(struct SqshFileReader));
-	if (reader == NULL) {
-		rv = -SQSH_ERROR_MALLOC_FAILED;
-		goto out;
-	}
-	rv = sqsh__file_reader_init(reader, file);
-	if (rv < 0) {
-		free(reader);
-		reader = NULL;
-	}
-out:
-	if (err != NULL) {
-		*err = rv;
-	}
-	return reader;
+	SQSH_NEW_IMPL(sqsh__file_reader_init, struct SqshFileReader, file);
 }
 
 int
@@ -123,10 +108,5 @@ sqsh__file_reader_cleanup(struct SqshFileReader *reader) {
 
 int
 sqsh_file_reader_free(struct SqshFileReader *context) {
-	if (context == NULL) {
-		return 0;
-	}
-	int rv = sqsh__file_reader_cleanup(context);
-	free(context);
-	return rv;
+	SQSH_FREE_IMPL(sqsh__file_reader_cleanup, context);
 }

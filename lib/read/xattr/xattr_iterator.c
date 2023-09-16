@@ -111,23 +111,7 @@ out:
 
 struct SqshXattrIterator *
 sqsh_xattr_iterator_new(const struct SqshFile *file, int *err) {
-	int rv = 0;
-	struct SqshXattrIterator *iterator =
-			calloc(1, sizeof(struct SqshXattrIterator));
-	if (iterator == NULL) {
-		rv = -SQSH_ERROR_MALLOC_FAILED;
-		goto out;
-	}
-	rv = sqsh__xattr_iterator_init(iterator, file);
-	if (rv < 0) {
-		free(iterator);
-		iterator = NULL;
-	}
-out:
-	if (err != NULL) {
-		*err = rv;
-	}
-	return iterator;
+	SQSH_NEW_IMPL(sqsh__xattr_iterator_init, struct SqshXattrIterator, file);
 }
 
 static const struct SqshDataXattrValue *
@@ -393,10 +377,5 @@ sqsh__xattr_iterator_cleanup(struct SqshXattrIterator *iterator) {
 
 int
 sqsh_xattr_iterator_free(struct SqshXattrIterator *iterator) {
-	if (iterator == NULL) {
-		return 0;
-	}
-	int rv = sqsh__xattr_iterator_cleanup(iterator);
-	free(iterator);
-	return rv;
+	SQSH_FREE_IMPL(sqsh__xattr_iterator_cleanup, iterator);
 }
