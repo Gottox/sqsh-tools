@@ -128,6 +128,8 @@ get_file_time(CURL *handle, uint64_t *file_time) {
 static CURL *
 configure_handle(struct SqshMapper *mapper) {
 	CURL *handle = mapper->data.cl.handle;
+	const long tls_versions =
+			CURL_SSLVERSION_TLSv1_2 | CURL_SSLVERSION_MAX_DEFAULT;
 	curl_easy_reset(handle);
 	curl_easy_setopt(handle, CURLOPT_URL, mapper->data.cl.url);
 	curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 1L);
@@ -136,6 +138,7 @@ configure_handle(struct SqshMapper *mapper) {
 	curl_easy_setopt(handle, CURLOPT_FAILONERROR, 1L);
 	curl_easy_setopt(handle, CURLOPT_FILETIME, 1L);
 	curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_data);
+	curl_easy_setopt(handle, CURLOPT_SSLVERSION, tls_versions);
 	return handle;
 }
 
