@@ -32,6 +32,7 @@ sqsh_test = [
     'nasty.c',
     'reader/reader.c',
     'tree/walker.c',
+    'tree/path_resolver.c',
     'xattr/xattr_iterator.c',
 ]
 sqsh_extended_test = [
