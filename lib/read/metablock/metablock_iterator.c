@@ -110,6 +110,7 @@ map_data(struct SqshMetablockIterator *iterator) {
 		goto out;
 	}
 
+	sqsh__extract_view_cleanup(&iterator->extract_view);
 	if (iterator->is_compressed) {
 		rv = sqsh__extract_view_init(
 				&iterator->extract_view, iterator->compression_manager,
@@ -132,8 +133,6 @@ bool
 sqsh__metablock_iterator_next(
 		struct SqshMetablockIterator *iterator, int *err) {
 	int rv = 0;
-
-	sqsh__extract_view_cleanup(&iterator->extract_view);
 
 	rv = process_next_header(iterator);
 	if (rv < 0) {
