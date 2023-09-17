@@ -335,7 +335,7 @@ main(int argc, char *argv[]) {
 	char *src_path = "/";
 	char *target_path = NULL;
 	struct SqshArchive *sqsh;
-	struct SqshTreeWalker *walker = NULL;
+	struct SqshPathResolver *resolver = NULL;
 	struct SqshFile *file = NULL;
 	uint64_t offset = 0;
 
@@ -377,20 +377,20 @@ main(int argc, char *argv[]) {
 		rv = EXIT_FAILURE;
 		goto out;
 	}
-	walker = sqsh_tree_walker_new(sqsh, &rv);
+	resolver = sqsh_path_resolver_new(sqsh, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, image_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
 
-	rv = sqsh_tree_walker_resolve(walker, src_path, false);
+	rv = sqsh_path_resolver_resolve(resolver, src_path, false);
 	if (rv < 0) {
 		sqsh_perror(rv, src_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
-	file = sqsh_tree_walker_open_file(walker, &rv);
+	file = sqsh_path_resolver_open_file(resolver, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, src_path);
 		rv = EXIT_FAILURE;
@@ -431,7 +431,7 @@ main(int argc, char *argv[]) {
 	}
 out:
 	sqsh_close(file);
-	sqsh_tree_walker_free(walker);
+	sqsh_path_resolver_free(resolver);
 	sqsh_archive_close(sqsh);
 	return rv;
 }

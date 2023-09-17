@@ -48,14 +48,14 @@
 bool
 sqsh_easy_file_exists(struct SqshArchive *archive, const char *path, int *err) {
 	int rv = 0;
-	struct SqshTreeWalker walker = {0};
+	struct SqshPathResolver resolver = {0};
 	bool exists = false;
 
-	rv = sqsh__tree_walker_init(&walker, archive);
+	rv = sqsh__path_resolver_init(&resolver, archive);
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh_tree_walker_resolve(&walker, path, true);
+	rv = sqsh_path_resolver_resolve(&resolver, path, true);
 	if (rv == -SQSH_ERROR_NO_SUCH_FILE) {
 		rv = 0;
 		goto out;
@@ -66,7 +66,7 @@ sqsh_easy_file_exists(struct SqshArchive *archive, const char *path, int *err) {
 	exists = true;
 
 out:
-	sqsh__tree_walker_cleanup(&walker);
+	sqsh__path_resolver_cleanup(&resolver);
 	if (err != NULL) {
 		*err = rv;
 	}

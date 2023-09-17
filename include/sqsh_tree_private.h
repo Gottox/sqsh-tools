@@ -45,13 +45,13 @@ extern "C" {
 struct SqshArchive;
 
 /***************************************
- * tree/walker.c
+ * tree/path_resolver.c
  */
 
 /**
  * @brief A walker over the contents of a file.
  */
-struct SqshTreeWalker {
+struct SqshPathResolver {
 	/**
 	 * @privatesection
 	 */
@@ -67,27 +67,41 @@ struct SqshTreeWalker {
 
 /**
  * @internal
- * @memberof SqshTreeWalker
- * @brief Initializes a SqshTreeWalker struct.
+ * @memberof SqshPathResolver
+ * @brief Initializes a SqshPathResolver struct.
  *
  * @param[out] walker   The file walker to initialize.
  * @param[in]  archive  The archive to use
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__tree_walker_init(
-		struct SqshTreeWalker *walker, struct SqshArchive *archive);
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__path_resolver_init(
+		struct SqshPathResolver *walker, struct SqshArchive *archive);
 
 /**
  * @internal
- * @memberof SqshTreeWalker
+ * @memberof SqshPathResolver
  * @brief Frees the resources used by the file walker.
  *
  * @param walker The file walker to clean up.
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_EXPORT int sqsh__tree_walker_cleanup(struct SqshTreeWalker *walker);
+SQSH_NO_EXPORT int sqsh__path_resolver_cleanup(struct SqshPathResolver *walker);
+/***************************************
+ * tree/walker.c
+ */
+
+/**
+ * @brief A walker over the contents of a file.
+ * @deprecated Since 1.2.0. Use struct SqshPathResolver instead.
+ */
+struct SqshTreeWalker {
+	/**
+	 * @privatesection
+	 */
+	struct SqshPathResolver inner;
+} __attribute__((deprecated("Since 1.2.0. Use SqshPathResolver instead.")));
 
 #ifdef __cplusplus
 }

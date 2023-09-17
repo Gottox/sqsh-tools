@@ -621,19 +621,19 @@ sqsh__file_cleanup(struct SqshFile *inode) {
 struct SqshFile *
 sqsh_open(struct SqshArchive *archive, const char *path, int *err) {
 	int rv;
-	struct SqshTreeWalker walker = {0};
+	struct SqshPathResolver resolver = {0};
 	struct SqshFile *inode = NULL;
-	rv = sqsh__tree_walker_init(&walker, archive);
+	rv = sqsh__path_resolver_init(&resolver, archive);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = sqsh_tree_walker_resolve(&walker, path, true);
+	rv = sqsh_path_resolver_resolve(&resolver, path, true);
 	if (rv < 0) {
 		goto out;
 	}
 
-	inode = sqsh_tree_walker_open_file(&walker, &rv);
+	inode = sqsh_path_resolver_open_file(&resolver, &rv);
 	if (rv < 0) {
 		goto out;
 	}
@@ -642,7 +642,7 @@ out:
 	if (err != NULL) {
 		*err = rv;
 	}
-	sqsh__tree_walker_cleanup(&walker);
+	sqsh__path_resolver_cleanup(&resolver);
 	return inode;
 }
 
