@@ -40,6 +40,7 @@ sqsh_extended_test = [
     'tools/read-chunk/tail.sh',
     'tools/unpack/repack.sh',
     'tools/unpack/pathtraversal/pathtraversal.sh',
+    'tools/ls/large-tree.sh',
 ]
 sqsh_extended_fs_test = [
     'tools/fs/large-file.sh',
