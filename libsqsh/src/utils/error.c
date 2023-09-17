@@ -152,6 +152,8 @@ sqsh_error_str(int error_code) {
 		return "No such element";
 	case SQSH_ERROR_DIRECTORY_RECURSION:
 		return "Directory recursion";
+	case SQSH_ERROR_READ_FAILED:
+		return "Read failed";
 	}
 	snprintf(err_str, sizeof(err_str), UNKNOWN_ERROR_FORMAT, error_code);
 	return err_str;

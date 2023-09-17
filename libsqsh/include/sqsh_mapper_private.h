@@ -96,6 +96,20 @@ struct SqshStaticMapper {
 };
 
 /***************************************
+ * mapper/static_mapper.c
+ */
+
+/**
+ * @brief The static mapper.
+ */
+struct SqshFileMapper {
+	/**
+	 * @privatesection
+	 */
+	void *file;
+};
+
+/***************************************
  * mapper/mapper.c
  */
 
@@ -114,6 +128,7 @@ struct SqshMapper {
 	union {
 		struct SqshMmapMapper mm;
 		struct SqshStaticMapper sm;
+		struct SqshFileMapper fm;
 		struct SqshCurlMapper cl;
 	} data;
 };
