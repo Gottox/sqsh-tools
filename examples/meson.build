@@ -47,6 +47,12 @@ executable(
     dependencies: libsqsh_dep,
 )
 executable(
+    'custom_mapper',
+    'custom_mapper.c',
+    install: false,
+    dependencies: libsqsh_dep,
+)
+executable(
     'readme_example',
     'readme_example.c',
     install: false,
