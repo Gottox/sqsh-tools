@@ -11,6 +11,7 @@ tests = [
     'collection/rc_hash_map_test.c',
     'collection/rc_map_test.c',
     'utils/memory.c',
+    'memory/rc.c',
 ]
 
 foreach test : tests

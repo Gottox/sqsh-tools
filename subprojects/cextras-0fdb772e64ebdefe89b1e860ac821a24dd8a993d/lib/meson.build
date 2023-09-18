@@ -4,7 +4,9 @@ subdir('concurrency')
 
 subdir('utils')
 
-src = [concurrency_src, collection_src, utils_src]
+subdir('memory')
+
+src = [concurrency_src, collection_src, utils_src, memory_src]
 
 cextras = static_library(
     'cextras',
