@@ -16,6 +16,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: configure
       run: |
+        apk add --repository https://dl-cdn.alpinelinux.org/alpine/edge/testing muon
         apk add clang16-extra-tools
         meson setup /tmp/build \
           -Dwerror=true \
@@ -29,7 +30,16 @@ jobs:
           -Dfuse-old=disabled \
           -Dtest=false \
           -Ddoc=false
-    - name: format-check
+    - name: muon fmt
+      run: |
+        if ! find . \( -name meson.build -or -name meson_options.txt \) -print0 \
+            | xargs -0 muon fmt -q; then
+          find . \( -name meson.build -or -name meson_options.txt \) -print0 \
+            | xargs -0 muon fmt -i;
+          git diff
+          exit 1
+        fi
+    - name: clang-format
       run: |
         ninja -C /tmp/build clang-format-check
   test:

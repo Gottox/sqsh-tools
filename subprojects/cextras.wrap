@@ -1,9 +1,9 @@
 [wrap-file]
-directory = cextras-c3d6f8c344099fd87d186a634b382d70b7e797ab
+directory = cextras-0fdb772e64ebdefe89b1e860ac821a24dd8a993d
 
-source_url = https://github.com/Gottox/cextras/archive/c3d6f8c344099fd87d186a634b382d70b7e797ab.tar.gz
-source_filename = cextras-c3d6f8c344099fd87d186a634b382d70b7e797ab.tar.gz
-source_hash = 497d4a45a5fbf976c750e5ada3e74593d381be8bef125858cd2df7d1e8da1a9e
+source_url = https://github.com/Gottox/cextras/archive/0fdb772e64ebdefe89b1e860ac821a24dd8a993d.tar.gz
+source_filename = cextras-0fdb772e64ebdefe89b1e860ac821a24dd8a993d.tar.gz
+source_hash = 2bcf6caae3b7a5cd6221d8784767f62c63bfc9159bb95ead00d9c1d0f7635dac
 
 [provide]
 cextras=cextras_dep
