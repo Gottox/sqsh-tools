@@ -12,7 +12,7 @@ libsqsh_data_dependencies = [
     cextras_dep,
 ]
 
-libsqsh_data_c_args = [ '-Wconversion', '-Wsign-conversion']
+libsqsh_data_c_args = ['-Wconversion', '-Wsign-conversion']
 
 libsqsh_data = static_library(
     'sqsh',
