@@ -1,21 +1,19 @@
-subdir('man')
-
 tool_sources = [
-    'src/cat.c',
-    'src/ls.c',
-    'src/stat.c',
-    'src/xattr.c',
-    'src/unpack.c',
+    'cat.c',
+    'ls.c',
+    'stat.c',
+    'xattr.c',
+    'unpack.c',
 ]
 
 c_args = ['-DVERSION="@0@"'.format(meson.project_version())]
 
 tools = {}
 foreach src : tool_sources
-    tool_name = 'sqsh-' + src.split('.')[0].split('/')[-1]
+    tool_name = 'sqsh-' + src.split('.')[0]
     tool = executable(
         tool_name,
-        [src, 'src/common.c'],
+        [src, 'common.c'],
         c_args: c_args,
         install: not meson.is_subproject(),
         dependencies: libsqsh_dep,
@@ -26,7 +24,7 @@ endforeach
 if fuse3_dep.found()
     tool = executable(
         'sqshfs',
-        ['src/fs3.c', 'src/common.c', 'src/fs-common.c'],
+        ['fs3.c', 'common.c', 'fs-common.c'],
         c_args: c_args,
         install: not meson.is_subproject(),
         dependencies: [libsqsh_dep, fuse3_dep],
@@ -37,7 +35,7 @@ endif
 if fuse2_dep.found()
     tool = executable(
         'sqshfs2',
-        ['src/fs2.c', 'src/common.c', 'src/fs-common.c'],
+        ['fs2.c', 'common.c', 'fs-common.c'],
         c_args: c_args,
         install: not meson.is_subproject() and not fuse3_dep.found(),
         dependencies: [libsqsh_dep, fuse2_dep],

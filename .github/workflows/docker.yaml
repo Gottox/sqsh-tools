@@ -4,7 +4,7 @@ on:
     branches:
       - main
     paths:
-      - utils/*
+      - common/build_utils/*
 
 jobs:
   docker:
@@ -31,8 +31,8 @@ jobs:
           sha-${{ github.sha }}-${{ matrix.tag_suffix }}
           ${{ github.ref_name }}-${{ matrix.tag_suffix }}
           ${{ matrix.extra_tags }}
-        context: utils
-        containerfiles: utils/Dockerfile
+        context: common/build_utils
+        containerfiles: common/build_utils/Dockerfile
     - name: Push to Dockerhub
       uses: redhat-actions/push-to-registry@v2
       with:

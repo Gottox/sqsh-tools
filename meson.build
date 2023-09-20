@@ -33,16 +33,13 @@ zlib_dep = dependency('zlib', required: get_option('zlib'))
 zstd_dep = dependency('libzstd', required: get_option('zstd'))
 cextras_dep = subproject('cextras').get_variable('cextras_dep')
 
+pkg_mod = import('pkgconfig')
+
 subdir('include')
 
-subdir('lib')
+subdir('common')
 
-subdir('man')
-
-libsqsh_dep = declare_dependency(
-    link_with: libsqsh,
-    include_directories: libsqsh_include,
-)
+subdir('libsqsh')
 
 if get_option('examples')
     subdir('examples')
@@ -56,21 +53,6 @@ if get_option('test') != 'false'
     subdir('test')
 endif
 
-if get_option('fuzzer')
-    subdir('fuzzer')
-endif
-
 if get_option('doc') != 'false'
     subdir('doc')
 endif
-
-pkg_mod = import('pkgconfig')
-pkg_mod.generate(
-    libsqsh,
-    name: 'libsqsh',
-    filebase: 'libsqsh',
-    description: 'A library to access squashfs archives',
-    subdirs: 'sqsh',
-    libraries: libsqsh,
-    version: meson.project_version(),
-)

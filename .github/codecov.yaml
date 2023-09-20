@@ -1,6 +1,6 @@
 ignore:
   - "examples/"
-  - "fuzzer/"
+  - "libsqsh/fuzzer/"
   - "subprojects/"
   - "test/"
 parsers:
