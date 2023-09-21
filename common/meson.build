@@ -1,0 +1,18 @@
+subdir('include')
+
+subdir('src')
+
+libsqsh_common_dependencies = [
+    cextras_dep,
+]
+
+libsqsh_common_c_args = ['-Wconversion', '-Wsign-conversion']
+
+libsqsh_common = static_library(
+    'sqsh',
+    libsqsh_common_sources,
+    include_directories: [libsqsh_common_include, libsqsh_include],
+    c_args: libsqsh_common_c_args,
+    dependencies: libsqsh_common_dependencies,
+    install: false,
+)

@@ -1,3 +1,0 @@
-subdir('data')
-
-subdir('read')
