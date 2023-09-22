@@ -33,7 +33,7 @@
 
 #include <sqsh_extract_private.h>
 
-#include "../utils/utils.h"
+#include <sqsh_common_private.h>
 #include <sqsh_error.h>
 
 int

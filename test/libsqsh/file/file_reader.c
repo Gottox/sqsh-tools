@@ -35,8 +35,8 @@
 #include "../common.h"
 #include <testlib.h>
 
-#include "../../libsqsh/src/utils/utils.h"
 #include <sqsh_archive_private.h>
+#include <sqsh_common_private.h>
 #include <sqsh_data_private.h>
 #include <sqsh_file.h>
 

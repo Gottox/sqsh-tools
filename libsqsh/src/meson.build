@@ -43,5 +43,3 @@ libsqsh_sources = files(
     'utils/thread.c',
     'xattr/xattr_iterator.c',
 )
-
-libsqsh_headers_private = files('utils/utils.h')

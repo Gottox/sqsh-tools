@@ -33,9 +33,9 @@
 
 #include <sqsh_directory_private.h>
 
-#include "../utils/utils.h"
 #include <cextras/utils.h>
 #include <sqsh_archive.h>
+#include <sqsh_common_private.h>
 #include <sqsh_data_private.h>
 #include <sqsh_error.h>
 #include <sqsh_file_private.h>
