@@ -33,8 +33,8 @@
 
 #include <sqsh_tree_private.h>
 
-#include "../utils/utils.h"
 #include <sqsh_archive_private.h>
+#include <sqsh_common_private.h>
 #include <sqsh_directory_private.h>
 #include <sqsh_error.h>
 #include <sqsh_file_private.h>

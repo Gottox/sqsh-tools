@@ -40,8 +40,8 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "../utils/utils.h"
 #include <sqsh_archive_private.h>
+#include <sqsh_common_private.h>
 #include <sqsh_extract_private.h>
 
 int

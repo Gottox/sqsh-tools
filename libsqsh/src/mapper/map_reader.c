@@ -33,7 +33,7 @@
 
 #include <sqsh_mapper_private.h>
 
-#include "../utils/utils.h"
+#include <sqsh_common_private.h>
 #include <sqsh_error.h>
 
 static bool

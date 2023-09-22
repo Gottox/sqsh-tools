@@ -37,7 +37,7 @@
 #include <sqsh_error.h>
 #include <sqsh_reader_private.h>
 
-#include "../utils/utils.h"
+#include <sqsh_common_private.h>
 
 static bool
 file_iterator_next(void *iterator, size_t desired_size, int *err) {

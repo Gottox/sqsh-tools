@@ -40,7 +40,7 @@
 
 #	include <sqsh_data_private.h>
 #	include <sqsh_error.h>
-#	include "../utils/utils.h"
+#	include <sqsh_common_private.h>
 
 #	include <curl/curl.h>
 #	include <inttypes.h>
