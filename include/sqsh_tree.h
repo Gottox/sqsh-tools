@@ -267,7 +267,7 @@ __attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_next() "
 sqsh_tree_walker_next(struct SqshTreeWalker *walker);
 
 /**
- * @deprecated Since 1.2.0. Use sqsh_tree_walker_type() instead.
+ * @deprecated Since 1.2.0. Use sqsh_path_resolver_type() instead.
  * @brief Returns the inode type of the current entry.
  * @memberof SqshTreeWalker
  *
@@ -275,12 +275,12 @@ sqsh_tree_walker_next(struct SqshTreeWalker *walker);
  *
  * @return the inode type of the current entry.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_tree_walker_type() "
+__attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_type() "
 						  "instead."))) enum SqshFileType
 sqsh_tree_walker_type(const struct SqshTreeWalker *walker);
 
 /**
- * @deprecated Since 1.2.0. Use sqsh_tree_walker_name() instead.
+ * @deprecated Since 1.2.0. Use sqsh_path_resolver_name() instead.
  * @brief Returns the name of the current entry. This entry is not zero
  * terminated.
  * @memberof SqshTreeWalker
@@ -289,12 +289,12 @@ sqsh_tree_walker_type(const struct SqshTreeWalker *walker);
  *
  * @return the name of the current entry.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_tree_walker_name() "
+__attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_name() "
 						  "instead."))) const char *
 sqsh_tree_walker_name(const struct SqshTreeWalker *walker);
 
 /**
- * @deprecated Since 1.2.0. Use sqsh_tree_walker_name_size() instead.
+ * @deprecated Since 1.2.0. Use sqsh_path_resolver_name_size() instead.
  * @memberof SqshTreeWalker
  * @brief Returns the size of the name of the current entry.
  *
@@ -302,12 +302,12 @@ sqsh_tree_walker_name(const struct SqshTreeWalker *walker);
  *
  * @return the size of the name of the current entry.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_tree_walker_name_size() "
+__attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_name_size() "
 						  "instead."))) uint16_t
 sqsh_tree_walker_name_size(const struct SqshTreeWalker *walker);
 
 /**
- * @deprecated Since 1.2.0. Use sqsh_tree_walker_name_dup() instead.
+ * @deprecated Since 1.2.0. Use sqsh_path_resolver_name_dup() instead.
  * @memberof SqshTreeWalker
  * @brief creates a heap allocated copy of the name of the current entry.
  *
@@ -319,7 +319,7 @@ sqsh_tree_walker_name_size(const struct SqshTreeWalker *walker);
  *
  * @return the name of the current entry.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_tree_walker_name_dup() "
+__attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_name_dup() "
 						  "instead."))) SQSH_NO_UNUSED char *
 sqsh_tree_walker_name_dup(const struct SqshTreeWalker *walker);
 
