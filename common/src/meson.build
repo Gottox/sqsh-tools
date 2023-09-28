@@ -1,9 +1,9 @@
 libsqsh_common_sources = files(
-    'compression_options_data.c',
-    'directory_data.c',
-    'fragment_data.c',
-    'inode_data.c',
-    'metablock_data.c',
-    'superblock_data.c',
-    'xattr_data.c',
+    'data/compression_options_data.c',
+    'data/directory_data.c',
+    'data/fragment_data.c',
+    'data/inode_data.c',
+    'data/metablock_data.c',
+    'data/superblock_data.c',
+    'data/xattr_data.c',
 )
