@@ -30,7 +30,6 @@ libsqsh_sources = files(
     'mapper/static_mapper.c',
     'metablock/metablock_iterator.c',
     'metablock/metablock_reader.c',
-    'reader/reader.c',
     'table/export_table.c',
     'table/fragment_table.c',
     'table/id_table.c',

@@ -36,6 +36,7 @@
 
 #include <sqsh_common.h>
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -99,7 +100,7 @@ sqsh_address_ref_create(uint32_t outer_offset, uint16_t inner_offset) {
 
 SQSH_NO_UNUSED static inline uint32_t
 sqsh_datablock_size(uint32_t size_info) {
-	return size_info & ~(1 << 24);
+	return size_info & (uint32_t) ~(1 << 24);
 }
 
 SQSH_NO_UNUSED static inline bool
