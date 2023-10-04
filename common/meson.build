@@ -16,3 +16,8 @@ libsqsh_common = static_library(
     dependencies: libsqsh_common_dependencies,
     install: false,
 )
+
+libsqsh_common_dep = declare_dependency(
+    link_with: libsqsh_common,
+    include_directories: libsqsh_common_include,
+)

@@ -8,6 +8,7 @@ endif
 
 libsqsh_dependencies = [
     cextras_dep,
+    libsqsh_common_dep,
 ]
 
 libsqsh_c_args = []
@@ -45,11 +46,9 @@ libsqsh = both_libraries(
     libsqsh_sources,
     include_directories: [
         libsqsh_private_include,
-        libsqsh_common_include,
         libsqsh_include,
     ],
     install: not meson.is_subproject(),
-    link_with: [libsqsh_common],
     c_args: libsqsh_c_args,
     dependencies: libsqsh_dependencies,
     version: meson.project_version(),
