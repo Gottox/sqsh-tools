@@ -39,6 +39,5 @@ libsqsh_sources = files(
     'tree/walker.c',
     'utils/error.c',
     'utils/posix.c',
-    'utils/thread.c',
     'xattr/xattr_iterator.c',
 )
