@@ -103,6 +103,14 @@ out:
 	return rv;
 }
 
+static const char opts[] = "o:vh";
+static const struct option long_opts[] = {
+		{"offset", required_argument, NULL, 'o'},
+		{"version", no_argument, NULL, 'v'},
+		{"help", no_argument, NULL, 'h'},
+		{0},
+};
+
 int
 main(int argc, char *argv[]) {
 	int rv = 0;
@@ -111,7 +119,7 @@ main(int argc, char *argv[]) {
 	struct SqshArchive *archive;
 	uint64_t offset = 0;
 
-	while ((opt = getopt(argc, argv, "o:vh")) != -1) {
+	while ((opt = getopt_long(argc, argv, opts, long_opts, NULL)) != -1) {
 		switch (opt) {
 		case 'o':
 			offset = strtoull(optarg, NULL, 0);

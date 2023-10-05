@@ -29,11 +29,11 @@ type.
 
 .SH OPTIONS
 .TP
-.BR \-o " " \fIOFFSET\fR
+.BR \-o " " \fIOFFSET\fR ", " \-\-offset " " \fIOFFSET\fR
 skip OFFSET bytes at start of FILESYSTEM.
 
 .TP
-.BR \-v
+.BR \-v ", " \-\-version
 Print the version of \fBsqsh-stat\fR and exit.
 
 .SH ARGUMENTS
@@ -62,8 +62,7 @@ archive:
 
 To display information about multiple paths within the squashfs archive:
 
-.BR sqsh-stat " " /path/to/filesystem.sqsh " " /path/to/file1 
-/path/to/directory/
+.BR sqsh-stat " " /path/to/filesystem.sqsh " " /path/to/file1 " "/path/to/dir/
 
 To print the version of \fBsqsh-stat\fR:
 

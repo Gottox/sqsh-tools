@@ -253,6 +253,16 @@ out:
 	return rv;
 }
 
+static const char opts[] = "o:vrhl";
+static const struct option long_opts[] = {
+		{"offset", required_argument, NULL, 'o'},
+		{"version", no_argument, NULL, 'v'},
+		{"recursive", no_argument, NULL, 'r'},
+		{"help", no_argument, NULL, 'h'},
+		{"long", no_argument, NULL, 'l'},
+		{0},
+};
+
 int
 main(int argc, char *argv[]) {
 	bool has_listed = false;
@@ -262,7 +272,7 @@ main(int argc, char *argv[]) {
 	struct SqshArchive *archive;
 	uint64_t offset = 0;
 
-	while ((opt = getopt(argc, argv, "o:vrhl")) != -1) {
+	while ((opt = getopt_long(argc, argv, opts, long_opts, NULL)) != -1) {
 		switch (opt) {
 		case 'o':
 			offset = strtoull(optarg, NULL, 0);
