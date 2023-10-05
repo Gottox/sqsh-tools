@@ -4,9 +4,7 @@ libsqsh_private_headers = files(
     'sqsh_extract_private.h',
     'sqsh_mapper_private.h',
     'sqsh_metablock_private.h',
-    'sqsh_reader_private.h',
     'sqsh_table_private.h',
-    'sqsh_thread_private.h',
     'sqsh_tree_private.h',
     'sqsh_xattr_private.h',
 )
