@@ -38,9 +38,6 @@
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
 #include <sqsh_error.h>
-#ifdef __linux__
-#	include <alloca.h>
-#endif
 
 static int
 apply_fragment(
@@ -118,21 +115,20 @@ sqsh__fragment_view_init(
 	struct SqshFragmentTable *table = NULL;
 
 	int rv = 0;
-	struct SqshDataFragment *fragment_info =
-			alloca(sizeof(struct SqshDataFragment));
+	struct SqshDataFragment fragment_info = {0};
 
 	rv = sqsh_archive_fragment_table(archive, &table);
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__fragment_table_get(table, file, fragment_info);
+	rv = sqsh__fragment_table_get(table, file, &fragment_info);
 	if (rv < 0) {
 		goto out;
 	}
 
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
-	const uint64_t start_address = sqsh__data_fragment_start(fragment_info);
-	const uint32_t size_info = sqsh__data_fragment_size_info(fragment_info);
+	const uint64_t start_address = sqsh__data_fragment_start(&fragment_info);
+	const uint32_t size_info = sqsh__data_fragment_size_info(&fragment_info);
 	const uint32_t size = sqsh_datablock_size(size_info);
 	const bool is_compressed = sqsh_datablock_is_compressed(size_info);
 	const uint64_t upper_limit = sqsh_superblock_inode_table_start(superblock);
