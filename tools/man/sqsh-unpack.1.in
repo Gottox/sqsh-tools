@@ -26,16 +26,20 @@ the archive.
 
 .SH OPTIONS
 .TP
-.BR \-o " " \fIOFFSET\fR
+.BR \-v ", " \-\-version
+Print the version of \fBsqsh-stat\fR and exit.
+
+.TP
+.BR \-o " " \fIOFFSET\fR ", " \fB\-\-offset " " \fIOFFSET\fR
 skip OFFSET bytes at start of FILESYSTEM.
 
 .TP
-.BR \-c
+.BR \-c ", " \fB\-\-chown\fR
 Change the owner and group of extracted files to match the user and 
 group ID of the current user.
 
 .TP
-.BR \-V
+.BR \-V ", " \fB\-\-verbose\fR
 Print more verbose output during unpacking.
 
 .SH ARGUMENTS

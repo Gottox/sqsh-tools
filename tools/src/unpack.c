@@ -327,6 +327,16 @@ out:
 	return rv;
 }
 
+static const char opts[] = "co:vVh";
+static const struct option long_opts[] = {
+		{"chown", no_argument, NULL, 'c'},
+		{"offset", required_argument, NULL, 'o'},
+		{"version", no_argument, NULL, 'v'},
+		{"verbose", no_argument, NULL, 'V'},
+		{"help", no_argument, NULL, 'h'},
+		{0},
+};
+
 int
 main(int argc, char *argv[]) {
 	int rv = 0;
@@ -339,7 +349,7 @@ main(int argc, char *argv[]) {
 	struct SqshFile *file = NULL;
 	uint64_t offset = 0;
 
-	while ((opt = getopt(argc, argv, "co:vVh")) != -1) {
+	while ((opt = getopt_long(argc, argv, opts, long_opts, NULL)) != -1) {
 		switch (opt) {
 		case 'c':
 			do_chown = true;

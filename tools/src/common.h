@@ -7,12 +7,11 @@
 
 #define TOOLS_COMMON_H
 
-#ifndef _DEFAULT_SOURCE
-#	define _DEFAULT_SOURCE
-#endif
+#define _GNU_SOURCE
 
-#include "../include/sqsh.h"
 #include <ctype.h>
+#include <getopt.h>
+#include <sqsh.h>
 #include <stdlib.h>
 #include <string.h>
 

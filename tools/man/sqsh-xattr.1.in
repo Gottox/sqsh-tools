@@ -17,12 +17,12 @@ The command operates in read-only mode.
 
 .SH OPTIONS
 .TP
-.BR \-v
-Print the version of \fBsqsh-xattr\fR.
+.BR \-v ", " \-\-version
+Print the version of \fBsqsh-xattr\fR and exit.
 
 .SH ARGUMENTS
 .TP
-.BR \-o " " \fIOFFSET\fR
+.BR \-o " " \fIOFFSET\fR ", " \-\-offset " " \fIOFFSET\fR
 skip OFFSET bytes at start of FILESYSTEM.
 
 .TP

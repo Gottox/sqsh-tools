@@ -24,21 +24,21 @@ within the archive.
 
 .SH OPTIONS
 .TP
-.BR \-o " " \fIOFFSET\fR
+.BR \-o " " \fIOFFSET\fR ", " \fB\-\-offset " " \fIOFFSET\fR
 skip OFFSET bytes at start of FILESYSTEM.
 
 .TP
-.BR \-r
+.BR \-r ", " \fB\-\-recursive
 Recursively list the contents of all subdirectories within the 
 specified path.
 
 .TP
-.BR \-l
+.BR \-l ", " \fB\-\-long
 Print a long format listing of files and directories, similar to the 
 output of the \fBls -l\fR command.
 
 .TP
-.BR \-v
+.BR \-v ", " \fB\-\-version
 Print the version of \fBsqsh-ls\fR and exit.
 
 .SH ARGUMENTS
