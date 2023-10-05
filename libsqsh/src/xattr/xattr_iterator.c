@@ -36,21 +36,15 @@
 #include <cextras/utils.h>
 #include <sqsh_archive.h>
 #include <sqsh_common_private.h>
-#include <sqsh_error.h>
-
-#ifdef __linux__
-#	include <alloca.h>
-#endif
-
 #include <sqsh_data_private.h>
+#include <sqsh_error.h>
 #include <sqsh_file_private.h>
 
 int
 sqsh__xattr_iterator_init(
 		struct SqshXattrIterator *iterator, const struct SqshFile *file) {
 	int rv;
-	struct SqshDataXattrLookupTable *ref =
-			alloca(sizeof(struct SqshDataXattrLookupTable));
+	struct SqshDataXattrLookupTable ref = {0};
 	struct SqshXattrTable *xattr_table = NULL;
 	struct SqshArchive *sqsh = file->archive;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
@@ -71,13 +65,13 @@ sqsh__xattr_iterator_init(
 		return -SQSH_ERROR_CORRUPTED_INODE;
 	}
 
-	rv = sqsh__xattr_table_get(xattr_table, index, ref);
+	rv = sqsh__xattr_table_get(xattr_table, index, &ref);
 	if (rv < 0) {
 		goto out;
 	}
 
 	/* The XATTR table is the last block in the file system. */
-	const uint64_t address_ref = sqsh__data_xattr_lookup_table_xattr_ref(ref);
+	const uint64_t address_ref = sqsh__data_xattr_lookup_table_xattr_ref(&ref);
 	const uint64_t inner_offset = sqsh_address_ref_inner_offset(address_ref);
 	const uint64_t outer_offset = sqsh_address_ref_outer_offset(address_ref);
 	const uint64_t archive_size = sqsh_superblock_bytes_used(superblock);
@@ -94,8 +88,8 @@ sqsh__xattr_iterator_init(
 		goto out;
 	}
 
-	iterator->remaining_entries = sqsh__data_xattr_lookup_table_count(ref);
-	iterator->remaining_size = sqsh__data_xattr_lookup_table_size(ref);
+	iterator->remaining_entries = sqsh__data_xattr_lookup_table_count(&ref);
+	iterator->remaining_size = sqsh__data_xattr_lookup_table_size(&ref);
 	iterator->next_offset = inner_offset;
 	iterator->value_index = 0;
 	iterator->context = xattr_table;
