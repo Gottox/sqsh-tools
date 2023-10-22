@@ -65,11 +65,12 @@ squashfs = custom_target(
     command: [integration_create, '', '@OUTPUT@', '@PRIVATE_DIR@'],
 )
 
+f2h = files('f2h.sh')
 squashfs_h = custom_target(
     'squashfs_image.c',
     input: squashfs,
     output: 'squashfs_image.c',
-    command: ['./f2h.sh', 'squashfs_image', '@INPUT@', '@OUTPUT@'],
+    command: [f2h, 'squashfs_image', '@INPUT@', '@OUTPUT@'],
 )
 sqsh_extra_source += {
     'integration.c': squashfs_h,
