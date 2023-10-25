@@ -125,7 +125,7 @@ sqsh__extractor_impl_from_id(int id);
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__extractor_init(
 		struct SqshExtractor *extractor, struct CxBuffer *buffer,
-		int algorithm_id, size_t block_size);
+		const struct SqshExtractorImpl *impl, size_t block_size);
 
 /**
  * @internal
@@ -176,7 +176,7 @@ struct SqshExtractManager {
 	 * @privatesection
 	 */
 	struct CxRcHashMap hash_map;
-	unsigned int compression_id;
+	const struct SqshExtractorImpl *extractor_impl;
 	uint32_t block_size;
 	struct SqshMapManager *map_manager;
 	struct CxLru lru;
