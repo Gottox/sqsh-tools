@@ -118,7 +118,7 @@ sqsh__extractor_impl_from_id(int id);
  *
  * @param[out] extractor      The context to initialize.
  * @param[out] buffer         The buffer to store the decompressed data.
- * @param[in]  algorithm_id   The id of the compression algorithm to use.
+ * @param[in]  impl           The implementation of the extraction algorithm.
  * @param[in]  block_size     The block size to use for the extraction.
  *
  * @return 0 on success, a negative value on error.
