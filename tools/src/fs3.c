@@ -33,7 +33,7 @@
 
 #define FUSE_USE_VERSION 35
 
-#include "fs-common.h"
+#include <sqshtools_fs_common.h>
 
 #include <errno.h>
 #include <fuse_lowlevel.h>

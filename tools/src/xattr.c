@@ -31,7 +31,7 @@
  * @file         xattr.c
  */
 
-#include "common.h"
+#include <sqshtools_common.h>
 
 #include <assert.h>
 #include <limits.h>

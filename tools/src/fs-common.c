@@ -31,7 +31,7 @@
  * @file         fs.c
  */
 
-#include "fs-common.h"
+#include <sqshtools_fs_common.h>
 
 #include <errno.h>
 #include <stddef.h>

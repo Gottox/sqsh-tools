@@ -1,5 +1,7 @@
 subdir('man')
 
+subdir('include')
+
 tool_sources = [
     'src/cat.c',
     'src/ls.c',
@@ -17,6 +19,7 @@ foreach src : tool_sources
         tool_name,
         [src, 'src/common.c'],
         c_args: c_args,
+        include_directories: tools_private_include,
         install: not meson.is_subproject(),
         dependencies: libsqsh_dep,
     )
@@ -28,6 +31,7 @@ if fuse3_dep.found()
         'sqshfs',
         ['src/fs3.c', 'src/common.c', 'src/fs-common.c'],
         c_args: c_args,
+        include_directories: tools_private_include,
         install: not meson.is_subproject(),
         dependencies: [libsqsh_dep, fuse3_dep],
     )
@@ -39,6 +43,7 @@ if fuse2_dep.found()
         'sqshfs2',
         ['src/fs2.c', 'src/common.c', 'src/fs-common.c'],
         c_args: c_args,
+        include_directories: tools_private_include,
         install: not meson.is_subproject() and not fuse3_dep.found(),
         dependencies: [libsqsh_dep, fuse2_dep],
     )

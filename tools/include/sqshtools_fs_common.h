@@ -8,7 +8,7 @@
 
 #define TOOLS_FS_COMMON_H
 
-#include "common.h"
+#include "sqshtools_common.h"
 
 #include "../include/sqsh.h"
 #include <fuse_opt.h>
