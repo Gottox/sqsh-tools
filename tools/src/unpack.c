@@ -31,7 +31,7 @@
  * @file         unpack.c
  */
 
-#include "common.h"
+#include <sqshtools_common.h>
 
 #include <errno.h>
 #include <fcntl.h>

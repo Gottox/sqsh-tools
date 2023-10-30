@@ -4,7 +4,7 @@
  * @created     : Wednesday Jun 07, 2023 15:41:30 CEST
  */
 
-#include "common.h"
+#include <sqshtools_common.h>
 
 struct SqshArchive *
 open_archive(const char *image_path, uint64_t offset, int *err) {
