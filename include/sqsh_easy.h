@@ -119,7 +119,7 @@ sqsh_easy_file_mtime(struct SqshArchive *archive, const char *path, int *err);
  */
 
 /**
- * @brief retrieves the contents of a directory.
+ * @brief retrieves the contents of a directory as a list of file names
  *
  * The returned list needs to be released with `free()`.
  *
@@ -130,6 +130,20 @@ sqsh_easy_file_mtime(struct SqshArchive *archive, const char *path, int *err);
  * @return A list of files and directories on success, NULL on error.
  */
 char **sqsh_easy_directory_list(
+		struct SqshArchive *archive, const char *path, int *err);
+
+/**
+ * @brief retrieves the contents of a directory as a list of file paths
+ *
+ * The returned list needs to be released with `free()`.
+ *
+ * @param[in] archive  The sqsh archive context.
+ * @param[in] path     The path the file or directory.
+ * @param[out] err     Pointer to an int where the error code will be stored.
+ *
+ * @return A list of files and directories on success, NULL on error.
+ */
+char **sqsh_easy_directory_list_path(
 		struct SqshArchive *archive, const char *path, int *err);
 
 /***************************************
