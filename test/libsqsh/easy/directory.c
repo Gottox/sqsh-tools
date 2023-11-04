@@ -80,6 +80,48 @@ list_two_files(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
+static void
+list_two_paths(void) {
+	int rv = 0;
+	struct SqshArchive archive = {0};
+	uint8_t payload[] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
+			INODE_HEADER(1, 0, 0, 0, 0, 1),
+			INODE_BASIC_DIR(0, 33, 0, 0),
+			[INODE_TABLE_OFFSET+2+128] = 
+			INODE_HEADER(3, 0, 0, 0, 0, 2),
+			INODE_BASIC_SYMLINK(3),
+			't', 'g', 't',
+			[INODE_TABLE_OFFSET+2+256] =
+			INODE_HEADER(2, 0, 0, 0, 0, 3),
+			INODE_BASIC_FILE(0, 0xFFFFFFFF, 0, 0),
+			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			DIRECTORY_HEADER(2, 0, 0),
+			DIRECTORY_ENTRY(128, 2, 3, 1),
+			'1',
+			DIRECTORY_ENTRY(256, 3, 2, 1),
+			'2',
+			[FRAGMENT_TABLE_OFFSET] = 0,
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	char **dir_list = sqsh_easy_directory_list_path(&archive, "/", &rv);
+	assert(rv == 0);
+	assert(dir_list != NULL);
+
+	assert(strcmp(dir_list[0], "/1") == 0);
+	assert(strcmp(dir_list[1], "/2") == 0);
+	assert(dir_list[2] == NULL);
+
+	free(dir_list);
+	sqsh__archive_cleanup(&archive);
+}
+
 DECLARE_TESTS
 TEST(list_two_files)
+TEST(list_two_paths)
 END_TESTS
