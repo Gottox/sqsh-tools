@@ -6,6 +6,7 @@ sqsh_extended_test = [
     'unpack/repack.sh',
     'unpack/pathtraversal/pathtraversal.sh',
     'ls/large-tree.sh',
+    'ls/utc.sh',
 ]
 sqsh_extended_fs_test = [
     'fs/large-file.sh',
