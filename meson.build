@@ -1,5 +1,5 @@
 project(
-    'libsqsh',
+    'sqsh-tools',
     'c',
     default_options: [
         'c_std=c11',
@@ -7,9 +7,7 @@ project(
         'warning_level=3',
     ],
     version: '1.2.0',
-    license: [
-        'BSD-2-Clause',
-    ],
+    license: 'BSD-2-Clause',
 )
 
 threads_dep = dependency('threads', required: get_option('threads'))
