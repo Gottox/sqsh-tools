@@ -319,6 +319,9 @@ main(int argc, char *argv[]) {
 	image_path = argv[optind];
 	optind++;
 
+	// Having TZ be set to its default value prevents libc to repeatedly
+	// stat /etc/localtime for every localtime() call.
+	setenv("TZ", ":/etc/localtime", 0);
 	archive = open_archive(image_path, offset, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, image_path);
