@@ -69,10 +69,20 @@ print_simple(const struct SqshDirectoryIterator *iter, const char *path) {
 	return 0;
 }
 
+static void
+print_mode(
+		int mode, int r_mask, int w_mask, int x_mask, int s_mask,
+		const char *s_chars) {
+	const char *x_chars = (mode & s_mask) ? s_chars : "-x";
+
+	putchar((mode & r_mask) ? 'r' : '-');
+	putchar((mode & w_mask) ? 'w' : '-');
+	putchar((mode & x_mask) ? x_chars[1] : x_chars[0]);
+}
+
 int
 print_detail_file(struct SqshFile *file, const char *path) {
 	int mode;
-	char xchar, unxchar;
 
 	time_t mtime = sqsh_file_modified_time(file);
 	struct tm tm_info_buf = {0};
@@ -112,23 +122,9 @@ print_detail_file(struct SqshFile *file, const char *path) {
 	}
 
 	mode = sqsh_file_permission(file);
-#define PRINT_MODE(t) \
-	{ \
-		putchar((S_IR##t & mode) ? 'r' : '-'); \
-		putchar((S_IW##t & mode) ? 'w' : '-'); \
-		putchar((S_IX##t & mode) ? xchar : unxchar); \
-	}
-	// TODO: these macros depend on system specific values
-	xchar = (S_ISUID & mode) ? 's' : 'x';
-	unxchar = (S_ISUID & mode) ? 'S' : '-';
-	PRINT_MODE(USR);
-	xchar = (S_ISGID & mode) ? 's' : 'x';
-	unxchar = (S_ISGID & mode) ? 'S' : '-';
-	PRINT_MODE(GRP);
-	xchar = (S_ISVTX & mode) ? 't' : 'x';
-	unxchar = (S_ISVTX & mode) ? 'T' : '-';
-	PRINT_MODE(OTH);
-#undef PRINT_MODE
+	print_mode(mode, S_IRUSR, S_IWUSR, S_IXUSR, S_ISUID, "Ss");
+	print_mode(mode, S_IRGRP, S_IWGRP, S_IXGRP, S_ISGID, "Ss");
+	print_mode(mode, S_IROTH, S_IWOTH, S_IXOTH, S_ISVTX, "Tt");
 
 	strftime(time_buffer, sizeof(time_buffer), "%a, %d %b %Y %T %z", tm_info);
 
