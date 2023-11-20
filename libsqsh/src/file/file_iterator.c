@@ -40,8 +40,6 @@
 
 #define BLOCK_INDEX_FINISHED UINT32_MAX
 
-static const uint8_t ZERO_BLOCK[16384] = {0};
-
 static bool
 is_last_block(const struct SqshFileIterator *iterator) {
 	const struct SqshFile *file = iterator->file;
@@ -188,15 +186,19 @@ out:
 
 static int
 map_zero_block(struct SqshFileIterator *iterator) {
+	const struct SqshFile *file = iterator->file;
+	const struct SqshArchive *archive = file->archive;
+	const size_t zero_block_size = sqsh__archive_zero_block_size(archive);
+
 	size_t current_sparse_size = iterator->sparse_size;
 
-	if (current_sparse_size > sizeof(ZERO_BLOCK)) {
-		current_sparse_size = sizeof(ZERO_BLOCK);
+	if (current_sparse_size > zero_block_size) {
+		current_sparse_size = zero_block_size;
 	}
 	iterator->sparse_size -= current_sparse_size;
 
 	iterator->size = current_sparse_size;
-	iterator->data = ZERO_BLOCK;
+	iterator->data = sqsh__archive_zero_block(archive);
 
 	return current_sparse_size;
 }

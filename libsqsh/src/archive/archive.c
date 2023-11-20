@@ -43,6 +43,7 @@
 #include <string.h>
 
 static const uint64_t NO_SEGMENT = 0xFFFFFFFFFFFFFFFF;
+static const size_t ZERO_BLOCK_SIZE = 16384;
 
 enum InitializedBitmap {
 	INITIALIZED_ID_TABLE = 1 << 0,
@@ -110,6 +111,12 @@ sqsh__archive_init(
 		memcpy(&archive->config, config, sizeof(struct SqshConfig));
 	} else {
 		memset(&archive->config, 0, sizeof(struct SqshConfig));
+	}
+
+	archive->zero_block = calloc(ZERO_BLOCK_SIZE, sizeof(uint8_t));
+	if (archive->zero_block == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
 	}
 
 	/*  RECURSIVE is needed because: inode_map may access the export_table
@@ -346,6 +353,17 @@ sqsh_archive_map_manager(struct SqshArchive *archive) {
 	return &archive->map_manager;
 }
 
+const uint8_t *
+sqsh__archive_zero_block(const struct SqshArchive *archive) {
+	return archive->zero_block;
+}
+
+size_t
+sqsh__archive_zero_block_size(const struct SqshArchive *archive) {
+	(void)archive;
+	return ZERO_BLOCK_SIZE;
+}
+
 int
 sqsh__archive_cleanup(struct SqshArchive *archive) {
 	int rv = 0;
@@ -373,6 +391,8 @@ sqsh__archive_cleanup(struct SqshArchive *archive) {
 	sqsh__map_manager_cleanup(&archive->map_manager);
 
 	sqsh__mutex_destroy(&archive->lock);
+
+	free(archive->zero_block);
 
 	return rv;
 }
