@@ -34,6 +34,7 @@
 #include <sqshtools_common.h>
 
 #include <assert.h>
+#include <errno.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <stdint.h>
@@ -47,6 +48,7 @@ static int
 print_simple(const struct SqshDirectoryIterator *iter, const char *path);
 
 static bool recursive = false;
+static bool utc = false;
 static int (*print_item)(const struct SqshDirectoryIterator *, const char *) =
 		print_simple;
 
@@ -55,7 +57,7 @@ ls(struct SqshArchive *archive, const char *path, struct SqshFile *file);
 
 static int
 usage(char *arg0) {
-	printf("usage: %s [-o OFFSET] [-r] [-l] FILESYSTEM [PATH]\n", arg0);
+	printf("usage: %s [-o OFFSET] [-r] [-l] [-u] FILESYSTEM [PATH]\n", arg0);
 	printf("       %s -v\n", arg0);
 	return EXIT_FAILURE;
 }
@@ -67,10 +69,20 @@ print_simple(const struct SqshDirectoryIterator *iter, const char *path) {
 	return 0;
 }
 
-void
+int
 print_detail_file(struct SqshFile *file, const char *path) {
 	int mode;
 	char xchar, unxchar;
+
+	time_t mtime = sqsh_file_modified_time(file);
+	struct tm tm_info_buf = {0};
+	const struct tm *tm_info;
+	char time_buffer[128] = {0};
+	tm_info = utc ? gmtime_r(&mtime, &tm_info_buf)
+				  : localtime_r(&mtime, &tm_info_buf);
+	if (tm_info == NULL) {
+		return -errno;
+	}
 
 	switch (sqsh_file_type(file)) {
 	case SQSH_FILE_TYPE_UNKNOWN:
@@ -118,10 +130,10 @@ print_detail_file(struct SqshFile *file, const char *path) {
 	PRINT_MODE(OTH);
 #undef PRINT_MODE
 
-	time_t mtime = sqsh_file_modified_time(file);
+	strftime(time_buffer, sizeof(time_buffer), "%a, %d %b %Y %T %z", tm_info);
+
 	printf(" %6u %6u %10" PRIu64 " %s %s", sqsh_file_uid(file),
-		   sqsh_file_gid(file), sqsh_file_size(file),
-		   strtok(ctime(&mtime), "\n"), path);
+		   sqsh_file_gid(file), sqsh_file_size(file), time_buffer, path);
 
 	if (sqsh_file_type(file) == SQSH_FILE_TYPE_SYMLINK) {
 		fputs(" -> ", stdout);
@@ -130,6 +142,8 @@ print_detail_file(struct SqshFile *file, const char *path) {
 	}
 
 	putchar('\n');
+
+	return 0;
 }
 
 static int
@@ -243,7 +257,10 @@ ls_path(struct SqshArchive *archive, char *path) {
 		}
 	} else {
 		if (print_item == print_detail) {
-			print_detail_file(file, path);
+			rv = print_detail_file(file, path);
+			if (rv < 0) {
+				goto out;
+			}
 		} else {
 			puts(path);
 		}
@@ -253,13 +270,14 @@ out:
 	return rv;
 }
 
-static const char opts[] = "o:vrhl";
+static const char opts[] = "o:vrhlu";
 static const struct option long_opts[] = {
 		{"offset", required_argument, NULL, 'o'},
 		{"version", no_argument, NULL, 'v'},
 		{"recursive", no_argument, NULL, 'r'},
 		{"help", no_argument, NULL, 'h'},
 		{"long", no_argument, NULL, 'l'},
+		{"utc", no_argument, NULL, 'u'},
 		{0},
 };
 
@@ -285,6 +303,9 @@ main(int argc, char *argv[]) {
 			break;
 		case 'l':
 			print_item = print_detail;
+			break;
+		case 'u':
+			utc = true;
 			break;
 		default:
 			return usage(argv[0]);

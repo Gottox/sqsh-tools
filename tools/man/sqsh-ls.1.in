@@ -38,6 +38,10 @@ Print a long format listing of files and directories, similar to the
 output of the \fBls -l\fR command.
 
 .TP
+.BR \-u ", " \fB\-\-utc
+When running with \fB-l\fR use UTC timestamps instead of local time.
+
+.TP
 .BR \-v ", " \fB\-\-version
 Print the version of \fBsqsh-ls\fR and exit.
 
