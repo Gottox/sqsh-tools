@@ -215,7 +215,7 @@ map_block(struct SqshFileIterator *iterator, size_t desired_size) {
 			sqsh__map_reader_size(&iterator->map_reader);
 
 	if (data_block_size == 0) {
-		if (is_last_block(iterator) == false || file_size == block_size) {
+		if (is_last_block(iterator) == false || file_size % block_size == 0) {
 			iterator->sparse_size = block_size;
 		} else {
 			iterator->sparse_size = file_size % block_size;
