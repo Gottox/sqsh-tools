@@ -484,6 +484,80 @@ load_two_zero_blocks(void) {
 }
 
 static void
+load_two_sparse_blocks(void) {
+	int rv;
+	struct SqshArchive archive = {0};
+	struct SqshFile file = {0};
+	uint8_t payload[8192] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			INODE_HEADER(2, 0, 0, 0, 0, 1),
+			INODE_BASIC_FILE(512, 0xFFFFFFFF, 0, BLOCK_SIZE * 2),
+			DATA_BLOCK_REF(0, 0),
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
+	rv = sqsh__file_init(&file, &archive, inode_ref);
+	assert(rv == 0);
+
+	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
+	assert(sqsh_file_has_fragment(&file) == false);
+
+	struct SqshFileIterator iter = {0};
+	rv = sqsh__file_iterator_init(&iter, &file);
+	assert(rv == 0);
+
+	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
+	assert(rv > 0);
+	assert(has_next == true);
+
+	size_t size = sqsh_file_iterator_size(&iter);
+	assert(size == ZERO_BLOCK_SIZE);
+
+	const uint8_t *data = sqsh_file_iterator_data(&iter);
+	assert(memcmp(data, ZERO_BLOCK, size) == 0);
+
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
+	assert(rv > 0);
+	assert(has_next == true);
+
+	size = sqsh_file_iterator_size(&iter);
+	assert(size == ZERO_BLOCK_SIZE);
+
+	assert(memcmp(data, ZERO_BLOCK, size) == 0);
+
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
+	assert(rv > 0);
+	assert(has_next == true);
+
+	size = sqsh_file_iterator_size(&iter);
+	assert(size == ZERO_BLOCK_SIZE);
+
+	assert(memcmp(data, ZERO_BLOCK, size) == 0);
+
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
+	assert(rv > 0);
+	assert(has_next == true);
+
+	size = sqsh_file_iterator_size(&iter);
+	assert(size == ZERO_BLOCK_SIZE);
+
+	assert(memcmp(data, ZERO_BLOCK, size) == 0);
+
+	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
+	assert(rv == 0);
+	assert(has_next == false);
+
+	sqsh__file_iterator_cleanup(&iter);
+	sqsh__file_cleanup(&file);
+	sqsh__archive_cleanup(&archive);
+}
+
+static void
 open_directory_with_file_iterator(void) {
 	int rv;
 	struct SqshArchive archive = {0};
@@ -523,5 +597,6 @@ TEST(load_zero_padding)
 TEST(load_zero_big_padding)
 TEST(load_zero_block)
 TEST(load_two_zero_blocks)
+TEST(load_two_sparse_blocks)
 TEST(open_directory_with_file_iterator)
 END_TESTS
