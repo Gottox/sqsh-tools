@@ -10,8 +10,8 @@ tests = [
     'collection/lru_test.c',
     'collection/rc_hash_map_test.c',
     'collection/rc_map_test.c',
-    'utils/memory.c',
     'memory/rc.c',
+    'memory/utils.c',
 ]
 
 foreach test : tests

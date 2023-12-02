@@ -33,7 +33,7 @@
 
 #include <sqsh_xattr_private.h>
 
-#include <cextras/utils.h>
+#include <cextras/memory.h>
 #include <sqsh_archive.h>
 #include <sqsh_common_private.h>
 #include <sqsh_data_private.h>

@@ -29,11 +29,11 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         memory.c
+ * @file         utils.c
  */
 
 #include <assert.h>
-#include <cextras/utils.h>
+#include <cextras/memory.h>
 #include <string.h>
 #include <testlib.h>
 
