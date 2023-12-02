@@ -49,7 +49,7 @@
 
 // Make sure, that lzo compression is not NULL, otherwise libsqsh will refuse
 // to init the archive.
-const struct SqshExtractorImpl *const sqsh__impl_lzo = (void *)0x1;
+const struct SqshExtractorImpl *const volatile sqsh__impl_lzo = (void *)0x1;
 
 static void
 load_compression_options_gzip(void) {
