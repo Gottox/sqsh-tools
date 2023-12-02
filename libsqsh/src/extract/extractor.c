@@ -37,8 +37,11 @@
 #include <sqsh_archive.h>
 #include <sqsh_error.h>
 
-const struct SqshExtractorImpl *const __attribute__((weak)) sqsh__impl_lzo =
-		NULL;
+// sqsh__impl_lzo needs to be declared `volatile`. Otherwise when compiled with
+// `-O2` this value might get inlined which breaks a) the the tests and b) the
+// overloading of this extractor using LD_PRELOAD.
+const struct SqshExtractorImpl *volatile const __attribute__((weak))
+sqsh__impl_lzo = NULL;
 
 const struct SqshExtractorImpl *
 sqsh__extractor_impl_from_id(int id) {
