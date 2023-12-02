@@ -27,10 +27,7 @@
  ******************************************************************************/
 
 #include "../../include/cextras/memory.h"
-#include <pthread.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include <stdatomic.h>
 
 void
 cx_rc_init(struct CxRc *rc) {

@@ -39,21 +39,27 @@
 extern "C" {
 #endif
 
-#include <stdatomic.h>
+#include "macro.h"
 #include <stdbool.h>
-#include <stdint.h>
+#include <stdlib.h>
 
 /***************************************
  * memory/rc.c
  */
 
 struct CxRc {
-	atomic_uint count;
+	_Atomic(unsigned int) count;
 };
 
 void cx_rc_init(struct CxRc *rc);
 void cx_rc_retain(struct CxRc *rc);
-bool cx_rc_release(struct CxRc *rc);
+CX_NO_UNUSED bool cx_rc_release(struct CxRc *rc);
+
+/***************************************
+ * memory/utils.c
+ */
+
+CX_NO_UNUSED void *cx_memdup(const void *source, size_t size);
 
 #ifdef __cplusplus
 }
