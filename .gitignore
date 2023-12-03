@@ -59,7 +59,7 @@ dkms.conf
 ### Meson ###
 # subproject directories
 /subprojects/packagecache
-/subprojects/cextra-*
+/subprojects/cextras-*
 
 # Meson Directories
 meson-logs
