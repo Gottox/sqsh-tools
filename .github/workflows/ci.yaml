@@ -42,6 +42,7 @@ jobs:
     - name: clang-format
       run: |
         ninja -C /tmp/build clang-format-check
+
   test:
     needs:
     - format-check
@@ -72,6 +73,34 @@ jobs:
           -Dtest=extended \
           -Ddoc=false
     - name: test
+      run: |
+         ninja -C /tmp/build test
+
+  fuzzer:
+    needs:
+    - format-check
+    runs-on: ubuntu-latest
+    container:
+      image: gottox/sqsh-build:x86_64
+      options: --privileged
+    steps:
+    - uses: actions/checkout@v3
+    - name: configure
+      run: |
+        apk add zlib-dev lz4-dev xz-dev zstd-dev
+        CC=clang meson setup /tmp/build \
+          -Dwerror=true \
+          -Dexamples=false  \
+          -Dcurl=enabled  \
+          -Dzlib=enabled \
+          -Dlz4=enabled \
+          -Dlzma=enabled  \
+          -Dzstd=enabled  \
+          -Dthreads=enabled \
+          -Dtest=false \
+          -Dfuzzer=true \
+          -Ddoc=false
+    - name: fuzzer
       run: |
          ninja -C /tmp/build test
 

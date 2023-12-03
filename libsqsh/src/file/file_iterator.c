@@ -294,6 +294,9 @@ sqsh_file_iterator_next(
 	if (err != NULL) {
 		*err = rv;
 	}
+	if (rv < 0) {
+		has_next = false;
+	}
 	return has_next;
 }
 
@@ -303,7 +306,19 @@ sqsh_file_iterator_skip(
 		size_t desired_size) {
 	int rv = 0;
 	const size_t block_size = iterator->block_size;
-	const sqsh_index_t skip_index = *offset / block_size;
+	const size_t current_block_size = sqsh_file_iterator_size(iterator);
+
+	if (*offset < current_block_size) {
+		goto out;
+	}
+
+	*offset -= current_block_size;
+
+	sqsh_index_t skip_index = *offset / block_size;
+	if (current_block_size != 0) {
+		skip_index += 1;
+	}
+
 	*offset = *offset % block_size;
 
 	if (skip_index == 0 && iterator->block_index != 0) {
@@ -312,7 +327,8 @@ sqsh_file_iterator_skip(
 
 	sqsh_index_t reader_forward = 0;
 	sqsh_index_t block_index = iterator->block_index;
-	for (sqsh_index_t i = 0; i < skip_index; i++) {
+	const size_t block_count = sqsh_file_block_count(iterator->file);
+	for (sqsh_index_t i = 0; i < skip_index && block_index < block_count; i++) {
 		reader_forward += sqsh_file_block_size(iterator->file, block_index);
 		block_index += 1;
 	}

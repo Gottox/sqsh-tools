@@ -2,10 +2,6 @@ subdir('include')
 
 subdir('src')
 
-if get_option('fuzzer')
-    subdir('fuzzer')
-endif
-
 libsqsh_dependencies = [
     cextras_dep,
     libsqsh_common_dep,
