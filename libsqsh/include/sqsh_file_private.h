@@ -40,12 +40,14 @@
 #include "sqsh_mapper_private.h"
 #include "sqsh_metablock_private.h"
 #include "sqsh_reader_private.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 struct SqshArchive;
+struct SqshDataInode;
 
 /***************************************
  * file/fragment_view.c
@@ -206,6 +208,35 @@ SQSH_NO_EXPORT int sqsh__file_reader_cleanup(struct SqshFileReader *reader);
  */
 
 /**
+ * @brief The file type implementation
+ */
+struct SqshInodeImpl {
+	size_t header_size;
+	size_t (*payload_size)(
+			const struct SqshDataInode *inode,
+			const struct SqshArchive *archive);
+
+	uint32_t (*hard_link_count)(const struct SqshDataInode *inode);
+	uint64_t (*size)(const struct SqshDataInode *inode);
+
+	uint64_t (*blocks_start)(const struct SqshDataInode *inode);
+	uint32_t (*block_size_info)(
+			const struct SqshDataInode *inode, sqsh_index_t index);
+	uint32_t (*fragment_block_index)(const struct SqshDataInode *inode);
+	uint32_t (*fragment_block_offset)(const struct SqshDataInode *inode);
+
+	uint32_t (*directory_block_start)(const struct SqshDataInode *inode);
+	uint16_t (*directory_block_offset)(const struct SqshDataInode *inode);
+	uint32_t (*directory_parent_inode)(const struct SqshDataInode *inode);
+
+	const char *(*symlink_target_path)(const struct SqshDataInode *inode);
+
+	uint32_t (*device_id)(const struct SqshDataInode *inode);
+
+	uint32_t (*xattr_index)(const struct SqshDataInode *inode);
+};
+
+/**
  * @brief The Inode context
  */
 struct SqshFile {
@@ -215,6 +246,8 @@ struct SqshFile {
 	uint64_t inode_ref;
 	struct SqshMetablockReader metablock;
 	struct SqshArchive *archive;
+	const struct SqshInodeImpl *impl;
+	enum SqshFileType type;
 };
 
 /**
@@ -232,6 +265,7 @@ struct SqshFile {
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_init(
 		struct SqshFile *context, struct SqshArchive *sqsh, uint64_t inode_ref);
+
 /**
  * @internal
  * @memberof SqshFile
@@ -242,6 +276,41 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_init(
  * @return int 0 on success, less than 0 on error.
  */
 SQSH_NO_EXPORT int sqsh__file_cleanup(struct SqshFile *context);
+
+/***************************************
+ * file/inode_directory.c
+ */
+
+extern const struct SqshInodeImpl sqsh__inode_directory_impl;
+extern const struct SqshInodeImpl sqsh__inode_directory_ext_impl;
+
+/***************************************
+ * file/inode_file.c
+ */
+
+extern const struct SqshInodeImpl sqsh__inode_file_impl;
+extern const struct SqshInodeImpl sqsh__inode_file_ext_impl;
+
+/***************************************
+ * file/inode_symlink.c
+ */
+
+extern const struct SqshInodeImpl sqsh__inode_symlink_impl;
+extern const struct SqshInodeImpl sqsh__inode_symlink_ext_impl;
+
+/***************************************
+ * file/inode_device.c
+ */
+
+extern const struct SqshInodeImpl sqsh__inode_device_impl;
+extern const struct SqshInodeImpl sqsh__inode_device_ext_impl;
+
+/***************************************
+ * file/inode_ipc.c
+ */
+
+extern const struct SqshInodeImpl sqsh__inode_ipc_impl;
+extern const struct SqshInodeImpl sqsh__inode_ipc_ext_impl;
 
 #ifdef __cplusplus
 }
