@@ -327,7 +327,8 @@ sqsh_file_iterator_skip(
 
 	sqsh_index_t reader_forward = 0;
 	sqsh_index_t block_index = iterator->block_index;
-	for (sqsh_index_t i = 0; i < skip_index; i++) {
+	const size_t block_count = sqsh_file_block_count(iterator->file);
+	for (sqsh_index_t i = 0; i < skip_index && block_index < block_count; i++) {
 		reader_forward += sqsh_file_block_size(iterator->file, block_index);
 		block_index += 1;
 	}
