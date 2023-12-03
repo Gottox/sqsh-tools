@@ -153,7 +153,7 @@ sqsh__archive_init(
 				sqsh_superblock_bytes_used(&archive->superblock),
 				get_data_segment_size(&archive->superblock), &range)) {
 		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
-		return rv;
+		goto out;
 	}
 	const size_t metablock_capacity = SQSH_DIVIDE_CEIL(
 			range,
