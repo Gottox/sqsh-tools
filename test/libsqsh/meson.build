@@ -36,7 +36,7 @@ sqsh_test = [
     'xattr/xattr_iterator.c',
 ]
 sqsh_extra_source = {
-    'fuzzer_repro.c': '../../libsqsh/fuzzer/simple.c',
+    'fuzzer_repro.c': '../../fuzzer/simple.c',
 }
 sqsh_failing_test = []
 sqsh_test_util = [

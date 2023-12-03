@@ -51,6 +51,10 @@ if get_option('test') != 'false'
     subdir('test')
 endif
 
+if get_option('fuzzer')
+    subdir('fuzzer')
+endif
+
 if get_option('doc') != 'false'
     subdir('doc')
 endif
