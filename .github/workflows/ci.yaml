@@ -7,6 +7,7 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+
 jobs:
   format-check:
     runs-on: ubuntu-latest
@@ -82,7 +83,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: gottox/sqsh-build:x86_64
-      options: --privileged
     steps:
     - uses: actions/checkout@v3
     - name: configure
@@ -140,6 +140,47 @@ jobs:
       run: |
         ninja -C /tmp/build
 
+  build-linux32:
+    needs:
+    - format-check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: install dependencies
+      run: |
+        sudo apt update
+        sudo apt install --yes meson build-essential gcc-multilib g++-multilib
+    - name: configure
+      env:
+        CROSS_FILE: |
+          [binaries]
+          c = 'gcc'
+          cpp = 'g++'
+          ar = 'gcc-ar'
+          strip = 'strip'
+
+          [built-in options]
+          c_args = ['-m32']
+          c_link_args = ['-m32']
+          cpp_args = ['-m32']
+          cpp_link_args = ['-m32']
+
+          [host_machine]
+          system = 'linux'
+          cpu_family = 'x86'
+          cpu = 'i686'
+          endian = 'little'
+      run: |
+        echo "$CROSS_FILE" > cross-file.txt
+        meson setup --cross-file cross-file.txt /tmp/build \
+          -Dwerror=false \
+          -Dexamples=true \
+          -Dtest=false \
+          -Ddoc=false
+    - name: build
+      run: |
+        ninja -C /tmp/build
+
   build-openbsd:
     needs:
     - format-check
@@ -179,11 +220,6 @@ jobs:
     - format-check
     runs-on: macos-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    strategy:
-      matrix:
-        arch:
-          - x86_64
-          - arm64
     steps:
     - uses: actions/checkout@v3
     - run: |
