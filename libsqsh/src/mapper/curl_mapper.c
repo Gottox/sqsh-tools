@@ -87,13 +87,14 @@ static int
 get_total_size(CURL *handle, uint64_t *total) {
 	static const char *format = CONTENT_RANGE_FORMAT;
 
-	int rv = 0;
+	CURLHcode hcode;
 	uint64_t dummy;
 	struct curl_header *header = NULL;
 	int scanned_fields;
 
-	rv = curl_easy_header(handle, CONTENT_RANGE, 0, CURLH_HEADER, -1, &header);
-	if (rv != CURLE_OK) {
+	hcode = curl_easy_header(
+			handle, CONTENT_RANGE, 0, CURLH_HEADER, -1, &header);
+	if (hcode != CURLHE_OK) {
 		return -SQSH_ERROR_CURL_INVALID_RANGE_HEADER;
 	}
 
@@ -109,14 +110,14 @@ get_total_size(CURL *handle, uint64_t *total) {
 static int
 get_file_time(CURL *handle, uint64_t *file_time) {
 	curl_off_t file_time_t;
-	int rv;
+	CURLcode code;
 
-	rv = curl_easy_getinfo(handle, CURLINFO_FILETIME_T, &file_time_t);
+	code = curl_easy_getinfo(handle, CURLINFO_FILETIME_T, &file_time_t);
 	/* According to curl docs, file_time_t is set to -1 if the server does not
 	 * report a file time. We treat this as an error as we need to detect if
 	 * the file has changed.
 	 */
-	if (rv != CURLE_OK || file_time_t < 0) {
+	if (code != CURLE_OK || file_time_t < 0) {
 		return -SQSH_ERROR_MAPPER_MAP;
 	}
 	/* We checked for negative values above, so this cast should be safe. */
@@ -156,6 +157,7 @@ curl_download(
 			.buffer = *data,
 	};
 
+	CURLcode code;
 	int rv = 0;
 	/* The actual max-size this string should ever use is 42, but we
 	 * add some padding to be a nice number. Not that 42 isn't nice.
@@ -174,14 +176,14 @@ curl_download(
 	curl_easy_setopt(handle, CURLOPT_RANGE, range_buffer);
 	curl_easy_setopt(handle, CURLOPT_WRITEDATA, &write_info);
 
-	rv = curl_easy_perform(handle);
-	if (rv != CURLE_OK) {
+	code = curl_easy_perform(handle);
+	if (code != CURLE_OK) {
 		rv = -SQSH_ERROR_MAPPER_MAP;
 		goto out;
 	}
 
-	rv = curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &http_code);
-	if (http_code != 206 || rv != CURLE_OK) {
+	code = curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &http_code);
+	if (http_code != 206 || code != CURLE_OK) {
 		rv = -SQSH_ERROR_MAPPER_MAP;
 		goto out;
 	}

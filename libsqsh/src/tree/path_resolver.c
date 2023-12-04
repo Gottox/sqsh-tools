@@ -91,7 +91,7 @@ enter_directory(struct SqshPathResolver *walker, uint64_t inode_ref) {
 		goto out;
 	}
 
-	const uint64_t inode_number = sqsh_file_inode(cwd);
+	const uint32_t inode_number = sqsh_file_inode(cwd);
 	walker->current_inode_ref = inode_ref;
 	rv = sqsh_inode_map_set2(walker->inode_map, inode_number, inode_ref);
 
@@ -137,7 +137,7 @@ sqsh_path_resolver_up(struct SqshPathResolver *walker) {
 	if (sqsh_file_inode_ref(cwd) == walker->root_inode_ref) {
 		return -SQSH_ERROR_WALKER_CANNOT_GO_UP;
 	}
-	const uint64_t parent_inode = sqsh_file_directory_parent_inode(cwd);
+	const uint32_t parent_inode = sqsh_file_directory_parent_inode(cwd);
 	if (parent_inode <= 0) {
 		rv = -SQSH_ERROR_CORRUPTED_INODE;
 		goto out;

@@ -88,7 +88,7 @@ fattr_path(struct SqshArchive *archive, char *path) {
 		const char *name = sqsh_xattr_iterator_name(iter);
 		uint16_t name_len = sqsh_xattr_iterator_name_size(iter);
 		const char *value = sqsh_xattr_iterator_value(iter);
-		uint16_t value_len = sqsh_xattr_iterator_value_size(iter);
+		uint16_t value_len = sqsh_xattr_iterator_value_size2(iter);
 
 		fwrite(prefix, prefix_len, 1, stdout);
 		fwrite(name, name_len, 1, stdout);

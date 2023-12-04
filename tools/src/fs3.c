@@ -383,7 +383,7 @@ fs_getxattr(fuse_req_t req, fuse_ino_t ino, const char *name, size_t size) {
 	}
 
 	value_ptr = sqsh_xattr_iterator_value(iterator);
-	value_size = sqsh_xattr_iterator_value_size(iterator);
+	value_size = sqsh_xattr_iterator_value_size2(iterator);
 
 	if (size == 0) {
 		fuse_reply_xattr(req, value_size);

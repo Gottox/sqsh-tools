@@ -40,7 +40,7 @@ sqsh__export_table_init(
 		struct SqshExportTable *table, struct SqshArchive *sqsh) {
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(sqsh);
 	const uint64_t table_start = sqsh_superblock_export_table_start(superblock);
-	const uint16_t count = sqsh_superblock_inode_count(superblock);
+	const uint32_t count = sqsh_superblock_inode_count(superblock);
 
 	return sqsh__table_init(
 			&table->table, sqsh, table_start, sizeof(uint64_t), count);

@@ -36,6 +36,7 @@
 
 #include <cextras/collection.h>
 
+#include <sqsh_data.h>
 #include <sqsh_thread_private.h>
 
 #ifdef __cplusplus
@@ -109,7 +110,7 @@ struct SqshExtractor {
  * algorithm is not supported.
  */
 SQSH_NO_EXPORT const struct SqshExtractorImpl *
-sqsh__extractor_impl_from_id(int id);
+sqsh__extractor_impl_from_id(enum SqshSuperblockCompressionId id);
 
 /**
  * @internal

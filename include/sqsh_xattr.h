@@ -237,6 +237,20 @@ const char *sqsh_xattr_iterator_value(const struct SqshXattrIterator *iterator);
  *
  * @return The size of the value of the current xattr.
  */
+uint32_t
+sqsh_xattr_iterator_value_size2(const struct SqshXattrIterator *iterator);
+
+/**
+ * @memberof SqshXattrIterator
+ * @brief Retrieves the size of the value of the current xattr.
+ * @deprecated Since 1.3.0. Use sqsh_xattr_iterator_value_size2() instead.
+ *
+ * @param[in] iterator The iterator to use.
+ *
+ * @return The size of the value of the current xattr.
+ */
+__attribute__((deprecated(
+		"Since 1.3.0. Use sqsh_xattr_iterator_value_size2() instead.")))
 uint16_t
 sqsh_xattr_iterator_value_size(const struct SqshXattrIterator *iterator);
 

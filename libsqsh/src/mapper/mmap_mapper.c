@@ -40,9 +40,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-static sqsh_index_t
+static off_t
 mmap_page_offset(const struct SqshMapSlice *mapping) {
-	const size_t offset = mapping->offset;
+	const off_t offset = (off_t)mapping->offset;
 	const struct SqshMapper *mapper = mapping->mapper;
 
 	return offset % mapper->data.mm.page_size;
@@ -75,7 +75,7 @@ sqsh_mapper_mmap_init(
 		rv = -errno;
 		goto out;
 	}
-	*size = st.st_size;
+	*size = (size_t)st.st_size;
 	mapper->data.mm.fd = fd;
 	mapper->data.mm.page_size = sysconf(_SC_PAGESIZE);
 
@@ -84,11 +84,11 @@ out:
 }
 static int
 sqsh_mapping_mmap_map(struct SqshMapSlice *mapping) {
-	const size_t offset = mapping->offset;
+	const off_t offset = (off_t)mapping->offset;
 	const size_t size = mapping->size;
 	const struct SqshMapper *mapper = mapping->mapper;
 
-	const size_t mmap_offset = mmap_page_offset(mapping);
+	const off_t mmap_offset = mmap_page_offset(mapping);
 	const size_t mmap_size = mmap_page_size(mapping);
 
 	uint8_t *file_map = NULL;
@@ -120,7 +120,7 @@ sqsh_mapping_mmap_unmap(struct SqshMapSlice *mapping) {
 }
 static const uint8_t *
 sqsh_mapping_mmap_data(const struct SqshMapSlice *mapping) {
-	const size_t page_offset = mmap_page_offset(mapping);
+	const off_t page_offset = mmap_page_offset(mapping);
 	const uint8_t *data = mapping->data;
 
 	return &data[page_offset];

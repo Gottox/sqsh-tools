@@ -37,6 +37,7 @@
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
 #include <sqsh_error.h>
+#include <stdint.h>
 
 #define BLOCK_INDEX_FINISHED UINT32_MAX
 
@@ -102,7 +103,7 @@ map_block_compressed(
 			iterator->compression_manager;
 	const struct SqshFile *file = iterator->file;
 	struct SqshExtractView *extract_view = &iterator->extract_view;
-	const sqsh_index_t block_index = iterator->block_index;
+	const uint32_t block_index = iterator->block_index;
 	const sqsh_index_t data_block_size =
 			sqsh_file_block_size(file, block_index);
 
@@ -124,7 +125,7 @@ map_block_compressed(
 		goto out;
 	}
 
-	rv = sqsh_file_iterator_size(iterator);
+	rv = 1;
 out:
 	return rv;
 }
@@ -135,7 +136,7 @@ map_block_uncompressed(
 		size_t desired_size) {
 	int rv = 0;
 	const struct SqshFile *file = iterator->file;
-	sqsh_index_t block_index = iterator->block_index;
+	uint32_t block_index = iterator->block_index;
 	struct SqshMapReader *reader = &iterator->map_reader;
 	const uint64_t block_count = sqsh_file_block_count(file);
 	uint64_t outer_size = 0;
@@ -200,7 +201,7 @@ map_zero_block(struct SqshFileIterator *iterator) {
 	iterator->size = current_sparse_size;
 	iterator->data = sqsh__archive_zero_block(archive);
 
-	return current_sparse_size;
+	return 1;
 }
 
 static int
@@ -208,7 +209,7 @@ map_block(struct SqshFileIterator *iterator, size_t desired_size) {
 	int rv = 0;
 	const struct SqshFile *file = iterator->file;
 
-	const sqsh_index_t block_index = iterator->block_index;
+	const uint32_t block_index = iterator->block_index;
 	const size_t block_size = iterator->block_size;
 	const bool is_compressed = sqsh_file_block_is_compressed(file, block_index);
 	const size_t file_size = sqsh_file_size(file);
@@ -326,7 +327,7 @@ sqsh_file_iterator_skip(
 	}
 
 	sqsh_index_t reader_forward = 0;
-	sqsh_index_t block_index = iterator->block_index;
+	uint32_t block_index = iterator->block_index;
 	const size_t block_count = sqsh_file_block_count(iterator->file);
 	for (sqsh_index_t i = 0; i < skip_index && block_index < block_count; i++) {
 		reader_forward += sqsh_file_block_size(iterator->file, block_index);

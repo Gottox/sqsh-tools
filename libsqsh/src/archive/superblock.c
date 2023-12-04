@@ -37,6 +37,7 @@
 
 #include <sqsh_data_private.h>
 
+#include <stdint.h>
 #include <string.h>
 
 enum SqshInitialized {
@@ -51,7 +52,8 @@ log2_u32(uint32_t x) {
 	if (x == 0) {
 		return UINT16_MAX;
 	} else {
-		return sizeof(uint32_t) * 8 - 1 - __builtin_clz(x);
+		const uint16_t clz = (uint16_t)__builtin_clz(x);
+		return (uint16_t)sizeof(uint32_t) * 8 - 1 - clz;
 	}
 }
 

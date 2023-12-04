@@ -53,7 +53,7 @@ main(int argc, char *argv[]) {
 		const char *name = sqsh_xattr_iterator_name(iterator);
 		const size_t name_size = sqsh_xattr_iterator_name_size(iterator);
 		const char *value = sqsh_xattr_iterator_value(iterator);
-		const size_t value_size = sqsh_xattr_iterator_value_size(iterator);
+		const size_t value_size = sqsh_xattr_iterator_value_size2(iterator);
 
 		printf("%.*s%.*s=%.*s\n", (int)prefix_size, prefix, (int)name_size,
 			   name, (int)value_size, value);
