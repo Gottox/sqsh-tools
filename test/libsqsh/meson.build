@@ -95,8 +95,9 @@ foreach p : sqsh_test
             libsqsh_include,
             libsqsh_common_include,
             libsqsh_private_include,
+            libmksqsh_include,
         ],
-        link_with: libsqsh.get_static_lib(),
+        link_with: [libsqsh.get_static_lib(), libmksqsh.get_static_lib()],
         dependencies: [threads_dep, testlib_dep, cextras_dep],
     )
     test(p, t)

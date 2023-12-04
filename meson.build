@@ -56,6 +56,8 @@ subdir('common')
 
 subdir('libsqsh')
 
+subdir('libmksqsh')
+
 if get_option('examples')
     subdir('examples')
 endif
