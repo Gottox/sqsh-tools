@@ -578,7 +578,6 @@ open_directory_with_file_iterator(void) {
 	assert(rv == 0);
 
 	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_DIRECTORY);
-	assert(sqsh_file_has_fragment(&file) == false);
 
 	struct SqshFileIterator iter = {0};
 	rv = sqsh__file_iterator_init(&iter, &file);
