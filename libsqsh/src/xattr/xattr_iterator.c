@@ -305,7 +305,7 @@ sqsh_xattr_iterator_fullname_cmp(
 		const struct SqshXattrIterator *iterator, const char *name) {
 	int rv = 0;
 	const char *prefix = sqsh_xattr_iterator_prefix(iterator);
-	int prefix_len = strlen(prefix);
+	const size_t prefix_len = sqsh_xattr_iterator_prefix_size(iterator);
 	rv = strncmp(name, prefix, prefix_len);
 	if (rv != 0) {
 		return rv;
