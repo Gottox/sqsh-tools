@@ -31,6 +31,23 @@ zlib_dep = dependency('zlib', required: get_option('zlib'))
 zstd_dep = dependency('libzstd', required: get_option('zstd'))
 cextras_dep = subproject('cextras').get_variable('cextras_dep')
 
+extractor_count = 0
+extractors = [lz4_dep, lzma_dep, zlib_dep, zlib_dep]
+extractors_str = ''
+foreach dep : [lz4_dep, lzma_dep, zlib_dep, zlib_dep]
+    extractors_str += '\n   - ' + dep.name()
+    if dep.found()
+        extractor_count += 1
+    endif
+endforeach
+
+if extractor_count == 0
+    warning(
+        'No compression library has been enabled. Please make sure you enable at least on of them:' +
+        extractors_str,
+    )
+endif
+
 pkg_mod = import('pkgconfig')
 
 subdir('include')
