@@ -141,6 +141,7 @@ const struct SqshInodeImpl sqsh__inode_directory_impl = {
 		.directory_parent_inode = inode_directory_parent_inode,
 
 		.symlink_target_path = sqsh__file_inode_null_symlink_target_path,
+		.symlink_target_size = sqsh__file_inode_null_symlink_target_size,
 
 		.device_id = sqsh__file_inode_null_device_id,
 
@@ -164,6 +165,7 @@ const struct SqshInodeImpl sqsh__inode_directory_ext_impl = {
 		.directory_parent_inode = inode_directory_ext_parent_inode,
 
 		.symlink_target_path = sqsh__file_inode_null_symlink_target_path,
+		.symlink_target_size = sqsh__file_inode_null_symlink_target_size,
 
 		.device_id = sqsh__file_inode_null_device_id,
 

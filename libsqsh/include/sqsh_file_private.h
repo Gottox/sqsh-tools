@@ -230,6 +230,7 @@ struct SqshInodeImpl {
 	uint32_t (*directory_parent_inode)(const struct SqshDataInode *inode);
 
 	const char *(*symlink_target_path)(const struct SqshDataInode *inode);
+	uint32_t (*symlink_target_size)(const struct SqshDataInode *inode);
 
 	uint32_t (*device_id)(const struct SqshDataInode *inode);
 
