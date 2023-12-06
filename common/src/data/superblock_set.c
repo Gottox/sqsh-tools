@@ -41,8 +41,6 @@
  * data/superblock_data.c
  */
 
-#include <endian.h> // for htoleXX functions
-
 void
 sqsh__data_superblock_magic_set(
 		struct SqshDataSuperblock *superblock, const uint32_t value) {
