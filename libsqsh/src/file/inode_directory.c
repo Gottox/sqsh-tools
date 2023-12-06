@@ -131,9 +131,20 @@ const struct SqshInodeImpl sqsh__inode_directory_impl = {
 		.hard_link_count = inode_directory_hard_link_count,
 		.size = inode_directory_size,
 
+		.blocks_start = sqsh__file_inode_null_blocks_start,
+		.block_size_info = sqsh__file_inode_null_block_size_info,
+		.fragment_block_index = sqsh__file_inode_null_fragment_block_index,
+		.fragment_block_offset = sqsh__file_inode_null_fragment_block_offset,
+
 		.directory_block_start = inode_directory_block_start,
 		.directory_block_offset = inode_directory_block_offset,
 		.directory_parent_inode = inode_directory_parent_inode,
+
+		.symlink_target_path = sqsh__file_inode_null_symlink_target_path,
+
+		.device_id = sqsh__file_inode_null_device_id,
+
+		.xattr_index = sqsh__file_inode_null_xattr_index,
 };
 
 const struct SqshInodeImpl sqsh__inode_directory_ext_impl = {
@@ -143,18 +154,18 @@ const struct SqshInodeImpl sqsh__inode_directory_ext_impl = {
 		.hard_link_count = inode_directory_ext_hard_link_count,
 		.size = inode_directory_ext_size,
 
-		.blocks_start = NULL,
-		.block_size_info = NULL,
-		.fragment_block_index = NULL,
-		.fragment_block_offset = NULL,
+		.blocks_start = sqsh__file_inode_null_blocks_start,
+		.block_size_info = sqsh__file_inode_null_block_size_info,
+		.fragment_block_index = sqsh__file_inode_null_fragment_block_index,
+		.fragment_block_offset = sqsh__file_inode_null_fragment_block_offset,
 
 		.directory_block_start = inode_directory_ext_block_start,
 		.directory_block_offset = inode_directory_ext_block_offset,
 		.directory_parent_inode = inode_directory_ext_parent_inode,
 
-		.symlink_target_path = NULL,
+		.symlink_target_path = sqsh__file_inode_null_symlink_target_path,
 
-		.device_id = NULL,
+		.device_id = sqsh__file_inode_null_device_id,
 
 		.xattr_index = inode_directory_ext_xattr_index,
 };
