@@ -18,6 +18,7 @@ static int
 read_file(struct SqshDirectoryIterator *iter) {
 	struct SqshFile *inode = NULL;
 	struct SqshFileReader file = {0};
+	struct SqshXattrIterator xattr_iter = {0};
 	int rv;
 
 	inode = sqsh_directory_iterator_open_file(iter, &rv);
@@ -48,7 +49,6 @@ read_file(struct SqshDirectoryIterator *iter) {
 		goto out;
 	}
 
-	struct SqshXattrIterator xattr_iter = {0};
 	rv = sqsh__xattr_iterator_init(&xattr_iter, inode);
 	if (rv < 0) {
 		goto out;
@@ -60,6 +60,7 @@ read_file(struct SqshDirectoryIterator *iter) {
 	}
 
 out:
+	sqsh__xattr_iterator_cleanup(&xattr_iter);
 	sqsh_close(inode);
 	sqsh__file_reader_cleanup(&file);
 	return 0;
