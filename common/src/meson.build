@@ -5,6 +5,7 @@ libsqsh_common_sources = files(
     'data/inode_data.c',
     'data/metablock_data.c',
     'data/superblock_data.c',
+    'data/superblock_set.c',
     'data/xattr_data.c',
     'reader/reader.c',
     'utils/thread.c',
