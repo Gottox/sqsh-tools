@@ -330,7 +330,7 @@ sqsh_file_symlink_dup(const struct SqshFile *inode) {
 
 uint32_t
 sqsh_file_symlink_size(const struct SqshFile *context) {
-	return (uint32_t)sqsh_file_size(context);
+	return context->impl->symlink_target_size(get_inode(context));
 }
 
 uint32_t

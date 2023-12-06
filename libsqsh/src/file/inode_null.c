@@ -95,6 +95,12 @@ sqsh__file_inode_null_symlink_target_path(const struct SqshDataInode *inode) {
 }
 
 uint32_t
+sqsh__file_inode_null_symlink_target_size(const struct SqshDataInode *inode) {
+	(void)inode;
+	return 0;
+}
+
+uint32_t
 sqsh__file_inode_null_device_id(const struct SqshDataInode *inode) {
 	(void)inode;
 	return UINT32_MAX;

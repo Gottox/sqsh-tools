@@ -43,22 +43,23 @@
 #include <sqsh_tree_private.h>
 #include <stdint.h>
 
-static uint64_t inode_symlink_size(const struct SqshDataInode *inode);
-static uint64_t inode_symlink_ext_size(const struct SqshDataInode *inode);
+static uint32_t inode_symlink_target_size(const struct SqshDataInode *inode);
+static uint32_t
+inode_symlink_ext_target_size(const struct SqshDataInode *inode);
 
 /* payload_size */
 static size_t
 inode_symlink_payload_size(
 		const struct SqshDataInode *inode, const struct SqshArchive *archive) {
 	(void)archive;
-	return inode_symlink_size(inode);
+	return inode_symlink_target_size(inode);
 }
 
 static size_t
 inode_symlink_ext_payload_size(
 		const struct SqshDataInode *inode, const struct SqshArchive *archive) {
 	(void)archive;
-	return inode_symlink_ext_size(inode);
+	return inode_symlink_ext_target_size(inode);
 }
 
 /* hard_link_count */
@@ -77,20 +78,30 @@ inode_symlink_ext_hard_link_count(const struct SqshDataInode *inode) {
 /* size */
 static uint64_t
 inode_symlink_size(const struct SqshDataInode *inode) {
-	return sqsh__data_inode_symlink_target_size(
-			sqsh__data_inode_symlink(inode));
+	return inode_symlink_target_size(inode);
 }
 
 static uint64_t
 inode_symlink_ext_size(const struct SqshDataInode *inode) {
-	return sqsh__data_inode_symlink_ext_target_size(
-			sqsh__data_inode_symlink_ext(inode));
+	return inode_symlink_ext_target_size(inode);
 }
 
 static const char *
 inode_symlink_target_path(const struct SqshDataInode *inode) {
 	return (const char *)sqsh__data_inode_symlink_ext_target_path(
 			sqsh__data_inode_symlink_ext(inode));
+}
+
+static uint32_t
+inode_symlink_ext_target_size(const struct SqshDataInode *inode) {
+	return sqsh__data_inode_symlink_ext_target_size(
+			sqsh__data_inode_symlink_ext(inode));
+}
+
+static uint32_t
+inode_symlink_target_size(const struct SqshDataInode *inode) {
+	return sqsh__data_inode_symlink_target_size(
+			sqsh__data_inode_symlink(inode));
 }
 
 static const char *
@@ -122,6 +133,7 @@ const struct SqshInodeImpl sqsh__inode_symlink_impl = {
 		.directory_parent_inode = sqsh__file_inode_null_directory_parent_inode,
 
 		.symlink_target_path = inode_symlink_target_path,
+		.symlink_target_size = inode_symlink_target_size,
 
 		.device_id = sqsh__file_inode_null_device_id,
 
@@ -145,6 +157,7 @@ const struct SqshInodeImpl sqsh__inode_symlink_ext_impl = {
 		.directory_parent_inode = sqsh__file_inode_null_directory_parent_inode,
 
 		.symlink_target_path = inode_symlink_ext_target_path,
+		.symlink_target_size = inode_symlink_ext_target_size,
 
 		.device_id = sqsh__file_inode_null_device_id,
 
