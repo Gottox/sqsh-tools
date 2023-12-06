@@ -209,7 +209,10 @@ out:
 
 bool
 sqsh_file_is_extended(const struct SqshFile *context) {
-	return context->impl->xattr_index != NULL;
+	// Only extended inodes have pointers to the xattr table. Instead of relying
+	// on a dedicated field, we reuse this property to decide if the inode is
+	// extended.
+	return context->impl->xattr_index != &sqsh__file_inode_null_xattr_index;
 }
 
 uint32_t
@@ -370,11 +373,7 @@ sqsh_file_inode_ref(const struct SqshFile *context) {
 
 uint32_t
 sqsh_file_xattr_index(const struct SqshFile *context) {
-	if (context->impl->xattr_index) {
-		return context->impl->xattr_index(get_inode(context));
-	} else {
-		return SQSH_INODE_NO_XATTR;
-	}
+	return context->impl->xattr_index(get_inode(context));
 }
 
 int

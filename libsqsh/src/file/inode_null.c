@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         symlink_file.c
+ * @file         inode_context.c
  */
 
 #include <sqsh_file_private.h>
@@ -42,78 +42,66 @@
 #include <sqsh_data_private.h>
 #include <sqsh_tree_private.h>
 
-static size_t
-inode_ipc_payload_size(
-		const struct SqshDataInode *inode, const struct SqshArchive *archive) {
-	(void)archive;
+uint32_t
+sqsh__file_inode_null_directory_block_start(const struct SqshDataInode *inode) {
 	(void)inode;
-	return 0;
+	return UINT32_MAX;
 }
 
-static uint32_t
-inode_ipc_hard_link_count(const struct SqshDataInode *inode) {
-	return sqsh__data_inode_ipc_hard_link_count(sqsh__data_inode_ipc(inode));
-}
-
-static uint32_t
-inode_ipc_ext_hard_link_count(const struct SqshDataInode *inode) {
-	return sqsh__data_inode_ipc_ext_hard_link_count(
-			sqsh__data_inode_ipc_ext(inode));
-}
-
-static uint64_t
-inode_ipc_size(const struct SqshDataInode *inode) {
+uint16_t
+sqsh__file_inode_null_directory_block_offset(
+		const struct SqshDataInode *inode) {
 	(void)inode;
-	return 0;
+	return UINT16_MAX;
 }
 
-static uint32_t
-inode_ipc_ext_xattr_index(const struct SqshDataInode *inode) {
-	return sqsh__data_inode_ipc_ext_xattr_idx(sqsh__data_inode_ipc_ext(inode));
+uint32_t
+sqsh__file_inode_null_directory_parent_inode(
+		const struct SqshDataInode *inode) {
+	(void)inode;
+	return UINT32_MAX;
 }
 
-const struct SqshInodeImpl sqsh__inode_ipc_impl = {
-		.header_size = sizeof(struct SqshDataInodeIpc),
-		.payload_size = inode_ipc_payload_size,
+uint64_t
+sqsh__file_inode_null_blocks_start(const struct SqshDataInode *inode) {
+	(void)inode;
+	return UINT64_MAX;
+}
 
-		.hard_link_count = inode_ipc_hard_link_count,
-		.size = inode_ipc_size,
+uint32_t
+sqsh__file_inode_null_block_size_info(
+		const struct SqshDataInode *inode, sqsh_index_t index) {
+	(void)inode;
+	(void)index;
+	return UINT32_MAX;
+}
 
-		.blocks_start = sqsh__file_inode_null_blocks_start,
-		.block_size_info = sqsh__file_inode_null_block_size_info,
-		.fragment_block_index = sqsh__file_inode_null_fragment_block_index,
-		.fragment_block_offset = sqsh__file_inode_null_fragment_block_offset,
+uint32_t
+sqsh__file_inode_null_fragment_block_index(const struct SqshDataInode *inode) {
+	(void)inode;
+	return UINT32_MAX;
+}
 
-		.directory_block_start = sqsh__file_inode_null_directory_block_start,
-		.directory_block_offset = sqsh__file_inode_null_directory_block_offset,
-		.directory_parent_inode = sqsh__file_inode_null_directory_parent_inode,
+uint32_t
+sqsh__file_inode_null_fragment_block_offset(const struct SqshDataInode *inode) {
+	(void)inode;
+	return UINT32_MAX;
+}
 
-		.symlink_target_path = sqsh__file_inode_null_symlink_target_path,
+const char *
+sqsh__file_inode_null_symlink_target_path(const struct SqshDataInode *inode) {
+	(void)inode;
+	return NULL;
+}
 
-		.device_id = sqsh__file_inode_null_device_id,
+uint32_t
+sqsh__file_inode_null_device_id(const struct SqshDataInode *inode) {
+	(void)inode;
+	return UINT32_MAX;
+}
 
-		.xattr_index = sqsh__file_inode_null_xattr_index,
-};
-
-const struct SqshInodeImpl sqsh__inode_ipc_ext_impl = {
-		.header_size = sizeof(struct SqshDataInodeIpcExt),
-		.payload_size = inode_ipc_payload_size,
-
-		.hard_link_count = inode_ipc_ext_hard_link_count,
-		.size = inode_ipc_size,
-
-		.blocks_start = sqsh__file_inode_null_blocks_start,
-		.block_size_info = sqsh__file_inode_null_block_size_info,
-		.fragment_block_index = sqsh__file_inode_null_fragment_block_index,
-		.fragment_block_offset = sqsh__file_inode_null_fragment_block_offset,
-
-		.directory_block_start = sqsh__file_inode_null_directory_block_start,
-		.directory_block_offset = sqsh__file_inode_null_directory_block_offset,
-		.directory_parent_inode = sqsh__file_inode_null_directory_parent_inode,
-
-		.symlink_target_path = sqsh__file_inode_null_symlink_target_path,
-
-		.device_id = sqsh__file_inode_null_device_id,
-
-		.xattr_index = inode_ipc_ext_xattr_index,
-};
+uint32_t
+sqsh__file_inode_null_xattr_index(const struct SqshDataInode *inode) {
+	(void)inode;
+	return SQSH_INODE_NO_XATTR;
+}

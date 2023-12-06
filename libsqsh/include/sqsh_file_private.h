@@ -281,36 +281,73 @@ SQSH_NO_EXPORT int sqsh__file_cleanup(struct SqshFile *context);
  * file/inode_directory.c
  */
 
-extern const struct SqshInodeImpl sqsh__inode_directory_impl;
-extern const struct SqshInodeImpl sqsh__inode_directory_ext_impl;
+SQSH_NO_EXPORT extern const struct SqshInodeImpl sqsh__inode_directory_impl;
+SQSH_NO_EXPORT extern const struct SqshInodeImpl sqsh__inode_directory_ext_impl;
 
 /***************************************
  * file/inode_file.c
  */
 
-extern const struct SqshInodeImpl sqsh__inode_file_impl;
-extern const struct SqshInodeImpl sqsh__inode_file_ext_impl;
+SQSH_NO_EXPORT extern const struct SqshInodeImpl sqsh__inode_file_impl;
+SQSH_NO_EXPORT extern const struct SqshInodeImpl sqsh__inode_file_ext_impl;
 
 /***************************************
  * file/inode_symlink.c
  */
 
-extern const struct SqshInodeImpl sqsh__inode_symlink_impl;
-extern const struct SqshInodeImpl sqsh__inode_symlink_ext_impl;
+SQSH_NO_EXPORT extern const struct SqshInodeImpl sqsh__inode_symlink_impl;
+SQSH_NO_EXPORT extern const struct SqshInodeImpl sqsh__inode_symlink_ext_impl;
 
 /***************************************
  * file/inode_device.c
  */
 
-extern const struct SqshInodeImpl sqsh__inode_device_impl;
-extern const struct SqshInodeImpl sqsh__inode_device_ext_impl;
+SQSH_NO_EXPORT extern const struct SqshInodeImpl sqsh__inode_device_impl;
+SQSH_NO_EXPORT extern const struct SqshInodeImpl sqsh__inode_device_ext_impl;
 
 /***************************************
  * file/inode_ipc.c
  */
 
-extern const struct SqshInodeImpl sqsh__inode_ipc_impl;
-extern const struct SqshInodeImpl sqsh__inode_ipc_ext_impl;
+SQSH_NO_EXPORT extern const struct SqshInodeImpl sqsh__inode_ipc_impl;
+SQSH_NO_EXPORT extern const struct SqshInodeImpl sqsh__inode_ipc_ext_impl;
+
+/***************************************
+ * file/inode_null.c
+ */
+
+SQSH_NO_EXPORT uint32_t
+sqsh__file_inode_null_directory_block_start(const struct SqshDataInode *inode);
+
+SQSH_NO_EXPORT uint16_t
+sqsh__file_inode_null_directory_block_offset(const struct SqshDataInode *inode);
+
+SQSH_NO_EXPORT uint32_t
+sqsh__file_inode_null_directory_parent_inode(const struct SqshDataInode *inode);
+
+SQSH_NO_EXPORT uint64_t
+sqsh__file_inode_null_blocks_start(const struct SqshDataInode *inode);
+
+SQSH_NO_EXPORT uint32_t sqsh__file_inode_null_block_size_info(
+		const struct SqshDataInode *inode, sqsh_index_t index);
+
+SQSH_NO_EXPORT uint32_t
+sqsh__file_inode_null_fragment_block_index(const struct SqshDataInode *inode);
+
+SQSH_NO_EXPORT uint32_t
+sqsh__file_inode_null_fragment_block_offset(const struct SqshDataInode *inode);
+
+SQSH_NO_EXPORT const char *
+sqsh__file_inode_null_symlink_target_path(const struct SqshDataInode *inode);
+
+SQSH_NO_EXPORT uint32_t
+sqsh__file_inode_null_symlink_target_size(const struct SqshDataInode *inode);
+
+SQSH_NO_EXPORT uint32_t
+sqsh__file_inode_null_device_id(const struct SqshDataInode *inode);
+
+SQSH_NO_EXPORT uint32_t
+sqsh__file_inode_null_xattr_index(const struct SqshDataInode *inode);
 
 #ifdef __cplusplus
 }

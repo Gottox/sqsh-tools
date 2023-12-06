@@ -24,6 +24,7 @@ libsqsh_sources = files(
     'file/inode_directory.c',
     'file/inode_file.c',
     'file/inode_ipc.c',
+    'file/inode_null.c',
     'file/inode_symlink.c',
     'mapper/curl_mapper.c',
     'mapper/map_iterator.c',

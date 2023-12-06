@@ -93,20 +93,20 @@ const struct SqshInodeImpl sqsh__inode_device_impl = {
 		.hard_link_count = inode_device_hard_link_count,
 		.size = inode_device_file_size,
 
-		.blocks_start = NULL,
-		.block_size_info = NULL,
-		.fragment_block_index = NULL,
-		.fragment_block_offset = NULL,
+		.blocks_start = sqsh__file_inode_null_blocks_start,
+		.block_size_info = sqsh__file_inode_null_block_size_info,
+		.fragment_block_index = sqsh__file_inode_null_fragment_block_index,
+		.fragment_block_offset = sqsh__file_inode_null_fragment_block_offset,
 
-		.directory_block_start = NULL,
-		.directory_block_offset = NULL,
-		.directory_parent_inode = NULL,
+		.directory_block_start = sqsh__file_inode_null_directory_block_start,
+		.directory_block_offset = sqsh__file_inode_null_directory_block_offset,
+		.directory_parent_inode = sqsh__file_inode_null_directory_parent_inode,
 
-		.symlink_target_path = NULL,
+		.symlink_target_path = sqsh__file_inode_null_symlink_target_path,
 
 		.device_id = inode_device_id,
 
-		.xattr_index = NULL,
+		.xattr_index = sqsh__file_inode_null_xattr_index,
 };
 
 const struct SqshInodeImpl sqsh__inode_device_ext_impl = {
@@ -116,16 +116,16 @@ const struct SqshInodeImpl sqsh__inode_device_ext_impl = {
 		.hard_link_count = inode_device_ext_hard_link_count,
 		.size = inode_device_file_size,
 
-		.blocks_start = NULL,
-		.block_size_info = NULL,
-		.fragment_block_index = NULL,
-		.fragment_block_offset = NULL,
+		.blocks_start = sqsh__file_inode_null_blocks_start,
+		.block_size_info = sqsh__file_inode_null_block_size_info,
+		.fragment_block_index = sqsh__file_inode_null_fragment_block_index,
+		.fragment_block_offset = sqsh__file_inode_null_fragment_block_offset,
 
-		.directory_block_start = NULL,
-		.directory_block_offset = NULL,
-		.directory_parent_inode = NULL,
+		.directory_block_start = sqsh__file_inode_null_directory_block_start,
+		.directory_block_offset = sqsh__file_inode_null_directory_block_offset,
+		.directory_parent_inode = sqsh__file_inode_null_directory_parent_inode,
 
-		.symlink_target_path = NULL,
+		.symlink_target_path = sqsh__file_inode_null_symlink_target_path,
 
 		.device_id = inode_device_ext_id,
 
