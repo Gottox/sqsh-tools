@@ -206,7 +206,7 @@ sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator, int *err) {
 	iterator->value_index = sizeof(struct SqshDataXattrKey) + name_size;
 
 	/* Load Value */
-	const uint16_t value_size = sqsh_xattr_iterator_value_size(iterator);
+	const uint32_t value_size = sqsh_xattr_iterator_value_size2(iterator);
 	size += value_size;
 	rv = sqsh__metablock_reader_advance(&iterator->metablock, 0, size);
 	if (rv < 0) {
@@ -223,7 +223,7 @@ sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator, int *err) {
 	}
 
 	const size_t processed_size = sqsh_xattr_iterator_prefix_size(iterator) +
-			name_size + sqsh_xattr_iterator_value_size(iterator) + 1;
+			name_size + sqsh_xattr_iterator_value_size2(iterator) + 1;
 	if (SQSH_SUB_OVERFLOW(
 				iterator->remaining_size, processed_size,
 				&iterator->remaining_size)) {
@@ -242,12 +242,13 @@ out:
 
 uint16_t
 sqsh_xattr_iterator_type(const struct SqshXattrIterator *iterator) {
-	return sqsh__data_xattr_key_type(get_key(iterator)) & ~0x0100;
+	return sqsh__data_xattr_key_type(get_key(iterator)) & (uint16_t)~0x0100;
 }
 
 bool
 sqsh_xattr_iterator_is_indirect(const struct SqshXattrIterator *iterator) {
-	return (sqsh__data_xattr_key_type(get_key(iterator)) & 0x0100) != 0;
+	return (sqsh__data_xattr_key_type(get_key(iterator)) & (uint16_t)0x0100) !=
+			0;
 }
 
 const char *
@@ -346,7 +347,7 @@ sqsh_xattr_iterator_name_size(const struct SqshXattrIterator *iterator) {
 
 char *
 sqsh_xattr_iterator_value_dup(const struct SqshXattrIterator *iterator) {
-	const size_t size = sqsh_xattr_iterator_value_size(iterator);
+	const size_t size = sqsh_xattr_iterator_value_size2(iterator);
 	const char *value = sqsh_xattr_iterator_value(iterator);
 
 	return cx_memdup(value, size);
@@ -357,9 +358,14 @@ sqsh_xattr_iterator_value(const struct SqshXattrIterator *iterator) {
 	return (const char *)sqsh__data_xattr_value(get_value(iterator));
 }
 
+uint32_t
+sqsh_xattr_iterator_value_size2(const struct SqshXattrIterator *iterator) {
+	return sqsh__data_xattr_value_size(get_value(iterator));
+}
+
 uint16_t
 sqsh_xattr_iterator_value_size(const struct SqshXattrIterator *iterator) {
-	return sqsh__data_xattr_value_size(get_value(iterator));
+	return (uint16_t)sqsh_xattr_iterator_value_size2(iterator);
 }
 
 int

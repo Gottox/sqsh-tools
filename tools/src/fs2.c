@@ -296,7 +296,7 @@ fs_getxattr(const char *path, const char *name, char *buf, size_t size) {
 	}
 
 	const char *value = sqsh_xattr_iterator_value(iterator);
-	size_t value_len = sqsh_xattr_iterator_value_size(iterator);
+	size_t value_len = sqsh_xattr_iterator_value_size2(iterator);
 	if (value_len > size) {
 		rv = SQSH_ERROR_OUT_OF_BOUNDS;
 		goto out;

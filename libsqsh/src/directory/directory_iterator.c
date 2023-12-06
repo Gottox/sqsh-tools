@@ -427,7 +427,7 @@ sqsh_directory_iterator_name(const struct SqshDirectoryIterator *iterator) {
 
 char *
 sqsh_directory_iterator_name_dup(const struct SqshDirectoryIterator *iterator) {
-	int size = sqsh_directory_iterator_name_size(iterator);
+	uint16_t size = sqsh_directory_iterator_name_size(iterator);
 	const char *entry_name = sqsh_directory_iterator_name(iterator);
 
 	return cx_memdup(entry_name, size);

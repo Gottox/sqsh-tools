@@ -48,7 +48,7 @@ sqsh_zlib_init(void *context, uint8_t *target, size_t target_size) {
 	stream->zfree = Z_NULL;
 	stream->opaque = Z_NULL;
 	stream->next_out = target;
-	stream->avail_out = target_size;
+	stream->avail_out = (uInt)target_size;
 
 	if (inflateInit(stream) != Z_OK) {
 		return -SQSH_ERROR_COMPRESSION_INIT;
@@ -64,7 +64,7 @@ sqsh_zlib_decompress(
 	int rv;
 	z_stream *stream = context;
 	stream->next_in = (Bytef *)compressed;
-	stream->avail_in = compressed_size;
+	stream->avail_in = (uInt)compressed_size;
 	rv = inflate(stream, Z_NO_FLUSH);
 
 	if (rv != Z_STREAM_END && rv != Z_OK) {

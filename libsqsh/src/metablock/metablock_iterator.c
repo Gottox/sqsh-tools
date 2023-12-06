@@ -83,17 +83,13 @@ process_next_header(struct SqshMetablockIterator *iterator) {
 			(struct SqshDataMetablock *)sqsh__map_reader_data(
 					&iterator->reader);
 	const bool is_compressed = sqsh__data_metablock_is_compressed(metablock);
-	const size_t outer_size = sqsh__data_metablock_size(metablock);
+	const uint16_t outer_size = sqsh__data_metablock_size(metablock);
 	if (outer_size > SQSH_METABLOCK_BLOCK_SIZE) {
 		rv = -SQSH_ERROR_SIZE_MISMATCH;
 		goto out;
 	}
 	iterator->is_compressed = is_compressed;
 	iterator->outer_size = outer_size;
-	if (iterator->outer_size > SQSH_METABLOCK_BLOCK_SIZE) {
-		rv = -SQSH_ERROR_SIZE_MISMATCH;
-		goto out;
-	}
 
 out:
 	return rv;
@@ -119,7 +115,15 @@ map_data(struct SqshMetablockIterator *iterator) {
 			goto out;
 		}
 		iterator->data = sqsh__extract_view_data(&iterator->extract_view);
-		iterator->inner_size = sqsh__extract_view_size(&iterator->extract_view);
+		size_t extracted_size =
+				sqsh__extract_view_size(&iterator->extract_view);
+		/* extracted_size is guaranteed to be less or equal to
+		 * SQSH_METABLOCK_BLOCK_SIZE as the compression_manager does only
+		 * provide a buffer of that size. If the inflated data is bigger, the
+		 * compression itself will fail. Therefore this explicit typecast is
+		 * safe.
+		 */
+		iterator->inner_size = (uint16_t)extracted_size;
 	} else {
 		iterator->data = sqsh__map_reader_data(&iterator->reader);
 		iterator->inner_size = iterator->outer_size;

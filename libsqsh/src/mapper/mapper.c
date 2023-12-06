@@ -50,7 +50,7 @@ sqsh__mapper_init(
 	}
 
 	if (config->mapper_block_size) {
-		mapper->block_size = config->mapper_block_size;
+		mapper->block_size = (size_t)config->mapper_block_size;
 	} else {
 		mapper->block_size = mapper->impl->block_size_hint;
 	}

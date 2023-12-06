@@ -72,6 +72,50 @@ next_once(void) {
 }
 
 static void
+next_failing_with_overflow(void) {
+	int rv;
+	struct SqshArchive sqsh = {0};
+	struct SqshMetablockIterator iter;
+	uint8_t payload[8192] = {SQSH_HEADER, METABLOCK_HEADER(0, 8192)};
+	mk_stub(&sqsh, payload, sizeof(payload));
+
+	rv = sqsh__metablock_iterator_init(
+			&iter, &sqsh, sizeof(struct SqshDataSuperblock), sizeof(payload));
+	assert(rv == 0);
+
+	bool has_next = sqsh__metablock_iterator_next(&iter, &rv);
+	assert(rv == -SQSH_ERROR_OUT_OF_BOUNDS);
+	assert(!has_next);
+
+	rv = sqsh__metablock_iterator_cleanup(&iter);
+	assert(rv == 0);
+
+	sqsh__archive_cleanup(&sqsh);
+}
+
+static void
+next_failing_with_size_too_big(void) {
+	int rv;
+	struct SqshArchive sqsh = {0};
+	struct SqshMetablockIterator iter;
+	uint8_t payload[8192 * 2] = {SQSH_HEADER, METABLOCK_HEADER(0, 8192 + 1)};
+	mk_stub(&sqsh, payload, sizeof(payload));
+
+	rv = sqsh__metablock_iterator_init(
+			&iter, &sqsh, sizeof(struct SqshDataSuperblock), sizeof(payload));
+	assert(rv == 0);
+
+	bool has_next = sqsh__metablock_iterator_next(&iter, &rv);
+	assert(rv == -SQSH_ERROR_SIZE_MISMATCH);
+	assert(!has_next);
+
+	rv = sqsh__metablock_iterator_cleanup(&iter);
+	assert(rv == 0);
+
+	sqsh__archive_cleanup(&sqsh);
+}
+
+static void
 next_failing_with_no_compression(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
@@ -189,6 +233,8 @@ next_compressed(void) {
 DECLARE_TESTS
 TEST(next_once)
 TEST(next_failing_with_no_compression)
+TEST(next_failing_with_size_too_big)
+TEST(next_failing_with_overflow)
 TEST(next_twice)
 TEST(next_compressed)
 END_TESTS

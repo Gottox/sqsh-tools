@@ -49,7 +49,7 @@ inode_file_ext_fragment_block_index(const struct SqshDataInode *inode);
 static uint64_t inode_file_size(const struct SqshDataInode *inode);
 static uint64_t inode_file_ext_size(const struct SqshDataInode *inode);
 
-static uint32_t
+static size_t
 calc_block_count(
 		const struct SqshArchive *archive, uint64_t file_size,
 		uint32_t fragment_index) {
@@ -67,7 +67,7 @@ calc_block_count(
 static size_t
 inode_file_payload_size(
 		const struct SqshDataInode *inode, const struct SqshArchive *archive) {
-	const uint32_t block_count = calc_block_count(
+	const size_t block_count = calc_block_count(
 			archive, inode_file_size(inode),
 			inode_file_fragment_block_index(inode));
 	return block_count * sizeof(uint32_t);
@@ -76,7 +76,7 @@ inode_file_payload_size(
 static size_t
 inode_file_ext_payload_size(
 		const struct SqshDataInode *inode, const struct SqshArchive *archive) {
-	const uint32_t block_count = calc_block_count(
+	const size_t block_count = calc_block_count(
 			archive, inode_file_ext_size(inode),
 			inode_file_ext_fragment_block_index(inode));
 	return block_count * sizeof(uint32_t);

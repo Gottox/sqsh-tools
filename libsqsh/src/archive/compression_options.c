@@ -75,7 +75,8 @@ sqsh__compression_options_init(
 		goto out;
 	}
 
-	context->compression_id = sqsh_superblock_compression_id(superblock);
+	context->compression_id =
+			(uint16_t)sqsh_superblock_compression_id(superblock);
 
 out:
 	if (rv < 0) {

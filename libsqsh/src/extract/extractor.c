@@ -44,8 +44,8 @@ const struct SqshExtractorImpl *volatile const __attribute__((weak))
 sqsh__impl_lzo = NULL;
 
 const struct SqshExtractorImpl *
-sqsh__extractor_impl_from_id(int id) {
-	switch ((enum SqshSuperblockCompressionId)id) {
+sqsh__extractor_impl_from_id(enum SqshSuperblockCompressionId id) {
+	switch (id) {
 	case SQSH_COMPRESSION_GZIP:
 		return sqsh__impl_zlib;
 	case SQSH_COMPRESSION_LZMA:

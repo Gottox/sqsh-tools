@@ -42,6 +42,7 @@
 
 #include <sqsh_data_private.h>
 #include <sqsh_tree_private.h>
+#include <stdint.h>
 
 static const struct SqshDataInode *
 get_inode(const struct SqshFile *inode) {
@@ -137,7 +138,7 @@ int
 sqsh__file_init(
 		struct SqshFile *inode, struct SqshArchive *archive,
 		uint64_t inode_ref) {
-	const uint32_t outer_offset = sqsh_address_ref_outer_offset(inode_ref);
+	const uint64_t outer_offset = sqsh_address_ref_outer_offset(inode_ref);
 	const uint16_t inner_offset = sqsh_address_ref_inner_offset(inode_ref);
 	uint64_t address_outer;
 	struct SqshInodeMap *inode_map;
@@ -241,6 +242,7 @@ sqsh_file_blocks_start(const struct SqshFile *context) {
 	return context->impl->blocks_start(get_inode(context));
 }
 
+// TODO: reconsider the return type of this function.
 uint32_t
 sqsh_file_block_count(const struct SqshFile *context) {
 	const struct SqshSuperblock *superblock =
@@ -253,9 +255,9 @@ sqsh_file_block_count(const struct SqshFile *context) {
 	} else if (file_size == 0) {
 		return 0;
 	} else if (sqsh_file_has_fragment(context)) {
-		return file_size / block_size;
+		return (uint32_t)file_size / block_size;
 	} else {
-		return SQSH_DIVIDE_CEIL(file_size, block_size);
+		return (uint32_t)SQSH_DIVIDE_CEIL(file_size, block_size);
 	}
 }
 
@@ -325,7 +327,7 @@ sqsh_file_symlink_dup(const struct SqshFile *inode) {
 
 uint32_t
 sqsh_file_symlink_size(const struct SqshFile *context) {
-	return sqsh_file_size(context);
+	return (uint32_t)sqsh_file_size(context);
 }
 
 uint32_t

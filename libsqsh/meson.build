@@ -7,7 +7,7 @@ libsqsh_dependencies = [
     libsqsh_common_dep,
 ]
 
-libsqsh_c_args = []
+libsqsh_c_args = ['-Wconversion']
 if threads_dep.found()
     libsqsh_dependencies += threads_dep
 endif

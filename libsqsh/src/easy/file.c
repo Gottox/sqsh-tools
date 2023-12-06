@@ -98,7 +98,8 @@ sqsh_easy_file_content(
 		goto out;
 	}
 
-	for (int pos = 0; sqsh_file_iterator_next(&iterator, SIZE_MAX, &rv);) {
+	for (sqsh_index_t pos = 0;
+		 sqsh_file_iterator_next(&iterator, SIZE_MAX, &rv);) {
 		const uint8_t *data = sqsh_file_iterator_data(&iterator);
 		const size_t size = sqsh_file_iterator_size(&iterator);
 		memcpy(&content[pos], data, size);
