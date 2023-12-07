@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         superblock_data.c
+ * @file         superblock_set.c
  */
 
 #define _DEFAULT_SOURCE

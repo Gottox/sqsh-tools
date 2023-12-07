@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_thread_private.h
+ * @file         sqsh_utils_private.h
  */
 
 #ifndef SQSH_THREAD_PRIVATE_H
@@ -41,6 +41,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/***************************************
+ * utils/thread.c
+ */
 
 /**
  * @brief sqsh_thread_t represents a thread.
@@ -93,6 +97,12 @@ SQSH_NO_EXPORT int sqsh__mutex_unlock(sqsh__mutex_t *mutex);
  * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_EXPORT int sqsh__mutex_destroy(sqsh__mutex_t *mutex);
+
+/***************************************
+ * utils/math.c
+ */
+
+SQSH_NO_UNUSED uint16_t sqsh__log2_u32(uint32_t x);
 
 #ifdef __cplusplus
 }

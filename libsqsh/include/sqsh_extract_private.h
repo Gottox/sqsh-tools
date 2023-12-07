@@ -37,7 +37,7 @@
 #include <cextras/collection.h>
 
 #include <sqsh_data.h>
-#include <sqsh_thread_private.h>
+#include <sqsh_utils_private.h>
 
 #ifdef __cplusplus
 extern "C" {

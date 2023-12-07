@@ -28,10 +28,8 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         thread.c
+ * @file         utils.c
  */
-
-#define _DEFAULT_SOURCE
 
 #include <sqsh_utils_private.h>
 
@@ -41,62 +39,12 @@
 #include <pthread.h>
 #include <stdlib.h>
 
-int
-sqsh__mutex_init(sqsh__mutex_t *mutex) {
-	int rv = pthread_mutex_init(mutex, NULL);
-	if (rv != 0) {
-		return -SQSH_ERROR_MUTEX_INIT_FAILED;
-	}
-	return 0;
-}
-
-int
-sqsh__mutex_init_recursive(sqsh__mutex_t *mutex) {
-	pthread_mutexattr_t mutex_attr;
-	int rv = pthread_mutexattr_init(&mutex_attr);
-	if (rv != 0) {
-		return -SQSH_ERROR_MUTEX_INIT_FAILED;
-	}
-
-	pthread_mutexattr_settype(&mutex_attr, PTHREAD_MUTEX_RECURSIVE);
-
-	rv = pthread_mutex_init(mutex, &mutex_attr);
-	if (rv != 0) {
-		rv = -SQSH_ERROR_MUTEX_INIT_FAILED;
-		goto out;
-	}
-
-out:
-	pthread_mutexattr_destroy(&mutex_attr);
-	return rv;
-}
-
-int
-sqsh__mutex_lock(sqsh__mutex_t *mutex) {
-	int rv = pthread_mutex_lock(mutex);
-	if (rv != 0) {
-		return -SQSH_ERROR_MUTEX_LOCK_FAILED;
+uint16_t
+sqsh__log2_u32(uint32_t x) {
+	if (x == 0) {
+		return UINT16_MAX;
 	} else {
-		return 0;
-	}
-}
-
-int
-sqsh__mutex_unlock(sqsh__mutex_t *mutex) {
-	int rv = pthread_mutex_unlock(mutex);
-	if (rv != 0) {
-		return -SQSH_ERROR_MUTEX_LOCK_FAILED;
-	} else {
-		return 0;
-	}
-}
-
-int
-sqsh__mutex_destroy(sqsh__mutex_t *mutex) {
-	int rv = pthread_mutex_destroy(mutex);
-	if (rv != 0) {
-		return -SQSH_ERROR_MUTEX_DESTROY_FAILED;
-	} else {
-		return 0;
+		const uint16_t clz = (uint16_t)__builtin_clz(x);
+		return (uint16_t)sizeof(uint32_t) * 8 - 1 - clz;
 	}
 }
