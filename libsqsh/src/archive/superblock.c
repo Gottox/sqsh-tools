@@ -32,13 +32,11 @@
  */
 
 #include <sqsh_archive_private.h>
+#include <sqsh_common_private.h>
 
 #include <sqsh_error.h>
 
 #include <sqsh_data_private.h>
-
-#include <stdint.h>
-#include <string.h>
 
 enum SqshInitialized {
 	SQSH_INITIALIZED_ID_TABLE = 1 << 0,
@@ -46,16 +44,6 @@ enum SqshInitialized {
 	SQSH_INITIALIZED_XATTR_TABLE = 1 << 3,
 	SQSH_INITIALIZED_FRAGMENT_TABLE = 1 << 4,
 };
-
-static uint16_t
-log2_u32(uint32_t x) {
-	if (x == 0) {
-		return UINT16_MAX;
-	} else {
-		const uint16_t clz = (uint16_t)__builtin_clz(x);
-		return (uint16_t)sizeof(uint32_t) * 8 - 1 - clz;
-	}
-}
 
 static const struct SqshDataSuperblock *
 get_header(const struct SqshSuperblock *superblock) {
@@ -105,7 +93,7 @@ sqsh__superblock_init(
 		goto out;
 	}
 
-	if (sqsh__data_superblock_block_log(header) != log2_u32(block_size)) {
+	if (sqsh__data_superblock_block_log(header) != sqsh__log2_u32(block_size)) {
 		rv = -SQSH_ERROR_BLOCKSIZE_MISMATCH;
 		goto out;
 	}

@@ -38,7 +38,7 @@
 
 #include "sqsh_error.h"
 #include "sqsh_file_private.h"
-#include "sqsh_thread_private.h"
+#include "sqsh_utils_private.h"
 #include "sqsh_xattr_private.h"
 
 #ifdef __cplusplus

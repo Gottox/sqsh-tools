@@ -34,17 +34,9 @@
 #include <sqsh_data.h>
 #include <sqsh_data_set.h>
 #include <sqsh_error.h>
+#include <sqsh_utils_private.h>
 
 #include <sqsh_archive_builder.h>
-
-static uint16_t
-log2_u32(uint32_t x) {
-	if (x == 0) {
-		return UINT16_MAX;
-	} else {
-		return sizeof(uint32_t) * 8 - 1 - __builtin_clz(x);
-	}
-}
 
 int
 sqsh__superblock_builder_init(struct SqshSuperblockBuilder *superblock) {
@@ -73,7 +65,7 @@ sqsh__superblock_builder_block_size(
 	}
 
 	sqsh__data_superblock_block_size_set(&superblock->data, block_size);
-	const uint16_t log2_block_size = log2_u32(block_size);
+	const uint16_t log2_block_size = sqsh__log2_u32(block_size);
 	sqsh__data_superblock_block_log_set(&superblock->data, log2_block_size);
 
 	return 0;

@@ -37,7 +37,7 @@
 #include "sqsh_mapper.h"
 
 #include "sqsh_reader_private.h"
-#include "sqsh_thread_private.h"
+#include "sqsh_utils_private.h"
 #include <cextras/collection.h>
 #include <sys/wait.h>
 
