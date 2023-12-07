@@ -425,6 +425,169 @@ __attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_free() "
 						  "instead."))) int
 sqsh_tree_walker_free(struct SqshTreeWalker *reader);
 
+/***************************************
+ * tree/traversal.c
+ */
+
+enum SqshTreeTraversalState {
+	SQSH_TREE_TRAVERSAL_STATE_FINISHED,
+	SQSH_TREE_TRAVERSAL_STATE_FILE,
+	SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN,
+	SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END,
+};
+
+struct SqshTreeTraversal;
+
+/**
+ * @brief Creates a new SqshTreeTraversal object at the root inode.
+ * @memberof SqshTreeTraversal
+ *
+ * @param[in]   file     the base inode to start from.
+ * @param[out]  err      Pointer to an int where the error code will be
+ * stored.
+ *
+ * @return a new file reader.
+ */
+struct SqshTreeTraversal *
+sqsh_tree_traversal_new(const struct SqshFile *file, int *err);
+
+/**
+ * @memberof SqshTreeTraversal
+ * @brief Moves the traversal to the next entry int the current directory.
+ *
+ * @param[in,out]   traversal  The traversal to use
+ * @param[out]      err Pointer to an int where the error code will be stored.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED bool
+sqsh_tree_traversal_next(struct SqshTreeTraversal *traversal, int *err);
+
+/**
+ * @brief Returns the inode type of the current entry.
+ * @memberof SqshTreeTraversal
+ *
+ * @param[in]   traversal  The traversal to use
+ *
+ * @return the inode type of the current entry.
+ */
+enum SqshFileType
+sqsh_tree_traversal_type(const struct SqshTreeTraversal *traversal);
+
+/**
+ * @memberof SqshTreeTraversal
+ * @brief returns the state of the traversal.
+ *
+ * @param[in,out]   traversal  The traversal to use
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+enum SqshTreeTraversalState
+sqsh_tree_traversal_state(const struct SqshTreeTraversal *traversal);
+
+/**
+ * @brief Returns the name of the current entry. This entry is not zero
+ * terminated.
+ * @memberof SqshTreeTraversal
+ *
+ * @param[in]   traversal  The traversal to use
+ *
+ * @return the name of the current entry.
+ */
+const char *sqsh_tree_traversal_name(const struct SqshTreeTraversal *traversal);
+
+/**
+ * @brief Returns the name of the current entry. This entry is not zero
+ * terminated.
+ * @memberof SqshTreeTraversal
+ *
+ * @param[in]   traversal  The traversal to use
+ *
+ * @return the name of the current entry.
+ */
+char *sqsh_tree_traversal_path_dup(const struct SqshTreeTraversal *traversal);
+
+/**
+ * @memberof SqshTreeTraversal
+ * @brief Returns the size of the name of the current entry.
+ *
+ * @param[in]   traversal  The traversal to use
+ *
+ * @return the size of the name of the current entry.
+ */
+uint16_t
+sqsh_tree_traversal_name_size(const struct SqshTreeTraversal *traversal);
+
+/**
+ * @memberof SqshTreeTraversal
+ * @brief creates a heap allocated copy of the name of the current entry.
+ *
+ * The caller is responsible for calling free() on the returned pointer.
+ *
+ * The returned string is 0 terminated.
+ *
+ * @param[in]   traversal  The traversal to use
+ *
+ * @return the name of the current entry.
+ */
+SQSH_NO_UNUSED char *
+sqsh_tree_traversal_name_dup(const struct SqshTreeTraversal *traversal);
+
+/**
+ * @brief Returns the path segment at a given index.
+ * @memberof SqshTreeTraversal
+ *
+ * @param[in,out]   traversal  The traversal to use
+ * @param[in]       index      The index of the path segment.
+ *
+ * @return the inode of the current entry.
+ */
+size_t sqsh_tree_traversal_path_segment_size(
+		const struct SqshTreeTraversal *traversal, sqsh_index_t index);
+
+/**
+ * @brief Returns the path segment at a given index.
+ * @memberof SqshTreeTraversal
+ *
+ * @param[in,out]   traversal  The traversal to use
+ *
+ * @return the inode of the current entry.
+ */
+size_t sqsh_tree_traversal_depth(const struct SqshTreeTraversal *traversal);
+
+/**
+ * @brief Returns the length of the path segment at a given index.
+ * @memberof SqshTreeTraversal
+ *
+ * @param[in,out]   traversal  The traversal to use
+ * @param[in]       index      The index of the path segment.
+ *
+ * @return the inode of the current entry.
+ */
+const char *sqsh_tree_traversal_path_segment(
+		const struct SqshTreeTraversal *traversal, sqsh_index_t index);
+
+/**
+ * @brief Returns the inode of the current entry.
+ * @memberof SqshTreeTraversal
+ *
+ * @param[in,out]   traversal  The traversal to use
+ * @param[out]      err     Pointer to an int where the error code will be
+ *
+ * @return the inode of the current entry.
+ */
+SQSH_NO_UNUSED struct SqshFile *sqsh_tree_traversal_open_file(
+		const struct SqshTreeTraversal *traversal, int *err);
+
+/**
+ * @memberof SqshTreeTraversal
+ *
+ * @param[in,out] traversal The file traversal struct to clean up.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+int sqsh_tree_traversal_free(struct SqshTreeTraversal *traversal);
+
 #ifdef __cplusplus
 }
 #endif

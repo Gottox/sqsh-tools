@@ -5,28 +5,25 @@
  * Distributed under terms of the MIT license.
  */
 
-#include "../include/sqsh_archive_private.h"
-#include "../include/sqsh_directory_private.h"
-#include "../include/sqsh_file_private.h"
-#include "../include/sqsh_xattr_private.h"
+#include <sqsh.h>
 #include <stdint.h>
 #include <stdlib.h>
 
 #define DEFAULT_CHUNK_SIZE 4096
 
 static int
-read_file(struct SqshDirectoryIterator *iter) {
+read_file(struct SqshTreeTraversal *traversal) {
 	struct SqshFile *inode = NULL;
-	struct SqshFileReader file = {0};
-	struct SqshXattrIterator xattr_iter = {0};
+	struct SqshFileReader *file = NULL;
+	struct SqshXattrIterator *xattr_iter = NULL;
 	int rv;
 
-	inode = sqsh_directory_iterator_open_file(iter, &rv);
+	inode = sqsh_tree_traversal_open_file(traversal, &rv);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = sqsh__file_reader_init(&file, inode);
+	file = sqsh_file_reader_new(inode, &rv);
 	if (rv < 0) {
 		goto out;
 	}
@@ -39,7 +36,7 @@ read_file(struct SqshDirectoryIterator *iter) {
 		if (chunk_size > size) {
 			chunk_size = size;
 		}
-		rv = sqsh_file_reader_advance(&file, advance, chunk_size);
+		rv = sqsh_file_reader_advance(file, advance, chunk_size);
 		if (rv < 0) {
 			goto out;
 		}
@@ -49,20 +46,20 @@ read_file(struct SqshDirectoryIterator *iter) {
 		goto out;
 	}
 
-	rv = sqsh__xattr_iterator_init(&xattr_iter, inode);
+	xattr_iter = sqsh_xattr_iterator_new(inode, &rv);
 	if (rv < 0) {
 		goto out;
 	}
-	while (sqsh_xattr_iterator_next(&xattr_iter, &rv)) {
-		char *fullname = sqsh_xattr_iterator_fullname_dup(&xattr_iter);
+	while (sqsh_xattr_iterator_next(xattr_iter, &rv)) {
+		char *fullname = sqsh_xattr_iterator_fullname_dup(xattr_iter);
 		free(fullname);
-		sqsh_xattr_iterator_value(&xattr_iter);
+		sqsh_xattr_iterator_value(xattr_iter);
 	}
 
 out:
-	sqsh__xattr_iterator_cleanup(&xattr_iter);
+	sqsh_xattr_iterator_free(xattr_iter);
+	sqsh_file_reader_free(file);
 	sqsh_close(inode);
-	sqsh__file_reader_cleanup(&file);
 	return 0;
 }
 
@@ -71,7 +68,7 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 	int rv = 0;
 	struct SqshArchive *archive = NULL;
 	struct SqshFile *inode = NULL;
-	struct SqshDirectoryIterator *iter = NULL;
+	struct SqshTreeTraversal *traversal = NULL;
 	const struct SqshSuperblock *superblock = NULL;
 
 	archive = sqsh_archive_open(
@@ -92,18 +89,18 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 		goto out;
 	}
 
-	iter = sqsh_directory_iterator_new(inode, &rv);
-	if (iter == NULL) {
+	traversal = sqsh_tree_traversal_new(inode, &rv);
+	if (traversal == NULL) {
 		goto out;
 	}
-	while (sqsh_directory_iterator_next(iter, &rv)) {
-		if (read_file(iter) < 0)
+	while (sqsh_tree_traversal_next(traversal, &rv)) {
+		if (read_file(traversal) < 0)
 			break;
 	}
 
 out:
 
-	sqsh_directory_iterator_free(iter);
+	sqsh_tree_traversal_free(traversal);
 	sqsh_close(inode);
 	sqsh_archive_close(archive);
 

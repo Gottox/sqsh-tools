@@ -42,6 +42,7 @@ libsqsh_sources = files(
     'table/table.c',
     'table/xattr_table.c',
     'tree/path_resolver.c',
+    'tree/traversal.c',
     'tree/walker.c',
     'utils/error.c',
     'utils/posix.c',

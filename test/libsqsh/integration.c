@@ -602,6 +602,31 @@ test_follow_symlink(void) {
 	rv = sqsh__archive_cleanup(&sqsh);
 	assert(rv == 0);
 }
+static void
+test_tree_traversal(void) {
+	int rv;
+	struct SqshArchive sqsh = {0};
+	struct SqshFile *file = NULL;
+	struct SqshTreeTraversal *traversal = NULL;
+
+	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	config.archive_offset = 1010;
+	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
+	assert(rv == 0);
+
+	file = sqsh_open(&sqsh, "/", &rv);
+	assert(rv == 0);
+
+	traversal = sqsh_tree_traversal_new(file, &rv);
+	assert(rv == 0);
+
+	rv = sqsh_tree_traversal_free(traversal);
+	assert(rv == 0);
+	rv = sqsh_close(file);
+
+	rv = sqsh__archive_cleanup(&sqsh);
+	assert(rv == 0);
+}
 
 DECLARE_TESTS
 TEST(sqsh_empty)
@@ -617,4 +642,5 @@ TEST(sqsh_test_extended_dir)
 // TEST(sqsh_test_xattr);
 TEST(multithreaded)
 TEST(test_follow_symlink)
+TEST(test_tree_traversal)
 END_TESTS
