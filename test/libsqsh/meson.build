@@ -31,8 +31,9 @@ sqsh_test = [
     'metablock/metablock_reader.c',
     'nasty.c',
     'reader/reader.c',
-    'tree/walker.c',
     'tree/path_resolver.c',
+    'tree/traversal.c',
+    'tree/walker.c',
     'xattr/xattr_iterator.c',
 ]
 sqsh_extra_source = {

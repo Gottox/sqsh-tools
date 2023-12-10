@@ -90,16 +90,24 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 	}
 
 	traversal = sqsh_tree_traversal_new(inode, &rv);
-	if (traversal == NULL) {
+	if (rv < 0) {
 		goto out;
 	}
 	while (sqsh_tree_traversal_next(traversal, &rv)) {
-		if (read_file(traversal) < 0)
+		for (size_t i = 0; i < sqsh_tree_traversal_depth(traversal); i++) {
+			const char *segment =
+					sqsh_tree_traversal_path_segment(traversal, i);
+			size_t size = sqsh_tree_traversal_path_segment_size(traversal, i);
+			fwrite(segment, size, 1, stdout);
+			putchar('/');
+		}
+		putchar('\n');
+		if (read_file(traversal) < 0) {
 			break;
+		}
 	}
 
 out:
-
 	sqsh_tree_traversal_free(traversal);
 	sqsh_close(inode);
 	sqsh_archive_close(archive);

@@ -112,8 +112,7 @@ struct SqshTreeTraversal {
 	enum SqshTreeTraversalState state;
 	const struct SqshFile *base_file;
 	struct SqshDirectoryIterator base_iterator;
-	uint64_t next_dir_inode_ref;
-	struct SqshTreeTraversalStackElement *stack;
+	struct SqshTreeTraversalStackElement **stack;
 	size_t stack_size;
 	size_t stack_capacity;
 };
