@@ -348,6 +348,11 @@ path_resolve(
 		} else if (strncmp("..", segment, segment_len) == 0) {
 			is_dir = true;
 			rv = sqsh_path_resolver_up(walker);
+			if (rv == -SQSH_ERROR_WALKER_CANNOT_GO_UP) {
+				// To mimic the behaviour of the unix file tree, we ignore
+				// attempts to go up from the root node.
+				rv = 0;
+			}
 		} else {
 			rv = sqsh_path_resolver_lookup(walker, segment, segment_len);
 			if (rv < 0) {

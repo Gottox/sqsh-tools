@@ -56,7 +56,7 @@ struct SqshDirectoryIterator;
  * @return The new iterator on success, NULL on error.
  */
 SQSH_NO_UNUSED struct SqshDirectoryIterator *
-sqsh_directory_iterator_new(struct SqshFile *file, int *err);
+sqsh_directory_iterator_new(const struct SqshFile *file, int *err);
 
 /**
  * @memberof SqshDirectoryIterator

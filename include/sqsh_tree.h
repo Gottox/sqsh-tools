@@ -568,6 +568,16 @@ const char *sqsh_tree_traversal_path_segment(
 		const struct SqshTreeTraversal *traversal, sqsh_index_t index);
 
 /**
+ * @brief Gets the underlying directory iterator pointing to the current entry.
+ *
+ * @param[in]   traversal  The traversal to use
+ *
+ * @return the inode of the current entry.
+ */
+const struct SqshDirectoryIterator *
+sqsh_tree_traversal_iterator(const struct SqshTreeTraversal *traversal);
+
+/**
  * @brief Returns the inode of the current entry.
  * @memberof SqshTreeTraversal
  *

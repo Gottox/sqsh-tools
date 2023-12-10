@@ -318,6 +318,11 @@ sqsh__tree_traversal_cleanup(struct SqshTreeTraversal *traversal) {
 	return 0;
 }
 
+const struct SqshDirectoryIterator *
+sqsh_tree_traversal_iterator(const struct SqshTreeTraversal *traversal) {
+	return stack_peek_const(traversal);
+}
+
 int
 sqsh_tree_traversal_free(struct SqshTreeTraversal *traversal) {
 	SQSH_FREE_IMPL(sqsh__tree_traversal_cleanup, traversal);

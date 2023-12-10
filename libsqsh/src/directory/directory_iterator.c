@@ -89,20 +89,6 @@ get_fragment(const struct SqshDirectoryIterator *iterator) {
 }
 
 static int
-check_entry_name_consistency(const struct SqshDirectoryIterator *iterator) {
-	const char *name = sqsh_directory_iterator_name(iterator);
-	const size_t name_len = sqsh_directory_iterator_name_size(iterator);
-
-	for (size_t i = 0; i < name_len; i++) {
-		if (name[i] == '\0' || name[i] == '/') {
-			return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
-		}
-	}
-
-	return 0;
-}
-
-static int
 directory_iterator_index_lookup(
 		struct SqshDirectoryIterator *iterator, const char *name,
 		const size_t name_len) {
@@ -147,6 +133,160 @@ out:
 	return rv;
 }
 
+static int
+check_file_consistency(
+		const struct SqshDirectoryIterator *iterator,
+		const struct SqshFile *file) {
+	const uint32_t file_inode = sqsh_file_inode(file);
+	const uint32_t iter_inode = sqsh_directory_iterator_inode(iterator);
+	if (iter_inode != file_inode) {
+		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
+	}
+
+	enum SqshFileType file_type = sqsh_file_type(file);
+	enum SqshFileType iter_type = sqsh_directory_iterator_file_type(iterator);
+	if (iter_type != file_type) {
+		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
+	}
+	return 0;
+}
+
+static int
+process_fragment(struct SqshDirectoryIterator *iterator) {
+	int rv = 0;
+
+	rv = sqsh__metablock_reader_advance(
+			&iterator->metablock, iterator->next_offset,
+			sizeof(struct SqshDataDirectoryFragment));
+	if (rv < 0) {
+		return rv;
+	}
+
+	const struct SqshDataDirectoryFragment *fragment = get_fragment(iterator);
+	/* entry count is 1-based. That means, that the actual amount of entries
+	 * is one less than the value in the fragment header. We use this fact and
+	 * don't decrease remaining_entries in the first iteration in a fragment.
+	 * See _next() for details.
+	 */
+	iterator->remaining_entries = sqsh__data_directory_fragment_count(fragment);
+	iterator->start_base = sqsh__data_directory_fragment_start(fragment);
+	iterator->inode_base = sqsh__data_directory_fragment_inode_number(fragment);
+
+	iterator->next_offset = sizeof(struct SqshDataDirectoryFragment);
+
+	if (SQSH_SUB_OVERFLOW(
+				iterator->remaining_size,
+				sizeof(struct SqshDataDirectoryFragment),
+				&iterator->remaining_size)) {
+		return -SQSH_ERROR_CORRUPTED_DIRECTORY_HEADER;
+	}
+	return rv;
+}
+
+static bool
+directory_iterator_next(struct SqshDirectoryIterator *iterator, int *err) {
+	int rv = 0;
+	size_t size;
+	bool has_next = false;
+
+	if (iterator->remaining_size == 0) {
+		if (iterator->remaining_entries != 0) {
+			rv = -SQSH_ERROR_CORRUPTED_DIRECTORY_HEADER;
+		}
+		goto out;
+	} else if (iterator->remaining_entries == 0) {
+		/*  New fragment begins */
+		rv = process_fragment(iterator);
+		if (rv < 0) {
+			goto out;
+		}
+	} else {
+		iterator->remaining_entries--;
+	}
+
+	/*  Make sure next entry is loaded: */
+	size = sizeof(struct SqshDataDirectoryEntry);
+	rv = sqsh__metablock_reader_advance(
+			&iterator->metablock, iterator->next_offset, size);
+	if (rv < 0) {
+		goto out;
+	}
+
+	/*  Make sure next entry has its name populated */
+	if (SQSH_ADD_OVERFLOW(
+				size, sqsh_directory_iterator_name_size(iterator), &size)) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
+	rv = sqsh__metablock_reader_advance(&iterator->metablock, 0, size);
+	if (rv < 0) {
+		goto out;
+	}
+
+	iterator->next_offset = size;
+	if (SQSH_SUB_OVERFLOW(
+				iterator->remaining_size, size, &iterator->remaining_size)) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
+
+	has_next = true;
+out:
+	if (err != NULL) {
+		*err = rv;
+	}
+	return has_next;
+}
+
+static int
+check_entry_name_consistency(const struct SqshDirectoryIterator *iterator) {
+	const char *name = sqsh_directory_iterator_name(iterator);
+	const size_t name_len = sqsh_directory_iterator_name_size(iterator);
+
+	for (size_t i = 0; i < name_len; i++) {
+		if (name[i] == '\0' || name[i] == '/') {
+			return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
+		}
+	}
+
+	return 0;
+}
+
+static int
+update_inode(struct SqshDirectoryIterator *iterator) {
+	const struct SqshDataDirectoryEntry *entry = get_entry(iterator);
+	const uint32_t inode_base = iterator->inode_base;
+	const int16_t inode_offset = sqsh__data_directory_entry_inode_offset(entry);
+
+	uint32_t inode;
+	if (SQSH_ADD_OVERFLOW(inode_base, inode_offset, &inode)) {
+		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
+	}
+	if (inode == 0) {
+		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
+	}
+
+	iterator->current_inode = (uint32_t)inode;
+	return 0;
+}
+
+static int
+directory_iterator_next_finalize(struct SqshDirectoryIterator *iterator) {
+	int rv;
+
+	rv = check_entry_name_consistency(iterator);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = update_inode(iterator);
+	if (rv < 0) {
+		goto out;
+	}
+out:
+	return rv;
+}
+
 int
 sqsh_directory_iterator_lookup(
 		struct SqshDirectoryIterator *iterator, const char *name,
@@ -160,7 +300,7 @@ sqsh_directory_iterator_lookup(
 		}
 	}
 
-	while (sqsh_directory_iterator_next(iterator, &rv) > 0) {
+	while (directory_iterator_next(iterator, &rv) > 0) {
 		const size_t entry_name_size =
 				sqsh_directory_iterator_name_size(iterator);
 		const char *entry_name = sqsh_directory_iterator_name(iterator);
@@ -168,11 +308,7 @@ sqsh_directory_iterator_lookup(
 			continue;
 		}
 		if (strncmp(name, (char *)entry_name, entry_name_size) == 0) {
-			/* We can directly return with a success result here.
-			 * check_entry_consistency() was already called by
-			 * sqsh_directory_iterator_next().
-			 */
-			return 0;
+			return directory_iterator_next_finalize(iterator);
 		}
 	}
 
@@ -205,7 +341,7 @@ sqsh__directory_iterator_init(
 }
 
 struct SqshDirectoryIterator *
-sqsh_directory_iterator_new(struct SqshFile *file, int *err) {
+sqsh_directory_iterator_new(const struct SqshFile *file, int *err) {
 	SQSH_NEW_IMPL(
 			sqsh__directory_iterator_init, struct SqshDirectoryIterator, file);
 }
@@ -260,24 +396,6 @@ sqsh_directory_iterator_file_type(
 	return SQSH_FILE_TYPE_UNKNOWN;
 }
 
-static int
-check_file_consistency(
-		const struct SqshDirectoryIterator *iterator,
-		const struct SqshFile *file) {
-	const uint32_t file_inode = sqsh_file_inode(file);
-	const uint32_t iter_inode = sqsh_directory_iterator_inode(iterator);
-	if (iter_inode != file_inode) {
-		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
-	}
-
-	enum SqshFileType file_type = sqsh_file_type(file);
-	enum SqshFileType iter_type = sqsh_directory_iterator_file_type(iterator);
-	if (iter_type != file_type) {
-		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
-	}
-	return 0;
-}
-
 struct SqshFile *
 sqsh_directory_iterator_open_file(
 		const struct SqshDirectoryIterator *iterator, int *err) {
@@ -304,117 +422,19 @@ out:
 	return file;
 }
 
-static int
-process_fragment(struct SqshDirectoryIterator *iterator) {
-	int rv = 0;
-
-	rv = sqsh__metablock_reader_advance(
-			&iterator->metablock, iterator->next_offset,
-			sizeof(struct SqshDataDirectoryFragment));
-	if (rv < 0) {
-		return rv;
-	}
-
-	const struct SqshDataDirectoryFragment *fragment = get_fragment(iterator);
-	/* entry count is 1-based. That means, that the actual amount of entries
-	 * is one less than the value in the fragment header. We use this fact and
-	 * don't decrease remaining_entries in the first iteration in a fragment.
-	 * See _next() for details.
-	 */
-	iterator->remaining_entries = sqsh__data_directory_fragment_count(fragment);
-	iterator->start_base = sqsh__data_directory_fragment_start(fragment);
-	iterator->inode_base = sqsh__data_directory_fragment_inode_number(fragment);
-
-	iterator->next_offset = sizeof(struct SqshDataDirectoryFragment);
-
-	if (SQSH_SUB_OVERFLOW(
-				iterator->remaining_size,
-				sizeof(struct SqshDataDirectoryFragment),
-				&iterator->remaining_size)) {
-		return -SQSH_ERROR_CORRUPTED_DIRECTORY_HEADER;
-	}
-	return rv;
-}
-
-static int
-update_inode(struct SqshDirectoryIterator *iterator) {
-	const struct SqshDataDirectoryEntry *entry = get_entry(iterator);
-	const uint32_t inode_base = iterator->inode_base;
-	const int16_t inode_offset = sqsh__data_directory_entry_inode_offset(entry);
-
-	uint32_t inode;
-	if (SQSH_ADD_OVERFLOW(inode_base, inode_offset, &inode)) {
-		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
-	}
-	if (inode == 0) {
-		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
-	}
-
-	iterator->current_inode = (uint32_t)inode;
-	return 0;
-}
-
 bool
 sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator, int *err) {
 	int rv = 0;
-	size_t size;
-	bool has_next = false;
-
-	if (iterator->remaining_size == 0) {
-		if (iterator->remaining_entries != 0) {
-			rv = -SQSH_ERROR_CORRUPTED_DIRECTORY_HEADER;
-		}
-		goto out;
-	} else if (iterator->remaining_entries == 0) {
-		/*  New fragment begins */
-		rv = process_fragment(iterator);
-		if (rv < 0) {
-			goto out;
-		}
-	} else {
-		iterator->remaining_entries--;
+	bool has_next = directory_iterator_next(iterator, &rv);
+	if (has_next) {
+		rv = directory_iterator_next_finalize(iterator);
 	}
 
-	/*  Make sure next entry is loaded: */
-	size = sizeof(struct SqshDataDirectoryEntry);
-	rv = sqsh__metablock_reader_advance(
-			&iterator->metablock, iterator->next_offset, size);
-	if (rv < 0) {
-		goto out;
-	}
-
-	/*  Make sure next entry has its name populated */
-	if (SQSH_ADD_OVERFLOW(
-				size, sqsh_directory_iterator_name_size(iterator), &size)) {
-		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
-		goto out;
-	}
-	/*  May invalidate pointers into directory entries. that's why the */
-	/*  get_entry() call is repeated below. */
-	rv = sqsh__metablock_reader_advance(&iterator->metablock, 0, size);
-	if (rv < 0) {
-		goto out;
-	}
-
-	iterator->next_offset = size;
-	if (SQSH_SUB_OVERFLOW(
-				iterator->remaining_size, size, &iterator->remaining_size)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
-	rv = check_entry_name_consistency(iterator);
-	if (rv < 0) {
-		goto out;
-	}
-
-	rv = update_inode(iterator);
-	if (rv < 0) {
-		goto out;
-	}
-
-	has_next = true;
-out:
 	if (err != NULL) {
 		*err = rv;
+	}
+	if (rv < 0) {
+		return false;
 	}
 	return has_next;
 }

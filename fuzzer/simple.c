@@ -12,7 +12,7 @@
 #define DEFAULT_CHUNK_SIZE 4096
 
 static int
-read_file(struct SqshTreeTraversal *traversal) {
+read_file(const struct SqshTreeTraversal *traversal) {
 	struct SqshFile *inode = NULL;
 	struct SqshFileReader *file = NULL;
 	struct SqshXattrIterator *xattr_iter = NULL;
