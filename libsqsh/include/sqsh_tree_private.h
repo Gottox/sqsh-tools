@@ -49,7 +49,7 @@ struct SqshArchive;
  */
 
 /**
- * @brief A walker over the contents of a file.
+ * @brief Resolves paths
  */
 struct SqshPathResolver {
 	/**
@@ -88,6 +88,61 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__path_resolver_init(
  * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_EXPORT int sqsh__path_resolver_cleanup(struct SqshPathResolver *walker);
+
+/***************************************
+ * tree/path_resolver.c
+ */
+
+/**
+ * @brief A walker over the contents of a file.
+ */
+struct SqshTreeTraversalStackElement {
+	struct SqshDirectoryIterator iterator;
+	struct SqshFile file;
+};
+
+/**
+ * @brief A walker over the contents of a file.
+ */
+struct SqshTreeTraversal {
+	/**
+	 * @privatesection
+	 */
+
+	enum SqshTreeTraversalState state;
+	const struct SqshFile *base_file;
+	struct SqshDirectoryIterator base_iterator;
+	uint64_t next_dir_inode_ref;
+	struct SqshTreeTraversalStackElement *stack;
+	size_t stack_size;
+	size_t stack_capacity;
+};
+
+/**
+ * @internal
+ * @memberof SqshTreeTraversal
+ * @brief Initializes a SqshTreeTraversal struct.
+ *
+ * @param[out] traversal  The file traversal to initialize.
+ * @param[in]  file       the file to start traversal at
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__tree_traversal_init(
+		struct SqshTreeTraversal *traversal, const struct SqshFile *file);
+
+/**
+ * @internal
+ * @memberof SqshTreeTraversal
+ * @brief Frees the resources used by the file traversal.
+ *
+ * @param traversal The file traversal to clean up.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_EXPORT int
+sqsh__tree_traversal_cleanup(struct SqshTreeTraversal *traversal);
+
 /***************************************
  * tree/walker.c
  */
