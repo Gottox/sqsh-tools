@@ -92,9 +92,12 @@ ensure_stack_capacity(
 	new_capacity = outer_capacity * STACK_BUCKET_SIZE;
 
 	struct SqshTreeTraversalStackElement **new_stack = NULL;
-	new_stack = reallocarray(
-			traversal->stack, outer_capacity,
-			sizeof(struct SqshTreeTraversalStackElement *));
+	size_t size;
+	if (SQSH_MULT_OVERFLOW(outer_capacity, sizeof(*new_stack), &size)) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
+	new_stack = realloc(traversal->stack, size);
 	if (new_stack == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
