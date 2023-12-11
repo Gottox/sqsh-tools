@@ -84,6 +84,8 @@ static int
 ensure_stack_capacity(
 		struct SqshTreeTraversal *traversal, size_t new_capacity) {
 	int rv = 0;
+	struct SqshTreeTraversalStackElement **new_stack = NULL;
+	struct SqshTreeTraversalStackElement *new_bucket = NULL;
 	if (new_capacity <= traversal->stack_capacity) {
 		return 0;
 	}
@@ -91,26 +93,32 @@ ensure_stack_capacity(
 	size_t outer_capacity = SQSH_DIVIDE_CEIL(new_capacity, STACK_BUCKET_SIZE);
 	new_capacity = outer_capacity * STACK_BUCKET_SIZE;
 
-	struct SqshTreeTraversalStackElement **new_stack = NULL;
-	new_stack = reallocarray(
-			traversal->stack, outer_capacity,
-			sizeof(struct SqshTreeTraversalStackElement *));
+	size_t size;
+	if (SQSH_MULT_OVERFLOW(outer_capacity, sizeof(*new_stack), &size)) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
+	new_stack = realloc(traversal->stack, size);
 	if (new_stack == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
 
-	struct SqshTreeTraversalStackElement *new_bucket = calloc(
+	new_bucket = calloc(
 			STACK_BUCKET_SIZE, sizeof(struct SqshTreeTraversalStackElement));
 	if (new_bucket == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
 	new_stack[outer_capacity - 1] = new_bucket;
+	new_bucket = NULL;
 
 	traversal->stack = new_stack;
 	traversal->stack_capacity = new_capacity;
+	new_stack = NULL;
 out:
+	free(new_stack);
+	free(new_bucket);
 	return rv;
 }
 
