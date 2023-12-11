@@ -46,6 +46,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define RECURSION_CHECK_DEPTH 128
+
 #define STACK_BUCKET_SIZE 16
 
 #define STACK_GET(t, i) \
@@ -55,6 +57,28 @@
 
 #define STACK_PEEK_ITERATOR(t) \
 	((t)->stack_size ? &STACK_PEEK(t)->iterator : &(t)->base_iterator)
+
+static const struct SqshDirectoryIterator *
+get_iterator(const struct SqshTreeTraversal *traversal, sqsh_index_t index) {
+	if (index == 0) {
+		return &traversal->base_iterator;
+	}
+	return &STACK_GET(traversal, index - 1)->iterator;
+}
+
+static int
+check_recursion(const struct SqshTreeTraversal *traversal, uint64_t inode_ref) {
+	const size_t count = sqsh_tree_traversal_depth(traversal);
+
+	for (sqsh_index_t i = 0; i < count - 1; i++) {
+		const struct SqshDirectoryIterator *iterator =
+				get_iterator(traversal, i);
+		if (sqsh_directory_iterator_inode_ref(iterator) == inode_ref) {
+			return -SQSH_ERROR_DIRECTORY_RECURSION;
+		}
+	}
+	return 0;
+}
 
 static int
 ensure_stack_capacity(
@@ -111,6 +135,10 @@ stack_add(struct SqshTreeTraversal *traversal, const uint64_t inode_ref) {
 	rv = sqsh__directory_iterator_init(&element->iterator, &element->file);
 	if (rv < 0) {
 		goto out;
+	}
+
+	if (traversal->stack_size >= RECURSION_CHECK_DEPTH) {
+		rv = check_recursion(traversal, inode_ref);
 	}
 
 out:
@@ -216,14 +244,6 @@ sqsh_tree_traversal_state(const struct SqshTreeTraversal *traversal) {
 const char *
 sqsh_tree_traversal_name(const struct SqshTreeTraversal *traversal) {
 	return sqsh_directory_iterator_name(STACK_PEEK_ITERATOR(traversal));
-}
-
-static const struct SqshDirectoryIterator *
-get_iterator(const struct SqshTreeTraversal *traversal, sqsh_index_t index) {
-	if (index == 0) {
-		return &traversal->base_iterator;
-	}
-	return &STACK_GET(traversal, index - 1)->iterator;
 }
 
 const char *

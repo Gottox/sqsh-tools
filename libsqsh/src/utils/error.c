@@ -150,6 +150,8 @@ sqsh_error_str(int error_code) {
 		return "Compression already finished";
 	case SQSH_ERROR_NO_SUCH_ELEMENT:
 		return "No such element";
+	case SQSH_ERROR_DIRECTORY_RECURSION:
+		return "Directory recursion";
 	}
 	snprintf(err_str, sizeof(err_str), UNKNOWN_ERROR_FORMAT, error_code);
 	return err_str;
