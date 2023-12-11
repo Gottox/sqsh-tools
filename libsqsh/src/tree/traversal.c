@@ -31,6 +31,8 @@
  * @file         tree_traversal.c
  */
 
+#define _DEFAULT_SOURCE
+
 #include "sqsh_directory.h"
 #include <sqsh_tree_private.h>
 
@@ -44,59 +46,72 @@
 #include <stdio.h>
 #include <string.h>
 
+#define RECURSION_CHECK_DEPTH 128
+
+#define STACK_BUCKET_SIZE 16
+
+#define STACK_GET(t, i) \
+	(&t->stack[(i) / STACK_BUCKET_SIZE][(i) % STACK_BUCKET_SIZE])
+
+#define STACK_PEEK(t) STACK_GET(t, (t)->stack_size - 1)
+
+#define STACK_PEEK_ITERATOR(t) \
+	((t)->stack_size ? &STACK_PEEK(t)->iterator : &(t)->base_iterator)
+
+static const struct SqshDirectoryIterator *
+get_iterator(const struct SqshTreeTraversal *traversal, sqsh_index_t index) {
+	if (index == 0) {
+		return &traversal->base_iterator;
+	}
+	return &STACK_GET(traversal, index - 1)->iterator;
+}
+
+static int
+check_recursion(const struct SqshTreeTraversal *traversal, uint64_t inode_ref) {
+	const size_t count = sqsh_tree_traversal_depth(traversal);
+
+	for (sqsh_index_t i = 0; i < count - 1; i++) {
+		const struct SqshDirectoryIterator *iterator =
+				get_iterator(traversal, i);
+		if (sqsh_directory_iterator_inode_ref(iterator) == inode_ref) {
+			return -SQSH_ERROR_DIRECTORY_RECURSION;
+		}
+	}
+	return 0;
+}
+
 static int
 ensure_stack_capacity(
 		struct SqshTreeTraversal *traversal, size_t new_capacity) {
 	int rv = 0;
-	struct SqshTreeTraversalStackElement *new_stack = NULL;
-
-	if (traversal->stack_capacity >= new_capacity) {
+	if (new_capacity <= traversal->stack_capacity) {
 		return 0;
-	} else if (new_capacity < 16) {
-		new_capacity = 16;
-	} else if (new_capacity < traversal->stack_capacity * 2) {
-		new_capacity = traversal->stack_capacity * 2;
 	}
 
-	new_stack = realloc(traversal->stack, new_capacity * sizeof(*new_stack));
+	size_t outer_capacity = SQSH_DIVIDE_CEIL(new_capacity, STACK_BUCKET_SIZE);
+	new_capacity = outer_capacity * STACK_BUCKET_SIZE;
+
+	struct SqshTreeTraversalStackElement **new_stack = NULL;
+	new_stack = reallocarray(
+			traversal->stack, outer_capacity,
+			sizeof(struct SqshTreeTraversalStackElement *));
 	if (new_stack == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
 
+	struct SqshTreeTraversalStackElement *new_bucket = calloc(
+			STACK_BUCKET_SIZE, sizeof(struct SqshTreeTraversalStackElement));
+	if (new_bucket == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
+	}
+	new_stack[outer_capacity - 1] = new_bucket;
+
 	traversal->stack = new_stack;
 	traversal->stack_capacity = new_capacity;
-	new_stack = NULL;
 out:
-	free(new_stack);
 	return rv;
-}
-
-static struct SqshDirectoryIterator *
-stack_peek(struct SqshTreeTraversal *traversal) {
-	if (traversal->stack_size == 0) {
-		return &traversal->base_iterator;
-	}
-	return &traversal->stack[traversal->stack_size - 1].iterator;
-}
-
-static const struct SqshDirectoryIterator *
-stack_peek_const(const struct SqshTreeTraversal *traversal) {
-	if (traversal->stack_size == 0) {
-		return &traversal->base_iterator;
-	}
-	return &traversal->stack[traversal->stack_size - 1].iterator;
-}
-
-static const struct SqshDirectoryIterator *
-stack_get(const struct SqshTreeTraversal *traversal, sqsh_index_t index) {
-	if (index == 0) {
-		return &traversal->base_iterator;
-	} else if (index > traversal->stack_size) {
-		return NULL;
-	} else {
-		return &traversal->stack[index - 1].iterator;
-	}
 }
 
 static int
@@ -109,9 +124,7 @@ stack_add(struct SqshTreeTraversal *traversal, const uint64_t inode_ref) {
 	}
 	traversal->stack_size = new_size;
 
-	struct SqshTreeTraversalStackElement *element =
-			&traversal->stack[new_size - 1];
-	memset(element, 0, sizeof(*element));
+	struct SqshTreeTraversalStackElement *element = STACK_PEEK(traversal);
 
 	rv = sqsh__file_init(
 			&element->file, traversal->base_file->archive, inode_ref);
@@ -124,6 +137,10 @@ stack_add(struct SqshTreeTraversal *traversal, const uint64_t inode_ref) {
 		goto out;
 	}
 
+	if (traversal->stack_size >= RECURSION_CHECK_DEPTH) {
+		rv = check_recursion(traversal, inode_ref);
+	}
+
 out:
 	return rv;
 }
@@ -134,8 +151,7 @@ stack_pop(struct SqshTreeTraversal *traversal) {
 	if (traversal->stack_size == 0) {
 		return 0;
 	}
-	struct SqshTreeTraversalStackElement *element =
-			&traversal->stack[traversal->stack_size - 1];
+	struct SqshTreeTraversalStackElement *element = STACK_PEEK(traversal);
 
 	rv = sqsh__directory_iterator_cleanup(&element->iterator);
 	if (rv < 0) {
@@ -179,14 +195,15 @@ sqsh_tree_traversal_next(struct SqshTreeTraversal *traversal, int *err) {
 	bool has_next = false;
 	int rv = 0;
 
-	struct SqshDirectoryIterator *iterator = stack_peek(traversal);
+	struct SqshDirectoryIterator *iterator = STACK_PEEK_ITERATOR(traversal);
+
 	if (sqsh_tree_traversal_state(traversal) ==
 		SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN) {
 		rv = stack_add(traversal, sqsh_directory_iterator_inode_ref(iterator));
 		if (rv < 0) {
 			goto out;
 		}
-		iterator = stack_peek(traversal);
+		iterator = STACK_PEEK_ITERATOR(traversal);
 	}
 	if (sqsh_directory_iterator_next(iterator, err)) {
 		has_next = true;
@@ -216,7 +233,7 @@ out:
 
 enum SqshFileType
 sqsh_tree_traversal_type(const struct SqshTreeTraversal *traversal) {
-	return sqsh_directory_iterator_file_type(stack_peek_const(traversal));
+	return sqsh_directory_iterator_file_type(STACK_PEEK_ITERATOR(traversal));
 }
 
 enum SqshTreeTraversalState
@@ -226,13 +243,14 @@ sqsh_tree_traversal_state(const struct SqshTreeTraversal *traversal) {
 
 const char *
 sqsh_tree_traversal_name(const struct SqshTreeTraversal *traversal) {
-	return sqsh_directory_iterator_name(stack_peek_const(traversal));
+	return sqsh_directory_iterator_name(STACK_PEEK_ITERATOR(traversal));
 }
 
 const char *
 sqsh_tree_traversal_path_segment(
 		const struct SqshTreeTraversal *traversal, sqsh_index_t index) {
-	const struct SqshDirectoryIterator *iterator = stack_get(traversal, index);
+	const struct SqshDirectoryIterator *iterator =
+			get_iterator(traversal, index);
 	if (iterator == NULL) {
 		return NULL;
 	}
@@ -242,7 +260,8 @@ sqsh_tree_traversal_path_segment(
 size_t
 sqsh_tree_traversal_path_segment_size(
 		const struct SqshTreeTraversal *traversal, sqsh_index_t index) {
-	const struct SqshDirectoryIterator *iterator = stack_get(traversal, index);
+	const struct SqshDirectoryIterator *iterator =
+			get_iterator(traversal, index);
 	if (iterator == NULL) {
 		return 0;
 	}
@@ -291,26 +310,31 @@ out:
 
 uint16_t
 sqsh_tree_traversal_name_size(const struct SqshTreeTraversal *traversal) {
-	return sqsh_directory_iterator_name_size(stack_peek_const(traversal));
+	return sqsh_directory_iterator_name_size(STACK_PEEK_ITERATOR(traversal));
 }
 
 char *
 sqsh_tree_traversal_name_dup(const struct SqshTreeTraversal *traversal) {
-	return sqsh_directory_iterator_name_dup(stack_peek_const(traversal));
+	return sqsh_directory_iterator_name_dup(STACK_PEEK_ITERATOR(traversal));
 }
 
 struct SqshFile *
 sqsh_tree_traversal_open_file(
 		const struct SqshTreeTraversal *traversal, int *err) {
-	return sqsh_directory_iterator_open_file(stack_peek_const(traversal), err);
+	return sqsh_directory_iterator_open_file(
+			STACK_PEEK_ITERATOR(traversal), err);
 }
 
 int
 sqsh__tree_traversal_cleanup(struct SqshTreeTraversal *traversal) {
 	for (sqsh_index_t i = 0; i < traversal->stack_size; i++) {
-		struct SqshTreeTraversalStackElement *element = &traversal->stack[i];
+		struct SqshTreeTraversalStackElement *element = STACK_GET(traversal, i);
 		sqsh__directory_iterator_cleanup(&element->iterator);
 		sqsh__file_cleanup(&element->file);
+	}
+	size_t outer_capacity = traversal->stack_capacity / STACK_BUCKET_SIZE;
+	for (sqsh_index_t i = 0; i < outer_capacity; i++) {
+		free(traversal->stack[i]);
 	}
 	free(traversal->stack);
 	sqsh__directory_iterator_cleanup(&traversal->base_iterator);
@@ -320,7 +344,7 @@ sqsh__tree_traversal_cleanup(struct SqshTreeTraversal *traversal) {
 
 const struct SqshDirectoryIterator *
 sqsh_tree_traversal_iterator(const struct SqshTreeTraversal *traversal) {
-	return stack_peek_const(traversal);
+	return STACK_PEEK_ITERATOR(traversal);
 }
 
 int
