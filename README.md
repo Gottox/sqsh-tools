@@ -126,4 +126,6 @@ LZO2 there's and independent glue library called [libsqsh-lzo](https://github.co
 * https://github.com/AgentD/squashfs-tools-ng/ - A rewrite of the squashfs-tools
   implementation with library support. In contrast to libsqsh, this library is
   able to write squashfs archives.
+* https://github.com/vasi/squashfuse - A C implementation of the squashfs
+  filesystem.
 
