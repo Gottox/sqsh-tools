@@ -237,6 +237,11 @@ sqsh_tree_traversal_next(struct SqshTreeTraversal *traversal, int *err) {
 			goto out;
 		}
 		break;
+	case SQSH_TREE_TRAVERSAL_STATE_FILE:
+		if (traversal->current_iterator == NULL) {
+			goto out;
+		}
+		break;
 	default:
 		break;
 	}
