@@ -54,7 +54,7 @@ get_upper_limit(const struct SqshSuperblock *superblock) {
 static int
 load_metablock(
 		struct SqshDirectoryIterator *iterator, const uint64_t outer_offset,
-		uint32_t inner_offset) {
+		uint16_t inner_offset) {
 	const struct SqshFile *file = iterator->file;
 	struct SqshArchive *archive = file->archive;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
@@ -65,11 +65,7 @@ load_metablock(
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
-	if (SQSH_SUB_OVERFLOW(sqsh_file_size(file), 3, &iterator->remaining_size)) {
-		return -SQSH_ERROR_INTEGER_OVERFLOW;
-	}
-
-	iterator->next_offset = inner_offset % SQSH_METABLOCK_BLOCK_SIZE;
+	iterator->next_offset = inner_offset;
 	iterator->remaining_entries = 0;
 
 	return sqsh__metablock_reader_init(
@@ -97,7 +93,7 @@ directory_iterator_index_lookup(
 	const struct SqshFile *file = iterator->file;
 	const uint64_t inode_ref = sqsh_file_inode_ref(file);
 	uint64_t outer_offset = sqsh_file_directory_block_start(file);
-	uint32_t inner_offset = sqsh_file_directory_block_offset(file);
+	uint32_t dir_index = 0;
 
 	rv = sqsh__directory_index_iterator_init(
 			&index_iterator, file->archive, inode_ref);
@@ -116,13 +112,16 @@ directory_iterator_index_lookup(
 			break;
 		}
 		outer_offset = sqsh__directory_index_iterator_start(&index_iterator);
-		inner_offset = sqsh__directory_index_iterator_index(&index_iterator);
+		dir_index = sqsh__directory_index_iterator_index(&index_iterator);
 	}
 	if (rv < 0) {
 		goto out;
 	}
 
 	sqsh__metablock_reader_cleanup(&iterator->metablock);
+	uint16_t inner_offset =
+			(iterator->next_offset + dir_index) % SQSH_METABLOCK_BLOCK_SIZE;
+	iterator->remaining_size -= dir_index;
 	rv = load_metablock(iterator, outer_offset, inner_offset);
 	iterator->remaining_entries = 0;
 	if (rv < 0) {
@@ -330,8 +329,12 @@ sqsh__directory_iterator_init(
 
 	iterator->file = file;
 
+	if (SQSH_SUB_OVERFLOW(sqsh_file_size(file), 3, &iterator->remaining_size)) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+
 	const uint64_t outer_offset = sqsh_file_directory_block_start(file);
-	const uint32_t inner_offset = sqsh_file_directory_block_offset(file);
+	const uint16_t inner_offset = sqsh_file_directory_block_offset2(file);
 	rv = load_metablock(iterator, outer_offset, inner_offset);
 	if (rv < 0) {
 		return rv;

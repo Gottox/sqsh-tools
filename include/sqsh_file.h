@@ -420,6 +420,7 @@ uint32_t sqsh_file_fragment_block_offset(const struct SqshFile *context);
 uint32_t sqsh_file_directory_block_start(const struct SqshFile *context);
 
 /**
+ * @deprecated Since 1.3.0. Use sqsh_file_directory_block_offset2() instead.
  * @memberof SqshFile
  * @brief retrieve the directory block offset. This is only internally used
  * and will be used while iterating over the directory entries.
@@ -428,7 +429,21 @@ uint32_t sqsh_file_directory_block_start(const struct SqshFile *context);
  *
  * @return the directory block offset.
  */
-uint32_t sqsh_file_directory_block_offset(const struct SqshFile *context);
+__attribute__((
+		deprecated("Since 1.3.0. Use sqsh_file_directory_block_offset2() "
+				   "instead."))) uint32_t
+sqsh_file_directory_block_offset(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief retrieve the directory block offset. This is only internally used
+ * and will be used while iterating over the directory entries.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the directory block offset.
+ */
+uint16_t sqsh_file_directory_block_offset2(const struct SqshFile *context);
 
 /**
  * @memberof SqshFile
