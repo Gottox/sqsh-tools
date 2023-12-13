@@ -430,7 +430,7 @@ sqsh_tree_walker_free(struct SqshTreeWalker *reader);
  */
 
 enum SqshTreeTraversalState {
-	SQSH_TREE_TRAVERSAL_STATE_FINISHED,
+	SQSH_TREE_TRAVERSAL_STATE_INIT,
 	SQSH_TREE_TRAVERSAL_STATE_FILE,
 	SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN,
 	SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END,
@@ -443,13 +443,14 @@ struct SqshTreeTraversal;
  * @memberof SqshTreeTraversal
  *
  * @param[in]   file     the base inode to start from.
+ * @param[in]   max_depth the maximum depth to traverse.
  * @param[out]  err      Pointer to an int where the error code will be
  * stored.
  *
  * @return a new file reader.
  */
-struct SqshTreeTraversal *
-sqsh_tree_traversal_new(const struct SqshFile *file, int *err);
+struct SqshTreeTraversal *sqsh_tree_traversal_new(
+		const struct SqshFile *file, size_t max_depth, int *err);
 
 /**
  * @memberof SqshTreeTraversal

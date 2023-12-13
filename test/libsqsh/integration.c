@@ -617,7 +617,7 @@ test_tree_traversal(void) {
 	file = sqsh_open(&sqsh, "/", &rv);
 	assert(rv == 0);
 
-	traversal = sqsh_tree_traversal_new(file, &rv);
+	traversal = sqsh_tree_traversal_new(file, 0, &rv);
 	assert(rv == 0);
 
 	rv = sqsh_tree_traversal_free(traversal);

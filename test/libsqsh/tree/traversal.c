@@ -66,7 +66,7 @@ test_recursive_directory(void) {
 	assert(rv == 0);
 
 	struct SqshTreeTraversal traversal = {0};
-	rv = sqsh__tree_traversal_init(&traversal, &file);
+	rv = sqsh__tree_traversal_init(&traversal, 0, &file);
 	assert(rv == 0);
 
 	for (int i = 0;; i++) {

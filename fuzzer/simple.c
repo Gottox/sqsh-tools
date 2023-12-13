@@ -89,7 +89,7 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 		goto out;
 	}
 
-	traversal = sqsh_tree_traversal_new(inode, &rv);
+	traversal = sqsh_tree_traversal_new(inode, 0, &rv);
 	if (rv < 0) {
 		goto out;
 	}

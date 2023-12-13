@@ -86,8 +86,7 @@ print_path(
 					traversal, &segment_size, i);
 			fwrite(segment, segment_size, sizeof(char), stdout);
 		}
-	}
-	if (iter) {
+	} else if (iter) {
 		putchar('/');
 		size_t size;
 		const char *name = sqsh_directory_iterator_name2(iter, &size);
@@ -212,7 +211,7 @@ ls_recursive(const struct SqshFile *file, const char *path) {
 	int rv = 0;
 	struct SqshTreeTraversal *traversal = NULL;
 
-	traversal = sqsh_tree_traversal_new(file, &rv);
+	traversal = sqsh_tree_traversal_new(file, 0, &rv);
 	if (rv < 0) {
 		goto out;
 	}

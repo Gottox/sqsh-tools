@@ -110,11 +110,16 @@ struct SqshTreeTraversal {
 	 */
 
 	enum SqshTreeTraversalState state;
+	size_t max_depth;
 	const struct SqshFile *base_file;
-	struct SqshDirectoryIterator base_iterator;
 	struct SqshTreeTraversalStackElement **stack;
 	size_t stack_size;
 	size_t stack_capacity;
+	struct SqshDirectoryIterator *current_iterator;
+	const char *current_name;
+	size_t current_name_size;
+	uint64_t current_inode_ref;
+	enum SqshFileType current_type;
 };
 
 /**
@@ -123,12 +128,14 @@ struct SqshTreeTraversal {
  * @brief Initializes a SqshTreeTraversal struct.
  *
  * @param[out] traversal  The file traversal to initialize.
+ * @param[in]  max_depth  The maximum depth to traverse
  * @param[in]  file       the file to start traversal at
  *
  * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__tree_traversal_init(
-		struct SqshTreeTraversal *traversal, const struct SqshFile *file);
+		struct SqshTreeTraversal *traversal, size_t max_depth,
+		const struct SqshFile *file);
 
 /**
  * @internal
