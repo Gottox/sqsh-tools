@@ -317,7 +317,7 @@ sqsh_tree_traversal_path_dup(const struct SqshTreeTraversal *traversal) {
 		if (rv < 0) {
 			goto out;
 		}
-		size_t size;
+		size_t size = 0;
 		const char *name =
 				sqsh_tree_traversal_path_segment(traversal, &size, i);
 		rv = cx_buffer_append(&buffer, (const uint8_t *)name, size);

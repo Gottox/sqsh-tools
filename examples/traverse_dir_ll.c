@@ -57,11 +57,11 @@ main(int argc, char *argv[]) {
 			continue;
 		}
 		size_t depth = sqsh_tree_traversal_depth(traversal);
-		for (sqsh_index_t i = 1; i < depth; i++) {
-			size_t segment_size;
-			const char *segment = sqsh_tree_traversal_path_segment(
+		size_t segment_size;
+		const char *segment;
+		for (sqsh_index_t i = 0; i < depth; i++) {
+			segment = sqsh_tree_traversal_path_segment(
 					traversal, &segment_size, i);
-			fwrite(segment, 1, segment_size, stdout);
 			fputc('/', stdout);
 			fwrite(segment, 1, segment_size, stdout);
 		}
