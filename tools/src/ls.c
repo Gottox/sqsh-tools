@@ -44,15 +44,13 @@
 #include <time.h>
 #include <unistd.h>
 
-static int print_simple(
-		const char *path, const struct SqshTreeTraversal *traversal,
-		const struct SqshDirectoryIterator *iter, struct SqshFile *file);
+static int
+print_simple(const char *path, const struct SqshTreeTraversal *traversal);
 
 static bool recursive = false;
 static bool utc = false;
-static int (*print_item)(
-		const char *, const struct SqshTreeTraversal *,
-		const struct SqshDirectoryIterator *, struct SqshFile *) = print_simple;
+static int (*print_item)(const char *, const struct SqshTreeTraversal *) =
+		print_simple;
 
 static int
 usage(char *arg0) {
@@ -73,49 +71,33 @@ print_mode(
 }
 
 static void
-print_path(
-		const char *path, const struct SqshTreeTraversal *traversal,
-		const struct SqshDirectoryIterator *iter) {
+print_path(const char *path, const struct SqshTreeTraversal *traversal) {
 	fputs(path, stdout);
-	if (traversal) {
-		size_t segment_count = sqsh_tree_traversal_depth(traversal);
-		for (size_t i = 0; i < segment_count; i++) {
-			putchar('/');
-			size_t segment_size;
-			const char *segment = sqsh_tree_traversal_path_segment(
-					traversal, &segment_size, i);
-			fwrite(segment, segment_size, sizeof(char), stdout);
-		}
-	} else if (iter) {
+	size_t segment_count = sqsh_tree_traversal_depth(traversal);
+	const char *segment;
+	size_t segment_size;
+	for (size_t i = 0; i < segment_count; i++) {
+		segment = sqsh_tree_traversal_path_segment(traversal, &segment_size, i);
 		putchar('/');
-		size_t size;
-		const char *name = sqsh_directory_iterator_name2(iter, &size);
-		fwrite(name, size, sizeof(char), stdout);
+		fwrite(segment, segment_size, sizeof(char), stdout);
 	}
 }
 
 static int
-print_simple(
-		const char *path, const struct SqshTreeTraversal *traversal,
-		const struct SqshDirectoryIterator *iter, struct SqshFile *file) {
-	(void)file;
-	print_path(path, traversal, iter);
+print_simple(const char *path, const struct SqshTreeTraversal *traversal) {
+	print_path(path, traversal);
 	putchar('\n');
 	return 0;
 }
 
 static int
-print_detail(
-		const char *path, const struct SqshTreeTraversal *traversal,
-		const struct SqshDirectoryIterator *iter, struct SqshFile *file) {
+print_detail(const char *path, const struct SqshTreeTraversal *traversal) {
 	int mode;
 	int rv = 0;
 
-	if (file == NULL) {
-		file = sqsh_directory_iterator_open_file(iter, &rv);
-		if (rv < 0) {
-			goto out;
-		}
+	struct SqshFile *file = sqsh_tree_traversal_open_file(traversal, &rv);
+	if (rv < 0) {
+		goto out;
 	}
 
 	time_t mtime = sqsh_file_modified_time(file);
@@ -165,7 +147,7 @@ print_detail(
 	printf(" %6u %6u %10" PRIu64 " %s ", sqsh_file_uid(file),
 		   sqsh_file_gid(file), sqsh_file_size(file), time_buffer);
 
-	print_path(path, traversal, iter);
+	print_path(path, traversal);
 
 	if (sqsh_file_type(file) == SQSH_FILE_TYPE_SYMLINK) {
 		fputs(" -> ", stdout);
@@ -181,67 +163,11 @@ out:
 }
 
 static int
-ls_flat(const struct SqshFile *file, const char *path) {
-	int rv = 0;
-	struct SqshDirectoryIterator *iter;
-
-	iter = sqsh_directory_iterator_new(file, &rv);
-	if (rv < 0) {
-		return rv;
-	}
-
-	while (sqsh_directory_iterator_next(iter, &rv)) {
-		if (rv < 0) {
-			goto out;
-		}
-
-		rv = print_item(path, NULL, iter, NULL);
-		if (rv < 0) {
-			goto out;
-		}
-	}
-
-out:
-	sqsh_directory_iterator_free(iter);
-	return rv;
-}
-
-static int
-ls_recursive(const struct SqshFile *file, const char *path) {
-	int rv = 0;
-	struct SqshTreeTraversal *traversal = NULL;
-
-	traversal = sqsh_tree_traversal_new(file, 0, &rv);
-	if (rv < 0) {
-		goto out;
-	}
-
-	while (sqsh_tree_traversal_next(traversal, &rv)) {
-		if (rv < 0) {
-			goto out;
-		}
-		if (sqsh_tree_traversal_state(traversal) ==
-			SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END) {
-			continue;
-		}
-
-		const struct SqshDirectoryIterator *iter =
-				sqsh_tree_traversal_iterator(traversal);
-		rv = print_item(path, traversal, iter, NULL);
-		if (rv < 0) {
-			goto out;
-		}
-	}
-out:
-	sqsh_tree_traversal_free(traversal);
-	return rv;
-}
-
-static int
 ls_path(struct SqshArchive *archive, char *path) {
 	int rv = 0;
 	struct SqshFile *file;
 	size_t path_size = strlen(path);
+	struct SqshTreeTraversal *traversal = NULL;
 
 	while (path_size > 0 && path[path_size - 1] == '/') {
 		path_size--;
@@ -253,22 +179,35 @@ ls_path(struct SqshArchive *archive, char *path) {
 		goto out;
 	}
 
-	if (sqsh_file_type(file) != SQSH_FILE_TYPE_DIRECTORY) {
-		rv = print_item(path, NULL, NULL, file);
+	traversal = sqsh_tree_traversal_new(file, recursive ? 0 : 1, &rv);
+	if (rv < 0) {
+		goto out;
+	}
+
+	while (sqsh_tree_traversal_next(traversal, &rv)) {
 		if (rv < 0) {
 			goto out;
 		}
-	} else if (recursive) {
-		rv = ls_recursive(file, path);
-	} else {
-		rv = ls_flat(file, path);
-	}
+		enum SqshTreeTraversalState state =
+				sqsh_tree_traversal_state(traversal);
+		size_t depth = sqsh_tree_traversal_depth(traversal);
+		if (depth == 0 && state == SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN) {
+			continue;
+		} else if (state == SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END) {
+			continue;
+		}
 
+		rv = print_item(path, traversal);
+		if (rv < 0) {
+			goto out;
+		}
+	}
 out:
 	if (rv < 0) {
 		sqsh_perror(rv, path);
 		rv = 0;
 	}
+	sqsh_tree_traversal_free(traversal);
 	sqsh_close(file);
 	return rv;
 }
