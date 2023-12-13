@@ -197,7 +197,7 @@ sqsh_tree_traversal_new(
 
 static void
 update_state_from_type(struct SqshTreeTraversal *traversal) {
-	if (traversal->max_depth < traversal->stack_size) {
+	if (traversal->max_depth <= traversal->stack_size) {
 		traversal->state = SQSH_TREE_TRAVERSAL_STATE_FILE;
 	} else if (traversal->current_type == SQSH_FILE_TYPE_DIRECTORY) {
 		traversal->state = SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN;
