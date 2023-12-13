@@ -2,7 +2,7 @@
 
 ######################################################################
 # @author      : Enno Boland (mail@eboland.de)
-# @file        : repack.sh
+# @file        : large-tree.sh
 # @created     : Friday Mar 17, 2023 15:11:09 CET
 #
 # @description : This script creates a squashfs image, mounts it, and
@@ -14,9 +14,9 @@
 : "${SOURCE_ROOT:?SOURCE_ROOT is not set}"
 : "${SQSH_LS:?SQSH_UNPACK is not set}"
 
-MKSQUASHFS_OPTS="-no-xattrs -noappend -all-root -mkfs-time 0"
+MKSQUASHFS_OPTS="-no-xattrs -noappend -all-root -mkfs-time 0 -noI -noD -noF -noX"
 
-WORK_DIR="$BUILD_DIR/unpack-repack"
+WORK_DIR="$BUILD_DIR/large-tree"
 
 mkdir -p "$WORK_DIR"
 cd "$WORK_DIR"
