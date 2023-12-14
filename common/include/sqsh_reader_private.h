@@ -121,6 +121,8 @@ struct SqshReader {
 	 * @brief The size of the data that is presented to the user.
 	 */
 	size_t size;
+
+	size_t iterator_size;
 };
 
 /**
