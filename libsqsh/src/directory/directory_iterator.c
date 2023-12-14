@@ -243,12 +243,11 @@ check_entry_name_consistency(const struct SqshDirectoryIterator *iterator) {
 	size_t name_len;
 	const char *name = sqsh_directory_iterator_name2(iterator, &name_len);
 
-	for (size_t i = 0; i < name_len; i++) {
-		if (name[i] == '\0' || name[i] == '/') {
-			return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
-		}
+	if (memchr(name, '\0', name_len) != NULL) {
+		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
+	} else if (memchr(name, '/', name_len) != NULL) {
+		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
 	}
-
 	return 0;
 }
 
