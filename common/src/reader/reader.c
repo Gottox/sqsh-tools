@@ -40,8 +40,9 @@
 
 static bool
 reader_iterator_next(struct SqshReader *reader, size_t desired_size, int *err) {
-	bool has_next =
-			reader->iterator_impl->next(reader->iterator, desired_size, err);
+	const struct SqshReaderIteratorImpl *impl = reader->iterator_impl;
+	bool has_next = impl->next(reader->iterator, desired_size, err);
+	reader->iterator_size = impl->size(reader->iterator);
 	if (has_next == false && *err == 0) {
 		*err = -SQSH_ERROR_OUT_OF_BOUNDS;
 		return false;
@@ -60,6 +61,7 @@ sqsh__reader_init(
 	reader->iterator_offset = 0;
 	reader->iterator_impl = iterator_impl;
 	reader->iterator = iterator;
+	reader->iterator_size = 0;
 	return cx_buffer_init(&reader->buffer);
 }
 
@@ -164,6 +166,7 @@ handle_mapped(struct SqshReader *reader, sqsh_index_t offset, size_t size) {
 	if (rv < 0) {
 		goto out;
 	}
+	reader->iterator_size = impl->size(iterator);
 
 	reader->offset = offset;
 	sqsh_index_t end_offset;
@@ -171,7 +174,7 @@ handle_mapped(struct SqshReader *reader, sqsh_index_t offset, size_t size) {
 		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
-	if (end_offset <= impl->size(iterator)) {
+	if (end_offset <= reader->iterator_size) {
 		const uint8_t *data = impl->data(iterator);
 		reader->data = &data[offset];
 		reader->size = size;
