@@ -81,17 +81,16 @@ print_path(
 		size_t segment_count = sqsh_tree_traversal_depth(traversal);
 		for (size_t i = 0; i < segment_count; i++) {
 			putchar('/');
-			const char *segment =
-					sqsh_tree_traversal_path_segment(traversal, i);
-			const size_t segment_size =
-					sqsh_tree_traversal_path_segment_size(traversal, i);
+			size_t segment_size;
+			const char *segment = sqsh_tree_traversal_path_segment(
+					traversal, &segment_size, i);
 			fwrite(segment, segment_size, sizeof(char), stdout);
 		}
 	}
 	if (iter) {
 		putchar('/');
-		const char *name = sqsh_directory_iterator_name(iter);
-		const size_t size = sqsh_directory_iterator_name_size(iter);
+		size_t size;
+		const char *name = sqsh_directory_iterator_name2(iter, &size);
 		fwrite(name, size, sizeof(char), stdout);
 	}
 }

@@ -56,14 +56,13 @@ main(int argc, char *argv[]) {
 		if (state == SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END) {
 			continue;
 		}
-		const char *name = sqsh_tree_traversal_name(traversal);
-		size_t size = sqsh_tree_traversal_name_size(traversal);
+		size_t size;
+		const char *name = sqsh_tree_traversal_name(traversal, &size);
 		size_t depth = sqsh_tree_traversal_depth(traversal);
 		for (sqsh_index_t i = 1; i < depth; i++) {
-			const char *segment =
-					sqsh_tree_traversal_path_segment(traversal, i);
-			size_t segment_size =
-					sqsh_tree_traversal_path_segment_size(traversal, i);
+			size_t segment_size;
+			const char *segment = sqsh_tree_traversal_path_segment(
+					traversal, &segment_size, i);
 			fwrite(segment, 1, segment_size, stdout);
 			fputc('/', stdout);
 		}

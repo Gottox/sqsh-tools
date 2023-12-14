@@ -54,7 +54,7 @@ test_recursive_directory(void) {
 			INODE_BASIC_DIR(0, 1024, 0, 0),
 			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
 			DIRECTORY_HEADER(1, 0, 0),
-			DIRECTORY_ENTRY(0, 2, 1, 0),
+			DIRECTORY_ENTRY(0, 2, 1, 1),
 			'r',
 			[FRAGMENT_TABLE_OFFSET] = 0,
 			/* clang-format on */

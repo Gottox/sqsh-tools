@@ -88,6 +88,7 @@ SQSH_NO_UNUSED int sqsh_directory_iterator_lookup(
 		const size_t name_len);
 
 /**
+ * @deprecated Since 1.3.0. Use sqsh_directory_iterator_name2() instead.
  * @memberof SqshDirectoryIterator
  * @brief Retrieves the size of the name of the current entry.
  *
@@ -95,7 +96,8 @@ SQSH_NO_UNUSED int sqsh_directory_iterator_lookup(
  *
  * @return The size of the name on success, a negative value on error.
  */
-uint16_t
+__attribute__((deprecated("Since 1.3.0. Use sqsh_directory_iterator_name2() "
+						  "instead"))) uint16_t
 sqsh_directory_iterator_name_size(const struct SqshDirectoryIterator *iterator);
 
 /**
@@ -162,6 +164,24 @@ SQSH_NO_UNUSED struct SqshFile *sqsh_directory_iterator_open_file(
  *
  * The returned pointer is allocated internally and only valid until the next
  * call of sqsh_directory_iterator_next(). It must not be freed. The returned
+ * string is not 0 terminated.
+ *
+ * @param[in]  iterator  The iterator to use.
+ * @param[out] len       Pointer to a size_t where the length of the name will
+ * be stored.
+ *
+ * @return The name of the current entry.
+ */
+const char *sqsh_directory_iterator_name2(
+		const struct SqshDirectoryIterator *iterator, size_t *len);
+
+/**
+ * @deprecated Since 1.3.0. Use sqsh_directory_iterator_name2() instead.
+ * @memberof SqshDirectoryIterator
+ * @brief Retrieves the name of the current entry.
+ *
+ * The returned pointer is allocated internally and only valid until the next
+ * call of sqsh_directory_iterator_next(). It must not be freed. The returned
  * string is not 0 terminated. Use sqsh_directory_iterator_name_size() to get
  * the size of the value.
  *
@@ -169,7 +189,8 @@ SQSH_NO_UNUSED struct SqshFile *sqsh_directory_iterator_open_file(
  *
  * @return The name of the current entry.
  */
-const char *
+__attribute__((deprecated("Since 1.3.0. Use sqsh_directory_iterator_inode() "
+						  "instead"))) const char *
 sqsh_directory_iterator_name(const struct SqshDirectoryIterator *iterator);
 
 /**

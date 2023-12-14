@@ -491,10 +491,12 @@ sqsh_tree_traversal_state(const struct SqshTreeTraversal *traversal);
  * @memberof SqshTreeTraversal
  *
  * @param[in]   traversal  The traversal to use
+ * @param[out]  len        Pointer to a size_t where the length will be stored.
  *
  * @return the name of the current entry.
  */
-const char *sqsh_tree_traversal_name(const struct SqshTreeTraversal *traversal);
+const char *sqsh_tree_traversal_name(
+		const struct SqshTreeTraversal *traversal, size_t *len);
 
 /**
  * @brief Returns the name of the current entry. This entry is not zero
@@ -506,17 +508,6 @@ const char *sqsh_tree_traversal_name(const struct SqshTreeTraversal *traversal);
  * @return the name of the current entry.
  */
 char *sqsh_tree_traversal_path_dup(const struct SqshTreeTraversal *traversal);
-
-/**
- * @memberof SqshTreeTraversal
- * @brief Returns the size of the name of the current entry.
- *
- * @param[in]   traversal  The traversal to use
- *
- * @return the size of the name of the current entry.
- */
-uint16_t
-sqsh_tree_traversal_name_size(const struct SqshTreeTraversal *traversal);
 
 /**
  * @memberof SqshTreeTraversal
@@ -560,12 +551,15 @@ size_t sqsh_tree_traversal_depth(const struct SqshTreeTraversal *traversal);
  * @memberof SqshTreeTraversal
  *
  * @param[in,out]   traversal  The traversal to use
+ * @param[out]      len        Pointer to a size_t where the length will be
+ * stored.
  * @param[in]       index      The index of the path segment.
  *
  * @return the inode of the current entry.
  */
 const char *sqsh_tree_traversal_path_segment(
-		const struct SqshTreeTraversal *traversal, sqsh_index_t index);
+		const struct SqshTreeTraversal *traversal, size_t *len,
+		sqsh_index_t index);
 
 /**
  * @brief Gets the underlying directory iterator pointing to the current entry.

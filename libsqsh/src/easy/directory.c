@@ -68,10 +68,9 @@ directory_path_collector_next(
 		if (rv < 0) {
 			goto out;
 		}
-		rv = cx_buffer_append(
-				&it->value,
-				(const uint8_t *)sqsh_directory_iterator_name(&it->dir),
-				(size_t)sqsh_directory_iterator_name_size(&it->dir));
+		size_t name_size;
+		const char *name = sqsh_directory_iterator_name2(&it->dir, &name_size);
+		rv = cx_buffer_append(&it->value, (const uint8_t *)name, name_size);
 		if (rv < 0) {
 			goto out;
 		}
@@ -131,8 +130,7 @@ static int
 directory_collector_next(void *iterator, const char **value, size_t *size) {
 	int rv = 0;
 	if (sqsh_directory_iterator_next(iterator, &rv)) {
-		*value = sqsh_directory_iterator_name(iterator);
-		*size = (size_t)sqsh_directory_iterator_name_size(iterator);
+		*value = sqsh_directory_iterator_name2(iterator, size);
 	}
 	return rv;
 }

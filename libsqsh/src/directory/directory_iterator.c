@@ -211,9 +211,10 @@ directory_iterator_next(struct SqshDirectoryIterator *iterator, int *err) {
 		goto out;
 	}
 
+	size_t name_size;
+	(void)sqsh_directory_iterator_name2(iterator, &name_size);
 	/*  Make sure next entry has its name populated */
-	if (SQSH_ADD_OVERFLOW(
-				size, sqsh_directory_iterator_name_size(iterator), &size)) {
+	if (SQSH_ADD_OVERFLOW(size, name_size, &size)) {
 		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
@@ -239,8 +240,8 @@ out:
 
 static int
 check_entry_name_consistency(const struct SqshDirectoryIterator *iterator) {
-	const char *name = sqsh_directory_iterator_name(iterator);
-	const size_t name_len = sqsh_directory_iterator_name_size(iterator);
+	size_t name_len;
+	const char *name = sqsh_directory_iterator_name2(iterator, &name_len);
 
 	for (size_t i = 0; i < name_len; i++) {
 		if (name[i] == '\0' || name[i] == '/') {
@@ -300,9 +301,9 @@ sqsh_directory_iterator_lookup(
 	}
 
 	while (directory_iterator_next(iterator, &rv) > 0) {
-		const size_t entry_name_size =
-				sqsh_directory_iterator_name_size(iterator);
-		const char *entry_name = sqsh_directory_iterator_name(iterator);
+		size_t entry_name_size;
+		const char *entry_name =
+				sqsh_directory_iterator_name2(iterator, &entry_name_size);
 		if (name_len != entry_name_size) {
 			continue;
 		}
@@ -352,8 +353,9 @@ sqsh_directory_iterator_new(const struct SqshFile *file, int *err) {
 uint16_t
 sqsh_directory_iterator_name_size(
 		const struct SqshDirectoryIterator *iterator) {
-	const struct SqshDataDirectoryEntry *entry = get_entry(iterator);
-	return sqsh__data_directory_entry_name_size(entry) + 1;
+	size_t size;
+	(void)sqsh_directory_iterator_name2(iterator, &size);
+	return (uint16_t)size;
 }
 
 uint64_t
@@ -443,15 +445,23 @@ sqsh_directory_iterator_next(struct SqshDirectoryIterator *iterator, int *err) {
 }
 
 const char *
-sqsh_directory_iterator_name(const struct SqshDirectoryIterator *iterator) {
+sqsh_directory_iterator_name2(
+		const struct SqshDirectoryIterator *iterator, size_t *len) {
 	const struct SqshDataDirectoryEntry *entry = get_entry(iterator);
+	*len = sqsh__data_directory_entry_name_size(entry) + 1;
 	return (char *)sqsh__data_directory_entry_name(entry);
+}
+
+const char *
+sqsh_directory_iterator_name(const struct SqshDirectoryIterator *iterator) {
+	size_t dummy;
+	return sqsh_directory_iterator_name2(iterator, &dummy);
 }
 
 char *
 sqsh_directory_iterator_name_dup(const struct SqshDirectoryIterator *iterator) {
-	uint16_t size = sqsh_directory_iterator_name_size(iterator);
-	const char *entry_name = sqsh_directory_iterator_name(iterator);
+	size_t size;
+	const char *entry_name = sqsh_directory_iterator_name2(iterator, &size);
 
 	return cx_memdup(entry_name, size);
 }

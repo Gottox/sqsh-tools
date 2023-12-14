@@ -92,8 +92,8 @@ extract_directory_entry(
 		const struct PathStack *path_stack) {
 	int rv;
 	struct SqshFile *file = NULL;
-	const char *filename_ptr = sqsh_directory_iterator_name(iter);
-	size_t size = sqsh_directory_iterator_name_size(iter);
+	size_t size;
+	const char *filename_ptr = sqsh_directory_iterator_name2(iter, &size);
 	char filename[size + 1];
 	memcpy(filename, filename_ptr, size);
 	filename[size] = '\0';
