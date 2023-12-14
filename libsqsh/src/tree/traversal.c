@@ -250,30 +250,22 @@ sqsh_tree_traversal_state(const struct SqshTreeTraversal *traversal) {
 }
 
 const char *
-sqsh_tree_traversal_name(const struct SqshTreeTraversal *traversal) {
-	return sqsh_directory_iterator_name(STACK_PEEK_ITERATOR(traversal));
+sqsh_tree_traversal_name(
+		const struct SqshTreeTraversal *traversal, size_t *len) {
+	return sqsh_directory_iterator_name2(STACK_PEEK_ITERATOR(traversal), len);
 }
 
 const char *
 sqsh_tree_traversal_path_segment(
-		const struct SqshTreeTraversal *traversal, sqsh_index_t index) {
+		const struct SqshTreeTraversal *traversal, size_t *len,
+		sqsh_index_t index) {
 	const struct SqshDirectoryIterator *iterator =
 			get_iterator(traversal, index);
 	if (iterator == NULL) {
+		*len = 0;
 		return NULL;
 	}
-	return sqsh_directory_iterator_name(iterator);
-}
-
-size_t
-sqsh_tree_traversal_path_segment_size(
-		const struct SqshTreeTraversal *traversal, sqsh_index_t index) {
-	const struct SqshDirectoryIterator *iterator =
-			get_iterator(traversal, index);
-	if (iterator == NULL) {
-		return 0;
-	}
-	return sqsh_directory_iterator_name_size(iterator);
+	return sqsh_directory_iterator_name2(STACK_PEEK_ITERATOR(traversal), len);
 }
 
 size_t
@@ -297,8 +289,9 @@ sqsh_tree_traversal_path_dup(const struct SqshTreeTraversal *traversal) {
 		if (rv < 0) {
 			goto out;
 		}
-		const char *name = sqsh_tree_traversal_path_segment(traversal, i);
-		size_t size = sqsh_tree_traversal_path_segment_size(traversal, i);
+		size_t size;
+		const char *name =
+				sqsh_tree_traversal_path_segment(traversal, &size, i);
 		rv = cx_buffer_append(&buffer, (const uint8_t *)name, size);
 		if (rv < 0) {
 			goto out;
@@ -314,11 +307,6 @@ out:
 	} else {
 		return (char *)cx_buffer_unwrap(&buffer);
 	}
-}
-
-uint16_t
-sqsh_tree_traversal_name_size(const struct SqshTreeTraversal *traversal) {
-	return sqsh_directory_iterator_name_size(STACK_PEEK_ITERATOR(traversal));
 }
 
 char *

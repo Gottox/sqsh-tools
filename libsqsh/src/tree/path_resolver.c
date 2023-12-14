@@ -197,19 +197,22 @@ sqsh_path_resolver_type(const struct SqshPathResolver *walker) {
 
 const char *
 sqsh_path_resolver_name(const struct SqshPathResolver *walker) {
+	size_t size;
 	if (walker->begin_iterator == true) {
 		return NULL;
 	} else {
-		return sqsh_directory_iterator_name(&walker->iterator);
+		return sqsh_directory_iterator_name2(&walker->iterator, &size);
 	}
 }
 
 uint16_t
 sqsh_path_resolver_name_size(const struct SqshPathResolver *walker) {
+	size_t size;
 	if (walker->begin_iterator == true) {
 		return 0;
 	} else {
-		return sqsh_directory_iterator_name_size(&walker->iterator);
+		sqsh_directory_iterator_name2(&walker->iterator, &size);
+		return (uint16_t)size;
 	}
 }
 

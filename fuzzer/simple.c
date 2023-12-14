@@ -95,10 +95,10 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 	}
 	while (sqsh_tree_traversal_next(traversal, &rv)) {
 		for (size_t i = 0; i < sqsh_tree_traversal_depth(traversal); i++) {
-			const char *segment =
-					sqsh_tree_traversal_path_segment(traversal, i);
-			size_t size = sqsh_tree_traversal_path_segment_size(traversal, i);
-			fwrite(segment, size, 1, stdout);
+			size_t segment_size;
+			const char *segment = sqsh_tree_traversal_path_segment(
+					traversal, &segment_size, i);
+			fwrite(segment, segment_size, 1, stdout);
 			putchar('/');
 		}
 		putchar('\n');

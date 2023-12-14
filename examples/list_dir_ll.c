@@ -51,8 +51,8 @@ main(int argc, char *argv[]) {
 	}
 
 	while (sqsh_directory_iterator_next(iterator, &error_code)) {
-		const char *name = sqsh_directory_iterator_name(iterator);
-		size_t size = sqsh_directory_iterator_name_size(iterator);
+		size_t size;
+		const char *name = sqsh_directory_iterator_name2(iterator, &size);
 		fwrite(name, size, 1, stdout);
 		fputc('\n', stdout);
 	}
