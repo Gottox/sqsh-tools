@@ -295,6 +295,11 @@ sqsh_file_directory_block_offset(const struct SqshFile *context) {
 	return context->impl->directory_block_offset(get_inode(context));
 }
 
+uint16_t
+sqsh_file_directory_block_offset2(const struct SqshFile *context) {
+	return context->impl->directory_block_offset(get_inode(context));
+}
+
 uint32_t
 sqsh_file_directory_parent_inode(const struct SqshFile *context) {
 	return context->impl->directory_parent_inode(get_inode(context));
