@@ -128,13 +128,11 @@ sqsh_inode_map_set2(
 	return 0;
 }
 
-// TODO: reconsider the type of inode_number. It should be uint32_t
 uint64_t
 sqsh_inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number) {
 	return sqsh_inode_map_get2(map, (uint32_t)inode_number, NULL);
 }
 
-// TODO: reconsider the type of inode_number. It should be uint32_t
 int
 sqsh_inode_map_set(
 		struct SqshInodeMap *map, uint64_t inode_number, uint64_t inode_ref) {
