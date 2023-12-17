@@ -188,7 +188,12 @@ sqsh__tree_traversal_init(
 }
 
 struct SqshTreeTraversal *
-sqsh_tree_traversal_new(
+sqsh_tree_traversal_new(const struct SqshFile *file, int *err) {
+	return sqsh_tree_traversal_new2(file, 0, err);
+}
+
+struct SqshTreeTraversal *
+sqsh_tree_traversal_new2(
 		const struct SqshFile *file, size_t max_depth, int *err) {
 	SQSH_NEW_IMPL(
 			sqsh__tree_traversal_init, struct SqshTreeTraversal, max_depth,

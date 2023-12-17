@@ -179,7 +179,7 @@ ls_path(struct SqshArchive *archive, char *path) {
 		goto out;
 	}
 
-	traversal = sqsh_tree_traversal_new(file, recursive ? 0 : 1, &rv);
+	traversal = sqsh_tree_traversal_new2(file, recursive ? 0 : 1, &rv);
 	if (rv < 0) {
 		goto out;
 	}
