@@ -57,12 +57,13 @@
 
 static int
 check_recursion(const struct SqshTreeTraversal *traversal, uint64_t inode_ref) {
+	const struct SqshDirectoryIterator *iterator;
+
 	const size_t count = sqsh_tree_traversal_depth(traversal);
-
-	for (sqsh_index_t i = 0; i < count; i++) {
-		const struct SqshDirectoryIterator *iterator =
-				&STACK_GET(traversal, i)->iterator;
-
+	// This function is only called when the stack size is greater than
+	// RECURSION_CHECK_DEPTH, so we can safely ignore underflows of count.
+	for (sqsh_index_t i = 0; i < count - 1; i++) {
+		iterator = &STACK_GET(traversal, i)->iterator;
 		if (sqsh_directory_iterator_inode_ref(iterator) == inode_ref) {
 			return -SQSH_ERROR_DIRECTORY_RECURSION;
 		}
