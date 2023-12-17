@@ -215,8 +215,11 @@ update_state_from_type(struct SqshTreeTraversal *traversal) {
 static void
 update_from_iterator(struct SqshTreeTraversal *traversal) {
 	const struct SqshDirectoryIterator *iterator = traversal->current_iterator;
-	traversal->current_name = sqsh_directory_iterator_name2(
-			iterator, &traversal->current_name_size);
+	size_t current_name_size = 0;
+	traversal->current_name =
+			sqsh_directory_iterator_name2(iterator, &current_name_size);
+	traversal->current_name_size = current_name_size;
+	traversal->current_inode_ref = sqsh_directory_iterator_inode_ref(iterator);
 	traversal->current_type = sqsh_directory_iterator_file_type(iterator);
 }
 
