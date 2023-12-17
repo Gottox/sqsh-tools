@@ -98,10 +98,8 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 			size_t size = 0;
 			const char *segment =
 					sqsh_tree_traversal_path_segment(traversal, &size, i);
-			fwrite(segment, size, 1, stdout);
-			putchar('/');
+			(void)segment;
 		}
-		putchar('\n');
 		if (read_file(traversal) < 0) {
 			break;
 		}

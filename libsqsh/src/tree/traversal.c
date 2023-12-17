@@ -31,20 +31,10 @@
  * @file         tree_traversal.c
  */
 
-#define _DEFAULT_SOURCE
-
-#include "sqsh_directory.h"
 #include <sqsh_tree_private.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
-#include <sqsh_directory_private.h>
-#include <sqsh_error.h>
-#include <sqsh_file_private.h>
-
-#include <stddef.h>
-#include <stdio.h>
-#include <string.h>
 
 #define RECURSION_CHECK_DEPTH 128
 
@@ -231,7 +221,6 @@ sqsh_tree_traversal_next(struct SqshTreeTraversal *traversal, int *err) {
 
 	switch (sqsh_tree_traversal_state(traversal)) {
 	case SQSH_TREE_TRAVERSAL_STATE_INIT:
-		traversal->current_iterator = NULL;
 		traversal->current_name = "";
 		traversal->current_name_size = 0;
 		traversal->current_inode_ref =

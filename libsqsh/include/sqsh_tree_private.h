@@ -35,7 +35,6 @@
 #define SQSH_TREE_PRIVATE_H
 
 #include "sqsh_directory_private.h"
-#include "sqsh_file_private.h"
 #include "sqsh_tree.h"
 
 #ifdef __cplusplus
@@ -110,11 +109,11 @@ struct SqshTreeTraversal {
 	 */
 
 	enum SqshTreeTraversalState state;
-	size_t max_depth;
 	const struct SqshFile *base_file;
 	struct SqshTreeTraversalStackElement **stack;
 	size_t stack_size;
 	size_t stack_capacity;
+	size_t max_depth;
 	struct SqshDirectoryIterator *current_iterator;
 	const char *current_name;
 	size_t current_name_size;
