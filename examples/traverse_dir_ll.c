@@ -44,7 +44,7 @@ main(int argc, char *argv[]) {
 	}
 
 	struct SqshTreeTraversal *traversal =
-			sqsh_tree_traversal_new(file, &error_code);
+			sqsh_tree_traversal_new2(file, 0, &error_code);
 	if (error_code != 0) {
 		sqsh_perror(error_code, "sqsh_directory_iterator_new");
 		return 1;
@@ -56,17 +56,15 @@ main(int argc, char *argv[]) {
 		if (state == SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END) {
 			continue;
 		}
-		size_t size;
-		const char *name = sqsh_tree_traversal_name(traversal, &size);
 		size_t depth = sqsh_tree_traversal_depth(traversal);
-		for (sqsh_index_t i = 1; i < depth; i++) {
-			size_t segment_size;
-			const char *segment = sqsh_tree_traversal_path_segment(
+		size_t segment_size;
+		const char *segment;
+		for (sqsh_index_t i = 0; i < depth; i++) {
+			segment = sqsh_tree_traversal_path_segment(
 					traversal, &segment_size, i);
-			fwrite(segment, 1, segment_size, stdout);
 			fputc('/', stdout);
+			fwrite(segment, 1, segment_size, stdout);
 		}
-		fwrite(name, 1, size, stdout);
 		fputc('\n', stdout);
 	}
 	if (error_code < 0) {

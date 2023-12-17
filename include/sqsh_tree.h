@@ -430,7 +430,7 @@ sqsh_tree_walker_free(struct SqshTreeWalker *reader);
  */
 
 enum SqshTreeTraversalState {
-	SQSH_TREE_TRAVERSAL_STATE_FINISHED,
+	SQSH_TREE_TRAVERSAL_STATE_INIT,
 	SQSH_TREE_TRAVERSAL_STATE_FILE,
 	SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN,
 	SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END,
@@ -439,6 +439,7 @@ enum SqshTreeTraversalState {
 struct SqshTreeTraversal;
 
 /**
+ * @deprecated Since 1.4.0. Use sqsh_tree_traversal_new2() instead.
  * @brief Creates a new SqshTreeTraversal object at the root inode.
  * @memberof SqshTreeTraversal
  *
@@ -448,8 +449,23 @@ struct SqshTreeTraversal;
  *
  * @return a new file reader.
  */
-struct SqshTreeTraversal *
+__attribute__((deprecated("Since 1.4.0. Use sqsh_tree_traversal_new2() "
+						  "instead."))) struct SqshTreeTraversal *
 sqsh_tree_traversal_new(const struct SqshFile *file, int *err);
+
+/**
+ * @brief Creates a new SqshTreeTraversal object at the root inode.
+ * @memberof SqshTreeTraversal
+ *
+ * @param[in]   file     the base inode to start from.
+ * @param[in]   max_depth the maximum depth to traverse.
+ * @param[out]  err      Pointer to an int where the error code will be
+ * stored.
+ *
+ * @return a new file reader.
+ */
+struct SqshTreeTraversal *sqsh_tree_traversal_new2(
+		const struct SqshFile *file, size_t max_depth, int *err);
 
 /**
  * @memberof SqshTreeTraversal
@@ -491,7 +507,8 @@ sqsh_tree_traversal_state(const struct SqshTreeTraversal *traversal);
  * @memberof SqshTreeTraversal
  *
  * @param[in]   traversal  The traversal to use
- * @param[out]  len        Pointer to a size_t where the length will be stored.
+ * @param[out]  len        Pointer to a size_t where the length of the name will
+ * be stored.
  *
  * @return the name of the current entry.
  */
@@ -529,18 +546,6 @@ sqsh_tree_traversal_name_dup(const struct SqshTreeTraversal *traversal);
  * @memberof SqshTreeTraversal
  *
  * @param[in,out]   traversal  The traversal to use
- * @param[in]       index      The index of the path segment.
- *
- * @return the inode of the current entry.
- */
-size_t sqsh_tree_traversal_path_segment_size(
-		const struct SqshTreeTraversal *traversal, sqsh_index_t index);
-
-/**
- * @brief Returns the path segment at a given index.
- * @memberof SqshTreeTraversal
- *
- * @param[in,out]   traversal  The traversal to use
  *
  * @return the inode of the current entry.
  */
@@ -551,8 +556,8 @@ size_t sqsh_tree_traversal_depth(const struct SqshTreeTraversal *traversal);
  * @memberof SqshTreeTraversal
  *
  * @param[in,out]   traversal  The traversal to use
- * @param[out]      len        Pointer to a size_t where the length will be
- * stored.
+ * @param[out]      len        Pointer to a size_t where the length of the name
+ * will be stored.
  * @param[in]       index      The index of the path segment.
  *
  * @return the inode of the current entry.
