@@ -34,7 +34,6 @@
 #include <sqsh_archive_private.h>
 #include <sqsh_error.h>
 
-#include <stdatomic.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -99,35 +98,48 @@ dyn_map_init(struct SqshInodeMap *map, struct SqshArchive *archive) {
 	const uint32_t inode_count = sqsh_superblock_inode_count(superblock);
 	map->inode_count = inode_count;
 
-	map->export_table = NULL;
-	map->inode_refs = calloc(inode_count, sizeof(atomic_uint_fast64_t));
-	if (map->inode_refs == NULL) {
+	// TODO: for 2.0 the mutex needs to be moved into the struct instead of
+	// being heap allocated. This is done because dyn_map_get needs to change
+	// the state of the mutex, which is not possible for a const struct.
+	map->mutex = malloc(sizeof(*map->mutex));
+	if (map->mutex == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
-	for (uint32_t i = 0; i < inode_count; i++) {
-		atomic_uint_fast64_t *ref =
-				&((atomic_uint_fast64_t *)map->inode_refs)[i];
-		atomic_init(ref, 0);
+	pthread_mutex_init(map->mutex, NULL);
+	map->export_table = NULL;
+	map->inode_refs = calloc(inode_count, sizeof(uint_fast64_t));
+	if (map->inode_refs == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
 	}
 out:
 	return rv;
 }
 
+// TODO: for 2.0 make this function accept a non-const struct.
 static uint64_t
 dyn_map_get(const struct SqshInodeMap *map, uint32_t inode_number, int *err) {
 	int rv = 0;
 	uint64_t inode_ref = 0;
-	atomic_uint_fast64_t *inode_refs = map->inode_refs;
+	uint_fast64_t *inode_refs = map->inode_refs;
 
 	if (inode_number == 0 || inode_number - 1 >= map->inode_count) {
 		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
 		goto out;
 	}
-	inode_ref = ~atomic_load(&inode_refs[inode_number - 1]);
+	rv = sqsh__mutex_lock(map->mutex);
+	if (rv < 0) {
+		goto out;
+	}
+	inode_ref = ~inode_refs[inode_number - 1];
 	if (inode_ref == EMPTY_INODE_REF) {
 		rv = -SQSH_ERROR_NO_SUCH_ELEMENT;
 		inode_ref = 0;
+		goto out;
+	}
+	rv = sqsh__mutex_unlock(map->mutex);
+	if (rv < 0) {
 		goto out;
 	}
 
@@ -141,8 +153,9 @@ out:
 static int
 dyn_map_set(
 		struct SqshInodeMap *map, uint32_t inode_number, uint64_t inode_ref) {
+	int rv = 0;
 	uint64_t old_value;
-	atomic_uint_fast64_t *inode_refs = map->inode_refs;
+	uint_fast64_t *inode_refs = map->inode_refs;
 
 	if (inode_ref == EMPTY_INODE_REF) {
 		return -SQSH_ERROR_INVALID_ARGUMENT;
@@ -150,10 +163,33 @@ dyn_map_set(
 		return -SQSH_ERROR_OUT_OF_BOUNDS;
 	}
 
-	old_value = ~atomic_exchange(&inode_refs[inode_number - 1], ~inode_ref);
+	rv = sqsh__mutex_lock(map->mutex);
+	if (rv < 0) {
+		return rv;
+	}
+	old_value = ~inode_refs[inode_number - 1];
+	inode_refs[inode_number - 1] = ~inode_ref;
 	if (old_value != EMPTY_INODE_REF && old_value != inode_ref) {
 		return -SQSH_ERROR_INODE_MAP_IS_INCONSISTENT;
 	}
+	rv = sqsh__mutex_unlock(map->mutex);
+	if (rv < 0) {
+		return rv;
+	}
+	return 0;
+}
+
+static int
+export_table_cleanup(struct SqshInodeMap *map) {
+	(void)map;
+	return 0;
+}
+
+static int
+dyn_map_cleanup(struct SqshInodeMap *map) {
+	free(map->inode_refs);
+	pthread_mutex_destroy(map->mutex);
+	free(map->mutex);
 	return 0;
 }
 
@@ -161,12 +197,14 @@ static const struct SqshInodeMapImpl export_table_impl = {
 		.init = export_table_init,
 		.get = export_table_get,
 		.set = export_table_set,
+		.cleanup = export_table_cleanup,
 };
 
 static const struct SqshInodeMapImpl dyn_map_impl = {
 		.init = dyn_map_init,
 		.get = dyn_map_get,
 		.set = dyn_map_set,
+		.cleanup = dyn_map_cleanup,
 };
 
 int
@@ -209,6 +247,6 @@ sqsh_inode_map_set(
 
 int
 sqsh__inode_map_cleanup(struct SqshInodeMap *map) {
-	free(map->inode_refs);
+	return map->impl->cleanup(map);
 	return 0;
 }

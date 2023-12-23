@@ -98,6 +98,7 @@ struct SqshInodeMapImpl {
 	int (*set)(
 			struct SqshInodeMap *map, uint32_t inode_number,
 			uint64_t inode_ref);
+	int (*cleanup)(struct SqshInodeMap *map);
 };
 /**
  * @brief The inode map context is used to cache inodes numbers and their
@@ -108,7 +109,8 @@ struct SqshInodeMap {
 	 * @privatesection
 	 */
 	const struct SqshInodeMapImpl *impl;
-	void *inode_refs; /* atomic_uint_fast64_t */
+	sqsh__mutex_t *mutex;
+	uint_fast64_t *inode_refs;
 	size_t inode_count;
 	struct SqshExportTable *export_table;
 };
