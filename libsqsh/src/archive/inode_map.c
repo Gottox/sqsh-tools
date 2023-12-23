@@ -105,6 +105,11 @@ dyn_map_init(struct SqshInodeMap *map, struct SqshArchive *archive) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
+	for (uint32_t i = 0; i < inode_count; i++) {
+		atomic_uint_fast64_t *ref =
+				&((atomic_uint_fast64_t *)map->inode_refs)[i];
+		atomic_init(ref, 0);
+	}
 out:
 	return rv;
 }
