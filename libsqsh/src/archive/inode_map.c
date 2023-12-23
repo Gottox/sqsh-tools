@@ -51,55 +51,29 @@
 // still have `UINT64_MAX` - an unlikely inode_ref - as the sentinal value for
 // empty inodes without memset()ing the inode map to all `UINT64_MAX`s.
 
-int
-sqsh__inode_map_init(struct SqshInodeMap *map, struct SqshArchive *archive) {
-	int rv = 0;
+static int
+export_table_init(struct SqshInodeMap *map, struct SqshArchive *archive) {
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 	const uint32_t inode_count = sqsh_superblock_inode_count(superblock);
-	memset(map, 0, sizeof(*map));
 	map->inode_count = inode_count;
 
-	if (sqsh_superblock_has_export_table(superblock)) {
-		rv = sqsh_archive_export_table(archive, &map->export_table);
-		if (rv < 0) {
-			goto out;
-		}
-		map->inode_refs = NULL;
-	} else {
-		map->export_table = NULL;
-		map->inode_refs = calloc(inode_count, sizeof(atomic_uint_fast64_t));
-		if (map->inode_refs == NULL) {
-			rv = -SQSH_ERROR_MALLOC_FAILED;
-			goto out;
-		}
-	}
-out:
-	return rv;
+	return sqsh_archive_export_table(archive, &map->export_table);
 }
 
-uint64_t
-sqsh_inode_map_get2(
+static uint64_t
+export_table_get(
 		const struct SqshInodeMap *map, uint32_t inode_number, int *err) {
 	int rv = 0;
 	uint64_t inode_ref = 0;
-	atomic_uint_fast64_t *inode_refs = map->inode_refs;
 
 	if (inode_number == 0 || inode_number - 1 >= map->inode_count) {
 		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
 		goto out;
-	} else if (map->export_table != NULL) {
-		rv = sqsh_export_table_resolve_inode(
-				map->export_table, inode_number, &inode_ref);
-		if (rv < 0) {
-			goto out;
-		}
-	} else {
-		inode_ref = ~atomic_load(&inode_refs[inode_number - 1]);
-		if (inode_ref == EMPTY_INODE_REF) {
-			rv = -SQSH_ERROR_NO_SUCH_ELEMENT;
-			inode_ref = 0;
-			goto out;
-		}
+	}
+	rv = sqsh_export_table_resolve_inode(
+			map->export_table, inode_number, &inode_ref);
+	if (rv < 0) {
+		goto out;
 	}
 
 out:
@@ -109,8 +83,58 @@ out:
 	return inode_ref;
 }
 
-int
-sqsh_inode_map_set2(
+static int
+export_table_set(
+		struct SqshInodeMap *map, uint32_t inode_number, uint64_t inode_ref) {
+	(void)map;
+	(void)inode_number;
+	(void)inode_ref;
+	return 0;
+}
+
+static int
+dyn_map_init(struct SqshInodeMap *map, struct SqshArchive *archive) {
+	int rv = 0;
+	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
+	const uint32_t inode_count = sqsh_superblock_inode_count(superblock);
+	map->inode_count = inode_count;
+
+	map->export_table = NULL;
+	map->inode_refs = calloc(inode_count, sizeof(atomic_uint_fast64_t));
+	if (map->inode_refs == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
+	}
+out:
+	return rv;
+}
+
+static uint64_t
+dyn_map_get(const struct SqshInodeMap *map, uint32_t inode_number, int *err) {
+	int rv = 0;
+	uint64_t inode_ref = 0;
+	atomic_uint_fast64_t *inode_refs = map->inode_refs;
+
+	if (inode_number == 0 || inode_number - 1 >= map->inode_count) {
+		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
+		goto out;
+	}
+	inode_ref = ~atomic_load(&inode_refs[inode_number - 1]);
+	if (inode_ref == EMPTY_INODE_REF) {
+		rv = -SQSH_ERROR_NO_SUCH_ELEMENT;
+		inode_ref = 0;
+		goto out;
+	}
+
+out:
+	if (err != NULL) {
+		*err = rv;
+	}
+	return inode_ref;
+}
+
+static int
+dyn_map_set(
 		struct SqshInodeMap *map, uint32_t inode_number, uint64_t inode_ref) {
 	uint64_t old_value;
 	atomic_uint_fast64_t *inode_refs = map->inode_refs;
@@ -119,13 +143,52 @@ sqsh_inode_map_set2(
 		return -SQSH_ERROR_INVALID_ARGUMENT;
 	} else if (inode_number == 0 || inode_number - 1 >= map->inode_count) {
 		return -SQSH_ERROR_OUT_OF_BOUNDS;
-	} else if (inode_number != 0 && map->export_table == NULL) {
-		old_value = ~atomic_exchange(&inode_refs[inode_number - 1], ~inode_ref);
-		if (old_value != EMPTY_INODE_REF && old_value != inode_ref) {
-			return -SQSH_ERROR_INODE_MAP_IS_INCONSISTENT;
-		}
+	}
+
+	old_value = ~atomic_exchange(&inode_refs[inode_number - 1], ~inode_ref);
+	if (old_value != EMPTY_INODE_REF && old_value != inode_ref) {
+		return -SQSH_ERROR_INODE_MAP_IS_INCONSISTENT;
 	}
 	return 0;
+}
+
+static const struct SqshInodeMapImpl export_table_impl = {
+		.init = export_table_init,
+		.get = export_table_get,
+		.set = export_table_set,
+};
+
+static const struct SqshInodeMapImpl dyn_map_impl = {
+		.init = dyn_map_init,
+		.get = dyn_map_get,
+		.set = dyn_map_set,
+};
+
+int
+sqsh__inode_map_init(struct SqshInodeMap *map, struct SqshArchive *archive) {
+	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
+	const uint32_t inode_count = sqsh_superblock_inode_count(superblock);
+	map->inode_count = inode_count;
+
+	if (sqsh_superblock_has_export_table(superblock)) {
+		map->impl = &export_table_impl;
+	} else {
+		map->impl = &dyn_map_impl;
+	}
+
+	return map->impl->init(map, archive);
+}
+
+uint64_t
+sqsh_inode_map_get2(
+		const struct SqshInodeMap *map, uint32_t inode_number, int *err) {
+	return map->impl->get(map, inode_number, err);
+}
+
+int
+sqsh_inode_map_set2(
+		struct SqshInodeMap *map, uint32_t inode_number, uint64_t inode_ref) {
+	return map->impl->set(map, inode_number, inode_ref);
 }
 
 uint64_t

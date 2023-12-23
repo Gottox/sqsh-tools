@@ -88,6 +88,17 @@ SQSH_NO_EXPORT int sqsh__trailing_cleanup(struct SqshTrailingContext *context);
  * archive/inode_map.c
  */
 
+struct SqshInodeMapImpl {
+	/**
+	 * @privatesection
+	 */
+	int (*init)(struct SqshInodeMap *map, struct SqshArchive *archive);
+	uint64_t (*get)(
+			const struct SqshInodeMap *map, uint32_t inode_number, int *err);
+	int (*set)(
+			struct SqshInodeMap *map, uint32_t inode_number,
+			uint64_t inode_ref);
+};
 /**
  * @brief The inode map context is used to cache inodes numbers and their
  * corresponding inode references.
@@ -96,6 +107,7 @@ struct SqshInodeMap {
 	/**
 	 * @privatesection
 	 */
+	const struct SqshInodeMapImpl *impl;
 	void *inode_refs; /* atomic_uint_fast64_t */
 	size_t inode_count;
 	struct SqshExportTable *export_table;
