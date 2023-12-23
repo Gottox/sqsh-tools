@@ -47,13 +47,21 @@ extern "C" {
 #define SQSH_MIN(a, b) ((a) < (b) ? (a) : (b))
 #define SQSH_MAX(a, b) ((a) > (b) ? (a) : (b))
 
-#define SQSH_ADD_OVERFLOW(a, b, res) __builtin_add_overflow(a, b, res)
-#define SQSH_SUB_OVERFLOW(a, b, res) __builtin_sub_overflow(a, b, res)
-#define SQSH_MULT_OVERFLOW(a, b, res) __builtin_mul_overflow(a, b, res)
+#define SQSH_UNLIKELY(x) __builtin_expect(!!(x), 0)
 
-// Does not work for x == 0
-#define SQSH_DIVIDE_CEIL(x, y) ((x) == 0 ? 0 : (((x)-1) / (y)) + 1)
-#define SQSH_PADDING(x, p) SQSH_DIVIDE_CEIL(x, p) * p
+#define SQSH__ADD_OVERFLOW(a, b, res) __builtin_add_overflow(a, b, res)
+#define SQSH__SUB_OVERFLOW(a, b, res) __builtin_sub_overflow(a, b, res)
+#define SQSH__MULT_OVERFLOW(a, b, res) __builtin_mul_overflow(a, b, res)
+
+#define SQSH_ADD_OVERFLOW(a, b, res) \
+	SQSH_UNLIKELY(SQSH__ADD_OVERFLOW(a, b, res))
+#define SQSH_SUB_OVERFLOW(a, b, res) \
+	SQSH_UNLIKELY(SQSH__SUB_OVERFLOW(a, b, res))
+#define SQSH_MULT_OVERFLOW(a, b, res) \
+	SQSH_UNLIKELY(SQSH__MULT_OVERFLOW(a, b, res))
+
+#define SQSH_DIVIDE_CEIL(x, y) ((x) / (y) + !!((x) % (y)))
+#define SQSH_PADDING(x, p) (SQSH_DIVIDE_CEIL(x, p) * p)
 
 #define SQSH_CONFIG_DEFAULT(x, d) (size_t)(x == 0 ? (d) : SQSH_MAX(x, 0))
 
