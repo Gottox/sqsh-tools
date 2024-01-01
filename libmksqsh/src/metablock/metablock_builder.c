@@ -40,17 +40,15 @@
 #include <string.h>
 
 int
-sqsh__metablock_builder_init(
-		struct SqshMetablockBuilder *metablock, FILE *out) {
+mksqsh__metablock_init(struct MksqshMetablock *metablock, FILE *out) {
 	memset(metablock, 0, sizeof(*metablock));
 	metablock->out = out;
 	return 0;
 }
 
 int
-sqsh__metablock_builder_write(
-		struct SqshMetablockBuilder *metablock, const uint8_t *data,
-		size_t size) {
+mksqsh__metablock_write(
+		struct MksqshMetablock *metablock, const uint8_t *data, size_t size) {
 	metablock->flushed = false;
 	int rv = 0;
 	while (size > 0) {
@@ -64,7 +62,7 @@ sqsh__metablock_builder_write(
 		data += copy_size;
 		size -= copy_size;
 		if (metablock->buffer_size == sizeof(metablock->buffer)) {
-			rv = sqsh__metablock_builder_flush(metablock);
+			rv = mksqsh__metablock_flush(metablock);
 			if (rv < 0) {
 				goto out;
 			}
@@ -75,13 +73,13 @@ out:
 }
 
 uint64_t
-sqsh__metablock_builder_ref(const struct SqshMetablockBuilder *metablock) {
+mksqsh__metablock_ref(const struct MksqshMetablock *metablock) {
 	return sqsh_address_ref_create(
 			metablock->outer_ref, metablock->buffer_size);
 }
 
 int
-sqsh__metablock_builder_flush(struct SqshMetablockBuilder *metablock) {
+mksqsh__metablock_flush(struct MksqshMetablock *metablock) {
 	int rv = 0;
 	struct SqshDataMetablock header = {0};
 	if (metablock->buffer_size == 0) {
@@ -113,7 +111,7 @@ out:
 }
 
 int
-sqsh__metablock_builder_cleanup(struct SqshMetablockBuilder *metablock) {
+mksqsh__metablock_cleanup(struct MksqshMetablock *metablock) {
 	(void)metablock;
 	return 0;
 }

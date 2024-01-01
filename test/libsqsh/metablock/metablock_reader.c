@@ -35,6 +35,7 @@
 #include "../common.h"
 #include <testlib.h>
 
+#include <mksqsh_metablock.h>
 #include <sqsh_archive_private.h>
 #include <sqsh_data_private.h>
 #include <sqsh_metablock_private.h>
@@ -45,11 +46,18 @@ advance_once(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor = {0};
-	uint8_t payload[8192] = {
-			SQSH_HEADER, METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
-	};
+	uint8_t payload[8192] = {0};
 	const uint8_t *p;
-	mk_stub(&sqsh, payload, sizeof(payload));
+
+	FILE *farchive = test_sqsh_prepare_archive(payload, sizeof(payload));
+
+	struct MksqshMetablock metablock_writer = {0};
+	mksqsh__metablock_init(&metablock_writer, farchive);
+	mksqsh__metablock_write(&metablock_writer, (const uint8_t *)"abcd", 4);
+	mksqsh__metablock_flush(&metablock_writer);
+	mksqsh__metablock_cleanup(&metablock_writer);
+
+	test_sqsh_init_archive(&sqsh, farchive, payload, sizeof(payload));
 
 	rv = sqsh__metablock_reader_init(
 			&cursor, &sqsh, sizeof(struct SqshDataSuperblock), sizeof(payload));
@@ -75,17 +83,23 @@ advance_twice(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor = {0};
-	uint8_t payload[] = {
-			/* clang-format off */
-			SQSH_HEADER, 
-			[1024] = METABLOCK_HEADER(0, 8192),
-			'a', 'b', 'c', 'd',
-			[1024 + sizeof(struct SqshDataMetablock) + 8192] = METABLOCK_HEADER(0, 4),
-			'e', 'f', 'g', 'h',
-			/* clang-format on */
+	uint8_t payload[16384] = {0};
+	uint8_t metablock_content[] = {
+			'a', 'b', 'c', 'd', [8192] = 'e', 'f', 'g', 'h',
 	};
 	const uint8_t *p;
-	mk_stub(&sqsh, payload, sizeof(payload));
+
+	FILE *farchive = test_sqsh_prepare_archive(payload, sizeof(payload));
+
+	fseek(farchive, 1024, SEEK_SET);
+	struct MksqshMetablock metablock_writer = {0};
+	mksqsh__metablock_init(&metablock_writer, farchive);
+	mksqsh__metablock_write(
+			&metablock_writer, metablock_content, sizeof(metablock_content));
+	mksqsh__metablock_flush(&metablock_writer);
+	mksqsh__metablock_cleanup(&metablock_writer);
+
+	test_sqsh_init_archive(&sqsh, farchive, payload, sizeof(payload));
 
 	rv = sqsh__metablock_reader_init(&cursor, &sqsh, 1024, sizeof(payload));
 	assert(rv == 0);
@@ -129,26 +143,37 @@ advance_overlapping(void) {
 			[1024 + 2*(sizeof(struct SqshDataMetablock) + 8192)-1] = 0,
 			/* clang-format on */
 	};
-	uint8_t expected[] = {
+	uint8_t metablock_content[] = {
 			/* clang-format off */
 			'a', 'b', 'c', 'd',
 			[8192] = 'e', 'f', 'g', 'h',
 			/* clang-format on */
 	};
 	const uint8_t *p;
-	mk_stub(&sqsh, payload, sizeof(payload));
+
+	FILE *farchive = test_sqsh_prepare_archive(payload, sizeof(payload));
+
+	fseek(farchive, 1024, SEEK_SET);
+	struct MksqshMetablock metablock_writer = {0};
+	mksqsh__metablock_init(&metablock_writer, farchive);
+	mksqsh__metablock_write(
+			&metablock_writer, metablock_content, sizeof(metablock_content));
+	mksqsh__metablock_flush(&metablock_writer);
+	mksqsh__metablock_cleanup(&metablock_writer);
+
+	test_sqsh_init_archive(&sqsh, farchive, payload, sizeof(payload));
 
 	rv = sqsh__metablock_reader_init(&cursor, &sqsh, 1024, sizeof(payload));
 	assert(rv == 0);
 
-	rv = sqsh__metablock_reader_advance(&cursor, 0, sizeof(expected));
+	rv = sqsh__metablock_reader_advance(&cursor, 0, sizeof(metablock_content));
 	assert(rv == 0);
 
-	assert(sqsh__metablock_reader_size(&cursor) == sizeof(expected));
+	assert(sqsh__metablock_reader_size(&cursor) == sizeof(metablock_content));
 
 	p = sqsh__metablock_reader_data(&cursor);
 	assert(p != NULL);
-	assert(memcmp(p, expected, sizeof(expected)) == 0);
+	assert(memcmp(p, metablock_content, sizeof(metablock_content)) == 0);
 
 	rv = sqsh__metablock_reader_cleanup(&cursor);
 	assert(rv == 0);

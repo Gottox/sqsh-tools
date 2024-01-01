@@ -31,8 +31,8 @@
  * @file         sqsh_archive_builder.h
  */
 
-#ifndef SQSH_METABLOCK_BUILDER_H
-#define SQSH_METABLOCK_BUILDER_H
+#ifndef MKSQSH_METABLOCK_H
+#define MKSQSH_METABLOCK_H
 
 #include <sqsh_data.h>
 #include <sqsh_data_set.h>
@@ -43,7 +43,7 @@
  * metablock/metablock_builder.c
  */
 
-struct SqshMetablockBuilder {
+struct MksqshMetablock {
 	uint8_t buffer[8192];
 	uint64_t outer_ref;
 	size_t buffer_size;
@@ -51,24 +51,20 @@ struct SqshMetablockBuilder {
 	bool flushed;
 };
 
-int
-sqsh__metablock_builder_init(struct SqshMetablockBuilder *metablock, FILE *out);
+int mksqsh__metablock_init(struct MksqshMetablock *metablock, FILE *out);
 
-uint64_t
-sqsh__metablock_builder_ref(const struct SqshMetablockBuilder *metablock);
+uint64_t mksqsh__metablock_ref(const struct MksqshMetablock *metablock);
 
-int sqsh__metablock_builder_write(
-		struct SqshMetablockBuilder *metablock, const uint8_t *data,
-		size_t size);
+int mksqsh__metablock_write(
+		struct MksqshMetablock *metablock, const uint8_t *data, size_t size);
 
-bool sqsh__metablock_builder_was_flushed(
-		const struct SqshMetablockBuilder *metablock);
+bool mksqsh__metablock_was_flushed(const struct MksqshMetablock *metablock);
 
-int sqsh__metablock_builder_flush(struct SqshMetablockBuilder *metablock);
+int mksqsh__metablock_flush(struct MksqshMetablock *metablock);
 
-int sqsh__metablock_builder_cleanup(struct SqshMetablockBuilder *metablock);
+int mksqsh__metablock_cleanup(struct MksqshMetablock *metablock);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* SQSH_METABLOCK_BUILDER_H */
+#endif /* MKSQSH_METABLOCK_H */

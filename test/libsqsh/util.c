@@ -14,14 +14,13 @@
 #include <sqsh_data_private.h>
 #include <sqsh_mapper.h>
 
-const uint8_t *
-mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size) {
+FILE *
+test_sqsh_prepare_archive(uint8_t *payload, size_t payload_size) {
 	int rv;
 	const int compression_id =
 			payload[20] ? payload[20] : SQSH_COMPRESSION_GZIP;
 	struct MksqshSuperblock builder = {0};
-	FILE *fsuperblock =
-			fmemopen(payload, sizeof(struct SqshDataSuperblock), "w");
+	FILE *fsuperblock = fmemopen(payload, payload_size, "r+");
 	assert(fsuperblock);
 	rv = mksqsh__superblock_init(&builder);
 	assert(rv == 0);
@@ -73,11 +72,26 @@ mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size) {
 	assert(rv == sizeof(struct SqshDataSuperblock));
 	rv = mksqsh__superblock_cleanup(&builder);
 	assert(rv == 0);
-	fclose(fsuperblock);
+
+	return fsuperblock;
+}
+
+void
+test_sqsh_init_archive(
+		struct SqshArchive *sqsh, FILE *farchive, uint8_t *payload,
+		size_t payload_size) {
+	int rv;
+	fseek(farchive, payload_size, SEEK_SET);
+	fclose(farchive);
 
 	const struct SqshConfig config = DEFAULT_CONFIG(payload_size);
 	rv = sqsh__archive_init(sqsh, payload, &config);
 	assert(0 == rv);
-	(void)rv;
+}
+
+const uint8_t *
+mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size) {
+	FILE *farchive = test_sqsh_prepare_archive(payload, payload_size);
+	test_sqsh_init_archive(sqsh, farchive, payload, payload_size);
 	return payload;
 }
