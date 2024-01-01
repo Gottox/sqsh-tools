@@ -168,4 +168,10 @@
 const uint8_t *
 mk_stub(struct SqshArchive *sqsh, uint8_t *payload, size_t payload_size);
 
+FILE *test_sqsh_prepare_archive(uint8_t *payload, size_t payload_size);
+
+void test_sqsh_init_archive(
+		struct SqshArchive *sqsh, FILE *farchive, uint8_t *payload,
+		size_t payload_size);
+
 #endif /* !COMMON_H */

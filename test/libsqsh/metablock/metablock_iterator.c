@@ -35,6 +35,7 @@
 #include "../common.h"
 #include <testlib.h>
 
+#include <mksqsh_metablock.h>
 #include <sqsh_archive_private.h>
 #include <sqsh_data_private.h>
 #include <sqsh_metablock_private.h>
@@ -45,11 +46,17 @@ next_once(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
-	uint8_t payload[8192] = {
-			SQSH_HEADER, METABLOCK_HEADER(0, 4), 'a', 'b', 'c', 'd',
-	};
+	uint8_t payload[8192] = {0};
 	const uint8_t *p;
-	mk_stub(&sqsh, payload, sizeof(payload));
+	FILE *farchive = test_sqsh_prepare_archive(payload, sizeof(payload));
+
+	struct MksqshMetablock metablock_writer = {0};
+	mksqsh__metablock_init(&metablock_writer, farchive);
+	mksqsh__metablock_write(&metablock_writer, (const uint8_t *)"abcd", 4);
+	mksqsh__metablock_flush(&metablock_writer);
+	mksqsh__metablock_cleanup(&metablock_writer);
+
+	test_sqsh_init_archive(&sqsh, farchive, payload, sizeof(payload));
 
 	rv = sqsh__metablock_iterator_init(
 			&iter, &sqsh, sizeof(struct SqshDataSuperblock), sizeof(payload));
@@ -144,17 +151,19 @@ next_twice(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
-	uint8_t payload[8192] = {
-			/* clang-format off */
-			SQSH_HEADER,
-			METABLOCK_HEADER(0, 4),
-			'a', 'b', 'c', 'd', 
-			METABLOCK_HEADER(0, 4),
-			'e', 'f', 'g', 'h',
-			/* clang-format on */
-	};
+	uint8_t payload[8192] = {0};
 	const uint8_t *p;
-	mk_stub(&sqsh, payload, sizeof(payload));
+	FILE *farchive = test_sqsh_prepare_archive(payload, sizeof(payload));
+
+	struct MksqshMetablock metablock_writer = {0};
+	mksqsh__metablock_init(&metablock_writer, farchive);
+	mksqsh__metablock_write(&metablock_writer, (const uint8_t *)"abcd", 4);
+	mksqsh__metablock_flush(&metablock_writer);
+	mksqsh__metablock_write(&metablock_writer, (const uint8_t *)"efgh", 4);
+	mksqsh__metablock_flush(&metablock_writer);
+	mksqsh__metablock_cleanup(&metablock_writer);
+
+	test_sqsh_init_archive(&sqsh, farchive, payload, sizeof(payload));
 
 	rv = sqsh__metablock_iterator_init(
 			&iter, &sqsh, sizeof(struct SqshDataSuperblock), sizeof(payload));

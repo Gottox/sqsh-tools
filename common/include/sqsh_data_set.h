@@ -78,6 +78,15 @@ void sqsh__data_superblock_fragment_table_start_set(
 void sqsh__data_superblock_export_table_start_set(
 		struct SqshDataSuperblock *superblock, const uint64_t value);
 
+/***************************************
+ * data/metablock_data.c
+ */
+
+void sqsh__data_metablock_is_compressed_set(
+		struct SqshDataMetablock *metablock, const int value);
+void sqsh__data_metablock_size_set(
+		struct SqshDataMetablock *metablock, const uint16_t value);
+
 #ifdef __cplusplus
 }
 #endif

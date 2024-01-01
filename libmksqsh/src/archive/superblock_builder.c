@@ -36,27 +36,27 @@
 #include <sqsh_error.h>
 #include <sqsh_utils_private.h>
 
-#include <sqsh_archive_builder.h>
+#include <mksqsh_archive.h>
 
 int
-sqsh__superblock_builder_init(struct SqshSuperblockBuilder *superblock) {
+mksqsh__superblock_init(struct MksqshSuperblock *superblock) {
 	sqsh__data_superblock_magic_set(&superblock->data, SQSH_SUPERBLOCK_MAGIC);
 	sqsh__data_superblock_version_major_set(&superblock->data, 4);
 	sqsh__data_superblock_version_minor_set(&superblock->data, 0);
 
-	return sqsh__superblock_builder_block_size(superblock, 4096);
+	return mksqsh__superblock_block_size(superblock, 4096);
 }
 
 int
-sqsh__superblock_builder_modification_time(
-		struct SqshSuperblockBuilder *superblock, uint32_t mtime) {
+mksqsh__superblock_modification_time(
+		struct MksqshSuperblock *superblock, uint32_t mtime) {
 	sqsh__data_superblock_modification_time_set(&superblock->data, mtime);
 	return 0;
 }
 
 int
-sqsh__superblock_builder_block_size(
-		struct SqshSuperblockBuilder *superblock, uint32_t block_size) {
+mksqsh__superblock_block_size(
+		struct MksqshSuperblock *superblock, uint32_t block_size) {
 	if (block_size < 4096 || block_size > 1048576) {
 		return -SQSH_ERROR_BLOCKSIZE_MISMATCH;
 	}
@@ -72,24 +72,24 @@ sqsh__superblock_builder_block_size(
 }
 
 int
-sqsh__superblock_builder_fragment_count(
-		struct SqshSuperblockBuilder *superblock, uint32_t fragment_count) {
+mksqsh__superblock_fragment_count(
+		struct MksqshSuperblock *superblock, uint32_t fragment_count) {
 	sqsh__data_superblock_fragment_entry_count_set(
 			&superblock->data, fragment_count);
 	return 0;
 }
 
 int
-sqsh__superblock_builder_compression_id(
-		struct SqshSuperblockBuilder *superblock,
+mksqsh__superblock_compression_id(
+		struct MksqshSuperblock *superblock,
 		enum SqshSuperblockCompressionId compression_id) {
 	sqsh__data_superblock_compression_id_set(&superblock->data, compression_id);
 	return 0;
 }
 
 int
-sqsh__superblock_builder_compress_inodes(
-		struct SqshSuperblockBuilder *superblock, bool compress_inodes) {
+mksqsh__superblock_compress_inodes(
+		struct MksqshSuperblock *superblock, bool compress_inodes) {
 	if (compress_inodes) {
 		superblock->flags &= ~SQSH_SUPERBLOCK_UNCOMPRESSED_INODES;
 	} else {
@@ -99,8 +99,8 @@ sqsh__superblock_builder_compress_inodes(
 }
 
 int
-sqsh__superblock_builder_compress_data(
-		struct SqshSuperblockBuilder *superblock, bool compress_data) {
+mksqsh__superblock_compress_data(
+		struct MksqshSuperblock *superblock, bool compress_data) {
 	if (compress_data) {
 		superblock->flags &= ~SQSH_SUPERBLOCK_UNCOMPRESSED_DATA;
 	} else {
@@ -110,8 +110,8 @@ sqsh__superblock_builder_compress_data(
 }
 
 int
-sqsh__superblock_builder_compress_fragments(
-		struct SqshSuperblockBuilder *superblock, bool compress_fragments) {
+mksqsh__superblock_compress_fragments(
+		struct MksqshSuperblock *superblock, bool compress_fragments) {
 	if (compress_fragments) {
 		superblock->flags &= ~SQSH_SUPERBLOCK_UNCOMPRESSED_FRAGMENTS;
 	} else {
@@ -121,8 +121,8 @@ sqsh__superblock_builder_compress_fragments(
 }
 
 int
-sqsh__superblock_builder_force_fragments(
-		struct SqshSuperblockBuilder *superblock, bool force_fragments) {
+mksqsh__superblock_force_fragments(
+		struct MksqshSuperblock *superblock, bool force_fragments) {
 	if (force_fragments) {
 		superblock->flags &= ~SQSH_SUPERBLOCK_ALWAYS_FRAGMENTS;
 	} else {
@@ -132,8 +132,8 @@ sqsh__superblock_builder_force_fragments(
 }
 
 int
-sqsh__superblock_builder_deduplicate(
-		struct SqshSuperblockBuilder *superblock, bool deduplicate) {
+mksqsh__superblock_deduplicate(
+		struct MksqshSuperblock *superblock, bool deduplicate) {
 	if (deduplicate) {
 		superblock->flags |= SQSH_SUPERBLOCK_DUPLICATES;
 	} else {
@@ -143,8 +143,8 @@ sqsh__superblock_builder_deduplicate(
 }
 
 int
-sqsh__superblock_builder_compress_xattr(
-		struct SqshSuperblockBuilder *superblock, bool compress_export) {
+mksqsh__superblock_compress_xattr(
+		struct MksqshSuperblock *superblock, bool compress_export) {
 	if (compress_export) {
 		superblock->flags &= ~SQSH_SUPERBLOCK_UNCOMPRESSED_XATTRS;
 	} else {
@@ -154,8 +154,8 @@ sqsh__superblock_builder_compress_xattr(
 }
 
 int
-sqsh__superblock_builder_compression_options(
-		struct SqshSuperblockBuilder *superblock, bool compression_options) {
+mksqsh__superblock_compression_options(
+		struct MksqshSuperblock *superblock, bool compression_options) {
 	if (compression_options) {
 		superblock->flags |= SQSH_SUPERBLOCK_COMPRESSOR_OPTIONS;
 	} else {
@@ -165,44 +165,43 @@ sqsh__superblock_builder_compression_options(
 }
 
 int
-sqsh__superblock_builder_id_count(
-		struct SqshSuperblockBuilder *superblock, uint32_t id_count) {
+mksqsh__superblock_id_count(
+		struct MksqshSuperblock *superblock, uint32_t id_count) {
 	sqsh__data_superblock_id_count_set(&superblock->data, id_count);
 	return 0;
 }
 
 int
-sqsh__superblock_builder_root_inode_ref(
-		struct SqshSuperblockBuilder *superblock, uint64_t root_inode_ref) {
+mksqsh__superblock_root_inode_ref(
+		struct MksqshSuperblock *superblock, uint64_t root_inode_ref) {
 	sqsh__data_superblock_root_inode_ref_set(&superblock->data, root_inode_ref);
 	return 0;
 }
 
 int
-sqsh__superblock_builder_inode_count(
-		struct SqshSuperblockBuilder *superblock, uint32_t inode_count) {
+mksqsh__superblock_inode_count(
+		struct MksqshSuperblock *superblock, uint32_t inode_count) {
 	sqsh__data_superblock_inode_count_set(&superblock->data, inode_count);
 	return 0;
 }
 
 int
-sqsh__superblock_builder_bytes_used(
-		struct SqshSuperblockBuilder *superblock, uint64_t bytes_used) {
+mksqsh__superblock_bytes_used(
+		struct MksqshSuperblock *superblock, uint64_t bytes_used) {
 	sqsh__data_superblock_bytes_used_set(&superblock->data, bytes_used);
 	return 0;
 }
 
 int
-sqsh__superblock_builder_id_table_start(
-		struct SqshSuperblockBuilder *superblock, uint64_t id_table_start) {
+mksqsh__superblock_id_table_start(
+		struct MksqshSuperblock *superblock, uint64_t id_table_start) {
 	sqsh__data_superblock_id_table_start_set(&superblock->data, id_table_start);
 	return 0;
 }
 
 int
-sqsh__superblock_builder_xattr_table_start(
-		struct SqshSuperblockBuilder *superblock,
-		uint64_t xattr_id_table_start) {
+mksqsh__superblock_xattr_table_start(
+		struct MksqshSuperblock *superblock, uint64_t xattr_id_table_start) {
 	sqsh__data_superblock_xattr_id_table_start_set(
 			&superblock->data, xattr_id_table_start);
 	if (xattr_id_table_start == UINT64_MAX) {
@@ -214,24 +213,24 @@ sqsh__superblock_builder_xattr_table_start(
 }
 
 int
-sqsh__superblock_builder_inode_table_start(
-		struct SqshSuperblockBuilder *superblock, uint64_t inode_table_start) {
+mksqsh__superblock_inode_table_start(
+		struct MksqshSuperblock *superblock, uint64_t inode_table_start) {
 	sqsh__data_superblock_inode_table_start_set(
 			&superblock->data, inode_table_start);
 	return 0;
 }
 
 int
-sqsh__superblock_builder_directory_table_start(
-		struct SqshSuperblockBuilder *superblock, uint64_t inode_table_start) {
+mksqsh__superblock_directory_table_start(
+		struct MksqshSuperblock *superblock, uint64_t inode_table_start) {
 	sqsh__data_superblock_directory_table_start_set(
 			&superblock->data, inode_table_start);
 	return 0;
 }
 
 int
-sqsh__superblock_builder_fragment_table_start(
-		struct SqshSuperblockBuilder *superblock,
+mksqsh__superblock_fragment_table_start(
+		struct MksqshSuperblock *superblock,
 		uint64_t export_fragment_table_start) {
 	sqsh__data_superblock_fragment_table_start_set(
 			&superblock->data, export_fragment_table_start);
@@ -244,8 +243,8 @@ sqsh__superblock_builder_fragment_table_start(
 }
 
 int
-sqsh__superblock_builder_export_table_start(
-		struct SqshSuperblockBuilder *superblock, uint64_t export_table_start) {
+mksqsh__superblock_export_table_start(
+		struct MksqshSuperblock *superblock, uint64_t export_table_start) {
 	sqsh__data_superblock_export_table_start_set(
 			&superblock->data, export_table_start);
 	if (export_table_start == UINT64_MAX) {
@@ -257,8 +256,7 @@ sqsh__superblock_builder_export_table_start(
 }
 
 int
-sqsh__superblock_builder_write(
-		struct SqshSuperblockBuilder *superblock, FILE *output) {
+mksqsh__superblock_write(struct MksqshSuperblock *superblock, FILE *output) {
 	int rv = 0;
 	struct SqshDataSuperblock *data = &superblock->data;
 
@@ -275,7 +273,7 @@ out:
 }
 
 int
-sqsh__superblock_builder_cleanup(struct SqshSuperblockBuilder *superblock) {
+mksqsh__superblock_cleanup(struct MksqshSuperblock *superblock) {
 	(void)superblock;
 	return 0;
 }
