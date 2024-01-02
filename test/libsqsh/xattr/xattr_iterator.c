@@ -29,7 +29,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         file_iterator.c
+ * @file         xattr_iterator.c
  */
 
 #include "../common.h"

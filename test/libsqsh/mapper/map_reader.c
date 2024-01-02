@@ -29,7 +29,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         cursor.c
+ * @file         map_reader.c
  */
 
 #include "../common.h"

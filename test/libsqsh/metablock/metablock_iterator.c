@@ -29,7 +29,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         metablock.c
+ * @file         metablock_iterator.c
  */
 
 #include "../common.h"

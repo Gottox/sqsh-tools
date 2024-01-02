@@ -29,7 +29,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         directory_iterator.c
+ * @file         traversal.c
  */
 
 #include "../common.h"

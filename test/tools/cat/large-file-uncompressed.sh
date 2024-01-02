@@ -1,11 +1,11 @@
 #!/bin/sh -ex
 
 ######################################################################
-# @author      : Enno Boland (mail@eboland.de)
-# @file        : large-file-uncompressed.sh
-# @created     : Friday Mar 17, 2023 15:11:09 CET
+# @author       Enno Boland (mail@eboland.de)
+# @file         large-file-uncompressed.sh
+# @created      Friday Mar 17, 2023 15:11:09 CET
 #
-# @description : creates an archive with a file that fails extracting
+# @description  creates an archive with a file that fails extracting
 ######################################################################
 
 : "${BUILD_DIR:?BUILD_DIR is not set}"

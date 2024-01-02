@@ -1,13 +1,13 @@
 #!/bin/sh -ex
 
 ######################################################################
-# @author      : Enno Boland (mail@eboland.de)
-# @file        : utc.sh
-# @created     : Monday Nov 20, 2023 18:24:05 CET
+# @author       Enno Boland (mail@eboland.de)
+# @file         utc.sh
+# @created      Monday Nov 20, 2023 18:24:05 CET
 
 #
-# @description : This script creates a squashfs image, mounts it, and
-#                repacks it from the mounted path.
+# @description  This script creates a squashfs image, mounts it, and
+#               repacks it from the mounted path.
 ######################################################################
 
 : "${BUILD_DIR:?BUILD_DIR is not set}"

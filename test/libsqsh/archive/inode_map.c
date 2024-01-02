@@ -29,7 +29,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         compression_options.c
+ * @file         inode_map.c
  */
 
 #include "../common.h"

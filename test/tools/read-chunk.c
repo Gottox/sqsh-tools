@@ -1,7 +1,7 @@
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : read-chunk
- * @created     : Wednesday Mar 29, 2023 18:37:10 CEST
+ * @author   Enno Boland (mail@eboland.de)
+ * @file     read-chunk.c
+ * @created  Wednesday Mar 29, 2023 18:37:10 CEST
  */
 
 #include <sqsh_archive.h>

@@ -1,7 +1,7 @@
 ######################################################################
-# @author      : Enno Boland (mail@eboland.de)
-# @file        : Makefile
-# @created     : Sunday Dec 12, 2021 09:18:43 CET
+# @author       Enno Boland (mail@eboland.de)
+# @file         Makefile
+# @created      Sunday Dec 12, 2021 09:18:43 CET
 ######################################################################
 
 NINJA_TARGETS := test benchmark install dist scan-build clang-format uninstall \

@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Copyright (c) 2023, Enno Boland <g@s01.de>                                 *
+ * Copyright (c) 2023-2024, Enno Boland <g@s01.de>                            *
  *                                                                            *
  * Redistribution and use in source and binary forms, with or without         *
  * modification, are permitted provided that the following conditions are     *
@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         metablock_iterator.c
+ * @file         metablock_reader.c
  */
 
 #include <sqsh_extract_private.h>

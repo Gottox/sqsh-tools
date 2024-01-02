@@ -29,7 +29,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         inode.c
+ * @file         file.c
  */
 
 #include "../common.h"

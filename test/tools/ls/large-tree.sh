@@ -1,12 +1,12 @@
 #!/bin/sh -ex
 
 ######################################################################
-# @author      : Enno Boland (mail@eboland.de)
-# @file        : large-tree.sh
-# @created     : Friday Mar 17, 2023 15:11:09 CET
+# @author       Enno Boland (mail@eboland.de)
+# @file         large-tree.sh
+# @created      Friday Mar 17, 2023 15:11:09 CET
 #
-# @description : This script creates a squashfs image, mounts it, and
-#                repacks it from the mounted path.
+# @description  This script creates a squashfs image, mounts it, and
+#               repacks it from the mounted path.
 ######################################################################
 
 : "${BUILD_DIR:?BUILD_DIR is not set}"
