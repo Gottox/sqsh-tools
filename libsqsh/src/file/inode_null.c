@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         inode_context.c
+ * @file         inode_null.c
  */
 
 #include <sqsh_file_private.h>

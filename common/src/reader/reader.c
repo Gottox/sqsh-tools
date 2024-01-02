@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         xattr_iterator.c
+ * @file         reader.c
  */
 
 #include <sqsh_reader_private.h>

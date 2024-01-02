@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_xattr.c
+ * @file         sqsh_posix.c
  */
 
 #include <sqsh_posix.h>

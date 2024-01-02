@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         symlink_file.c
+ * @file         inode_symlink.c
  */
 
 #include <sqsh_file_private.h>

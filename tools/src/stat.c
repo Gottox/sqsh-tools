@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         cat.c
+ * @file         stat.c
  */
 
 #include <sqshtools_common.h>

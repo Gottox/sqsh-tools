@@ -29,7 +29,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         resolver.c
+ * @file         path_resolver.c
  */
 
 #include "../common.h"

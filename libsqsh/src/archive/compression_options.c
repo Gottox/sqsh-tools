@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         compression_options_context.c
+ * @file         compression_options.c
  */
 
 #include <sqsh_archive_private.h>

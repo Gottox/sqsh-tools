@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_chrome.c
+ * @file         sqsh_easy.c
  */
 
 #include <sqsh_easy.h>

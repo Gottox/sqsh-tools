@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         thread.c
+ * @file         posix.c
  */
 
 #define _DEFAULT_SOURCE

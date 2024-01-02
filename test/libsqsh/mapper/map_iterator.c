@@ -29,7 +29,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         cursor.c
+ * @file         map_iterator.c
  */
 
 #include "../common.h"

@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         metablock_iterator.c
+ * @file         metablock_reader.c
  */
 
 #include <sqsh_extract_private.h>

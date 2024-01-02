@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         file.c
+ * @file         directory.c
  */
 
 #define _DEFAULT_SOURCE

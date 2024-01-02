@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         cat.c
+ * @file         fs2.c
  */
 
 #define FUSE_USE_VERSION 28

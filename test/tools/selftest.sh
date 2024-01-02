@@ -1,12 +1,12 @@
 #!/bin/sh -ex
 
 ######################################################################
-# @author      : Enno Boland (mail@eboland.de)
-# @file        : repacktest
-# @created     : Friday Mar 17, 2023 15:11:09 CET
+# @author       Enno Boland (mail@eboland.de)
+# @file         selftest.sh
+# @created      Friday Mar 17, 2023 15:11:09 CET
 #
-# @description : This script creates a squashfs image, lists all
-#                files and cats them.
+# @description  This script creates a squashfs image, lists all
+#               files and cats them.
 ######################################################################
 
 : "${BUILD_DIR:?BUILD_DIR is not set}"

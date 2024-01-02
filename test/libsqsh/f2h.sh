@@ -1,11 +1,11 @@
 #!/usr/bin/env sh
 
 ######################################################################
-# @author      : Enno Boland (mail@eboland.de)
-# @file        : f2h
-# @created     : Sunday Jun 11, 2023 23:15:34 CEST
+# @author       Enno Boland (mail@eboland.de)
+# @file         f2h.sh
+# @created      Sunday Jun 11, 2023 23:15:34 CEST
 #
-# @description : converts a binary file to a header file
+# @description  converts a binary file to a header file
 ######################################################################
 
 

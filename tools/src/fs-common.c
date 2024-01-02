@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         fs.c
+ * @file         fs-common.c
  */
 
 #include <sqshtools_fs_common.h>

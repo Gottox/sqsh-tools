@@ -27,8 +27,8 @@
  ******************************************************************************/
 
 /**
- * @author      : Enno Boland (mail@eboland.de)
- * @file        : trailing_context.c
+ * @author      Enno Boland (mail@eboland.de)
+ * @file        trailing_context.c
  */
 
 #include <sqsh_archive_private.h>

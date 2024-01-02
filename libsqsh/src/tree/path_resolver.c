@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         walker.c
+ * @file         path_resolver.c
  */
 
 #include <sqsh_tree_private.h>

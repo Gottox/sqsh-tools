@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         integration.c
+ * @file         fuzzer_repro.c
  */
 
 #include "common.h"

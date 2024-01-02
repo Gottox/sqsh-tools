@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_utils.h
+ * @file         sqsh_common_private.h
  */
 
 #ifndef SQSH_UTILS_H

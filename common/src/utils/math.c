@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         utils.c
+ * @file         math.c
  */
 
 #include <sqsh_utils_private.h>

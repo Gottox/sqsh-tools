@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         cpp-test.c
+ * @file         cpp-test.cpp
  */
 
 #ifndef __cplusplus

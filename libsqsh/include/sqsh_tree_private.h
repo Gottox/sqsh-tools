@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_tree.h
+ * @file         sqsh_tree_private.h
  */
 
 #ifndef SQSH_TREE_PRIVATE_H
