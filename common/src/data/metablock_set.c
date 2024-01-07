@@ -31,11 +31,8 @@
  * @file         metablock_data.c
  */
 
-#define _DEFAULT_SOURCE
-
+#include <cextras/endian.h>
 #include <sqsh_data_private.h>
-
-#include <cextras/endian_compat.h>
 
 void
 sqsh__data_metablock_is_compressed_set(

@@ -31,32 +31,29 @@
  * @file         directory_data.c
  */
 
-#define _DEFAULT_SOURCE
-
+#include <cextras/endian.h>
 #include <sqsh_data_private.h>
-
-#include <cextras/endian_compat.h>
 
 uint16_t
 sqsh__data_directory_entry_offset(const struct SqshDataDirectoryEntry *entry) {
-	return le16toh(entry->offset);
+	return CX_LE_2_CPU16(entry->offset);
 }
 
 int16_t
 sqsh__data_directory_entry_inode_offset(
 		const struct SqshDataDirectoryEntry *entry) {
-	return (int16_t)le16toh((uint16_t)entry->inode_offset);
+	return (int16_t)CX_LE_2_CPU16((uint16_t)entry->inode_offset);
 }
 
 uint16_t
 sqsh__data_directory_entry_type(const struct SqshDataDirectoryEntry *entry) {
-	return le16toh(entry->type);
+	return CX_LE_2_CPU16(entry->type);
 }
 
 uint16_t
 sqsh__data_directory_entry_name_size(
 		const struct SqshDataDirectoryEntry *entry) {
-	return le16toh(entry->name_size);
+	return CX_LE_2_CPU16(entry->name_size);
 }
 
 const uint8_t *
@@ -67,15 +64,15 @@ sqsh__data_directory_entry_name(const struct SqshDataDirectoryEntry *entry) {
 uint32_t
 sqsh__data_directory_fragment_count(
 		const struct SqshDataDirectoryFragment *fragment) {
-	return le32toh(fragment->count);
+	return CX_LE_2_CPU32(fragment->count);
 }
 uint32_t
 sqsh__data_directory_fragment_start(
 		const struct SqshDataDirectoryFragment *fragment) {
-	return le32toh(fragment->start);
+	return CX_LE_2_CPU32(fragment->start);
 }
 uint32_t
 sqsh__data_directory_fragment_inode_number(
 		const struct SqshDataDirectoryFragment *fragment) {
-	return le32toh(fragment->inode_number);
+	return CX_LE_2_CPU32(fragment->inode_number);
 }
