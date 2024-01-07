@@ -38,9 +38,9 @@ void
 sqsh__data_metablock_is_compressed_set(
 		struct SqshDataMetablock *metablock, const int value) {
 	if (value) {
-		metablock->header &= htole16((uint16_t)~0x8000);
+		metablock->header &= CX_CPU_2_LE16((uint16_t)~0x8000);
 	} else {
-		metablock->header |= htole16(0x8000);
+		metablock->header |= CX_CPU_2_LE16(0x8000);
 	}
 }
 
@@ -48,6 +48,6 @@ void
 sqsh__data_metablock_size_set(
 		struct SqshDataMetablock *metablock, const uint16_t value) {
 	// null out the size before setting.
-	metablock->header &= htole16((uint16_t)0x8000);
-	metablock->header |= htole16(value & (uint16_t)~0x8000);
+	metablock->header &= CX_CPU_2_LE16((uint16_t)0x8000);
+	metablock->header |= CX_CPU_2_LE16(value & (uint16_t)~0x8000);
 }

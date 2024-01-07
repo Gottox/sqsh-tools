@@ -41,113 +41,113 @@
 void
 sqsh__data_superblock_magic_set(
 		struct SqshDataSuperblock *superblock, const uint32_t value) {
-	superblock->magic = htole32(value);
+	superblock->magic = CX_CPU_2_LE32(value);
 }
 
 void
 sqsh__data_superblock_inode_count_set(
 		struct SqshDataSuperblock *superblock, const uint32_t value) {
-	superblock->inode_count = htole32(value);
+	superblock->inode_count = CX_CPU_2_LE32(value);
 }
 
 void
 sqsh__data_superblock_modification_time_set(
 		struct SqshDataSuperblock *superblock, const uint32_t value) {
-	superblock->modification_time = htole32(value);
+	superblock->modification_time = CX_CPU_2_LE32(value);
 }
 
 void
 sqsh__data_superblock_block_size_set(
 		struct SqshDataSuperblock *superblock, const uint32_t value) {
-	superblock->block_size = htole32(value);
+	superblock->block_size = CX_CPU_2_LE32(value);
 }
 
 void
 sqsh__data_superblock_fragment_entry_count_set(
 		struct SqshDataSuperblock *superblock, const uint32_t value) {
-	superblock->fragment_entry_count = htole32(value);
+	superblock->fragment_entry_count = CX_CPU_2_LE32(value);
 }
 
 void
 sqsh__data_superblock_compression_id_set(
 		struct SqshDataSuperblock *superblock, const uint16_t value) {
-	superblock->compression_id = htole16(value);
+	superblock->compression_id = CX_CPU_2_LE16(value);
 }
 
 void
 sqsh__data_superblock_block_log_set(
 		struct SqshDataSuperblock *superblock, const uint16_t value) {
-	superblock->block_log = htole16(value);
+	superblock->block_log = CX_CPU_2_LE16(value);
 }
 
 void
 sqsh__data_superblock_flags_set(
 		struct SqshDataSuperblock *superblock, const uint16_t value) {
-	superblock->flags = htole16(value);
+	superblock->flags = CX_CPU_2_LE16(value);
 }
 
 void
 sqsh__data_superblock_id_count_set(
 		struct SqshDataSuperblock *superblock, const uint16_t value) {
-	superblock->id_count = htole16(value);
+	superblock->id_count = CX_CPU_2_LE16(value);
 }
 
 void
 sqsh__data_superblock_version_major_set(
 		struct SqshDataSuperblock *superblock, const uint16_t value) {
-	superblock->version_major = htole16(value);
+	superblock->version_major = CX_CPU_2_LE16(value);
 }
 
 void
 sqsh__data_superblock_version_minor_set(
 		struct SqshDataSuperblock *superblock, const uint16_t value) {
-	superblock->version_minor = htole16(value);
+	superblock->version_minor = CX_CPU_2_LE16(value);
 }
 
 void
 sqsh__data_superblock_root_inode_ref_set(
 		struct SqshDataSuperblock *superblock, const uint64_t value) {
-	superblock->root_inode_ref = htole64(value);
+	superblock->root_inode_ref = CX_CPU_2_LE64(value);
 }
 
 void
 sqsh__data_superblock_bytes_used_set(
 		struct SqshDataSuperblock *superblock, const uint64_t value) {
-	superblock->bytes_used = htole64(value);
+	superblock->bytes_used = CX_CPU_2_LE64(value);
 }
 
 void
 sqsh__data_superblock_id_table_start_set(
 		struct SqshDataSuperblock *superblock, const uint64_t value) {
-	superblock->id_table_start = htole64(value);
+	superblock->id_table_start = CX_CPU_2_LE64(value);
 }
 
 void
 sqsh__data_superblock_xattr_id_table_start_set(
 		struct SqshDataSuperblock *superblock, const uint64_t value) {
-	superblock->xattr_id_table_start = htole64(value);
+	superblock->xattr_id_table_start = CX_CPU_2_LE64(value);
 }
 
 void
 sqsh__data_superblock_inode_table_start_set(
 		struct SqshDataSuperblock *superblock, const uint64_t value) {
-	superblock->inode_table_start = htole64(value);
+	superblock->inode_table_start = CX_CPU_2_LE64(value);
 }
 
 void
 sqsh__data_superblock_directory_table_start_set(
 		struct SqshDataSuperblock *superblock, const uint64_t value) {
-	superblock->directory_table_start = htole64(value);
+	superblock->directory_table_start = CX_CPU_2_LE64(value);
 }
 
 void
 sqsh__data_superblock_fragment_table_start_set(
 		struct SqshDataSuperblock *superblock, const uint64_t value) {
-	superblock->fragment_table_start = htole64(value);
+	superblock->fragment_table_start = CX_CPU_2_LE64(value);
 }
 
 void
 sqsh__data_superblock_export_table_start_set(
 		struct SqshDataSuperblock *superblock, const uint64_t value) {
-	superblock->export_table_start = htole64(value);
+	superblock->export_table_start = CX_CPU_2_LE64(value);
 }
