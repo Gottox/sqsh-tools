@@ -39,12 +39,12 @@
 #include <pthread.h>
 #include <stdlib.h>
 
-uint16_t
-sqsh__log2_u32(uint32_t x) {
+unsigned long
+sqsh__log2(unsigned long x) {
 	if (x == 0) {
 		return UINT16_MAX;
 	} else {
-		const uint16_t clz = (uint16_t)__builtin_clz(x);
-		return (uint16_t)sizeof(uint32_t) * 8 - 1 - clz;
+		const unsigned long clz = (unsigned int)__builtin_clzl(x);
+		return sizeof(unsigned long) * 8 - 1 - clz;
 	}
 }

@@ -93,7 +93,8 @@ sqsh__superblock_init(
 		goto out;
 	}
 
-	if (sqsh__data_superblock_block_log(header) != sqsh__log2_u32(block_size)) {
+	unsigned long block_size_log = sqsh__log2(block_size);
+	if (sqsh__data_superblock_block_log(header) != block_size_log) {
 		rv = -SQSH_ERROR_BLOCKSIZE_MISMATCH;
 		goto out;
 	}
