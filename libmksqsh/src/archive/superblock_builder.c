@@ -65,7 +65,7 @@ mksqsh__superblock_block_size(
 	}
 
 	sqsh__data_superblock_block_size_set(&superblock->data, block_size);
-	const uint16_t log2_block_size = sqsh__log2_u32(block_size);
+	const uint16_t log2_block_size = sqsh__log2(block_size);
 	sqsh__data_superblock_block_log_set(&superblock->data, log2_block_size);
 
 	return 0;
