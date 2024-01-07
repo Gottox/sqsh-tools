@@ -31,11 +31,8 @@
  * @file         superblock_set.c
  */
 
-#define _DEFAULT_SOURCE
-
+#include <cextras/endian.h>
 #include <sqsh_data_set.h>
-
-#include <cextras/endian_compat.h>
 
 /***************************************
  * data/superblock_data.c

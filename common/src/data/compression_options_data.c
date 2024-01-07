@@ -31,63 +31,60 @@
  * @file         compression_options_data.c
  */
 
-#define _DEFAULT_SOURCE
-
+#include <cextras/endian.h>
 #include <sqsh_data_private.h>
-
-#include <cextras/endian_compat.h>
 
 uint32_t
 sqsh_compression_data_options_gzip_compression_level(
 		const union SqshDataCompressionOptions *options) {
-	return le32toh(options->gzip.compression_level);
+	return CX_LE_2_CPU32(options->gzip.compression_level);
 }
 uint16_t
 sqsh_compression_data_options_gzip_window_size(
 		const union SqshDataCompressionOptions *options) {
-	return le16toh(options->gzip.window_size);
+	return CX_LE_2_CPU16(options->gzip.window_size);
 }
 uint16_t
 sqsh_compression_data_options_gzip_strategies(
 		const union SqshDataCompressionOptions *options) {
-	return le16toh(options->gzip.strategies);
+	return CX_LE_2_CPU16(options->gzip.strategies);
 }
 
 uint32_t
 sqsh_compression_data_options_xz_dictionary_size(
 		const union SqshDataCompressionOptions *options) {
-	return le32toh(options->xz.dictionary_size);
+	return CX_LE_2_CPU32(options->xz.dictionary_size);
 }
 uint32_t
 sqsh_compression_data_options_xz_filters(
 		const union SqshDataCompressionOptions *options) {
-	return le32toh(options->xz.filters);
+	return CX_LE_2_CPU32(options->xz.filters);
 }
 
 uint32_t
 sqsh_compression_data_options_lz4_version(
 		const union SqshDataCompressionOptions *options) {
-	return le32toh(options->lz4.version);
+	return CX_LE_2_CPU32(options->lz4.version);
 }
 uint32_t
 sqsh_compression_data_options_lz4_flags(
 		const union SqshDataCompressionOptions *options) {
-	return le32toh(options->lz4.flags);
+	return CX_LE_2_CPU32(options->lz4.flags);
 }
 
 uint32_t
 sqsh_compression_data_options_zstd_compression_level(
 		const union SqshDataCompressionOptions *options) {
-	return le32toh(options->zstd.compression_level);
+	return CX_LE_2_CPU32(options->zstd.compression_level);
 }
 
 uint32_t
 sqsh_compression_data_options_lzo_algorithm(
 		const union SqshDataCompressionOptions *options) {
-	return le32toh(options->lzo.algorithm);
+	return CX_LE_2_CPU32(options->lzo.algorithm);
 }
 uint32_t
 sqsh_compression_data_options_lzo_compression_level(
 		const union SqshDataCompressionOptions *options) {
-	return le32toh(options->lzo.compression_level);
+	return CX_LE_2_CPU32(options->lzo.compression_level);
 }

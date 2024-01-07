@@ -31,18 +31,15 @@
  * @file         metablock_data.c
  */
 
-#define _DEFAULT_SOURCE
-
+#include <cextras/endian.h>
 #include <sqsh_data_private.h>
-
-#include <cextras/endian_compat.h>
 
 int
 sqsh__data_metablock_is_compressed(const struct SqshDataMetablock *metablock) {
-	return !(le16toh(metablock->header) & 0x8000);
+	return !(CX_LE_2_CPU16(metablock->header) & 0x8000);
 }
 
 uint16_t
 sqsh__data_metablock_size(const struct SqshDataMetablock *metablock) {
-	return le16toh(metablock->header) & 0x7FFF;
+	return CX_LE_2_CPU16(metablock->header) & 0x7FFF;
 }

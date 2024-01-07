@@ -31,18 +31,15 @@
  * @file         fragment_data.c
  */
 
-#define _DEFAULT_SOURCE
-
+#include <cextras/endian.h>
 #include <sqsh_data_private.h>
-
-#include <cextras/endian_compat.h>
 
 uint64_t
 sqsh__data_fragment_start(const struct SqshDataFragment *fragment) {
-	return le64toh(fragment->start);
+	return CX_LE_2_CPU64(fragment->start);
 }
 
 uint32_t
 sqsh__data_fragment_size_info(const struct SqshDataFragment *fragment) {
-	return le32toh(fragment->size_info);
+	return CX_LE_2_CPU32(fragment->size_info);
 }
