@@ -122,7 +122,8 @@ sqsh_compression_options_xz_dictionary_size(
 	return sqsh_compression_data_options_xz_dictionary_size(
 			compression_options(context));
 }
-uint32_t
+
+enum SqshXzFilters
 sqsh_compression_options_xz_filters(
 		const struct SqshCompressionOptions *context) {
 	if (context->compression_id != SQSH_COMPRESSION_XZ) {
