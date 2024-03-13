@@ -9,7 +9,7 @@ libsqsh_common_dependencies = [
 libsqsh_common_c_args = ['-Wconversion', '-Wsign-conversion']
 
 libsqsh_common = static_library(
-    'sqsh',
+    'sqshcommon',
     libsqsh_common_sources,
     include_directories: [libsqsh_common_include, libsqsh_include],
     c_args: libsqsh_common_c_args,
