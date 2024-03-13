@@ -46,7 +46,7 @@ sqsh__mapper_init(
 	if (config->source_mapper) {
 		mapper->impl = config->source_mapper;
 	} else {
-		mapper->impl = sqsh_mapper_impl_mmap;
+		mapper->impl = sqsh_mapper_impl_file;
 	}
 
 	if (config->mapper_block_size) {

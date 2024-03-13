@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Copyright (c) 2023-2024, Enno Boland <g@s01.de>                            *
+ * Copyright (c) 2023, Enno Boland <g@s01.de>                                 *
  *                                                                            *
  * Redistribution and use in source and binary forms, with or without         *
  * modification, are permitted provided that the following conditions are     *
@@ -28,53 +28,101 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_mapper.h
+ * @file         mmap_mapper.c
  */
 
-#ifndef SQSH_MAPPER_H
-#define SQSH_MAPPER_H
+#define _DEFAULT_SOURCE
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <sqsh_common_private.h>
+#include <sqsh_error.h>
+#include <sqsh_mapper_private.h>
 
-/***************************************
- * mapper/curl_mapper.c
- */
+#include <errno.h>
+#include <stdio.h>
+#include <sys/stat.h>
 
-/**
- * @brief a mapper that uses curl to download the file.
- */
-extern const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_curl;
+static int
+sqsh_mapper_file_init(
+		struct SqshMapper *mapper, const void *input, size_t *size) {
+	(void)size;
+	int rv = 0;
+	FILE *file;
+	int fd;
+	struct stat st = {0};
 
-/***************************************
- * mapper/mmap_mapper.c
- */
+	file = fopen(input, "r");
+	if (file == NULL) {
+		rv = -errno;
+		goto out;
+	}
 
-/**
- * @brief a mapper that uses mmap to map the file into memory.
- */
-extern const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_mmap;
+	fd = fileno(file);
 
-/***************************************
- * mapper/static_mapper.c
- */
+	if (fstat(fd, &st) < 0) {
+		fclose(file);
+		rv = -errno;
+		goto out;
+	}
 
-/**
- * @brief a mapper that uses a static buffer.
- */
-extern const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_static;
+	// TODO: check for overflow.
+	*size = (size_t)st.st_size;
+	mapper->data.fm.file = file;
 
-/***************************************
- * mapper/static_file.c
- */
-
-/**
- * @brief a mapper that uses a static buffer.
- */
-extern const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_file;
-
-#ifdef __cplusplus
+out:
+	return rv;
 }
-#endif
-#endif /* SQSH_MAPPER_H */
+static int
+sqsh_mapping_file_map(struct SqshMapSlice *mapping) {
+	int rv = 0;
+	const size_t offset = mapping->offset;
+	const size_t size = mapping->size;
+	const struct SqshMapper *mapper = mapping->mapper;
+
+	uint8_t *data = NULL;
+
+	if (size != 0) {
+		data = calloc(size, sizeof(uint8_t));
+		if (data == NULL) {
+			rv = -SQSH_ERROR_MALLOC_FAILED;
+			goto out;
+		}
+		fseek(mapper->data.fm.file, (long)offset, SEEK_SET);
+		if (fread(data, sizeof(uint8_t), size, mapper->data.fm.file) != size) {
+			rv = -SQSH_ERROR_READ_FAILED;
+			goto out;
+		}
+	}
+
+	mapping->data = data;
+out:
+	if (rv < 0) {
+		free(data);
+	}
+	return 0;
+}
+
+static int
+sqsh_mapper_file_cleanup(struct SqshMapper *mapper) {
+	fclose(mapper->data.fm.file);
+	return 0;
+}
+
+static int
+sqsh_mapping_file_unmap(struct SqshMapSlice *mapping) {
+	free(mapping->data);
+	return 0;
+}
+static const uint8_t *
+sqsh_mapping_file_data(const struct SqshMapSlice *mapping) {
+	const uint8_t *data = mapping->data;
+
+	return data;
+}
+
+static const struct SqshMemoryMapperImpl impl = {
+		/* 1 MiB */
+		.block_size_hint = 1024 * 1024,   .init = sqsh_mapper_file_init,
+		.map = sqsh_mapping_file_map,     .map_data = sqsh_mapping_file_data,
+		.unmap = sqsh_mapping_file_unmap, .cleanup = sqsh_mapper_file_cleanup,
+};
+const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_file = &impl;
