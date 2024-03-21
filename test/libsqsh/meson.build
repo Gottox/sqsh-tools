@@ -2,6 +2,7 @@ add_languages('cpp', native: false)
 
 sqsh_test2 = [
     'archive/compression_options.c',
+    'nasty.c',
 ]
 sqsh_test = [
     'archive/inode_map.c',
@@ -31,7 +32,6 @@ sqsh_test = [
     'mapper/map_reader.c',
     'metablock/metablock_iterator.c',
     'metablock/metablock_reader.c',
-    'nasty.c',
     'reader/reader.c',
     'tree/path_resolver.c',
     'tree/traversal.c',
