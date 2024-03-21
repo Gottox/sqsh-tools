@@ -60,6 +60,7 @@ dkms.conf
 # subproject directories
 /subprojects/packagecache
 /subprojects/cextras-*
+/subprojects/utest.h
 
 # Meson Directories
 meson-logs
