@@ -1,0 +1,7 @@
+[wrap-git]
+url = https://github.com/Gottox/utest.h.git
+revision = master
+depth = 1
+
+[provide]
+utest=utest_dep

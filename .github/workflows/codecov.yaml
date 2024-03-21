@@ -16,6 +16,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install --yes \
+          git \
           build-essential \
           gcovr \
           meson \

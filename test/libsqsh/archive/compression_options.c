@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include <testlib.h>
+#include <utest.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
@@ -51,8 +51,7 @@
 // to init the archive.
 const struct SqshExtractorImpl *const volatile sqsh__impl_lzo = (void *)0x1;
 
-static void
-load_compression_options_gzip(void) {
+UTEST(compression_options, load_compression_options_gzip) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[8192] = {
@@ -65,33 +64,39 @@ load_compression_options_gzip(void) {
 
 	struct SqshCompressionOptions *options =
 			sqsh_compression_options_new(&archive, &rv);
-	assert(rv == 0);
-	assert(options != NULL);
+	ASSERT_EQ(rv, 0);
+	ASSERT_NE(options, NULL);
 
-	assert(sqsh_compression_options_size(options) == 8);
+	ASSERT_EQ((size_t)8, sqsh_compression_options_size(options));
 
-	assert(sqsh_compression_options_gzip_compression_level(options) == 123);
-	assert(sqsh_compression_options_gzip_window_size(options) == 456);
-	assert(sqsh_compression_options_gzip_strategies(options) == 789);
+	ASSERT_EQ(
+			(uint32_t)123,
+			sqsh_compression_options_gzip_compression_level(options));
+	ASSERT_EQ(
+			(uint16_t)456, sqsh_compression_options_gzip_window_size(options));
+	ASSERT_EQ(
+			(enum SqshGzipStrategies)789,
+			sqsh_compression_options_gzip_strategies(options));
 
-	assert(sqsh_compression_options_xz_dictionary_size(options) == UINT32_MAX);
-	assert(sqsh_compression_options_xz_filters(options) == UINT32_MAX);
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_xz_dictionary_size(options));
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_xz_filters(options));
 
-	assert(sqsh_compression_options_lz4_version(options) == UINT32_MAX);
-	assert(sqsh_compression_options_lz4_flags(options) == UINT32_MAX);
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_lz4_version(options));
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_lz4_flags(options));
 
-	assert(sqsh_compression_options_zstd_compression_level(options) ==
-		   UINT32_MAX);
+	ASSERT_EQ(
+			UINT32_MAX,
+			sqsh_compression_options_zstd_compression_level(options));
 
-	assert(sqsh_compression_options_lzo_algorithm(options) == UINT32_MAX);
-	assert(sqsh_compression_options_lzo_compression_level(options) ==
-		   UINT32_MAX);
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_lzo_algorithm(options));
+	ASSERT_EQ(
+			UINT32_MAX,
+			sqsh_compression_options_lzo_compression_level(options));
 	sqsh_compression_options_free(options);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-load_compression_options_xz(void) {
+UTEST(compression_options, load_compression_options_xz) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[8192] = {
@@ -104,34 +109,42 @@ load_compression_options_xz(void) {
 
 	struct SqshCompressionOptions *options =
 			sqsh_compression_options_new(&archive, &rv);
-	assert(rv == 0);
-	assert(options != NULL);
+	ASSERT_EQ(0, rv);
+	ASSERT_NE(NULL, options);
 
-	assert(sqsh_compression_options_size(options) == 8);
+	ASSERT_EQ((size_t)8, sqsh_compression_options_size(options));
 
-	assert(sqsh_compression_options_gzip_compression_level(options) ==
-		   UINT32_MAX);
-	assert(sqsh_compression_options_gzip_window_size(options) == UINT16_MAX);
-	assert(sqsh_compression_options_gzip_strategies(options) == UINT16_MAX);
+	ASSERT_EQ(
+			UINT32_MAX,
+			sqsh_compression_options_gzip_compression_level(options));
+	ASSERT_EQ(UINT16_MAX, sqsh_compression_options_gzip_window_size(options));
+	ASSERT_EQ(
+			(enum SqshGzipStrategies)UINT16_MAX,
+			sqsh_compression_options_gzip_strategies(options));
 
-	assert(sqsh_compression_options_xz_dictionary_size(options) == 123);
-	assert(sqsh_compression_options_xz_filters(options) == 456);
+	ASSERT_EQ(
+			(uint32_t)123,
+			sqsh_compression_options_xz_dictionary_size(options));
+	ASSERT_EQ(
+			(enum SqshXzFilters)456,
+			sqsh_compression_options_xz_filters(options));
 
-	assert(sqsh_compression_options_lz4_version(options) == UINT32_MAX);
-	assert(sqsh_compression_options_lz4_flags(options) == UINT32_MAX);
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_lz4_version(options));
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_lz4_flags(options));
 
-	assert(sqsh_compression_options_zstd_compression_level(options) ==
-		   UINT32_MAX);
+	ASSERT_EQ(
+			UINT32_MAX,
+			sqsh_compression_options_zstd_compression_level(options));
 
-	assert(sqsh_compression_options_lzo_algorithm(options) == UINT32_MAX);
-	assert(sqsh_compression_options_lzo_compression_level(options) ==
-		   UINT32_MAX);
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_lzo_algorithm(options));
+	ASSERT_EQ(
+			UINT32_MAX,
+			sqsh_compression_options_lzo_compression_level(options));
 	sqsh_compression_options_free(options);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-load_compression_options_lz4(void) {
+UTEST(compression_options, load_compression_options_lz4) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[8192] = {
@@ -144,34 +157,38 @@ load_compression_options_lz4(void) {
 
 	struct SqshCompressionOptions *options =
 			sqsh_compression_options_new(&archive, &rv);
-	assert(rv == 0);
-	assert(options != NULL);
+	ASSERT_EQ(0, rv);
+	ASSERT_NE(NULL, options);
 
-	assert(sqsh_compression_options_size(options) == 8);
+	ASSERT_EQ((size_t)8, sqsh_compression_options_size(options));
 
-	assert(sqsh_compression_options_gzip_compression_level(options) ==
-		   UINT32_MAX);
-	assert(sqsh_compression_options_gzip_window_size(options) == UINT16_MAX);
-	assert(sqsh_compression_options_gzip_strategies(options) == UINT16_MAX);
+	ASSERT_EQ(
+			UINT32_MAX,
+			sqsh_compression_options_gzip_compression_level(options));
+	ASSERT_EQ(UINT16_MAX, sqsh_compression_options_gzip_window_size(options));
+	ASSERT_EQ(
+			(enum SqshGzipStrategies)UINT16_MAX,
+			sqsh_compression_options_gzip_strategies(options));
 
-	assert(sqsh_compression_options_xz_dictionary_size(options) == UINT32_MAX);
-	assert(sqsh_compression_options_xz_filters(options) == UINT32_MAX);
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_xz_dictionary_size(options));
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_xz_filters(options));
 
-	assert(sqsh_compression_options_lz4_version(options) == 123);
-	assert(sqsh_compression_options_lz4_flags(options) == 456);
+	ASSERT_EQ((uint32_t)123, sqsh_compression_options_lz4_version(options));
+	ASSERT_EQ((uint32_t)456, sqsh_compression_options_lz4_flags(options));
 
-	assert(sqsh_compression_options_zstd_compression_level(options) ==
-		   UINT32_MAX);
+	ASSERT_EQ(
+			UINT32_MAX,
+			sqsh_compression_options_zstd_compression_level(options));
 
-	assert(sqsh_compression_options_lzo_algorithm(options) == UINT32_MAX);
-	assert(sqsh_compression_options_lzo_compression_level(options) ==
-		   UINT32_MAX);
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_lzo_algorithm(options));
+	ASSERT_EQ(
+			UINT32_MAX,
+			sqsh_compression_options_lzo_compression_level(options));
 	sqsh_compression_options_free(options);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-load_compression_options_zstd(void) {
+UTEST(compression_options, load_compression_options_zstd) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[8192] = {
@@ -184,33 +201,38 @@ load_compression_options_zstd(void) {
 
 	struct SqshCompressionOptions *options =
 			sqsh_compression_options_new(&archive, &rv);
-	assert(rv == 0);
-	assert(options != NULL);
+	ASSERT_EQ(0, rv);
+	ASSERT_NE(NULL, options);
 
-	assert(sqsh_compression_options_size(options) == 4);
+	ASSERT_EQ((size_t)4, sqsh_compression_options_size(options));
 
-	assert(sqsh_compression_options_gzip_compression_level(options) ==
-		   UINT32_MAX);
-	assert(sqsh_compression_options_gzip_window_size(options) == UINT16_MAX);
-	assert(sqsh_compression_options_gzip_strategies(options) == UINT16_MAX);
+	ASSERT_EQ(
+			UINT32_MAX,
+			sqsh_compression_options_gzip_compression_level(options));
+	ASSERT_EQ(UINT16_MAX, sqsh_compression_options_gzip_window_size(options));
+	ASSERT_EQ(
+			(enum SqshGzipStrategies)UINT16_MAX,
+			sqsh_compression_options_gzip_strategies(options));
 
-	assert(sqsh_compression_options_xz_dictionary_size(options) == UINT32_MAX);
-	assert(sqsh_compression_options_xz_filters(options) == UINT32_MAX);
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_xz_dictionary_size(options));
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_xz_filters(options));
 
-	assert(sqsh_compression_options_lz4_version(options) == UINT32_MAX);
-	assert(sqsh_compression_options_lz4_flags(options) == UINT32_MAX);
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_lz4_version(options));
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_lz4_flags(options));
 
-	assert(sqsh_compression_options_zstd_compression_level(options) == 123);
+	ASSERT_EQ(
+			(uint32_t)123,
+			sqsh_compression_options_zstd_compression_level(options));
 
-	assert(sqsh_compression_options_lzo_algorithm(options) == UINT32_MAX);
-	assert(sqsh_compression_options_lzo_compression_level(options) ==
-		   UINT32_MAX);
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_lzo_algorithm(options));
+	ASSERT_EQ(
+			UINT32_MAX,
+			sqsh_compression_options_lzo_compression_level(options));
 	sqsh_compression_options_free(options);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-load_compression_options_lzo(void) {
+UTEST(compression_options, load_compression_options_lzo) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[8192] = {
@@ -223,37 +245,40 @@ load_compression_options_lzo(void) {
 
 	struct SqshCompressionOptions *options =
 			sqsh_compression_options_new(&archive, &rv);
-	assert(rv == 0);
-	assert(options != NULL);
+	ASSERT_EQ(0, rv);
+	ASSERT_NE(NULL, options);
 
-	assert(sqsh_compression_options_size(options) == 8);
+	ASSERT_EQ((size_t)8, sqsh_compression_options_size(options));
 
-	assert(sqsh_compression_options_gzip_compression_level(options) ==
-		   UINT32_MAX);
-	assert(sqsh_compression_options_gzip_compression_level(options) ==
-		   UINT32_MAX);
-	assert(sqsh_compression_options_gzip_window_size(options) == UINT16_MAX);
-	assert(sqsh_compression_options_gzip_strategies(options) == UINT16_MAX);
+	ASSERT_EQ(
+			UINT32_MAX,
+			sqsh_compression_options_gzip_compression_level(options));
+	ASSERT_EQ(
+			UINT32_MAX,
+			sqsh_compression_options_gzip_compression_level(options));
+	ASSERT_EQ(UINT16_MAX, sqsh_compression_options_gzip_window_size(options));
+	ASSERT_EQ(
+			(enum SqshGzipStrategies)UINT16_MAX,
+			sqsh_compression_options_gzip_strategies(options));
 
-	assert(sqsh_compression_options_xz_dictionary_size(options) == UINT32_MAX);
-	assert(sqsh_compression_options_xz_filters(options) == UINT32_MAX);
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_xz_dictionary_size(options));
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_xz_filters(options));
 
-	assert(sqsh_compression_options_lz4_version(options) == UINT32_MAX);
-	assert(sqsh_compression_options_lz4_flags(options) == UINT32_MAX);
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_lz4_version(options));
+	ASSERT_EQ(UINT32_MAX, sqsh_compression_options_lz4_flags(options));
 
-	assert(sqsh_compression_options_zstd_compression_level(options) ==
-		   UINT32_MAX);
+	ASSERT_EQ(
+			UINT32_MAX,
+			sqsh_compression_options_zstd_compression_level(options));
 
-	assert(sqsh_compression_options_lzo_algorithm(options) == 123);
-	assert(sqsh_compression_options_lzo_compression_level(options) == 456);
+	ASSERT_EQ(
+			(enum SqshLzoAlgorithm)123,
+			sqsh_compression_options_lzo_algorithm(options));
+	ASSERT_EQ(
+			(uint32_t)456,
+			sqsh_compression_options_lzo_compression_level(options));
 	sqsh_compression_options_free(options);
 	sqsh__archive_cleanup(&archive);
 }
 
-DECLARE_TESTS
-TEST(load_compression_options_gzip)
-TEST(load_compression_options_xz)
-TEST(load_compression_options_lz4)
-TEST(load_compression_options_zstd)
-TEST(load_compression_options_lzo)
-END_TESTS
+UTEST_MAIN();
