@@ -281,4 +281,4 @@ UTEST(compression_options, load_compression_options_lzo) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST_MAIN();
+UTEST_MAIN()
