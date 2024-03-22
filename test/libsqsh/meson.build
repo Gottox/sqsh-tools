@@ -3,6 +3,7 @@ add_languages('cpp', native: false)
 sqsh_test2 = [
     'archive/compression_options.c',
     'nasty.c',
+    'integration.c',
 ]
 sqsh_test = [
     'archive/inode_map.c',
@@ -27,7 +28,6 @@ sqsh_test = [
     'include_tests/sqsh_tree.c',
     'include_tests/sqsh_xattr.c',
     'file/file.c',
-    'integration.c',
     'mapper/map_iterator.c',
     'mapper/map_reader.c',
     'metablock/metablock_iterator.c',
