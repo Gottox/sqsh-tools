@@ -75,4 +75,4 @@ UTEST(nast, nasty_sqfs) {
 	sqsh_archive_close(archive);
 }
 
-UTEST_MAIN();
+UTEST_MAIN()
