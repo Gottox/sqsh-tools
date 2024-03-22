@@ -1,12 +1,12 @@
 add_languages('cpp', native: false)
 
 sqsh_test2 = [
+    'archive/inode_map.c',
     'archive/compression_options.c',
     'nasty.c',
     'integration.c',
 ]
 sqsh_test = [
-    'archive/inode_map.c',
     'easy/directory.c',
     'easy/file.c',
     'easy/xattr.c',
