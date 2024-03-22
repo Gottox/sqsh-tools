@@ -33,15 +33,14 @@
  */
 
 #include "../common.h"
-#include <testlib.h>
+#include <utest.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
 #include <sqsh_data_private.h>
 #include <sqsh_file.h>
 
-static void
-load_file_from_compressed_data_block(void) {
+UTEST(file_reader, load_file_from_compressed_data_block) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -61,33 +60,32 @@ load_file_from_compressed_data_block(void) {
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 3);
 	rv = sqsh__file_init(&file, &archive, inode_ref);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
-	assert(sqsh_file_has_fragment(&file) == false);
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileReader reader = {0};
 	rv = sqsh__file_reader_init(&reader, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_file_reader_advance(&reader, 0, 4);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	size_t size = sqsh_file_reader_size(&reader);
-	assert(size == 4);
+	ASSERT_EQ((size_t)4, size);
 	const uint8_t *data = sqsh_file_reader_data(&reader);
-	assert(data[0] == 'a');
-	assert(data[1] == 'b');
-	assert(data[2] == 'c');
-	assert(data[3] == 'd');
+	ASSERT_EQ('a', data[0]);
+	ASSERT_EQ('b', data[1]);
+	ASSERT_EQ('c', data[2]);
+	ASSERT_EQ('d', data[3]);
 
 	sqsh__file_reader_cleanup(&reader);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-load_file_from_compressed_data_block_with_offset(void) {
+UTEST(file_reader, load_file_from_compressed_data_block_with_offset) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -107,31 +105,30 @@ load_file_from_compressed_data_block_with_offset(void) {
 
 	uint64_t inode_ref = sqsh_address_ref_create(256, 3);
 	rv = sqsh__file_init(&file, &archive, inode_ref);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
-	assert(sqsh_file_has_fragment(&file) == false);
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileReader reader = {0};
 	rv = sqsh__file_reader_init(&reader, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_file_reader_advance(&reader, 1, 2);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	size_t size = sqsh_file_reader_size(&reader);
-	assert(size == 2);
+	ASSERT_EQ((size_t)2, size);
 	const uint8_t *data = sqsh_file_reader_data(&reader);
-	assert(data[0] == 'b');
-	assert(data[1] == 'c');
+	ASSERT_EQ('b', data[0]);
+	ASSERT_EQ('c', data[1]);
 
 	sqsh__file_reader_cleanup(&reader);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-load_file_from_uncompressed_data_block(void) {
+UTEST(file_reader, load_file_from_uncompressed_data_block) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -150,34 +147,33 @@ load_file_from_uncompressed_data_block(void) {
 
 	uint64_t inode_ref = sqsh_address_ref_create(256, 0);
 	rv = sqsh__file_init(&file, &archive, inode_ref);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
-	assert(sqsh_file_has_fragment(&file) == false);
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileReader reader = {0};
 	rv = sqsh__file_reader_init(&reader, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_file_reader_advance(&reader, 0, 5);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	size_t size = sqsh_file_reader_size(&reader);
-	assert(size == 5);
+	ASSERT_EQ((size_t)5, size);
 	const uint8_t *data = sqsh_file_reader_data(&reader);
-	assert(data[0] == 1);
-	assert(data[1] == 2);
-	assert(data[2] == 3);
-	assert(data[3] == 4);
-	assert(data[4] == 5);
+	ASSERT_EQ(1, data[0]);
+	ASSERT_EQ(2, data[1]);
+	ASSERT_EQ(3, data[2]);
+	ASSERT_EQ(4, data[3]);
+	ASSERT_EQ(5, data[4]);
 
 	sqsh__file_reader_cleanup(&reader);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-skip_over_zero_page(void) {
+UTEST(file_reader, skip_over_zero_page) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -198,31 +194,26 @@ skip_over_zero_page(void) {
 
 	uint64_t inode_ref = sqsh_address_ref_create(256, 0);
 	rv = sqsh__file_init(&file, &archive, inode_ref);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
-	assert(sqsh_file_has_fragment(&file) == false);
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileReader reader = {0};
 	rv = sqsh__file_reader_init(&reader, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_file_reader_advance(&reader, 32768, 6);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	size_t size = sqsh_file_reader_size(&reader);
-	assert(size == 6);
+	ASSERT_EQ((size_t)6, size);
 	const uint8_t *data = sqsh_file_reader_data(&reader);
-	assert(memcmp(data, "foobar", 6) == 0);
+	ASSERT_EQ(0, memcmp(data, "foobar", 6));
 
 	sqsh__file_reader_cleanup(&reader);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-DECLARE_TESTS
-TEST(load_file_from_uncompressed_data_block)
-TEST(load_file_from_compressed_data_block)
-TEST(load_file_from_compressed_data_block_with_offset)
-TEST(skip_over_zero_page)
-END_TESTS
+UTEST_MAIN()

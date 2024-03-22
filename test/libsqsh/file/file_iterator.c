@@ -33,18 +33,17 @@
  */
 
 #include "../common.h"
-#include <testlib.h>
+#include <utest.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
 #include <sqsh_data_private.h>
 
 static const size_t BLOCK_SIZE = 32768;
-#define ZERO_BLOCK_SIZE 16384
+#define ZERO_BLOCK_SIZE (size_t)16384
 uint8_t ZERO_BLOCK[ZERO_BLOCK_SIZE] = {0};
 
-static void
-load_segment_from_compressed_data_block(void) {
+UTEST(file_iterator, load_segment_from_compressed_data_block) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -64,43 +63,42 @@ load_segment_from_compressed_data_block(void) {
 
 	uint64_t inode_ref = sqsh_address_ref_create(256, 3);
 	rv = sqsh__file_init(&file, &archive, inode_ref);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
-	assert(sqsh_file_has_fragment(&file) == false);
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileIterator iter = {0};
 	rv = sqsh__file_iterator_init(&iter, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 
 	size_t size = sqsh_file_iterator_size(&iter);
-	assert(size == 4);
+	ASSERT_EQ((size_t)4, size);
 	const uint8_t *data = sqsh_file_iterator_data(&iter);
-	assert(data[0] == 'a');
-	assert(data[1] == 'b');
-	assert(data[2] == 'c');
-	assert(data[3] == 'd');
+	ASSERT_EQ('a', data[0]);
+	ASSERT_EQ('b', data[1]);
+	ASSERT_EQ('c', data[2]);
+	ASSERT_EQ('d', data[3]);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv == 0);
-	assert(has_next == false);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(false, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
-	assert(size == 0);
+	ASSERT_EQ((size_t)0, size);
 	data = sqsh_file_iterator_data(&iter);
-	assert(data == NULL);
+	ASSERT_EQ(NULL, data);
 
 	sqsh__file_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-load_two_segments_from_uncompressed_data_block(void) {
+UTEST(file_iterator, load_two_segments_from_uncompressed_data_block) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -122,73 +120,72 @@ load_two_segments_from_uncompressed_data_block(void) {
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
 	rv = sqsh__file_init(&file, &archive, inode_ref);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
-	assert(sqsh_file_has_fragment(&file) == false);
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileIterator iter = {0};
 	rv = sqsh__file_iterator_init(&iter, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 
 	size_t size = sqsh_file_iterator_size(&iter);
-	assert(size == 1000);
+	ASSERT_EQ((size_t)1000, size);
 	const uint8_t *data = sqsh_file_iterator_data(&iter);
 	for (size_t i = 0; i < size; i++) {
-		assert(data[i] == 0xa1);
+		ASSERT_EQ(0xa1, data[i]);
 	}
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
-	assert(size == ZERO_BLOCK_SIZE);
+	ASSERT_EQ(ZERO_BLOCK_SIZE, size);
 	data = sqsh_file_iterator_data(&iter);
-	assert(memcmp(data, ZERO_BLOCK, size) == 0);
+	ASSERT_EQ(0, memcmp(data, ZERO_BLOCK, size));
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
-	assert(size == ZERO_BLOCK_SIZE - 1000);
+	ASSERT_EQ(ZERO_BLOCK_SIZE - 1000, size);
 	data = sqsh_file_iterator_data(&iter);
-	assert(memcmp(data, ZERO_BLOCK, size) == 0);
+	ASSERT_EQ(0, memcmp(data, ZERO_BLOCK, size));
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
-	assert(size == 5);
+	ASSERT_EQ((size_t)5, size);
 	data = sqsh_file_iterator_data(&iter);
-	assert(data[0] == 1);
-	assert(data[1] == 2);
-	assert(data[2] == 3);
-	assert(data[3] == 4);
-	assert(data[4] == 5);
+	ASSERT_EQ(1, data[0]);
+	ASSERT_EQ(2, data[1]);
+	ASSERT_EQ(3, data[2]);
+	ASSERT_EQ(4, data[3]);
+	ASSERT_EQ(5, data[4]);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv == 0);
-	assert(has_next == false);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(false, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
-	assert(size == 0);
+	ASSERT_EQ((size_t)0, size);
 	data = sqsh_file_iterator_data(&iter);
-	assert(data == NULL);
+	ASSERT_EQ(NULL, data);
 
 	sqsh__file_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-load_segment_from_uncompressed_data_block(void) {
+UTEST(file_iterator, load_segment_from_uncompressed_data_block) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -208,44 +205,43 @@ load_segment_from_uncompressed_data_block(void) {
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
 	rv = sqsh__file_init(&file, &archive, inode_ref);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
-	assert(sqsh_file_has_fragment(&file) == false);
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileIterator iter = {0};
 	rv = sqsh__file_iterator_init(&iter, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 
 	size_t size = sqsh_file_iterator_size(&iter);
-	assert(size == 5);
+	ASSERT_EQ((size_t)5, size);
 	const uint8_t *data = sqsh_file_iterator_data(&iter);
-	assert(data[0] == 1);
-	assert(data[1] == 2);
-	assert(data[2] == 3);
-	assert(data[3] == 4);
-	assert(data[4] == 5);
+	ASSERT_EQ(1, data[0]);
+	ASSERT_EQ(2, data[1]);
+	ASSERT_EQ(3, data[2]);
+	ASSERT_EQ(4, data[3]);
+	ASSERT_EQ(5, data[4]);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv == 0);
-	assert(has_next == false);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(false, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
-	assert(size == 0);
+	ASSERT_EQ((size_t)0, size);
 	data = sqsh_file_iterator_data(&iter);
-	assert(data == NULL);
+	ASSERT_EQ(NULL, data);
 
 	sqsh__file_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-load_zero_padding(void) {
+UTEST(file_iterator, load_zero_padding) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -264,56 +260,55 @@ load_zero_padding(void) {
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
 	rv = sqsh__file_init(&file, &archive, inode_ref);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
-	assert(sqsh_file_has_fragment(&file) == false);
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileIterator iter = {0};
 	rv = sqsh__file_iterator_init(&iter, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 	size_t size = sqsh_file_iterator_size(&iter);
-	assert(size == ZERO_BLOCK_SIZE);
+	ASSERT_EQ(ZERO_BLOCK_SIZE, size);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 	size = sqsh_file_iterator_size(&iter);
-	assert(size == ZERO_BLOCK_SIZE);
+	ASSERT_EQ(ZERO_BLOCK_SIZE, size);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
-	assert(size == 5);
+	ASSERT_EQ((size_t)5, size);
 	const uint8_t *data = sqsh_file_iterator_data(&iter);
-	assert(data[0] == 0);
-	assert(data[1] == 0);
-	assert(data[2] == 0);
-	assert(data[3] == 0);
-	assert(data[4] == 0);
+	ASSERT_EQ(0, data[0]);
+	ASSERT_EQ(0, data[1]);
+	ASSERT_EQ(0, data[2]);
+	ASSERT_EQ(0, data[3]);
+	ASSERT_EQ(0, data[4]);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv == 0);
-	assert(has_next == false);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(false, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
-	assert(size == 0);
+	ASSERT_EQ((size_t)0, size);
 	data = sqsh_file_iterator_data(&iter);
-	assert(data == NULL);
+	ASSERT_EQ(NULL, data);
 
 	sqsh__file_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-load_zero_big_padding(void) {
+UTEST(file_iterator, load_zero_big_padding) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -332,56 +327,55 @@ load_zero_big_padding(void) {
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
 	rv = sqsh__file_init(&file, &archive, inode_ref);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
-	assert(sqsh_file_has_fragment(&file) == false);
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileIterator iter = {0};
 	rv = sqsh__file_iterator_init(&iter, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 	size_t size = sqsh_file_iterator_size(&iter);
-	assert(size == ZERO_BLOCK_SIZE);
+	ASSERT_EQ(ZERO_BLOCK_SIZE, size);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 	size = sqsh_file_iterator_size(&iter);
-	assert(size == ZERO_BLOCK_SIZE);
+	ASSERT_EQ(ZERO_BLOCK_SIZE, size);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
-	assert(size == 5);
+	ASSERT_EQ((size_t)5, size);
 	const uint8_t *data = sqsh_file_iterator_data(&iter);
-	assert(data[0] == 0);
-	assert(data[1] == 0);
-	assert(data[2] == 0);
-	assert(data[3] == 0);
-	assert(data[4] == 0);
+	ASSERT_EQ(0, data[0]);
+	ASSERT_EQ(0, data[1]);
+	ASSERT_EQ(0, data[2]);
+	ASSERT_EQ(0, data[3]);
+	ASSERT_EQ(0, data[4]);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv == 0);
-	assert(has_next == false);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(false, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
-	assert(size == 0);
+	ASSERT_EQ((size_t)0, size);
 	data = sqsh_file_iterator_data(&iter);
-	assert(data == NULL);
+	ASSERT_EQ(NULL, data);
 
 	sqsh__file_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-load_zero_block(void) {
+UTEST(file_iterator, load_zero_block) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -399,36 +393,35 @@ load_zero_block(void) {
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
 	rv = sqsh__file_init(&file, &archive, inode_ref);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
-	assert(sqsh_file_has_fragment(&file) == false);
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileIterator iter = {0};
 	rv = sqsh__file_iterator_init(&iter, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 
 	size_t size = sqsh_file_iterator_size(&iter);
-	assert(size == ZERO_BLOCK_SIZE);
+	ASSERT_EQ(ZERO_BLOCK_SIZE, size);
 
 	const uint8_t *data = sqsh_file_iterator_data(&iter);
-	assert(memcmp(data, ZERO_BLOCK, size) == 0);
+	ASSERT_EQ(0, memcmp(data, ZERO_BLOCK, size));
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv == 0);
-	assert(has_next == false);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(false, has_next);
 
 	sqsh__file_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-load_two_zero_blocks(void) {
+UTEST(file_iterator, load_two_zero_blocks) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -446,45 +439,44 @@ load_two_zero_blocks(void) {
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
 	rv = sqsh__file_init(&file, &archive, inode_ref);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
-	assert(sqsh_file_has_fragment(&file) == false);
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileIterator iter = {0};
 	rv = sqsh__file_iterator_init(&iter, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 
 	size_t size = sqsh_file_iterator_size(&iter);
-	assert(size == ZERO_BLOCK_SIZE);
+	ASSERT_EQ(ZERO_BLOCK_SIZE, size);
 
 	const uint8_t *data = sqsh_file_iterator_data(&iter);
-	assert(memcmp(data, ZERO_BLOCK, size) == 0);
+	ASSERT_EQ(0, memcmp(data, ZERO_BLOCK, size));
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
-	assert(size == ZERO_BLOCK_SIZE);
+	ASSERT_EQ(ZERO_BLOCK_SIZE, size);
 
-	assert(memcmp(data, ZERO_BLOCK, size) == 0);
+	ASSERT_EQ(0, memcmp(data, ZERO_BLOCK, size));
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv == 0);
-	assert(has_next == false);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(false, has_next);
 
 	sqsh__file_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-load_two_sparse_blocks(void) {
+UTEST(file_iterator, load_two_sparse_blocks) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -502,63 +494,62 @@ load_two_sparse_blocks(void) {
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
 	rv = sqsh__file_init(&file, &archive, inode_ref);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
-	assert(sqsh_file_has_fragment(&file) == false);
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileIterator iter = {0};
 	rv = sqsh__file_iterator_init(&iter, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 
 	size_t size = sqsh_file_iterator_size(&iter);
-	assert(size == ZERO_BLOCK_SIZE);
+	ASSERT_EQ(ZERO_BLOCK_SIZE, size);
 
 	const uint8_t *data = sqsh_file_iterator_data(&iter);
-	assert(memcmp(data, ZERO_BLOCK, size) == 0);
+	ASSERT_EQ(0, memcmp(data, ZERO_BLOCK, size));
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
-	assert(size == ZERO_BLOCK_SIZE);
+	ASSERT_EQ(ZERO_BLOCK_SIZE, size);
 
-	assert(memcmp(data, ZERO_BLOCK, size) == 0);
+	ASSERT_EQ(0, memcmp(data, ZERO_BLOCK, size));
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
-	assert(size == ZERO_BLOCK_SIZE);
+	ASSERT_EQ(ZERO_BLOCK_SIZE, size);
 
-	assert(memcmp(data, ZERO_BLOCK, size) == 0);
+	ASSERT_EQ(0, memcmp(data, ZERO_BLOCK, size));
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
 	assert(rv > 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
-	assert(size == ZERO_BLOCK_SIZE);
+	ASSERT_EQ(ZERO_BLOCK_SIZE, size);
 
-	assert(memcmp(data, ZERO_BLOCK, size) == 0);
+	ASSERT_EQ(0, memcmp(data, ZERO_BLOCK, size));
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv == 0);
-	assert(has_next == false);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(false, has_next);
 
 	sqsh__file_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-open_directory_with_file_iterator(void) {
+UTEST(file_iterator, open_directory_with_file_iterator) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -575,27 +566,17 @@ open_directory_with_file_iterator(void) {
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
 	rv = sqsh__file_init(&file, &archive, inode_ref);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_DIRECTORY);
+	ASSERT_EQ(SQSH_FILE_TYPE_DIRECTORY, sqsh_file_type(&file));
 
 	struct SqshFileIterator iter = {0};
 	rv = sqsh__file_iterator_init(&iter, &file);
-	assert(rv == -SQSH_ERROR_NOT_A_FILE);
+	ASSERT_EQ(-SQSH_ERROR_NOT_A_FILE, rv);
 
 	sqsh__file_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-DECLARE_TESTS
-TEST(load_two_segments_from_uncompressed_data_block)
-TEST(load_segment_from_uncompressed_data_block)
-TEST(load_segment_from_compressed_data_block)
-TEST(load_zero_padding)
-TEST(load_zero_big_padding)
-TEST(load_zero_block)
-TEST(load_two_zero_blocks)
-TEST(load_two_sparse_blocks)
-TEST(open_directory_with_file_iterator)
-END_TESTS
+UTEST_MAIN()

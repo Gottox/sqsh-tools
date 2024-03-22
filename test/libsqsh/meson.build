@@ -8,6 +8,9 @@ sqsh_test2 = [
     'easy/file.c',
     'easy/xattr.c',
     'extract/extract_manager.c',
+    'file/file.c',
+    'file/file_iterator.c',
+    'file/file_reader.c',
     'integration.c',
     'metablock/metablock_iterator.c',
     'metablock/metablock_reader.c',
@@ -22,8 +25,6 @@ sqsh_test2 = [
 sqsh_test = [
     'cpp-test.cpp',
     'extract/extract.c',
-    'file/file_iterator.c',
-    'file/file_reader.c',
     'fuzzer_repro.c',
     'include_tests/sqsh_archive.c',
     'include_tests/sqsh_easy.c',
@@ -35,7 +36,6 @@ sqsh_test = [
     'include_tests/sqsh_table.c',
     'include_tests/sqsh_tree.c',
     'include_tests/sqsh_xattr.c',
-    'file/file.c',
     'reader/reader.c',
 ]
 sqsh_extra_source = {
