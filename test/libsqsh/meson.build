@@ -17,6 +17,7 @@ sqsh_test2 = [
     'mapper/map_iterator.c',
     'mapper/map_reader.c',
     'nasty.c',
+    'reader/reader.c',
     'tree/path_resolver.c',
     'tree/traversal.c',
     'tree/walker.c',
@@ -36,7 +37,6 @@ sqsh_test = [
     'include_tests/sqsh_table.c',
     'include_tests/sqsh_tree.c',
     'include_tests/sqsh_xattr.c',
-    'reader/reader.c',
 ]
 sqsh_extra_source = {
     'fuzzer_repro.c': '../../fuzzer/simple.c',
