@@ -33,13 +33,12 @@
  */
 
 #include "../common.h"
-#include <testlib.h>
+#include <utest.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_easy.h>
 
-static void
-load_easy_xattr(void) {
+UTEST(ease_xattr, load_easy_xattr) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[8192] = {
@@ -77,35 +76,33 @@ load_easy_xattr(void) {
 
 	char **xattr_keys = sqsh_easy_xattr_keys(&archive, "/", &rv);
 	char *value;
-	assert(rv == 0);
-	assert(xattr_keys != NULL);
-	assert(strcmp(xattr_keys[0], "user.abc") == 0);
+	ASSERT_EQ(0, rv);
+	ASSERT_NE(NULL, xattr_keys);
+	ASSERT_EQ(0, strcmp(xattr_keys[0], "user.abc"));
 	value = sqsh_easy_xattr_get(&archive, "/", "user.abc", &rv);
-	assert(rv == 0);
-	assert(strcmp(value, "defg") == 0);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(0, strcmp(value, "defg"));
 	free(value);
 
-	assert(strcmp(xattr_keys[1], "trusted.hij") == 0);
+	ASSERT_EQ(0, strcmp(xattr_keys[1], "trusted.hij"));
 	value = sqsh_easy_xattr_get(&archive, "/", "trusted.hij", &rv);
-	assert(rv == 0);
-	assert(strcmp(value, "klm") == 0);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(0, strcmp(value, "klm"));
 	free(value);
 
-	assert(strcmp(xattr_keys[2], "security.nop") == 0);
+	ASSERT_EQ(0, strcmp(xattr_keys[2], "security.nop"));
 	value = sqsh_easy_xattr_get(&archive, "/", "security.nop", &rv);
-	assert(rv == 0);
-	assert(strcmp(value, "qrs") == 0);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(0, strcmp(value, "qrs"));
 	free(value);
 
-	assert(xattr_keys[3] == NULL);
+	ASSERT_EQ(NULL, xattr_keys[3]);
 	value = sqsh_easy_xattr_get(&archive, "/", "non-existing", &rv);
-	assert(rv == -SQSH_ERROR_NO_SUCH_XATTR);
-	assert(value == NULL);
+	ASSERT_EQ(-SQSH_ERROR_NO_SUCH_XATTR, rv);
+	ASSERT_EQ(NULL, value);
 
 	free(xattr_keys);
 	sqsh__archive_cleanup(&archive);
 }
 
-DECLARE_TESTS
-TEST(load_easy_xattr)
-END_TESTS
+UTEST_MAIN()

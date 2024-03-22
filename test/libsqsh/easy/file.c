@@ -33,15 +33,14 @@
  */
 
 #include "../common.h"
-#include <testlib.h>
+#include <utest.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
 #include <sqsh_easy.h>
 #include <sqsh_tree_private.h>
 
-static void
-test_file_get_content_through_symlink(void) {
+UTEST(ease_file, test_file_get_content_through_symlink) {
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
 			/* clang-format off */
@@ -71,15 +70,14 @@ test_file_get_content_through_symlink(void) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint8_t *content = sqsh_easy_file_content(&archive, "/src", NULL);
-	assert(content != NULL);
-	assert(strcmp((char *)content, "12345678") == 0);
+	ASSERT_NE(NULL, content);
+	ASSERT_EQ(0, strcmp((char *)content, "12345678"));
 	free(content);
 
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-test_file_exists_through_dead_symlink(void) {
+UTEST(ease_file, test_file_exists_through_dead_symlink) {
 	int rv = 0;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -104,14 +102,13 @@ test_file_exists_through_dead_symlink(void) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	bool exists = sqsh_easy_file_exists(&archive, "/src", &rv);
-	assert(exists == false);
-	assert(rv == 0);
+	ASSERT_EQ(false, exists);
+	ASSERT_EQ(0, rv);
 
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-test_file_exists_through_symlink(void) {
+UTEST(ease_file, test_file_exists_through_symlink) {
 	struct SqshArchive archive = {0};
 	int rv = 0;
 	uint8_t payload[] = {
@@ -143,17 +140,16 @@ test_file_exists_through_symlink(void) {
 
 	bool exists = sqsh_easy_file_exists(&archive, "/src", &rv);
 	assert(exists);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	exists = sqsh_easy_file_exists(&archive, "/file_not_found", &rv);
-	assert(rv == 0);
-	assert(exists == false);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(false, exists);
 
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-test_file_size(void) {
+UTEST(ease_file, test_file_size) {
 	struct SqshArchive archive = {0};
 	int rv = 0;
 	uint8_t payload[] = {
@@ -177,18 +173,17 @@ test_file_size(void) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	size_t file_size = sqsh_easy_file_size(&archive, "/file", &rv);
-	assert(rv == 0);
-	assert(file_size == 424242);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ((size_t)424242, file_size);
 
 	file_size = sqsh_easy_file_size(&archive, "/file_not_found", &rv);
-	assert(rv == -SQSH_ERROR_NO_SUCH_FILE);
-	assert(file_size == 0);
+	ASSERT_EQ(-SQSH_ERROR_NO_SUCH_FILE, rv);
+	ASSERT_EQ((size_t)0, file_size);
 
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-test_file_permission(void) {
+UTEST(ease_file, test_file_permission) {
 	struct SqshArchive archive = {0};
 	int rv = 0;
 	uint8_t payload[] = {
@@ -212,18 +207,17 @@ test_file_permission(void) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	mode_t permission = sqsh_easy_file_permission(&archive, "/file", &rv);
-	assert(rv == 0);
-	assert(permission == 0666);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ((size_t)0666, permission);
 
 	permission = sqsh_easy_file_permission(&archive, "/file_not_found", &rv);
-	assert(rv == -SQSH_ERROR_NO_SUCH_FILE);
-	assert(permission == 0);
+	ASSERT_EQ(-SQSH_ERROR_NO_SUCH_FILE, rv);
+	ASSERT_EQ((size_t)0, permission);
 
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-test_file_mtime(void) {
+UTEST(ease_file, test_file_mtime) {
 	struct SqshArchive archive = {0};
 	int rv = 0;
 	uint8_t payload[] = {
@@ -247,21 +241,14 @@ test_file_mtime(void) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	time_t mtime = sqsh_easy_file_mtime(&archive, "/file", &rv);
-	assert(rv == 0);
-	assert(mtime == 42424242);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(42424242, mtime);
 
 	mtime = sqsh_easy_file_mtime(&archive, "/file_not_found", &rv);
-	assert(rv == -SQSH_ERROR_NO_SUCH_FILE);
-	assert(mtime == 0);
+	ASSERT_EQ(-SQSH_ERROR_NO_SUCH_FILE, rv);
+	ASSERT_EQ(0, mtime);
 
 	sqsh__archive_cleanup(&archive);
 }
 
-DECLARE_TESTS
-TEST(test_file_get_content_through_symlink)
-TEST(test_file_exists_through_dead_symlink)
-TEST(test_file_exists_through_symlink)
-TEST(test_file_size)
-TEST(test_file_permission)
-TEST(test_file_mtime)
-END_TESTS
+UTEST_MAIN()
