@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include <testlib.h>
+#include <utest.h>
 
 #include <mksqsh_metablock.h>
 #include <sqsh_archive_private.h>
@@ -41,8 +41,7 @@
 #include <sqsh_metablock_private.h>
 #include <stdint.h>
 
-static void
-next_once(void) {
+UTEST(map_iterator, next_once) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
@@ -60,26 +59,25 @@ next_once(void) {
 
 	rv = sqsh__metablock_iterator_init(
 			&iter, &sqsh, sizeof(struct SqshDataSuperblock), sizeof(payload));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh__metablock_iterator_next(&iter, &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	assert(has_next);
 
-	assert(sqsh__metablock_iterator_size(&iter) == 4);
+	ASSERT_EQ((size_t)4, sqsh__metablock_iterator_size(&iter));
 
 	p = sqsh__metablock_iterator_data(&iter);
-	assert(p != NULL);
-	assert(memcmp(p, "abcd", 4) == 0);
+	ASSERT_NE(NULL, p);
+	ASSERT_EQ(0, memcmp(p, "abcd", 4));
 
 	rv = sqsh__metablock_iterator_cleanup(&iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	sqsh__archive_cleanup(&sqsh);
 }
 
-static void
-next_failing_with_overflow(void) {
+UTEST(map_iterator, next_failing_with_overflow) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
@@ -88,20 +86,19 @@ next_failing_with_overflow(void) {
 
 	rv = sqsh__metablock_iterator_init(
 			&iter, &sqsh, sizeof(struct SqshDataSuperblock), sizeof(payload));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh__metablock_iterator_next(&iter, &rv);
-	assert(rv == -SQSH_ERROR_OUT_OF_BOUNDS);
+	ASSERT_EQ(-SQSH_ERROR_OUT_OF_BOUNDS, rv);
 	assert(!has_next);
 
 	rv = sqsh__metablock_iterator_cleanup(&iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	sqsh__archive_cleanup(&sqsh);
 }
 
-static void
-next_failing_with_size_too_big(void) {
+UTEST(map_iterator, next_failing_with_size_too_big) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
@@ -110,20 +107,19 @@ next_failing_with_size_too_big(void) {
 
 	rv = sqsh__metablock_iterator_init(
 			&iter, &sqsh, sizeof(struct SqshDataSuperblock), sizeof(payload));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh__metablock_iterator_next(&iter, &rv);
-	assert(rv == -SQSH_ERROR_SIZE_MISMATCH);
+	ASSERT_EQ(-SQSH_ERROR_SIZE_MISMATCH, rv);
 	assert(!has_next);
 
 	rv = sqsh__metablock_iterator_cleanup(&iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	sqsh__archive_cleanup(&sqsh);
 }
 
-static void
-next_failing_with_no_compression(void) {
+UTEST(map_iterator, next_failing_with_no_compression) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
@@ -134,20 +130,19 @@ next_failing_with_no_compression(void) {
 
 	rv = sqsh__metablock_iterator_init(
 			&iter, &sqsh, sizeof(struct SqshDataSuperblock), sizeof(payload));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh__metablock_iterator_next(&iter, &rv);
-	assert(rv != 0);
+	ASSERT_NE(0, rv);
 	assert(!has_next);
 
 	rv = sqsh__metablock_iterator_cleanup(&iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	sqsh__archive_cleanup(&sqsh);
 }
 
-static void
-next_twice(void) {
+UTEST(map_iterator, next_twice) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
@@ -167,36 +162,35 @@ next_twice(void) {
 
 	rv = sqsh__metablock_iterator_init(
 			&iter, &sqsh, sizeof(struct SqshDataSuperblock), sizeof(payload));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh__metablock_iterator_next(&iter, &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	assert(has_next);
 
-	assert(sqsh__metablock_iterator_size(&iter) == 4);
+	ASSERT_EQ((size_t)4, sqsh__metablock_iterator_size(&iter));
 
 	p = sqsh__metablock_iterator_data(&iter);
-	assert(p != NULL);
-	assert(memcmp(p, "abcd", 4) == 0);
+	ASSERT_NE(NULL, p);
+	ASSERT_EQ(0, memcmp(p, "abcd", 4));
 
 	has_next = sqsh__metablock_iterator_next(&iter, &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	assert(has_next);
 
-	assert(sqsh__metablock_iterator_size(&iter) == 4);
+	ASSERT_EQ((size_t)4, sqsh__metablock_iterator_size(&iter));
 
 	p = sqsh__metablock_iterator_data(&iter);
-	assert(p != NULL);
-	assert(memcmp(p, "efgh", 4) == 0);
+	ASSERT_NE(NULL, p);
+	ASSERT_EQ(0, memcmp(p, "efgh", 4));
 
 	rv = sqsh__metablock_iterator_cleanup(&iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	sqsh__archive_cleanup(&sqsh);
 }
 
-static void
-next_compressed(void) {
+UTEST(map_iterator, next_compressed) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
@@ -211,39 +205,32 @@ next_compressed(void) {
 
 	rv = sqsh__metablock_iterator_init(
 			&iter, &sqsh, sizeof(struct SqshDataSuperblock), sizeof(payload));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh__metablock_iterator_next(&iter, &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	assert(has_next);
 
-	assert(sqsh__metablock_iterator_size(&iter) == 4);
+	ASSERT_EQ((size_t)4, sqsh__metablock_iterator_size(&iter));
 
 	p = sqsh__metablock_iterator_data(&iter);
-	assert(p != NULL);
-	assert(memcmp(p, "abcd", 4) == 0);
+	ASSERT_NE(NULL, p);
+	ASSERT_EQ(0, memcmp(p, "abcd", 4));
 
 	has_next = sqsh__metablock_iterator_next(&iter, &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	assert(has_next);
 
-	assert(sqsh__metablock_iterator_size(&iter) == 4);
+	ASSERT_EQ((size_t)4, sqsh__metablock_iterator_size(&iter));
 
 	p = sqsh__metablock_iterator_data(&iter);
-	assert(p != NULL);
-	assert(memcmp(p, "efgh", 4) == 0);
+	ASSERT_NE(NULL, p);
+	ASSERT_EQ(0, memcmp(p, "efgh", 4));
 
 	rv = sqsh__metablock_iterator_cleanup(&iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	sqsh__archive_cleanup(&sqsh);
 }
 
-DECLARE_TESTS
-TEST(next_once)
-TEST(next_failing_with_no_compression)
-TEST(next_failing_with_size_too_big)
-TEST(next_failing_with_overflow)
-TEST(next_twice)
-TEST(next_compressed)
-END_TESTS
+UTEST_MAIN()

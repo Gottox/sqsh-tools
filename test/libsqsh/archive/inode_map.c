@@ -33,12 +33,11 @@
  */
 
 #include "../common.h"
-#include <testlib.h>
+#include <utest.h>
 
 #include <sqsh_archive_private.h>
 
-static void
-insert_inode_ref(void) {
+UTEST(inode_map, insert_inode_ref) {
 	int rv = 0;
 	uint64_t inode_ref = 0;
 	uint8_t payload[8192] = {
@@ -50,21 +49,20 @@ insert_inode_ref(void) {
 	struct SqshInodeMap map = {0};
 
 	rv = sqsh__inode_map_init(&map, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_inode_map_set(&map, 1, 4242);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	inode_ref = sqsh_inode_map_get2(&map, 1, &rv);
-	assert(rv == 0);
-	assert(inode_ref == 4242);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ((uint64_t)4242, inode_ref);
 
 	sqsh__inode_map_cleanup(&map);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-insert_invalid_inode(void) {
+UTEST(inode_map, insert_invalid_inode) {
 	int rv = 0;
 	uint8_t payload[8192] = {
 			SQSH_HEADER,
@@ -75,20 +73,19 @@ insert_invalid_inode(void) {
 	struct SqshInodeMap map = {0};
 
 	rv = sqsh__inode_map_init(&map, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_inode_map_set(&map, 0, 4242);
-	assert(rv == -SQSH_ERROR_OUT_OF_BOUNDS);
+	ASSERT_EQ(-SQSH_ERROR_OUT_OF_BOUNDS, rv);
 
 	rv = sqsh_inode_map_set(&map, 1000, 4242);
-	assert(rv == -SQSH_ERROR_OUT_OF_BOUNDS);
+	ASSERT_EQ(-SQSH_ERROR_OUT_OF_BOUNDS, rv);
 
 	sqsh__inode_map_cleanup(&map);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-insert_invalid_inode_ref(void) {
+UTEST(inode_map, insert_invalid_inode_ref) {
 	int rv = 0;
 	uint8_t payload[8192] = {
 			SQSH_HEADER,
@@ -99,17 +96,16 @@ insert_invalid_inode_ref(void) {
 	struct SqshInodeMap map = {0};
 
 	rv = sqsh__inode_map_init(&map, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_inode_map_set(&map, 1, UINT64_MAX);
-	assert(rv == -SQSH_ERROR_INVALID_ARGUMENT);
+	ASSERT_EQ(-SQSH_ERROR_INVALID_ARGUMENT, rv);
 
 	sqsh__inode_map_cleanup(&map);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-get_invalid_inode(void) {
+UTEST(inode_map, get_invalid_inode) {
 	int rv = 0;
 	uint64_t inode_ref = 4242;
 	uint8_t payload[8192] = {
@@ -121,22 +117,21 @@ get_invalid_inode(void) {
 	struct SqshInodeMap map = {0};
 
 	rv = sqsh__inode_map_init(&map, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	inode_ref = sqsh_inode_map_get2(&map, 424242, &rv);
-	assert(rv == -SQSH_ERROR_OUT_OF_BOUNDS);
-	assert(inode_ref == 0);
+	ASSERT_EQ(-SQSH_ERROR_OUT_OF_BOUNDS, rv);
+	ASSERT_EQ((uint64_t)0, inode_ref);
 
 	inode_ref = sqsh_inode_map_get2(&map, 0, &rv);
-	assert(rv == -SQSH_ERROR_OUT_OF_BOUNDS);
-	assert(inode_ref == 0);
+	ASSERT_EQ(-SQSH_ERROR_OUT_OF_BOUNDS, rv);
+	ASSERT_EQ((uint64_t)0, inode_ref);
 
 	sqsh__inode_map_cleanup(&map);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-get_unknown_inode_ref(void) {
+UTEST(inode_map, get_unknown_inode_ref) {
 	int rv = 0;
 	uint64_t inode_ref = 4242;
 	uint8_t payload[8192] = {
@@ -148,18 +143,17 @@ get_unknown_inode_ref(void) {
 	struct SqshInodeMap map = {0};
 
 	rv = sqsh__inode_map_init(&map, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	inode_ref = sqsh_inode_map_get2(&map, 1, &rv);
-	assert(rv == -SQSH_ERROR_NO_SUCH_ELEMENT);
-	assert(inode_ref == 0);
+	ASSERT_EQ(-SQSH_ERROR_NO_SUCH_ELEMENT, rv);
+	ASSERT_EQ((uint64_t)0, inode_ref);
 
 	sqsh__inode_map_cleanup(&map);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-insert_inconsistent_mapping(void) {
+UTEST(inode_map, insert_inconsistent_mapping) {
 	int rv = 0;
 	uint8_t payload[8192] = {
 			SQSH_HEADER,
@@ -170,26 +164,19 @@ insert_inconsistent_mapping(void) {
 	struct SqshInodeMap map = {0};
 
 	rv = sqsh__inode_map_init(&map, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_inode_map_set(&map, 1, 4242);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_inode_map_set(&map, 1, 4242);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_inode_map_set(&map, 1, 2424);
-	assert(rv == -SQSH_ERROR_INODE_MAP_IS_INCONSISTENT);
+	ASSERT_EQ(-SQSH_ERROR_INODE_MAP_IS_INCONSISTENT, rv);
 
 	sqsh__inode_map_cleanup(&map);
 	sqsh__archive_cleanup(&archive);
 }
 
-DECLARE_TESTS
-TEST(insert_inode_ref)
-TEST(insert_invalid_inode)
-TEST(insert_invalid_inode_ref)
-TEST(get_invalid_inode)
-TEST(get_unknown_inode_ref)
-TEST(insert_inconsistent_mapping)
-END_TESTS
+UTEST_MAIN()

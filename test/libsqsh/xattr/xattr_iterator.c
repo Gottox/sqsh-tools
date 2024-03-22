@@ -33,15 +33,14 @@
  */
 
 #include "../common.h"
-#include <testlib.h>
+#include <utest.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
 #include <sqsh_file_private.h>
 #include <sqsh_xattr.h>
 
-static void
-load_xattr(void) {
+UTEST(xattr_iterator, load_xattr) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -80,68 +79,67 @@ load_xattr(void) {
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
 	rv = sqsh__file_init(&file, &archive, inode_ref);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_DIRECTORY);
-	assert(sqsh_file_is_extended(&file) == true);
+	ASSERT_EQ(SQSH_FILE_TYPE_DIRECTORY, sqsh_file_type(&file));
+	ASSERT_EQ(true, sqsh_file_is_extended(&file));
 
 	struct SqshXattrIterator *iterator = sqsh_xattr_iterator_new(&file, &rv);
-	assert(rv == 0);
-	assert(iterator != NULL);
+	ASSERT_EQ(0, rv);
+	ASSERT_NE(NULL, iterator);
 
 	bool has_next = sqsh_xattr_iterator_next(iterator, &rv);
-	assert(rv == 0);
-	assert(has_next == true);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(true, has_next);
 	size_t size = sqsh_xattr_iterator_name_size(iterator);
-	assert(size == 3);
+	ASSERT_EQ((size_t)3, size);
 	const char *name = sqsh_xattr_iterator_name(iterator);
-	assert(memcmp(name, "abc", size) == 0);
+	ASSERT_EQ(0, memcmp(name, "abc", size));
 	size = sqsh_xattr_iterator_value_size(iterator);
-	assert(size == 4);
+	ASSERT_EQ((size_t)4, size);
 	const char *value = sqsh_xattr_iterator_value(iterator);
-	assert(memcmp(value, "defg", size) == 0);
+	ASSERT_EQ(0, memcmp(value, "defg", size));
 	const char *prefix = sqsh_xattr_iterator_prefix(iterator);
-	assert(strcmp(prefix, "user.") == 0);
+	ASSERT_EQ(0, strcmp(prefix, "user."));
 
 	has_next = sqsh_xattr_iterator_next(iterator, &rv);
-	assert(rv == 0);
-	assert(has_next == true);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(true, has_next);
 	size = sqsh_xattr_iterator_name_size(iterator);
-	assert(size == 3);
+	ASSERT_EQ((size_t)3, size);
 	name = sqsh_xattr_iterator_name(iterator);
-	assert(memcmp(name, "hij", size) == 0);
+	ASSERT_EQ(0, memcmp(name, "hij", size));
 	size = sqsh_xattr_iterator_value_size(iterator);
-	assert(size == 3);
+	ASSERT_EQ((size_t)3, size);
 	value = sqsh_xattr_iterator_value(iterator);
-	assert(memcmp(value, "klm", size) == 0);
+	ASSERT_EQ(0, memcmp(value, "klm", size));
 	prefix = sqsh_xattr_iterator_prefix(iterator);
-	assert(strcmp(prefix, "trusted.") == 0);
+	ASSERT_EQ(0, strcmp(prefix, "trusted."));
 
 	has_next = sqsh_xattr_iterator_next(iterator, &rv);
-	assert(rv == 0);
-	assert(has_next == true);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(true, has_next);
 	size = sqsh_xattr_iterator_name_size(iterator);
-	assert(size == 3);
+	ASSERT_EQ((size_t)3, size);
 	name = sqsh_xattr_iterator_name(iterator);
-	assert(memcmp(name, "nop", size) == 0);
+	ASSERT_EQ(0, memcmp(name, "nop", size));
 	size = sqsh_xattr_iterator_value_size(iterator);
-	assert(size == 3);
+	ASSERT_EQ((size_t)3, size);
 	value = sqsh_xattr_iterator_value(iterator);
-	assert(memcmp(value, "qrs", size) == 0);
+	ASSERT_EQ(0, memcmp(value, "qrs", size));
 	prefix = sqsh_xattr_iterator_prefix(iterator);
-	assert(strcmp(prefix, "security.") == 0);
+	ASSERT_EQ(0, strcmp(prefix, "security."));
 
 	has_next = sqsh_xattr_iterator_next(iterator, &rv);
-	assert(rv == 0);
-	assert(has_next == false);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(false, has_next);
 
 	sqsh_xattr_iterator_free(iterator);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-load_xattr_indirect(void) {
+UTEST(xattr_iterator, load_xattr_indirect) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -175,37 +173,34 @@ load_xattr_indirect(void) {
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
 	rv = sqsh__file_init(&file, &archive, inode_ref);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_DIRECTORY);
-	assert(sqsh_file_is_extended(&file) == true);
+	ASSERT_EQ(SQSH_FILE_TYPE_DIRECTORY, sqsh_file_type(&file));
+	ASSERT_EQ(true, sqsh_file_is_extended(&file));
 
 	struct SqshXattrIterator *iterator = sqsh_xattr_iterator_new(&file, &rv);
-	assert(rv == 0);
-	assert(iterator != NULL);
+	ASSERT_EQ(0, rv);
+	ASSERT_NE(NULL, iterator);
 
 	bool has_next = sqsh_xattr_iterator_next(iterator, &rv);
-	assert(rv == 0);
-	assert(has_next == true);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(true, has_next);
 	size_t size = sqsh_xattr_iterator_name_size(iterator);
-	assert(size == 3);
+	ASSERT_EQ((size_t)3, size);
 	const char *name = sqsh_xattr_iterator_name(iterator);
-	assert(memcmp(name, "abc", size) == 0);
+	ASSERT_EQ(0, memcmp(name, "abc", size));
 	size = sqsh_xattr_iterator_value_size(iterator);
-	assert(size == 3);
+	ASSERT_EQ((size_t)3, size);
 	const char *value = sqsh_xattr_iterator_value(iterator);
-	assert(memcmp(value, "123", size) == 0);
+	ASSERT_EQ(0, memcmp(value, "123", size));
 
 	has_next = sqsh_xattr_iterator_next(iterator, &rv);
-	assert(rv == 0);
-	assert(has_next == false);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(false, has_next);
 
 	sqsh_xattr_iterator_free(iterator);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-DECLARE_TESTS
-TEST(load_xattr)
-TEST(load_xattr_indirect)
-END_TESTS
+UTEST_MAIN()

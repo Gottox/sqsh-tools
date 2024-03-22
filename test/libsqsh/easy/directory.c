@@ -33,14 +33,13 @@
  */
 
 #include "../common.h"
-#include <testlib.h>
+#include <utest.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
 #include <sqsh_easy.h>
 
-static void
-list_two_files(void) {
+UTEST(ease_directory, list_two_files) {
 	int rv = 0;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -69,19 +68,18 @@ list_two_files(void) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	char **dir_list = sqsh_easy_directory_list(&archive, "/", &rv);
-	assert(rv == 0);
-	assert(dir_list != NULL);
+	ASSERT_EQ(0, rv);
+	ASSERT_NE(NULL, dir_list);
 
-	assert(strcmp(dir_list[0], "1") == 0);
-	assert(strcmp(dir_list[1], "2") == 0);
-	assert(dir_list[2] == NULL);
+	ASSERT_EQ(0, strcmp(dir_list[0], "1"));
+	ASSERT_EQ(0, strcmp(dir_list[1], "2"));
+	ASSERT_EQ(NULL, dir_list[2]);
 
 	free(dir_list);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-list_two_paths(void) {
+UTEST(ease_directory, list_two_paths) {
 	int rv = 0;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -110,18 +108,15 @@ list_two_paths(void) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	char **dir_list = sqsh_easy_directory_list_path(&archive, "/", &rv);
-	assert(rv == 0);
-	assert(dir_list != NULL);
+	ASSERT_EQ(0, rv);
+	ASSERT_NE(NULL, dir_list);
 
-	assert(strcmp(dir_list[0], "/1") == 0);
-	assert(strcmp(dir_list[1], "/2") == 0);
-	assert(dir_list[2] == NULL);
+	ASSERT_EQ(0, strcmp(dir_list[0], "/1"));
+	ASSERT_EQ(0, strcmp(dir_list[1], "/2"));
+	ASSERT_EQ(NULL, dir_list[2]);
 
 	free(dir_list);
 	sqsh__archive_cleanup(&archive);
 }
 
-DECLARE_TESTS
-TEST(list_two_files)
-TEST(list_two_paths)
-END_TESTS
+UTEST_MAIN()

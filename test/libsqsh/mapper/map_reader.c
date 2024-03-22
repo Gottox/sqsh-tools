@@ -33,14 +33,13 @@
  */
 
 #include "../common.h"
-#include <testlib.h>
+#include <utest.h>
 
 #include <sqsh_mapper_private.h>
 #include <stdint.h>
 #include <string.h>
 
-static void
-init_cursor(void) {
+UTEST(map_reader, init_cursor) {
 	int rv;
 	struct SqshMapManager map_manager = {0};
 	struct SqshMapReader cursor = {0};
@@ -50,17 +49,16 @@ init_cursor(void) {
 			&(struct SqshConfig){
 					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = sizeof(buffer) - 1});
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_init(&cursor, &map_manager, 0, sizeof(buffer) - 1);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	sqsh__map_reader_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&map_manager);
 }
 
-static void
-advance_once(void) {
+UTEST(map_reader, advance_once) {
 	int rv;
 	struct SqshMapManager mapper = {0};
 	struct SqshMapReader cursor = {0};
@@ -70,23 +68,22 @@ advance_once(void) {
 			&(struct SqshConfig){
 					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = sizeof(buffer) - 1});
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_init(&cursor, &mapper, 0, sizeof(buffer) - 1);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_advance(&cursor, 0, 6);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__map_reader_data(&cursor);
-	assert(data == buffer);
+	ASSERT_EQ(buffer, data);
 
 	sqsh__map_reader_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);
 }
 
-static void
-advance_once_with_offset(void) {
+UTEST(map_reader, advance_once_with_offset) {
 	int rv;
 	struct SqshMapManager mapper = {0};
 	struct SqshMapReader cursor = {0};
@@ -96,23 +93,22 @@ advance_once_with_offset(void) {
 			&(struct SqshConfig){
 					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = sizeof(buffer) - 1});
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_init(&cursor, &mapper, 0, sizeof(buffer) - 1);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_advance(&cursor, 4, 6);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__map_reader_data(&cursor);
-	assert(data == &buffer[4]);
+	ASSERT_EQ(&buffer[4], data);
 
 	sqsh__map_reader_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);
 }
 
-static void
-advance_twice_with_offset(void) {
+UTEST(map_reader, advance_twice_with_offset) {
 	int rv;
 	struct SqshMapManager mapper = {0};
 	struct SqshMapReader cursor = {0};
@@ -122,29 +118,28 @@ advance_twice_with_offset(void) {
 			&(struct SqshConfig){
 					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = sizeof(buffer) - 1});
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_init(&cursor, &mapper, 0, sizeof(buffer) - 1);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_advance(&cursor, 4, 6);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__map_reader_data(&cursor);
-	assert(data == &buffer[4]);
+	ASSERT_EQ(&buffer[4], data);
 
 	rv = sqsh__map_reader_advance(&cursor, 6, 2);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data2 = sqsh__map_reader_data(&cursor);
-	assert(data2 == &buffer[10]);
+	ASSERT_EQ(&buffer[10], data2);
 
 	sqsh__map_reader_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);
 }
 
-static void
-initial_advance(void) {
+UTEST(map_reader, initial_advance) {
 	int rv;
 	struct SqshMapManager mapper = {0};
 	struct SqshMapReader cursor = {0};
@@ -155,24 +150,23 @@ initial_advance(void) {
 					.mapper_block_size = 4,
 					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = sizeof(buffer) - 1});
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_init(&cursor, &mapper, 5, sizeof(buffer) - 1);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_advance(&cursor, 0, 3);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	const uint8_t *data = sqsh__map_reader_data(&cursor);
-	assert(3 == sqsh__map_reader_size(&cursor));
-	assert(memcmp(data, "IS ", 3) == 0);
-	// assert(data == &buffer[5]);
+	ASSERT_EQ((size_t)3, sqsh__map_reader_size(&cursor));
+	ASSERT_EQ(0, memcmp(data, "IS ", 3));
+	// ASSERT_EQ(&buffer[5], data);
 
 	sqsh__map_reader_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);
 }
 
-static void
-advance_to_out_of_bounds(void) {
+UTEST(map_reader, advance_to_out_of_bounds) {
 	int rv;
 	struct SqshMapManager mapper = {0};
 	struct SqshMapReader cursor = {0};
@@ -182,20 +176,19 @@ advance_to_out_of_bounds(void) {
 			&(struct SqshConfig){
 					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = sizeof(buffer) - 1});
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_init(&cursor, &mapper, 0, sizeof(buffer) - 1);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_advance(&cursor, sizeof(buffer) - 1, 1);
-	assert(rv != 0);
+	ASSERT_NE(0, rv);
 
 	sqsh__map_reader_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);
 }
 
-static void
-initial_advance_2(void) {
+UTEST(map_reader, initial_advance_2) {
 	int rv;
 	struct SqshMapManager mapper = {0};
 	struct SqshMapReader cursor = {0};
@@ -210,24 +203,23 @@ initial_advance_2(void) {
 					.mapper_block_size = 2,
 					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = sizeof(buffer) - 1});
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_init(&cursor, &mapper, 96, sizeof(buffer) - 1);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_advance(&cursor, 4, 4);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__map_reader_data(&cursor);
-	assert(sqsh__map_reader_size(&cursor) == 4);
-	assert(memcmp(data, "1234", 2) == 0);
+	ASSERT_EQ((size_t)4, sqsh__map_reader_size(&cursor));
+	ASSERT_EQ(0, memcmp(data, "1234", 2));
 
 	sqsh__map_reader_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);
 }
 
-static void
-error_1(void) {
+UTEST(map_reader, error_1) {
 	int rv;
 	struct SqshMapManager mapper = {0};
 	struct SqshMapReader cursor = {0};
@@ -242,31 +234,30 @@ error_1(void) {
 					.mapper_block_size = 2,
 					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = sizeof(buffer) - 1});
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_init(&cursor, &mapper, 96, sizeof(buffer) - 1);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_advance(&cursor, 0, 4);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__map_reader_data(&cursor);
-	assert(sqsh__map_reader_size(&cursor) == 4);
-	assert(memcmp(data, "ABCD", 4) == 0);
+	ASSERT_EQ((size_t)4, sqsh__map_reader_size(&cursor));
+	ASSERT_EQ(0, memcmp(data, "ABCD", 4));
 
 	rv = sqsh__map_reader_advance(&cursor, 4, 4);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	data = sqsh__map_reader_data(&cursor);
-	assert(sqsh__map_reader_size(&cursor) == 4);
-	assert(memcmp(data, "1234", 4) == 0);
+	ASSERT_EQ((size_t)4, sqsh__map_reader_size(&cursor));
+	ASSERT_EQ(0, memcmp(data, "1234", 4));
 
 	sqsh__map_reader_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);
 }
 
-static void
-error_2(void) {
+UTEST(map_reader, error_2) {
 	int rv;
 	struct SqshMapManager mapper = {0};
 	struct SqshMapReader cursor = {0};
@@ -281,28 +272,18 @@ error_2(void) {
 					.mapper_block_size = 2,
 					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = sizeof(buffer) - 1});
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_init(&cursor, &mapper, 96, sizeof(buffer) - 1);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	for (int i = 0; i < 64; i++) {
 		rv = sqsh__map_reader_advance(&cursor, 1, 2);
-		assert(rv == 0);
+		ASSERT_EQ(0, rv);
 	}
 
 	sqsh__map_reader_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);
 }
 
-DECLARE_TESTS
-TEST(init_cursor)
-TEST(advance_once)
-TEST(advance_once_with_offset)
-TEST(advance_twice_with_offset)
-TEST(initial_advance)
-TEST(advance_to_out_of_bounds)
-TEST(initial_advance_2)
-TEST(error_1)
-TEST(error_2)
-END_TESTS
+UTEST_MAIN()

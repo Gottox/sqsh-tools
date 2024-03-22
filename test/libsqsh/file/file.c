@@ -33,15 +33,14 @@
  */
 
 #include "../common.h"
-#include <testlib.h>
+#include <utest.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
 #include <sqsh_data_private.h>
 #include <sqsh_file_private.h>
 
-static void
-load_file(void) {
+UTEST(file, load_file) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -61,21 +60,19 @@ load_file(void) {
 
 	uint64_t inode_ref = sqsh_address_ref_create(15, 3);
 	rv = sqsh__file_init(&file, &archive, inode_ref);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh_file_type(&file) == SQSH_FILE_TYPE_FILE);
-	assert(sqsh_file_permission(&file) == 0666);
-	assert(sqsh_file_modified_time(&file) == 4242);
-	assert(sqsh_file_blocks_start(&file) == 1024);
-	assert(sqsh_file_has_fragment(&file) == false);
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(0666, sqsh_file_permission(&file));
+	ASSERT_EQ((uint32_t)4242, sqsh_file_modified_time(&file));
+	ASSERT_EQ((uint32_t)1024, sqsh_file_blocks_start(&file));
+	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
-	assert(sqsh_file_block_count(&file) == 1);
-	assert(sqsh_file_block_size(&file, 0) == 42);
+	ASSERT_EQ((uint32_t)1, sqsh_file_block_count(&file));
+	ASSERT_EQ((uint32_t)42, sqsh_file_block_size(&file, 0));
 
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-DECLARE_TESTS
-TEST(load_file)
-END_TESTS
+UTEST_MAIN()

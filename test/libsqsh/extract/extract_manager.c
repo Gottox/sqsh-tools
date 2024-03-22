@@ -33,15 +33,14 @@
  */
 
 #include "../common.h"
-#include <testlib.h>
+#include <utest.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_data_private.h>
 #include <sqsh_extract_private.h>
 #include <sqsh_mapper_private.h>
 
-static void
-decompress(void) {
+UTEST(directory_iterator, decompress) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshExtractManager manager = {0};
@@ -55,19 +54,19 @@ decompress(void) {
 	rv = sqsh__map_reader_init(
 			&reader, map_manager, sizeof(struct SqshDataSuperblock),
 			sizeof(payload));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_advance(&reader, 0, CHUNK_SIZE(ZLIB_ABCD));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__extract_manager_init(&manager, &archive, 8192, 10);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__extract_manager_uncompress(&manager, &reader, &buffer);
-	assert(rv == 0);
-	assert(buffer != NULL);
-	assert(cx_buffer_size(buffer) == 4);
-	assert(memcmp(cx_buffer_data(buffer), "abcd", 4) == 0);
+	ASSERT_EQ(0, rv);
+	ASSERT_NE(NULL, buffer);
+	ASSERT_EQ((size_t)4, cx_buffer_size(buffer));
+	ASSERT_EQ(0, memcmp(cx_buffer_data(buffer), "abcd", 4));
 
 	sqsh__map_reader_cleanup(&reader);
 	sqsh__extract_manager_release(&manager, buffer);
@@ -75,8 +74,7 @@ decompress(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-decompress_and_cached(void) {
+UTEST(directory_iterator, decompress_and_cached) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshExtractManager manager = {0};
@@ -91,23 +89,23 @@ decompress_and_cached(void) {
 	rv = sqsh__map_reader_init(
 			&reader, map_manager, sizeof(struct SqshDataSuperblock),
 			sizeof(payload));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_advance(&reader, 0, CHUNK_SIZE(ZLIB_ABCD));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__extract_manager_init(&manager, &archive, 8192, 10);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__extract_manager_uncompress(&manager, &reader, &buffer);
-	assert(rv == 0);
-	assert(buffer != NULL);
-	assert(cx_buffer_size(buffer) == 4);
-	assert(memcmp(cx_buffer_data(buffer), "abcd", 4) == 0);
+	ASSERT_EQ(0, rv);
+	ASSERT_NE(NULL, buffer);
+	ASSERT_EQ((size_t)4, cx_buffer_size(buffer));
+	ASSERT_EQ(0, memcmp(cx_buffer_data(buffer), "abcd", 4));
 
 	rv = sqsh__extract_manager_uncompress(&manager, &reader, &cached_buffer);
-	assert(rv == 0);
-	assert(buffer == cached_buffer);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(cached_buffer, buffer);
 
 	sqsh__map_reader_cleanup(&reader);
 	sqsh__extract_manager_release(&manager, buffer);
@@ -116,7 +114,4 @@ decompress_and_cached(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
-DECLARE_TESTS
-TEST(decompress)
-TEST(decompress_and_cached)
-END_TESTS
+UTEST_MAIN()

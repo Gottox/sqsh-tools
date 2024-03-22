@@ -39,7 +39,7 @@
 #include <sqsh_file_private.h>
 #include <sqsh_tree.h>
 #include <sqsh_tree_private.h>
-#include <testlib.h>
+#include <utest.h>
 
 extern uint8_t squashfs_image[];
 extern size_t squashfs_image_size;
@@ -47,17 +47,15 @@ extern size_t squashfs_image_size;
 #define TEST_SQUASHFS_IMAGE_LEN squashfs_image_size
 #define TEST_SQUASHFS_IMAGE squashfs_image
 
-static void
-sqsh_empty(void) {
+UTEST(integration, sqsh_empty) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshConfig config = DEFAULT_CONFIG(0);
 	rv = sqsh__archive_init(&sqsh, NULL, &config);
-	assert(rv == -SQSH_ERROR_SUPERBLOCK_TOO_SMALL);
+	ASSERT_EQ(-SQSH_ERROR_SUPERBLOCK_TOO_SMALL, rv);
 }
 
-static void
-sqsh_get_nonexistant(void) {
+UTEST(integration, sqsh_get_nonexistant) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshPathResolver resolver = {0};
@@ -65,23 +63,22 @@ sqsh_get_nonexistant(void) {
 	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
 	config.archive_offset = 1010;
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_resolve(&resolver, "/nonexistant", false);
-	assert(rv < 0);
+	ASSERT_GT(0, rv);
 
 	rv = sqsh__path_resolver_cleanup(&resolver);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__archive_cleanup(&sqsh);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 }
 
-static void
-path_resolver(void) {
+UTEST(integration, path_resolver) {
 	int rv;
 	struct SqshPathResolver resolver = {0};
 	struct SqshArchive sqsh = {0};
@@ -89,33 +86,32 @@ path_resolver(void) {
 	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
 	config.archive_offset = 1010;
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_resolve(&resolver, "/large_dir", false);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_resolve(&resolver, "999", false);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	file = sqsh_path_resolver_open_file(&resolver, &rv);
-	assert(file != NULL);
-	assert(rv == 0);
+	ASSERT_NE(NULL, file);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_close(file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__path_resolver_cleanup(&resolver);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__archive_cleanup(&sqsh);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 }
 
-static void
-sqsh_ls(void) {
+UTEST(integration, sqsh_ls) {
 	int rv;
 	char *name;
 	struct SqshFile file = {0};
@@ -125,76 +121,74 @@ sqsh_ls(void) {
 	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
 	config.archive_offset = 1010;
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	superblock = sqsh_archive_superblock(&sqsh);
 	rv = sqsh__file_init(
 			&file, &sqsh, sqsh_superblock_inode_root_ref(superblock));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	iter = sqsh_directory_iterator_new(&file, &rv);
-	assert(iter != NULL);
-	assert(rv == 0);
+	ASSERT_NE(NULL, iter);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_directory_iterator_next(iter, &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	assert(has_next);
 	name = sqsh_directory_iterator_name_dup(iter);
-	assert(name != NULL);
-	assert(strcmp("a", name) == 0);
+	ASSERT_NE(NULL, name);
+	ASSERT_EQ(0, strcmp("a", name));
 	free(name);
 
 	has_next = sqsh_directory_iterator_next(iter, &rv);
 	assert(rv >= 0);
-	assert(has_next == true);
+	ASSERT_EQ(true, has_next);
 	name = sqsh_directory_iterator_name_dup(iter);
-	assert(name != NULL);
-	assert(strcmp("b", name) == 0);
+	ASSERT_NE(NULL, name);
+	ASSERT_EQ(0, strcmp("b", name));
 	free(name);
 
 	has_next = sqsh_directory_iterator_next(iter, &rv);
-	assert(rv == 0);
-	assert(has_next == true);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(true, has_next);
 	name = sqsh_directory_iterator_name_dup(iter);
-	assert(name != NULL);
-	assert(strcmp("large_dir", name) == 0);
+	ASSERT_NE(NULL, name);
+	ASSERT_EQ(0, strcmp("large_dir", name));
 	free(name);
 
 	has_next = sqsh_directory_iterator_next(iter, &rv);
 	// End of file list
-	assert(rv == 0);
-	assert(has_next == false);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(false, has_next);
 
 	rv = sqsh_directory_iterator_free(iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__file_cleanup(&file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__archive_cleanup(&sqsh);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 }
 
-static void
-sqsh_read_content(void) {
+UTEST(integration, sqsh_read_content) {
 	int rv;
 	char *data;
 	struct SqshArchive archive = {0};
 	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
 	config.archive_offset = 1010;
 	rv = sqsh__archive_init(&archive, (char *)TEST_SQUASHFS_IMAGE, &config);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	data = (char *)sqsh_easy_file_content(&archive, "/a", NULL);
-	assert(strcmp(data, "a\n") == 0);
+	ASSERT_EQ(0, strcmp(data, "a\n"));
 	free(data);
 
 	rv = sqsh__archive_cleanup(&archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 }
 
-static void
-sqsh_cat_fragment(void) {
+UTEST(integration, sqsh_cat_fragment) {
 	int rv;
 	const uint8_t *data;
 	size_t size;
@@ -205,45 +199,44 @@ sqsh_cat_fragment(void) {
 	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
 	config.archive_offset = 1010;
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_resolve(&resolver, "a", false);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	file = sqsh_path_resolver_open_file(&resolver, &rv);
-	assert(file != NULL);
-	assert(rv == 0);
+	ASSERT_NE(NULL, file);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__file_reader_init(&reader, file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	size = sqsh_file_size(file);
-	assert(size == 2);
+	ASSERT_EQ((size_t)2, size);
 
 	rv = sqsh_file_reader_advance(&reader, 0, size);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	data = sqsh_file_reader_data(&reader);
-	assert(memcmp(data, "a\n", size) == 0);
+	ASSERT_EQ(0, memcmp(data, "a\n", size));
 
 	rv = sqsh__file_reader_cleanup(&reader);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_close(file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__path_resolver_cleanup(&resolver);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__archive_cleanup(&sqsh);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 }
 
-static void
-sqsh_cat_datablock_and_fragment(void) {
+UTEST(integration, sqsh_cat_datablock_and_fragment) {
 	int rv;
 	const uint8_t *data;
 	size_t size;
@@ -257,48 +250,47 @@ sqsh_cat_datablock_and_fragment(void) {
 			.archive_offset = 1010,
 	};
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_resolve(&resolver, "b", false);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	file = sqsh_path_resolver_open_file(&resolver, &rv);
-	assert(file != NULL);
-	assert(rv == 0);
+	ASSERT_NE(NULL, file);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__file_reader_init(&reader, file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	size = sqsh_file_size(file);
-	assert(size == 1050000);
+	ASSERT_EQ((size_t)1050000, size);
 
 	rv = sqsh_file_reader_advance(&reader, 0, size);
-	assert(rv == 0);
-	assert(size == sqsh_file_reader_size(&reader));
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(sqsh_file_reader_size(&reader), size);
 
 	data = sqsh_file_reader_data(&reader);
 	for (sqsh_index_t i = 0; i < size; i++) {
-		assert(data[i] == 'b');
+		ASSERT_EQ('b', data[i]);
 	}
 
 	rv = sqsh__file_reader_cleanup(&reader);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_close(file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__path_resolver_cleanup(&resolver);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__archive_cleanup(&sqsh);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 }
 
-static void
-sqsh_cat_size_overflow(void) {
+UTEST(integration, sqsh_cat_size_overflow) {
 	int rv;
 	size_t size;
 	struct SqshFile *file = NULL;
@@ -311,41 +303,40 @@ sqsh_cat_size_overflow(void) {
 			.archive_offset = 1010,
 	};
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_resolve(&resolver, "b", false);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	file = sqsh_path_resolver_open_file(&resolver, &rv);
-	assert(file != NULL);
-	assert(rv == 0);
+	ASSERT_NE(NULL, file);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__file_reader_init(&reader, file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	size = sqsh_file_size(file);
-	assert(size == 1050000);
+	ASSERT_EQ((size_t)1050000, size);
 
 	rv = sqsh_file_reader_advance(&reader, 0, size + 4096);
-	assert(rv == -SQSH_ERROR_OUT_OF_BOUNDS);
+	ASSERT_EQ(-SQSH_ERROR_OUT_OF_BOUNDS, rv);
 
 	rv = sqsh__file_reader_cleanup(&reader);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_close(file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__path_resolver_cleanup(&resolver);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__archive_cleanup(&sqsh);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 }
 
-static void
-sqsh_test_uid_and_gid(void) {
+UTEST(integration, sqsh_test_uid_and_gid) {
 	int rv;
 	uint32_t uid, gid;
 	struct SqshFile file = {0};
@@ -357,27 +348,26 @@ sqsh_test_uid_and_gid(void) {
 			.archive_offset = 1010,
 	};
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	superblock = sqsh_archive_superblock(&sqsh);
 	rv = sqsh__file_init(
 			&file, &sqsh, sqsh_superblock_inode_root_ref(superblock));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	uid = sqsh_file_uid(&file);
-	assert(uid == 2020);
+	ASSERT_EQ((uint32_t)2020, uid);
 	gid = sqsh_file_gid(&file);
-	assert(gid == 202020);
+	ASSERT_EQ((uint32_t)202020, gid);
 
 	rv = sqsh__file_cleanup(&file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__archive_cleanup(&sqsh);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 }
 
-static void
-sqsh_test_extended_dir(void) {
+UTEST(integration, sqsh_test_extended_dir) {
 	int rv;
 	struct SqshFile *file = NULL;
 	struct SqshArchive sqsh = {0};
@@ -388,29 +378,29 @@ sqsh_test_extended_dir(void) {
 			.archive_offset = 1010,
 	};
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_resolve(&resolver, "/large_dir/999", false);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	file = sqsh_path_resolver_open_file(&resolver, &rv);
-	assert(file != NULL);
+	ASSERT_NE(NULL, file);
 
 	rv = sqsh_close(file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__path_resolver_cleanup(&resolver);
 
 	rv = sqsh__archive_cleanup(&sqsh);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 }
 
 #if 0
-static void
-sqsh_test_xattr(void) {
+
+UTEST(integration, sqsh_test_xattr) {
 	const char *expected_value = "1234567891234567891234567890001234567890";
 	int rv;
 	char *name, *value;
@@ -426,91 +416,91 @@ sqsh_test_xattr(void) {
 			.archive_offset = 1010,
 	};
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	superblock = sqsh_archive_superblock(&sqsh);
 	file = sqsh_file_new(
 			&sqsh, sqsh_superblock_inode_root_ref(superblock), &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	xattr_iter = sqsh_xattr_iterator_new(file, &rv);
-	assert(xattr_iter != NULL);
-	assert(rv == 0);
+	ASSERT_NE(NULL, xattr_iter);
+	ASSERT_EQ(0, rv);
 	rv = sqsh_xattr_iterator_next(xattr_iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	rv = sqsh_xattr_iterator_free(xattr_iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	dir_iter = sqsh_directory_iterator_new(file, &rv);
-	assert(dir_iter != NULL);
-	assert(rv == 0);
+	ASSERT_NE(NULL, dir_iter);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_directory_iterator_next(dir_iter);
 	assert(rv > 0);
 	name = sqsh_directory_iterator_name_dup(dir_iter);
-	assert(name != NULL);
-	assert(strcmp("a", name) == 0);
+	ASSERT_NE(NULL, name);
+	ASSERT_EQ(0, strcmp("a", name));
 	free(name);
 	entry_file = sqsh_directory_iterator_open_file(dir_iter, &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	xattr_iter = sqsh_xattr_iterator_new(entry_file, &rv);
-	assert(xattr_iter != NULL);
-	assert(rv == 0);
+	ASSERT_NE(NULL, xattr_iter);
+	ASSERT_EQ(0, rv);
 	rv = sqsh_xattr_iterator_next(xattr_iter);
 	assert(rv > 0);
-	assert(sqsh_xattr_iterator_is_indirect(xattr_iter) == false);
+	ASSERT_EQ(false, sqsh_xattr_iterator_is_indirect(xattr_iter));
 	name = sqsh_xattr_iterator_fullname_dup(xattr_iter);
-	assert(name != NULL);
-	assert(strcmp("user.foo", name) == 0);
+	ASSERT_NE(NULL, name);
+	ASSERT_EQ(0, strcmp("user.foo", name));
 	free(name);
 	value = sqsh_xattr_iterator_value_dup(xattr_iter);
-	assert(value != NULL);
-	assert(strcmp(expected_value, value) == 0);
+	ASSERT_NE(NULL, value);
+	ASSERT_EQ(0, strcmp(expected_value, value));
 	free(value);
 	rv = sqsh_xattr_iterator_next(xattr_iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	rv = sqsh_xattr_iterator_free(xattr_iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	rv = sqsh_close(entry_file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_directory_iterator_next(dir_iter);
 	assert(rv >= 0);
 	name = sqsh_directory_iterator_name_dup(dir_iter);
-	assert(name != NULL);
-	assert(strcmp("b", name) == 0);
+	ASSERT_NE(NULL, name);
+	ASSERT_EQ(0, strcmp("b", name));
 	free(name);
 	entry_file = sqsh_directory_iterator_open_file(dir_iter, &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	xattr_iter = sqsh_xattr_iterator_new(entry_file, &rv);
-	assert(xattr_iter != NULL);
-	assert(rv == 0);
+	ASSERT_NE(NULL, xattr_iter);
+	ASSERT_EQ(0, rv);
 	rv = sqsh_xattr_iterator_next(xattr_iter);
 	assert(rv > 0);
-	assert(sqsh_xattr_iterator_is_indirect(xattr_iter) == true);
+	ASSERT_EQ(true, sqsh_xattr_iterator_is_indirect(xattr_iter));
 	name = sqsh_xattr_iterator_fullname_dup(xattr_iter);
-	assert(name != NULL);
-	assert(strcmp("user.bar", name) == 0);
+	ASSERT_NE(NULL, name);
+	ASSERT_EQ(0, strcmp("user.bar", name));
 	free(name);
 	value = sqsh_xattr_iterator_value_dup(xattr_iter);
-	assert(value != NULL);
-	assert(strcmp(expected_value, value) == 0);
+	ASSERT_NE(NULL, value);
+	ASSERT_EQ(0, strcmp(expected_value, value));
 	free(value);
 	rv = sqsh_xattr_iterator_next(xattr_iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	rv = sqsh_xattr_iterator_free(xattr_iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	rv = sqsh_close(entry_file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_directory_iterator_free(dir_iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_file_cleanup(file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__archive_cleanup(&sqsh);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 }
 #endif
 
@@ -549,8 +539,8 @@ multithreaded_resolver(void *arg) {
 
 	return 0;
 }
-static void
-multithreaded(void) {
+
+UTEST(integration, multithreaded) {
 	int rv;
 	pthread_t threads[16] = {0};
 	struct SqshArchive sqsh = {0};
@@ -558,7 +548,7 @@ multithreaded(void) {
 	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
 	config.archive_offset = 1010;
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(&sqsh);
 	struct Walker resolver = {
@@ -568,42 +558,42 @@ multithreaded(void) {
 	for (unsigned long i = 0; i < LENGTH(threads); i++) {
 		rv = pthread_create(
 				&threads[i], NULL, multithreaded_resolver, &resolver);
-		assert(rv == 0);
+		ASSERT_EQ(0, rv);
 	}
 
 	for (unsigned long i = 0; i < LENGTH(threads); i++) {
 		rv = pthread_join(threads[i], NULL);
-		assert(rv == 0);
+		ASSERT_EQ(0, rv);
 	}
 
 	rv = sqsh__archive_cleanup(&sqsh);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 }
-static void
-test_follow_symlink(void) {
+
+UTEST(integration, test_follow_symlink) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 
 	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
 	config.archive_offset = 1010;
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	char **dir_list = sqsh_easy_directory_list(
 			&sqsh, "/large_dir/link/large_dir/link", &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(strcmp(dir_list[0], "a") == 0);
-	assert(strcmp(dir_list[1], "b") == 0);
-	assert(strcmp(dir_list[2], "large_dir") == 0);
-	assert(dir_list[3] == NULL);
+	ASSERT_EQ(0, strcmp(dir_list[0], "a"));
+	ASSERT_EQ(0, strcmp(dir_list[1], "b"));
+	ASSERT_EQ(0, strcmp(dir_list[2], "large_dir"));
+	ASSERT_EQ(NULL, dir_list[3]);
 	free(dir_list);
 
 	rv = sqsh__archive_cleanup(&sqsh);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 }
-static void
-test_tree_traversal(void) {
+
+UTEST(integration, test_tree_traversal) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshFile *file = NULL;
@@ -612,35 +602,20 @@ test_tree_traversal(void) {
 	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
 	config.archive_offset = 1010;
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	file = sqsh_open(&sqsh, "/", &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	traversal = sqsh_tree_traversal_new2(file, 0, &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_tree_traversal_free(traversal);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	rv = sqsh_close(file);
 
 	rv = sqsh__archive_cleanup(&sqsh);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 }
 
-DECLARE_TESTS
-TEST(sqsh_empty)
-TEST(sqsh_ls)
-TEST(path_resolver)
-TEST(sqsh_get_nonexistant)
-TEST(sqsh_read_content)
-TEST(sqsh_cat_fragment)
-TEST(sqsh_cat_datablock_and_fragment)
-TEST(sqsh_cat_size_overflow)
-TEST(sqsh_test_uid_and_gid)
-TEST(sqsh_test_extended_dir)
-// TEST(sqsh_test_xattr);
-TEST(multithreaded)
-TEST(test_follow_symlink)
-TEST(test_tree_traversal)
-END_TESTS
+UTEST_MAIN()

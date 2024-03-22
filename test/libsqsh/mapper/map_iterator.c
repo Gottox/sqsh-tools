@@ -33,13 +33,12 @@
  */
 
 #include "../common.h"
-#include <testlib.h>
+#include <utest.h>
 
 #include <sqsh_mapper_private.h>
 #include <stdint.h>
 
-static void
-init_cursor(void) {
+UTEST(map_iterator, init_cursor) {
 	int rv;
 	struct SqshMapManager map_manager = {0};
 	struct SqshMapIterator cursor = {0};
@@ -49,17 +48,16 @@ init_cursor(void) {
 			&(struct SqshConfig){
 					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = sizeof(buffer) - 1});
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_iterator_init(&cursor, &map_manager, 0);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	sqsh__map_iterator_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&map_manager);
 }
 
-static void
-next_once(void) {
+UTEST(map_iterator, next_once) {
 	int rv;
 	struct SqshMapManager mapper = {0};
 	struct SqshMapIterator cursor = {0};
@@ -69,24 +67,23 @@ next_once(void) {
 			&(struct SqshConfig){
 					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = sizeof(buffer) - 1});
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_iterator_init(&cursor, &mapper, 0);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh__map_iterator_next(&cursor, &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	assert(has_next);
 
 	const uint8_t *data = sqsh__map_iterator_data(&cursor);
-	assert(data == buffer);
+	ASSERT_EQ(buffer, data);
 
 	sqsh__map_iterator_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);
 }
 
-static void
-next_twice(void) {
+UTEST(map_iterator, next_twice) {
 	int rv;
 	struct SqshMapManager mapper = {0};
 	struct SqshMapIterator cursor = {0};
@@ -98,37 +95,36 @@ next_twice(void) {
 					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = sizeof(buffer) - 1});
 
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_iterator_init(&cursor, &mapper, 0);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh__map_iterator_next(&cursor, &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__map_iterator_data(&cursor);
-	assert(data == &buffer[0]);
+	ASSERT_EQ(&buffer[0], data);
 
 	has_next = sqsh__map_iterator_next(&cursor, &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	assert(has_next);
 
 	data = sqsh__map_iterator_data(&cursor);
-	assert(data == &buffer[12]);
+	ASSERT_EQ(&buffer[12], data);
 
 	has_next = sqsh__map_iterator_next(&cursor, &rv);
-	assert(rv == 0);
-	assert(has_next == false);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(false, has_next);
 
 	data = sqsh__map_iterator_data(&cursor);
-	assert(data == NULL);
+	ASSERT_EQ(NULL, data);
 
 	sqsh__map_iterator_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);
 }
 
-static void
-map_iterator_out_of_bounds_inside_blocksize(void) {
+UTEST(map_iterator, map_iterator_out_of_bounds_inside_blocksize) {
 	int rv;
 	struct SqshMapManager mapper = {0};
 	struct SqshMapIterator cursor = {0};
@@ -140,17 +136,16 @@ map_iterator_out_of_bounds_inside_blocksize(void) {
 					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = sizeof(buffer) - 1});
 
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_iterator_init(&cursor, &mapper, 22);
-	assert(rv != 0);
+	ASSERT_NE(0, rv);
 
 	sqsh__map_iterator_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);
 }
 
-static void
-map_iterator_out_of_bounds_outside_blocksize(void) {
+UTEST(map_iterator, map_iterator_out_of_bounds_outside_blocksize) {
 	int rv;
 	struct SqshMapManager mapper = {0};
 	struct SqshMapIterator cursor = {0};
@@ -162,19 +157,13 @@ map_iterator_out_of_bounds_outside_blocksize(void) {
 					.source_mapper = sqsh_mapper_impl_static,
 					.source_size = sizeof(buffer) - 1});
 
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_iterator_init(&cursor, &mapper, 30);
-	assert(rv != 0);
+	ASSERT_NE(0, rv);
 
 	sqsh__map_iterator_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);
 }
 
-DECLARE_TESTS
-TEST(init_cursor)
-TEST(next_once)
-TEST(next_twice)
-TEST(map_iterator_out_of_bounds_inside_blocksize)
-TEST(map_iterator_out_of_bounds_outside_blocksize)
-END_TESTS
+UTEST_MAIN()

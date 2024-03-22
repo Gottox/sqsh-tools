@@ -34,15 +34,14 @@
 
 #include "../common.h"
 #include <stdint.h>
-#include <testlib.h>
+#include <utest.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_data_private.h>
 #include <sqsh_tree.h>
 #include <sqsh_tree_private.h>
 
-static void
-test_recursive_directory(void) {
+UTEST(traversal, test_recursive_directory) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -63,20 +62,20 @@ test_recursive_directory(void) {
 
 	struct SqshFile file = {0};
 	rv = sqsh__file_init(&file, &archive, 0);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	struct SqshTreeTraversal traversal = {0};
 	rv = sqsh__tree_traversal_init(&traversal, 0, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	for (int i = 0;; i++) {
 		bool has_next = sqsh_tree_traversal_next(&traversal, &rv);
 		if (i < 128) {
 			assert(has_next);
-			assert(rv == 0);
+			ASSERT_EQ(0, rv);
 		} else {
 			assert(!has_next);
-			assert(rv == -SQSH_ERROR_DIRECTORY_RECURSION);
+			ASSERT_EQ(-SQSH_ERROR_DIRECTORY_RECURSION, rv);
 			break;
 		}
 	}
@@ -86,6 +85,4 @@ test_recursive_directory(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
-DECLARE_TESTS
-TEST(test_recursive_directory)
-END_TESTS
+UTEST_MAIN()

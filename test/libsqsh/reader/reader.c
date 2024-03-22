@@ -35,7 +35,7 @@
 #include <sqsh_error.h>
 #include <sqsh_reader_private.h>
 #include <sys/wait.h>
-#include <testlib.h>
+#include <utest.h>
 
 struct TestIterator {
 	char *data;
@@ -103,8 +103,7 @@ static const struct SqshReaderIteratorImpl test_iter = {
 		.size = test_iter_size,
 };
 
-static void
-test_reader_init(void) {
+UTEST(reader, test_reader_init) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -112,13 +111,12 @@ test_reader_init(void) {
 	};
 
 	int rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	sqsh__reader_cleanup(&reader);
 }
 
-static void
-test_reader_advance_with_offset(void) {
+UTEST(reader, test_reader_advance_with_offset) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -126,21 +124,20 @@ test_reader_advance_with_offset(void) {
 	};
 
 	int rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__reader_advance(&reader, 1, 2);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__reader_data(&reader);
 	size_t size = sqsh__reader_size(&reader);
-	assert(size == 2);
-	assert(memcmp(data, "es", 2) == 0);
+	ASSERT_EQ((size_t)2, size);
+	ASSERT_EQ(0, memcmp(data, "es", 2));
 
 	sqsh__reader_cleanup(&reader);
 }
 
-static void
-test_reader_advance_to_block(void) {
+UTEST(reader, test_reader_advance_to_block) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -148,21 +145,20 @@ test_reader_advance_to_block(void) {
 	};
 
 	int rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__reader_advance(&reader, 0, 4);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__reader_data(&reader);
 	size_t size = sqsh__reader_size(&reader);
-	assert(size == 4);
-	assert(memcmp(data, "test", 4) == 0);
+	ASSERT_EQ((size_t)4, size);
+	ASSERT_EQ(0, memcmp(data, "test", 4));
 
 	sqsh__reader_cleanup(&reader);
 }
 
-static void
-test_reader_advance_to_two_blocks(void) {
+UTEST(reader, test_reader_advance_to_two_blocks) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -170,21 +166,20 @@ test_reader_advance_to_two_blocks(void) {
 	};
 
 	int rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__reader_advance(&reader, 0, 8);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__reader_data(&reader);
 	size_t size = sqsh__reader_size(&reader);
-	assert(size == 8);
-	assert(memcmp(data, "testtest", 8) == 0);
+	ASSERT_EQ((size_t)8, size);
+	ASSERT_EQ(0, memcmp(data, "testtest", 8));
 
 	sqsh__reader_cleanup(&reader);
 }
 
-static void
-test_reader_advance_to_two_blocks_with_offset(void) {
+UTEST(reader, test_reader_advance_to_two_blocks_with_offset) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -192,21 +187,20 @@ test_reader_advance_to_two_blocks_with_offset(void) {
 	};
 
 	int rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__reader_advance(&reader, 1, 6);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__reader_data(&reader);
 	size_t size = sqsh__reader_size(&reader);
-	assert(size == 6);
-	assert(memcmp(data, "esttes", 6) == 0);
+	ASSERT_EQ((size_t)6, size);
+	ASSERT_EQ(0, memcmp(data, "esttes", 6));
 
 	sqsh__reader_cleanup(&reader);
 }
 
-static void
-test_reader_from_buffered_to_mapped(void) {
+UTEST(reader, test_reader_from_buffered_to_mapped) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -214,31 +208,30 @@ test_reader_from_buffered_to_mapped(void) {
 	};
 
 	int rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	// Trigger a buffered result
 	rv = sqsh__reader_advance(&reader, 1, 6);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__reader_data(&reader);
 	size_t size = sqsh__reader_size(&reader);
-	assert(size == 6);
-	assert(memcmp(data, "esttes", 6) == 0);
+	ASSERT_EQ((size_t)6, size);
+	ASSERT_EQ(0, memcmp(data, "esttes", 6));
 
 	// Trigger back to a mapped result
 	rv = sqsh__reader_advance(&reader, 4, 3);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	data = sqsh__reader_data(&reader);
 	size = sqsh__reader_size(&reader);
-	assert(size == 3);
-	assert(memcmp(data, "est", 3) == 0);
+	ASSERT_EQ((size_t)3, size);
+	ASSERT_EQ(0, memcmp(data, "est", 3));
 
 	sqsh__reader_cleanup(&reader);
 }
 
-static void
-test_reader_from_buffered_to_buffered(void) {
+UTEST(reader, test_reader_from_buffered_to_buffered) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -246,31 +239,30 @@ test_reader_from_buffered_to_buffered(void) {
 	};
 
 	int rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	// Trigger a buffered result
 	rv = sqsh__reader_advance(&reader, 1, 6);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__reader_data(&reader);
 	size_t size = sqsh__reader_size(&reader);
-	assert(size == 6);
-	assert(memcmp(data, "esttes", 6) == 0);
+	ASSERT_EQ((size_t)6, size);
+	ASSERT_EQ(0, memcmp(data, "esttes", 6));
 
 	// Trigger back to a mapped result
 	rv = sqsh__reader_advance(&reader, 8, 6);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	data = sqsh__reader_data(&reader);
 	size = sqsh__reader_size(&reader);
-	assert(size == 6);
-	assert(memcmp(data, "esttes", 6) == 0);
+	ASSERT_EQ((size_t)6, size);
+	ASSERT_EQ(0, memcmp(data, "esttes", 6));
 
 	sqsh__reader_cleanup(&reader);
 }
 
-static void
-test_reader_advance_inside_buffered(void) {
+UTEST(reader, test_reader_advance_inside_buffered) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -278,31 +270,30 @@ test_reader_advance_inside_buffered(void) {
 	};
 
 	int rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	// Trigger a buffered result
 	rv = sqsh__reader_advance(&reader, 1, 6);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__reader_data(&reader);
 	size_t size = sqsh__reader_size(&reader);
-	assert(size == 6);
-	assert(memcmp(data, "esttes", 6) == 0);
+	ASSERT_EQ((size_t)6, size);
+	ASSERT_EQ(0, memcmp(data, "esttes", 6));
 
 	// Trigger back to a mapped result
 	rv = sqsh__reader_advance(&reader, 1, 6);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	data = sqsh__reader_data(&reader);
 	size = sqsh__reader_size(&reader);
-	assert(size == 6);
-	assert(memcmp(data, "sttest", 6) == 0);
+	ASSERT_EQ((size_t)6, size);
+	ASSERT_EQ(0, memcmp(data, "sttest", 6));
 
 	sqsh__reader_cleanup(&reader);
 }
 
-static void
-test_reader_advance_with_zero_size(void) {
+UTEST(reader, test_reader_advance_with_zero_size) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -310,116 +301,111 @@ test_reader_advance_with_zero_size(void) {
 	};
 
 	int rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__reader_advance(&reader, 3, 0);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	size_t size = sqsh__reader_size(&reader);
-	assert(size == 0);
+	ASSERT_EQ((size_t)0, size);
 
 	// Trigger back to a mapped result
 	rv = sqsh__reader_advance(&reader, 0, 4);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__reader_data(&reader);
 	size = sqsh__reader_size(&reader);
-	assert(size == 4);
-	assert(memcmp(data, "ttes", 4) == 0);
+	ASSERT_EQ((size_t)4, size);
+	ASSERT_EQ(0, memcmp(data, "ttes", 4));
 
 	sqsh__reader_cleanup(&reader);
 }
 
-static void
-test_reader_advance_once(void) {
+UTEST(reader, test_reader_advance_once) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "THIS IS A TEST STRING", .remaining = 1};
 
 	rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__reader_advance(&reader, 0, 6);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__reader_data(&reader);
-	assert(data == (void *)iter.data);
+	ASSERT_EQ((void *)iter.data, data);
 
 	sqsh__reader_cleanup(&reader);
 }
 
-static void
-test_reader_advance_once_with_offset(void) {
+UTEST(reader, test_reader_advance_once_with_offset) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "THIS IS A TEST STRING", .remaining = 1};
 	rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__reader_advance(&reader, 4, 6);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__reader_data(&reader);
-	assert(data == (uint8_t *)&iter.data[4]);
+	ASSERT_EQ((uint8_t *)&iter.data[4], data);
 
 	sqsh__reader_cleanup(&reader);
 }
 
-static void
-test_reader_advance_twice_with_offset(void) {
+UTEST(reader, test_reader_advance_twice_with_offset) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "THIS IS A TEST STRING", .remaining = 1};
 
 	rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__reader_advance(&reader, 4, 6);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__reader_data(&reader);
-	assert(data == (uint8_t *)&iter.data[4]);
+	ASSERT_EQ((uint8_t *)&iter.data[4], data);
 
 	rv = sqsh__reader_advance(&reader, 6, 2);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data2 = sqsh__reader_data(&reader);
-	assert(data2 == (uint8_t *)&iter.data[10]);
+	ASSERT_EQ((uint8_t *)&iter.data[10], data2);
 
 	sqsh__reader_cleanup(&reader);
 }
 
-static void
-test_reader_initial_advance(void) {
+UTEST(reader, test_reader_initial_advance) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "THIS IS A TEST STRING", .remaining = 1};
 	rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__reader_advance(&reader, 5, 3);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	const uint8_t *data = sqsh__reader_data(&reader);
-	assert(3 == sqsh__reader_size(&reader));
-	assert(memcmp(data, "IS ", 3) == 0);
-	assert(data == (uint8_t *)&iter.data[5]);
+	ASSERT_EQ((size_t)3, sqsh__reader_size(&reader));
+	ASSERT_EQ(0, memcmp(data, "IS ", 3));
+	ASSERT_EQ((uint8_t *)&iter.data[5], data);
 
 	sqsh__reader_cleanup(&reader);
 }
 
-static void
-test_reader_advance_to_out_of_bounds(void) {
+UTEST(reader, test_reader_advance_to_out_of_bounds) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "THIS IS A TEST STRING", .remaining = 1};
 
 	rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__reader_advance(&reader, strlen(iter.data), 1);
 	assert(rv < 0);
@@ -427,179 +413,151 @@ test_reader_advance_to_out_of_bounds(void) {
 	sqsh__reader_cleanup(&reader);
 }
 
-static void
-test_reader_advance_over_boundary(void) {
+UTEST(reader, test_reader_advance_over_boundary) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {.data = "0123456789", .remaining = 2};
 
 	rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__reader_advance(&reader, 9, 2);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	const uint8_t *data = sqsh__reader_data(&reader);
-	assert(2 == sqsh__reader_size(&reader));
-	assert(memcmp(data, "90", 2) == 0);
+	ASSERT_EQ((size_t)2, sqsh__reader_size(&reader));
+	ASSERT_EQ(0, memcmp(data, "90", 2));
 
 	sqsh__reader_cleanup(&reader);
 }
 
-static void
-test_reader_initial_advance_2(void) {
+UTEST(reader, test_reader_initial_advance_2) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {.data = "ABCD", .remaining = 10};
 
 	rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__reader_advance(&reader, 7, 5);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__reader_data(&reader);
-	assert(sqsh__reader_size(&reader) == 5);
-	assert(memcmp(data, "DABCD", 5) == 0);
+	ASSERT_EQ((size_t)5, sqsh__reader_size(&reader));
+	ASSERT_EQ(0, memcmp(data, "DABCD", 5));
 
 	sqsh__reader_cleanup(&reader);
 }
 
-static void
-test_reader_error_1(void) {
+UTEST(reader, test_reader_error_1) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {.data = "AB", .remaining = 10};
 
 	rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__reader_advance(&reader, 0, 4);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__reader_data(&reader);
-	assert(sqsh__reader_size(&reader) == 4);
-	assert(memcmp(data, "ABAB", 4) == 0);
+	ASSERT_EQ((size_t)4, sqsh__reader_size(&reader));
+	ASSERT_EQ(0, memcmp(data, "ABAB", 4));
 
 	iter.data = "12";
 	rv = sqsh__reader_advance(&reader, 4, 4);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	data = sqsh__reader_data(&reader);
-	assert(sqsh__reader_size(&reader) == 4);
-	assert(memcmp(data, "1212", 4) == 0);
+	ASSERT_EQ((size_t)4, sqsh__reader_size(&reader));
+	ASSERT_EQ(0, memcmp(data, "1212", 4));
 
 	sqsh__reader_cleanup(&reader);
 }
 
-static void
-test_reader_map_into_buffer(void) {
+UTEST(reader, test_reader_map_into_buffer) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {.data = "0123456789", .remaining = 2};
 
 	rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__reader_advance(&reader, 8, 4);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__reader_data(&reader);
-	assert(sqsh__reader_size(&reader) == 4);
-	assert(memcmp(data, "8901", 4) == 0);
+	ASSERT_EQ((size_t)4, sqsh__reader_size(&reader));
+	ASSERT_EQ(0, memcmp(data, "8901", 4));
 
 	rv = sqsh__reader_advance(&reader, 1, 4);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	data = sqsh__reader_data(&reader);
-	assert(sqsh__reader_size(&reader) == 4);
-	assert(memcmp(data, "9012", 4) == 0);
+	ASSERT_EQ((size_t)4, sqsh__reader_size(&reader));
+	ASSERT_EQ(0, memcmp(data, "9012", 4));
 
 	sqsh__reader_cleanup(&reader);
 }
 
-static void
-test_reader_map_into_buffer_twice(void) {
+UTEST(reader, test_reader_map_into_buffer_twice) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {.data = "0123456789", .remaining = 3};
 
 	rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__reader_advance(&reader, 8, 4);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__reader_data(&reader);
-	assert(sqsh__reader_size(&reader) == 4);
-	assert(memcmp(data, "8901", 4) == 0);
+	ASSERT_EQ((size_t)4, sqsh__reader_size(&reader));
+	ASSERT_EQ(0, memcmp(data, "8901", 4));
 
 	rv = sqsh__reader_advance(&reader, 1, 14);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	data = sqsh__reader_data(&reader);
-	assert(sqsh__reader_size(&reader) == 14);
-	assert(memcmp(data, "90123456789012", 14) == 0);
+	ASSERT_EQ((size_t)14, sqsh__reader_size(&reader));
+	ASSERT_EQ(0, memcmp(data, "90123456789012", 14));
 
 	sqsh__reader_cleanup(&reader);
 }
 
-static void
-test_reader_extend_size_till_end(void) {
+UTEST(reader, test_reader_extend_size_till_end) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {.data = "0123456789", .remaining = 2};
 
 	rv = sqsh__reader_init(&reader, &test_iter, &iter);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__reader_advance(&reader, 4, 4);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__reader_data(&reader);
-	assert(sqsh__reader_size(&reader) == 4);
-	assert(memcmp(data, "4567", 4) == 0);
+	ASSERT_EQ((size_t)4, sqsh__reader_size(&reader));
+	ASSERT_EQ(0, memcmp(data, "4567", 4));
 
 	rv = sqsh__reader_advance(&reader, 0, 6);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	data = sqsh__reader_data(&reader);
-	assert(sqsh__reader_size(&reader) == 6);
-	assert(memcmp(data, "456789", 6) == 0);
+	ASSERT_EQ((size_t)6, sqsh__reader_size(&reader));
+	ASSERT_EQ(0, memcmp(data, "456789", 6));
 
 	iter.data = "ABCDEF";
 
 	rv = sqsh__reader_advance(&reader, 0, 12);
 	data = sqsh__reader_data(&reader);
-	assert(sqsh__reader_size(&reader) == 12);
-	assert(memcmp(data, "456789ABCDEF", 12) == 0);
-	assert(rv == 0);
+	ASSERT_EQ((size_t)12, sqsh__reader_size(&reader));
+	ASSERT_EQ(0, memcmp(data, "456789ABCDEF", 12));
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__reader_advance(&reader, 0, 13);
-	assert(rv == -SQSH_ERROR_OUT_OF_BOUNDS);
+	ASSERT_EQ(-SQSH_ERROR_OUT_OF_BOUNDS, rv);
 
 	sqsh__reader_cleanup(&reader);
 }
 
-DECLARE_TESTS
-TEST(test_reader_init)
-TEST(test_reader_advance_to_block)
-TEST(test_reader_advance_with_offset)
-TEST(test_reader_advance_to_two_blocks)
-TEST(test_reader_advance_to_two_blocks_with_offset)
-TEST(test_reader_from_buffered_to_mapped)
-TEST(test_reader_from_buffered_to_buffered)
-TEST(test_reader_from_buffered_to_buffered)
-TEST(test_reader_advance_inside_buffered)
-TEST(test_reader_advance_with_zero_size)
-TEST(test_reader_advance_once)
-TEST(test_reader_advance_once_with_offset)
-TEST(test_reader_advance_twice_with_offset)
-TEST(test_reader_initial_advance)
-TEST(test_reader_advance_to_out_of_bounds)
-TEST(test_reader_advance_over_boundary)
-TEST(test_reader_initial_advance_2)
-TEST(test_reader_error_1)
-TEST(test_reader_map_into_buffer)
-TEST(test_reader_map_into_buffer_twice)
-TEST(test_reader_extend_size_till_end)
-END_TESTS
+UTEST_MAIN()
