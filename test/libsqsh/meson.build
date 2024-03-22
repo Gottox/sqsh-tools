@@ -12,6 +12,7 @@ sqsh_test2 = [
     'tree/path_resolver.c',
     'tree/traversal.c',
     'tree/walker.c',
+    'xattr/xattr_iterator.c',
 ]
 sqsh_test = [
     'easy/directory.c',
@@ -36,7 +37,6 @@ sqsh_test = [
     'include_tests/sqsh_xattr.c',
     'file/file.c',
     'reader/reader.c',
-    'xattr/xattr_iterator.c',
 ]
 sqsh_extra_source = {
     'fuzzer_repro.c': '../../fuzzer/simple.c',
