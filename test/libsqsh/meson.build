@@ -5,6 +5,9 @@ sqsh_test2 = [
     'archive/compression_options.c',
     'nasty.c',
     'integration.c',
+    'tree/path_resolver.c',
+    'tree/traversal.c',
+    'tree/walker.c',
 ]
 sqsh_test = [
     'easy/directory.c',
@@ -33,9 +36,6 @@ sqsh_test = [
     'metablock/metablock_iterator.c',
     'metablock/metablock_reader.c',
     'reader/reader.c',
-    'tree/path_resolver.c',
-    'tree/traversal.c',
-    'tree/walker.c',
     'xattr/xattr_iterator.c',
 ]
 sqsh_extra_source = {

@@ -33,14 +33,13 @@
  */
 
 #include "../common.h"
-#include <testlib.h>
+#include <utest.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_data_private.h>
 #include <sqsh_tree_private.h>
 
-static void
-walker_symlink_recursion(void) {
+UTEST(tree_walker, walker_symlink_recursion) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -65,17 +64,16 @@ walker_symlink_recursion(void) {
 
 	struct SqshTreeWalker walker = {0};
 	rv = sqsh__path_resolver_init(&walker.inner, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_tree_walker_resolve(&walker, "src", true);
-	assert(rv == -SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED);
+	ASSERT_EQ(-SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED, rv);
 
 	sqsh__path_resolver_cleanup(&walker.inner);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-walker_symlink_alternating_recursion(void) {
+UTEST(tree_walker, walker_symlink_alternating_recursion) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -105,17 +103,16 @@ walker_symlink_alternating_recursion(void) {
 
 	struct SqshTreeWalker walker = {0};
 	rv = sqsh__path_resolver_init(&walker.inner, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_tree_walker_resolve(&walker, "src1", true);
-	assert(rv == -SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED);
+	ASSERT_EQ(-SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED, rv);
 
 	sqsh__path_resolver_cleanup(&walker.inner);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-walker_symlink_open(void) {
+UTEST(tree_walker, walker_symlink_open) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -145,15 +142,15 @@ walker_symlink_open(void) {
 
 	struct SqshTreeWalker walker = {0};
 	rv = sqsh__path_resolver_init(&walker.inner, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_tree_walker_resolve(&walker, "src", true);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const char *name = sqsh_tree_walker_name(&walker);
 	size_t name_size = sqsh_tree_walker_name_size(&walker);
-	assert(name_size == 3);
-	assert(memcmp(name, "tgt", name_size) == 0);
+	ASSERT_EQ((size_t)3, name_size);
+	ASSERT_EQ(0, memcmp(name, "tgt", name_size));
 
 	sqsh__path_resolver_cleanup(&walker.inner);
 	sqsh__archive_cleanup(&archive);
@@ -170,8 +167,7 @@ expect_inode(struct SqshTreeWalker *walker, uint32_t inode_number) {
 	sqsh_close(file);
 }
 
-static void
-walker_directory_enter(void) {
+UTEST(tree_walker, walker_directory_enter) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -201,22 +197,21 @@ walker_directory_enter(void) {
 
 	struct SqshTreeWalker walker = {0};
 	rv = sqsh__path_resolver_init(&walker.inner, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_tree_walker_resolve(&walker, "dir", true);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	expect_inode(&walker, 2);
 
 	rv = sqsh_tree_walker_up(&walker);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	expect_inode(&walker, 1);
 
 	sqsh__path_resolver_cleanup(&walker.inner);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-walker_uninitialized_up(void) {
+UTEST(tree_walker, walker_uninitialized_up) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -237,17 +232,16 @@ walker_uninitialized_up(void) {
 
 	struct SqshTreeWalker walker = {0};
 	rv = sqsh__path_resolver_init(&walker.inner, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_tree_walker_up(&walker);
-	assert(rv == -SQSH_ERROR_WALKER_CANNOT_GO_UP);
+	ASSERT_EQ(-SQSH_ERROR_WALKER_CANNOT_GO_UP, rv);
 
 	sqsh__path_resolver_cleanup(&walker.inner);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-walker_uninitialized_down(void) {
+UTEST(tree_walker, walker_uninitialized_down) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -268,17 +262,16 @@ walker_uninitialized_down(void) {
 
 	struct SqshTreeWalker walker = {0};
 	rv = sqsh__path_resolver_init(&walker.inner, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_tree_walker_down(&walker);
-	assert(rv == -SQSH_ERROR_WALKER_CANNOT_GO_DOWN);
+	ASSERT_EQ(-SQSH_ERROR_WALKER_CANNOT_GO_DOWN, rv);
 
 	sqsh__path_resolver_cleanup(&walker.inner);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-walker_next(void) {
+UTEST(tree_walker, walker_next) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -304,10 +297,10 @@ walker_next(void) {
 
 	struct SqshTreeWalker walker = {0};
 	rv = sqsh__path_resolver_init(&walker.inner, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_tree_walker_to_root(&walker);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_tree_walker_next(&walker);
 	assert(rv > 0);
@@ -319,18 +312,10 @@ walker_next(void) {
 	assert(rv > 0);
 
 	rv = sqsh_tree_walker_next(&walker);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	sqsh__path_resolver_cleanup(&walker.inner);
 	sqsh__archive_cleanup(&archive);
 }
 
-DECLARE_TESTS
-TEST(walker_symlink_open)
-TEST(walker_symlink_recursion)
-TEST(walker_symlink_alternating_recursion)
-TEST(walker_directory_enter)
-TEST(walker_uninitialized_down)
-TEST(walker_uninitialized_up)
-TEST(walker_next)
-END_TESTS
+UTEST_MAIN()

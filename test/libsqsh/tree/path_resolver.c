@@ -33,14 +33,13 @@
  */
 
 #include "../common.h"
-#include <testlib.h>
+#include <utest.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_data_private.h>
 #include <sqsh_tree_private.h>
 
-static void
-resolver_symlink_recursion(void) {
+UTEST(path_resolver, resolver_symlink_recursion) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -65,17 +64,16 @@ resolver_symlink_recursion(void) {
 
 	struct SqshPathResolver resolver = {0};
 	rv = sqsh__path_resolver_init(&resolver, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_resolve(&resolver, "src", true);
-	assert(rv == -SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED);
+	ASSERT_EQ(-SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED, rv);
 
 	sqsh__path_resolver_cleanup(&resolver);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-resolver_symlink_alternating_recursion(void) {
+UTEST(path_resolver, resolver_symlink_alternating_recursion) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -105,17 +103,16 @@ resolver_symlink_alternating_recursion(void) {
 
 	struct SqshPathResolver resolver = {0};
 	rv = sqsh__path_resolver_init(&resolver, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_resolve(&resolver, "src1", true);
-	assert(rv == -SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED);
+	ASSERT_EQ(-SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED, rv);
 
 	sqsh__path_resolver_cleanup(&resolver);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-resolver_symlink_open(void) {
+UTEST(path_resolver, resolver_symlink_open) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -145,15 +142,15 @@ resolver_symlink_open(void) {
 
 	struct SqshPathResolver resolver = {0};
 	rv = sqsh__path_resolver_init(&resolver, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_resolve(&resolver, "src", true);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	const char *name = sqsh_path_resolver_name(&resolver);
 	size_t name_size = sqsh_path_resolver_name_size(&resolver);
-	assert(name_size == 3);
-	assert(memcmp(name, "tgt", name_size) == 0);
+	ASSERT_EQ((size_t)3, name_size);
+	ASSERT_EQ(0, memcmp(name, "tgt", name_size));
 
 	sqsh__path_resolver_cleanup(&resolver);
 	sqsh__archive_cleanup(&archive);
@@ -170,8 +167,7 @@ expect_inode(struct SqshPathResolver *resolver, uint32_t inode_number) {
 	sqsh_close(file);
 }
 
-static void
-resolver_directory_enter(void) {
+UTEST(path_resolver, resolver_directory_enter) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -201,22 +197,21 @@ resolver_directory_enter(void) {
 
 	struct SqshPathResolver resolver = {0};
 	rv = sqsh__path_resolver_init(&resolver, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_resolve(&resolver, "dir", true);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	expect_inode(&resolver, 2);
 
 	rv = sqsh_path_resolver_up(&resolver);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	expect_inode(&resolver, 1);
 
 	sqsh__path_resolver_cleanup(&resolver);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-resolver_uninitialized_up(void) {
+UTEST(path_resolver, resolver_uninitialized_up) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -237,17 +232,16 @@ resolver_uninitialized_up(void) {
 
 	struct SqshPathResolver resolver = {0};
 	rv = sqsh__path_resolver_init(&resolver, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_up(&resolver);
-	assert(rv == -SQSH_ERROR_WALKER_CANNOT_GO_UP);
+	ASSERT_EQ(-SQSH_ERROR_WALKER_CANNOT_GO_UP, rv);
 
 	sqsh__path_resolver_cleanup(&resolver);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-resolver_uninitialized_down(void) {
+UTEST(path_resolver, resolver_uninitialized_down) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -268,17 +262,16 @@ resolver_uninitialized_down(void) {
 
 	struct SqshPathResolver resolver = {0};
 	rv = sqsh__path_resolver_init(&resolver, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_down(&resolver);
-	assert(rv == -SQSH_ERROR_WALKER_CANNOT_GO_DOWN);
+	ASSERT_EQ(-SQSH_ERROR_WALKER_CANNOT_GO_DOWN, rv);
 
 	sqsh__path_resolver_cleanup(&resolver);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-resolver_next(void) {
+UTEST(path_resolver, resolver_next) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -304,40 +297,32 @@ resolver_next(void) {
 
 	struct SqshPathResolver resolver = {0};
 	rv = sqsh__path_resolver_init(&resolver, &archive);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_to_root(&resolver);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_path_resolver_next(&resolver, &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	assert(has_next);
 
 	has_next = sqsh_path_resolver_next(&resolver, &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	assert(has_next);
 
 	has_next = sqsh_path_resolver_next(&resolver, &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 	assert(has_next);
 
 	has_next = sqsh_path_resolver_next(&resolver, &rv);
-	assert(rv == 0);
-	assert(has_next == false);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(false, has_next);
 
 	rv = sqsh_path_resolver_next(&resolver, &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	sqsh__path_resolver_cleanup(&resolver);
 	sqsh__archive_cleanup(&archive);
 }
 
-DECLARE_TESTS
-TEST(resolver_symlink_open)
-TEST(resolver_symlink_recursion)
-TEST(resolver_symlink_alternating_recursion)
-TEST(resolver_directory_enter)
-TEST(resolver_uninitialized_down)
-TEST(resolver_uninitialized_up)
-TEST(resolver_next)
-END_TESTS
+UTEST_MAIN()
