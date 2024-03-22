@@ -34,15 +34,14 @@
 
 #include "../common.h"
 #include <stdint.h>
-#include <testlib.h>
+#include <utest.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_data_private.h>
 #include <sqsh_directory.h>
 #include <sqsh_directory_private.h>
 
-static void
-iter_invalid_file_name_with_0(void) {
+UTEST(directory_iterator, iter_invalid_file_name_with_0) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -63,23 +62,22 @@ iter_invalid_file_name_with_0(void) {
 
 	struct SqshFile file = {0};
 	rv = sqsh__file_init(&file, &archive, 0);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	struct SqshDirectoryIterator iter = {0};
 	rv = sqsh__directory_iterator_init(&iter, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_directory_iterator_next(&iter, &rv);
-	assert(rv == -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY);
-	assert(has_next == false);
+	ASSERT_EQ(-SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY, rv);
+	ASSERT_EQ(false, has_next);
 
 	sqsh__directory_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-iter_invalid_file_name_with_slash(void) {
+UTEST(directory_iterator, iter_invalid_file_name_with_slash) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -100,23 +98,22 @@ iter_invalid_file_name_with_slash(void) {
 
 	struct SqshFile file = {0};
 	rv = sqsh__file_init(&file, &archive, 0);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	struct SqshDirectoryIterator iter = {0};
 	rv = sqsh__directory_iterator_init(&iter, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_directory_iterator_next(&iter, &rv);
-	assert(rv == -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY);
-	assert(has_next == false);
+	ASSERT_EQ(-SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY, rv);
+	ASSERT_EQ(false, has_next);
 
 	sqsh__directory_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-iter_two_files(void) {
+UTEST(directory_iterator, iter_two_files) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -146,41 +143,40 @@ iter_two_files(void) {
 
 	struct SqshFile file = {0};
 	rv = sqsh__file_init(&file, &archive, 0);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	struct SqshDirectoryIterator iter = {0};
 	rv = sqsh__directory_iterator_init(&iter, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_directory_iterator_next(&iter, &rv);
-	assert(rv == 0);
-	assert(has_next == true);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(true, has_next);
 
 	const char *name = sqsh_directory_iterator_name(&iter);
 	size_t size = sqsh_directory_iterator_name_size(&iter);
-	assert(size == 1);
-	assert(name[0] == '1');
+	ASSERT_EQ((size_t)1, size);
+	ASSERT_EQ('1', name[0]);
 
 	has_next = sqsh_directory_iterator_next(&iter, &rv);
-	assert(rv == 0);
-	assert(has_next == true);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(true, has_next);
 
 	name = sqsh_directory_iterator_name(&iter);
 	size = sqsh_directory_iterator_name_size(&iter);
-	assert(size == 1);
-	assert(name[0] == '2');
+	ASSERT_EQ((size_t)1, size);
+	ASSERT_EQ('2', name[0]);
 
 	has_next = sqsh_directory_iterator_next(&iter, &rv);
-	assert(rv == 0);
-	assert(has_next == false);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(false, has_next);
 
 	sqsh__directory_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-iter_invalid_file_type(void) {
+UTEST(directory_iterator, iter_invalid_file_type) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -199,20 +195,19 @@ iter_invalid_file_type(void) {
 
 	struct SqshFile file = {0};
 	rv = sqsh__file_init(&file, &archive, 0);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	struct SqshDirectoryIterator *iter =
 			sqsh_directory_iterator_new(&file, &rv);
-	assert(rv == -SQSH_ERROR_NOT_A_DIRECTORY);
-	assert(iter == NULL);
+	ASSERT_EQ(-SQSH_ERROR_NOT_A_DIRECTORY, rv);
+	ASSERT_EQ(NULL, iter);
 
 	sqsh_directory_iterator_free(iter);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-iter_inconsistent_file_type(void) {
+UTEST(directory_iterator, iter_inconsistent_file_type) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -237,27 +232,26 @@ iter_inconsistent_file_type(void) {
 
 	struct SqshFile file = {0};
 	rv = sqsh__file_init(&file, &archive, 0);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	struct SqshDirectoryIterator *iter =
 			sqsh_directory_iterator_new(&file, &rv);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_directory_iterator_next(iter, &rv);
-	assert(rv == 0);
-	assert(has_next == true);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(true, has_next);
 
 	struct SqshFile *entry_file = sqsh_directory_iterator_open_file(iter, &rv);
-	assert(rv == -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY);
-	assert(entry_file == NULL);
+	ASSERT_EQ(-SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY, rv);
+	ASSERT_EQ(NULL, entry_file);
 
 	sqsh_directory_iterator_free(iter);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-iter_over_corrupt_header_too_small(void) {
+UTEST(directory_iterator, iter_over_corrupt_header_too_small) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -280,23 +274,22 @@ iter_over_corrupt_header_too_small(void) {
 
 	struct SqshFile file = {0};
 	rv = sqsh__file_init(&file, &archive, 0);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	struct SqshDirectoryIterator iter = {0};
 	rv = sqsh__directory_iterator_init(&iter, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_directory_iterator_next(&iter, &rv);
-	assert(rv == -SQSH_ERROR_CORRUPTED_DIRECTORY_HEADER);
-	assert(has_next == false);
+	ASSERT_EQ(-SQSH_ERROR_CORRUPTED_DIRECTORY_HEADER, rv);
+	ASSERT_EQ(false, has_next);
 
 	sqsh__directory_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-iter_inode_overflow(void) {
+UTEST(directory_iterator, iter_inode_overflow) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -317,23 +310,22 @@ iter_inode_overflow(void) {
 
 	struct SqshFile file = {0};
 	rv = sqsh__file_init(&file, &archive, 0);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	struct SqshDirectoryIterator iter = {0};
 	rv = sqsh__directory_iterator_init(&iter, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_directory_iterator_next(&iter, &rv);
-	assert(rv == -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY);
-	assert(has_next == false);
+	ASSERT_EQ(-SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY, rv);
+	ASSERT_EQ(false, has_next);
 
 	sqsh__directory_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-iter_inode_underflow(void) {
+UTEST(directory_iterator, iter_inode_underflow) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -354,23 +346,22 @@ iter_inode_underflow(void) {
 
 	struct SqshFile file = {0};
 	rv = sqsh__file_init(&file, &archive, 0);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	struct SqshDirectoryIterator iter = {0};
 	rv = sqsh__directory_iterator_init(&iter, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_directory_iterator_next(&iter, &rv);
-	assert(rv == -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY);
-	assert(has_next == false);
+	ASSERT_EQ(-SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY, rv);
+	ASSERT_EQ(false, has_next);
 
 	sqsh__directory_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-static void
-iter_inode_to_zero(void) {
+UTEST(directory_iterator, iter_inode_to_zero) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -391,29 +382,19 @@ iter_inode_to_zero(void) {
 
 	struct SqshFile file = {0};
 	rv = sqsh__file_init(&file, &archive, 0);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	struct SqshDirectoryIterator iter = {0};
 	rv = sqsh__directory_iterator_init(&iter, &file);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_directory_iterator_next(&iter, &rv);
-	assert(rv == -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY);
-	assert(has_next == false);
+	ASSERT_EQ(-SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY, rv);
+	ASSERT_EQ(false, has_next);
 
 	sqsh__directory_iterator_cleanup(&iter);
 	sqsh__file_cleanup(&file);
 	sqsh__archive_cleanup(&archive);
 }
 
-DECLARE_TESTS
-TEST(iter_two_files)
-TEST(iter_invalid_file_name_with_slash)
-TEST(iter_invalid_file_name_with_0)
-TEST(iter_invalid_file_type)
-TEST(iter_inconsistent_file_type)
-TEST(iter_over_corrupt_header_too_small)
-TEST(iter_inode_overflow)
-TEST(iter_inode_underflow)
-TEST(iter_inode_to_zero)
-END_TESTS
+UTEST_MAIN()

@@ -1,6 +1,7 @@
 add_languages('cpp', native: false)
 
 sqsh_test2 = [
+    'directory/directory_iterator.c',
     'easy/directory.c',
     'easy/file.c',
     'easy/xattr.c',
@@ -19,7 +20,6 @@ sqsh_test2 = [
 ]
 sqsh_test = [
     'cpp-test.cpp',
-    'directory/directory_iterator.c',
     'extract/extract.c',
     'extract/extract_manager.c',
     'file/file_iterator.c',
