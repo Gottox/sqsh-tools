@@ -1,12 +1,13 @@
 add_languages('cpp', native: false)
 
 sqsh_test2 = [
+    'archive/compression_options.c',
+    'archive/inode_map.c',
     'directory/directory_iterator.c',
     'easy/directory.c',
     'easy/file.c',
     'easy/xattr.c',
-    'archive/compression_options.c',
-    'archive/inode_map.c',
+    'extract/extract_manager.c',
     'integration.c',
     'metablock/metablock_iterator.c',
     'metablock/metablock_reader.c',
@@ -21,7 +22,6 @@ sqsh_test2 = [
 sqsh_test = [
     'cpp-test.cpp',
     'extract/extract.c',
-    'extract/extract_manager.c',
     'file/file_iterator.c',
     'file/file_reader.c',
     'fuzzer_repro.c',
