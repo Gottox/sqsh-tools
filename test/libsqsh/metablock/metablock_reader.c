@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include <testlib.h>
+#include <utest.h>
 
 #include <mksqsh_metablock.h>
 #include <sqsh_archive_private.h>
@@ -41,8 +41,7 @@
 #include <sqsh_metablock_private.h>
 #include <stdint.h>
 
-static void
-advance_once(void) {
+UTEST(map_iterator, advance_once) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor = {0};
@@ -61,25 +60,24 @@ advance_once(void) {
 
 	rv = sqsh__metablock_reader_init(
 			&cursor, &sqsh, sizeof(struct SqshDataSuperblock), sizeof(payload));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__metablock_reader_advance(&cursor, 0, 4);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh__metablock_reader_size(&cursor) == 4);
+	ASSERT_EQ((size_t)4, sqsh__metablock_reader_size(&cursor));
 
 	p = sqsh__metablock_reader_data(&cursor);
-	assert(p != NULL);
-	assert(memcmp(p, "abcd", 4) == 0);
+	ASSERT_NE(NULL, p);
+	ASSERT_EQ(0, memcmp(p, "abcd", 4));
 
 	rv = sqsh__metablock_reader_cleanup(&cursor);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	sqsh__archive_cleanup(&sqsh);
 }
 
-static void
-advance_twice(void) {
+UTEST(map_iterator, advance_twice) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor = {0};
@@ -102,34 +100,33 @@ advance_twice(void) {
 	test_sqsh_init_archive(&sqsh, farchive, payload, sizeof(payload));
 
 	rv = sqsh__metablock_reader_init(&cursor, &sqsh, 1024, sizeof(payload));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__metablock_reader_advance(&cursor, 0, 4);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh__metablock_reader_size(&cursor) == 4);
+	ASSERT_EQ((size_t)4, sqsh__metablock_reader_size(&cursor));
 
 	p = sqsh__metablock_reader_data(&cursor);
-	assert(p != NULL);
-	assert(memcmp(p, "abcd", 4) == 0);
+	ASSERT_NE(NULL, p);
+	ASSERT_EQ(0, memcmp(p, "abcd", 4));
 
 	rv = sqsh__metablock_reader_advance(&cursor, 8192, 4);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh__metablock_reader_size(&cursor) == 4);
+	ASSERT_EQ((size_t)4, sqsh__metablock_reader_size(&cursor));
 
 	p = sqsh__metablock_reader_data(&cursor);
-	assert(p != NULL);
-	assert(memcmp(p, "efgh", 4) == 0);
+	ASSERT_NE(NULL, p);
+	ASSERT_EQ(0, memcmp(p, "efgh", 4));
 
 	rv = sqsh__metablock_reader_cleanup(&cursor);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	sqsh__archive_cleanup(&sqsh);
 }
 
-static void
-advance_overlapping(void) {
+UTEST(map_iterator, advance_overlapping) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor;
@@ -164,25 +161,24 @@ advance_overlapping(void) {
 	test_sqsh_init_archive(&sqsh, farchive, payload, sizeof(payload));
 
 	rv = sqsh__metablock_reader_init(&cursor, &sqsh, 1024, sizeof(payload));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__metablock_reader_advance(&cursor, 0, sizeof(metablock_content));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
-	assert(sqsh__metablock_reader_size(&cursor) == sizeof(metablock_content));
+	ASSERT_EQ(sizeof(metablock_content), sqsh__metablock_reader_size(&cursor));
 
 	p = sqsh__metablock_reader_data(&cursor);
-	assert(p != NULL);
-	assert(memcmp(p, metablock_content, sizeof(metablock_content)) == 0);
+	ASSERT_NE(NULL, p);
+	ASSERT_EQ(0, memcmp(p, metablock_content, sizeof(metablock_content)));
 
 	rv = sqsh__metablock_reader_cleanup(&cursor);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	sqsh__archive_cleanup(&sqsh);
 }
 
-static void
-advance_overlapping_2(void) {
+UTEST(map_iterator, advance_overlapping_2) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor;
@@ -200,30 +196,29 @@ advance_overlapping_2(void) {
 	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_reader_init(&cursor, &sqsh, 1024, sizeof(payload));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__metablock_reader_advance(&cursor, 8192 - 4, 3);
-	assert(rv == 0);
-	assert(sqsh__metablock_reader_size(&cursor) == 3);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ((size_t)3, sqsh__metablock_reader_size(&cursor));
 	p = sqsh__metablock_reader_data(&cursor);
-	assert(p != NULL);
-	assert(memcmp(p, "abc", 3) == 0);
+	ASSERT_NE(NULL, p);
+	ASSERT_EQ(0, memcmp(p, "abc", 3));
 
 	rv = sqsh__metablock_reader_advance(&cursor, 0, 8);
-	assert(rv == 0);
-	assert(sqsh__metablock_reader_size(&cursor) == 8);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ((size_t)8, sqsh__metablock_reader_size(&cursor));
 	p = sqsh__metablock_reader_data(&cursor);
-	assert(p != NULL);
-	assert(memcmp(p, "abcdefgh", 8) == 0);
+	ASSERT_NE(NULL, p);
+	ASSERT_EQ(0, memcmp(p, "abcdefgh", 8));
 
 	rv = sqsh__metablock_reader_cleanup(&cursor);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	sqsh__archive_cleanup(&sqsh);
 }
 
-static void
-advance_overlapping_3(void) {
+UTEST(map_iterator, advance_overlapping_3) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor;
@@ -244,30 +239,29 @@ advance_overlapping_3(void) {
 	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_reader_init(&cursor, &sqsh, 1024, sizeof(payload));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__metablock_reader_advance(&cursor, 8180, 16);
-	assert(rv == 0);
-	assert(sqsh__metablock_reader_size(&cursor) == 16);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ((size_t)16, sqsh__metablock_reader_size(&cursor));
 	data = sqsh__metablock_reader_data(&cursor);
-	assert(data != NULL);
-	assert(memcmp(data, expected, 16) == 0);
+	ASSERT_NE(NULL, data);
+	ASSERT_EQ(0, memcmp(data, expected, 16));
 
 	rv = sqsh__metablock_reader_advance(&cursor, 0, 32);
-	assert(rv == 0);
-	assert(sqsh__metablock_reader_size(&cursor) == 32);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ((size_t)32, sqsh__metablock_reader_size(&cursor));
 	data = sqsh__metablock_reader_data(&cursor);
-	assert(data != NULL);
-	assert(memcmp(data, expected, 32) == 0);
+	ASSERT_NE(NULL, data);
+	ASSERT_EQ(0, memcmp(data, expected, 32));
 
 	rv = sqsh__metablock_reader_cleanup(&cursor);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	sqsh__archive_cleanup(&sqsh);
 }
 
-static void
-advance_skip(void) {
+UTEST(map_iterator, advance_skip) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor;
@@ -284,23 +278,22 @@ advance_skip(void) {
 	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_reader_init(&cursor, &sqsh, 1024, sizeof(payload));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__metablock_reader_advance(&cursor, 8192, 4);
-	assert(rv == 0);
-	assert(sqsh__metablock_reader_size(&cursor) == 4);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ((size_t)4, sqsh__metablock_reader_size(&cursor));
 	p = sqsh__metablock_reader_data(&cursor);
-	assert(p != NULL);
-	assert(memcmp(p, "efgh", 4) == 0);
+	ASSERT_NE(NULL, p);
+	ASSERT_EQ(0, memcmp(p, "efgh", 4));
 
 	rv = sqsh__metablock_reader_cleanup(&cursor);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	sqsh__archive_cleanup(&sqsh);
 }
 
-static void
-advance_skip_2(void) {
+UTEST(map_iterator, advance_skip_2) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor;
@@ -321,30 +314,29 @@ advance_skip_2(void) {
 	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_reader_init(&cursor, &sqsh, 1024, sizeof(payload));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__metablock_reader_advance(&cursor, 0, 4);
-	assert(rv == 0);
-	assert(sqsh__metablock_reader_size(&cursor) == 4);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ((size_t)4, sqsh__metablock_reader_size(&cursor));
 	p = sqsh__metablock_reader_data(&cursor);
-	assert(p != NULL);
-	assert(memcmp(p, "abcd", 4) == 0);
+	ASSERT_NE(NULL, p);
+	ASSERT_EQ(0, memcmp(p, "abcd", 4));
 
 	rv = sqsh__metablock_reader_advance(&cursor, 8192 * 2, 4);
-	assert(rv == 0);
-	assert(sqsh__metablock_reader_size(&cursor) == 4);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ((size_t)4, sqsh__metablock_reader_size(&cursor));
 	p = sqsh__metablock_reader_data(&cursor);
-	assert(p != NULL);
-	assert(memcmp(p, "ijkl", 4) == 0);
+	ASSERT_NE(NULL, p);
+	ASSERT_EQ(0, memcmp(p, "ijkl", 4));
 
 	rv = sqsh__metablock_reader_cleanup(&cursor);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	sqsh__archive_cleanup(&sqsh);
 }
 
-static void
-advance_overflow(void) {
+UTEST(map_iterator, advance_overflow) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor;
@@ -358,27 +350,18 @@ advance_overflow(void) {
 	mk_stub(&sqsh, payload, sizeof(payload));
 
 	rv = sqsh__metablock_reader_init(&cursor, &sqsh, 1024, sizeof(payload));
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__metablock_reader_advance(&cursor, 0, 8192);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__metablock_reader_advance(&cursor, 8192, 1);
 	assert(rv < 0);
 
 	rv = sqsh__metablock_reader_cleanup(&cursor);
-	assert(rv == 0);
+	ASSERT_EQ(0, rv);
 
 	sqsh__archive_cleanup(&sqsh);
 }
 
-DECLARE_TESTS
-TEST(advance_once)
-TEST(advance_twice)
-TEST(advance_overlapping)
-TEST(advance_overlapping_2)
-TEST(advance_overlapping_3)
-TEST(advance_skip)
-TEST(advance_skip_2)
-TEST(advance_overflow)
-END_TESTS
+UTEST_MAIN()

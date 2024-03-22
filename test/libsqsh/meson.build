@@ -4,6 +4,8 @@ sqsh_test2 = [
     'archive/compression_options.c',
     'archive/inode_map.c',
     'integration.c',
+    'metablock/metablock_iterator.c',
+    'metablock/metablock_reader.c',
     'mapper/map_iterator.c',
     'mapper/map_reader.c',
     'nasty.c',
@@ -33,8 +35,6 @@ sqsh_test = [
     'include_tests/sqsh_tree.c',
     'include_tests/sqsh_xattr.c',
     'file/file.c',
-    'metablock/metablock_iterator.c',
-    'metablock/metablock_reader.c',
     'reader/reader.c',
     'xattr/xattr_iterator.c',
 ]
