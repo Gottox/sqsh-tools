@@ -1,6 +1,7 @@
 add_languages('cpp', native: false)
 
 sqsh_test2 = [
+    'cpp-test.cpp',
     'archive/compression_options.c',
     'archive/inode_map.c',
     'directory/directory_iterator.c',
@@ -24,7 +25,6 @@ sqsh_test2 = [
     'xattr/xattr_iterator.c',
 ]
 sqsh_test = [
-    'cpp-test.cpp',
     'extract/extract.c',
     'fuzzer_repro.c',
     'include_tests/sqsh_archive.c',

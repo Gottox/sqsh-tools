@@ -40,11 +40,9 @@
 #include <sqsh_directory.h>
 #include <sqsh_error.h>
 #include <sqsh_mapper.h>
-#include <stdint.h>
-#include <testlib.h>
+#include <utest.h>
 
-static void
-sqsh_empty() {
+UTEST(cpp_test, sqsh_empty) {
 	int rv;
 	struct SqshArchive *archive = NULL;
 	struct SqshConfig config = {};
@@ -52,10 +50,8 @@ sqsh_empty() {
 	config.mapper_block_size = 1;
 	config.source_size = 0;
 	archive = sqsh_archive_open(NULL, &config, &rv);
-	assert(rv == -SQSH_ERROR_SUPERBLOCK_TOO_SMALL);
-	assert(archive == NULL);
+	ASSERT_EQ(-SQSH_ERROR_SUPERBLOCK_TOO_SMALL, rv);
+	ASSERT_EQ((void *)NULL, archive);
 }
 
-DECLARE_TESTS
-TEST(sqsh_empty)
-END_TESTS
+UTEST_MAIN()
