@@ -51,7 +51,9 @@ UTEST(cpp_test, sqsh_empty) {
 	config.source_size = 0;
 	archive = sqsh_archive_open(NULL, &config, &rv);
 	ASSERT_EQ(-SQSH_ERROR_SUPERBLOCK_TOO_SMALL, rv);
-	ASSERT_EQ((void *)NULL, archive);
+	// BUG: Not using ASSERT_EQ here, because of this issue:
+	// https://github.com/sheredom/utest.h/issues/151
+	ASSERT_TRUE(archive == NULL);
 }
 
 UTEST_MAIN()
