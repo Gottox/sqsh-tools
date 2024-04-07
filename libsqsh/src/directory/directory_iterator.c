@@ -72,16 +72,16 @@ load_metablock(
 			&iterator->metablock, archive, start_address, upper_limit);
 }
 
-static struct SqshDataDirectoryEntry *
+static const struct SqshDataDirectoryEntry *
 get_entry(const struct SqshDirectoryIterator *iterator) {
 	const uint8_t *data = sqsh__metablock_reader_data(&iterator->metablock);
-	return (struct SqshDataDirectoryEntry *)data;
+	return (const struct SqshDataDirectoryEntry *)data;
 }
 
-static struct SqshDataDirectoryFragment *
+static const struct SqshDataDirectoryFragment *
 get_fragment(const struct SqshDirectoryIterator *iterator) {
 	const uint8_t *data = sqsh__metablock_reader_data(&iterator->metablock);
-	return (struct SqshDataDirectoryFragment *)data;
+	return (const struct SqshDataDirectoryFragment *)data;
 }
 
 static int
@@ -106,9 +106,9 @@ directory_iterator_index_lookup(
 		const uint32_t index_name_size =
 				sqsh__directory_index_iterator_name_size(&index_iterator);
 
+		const size_t cmp_size = SQSH_MIN(index_name_size, name_len);
 		/* BUG: the branch could be taken too early when the name is a prefix */
-		if (strncmp(name, (char *)index_name,
-					SQSH_MIN(index_name_size, name_len + 1)) < 0) {
+		if (strncmp(name, index_name, cmp_size) < 0) {
 			break;
 		}
 		outer_offset = sqsh__directory_index_iterator_start(&index_iterator);
@@ -306,7 +306,7 @@ sqsh_directory_iterator_lookup(
 		if (name_len != entry_name_size) {
 			continue;
 		}
-		if (strncmp(name, (char *)entry_name, entry_name_size) == 0) {
+		if (strncmp(name, entry_name, entry_name_size) == 0) {
 			return directory_iterator_next_finalize(iterator);
 		}
 	}
@@ -448,7 +448,7 @@ sqsh_directory_iterator_name2(
 		const struct SqshDirectoryIterator *iterator, size_t *len) {
 	const struct SqshDataDirectoryEntry *entry = get_entry(iterator);
 	*len = sqsh__data_directory_entry_name_size(entry) + 1;
-	return (char *)sqsh__data_directory_entry_name(entry);
+	return (const char *)sqsh__data_directory_entry_name(entry);
 }
 
 const char *
