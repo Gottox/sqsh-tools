@@ -17,8 +17,6 @@ jobs:
     - uses: actions/checkout@v3
     - name: configure
       run: |
-        apk add --repository https://dl-cdn.alpinelinux.org/alpine/edge/testing muon
-        apk add clang16-extra-tools
         meson setup /tmp/build \
           -Dwerror=true \
           -Dexamples=true  \
@@ -60,7 +58,6 @@ jobs:
     - uses: actions/checkout@v3
     - name: configure
       run: |
-        apk add zlib-dev lz4-dev xz-dev zstd-dev
         CC=gcc meson setup /tmp/build \
           -Dwerror=true \
           -Dexamples=true  \
@@ -87,7 +84,6 @@ jobs:
     - uses: actions/checkout@v3
     - name: configure
       run: |
-        apk add zlib-dev lz4-dev xz-dev zstd-dev
         CC=clang meson setup /tmp/build \
           -Dwerror=true \
           -Dexamples=false  \
