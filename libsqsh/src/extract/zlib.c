@@ -77,14 +77,13 @@ static int
 sqsh_zlib_finish(void *context, uint8_t *target, size_t *target_size) {
 	(void)target;
 
-	int rv;
+	int rv = 0;
 	z_stream *stream = context;
 	stream->next_in = Z_NULL;
 	stream->avail_in = 0;
 
-	rv = inflate(stream, Z_FINISH);
-
-	if (rv != Z_STREAM_END) {
+	int zrv = inflate(stream, Z_FINISH);
+	if (zrv != Z_STREAM_END) {
 		rv = -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 		goto out;
 	}
