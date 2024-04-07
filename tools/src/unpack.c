@@ -185,7 +185,6 @@ extract_file(
 		rv = EXIT_FAILURE;
 		goto out;
 	}
-	fclose(stream);
 
 	rv = rename(tmp_filename, filename);
 	if (rv < 0 && errno != ENOENT) {
@@ -193,6 +192,9 @@ extract_file(
 		goto out;
 	}
 out:
+	if (stream != NULL) {
+		fclose(stream);
+	}
 	return rv;
 }
 
