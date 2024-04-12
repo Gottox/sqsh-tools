@@ -23,10 +23,6 @@ sqsh_test2 = [
     'tree/traversal.c',
     'tree/walker.c',
     'xattr/xattr_iterator.c',
-]
-sqsh_test = [
-    'extract/extract.c',
-    'fuzzer_repro.c',
     'include_tests/sqsh_archive.c',
     'include_tests/sqsh_easy.c',
     'include_tests/sqsh_common.c',
@@ -37,7 +33,10 @@ sqsh_test = [
     'include_tests/sqsh_table.c',
     'include_tests/sqsh_tree.c',
     'include_tests/sqsh_xattr.c',
+    'extract/extract.c',
+    'fuzzer_repro.c',
 ]
+sqsh_test = []
 sqsh_extra_source = {
     'fuzzer_repro.c': '../../fuzzer/simple.c',
 }
