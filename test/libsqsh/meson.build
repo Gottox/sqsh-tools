@@ -1,6 +1,6 @@
 add_languages('cpp', native: false)
 
-sqsh_test2 = [
+sqsh_test = [
     'cpp-test.cpp',
     'archive/compression_options.c',
     'archive/inode_map.c',
@@ -23,10 +23,6 @@ sqsh_test2 = [
     'tree/traversal.c',
     'tree/walker.c',
     'xattr/xattr_iterator.c',
-]
-sqsh_test = [
-    'extract/extract.c',
-    'fuzzer_repro.c',
     'include_tests/sqsh_archive.c',
     'include_tests/sqsh_easy.c',
     'include_tests/sqsh_common.c',
@@ -37,6 +33,8 @@ sqsh_test = [
     'include_tests/sqsh_table.c',
     'include_tests/sqsh_tree.c',
     'include_tests/sqsh_xattr.c',
+    'extract/extract.c',
+    'fuzzer_repro.c',
 ]
 sqsh_extra_source = {
     'fuzzer_repro.c': '../../fuzzer/simple.c',
@@ -80,33 +78,6 @@ sqsh_extra_source += {
 }
 
 foreach p : sqsh_test
-    sources = [p, sqsh_test_util]
-    if sqsh_extra_source.has_key(p)
-        sources += sqsh_extra_source[p]
-    endif
-    this_c_args = ['-Wno-deprecated-declarations']
-    this_c_args += test_c_args
-    this_cpp_args = []
-    this_cpp_args += test_cpp_args
-    t = executable(
-        p.underscorify(),
-        sources,
-        install: false,
-        c_args: this_c_args,
-        cpp_args: this_cpp_args,
-        include_directories: [
-            libsqsh_include,
-            libsqsh_common_include,
-            libsqsh_private_include,
-            libmksqsh_include,
-        ],
-        link_with: [libsqsh.get_static_lib(), libmksqsh.get_static_lib()],
-        dependencies: [threads_dep, testlib_dep, cextras_dep],
-    )
-    test(p, t)
-endforeach
-
-foreach p : sqsh_test2
     sources = [p, sqsh_test_util]
     if sqsh_extra_source.has_key(p)
         sources += sqsh_extra_source[p]
