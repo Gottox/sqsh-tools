@@ -346,6 +346,31 @@ SQSH_NO_EXPORT extern const struct SqshExtractorImpl *const sqsh__impl_zlib;
  */
 SQSH_NO_EXPORT extern const struct SqshExtractorImpl *const sqsh__impl_zstd;
 
+/***************************************
+ * extract/radix.c
+ */
+
+struct SqshExtractRadix {
+	/**
+	 * @privatesection
+	 */
+	size_t child_count;
+	struct SqshExtractRadix *parent;
+	union {
+		struct SqshExtractRadix *radix[256];
+		struct SqshExtractList *list;
+	} children;
+};
+
+struct SqshExtractRadixList {
+	struct SqshExtractView view;
+	struct SqshExtractRadixList *next;
+};
+
+SQSH_NO_EXPORT int sqsh__extract_radix_init(struct SqshExtractRadix *radix);
+
+SQSH_NO_EXPORT int sqsh__extract_radix_cleanup(struct SqshExtractRadix *radix);
+
 #ifdef __cplusplus
 }
 #endif
