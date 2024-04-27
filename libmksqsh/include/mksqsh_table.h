@@ -86,6 +86,24 @@ int mksqsh__fragment_table_flush(struct MksqshFragmentTable *table);
 
 int mksqsh__fragment_table_cleanup(struct MksqshFragmentTable *table);
 
+/***************************************
+ * table/id_table_builder.c
+ */
+
+struct MksqshIdTable {
+	struct MksqshTable table;
+};
+
+int mksqsh__id_table_init(
+		struct MksqshIdTable *table, FILE *content_output, FILE *lookup_output);
+
+int mksqsh__id_table_add(
+		struct MksqshIdTable *table, uint64_t start, uint32_t size);
+
+int mksqsh__id_table_flush(struct MksqshIdTable *table);
+
+int mksqsh__id_table_cleanup(struct MksqshIdTable *table);
+
 #ifdef __cplusplus
 }
 #endif
