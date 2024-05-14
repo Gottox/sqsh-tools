@@ -97,8 +97,7 @@ struct MksqshIdTable {
 int mksqsh__id_table_init(
 		struct MksqshIdTable *table, FILE *content_output, FILE *lookup_output);
 
-int mksqsh__id_table_add(
-		struct MksqshIdTable *table, uint64_t start, uint32_t size);
+int mksqsh__id_table_add(struct MksqshIdTable *table, uint32_t id);
 
 int mksqsh__id_table_flush(struct MksqshIdTable *table);
 

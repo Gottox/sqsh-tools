@@ -31,12 +31,12 @@
  * @file         inode_builder.c
  */
 
-#include "sqsh_error.h"
 #define _DEFAULT_SOURCE
 
 #include <mksqsh_metablock.h>
 #include <sqsh_common_private.h>
 #include <sqsh_data_set.h>
+#include <sqsh_error.h>
 #include <string.h>
 
 int
@@ -108,6 +108,11 @@ mksqsh__metablock_flush(struct MksqshMetablock *metablock) {
 	rv = 0;
 out:
 	return rv;
+}
+
+bool
+mksqsh__metablock_was_flushed(const struct MksqshMetablock *metablock) {
+	return metablock->flushed;
 }
 
 int

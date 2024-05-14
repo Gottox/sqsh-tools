@@ -42,7 +42,7 @@
 UTEST(path_resolver, resolver_symlink_recursion) {
 	int rv;
 	struct SqshArchive archive = {0};
-	uint8_t payload[] = {
+	uint8_t payload[8192] = {
 			/* clang-format off */
 			SQSH_HEADER,
 			/* inode */
@@ -76,7 +76,7 @@ UTEST(path_resolver, resolver_symlink_recursion) {
 UTEST(path_resolver, resolver_symlink_alternating_recursion) {
 	int rv;
 	struct SqshArchive archive = {0};
-	uint8_t payload[] = {
+	uint8_t payload[8192] = {
 			/* clang-format off */
 			SQSH_HEADER,
 			/* inode */
@@ -115,7 +115,7 @@ UTEST(path_resolver, resolver_symlink_alternating_recursion) {
 UTEST(path_resolver, resolver_symlink_open) {
 	int rv;
 	struct SqshArchive archive = {0};
-	uint8_t payload[] = {
+	uint8_t payload[8192] = {
 			/* clang-format off */
 			SQSH_HEADER,
 			/* inode */
@@ -170,7 +170,7 @@ expect_inode(struct SqshPathResolver *resolver, uint32_t inode_number) {
 UTEST(path_resolver, resolver_directory_enter) {
 	int rv;
 	struct SqshArchive archive = {0};
-	uint8_t payload[] = {
+	uint8_t payload[8192] = {
 			/* clang-format off */
 			SQSH_HEADER,
 			/* inode */
@@ -214,7 +214,7 @@ UTEST(path_resolver, resolver_directory_enter) {
 UTEST(path_resolver, resolver_uninitialized_up) {
 	int rv;
 	struct SqshArchive archive = {0};
-	uint8_t payload[] = {
+	uint8_t payload[8192] = {
 			/* clang-format off */
 			SQSH_HEADER,
 			/* inode */
@@ -244,7 +244,7 @@ UTEST(path_resolver, resolver_uninitialized_up) {
 UTEST(path_resolver, resolver_uninitialized_down) {
 	int rv;
 	struct SqshArchive archive = {0};
-	uint8_t payload[] = {
+	uint8_t payload[8192] = {
 			/* clang-format off */
 			SQSH_HEADER,
 			/* inode */
@@ -274,7 +274,7 @@ UTEST(path_resolver, resolver_uninitialized_down) {
 UTEST(path_resolver, resolver_next) {
 	int rv;
 	struct SqshArchive archive = {0};
-	uint8_t payload[] = {
+	uint8_t payload[8192] = {
 			/* clang-format off */
 			SQSH_HEADER,
 			/* inode */
