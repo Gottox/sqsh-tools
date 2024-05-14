@@ -39,47 +39,65 @@
 #include <sqsh_common_private.h>
 #include <sqsh_data_set.h>
 
+static int
+table_add_lookup(struct MksqshTable *table) {
+	int rv = 0;
+	const uint64_t ref = mksqsh__metablock_ref(&table->metablock_writer);
+	const uint64_t outer_ref = sqsh_address_ref_outer_offset(ref);
+	const uint64_t outer_ref_le = CX_CPU_2_LE64(outer_ref);
+	const unsigned long write =
+			fwrite(&outer_ref_le, sizeof(outer_ref_le), 1, table->output);
+	if (write != 1) {
+		rv = -1; // TODO: proper error code
+		goto out;
+	}
+out:
+	return rv;
+}
+
 int
 mksqsh__table_init(
 		struct MksqshTable *table, size_t entry_size, FILE *metablock_output,
 		FILE *output) {
-	assert(0 == entry_size % SQSH_METABLOCK_BLOCK_SIZE);
+	int rv = 0;
+	assert(0 == SQSH_METABLOCK_BLOCK_SIZE % entry_size);
 
 	table->entry_size = entry_size;
 	table->output = output;
 	table->metablock_output = metablock_output;
-	return mksqsh__metablock_init(&table->metablock_writer, metablock_output);
+
+	rv = mksqsh__metablock_init(&table->metablock_writer, metablock_output);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = table_add_lookup(table);
+	if (rv < 0) {
+		goto out;
+	}
+
+out:
+	return rv;
 }
 
 int
 mksqsh__table_add(
 		struct MksqshTable *table, const void *entry, size_t entry_size) {
 	int rv = 0;
-	(void)table;
-	(void)entry;
-	(void)entry_size;
 	assert(entry_size == table->entry_size);
-
-	const uint64_t ref = mksqsh__metablock_ref(&table->metablock_writer);
-	const uint64_t outer_ref = sqsh_address_ref_outer_offset(ref);
-	const uint64_t inner_ref =
-			sqsh_address_ref_inner_offset(ref) / table->entry_size;
-
-	const uint64_t current_ref = sqsh_address_ref_create(outer_ref, inner_ref);
-	table->entry_count += 1;
-
-	const uint64_t current_ref_le = CX_CPU_2_LE64(current_ref);
-	const unsigned long write =
-			fwrite(&current_ref_le, sizeof(current_ref_le), 1, table->output);
-	if (write != 1) {
-		rv = -1; // TODO: proper error code
-		goto out;
-	}
 
 	rv = mksqsh__metablock_write(&table->metablock_writer, entry, entry_size);
 	if (rv < 0) {
 		goto out;
 	}
+
+	if (mksqsh__metablock_was_flushed(&table->metablock_writer)) {
+		rv = table_add_lookup(table);
+		if (rv < 0) {
+			goto out;
+		}
+	}
+
 out:
 	return rv;
 }

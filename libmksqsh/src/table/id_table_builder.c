@@ -2,20 +2,21 @@
 #include <mksqsh_table.h>
 #include <sqsh_data_set.h>
 
+#define ENTRY_SIZE sizeof(uint32_t)
+
 int
 mksqsh__id_table_init(
 		struct MksqshIdTable *table, FILE *content_output,
 		FILE *lookup_output) {
-	const size_t entry_size = sizeof(uint32_t);
 	return mksqsh__table_init(
-			&table->table, entry_size, content_output, lookup_output);
+			&table->table, ENTRY_SIZE, content_output, lookup_output);
 }
 
 int
-mksqsh__id_table_write(struct MksqshIdTable *table, uint32_t id) {
+mksqsh__id_table_add(struct MksqshIdTable *table, uint32_t id) {
 	uint32_t id_le = CX_CPU_2_LE32(id);
 
-	return mksqsh__table_add(&table->table, &id_le, sizeof(id_le));
+	return mksqsh__table_add(&table->table, &id_le, ENTRY_SIZE);
 }
 
 int
