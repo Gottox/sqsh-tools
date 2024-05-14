@@ -1,0 +1,20 @@
+configure:
+  - -Ddefault_library=static
+  - -Dexamples=true
+  - -Db_lundef=false
+  - -Dtest=true
+  - -Ddoc=internal
+  - -Dcurl=enabled
+  - -Dzlib=enabled
+  - -Dlz4=enabled
+  - -Dlzma=enabled
+  - -Dzstd=enabled
+  - -Dfuse=enabled
+  - -Dfuse-old=enabled
+  - -Db_coverage=true
+  - -Db_sanitize=address,undefined
+  #- -Dtest=extended
+  #- -Dfuzzer=true
+  #- -Dfuzzer_timeout=10
+default:
+  - test
