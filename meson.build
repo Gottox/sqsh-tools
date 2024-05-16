@@ -6,7 +6,7 @@ project(
         'optimization=0',
         'warning_level=3',
     ],
-    version: '1.3.0',
+    version: '1.3.1',
     license: 'BSD-2-Clause',
 )
 
