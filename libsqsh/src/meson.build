@@ -8,6 +8,7 @@ libsqsh_sources = files(
     'directory/directory_iterator.c',
     'easy/directory.c',
     'easy/file.c',
+    'easy/traversal.c',
     'easy/xattr.c',
     'extract/extract_manager.c',
     'extract/extract_view.c',

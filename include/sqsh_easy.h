@@ -147,6 +147,13 @@ char **sqsh_easy_directory_list_path(
 		struct SqshArchive *archive, const char *path, int *err);
 
 /***************************************
+ * easy/traversal.c
+ */
+
+char **sqsh_easy_tree_traversal(
+		struct SqshArchive *archive, const char *path, int *err);
+
+/***************************************
  * easy/xattr.c
  */
 
