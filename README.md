@@ -111,6 +111,17 @@ sqsh_archive_close(archive);
 
 Find further examples in the [examples](examples) directory.
 
+### Note on Deprecation
+
+The sqsh-tools team works hard to keep the API stable. As a result,
+some functions are marked as deprecated but remain available for the
+current major version. The replacements for these deprecated functions
+typically have the same name with a `...2` suffix.
+
+In the next major (at the time of writing v2.0.0) version, the `...2`
+functions will be renamed to their original names, and the deprecated
+functions will be removed.
+
 ### LZO2
 
 LZO2 is a fast compression algorithm. Unfortunately the current implementation

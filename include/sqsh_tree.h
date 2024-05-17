@@ -429,10 +429,29 @@ sqsh_tree_walker_free(struct SqshTreeWalker *reader);
  * tree/traversal.c
  */
 
+/**
+ * @brief The state of the tree traversal.
+ */
 enum SqshTreeTraversalState {
+	/**
+	 * The traversal is in the initial state, right after initialization.
+	 */
 	SQSH_TREE_TRAVERSAL_STATE_INIT,
+	/**
+	 * The traversal iterator is currently pointing at a file object. This
+	 * includes special files like named pipes, symlinks, or devices but not
+	 * directories.
+	 */
 	SQSH_TREE_TRAVERSAL_STATE_FILE,
+	/**
+	 * The traversal iterator is currently pointing at a directory object, right
+	 * before SqshTreeTraversal is about to descend into it.
+	 */
 	SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN,
+	/**
+	 * The traversal iterator is currently pointing at a directory object, after
+	 * SqshTreeTraversal has finised iterating over it.
+	 */
 	SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END,
 };
 
@@ -502,9 +521,10 @@ enum SqshTreeTraversalState
 sqsh_tree_traversal_state(const struct SqshTreeTraversal *traversal);
 
 /**
- * @brief Returns the name of the current entry. This entry is not zero
- * terminated.
  * @memberof SqshTreeTraversal
+ * @brief Returns the name of the current entry. This entry is not zero
+ * terminated. The function will return an emptry string for the uppermost
+ * object.
  *
  * @param[in]   traversal  The traversal to use
  * @param[out]  len        Pointer to a size_t where the length of the name will
