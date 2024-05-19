@@ -111,11 +111,7 @@ struct SqshMapper {
 	const struct SqshMemoryMapperImpl *impl;
 	size_t block_size;
 	size_t archive_size;
-	union {
-		struct SqshMmapMapper mm;
-		struct SqshStaticMapper sm;
-		struct SqshCurlMapper cl;
-	} data;
+	void *user_data;
 };
 
 /**

@@ -128,11 +128,12 @@ get_file_time(CURL *handle, uint64_t *file_time) {
 
 static CURL *
 configure_handle(struct SqshMapper *mapper) {
-	CURL *handle = mapper->data.cl.handle;
+	struct SqshCurlMapper *user_data = mapper->user_data;
+	CURL *handle = user_data->handle;
 	const long tls_versions =
 			CURL_SSLVERSION_TLSv1_2 | CURL_SSLVERSION_MAX_DEFAULT;
 	curl_easy_reset(handle);
-	curl_easy_setopt(handle, CURLOPT_URL, mapper->data.cl.url);
+	curl_easy_setopt(handle, CURLOPT_URL, user_data->url);
 	curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 1L);
 	curl_easy_setopt(handle, CURLOPT_TCP_KEEPALIVE, 1L);
 	curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1L);
@@ -209,10 +210,16 @@ sqsh_mapper_curl_init(
 	int rv = 0;
 	curl_global_init(CURL_GLOBAL_ALL);
 
-	mapper->data.cl.url = strdup(input);
-	mapper->data.cl.handle = curl_easy_init();
+	struct SqshCurlMapper *user_data = calloc(1, sizeof(struct SqshCurlMapper));
+	if (user_data == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
+	}
+	user_data->url = strdup(input);
+	user_data->handle = curl_easy_init();
+	mapper->user_data = user_data;
 
-	rv = sqsh__mutex_init(&mapper->data.cl.lock);
+	rv = sqsh__mutex_init(&user_data->lock);
 	if (rv < 0) {
 		goto out;
 	}
@@ -222,8 +229,8 @@ sqsh_mapper_curl_init(
 
 	uint64_t size64 = *size;
 	rv = curl_download(
-			handle, 0, block_size, &mapper->data.cl.header_cache, &size64,
-			&mapper->data.cl.expected_time);
+			handle, 0, block_size, &user_data->header_cache, &size64,
+			&user_data->expected_time);
 	if (rv < 0) {
 		goto out;
 	}
@@ -241,18 +248,19 @@ static int
 sqsh_mapper_curl_map(struct SqshMapSlice *mapping) {
 	const sqsh_index_t offset = mapping->offset;
 	const size_t size = mapping->size;
+	struct SqshCurlMapper *user_data = mapping->mapper->user_data;
 	int rv = 0;
 	uint64_t file_size = 0;
 	uint64_t file_time = 0;
 
-	sqsh__mutex_t *lock = &mapping->mapper->data.cl.lock;
+	sqsh__mutex_t *lock = &user_data->lock;
 	rv = sqsh__mutex_lock(lock);
 	if (rv < 0) {
 		goto out;
 	}
-	if (offset == 0 && mapping->mapper->data.cl.header_cache != NULL) {
-		mapping->data = mapping->mapper->data.cl.header_cache;
-		mapping->mapper->data.cl.header_cache = NULL;
+	if (offset == 0 && user_data->header_cache != NULL) {
+		mapping->data = user_data->header_cache;
+		user_data->header_cache = NULL;
 	} else {
 		CURL *handle = configure_handle(mapping->mapper);
 
@@ -263,7 +271,7 @@ sqsh_mapper_curl_map(struct SqshMapSlice *mapping) {
 			goto out;
 		}
 
-		if (file_time != mapping->mapper->data.cl.expected_time) {
+		if (file_time != user_data->expected_time) {
 			rv = -SQSH_ERROR_MAPPER_MAP;
 			goto out;
 		}
@@ -284,10 +292,12 @@ out:
 
 static int
 sqsh_mapper_curl_cleanup(struct SqshMapper *mapper) {
-	free(mapper->data.cl.url);
-	free(mapper->data.cl.header_cache);
-	sqsh__mutex_destroy(&mapper->data.cl.lock);
-	curl_easy_cleanup(mapper->data.cl.handle);
+	struct SqshCurlMapper *user_data = mapper->user_data;
+
+	free(user_data->url);
+	free(user_data->header_cache);
+	sqsh__mutex_destroy(&user_data->lock);
+	curl_easy_cleanup(user_data->handle);
 	return 0;
 }
 

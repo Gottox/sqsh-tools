@@ -42,10 +42,10 @@
 
 static off_t
 mmap_page_offset(const struct SqshMapSlice *mapping) {
+	struct SqshMmapMapper *user_data = mapping->mapper->user_data;
 	const off_t offset = (off_t)mapping->offset;
-	const struct SqshMapper *mapper = mapping->mapper;
 
-	return offset % mapper->data.mm.page_size;
+	return offset % user_data->page_size;
 }
 
 static sqsh_index_t
@@ -71,15 +71,26 @@ sqsh_mapper_mmap_init(
 	}
 
 	if (fstat(fd, &st) < 0) {
-		close(fd);
 		rv = -errno;
 		goto out;
 	}
 	*size = (size_t)st.st_size;
-	mapper->data.mm.fd = fd;
-	mapper->data.mm.page_size = sysconf(_SC_PAGESIZE);
+	struct SqshMmapMapper *user_data = calloc(1, sizeof(struct SqshMmapMapper));
+	if (user_data == NULL) {
+		rv = -ENOMEM;
+		goto out;
+	}
+
+	user_data->fd = fd;
+	user_data->page_size = sysconf(_SC_PAGESIZE);
+	mapper->user_data = user_data;
 
 out:
+	if (rv < 0) {
+		if (fd >= 0) {
+			close(fd);
+		}
+	}
 	return rv;
 }
 static int
@@ -87,6 +98,7 @@ sqsh_mapping_mmap_map(struct SqshMapSlice *mapping) {
 	const off_t offset = (off_t)mapping->offset;
 	const size_t size = mapping->size;
 	const struct SqshMapper *mapper = mapping->mapper;
+	struct SqshMmapMapper *user_data = mapper->user_data;
 
 	const off_t mmap_offset = mmap_page_offset(mapping);
 	const size_t mmap_size = mmap_page_size(mapping);
@@ -95,8 +107,8 @@ sqsh_mapping_mmap_map(struct SqshMapSlice *mapping) {
 
 	if (size != 0) {
 		file_map =
-				mmap(NULL, mmap_size, PROT_READ, MAP_PRIVATE,
-					 mapper->data.mm.fd, offset - mmap_offset);
+				mmap(NULL, mmap_size, PROT_READ, MAP_PRIVATE, user_data->fd,
+					 offset - mmap_offset);
 		if (file_map == MAP_FAILED) {
 			return -errno;
 		}
@@ -108,7 +120,9 @@ sqsh_mapping_mmap_map(struct SqshMapSlice *mapping) {
 
 static int
 sqsh_mapper_mmap_cleanup(struct SqshMapper *mapper) {
-	close(mapper->data.mm.fd);
+	struct SqshMmapMapper *user_data = mapper->user_data;
+	close(user_data->fd);
+	free(user_data);
 	return 0;
 }
 

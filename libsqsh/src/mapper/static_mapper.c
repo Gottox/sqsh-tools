@@ -31,26 +31,37 @@
  * @file         static_mapper.c
  */
 
+#include "sqsh_error.h"
 #include <sqsh_mapper_private.h>
+#include <stdlib.h>
 
 static int
 sqsh_mapper_static_mem_init(
 		struct SqshMapper *mapper, const void *input, size_t *size) {
 	(void)size;
-	mapper->data.sm.data = input;
+	struct SqshStaticMapper *user_data =
+			calloc(1, sizeof(struct SqshStaticMapper));
+	if (!user_data) {
+		return -SQSH_ERROR_MALLOC_FAILED;
+	}
+
+	user_data->data = input;
+	mapper->user_data = user_data;
+
 	return 0;
 }
 static int
 sqsh_mapper_static_mem_map(struct SqshMapSlice *mapping) {
+	struct SqshStaticMapper *user_data = mapping->mapper->user_data;
 	size_t offset = mapping->offset;
 	/* Cast to remove const qualifier. */
-	uint8_t *data = (uint8_t *)mapping->mapper->data.sm.data;
+	uint8_t *data = (uint8_t *)user_data->data;
 	mapping->data = &data[offset];
 	return 0;
 }
 static int
 sqsh_mapper_static_mem_cleanup(struct SqshMapper *mapper) {
-	(void)mapper;
+	free(mapper->user_data);
 	return 0;
 }
 static int
