@@ -108,7 +108,9 @@ struct SqshMemoryMapperImpl {
 	 * @privatesection
 	 */
 	size_t block_size_hint;
-	int (*init)(struct SqshMapper *mapper, const void *input, size_t *size);
+	int (*init)(
+			const struct SqshMapper *mapper, const void *input, size_t *size,
+			void **user_data);
 	int (*map)(struct SqshMapSlice *map);
 	const uint8_t *(*map_data)(const struct SqshMapSlice *mapping);
 	int (*unmap)(struct SqshMapSlice *mapping);

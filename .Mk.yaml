@@ -13,7 +13,7 @@ configure:
   - -Dfuse-old=enabled
   - -Db_coverage=true
   - -Db_sanitize=address,undefined
-  #- -Dtest=extended
+  - -Dtest=extended
   #- -Dfuzzer=true
   #- -Dfuzzer_timeout=10
 default:

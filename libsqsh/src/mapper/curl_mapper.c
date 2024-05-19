@@ -127,13 +127,12 @@ get_file_time(CURL *handle, uint64_t *file_time) {
 }
 
 static CURL *
-configure_handle(struct SqshMapper *mapper) {
-	struct SqshCurlMapper *user_data = mapper->user_data;
-	CURL *handle = user_data->handle;
+configure_handle(struct SqshCurlMapper *mapper) {
+	CURL *handle = mapper->handle;
 	const long tls_versions =
 			CURL_SSLVERSION_TLSv1_2 | CURL_SSLVERSION_MAX_DEFAULT;
 	curl_easy_reset(handle);
-	curl_easy_setopt(handle, CURLOPT_URL, user_data->url);
+	curl_easy_setopt(handle, CURLOPT_URL, mapper->url);
 	curl_easy_setopt(handle, CURLOPT_NOPROGRESS, 1L);
 	curl_easy_setopt(handle, CURLOPT_TCP_KEEPALIVE, 1L);
 	curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1L);
@@ -205,32 +204,34 @@ out:
 
 static int
 sqsh_mapper_curl_init(
-		struct SqshMapper *mapper, const void *input, size_t *size) {
+		const struct SqshMapper *mapper, const void *input, size_t *size,
+		void **user_data) {
 	(void)size;
 	int rv = 0;
 	curl_global_init(CURL_GLOBAL_ALL);
 
-	struct SqshCurlMapper *user_data = calloc(1, sizeof(struct SqshCurlMapper));
-	if (user_data == NULL) {
+	struct SqshCurlMapper *curl_mapper =
+			calloc(1, sizeof(struct SqshCurlMapper));
+	if (curl_mapper == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
-	user_data->url = strdup(input);
-	user_data->handle = curl_easy_init();
-	mapper->user_data = user_data;
+	curl_mapper->url = strdup(input);
+	curl_mapper->handle = curl_easy_init();
+	*user_data = curl_mapper;
 
-	rv = sqsh__mutex_init(&user_data->lock);
+	rv = sqsh__mutex_init(&curl_mapper->lock);
 	if (rv < 0) {
 		goto out;
 	}
 
 	size_t block_size = sqsh__mapper_block_size(mapper);
-	CURL *handle = configure_handle(mapper);
+	CURL *handle = configure_handle(curl_mapper);
 
 	uint64_t size64 = *size;
 	rv = curl_download(
-			handle, 0, block_size, &user_data->header_cache, &size64,
-			&user_data->expected_time);
+			handle, 0, block_size, &curl_mapper->header_cache, &size64,
+			&curl_mapper->expected_time);
 	if (rv < 0) {
 		goto out;
 	}
@@ -262,7 +263,7 @@ sqsh_mapper_curl_map(struct SqshMapSlice *mapping) {
 		mapping->data = user_data->header_cache;
 		user_data->header_cache = NULL;
 	} else {
-		CURL *handle = configure_handle(mapping->mapper);
+		CURL *handle = configure_handle(mapping->mapper->user_data);
 
 		rv = curl_download(
 				handle, offset, size, (uint8_t **)&mapping->data, &file_size,

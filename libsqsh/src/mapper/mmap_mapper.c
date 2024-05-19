@@ -58,8 +58,10 @@ mmap_page_size(const struct SqshMapSlice *mapping) {
 
 static int
 sqsh_mapper_mmap_init(
-		struct SqshMapper *mapper, const void *input, size_t *size) {
+		const struct SqshMapper *mapper, const void *input, size_t *size,
+		void **user_data) {
 	(void)size;
+	(void)mapper;
 	int rv = 0;
 	int fd = -1;
 	struct stat st = {0};
@@ -75,15 +77,16 @@ sqsh_mapper_mmap_init(
 		goto out;
 	}
 	*size = (size_t)st.st_size;
-	struct SqshMmapMapper *user_data = calloc(1, sizeof(struct SqshMmapMapper));
+	struct SqshMmapMapper *mmap_mapper =
+			calloc(1, sizeof(struct SqshMmapMapper));
 	if (user_data == NULL) {
 		rv = -ENOMEM;
 		goto out;
 	}
 
-	user_data->fd = fd;
-	user_data->page_size = sysconf(_SC_PAGESIZE);
-	mapper->user_data = user_data;
+	mmap_mapper->fd = fd;
+	mmap_mapper->page_size = sysconf(_SC_PAGESIZE);
+	*user_data = mmap_mapper;
 
 out:
 	if (rv < 0) {
