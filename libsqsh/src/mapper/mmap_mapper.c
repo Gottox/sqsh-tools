@@ -42,7 +42,7 @@
 
 static off_t
 mmap_page_offset(const struct SqshMapSlice *mapping) {
-	struct SqshMmapMapper *user_data = mapping->mapper->user_data;
+	const struct SqshMmapMapper *user_data = mapping->mapper->user_data;
 	const off_t offset = (off_t)mapping->offset;
 
 	return offset % user_data->page_size;
@@ -89,10 +89,8 @@ sqsh_mapper_mmap_init(
 	*user_data = mmap_mapper;
 
 out:
-	if (rv < 0) {
-		if (fd >= 0) {
-			close(fd);
-		}
+	if (rv < 0 && fd >= 0) {
+		close(fd);
 	}
 	return rv;
 }
@@ -101,7 +99,7 @@ sqsh_mapping_mmap_map(struct SqshMapSlice *mapping) {
 	const off_t offset = (off_t)mapping->offset;
 	const size_t size = mapping->size;
 	const struct SqshMapper *mapper = mapping->mapper;
-	struct SqshMmapMapper *user_data = mapper->user_data;
+	const struct SqshMmapMapper *user_data = mapper->user_data;
 
 	const off_t mmap_offset = mmap_page_offset(mapping);
 	const size_t mmap_size = mmap_page_size(mapping);

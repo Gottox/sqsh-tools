@@ -1,4 +1,5 @@
 configure:
+  - -Dwerror=true
   - -Ddefault_library=static
   - -Dexamples=true
   - -Db_lundef=false
