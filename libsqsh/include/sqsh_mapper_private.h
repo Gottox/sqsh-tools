@@ -82,20 +82,6 @@ struct SqshMmapMapper {
 };
 
 /***************************************
- * mapper/static_mapper.c
- */
-
-/**
- * @brief The static mapper.
- */
-struct SqshStaticMapper {
-	/**
-	 * @privatesection
-	 */
-	const uint8_t *data;
-};
-
-/***************************************
  * mapper/mapper.c
  */
 
