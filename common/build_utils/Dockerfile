@@ -1,6 +1,6 @@
 ARG BASE_IMAGE=alpine
 #ARG BASE_IMAGE=i386/alpine
-FROM ${BASE_IMAGE}:3.19
+FROM ${BASE_IMAGE}:3.20
 
 RUN apk add --no-cache \
 	gcc \
