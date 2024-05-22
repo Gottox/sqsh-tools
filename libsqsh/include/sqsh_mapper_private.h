@@ -34,7 +34,7 @@
 #ifndef SQSH_PRIVATE_MAPPER_H
 #define SQSH_PRIVATE_MAPPER_H
 
-#include "sqsh_mapper.h"
+#include <sqsh_mapper.h>
 
 #include "sqsh_reader_private.h"
 #include "sqsh_utils_private.h"
@@ -47,39 +47,6 @@ extern "C" {
 
 struct SqshArchive;
 struct SqshConfig;
-
-/***************************************
- * mapper/curl_mapper.c
- */
-
-/**
- * @brief The curl mapper.
- */
-struct SqshCurlMapper {
-	/**
-	 * @privatesection
-	 */
-	char *url;
-	uint64_t expected_time;
-	void *handle;
-	uint8_t *header_cache;
-	sqsh__mutex_t lock;
-};
-
-/***************************************
- * mapper/mmap_mapper.c
- */
-
-/**
- * @brief The mmap mapper.
- */
-struct SqshMmapMapper {
-	/**
-	 * @privatesection
-	 */
-	int fd;
-	long page_size;
-};
 
 /***************************************
  * mapper/mapper.c
@@ -108,12 +75,10 @@ struct SqshMemoryMapperImpl {
 	 * @privatesection
 	 */
 	size_t block_size_hint;
-	int (*init)(
-			const struct SqshMapper *mapper, const void *input, size_t *size,
-			void **user_data);
-	int (*map)(struct SqshMapSlice *map);
-	const uint8_t *(*map_data)(const struct SqshMapSlice *mapping);
-	int (*unmap)(struct SqshMapSlice *mapping);
+	int (*init)(struct SqshMapper *mapper, const void *input, size_t *size);
+	int (*map)(const struct SqshMapper *mapper, sqsh_index_t offset, size_t size,
+			   uint8_t **data);
+	int (*unmap)(const struct SqshMapper *mapper, uint8_t *data, size_t size);
 	int (*cleanup)(struct SqshMapper *mapper);
 };
 
@@ -154,6 +119,7 @@ SQSH_NO_EXPORT size_t sqsh__mapper_size(const struct SqshMapper *mapper);
  */
 SQSH_NO_EXPORT size_t sqsh__mapper_block_size(const struct SqshMapper *mapper);
 
+
 /**
  * @internal
  * @memberof SqshMapper
@@ -179,7 +145,7 @@ struct SqshMapSlice {
 	struct SqshMapper *mapper;
 	sqsh_index_t offset;
 	size_t size;
-	void *data;
+	uint8_t *data;
 };
 
 /**
@@ -193,6 +159,18 @@ struct SqshMapSlice {
  */
 SQSH_NO_EXPORT const uint8_t *
 sqsh__map_slice_data(const struct SqshMapSlice *mapping);
+
+/**
+ * @internal
+ * @memberof SqshMapSlice
+ * @brief Retrieves the offset of a mapping.
+ *
+ * @param[in] mapping The mapping to retrieve the offset from.
+ *
+ * @return The data in the mapping.
+ */
+SQSH_NO_EXPORT size_t
+sqsh__map_slice_offset(const struct SqshMapSlice *mapping);
 
 /**
  * @internal
