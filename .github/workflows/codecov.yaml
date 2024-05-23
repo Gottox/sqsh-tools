@@ -46,7 +46,7 @@ jobs:
          meson compile -C build
     - name: Test
       run: |
-         MESON_TESTTHREADS=1 meson test -C build
+         MESON_TESTTHREADS=1 meson test --verbose -C build
     - name: Generate Reports
       run: |
          ninja -C build coverage-xml

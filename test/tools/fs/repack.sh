@@ -33,7 +33,7 @@ mkdir -p "$WORK_DIR"
 cd "$WORK_DIR"
 
 # shellcheck disable=SC2086
-$MKSQUASHFS "$SOURCE_ROOT/.git" "$PWD/original.squashfs" $MKSQUASHFS_OPTS
+$MKSQUASHFS "$SOURCE_ROOT/libsqsh" "$PWD/original.squashfs" $MKSQUASHFS_OPTS
 
 mkdir -p "mnt"
 
