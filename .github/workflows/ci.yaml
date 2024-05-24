@@ -1,8 +1,12 @@
 name: CI
 on:
-  push: {}
+  push:
+    branches:
+    - "main"
   pull_request:
-    branches: [ "main" ]
+    branches:
+    - "main"
+    - "release/*"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -14,7 +18,7 @@ jobs:
     container:
       image: gottox/sqsh-build:x86_64
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: configure
       run: |
         meson setup /tmp/build \
@@ -55,7 +59,7 @@ jobs:
       image: gottox/sqsh-build:${{ matrix.arch }}
       options: --privileged
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: configure
       run: |
         CC=gcc meson setup /tmp/build \
@@ -81,7 +85,7 @@ jobs:
     container:
       image: gottox/sqsh-build:x86_64
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: configure
       run: |
         CC=clang meson setup /tmp/build \
@@ -104,7 +108,8 @@ jobs:
     needs:
     - format-check
     runs-on: ubuntu-latest
-    container: gottox/sqsh-build:${{ matrix.arch }}
+    container:
+      image: gottox/sqsh-build:${{ matrix.arch }}
     strategy:
       matrix:
         cc:
@@ -117,7 +122,7 @@ jobs:
           #- i386
           - x86_64
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: configure
       run: |
         meson wrap update-db
@@ -141,7 +146,7 @@ jobs:
     - format-check
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: install dependencies
       run: |
         sudo apt update
@@ -188,7 +193,7 @@ jobs:
           - x86_64
           - arm64
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: "cross-platform-actions/action@v0.19.0"
       with:
         operating_system: openbsd
@@ -217,22 +222,22 @@ jobs:
     runs-on: macos-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - run: |
           brew install git meson squashfs lz4 xz zstd macfuse
     - run: |
-          meson setup /tmp/build \
-            -Dwerror=true \
-            -Dexamples=true \
-            -Dcurl=disabled \
-            -Dzlib=enabled \
-            -Dlz4=enabled \
-            -Dlzma=enabled \
-            -Dzstd=enabled \
-            -Dfuse-old=enabled \
-            -Dfuse=disabled \
-            -Dtest=extended \
-            -Ddoc=false
+        meson setup /tmp/build \
+          -Dwerror=true \
+          -Dexamples=true \
+          -Dcurl=disabled \
+          -Dzlib=enabled \
+          -Dlz4=enabled \
+          -Dlzma=enabled \
+          -Dzstd=enabled \
+          -Dfuse-old=enabled \
+          -Dfuse=disabled \
+          -Dtest=extended \
+          -Ddoc=false
     - run: |
           meson test -C /tmp/build -t 5
 
@@ -241,9 +246,10 @@ jobs:
     - build
     - test
     runs-on: ubuntu-latest
-    container: gottox/sqsh-build:latest
+    container:
+      image: gottox/sqsh-build:latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: configure
@@ -261,8 +267,7 @@ jobs:
           -Ddoc=true
     - name: generate
       run: |
-        cd /tmp/build
-        meson compile doc
+        meson compile -C /tmp/build doc
     - name: deploy
       uses: peaceiris/actions-gh-pages@v3
       if: ${{ github.ref_type == 'tag' }}
@@ -270,3 +275,56 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: /tmp/build/doc/html
         destination_dir: doxygen
+
+  release:
+    needs:
+    - test
+    - fuzzer
+    - build
+    - build-linux32
+    - doxygen
+    runs-on: ubuntu-latest
+    container:
+      image: gottox/sqsh-build:latest
+      volumes:
+      - /tmp/build:/tmp/build
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: configure
+      run: |
+        git config --global --add safe.directory $PWD
+        meson setup /tmp/build \
+          -Dtest=true
+    - name: dist
+      run: |
+        meson dist -C /tmp/build \
+          --formats gztar,xztar \
+          --include-subprojects
+    - name: Create Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: tarball
+        path: /tmp/build/meson-dist/*
+    - name: check-version
+      if: ${{ github.ref_type == 'tag' }}
+      run: |
+        git tag --points-at > /tmp/tags.txt
+        meson introspect --projectinfo  /tmp/build \
+          | jq -r '"v" + .version' > /tmp/version.txt
+        if ! diff /tmp/version.txt /tmp/tags.txt; then
+          echo "Version mismatch"
+          exit 1
+        fi
+    - name: Create Release Draft
+      uses: softprops/action-gh-release@v2
+      if: ${{ github.ref_type == 'tag' }}
+      with:
+        draft: true
+        make_latest: true
+        generate_release_notes: true
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        files: /tmp/build/meson-dist/*

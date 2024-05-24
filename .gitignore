@@ -59,7 +59,7 @@ dkms.conf
 ### Meson ###
 # subproject directories
 /subprojects/packagecache
-/subprojects/cextras-*
+/subprojects/cextras
 /subprojects/utest.h
 
 # Meson Directories

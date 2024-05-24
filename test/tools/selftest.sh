@@ -24,8 +24,8 @@ mkdir -p "$tmpdir"
 PACKED="$tmpdir/squashfs-packed.img"
 UNPACKED="$tmpdir/squashfs-unpacked.img"
 
-$MKSQUASHFS .git "$PACKED" -noappend -keep-as-directory -b 4096
-$MKSQUASHFS .git "$UNPACKED" -noappend -keep-as-directory -b 4096 -noI -noId -noD -noF -noX
+$MKSQUASHFS "$SOURCE_ROOT/libsqsh" "$PACKED" -noappend -keep-as-directory -b 4096
+$MKSQUASHFS "$SOURCE_ROOT/libsqsh" "$UNPACKED" -noappend -keep-as-directory -b 4096 -noI -noId -noD -noF -noX
 
 $SQSH_LS -r "$PACKED" . > "$tmpdir"/packed.list
 $SQSH_LS -r "$UNPACKED" . > "$tmpdir"/unpacked.list

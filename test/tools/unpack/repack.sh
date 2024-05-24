@@ -22,7 +22,7 @@ mkdir -p "$WORK_DIR"
 cd "$WORK_DIR"
 
 # shellcheck disable=SC2086
-$MKSQUASHFS "$SOURCE_ROOT/.git" "original.squashfs" $MKSQUASHFS_OPTS
+$MKSQUASHFS "$SOURCE_ROOT/libsqsh" "original.squashfs" $MKSQUASHFS_OPTS
 
 mkdir -p "unpack"
 
