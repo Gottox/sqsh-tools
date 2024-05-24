@@ -32,9 +32,9 @@ zstd_dep = dependency('libzstd', required: get_option('zstd'))
 cextras_dep = subproject('cextras').get_variable('cextras_dep')
 
 extractor_count = 0
-extractors = [lz4_dep, lzma_dep, zlib_dep, zlib_dep]
+extractors = [lz4_dep, lzma_dep, zlib_dep, zstd_dep]
 extractors_str = ''
-foreach dep : [lz4_dep, lzma_dep, zlib_dep, zlib_dep]
+foreach dep : extractors
     extractors_str += '\n   - ' + dep.name()
     if dep.found()
         extractor_count += 1
