@@ -18,7 +18,7 @@ jobs:
     container:
       image: gottox/sqsh-build:x86_64
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: configure
       run: |
         meson setup /tmp/build \
@@ -59,7 +59,7 @@ jobs:
       image: gottox/sqsh-build:${{ matrix.arch }}
       options: --privileged
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: configure
       run: |
         CC=gcc meson setup /tmp/build \
@@ -85,7 +85,7 @@ jobs:
     container:
       image: gottox/sqsh-build:x86_64
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: configure
       run: |
         CC=clang meson setup /tmp/build \
@@ -122,7 +122,7 @@ jobs:
           #- i386
           - x86_64
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: configure
       run: |
         meson wrap update-db
@@ -146,7 +146,7 @@ jobs:
     - format-check
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: install dependencies
       run: |
         sudo apt update
@@ -193,7 +193,7 @@ jobs:
           - x86_64
           - arm64
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: "cross-platform-actions/action@v0.19.0"
       with:
         operating_system: openbsd
@@ -222,7 +222,7 @@ jobs:
     runs-on: macos-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - run: |
           brew install git meson squashfs lz4 xz zstd macfuse
     - run: |
@@ -249,7 +249,7 @@ jobs:
     container:
       image: gottox/sqsh-build:latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: configure
@@ -291,7 +291,7 @@ jobs:
     permissions:
       contents: write
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: configure
