@@ -139,4 +139,6 @@ LZO2 there's and independent glue library called [libsqsh-lzo](https://github.co
   able to write squashfs archives.
 * https://github.com/vasi/squashfuse - A C implementation of the squashfs
   filesystem.
+* https://github.com/wcampbell0x2a/backhand - A Rust implementation of the
+  squashfs filesystem.
 
