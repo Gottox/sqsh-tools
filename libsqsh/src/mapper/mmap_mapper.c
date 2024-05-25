@@ -46,6 +46,11 @@
 #define TO_PTR(x) ((void *)(uintptr_t)(x))
 #define FROM_PTR(x) ((int)(uintptr_t)(x))
 
+#if defined(__APPLE__) || defined(__OpenBSD__)
+#	define off64_t off_t
+#	define lseek64 lseek
+#endif
+
 static int
 sqsh_mapper_mmap_init(
 		struct SqshMapper *mapper, const void *input, size_t *size) {
