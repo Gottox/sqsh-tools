@@ -34,17 +34,48 @@
 #ifndef SQSH_MAPPER_H
 #define SQSH_MAPPER_H
 
+#include <sqsh_common.h>
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <stddef.h>
 
 /***************************************
  * mapper/mapper.c
  */
 
 struct SqshMapper;
+
+/**
+ * @brief The implementation of a memory mapper.
+ */
+struct SqshMemoryMapperImpl {
+	/**
+	 * @brief A hint to libsqsh to use this block size if the user did not
+	 * specify one.
+	 */
+	size_t block_size_hint;
+	/**
+	 * @brief The initialization function for the mapper. Use
+	 * sqsh_mapper_set_user_data() to set custom user data.
+	 */
+	int (*init)(struct SqshMapper *mapper, const void *input, size_t *size);
+	/**
+	 * @brief The function that maps a block of data into memory.
+	 */
+	int (*map)(
+			const struct SqshMapper *mapper, sqsh_index_t offset, size_t size,
+			uint8_t **data);
+	/**
+	 * @brief The function that unmaps a block of data from memory.
+	 */
+	int (*unmap)(const struct SqshMapper *mapper, uint8_t *data, size_t size);
+	/**
+	 * @brief The cleanup function for the mapper.
+	 */
+	int (*cleanup)(struct SqshMapper *mapper);
+};
 
 /**
  * @memberof SqshMapper
