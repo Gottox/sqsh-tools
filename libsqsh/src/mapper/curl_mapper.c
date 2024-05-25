@@ -232,7 +232,7 @@ sqsh_mapper_curl_init(
 		goto out;
 	}
 
-	size_t block_size = sqsh__mapper_block_size(mapper);
+	size_t block_size = sqsh_mapper_block_size(mapper);
 	CURL *handle = configure_handle(curl_mapper);
 
 	uint64_t size64 = *size;
@@ -282,7 +282,7 @@ sqsh_mapper_curl_map(
 			goto out;
 		}
 
-		if (file_size != sqsh__mapper_size(mapper)) {
+		if (file_size != sqsh_mapper_size(mapper)) {
 			rv = -SQSH_ERROR_MAPPER_MAP;
 			goto out;
 		}
@@ -305,7 +305,8 @@ sqsh_mapper_curl_cleanup(struct SqshMapper *mapper) {
 }
 
 static int
-sqsh_mapping_curl_unmap(const struct SqshMapper *mapper, uint8_t *data, size_t size) {
+sqsh_mapping_curl_unmap(
+		const struct SqshMapper *mapper, uint8_t *data, size_t size) {
 	(void)mapper;
 	(void)size;
 	free(data);

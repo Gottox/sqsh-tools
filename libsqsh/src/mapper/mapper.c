@@ -66,12 +66,12 @@ sqsh__mapper_init(
 }
 
 size_t
-sqsh__mapper_block_size(const struct SqshMapper *mapper) {
+sqsh_mapper_block_size(const struct SqshMapper *mapper) {
 	return mapper->block_size;
 }
 
 size_t
-sqsh__mapper_size(const struct SqshMapper *mapper) {
+sqsh_mapper_size(const struct SqshMapper *mapper) {
 	return mapper->archive_size;
 }
 

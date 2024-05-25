@@ -38,6 +38,8 @@
 extern "C" {
 #endif
 
+#include <stddef.h>
+
 /***************************************
  * mapper/mapper.c
  */
@@ -62,6 +64,28 @@ void sqsh_mapper_set_user_data(struct SqshMapper *mapper, void *user_data);
  * @return The user data from the mapper.
  */
 void *sqsh_mapper_user_data(const struct SqshMapper *mapper);
+
+/**
+ * @internal
+ * @memberof SqshMapper
+ * @brief Retrieves the size of the input data in a mapper.
+ *
+ * @param[in] mapper The mapper to retrieve the size from.
+ *
+ * @return The size of the input data in the mapper.
+ */
+size_t sqsh_mapper_size(const struct SqshMapper *mapper);
+
+/**
+ * @internal
+ * @memberof SqshMapper
+ * @brief Retrieves the block size for a mapper.
+ *
+ * @param[in] mapper The mapper to retrieve the size from.
+ *
+ * @return The size of the input data in the mapper.
+ */
+size_t sqsh_mapper_block_size(const struct SqshMapper *mapper);
 
 /***************************************
  * mapper/curl_mapper.c

@@ -122,7 +122,8 @@ sqsh_mapper_mmap_cleanup(struct SqshMapper *mapper) {
 }
 
 static int
-sqsh_mapping_mmap_unmap(const struct SqshMapper *mapper, uint8_t *data, size_t size) {
+sqsh_mapping_mmap_unmap(
+		const struct SqshMapper *mapper, uint8_t *data, size_t size) {
 	(void)mapper;
 	const uintptr_t offset = (uintptr_t)data % (uintptr_t)page_size;
 
