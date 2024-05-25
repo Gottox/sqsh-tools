@@ -51,7 +51,7 @@ load_mapping(
 		sqsh_index_t index) {
 	int rv = 0;
 
-	const size_t block_size = sqsh__mapper_block_size(&manager->mapper);
+	const size_t block_size = sqsh_mapper_block_size(&manager->mapper);
 	const size_t block_count = sqsh__map_manager_block_count(manager);
 	const size_t mapper_size = sqsh__map_manager_size(manager);
 	size_t size = block_size;
@@ -98,7 +98,7 @@ sqsh__map_manager_init(
 		goto out;
 	}
 
-	const size_t mapper_size = sqsh__mapper_size(&manager->mapper);
+	const size_t mapper_size = sqsh_mapper_size(&manager->mapper);
 
 	if (mapper_size < archive_offset) {
 		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
@@ -106,7 +106,7 @@ sqsh__map_manager_init(
 	}
 	map_size = SQSH_DIVIDE_CEIL(
 			mapper_size - archive_offset,
-			sqsh__mapper_block_size(&manager->mapper));
+			sqsh_mapper_block_size(&manager->mapper));
 
 	manager->archive_offset = archive_offset;
 	rv = cx_rc_map_init(
@@ -126,12 +126,12 @@ out:
 
 uint64_t
 sqsh__map_manager_size(const struct SqshMapManager *manager) {
-	return sqsh__mapper_size(&manager->mapper) - manager->archive_offset;
+	return sqsh_mapper_size(&manager->mapper) - manager->archive_offset;
 }
 
 size_t
 sqsh__map_manager_block_size(const struct SqshMapManager *manager) {
-	return sqsh__mapper_block_size(&manager->mapper);
+	return sqsh_mapper_block_size(&manager->mapper);
 }
 
 size_t

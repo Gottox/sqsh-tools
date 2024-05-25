@@ -34,7 +34,7 @@
 #ifndef SQSH_PRIVATE_MAPPER_H
 #define SQSH_PRIVATE_MAPPER_H
 
-#include "sqsh_mapper.h"
+#include <sqsh_mapper.h>
 
 #include "sqsh_reader_private.h"
 #include "sqsh_utils_private.h"
@@ -47,53 +47,6 @@ extern "C" {
 
 struct SqshArchive;
 struct SqshConfig;
-
-/***************************************
- * mapper/curl_mapper.c
- */
-
-/**
- * @brief The curl mapper.
- */
-struct SqshCurlMapper {
-	/**
-	 * @privatesection
-	 */
-	char *url;
-	uint64_t expected_time;
-	void *handle;
-	uint8_t *header_cache;
-	sqsh__mutex_t lock;
-};
-
-/***************************************
- * mapper/mmap_mapper.c
- */
-
-/**
- * @brief The mmap mapper.
- */
-struct SqshMmapMapper {
-	/**
-	 * @privatesection
-	 */
-	int fd;
-	long page_size;
-};
-
-/***************************************
- * mapper/static_mapper.c
- */
-
-/**
- * @brief The static mapper.
- */
-struct SqshStaticMapper {
-	/**
-	 * @privatesection
-	 */
-	const uint8_t *data;
-};
 
 /***************************************
  * mapper/mapper.c
@@ -111,11 +64,7 @@ struct SqshMapper {
 	const struct SqshMemoryMapperImpl *impl;
 	size_t block_size;
 	size_t archive_size;
-	union {
-		struct SqshMmapMapper mm;
-		struct SqshStaticMapper sm;
-		struct SqshCurlMapper cl;
-	} data;
+	void *user_data;
 };
 
 /**
@@ -127,9 +76,10 @@ struct SqshMemoryMapperImpl {
 	 */
 	size_t block_size_hint;
 	int (*init)(struct SqshMapper *mapper, const void *input, size_t *size);
-	int (*map)(struct SqshMapSlice *map);
-	const uint8_t *(*map_data)(const struct SqshMapSlice *mapping);
-	int (*unmap)(struct SqshMapSlice *mapping);
+	int (*map)(
+			const struct SqshMapper *mapper, sqsh_index_t offset, size_t size,
+			uint8_t **data);
+	int (*unmap)(const struct SqshMapper *mapper, uint8_t *data, size_t size);
 	int (*cleanup)(struct SqshMapper *mapper);
 };
 
@@ -147,28 +97,6 @@ struct SqshMemoryMapperImpl {
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__mapper_init(
 		struct SqshMapper *mapper, const void *source,
 		const struct SqshConfig *config);
-
-/**
- * @internal
- * @memberof SqshMapper
- * @brief Retrieves the size of the input data in a mapper.
- *
- * @param[in] mapper The mapper to retrieve the size from.
- *
- * @return The size of the input data in the mapper.
- */
-SQSH_NO_EXPORT size_t sqsh__mapper_size(const struct SqshMapper *mapper);
-
-/**
- * @internal
- * @memberof SqshMapper
- * @brief Retrieves the block size for a mapper.
- *
- * @param[in] mapper The mapper to retrieve the size from.
- *
- * @return The size of the input data in the mapper.
- */
-SQSH_NO_EXPORT size_t sqsh__mapper_block_size(const struct SqshMapper *mapper);
 
 /**
  * @internal
@@ -193,9 +121,8 @@ struct SqshMapSlice {
 	 * @privatesection
 	 */
 	struct SqshMapper *mapper;
-	sqsh_index_t offset;
 	size_t size;
-	void *data;
+	uint8_t *data;
 };
 
 /**

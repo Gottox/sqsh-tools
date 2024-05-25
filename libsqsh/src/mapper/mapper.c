@@ -66,13 +66,23 @@ sqsh__mapper_init(
 }
 
 size_t
-sqsh__mapper_block_size(const struct SqshMapper *mapper) {
+sqsh_mapper_block_size(const struct SqshMapper *mapper) {
 	return mapper->block_size;
 }
 
 size_t
-sqsh__mapper_size(const struct SqshMapper *mapper) {
+sqsh_mapper_size(const struct SqshMapper *mapper) {
 	return mapper->archive_size;
+}
+
+void
+sqsh_mapper_set_user_data(struct SqshMapper *mapper, void *user_data) {
+	mapper->user_data = user_data;
+}
+
+void *
+sqsh_mapper_user_data(const struct SqshMapper *mapper) {
+	return mapper->user_data;
 }
 
 int

@@ -37,15 +37,19 @@ static int
 sqsh_mapper_static_mem_init(
 		struct SqshMapper *mapper, const void *input, size_t *size) {
 	(void)size;
-	mapper->data.sm.data = input;
+
+	sqsh_mapper_set_user_data(mapper, (void *)input);
+
 	return 0;
 }
 static int
-sqsh_mapper_static_mem_map(struct SqshMapSlice *mapping) {
-	size_t offset = mapping->offset;
+sqsh_mapper_static_mem_map(
+		const struct SqshMapper *mapper, sqsh_index_t offset, size_t size,
+		uint8_t **data) {
+	(void)size;
 	/* Cast to remove const qualifier. */
-	uint8_t *data = (uint8_t *)mapping->mapper->data.sm.data;
-	mapping->data = &data[offset];
+	uint8_t *global_data = sqsh_mapper_user_data(mapper);
+	*data = &global_data[offset];
 	return 0;
 }
 static int
@@ -54,13 +58,12 @@ sqsh_mapper_static_mem_cleanup(struct SqshMapper *mapper) {
 	return 0;
 }
 static int
-sqsh_mapping_static_mem_unmap(struct SqshMapSlice *mapping) {
-	mapping->data = NULL;
+sqsh_mapping_static_mem_unmap(
+		const struct SqshMapper *mapper, uint8_t *data, size_t size) {
+	(void)mapper;
+	(void)data;
+	(void)size;
 	return 0;
-}
-static const uint8_t *
-sqsh_mapping_static_mem_data(const struct SqshMapSlice *mapping) {
-	return mapping->data;
 }
 
 static const struct SqshMemoryMapperImpl impl = {
@@ -68,7 +71,6 @@ static const struct SqshMemoryMapperImpl impl = {
 		.init = sqsh_mapper_static_mem_init,
 		.map = sqsh_mapper_static_mem_map,
 		.cleanup = sqsh_mapper_static_mem_cleanup,
-		.map_data = sqsh_mapping_static_mem_data,
 		.unmap = sqsh_mapping_static_mem_unmap,
 };
 const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_static = &impl;
