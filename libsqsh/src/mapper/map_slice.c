@@ -53,7 +53,6 @@ sqsh__map_slice_init(
 		return -SQSH_ERROR_SIZE_MISMATCH;
 	}
 	mapping->mapper = mapper;
-	mapping->offset = offset;
 	mapping->size = size;
 	return mapper->impl->map(mapper, offset, size, &mapping->data);
 }
@@ -68,18 +67,14 @@ sqsh__map_slice_size(const struct SqshMapSlice *mapping) {
 	return mapping->size;
 }
 
-size_t
-sqsh__map_slice_offset(const struct SqshMapSlice *mapping) {
-	return mapping->offset;
-}
-
 int
 sqsh__map_slice_cleanup(struct SqshMapSlice *mapping) {
 	int rv = 0;
 
 	if (mapping->mapper) {
-		rv = mapping->mapper->impl->unmap(
-				mapping->mapper, mapping->data, mapping->size);
+		uint8_t *data = mapping->data;
+		size_t size = sqsh__map_slice_size(mapping);
+		rv = mapping->mapper->impl->unmap(mapping->mapper, data, size);
 	}
 	mapping->mapper = NULL;
 	return rv;

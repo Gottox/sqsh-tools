@@ -121,7 +121,6 @@ struct SqshMapSlice {
 	 * @privatesection
 	 */
 	struct SqshMapper *mapper;
-	sqsh_index_t offset;
 	size_t size;
 	uint8_t *data;
 };
@@ -137,18 +136,6 @@ struct SqshMapSlice {
  */
 SQSH_NO_EXPORT const uint8_t *
 sqsh__map_slice_data(const struct SqshMapSlice *mapping);
-
-/**
- * @internal
- * @memberof SqshMapSlice
- * @brief Retrieves the offset of a mapping.
- *
- * @param[in] mapping The mapping to retrieve the offset from.
- *
- * @return The data in the mapping.
- */
-SQSH_NO_EXPORT size_t
-sqsh__map_slice_offset(const struct SqshMapSlice *mapping);
 
 /**
  * @internal
