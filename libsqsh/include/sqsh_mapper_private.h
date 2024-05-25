@@ -38,8 +38,6 @@
 
 #include "sqsh_reader_private.h"
 #include "sqsh_utils_private.h"
-#include <cextras/collection.h>
-#include <sys/wait.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,22 +63,6 @@ struct SqshMapper {
 	size_t block_size;
 	size_t archive_size;
 	void *user_data;
-};
-
-/**
- * @brief The implementation of a memory mapper.
- */
-struct SqshMemoryMapperImpl {
-	/**
-	 * @privatesection
-	 */
-	size_t block_size_hint;
-	int (*init)(struct SqshMapper *mapper, const void *input, size_t *size);
-	int (*map)(
-			const struct SqshMapper *mapper, sqsh_index_t offset, size_t size,
-			uint8_t **data);
-	int (*unmap)(const struct SqshMapper *mapper, uint8_t *data, size_t size);
-	int (*cleanup)(struct SqshMapper *mapper);
 };
 
 /**
