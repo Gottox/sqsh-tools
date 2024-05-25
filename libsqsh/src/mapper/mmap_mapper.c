@@ -39,21 +39,12 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <pthread.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
 #define TO_PTR(x) ((void *)(uintptr_t)(x))
 #define FROM_PTR(x) ((int)(uintptr_t)(x))
-
-static long page_size = 0;
-static pthread_once_t page_size_initialized = PTHREAD_ONCE_INIT;
-
-static void
-init_page_size(void) {
-	page_size = sysconf(_SC_PAGESIZE);
-}
 
 static int
 sqsh_mapper_mmap_init(
@@ -63,11 +54,6 @@ sqsh_mapper_mmap_init(
 	int rv = 0;
 	int fd = -1;
 	off64_t pos = 0;
-
-	rv = pthread_once(&page_size_initialized, init_page_size);
-	if (rv != 0) {
-		return -SQSH_ERROR_INTERNAL;
-	}
 
 	fd = open(input, 0);
 	if (fd < 0) {
@@ -95,6 +81,7 @@ sqsh_mapping_mmap_map(
 		const struct SqshMapper *mapper, sqsh_index_t offset, size_t size,
 		uint8_t **data) {
 	const int fd = FROM_PTR(sqsh_mapper_user_data(mapper));
+	const long page_size = sysconf(_SC_PAGESIZE);
 
 	const off_t mmap_offset = (off_t)offset % page_size;
 	const size_t mmap_size = (size_t)mmap_offset + size;
@@ -125,6 +112,7 @@ static int
 sqsh_mapping_mmap_unmap(
 		const struct SqshMapper *mapper, uint8_t *data, size_t size) {
 	(void)mapper;
+	const long page_size = sysconf(_SC_PAGESIZE);
 	const uintptr_t offset = (uintptr_t)data % (uintptr_t)page_size;
 
 	return munmap(data - offset, size + offset);

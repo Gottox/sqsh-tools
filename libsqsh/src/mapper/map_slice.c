@@ -76,6 +76,7 @@ sqsh__map_slice_offset(const struct SqshMapSlice *mapping) {
 int
 sqsh__map_slice_cleanup(struct SqshMapSlice *mapping) {
 	int rv = 0;
+
 	if (mapping->mapper) {
 		rv = mapping->mapper->impl->unmap(
 				mapping->mapper, mapping->data, mapping->size);
