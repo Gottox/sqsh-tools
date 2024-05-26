@@ -494,6 +494,17 @@ enum SqshFileType sqsh_file_type(const struct SqshFile *context);
 
 /**
  * @memberof SqshFile
+ * @brief resolves the symlink target. After calling this function the file is
+ * in place changed to the target of the symlink.
+ *
+ * @param[in] context The file context.
+ *
+ * @return int 0 on success, less than 0 on error.
+ */
+int sqsh_file_symlink_resolve(struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
  * @brief returns the target of a symbolic link. Be aware that the returned
  * value is not zero terminated.
  *

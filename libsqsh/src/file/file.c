@@ -198,11 +198,16 @@ sqsh__file_init(
 
 	inode->archive = archive;
 	inode->inode_ref = inode_ref;
-	inode->dir_inode = dir_inode;
 
 	rv = inode_load(inode);
 	if (rv < 0) {
 		goto out;
+	}
+
+	if (dir_inode == 0 && sqsh_file_type(inode) == SQSH_FILE_TYPE_DIRECTORY) {
+		inode->dir_inode = sqsh_file_directory_parent_inode(inode);
+	} else {
+		inode->dir_inode = dir_inode;
 	}
 
 	rv = sqsh_archive_inode_map(archive, &inode_map);
@@ -351,6 +356,64 @@ sqsh_file_has_fragment(const struct SqshFile *inode) {
 enum SqshFileType
 sqsh_file_type(const struct SqshFile *context) {
 	return context->type;
+}
+
+static int
+symlink_resolve_inode_ref(
+		const struct SqshFile *context, uint64_t *inode_ref,
+		uint32_t *dir_inode) {
+	int rv = 0;
+	struct SqshPathResolver resolver = {0};
+	uint32_t old_dir_inode = context->dir_inode;
+	if (sqsh_file_type(context) != SQSH_FILE_TYPE_SYMLINK) {
+		rv = -SQSH_ERROR_NOT_A_SYMLINK;
+		goto out;
+	}
+
+	struct SqshInodeMap *inode_map = NULL;
+	rv = sqsh_archive_inode_map(context->archive, &inode_map);
+	if (rv < 0) {
+		goto out;
+	}
+
+	uint64_t dir_inode_ref = sqsh_inode_map_get2(inode_map, old_dir_inode, &rv);
+
+	rv = sqsh__path_resolver_init_from_inode_ref(
+			&resolver, context->archive, dir_inode_ref);
+	if (rv < 0) {
+		goto out;
+	}
+
+	const char *target = sqsh_file_symlink(context);
+	size_t target_len = sqsh_file_symlink_size(context);
+	rv = sqsh__path_resolver_resolve_len(&resolver, target, target_len, true);
+	if (rv < 0) {
+		goto out;
+	}
+
+	*inode_ref = sqsh_path_resolver_inode_ref(&resolver);
+	*dir_inode = sqsh_path_resolver_dir_inode(&resolver);
+out:
+	sqsh__path_resolver_cleanup(&resolver);
+	return rv;
+}
+
+int
+sqsh_file_symlink_resolve(struct SqshFile *context) {
+	int rv = 0;
+	struct SqshArchive *archive = context->archive;
+	uint32_t dir_inode = 0;
+	uint64_t inode_ref = 0;
+	rv = symlink_resolve_inode_ref(context, &inode_ref, &dir_inode);
+	if (rv < 0) {
+		goto out;
+	}
+
+	sqsh__file_cleanup(context);
+	rv = sqsh__file_init(context, archive, inode_ref, dir_inode);
+
+out:
+	return rv;
 }
 
 const char *
