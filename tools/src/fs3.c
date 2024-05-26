@@ -38,7 +38,6 @@
 #include <errno.h>
 #include <fuse_lowlevel.h>
 #include <pthread.h>
-#include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -92,7 +91,7 @@ fs_file_open(fuse_ino_t ino, int *err) {
 	if (*err < 0) {
 		return NULL;
 	}
-	return sqsh_open_by_ref(context.archive, inode_ref, err);
+	return sqsh_open_by_ref2(context.archive, inode_ref, /* TODO */ 0, err);
 }
 
 static void
@@ -141,7 +140,7 @@ fs_lookup(fuse_req_t req, fuse_ino_t parent, const char *name) {
 	}
 
 	const uint64_t inode_ref = sqsh_directory_iterator_inode_ref(iterator);
-	file = sqsh_open_by_ref(context.archive, inode_ref, &rv);
+	file = sqsh_open_by_ref2(context.archive, inode_ref, /* TODO */ 0, &rv);
 	if (rv < 0) {
 		fuse_reply_err(req, -fs_common_map_err(rv));
 		goto out;

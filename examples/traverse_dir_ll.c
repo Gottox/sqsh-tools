@@ -8,7 +8,6 @@
 
 #include <sqsh.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 int
 main(int argc, char *argv[]) {
@@ -37,7 +36,7 @@ main(int argc, char *argv[]) {
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 	uint64_t inode_root_ref = sqsh_superblock_inode_root_ref(superblock);
 	struct SqshFile *file =
-			sqsh_open_by_ref(archive, inode_root_ref, &error_code);
+			sqsh_open_by_ref2(archive, inode_root_ref, 0, &error_code);
 	if (error_code != 0) {
 		sqsh_perror(error_code, "sqsh_file_new");
 		return 1;

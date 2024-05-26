@@ -290,7 +290,14 @@ sqsh_path_resolver_to_root(struct SqshPathResolver *walker) {
 
 struct SqshFile *
 sqsh_path_resolver_open_file(const struct SqshPathResolver *walker, int *err) {
-	return sqsh_open_by_ref(walker->archive, walker->current_inode_ref, err);
+	uint32_t dir_inode;
+	if (is_beginning(walker)) {
+		dir_inode = sqsh_file_directory_parent_inode(&walker->cwd);
+	} else {
+		dir_inode = sqsh_file_inode(&walker->cwd);
+	}
+	return sqsh_open_by_ref2(
+			walker->archive, walker->current_inode_ref, dir_inode, err);
 }
 
 static size_t

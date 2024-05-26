@@ -350,9 +350,9 @@ struct SqshFile *
 sqsh_tree_traversal_open_file(
 		const struct SqshTreeTraversal *traversal, int *err) {
 	if (traversal->current_iterator == NULL) {
-		return sqsh_open_by_ref(
+		return sqsh_open_by_ref2(
 				traversal->base_file->archive, traversal->current_inode_ref,
-				err);
+				/* TODO */ 0, err);
 	} else {
 		return sqsh_directory_iterator_open_file(
 				traversal->current_iterator, err);

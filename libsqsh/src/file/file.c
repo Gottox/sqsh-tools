@@ -229,7 +229,15 @@ out:
 
 struct SqshFile *
 sqsh_open_by_ref(struct SqshArchive *archive, uint64_t inode_ref, int *err) {
-	SQSH_NEW_IMPL(sqsh__file_init, struct SqshFile, archive, inode_ref, 0);
+	return sqsh_open_by_ref2(archive, inode_ref, 0, err);
+}
+
+struct SqshFile *
+sqsh_open_by_ref2(
+		struct SqshArchive *archive, uint64_t inode_ref, uint32_t dir_inode,
+		int *err) {
+	SQSH_NEW_IMPL(
+			sqsh__file_init, struct SqshFile, archive, inode_ref, dir_inode);
 }
 
 bool
