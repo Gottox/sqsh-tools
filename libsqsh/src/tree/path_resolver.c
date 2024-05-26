@@ -55,7 +55,6 @@ is_beginning(const struct SqshPathResolver *walker) {
 
 SQSH_NO_UNUSED static int
 update_inode_from_iterator(struct SqshPathResolver *walker) {
-	// TODO: this should be done from sqsh__file_init.
 	struct SqshDirectoryIterator *iterator = &walker->iterator;
 	const uint32_t inode_number = sqsh_directory_iterator_inode(iterator);
 	const uint64_t inode_ref = sqsh_directory_iterator_inode_ref(iterator);
@@ -67,7 +66,7 @@ update_inode_from_iterator(struct SqshPathResolver *walker) {
 		return -SQSH_ERROR_CORRUPTED_INODE;
 	}
 	walker->current_inode_ref = inode_ref;
-	return sqsh_inode_map_set2(walker->inode_map, inode_number, inode_ref);
+	return 0;
 }
 
 SQSH_NO_UNUSED static int
@@ -75,7 +74,6 @@ update_inode_from_cwd(struct SqshPathResolver *walker) {
 	int rv = 0;
 	struct SqshDirectoryIterator *iterator = &walker->iterator;
 	struct SqshFile *cwd = &walker->cwd;
-	const uint32_t inode_number = sqsh_file_inode(cwd);
 	const uint64_t inode_ref = sqsh_file_inode_ref(cwd);
 
 	rv = sqsh__directory_iterator_cleanup(iterator);
@@ -89,10 +87,6 @@ update_inode_from_cwd(struct SqshPathResolver *walker) {
 	}
 
 	walker->current_inode_ref = inode_ref;
-	rv = sqsh_inode_map_set2(walker->inode_map, inode_number, inode_ref);
-	if (rv < 0) {
-		goto out;
-	}
 out:
 	return rv;
 }
