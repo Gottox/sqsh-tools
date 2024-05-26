@@ -61,8 +61,23 @@ struct SqshPathResolver {
 	struct SqshFile cwd;
 	struct SqshDirectoryIterator iterator;
 	size_t max_symlink_depth;
-	bool begin_iterator;
 };
+
+/**
+ * @internal
+ * @memberof SqshPathResolver
+ * @brief Initializes a SqshPathResolver struct using the inode_ref as the start
+ * directory.
+ *
+ * @param[out] walker    The file walker to initialize.
+ * @param[in]  archive   The archive to used
+ * @param[in]  inode_ref The inode reference to start at
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__path_resolver_init_from_inode_ref(
+		struct SqshPathResolver *walker, struct SqshArchive *archive,
+		uint64_t inode_ref);
 
 /**
  * @internal
@@ -76,6 +91,25 @@ struct SqshPathResolver {
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__path_resolver_init(
 		struct SqshPathResolver *walker, struct SqshArchive *archive);
+
+/**
+ * @internal
+ * @memberof SqshPathResolver
+ * @brief Resolve a non-zero terminated path with the tree walker.
+ *
+ * This function will resolve the given path with the tree walker. The base is
+ * the current directory.
+ *
+ * @param[in,out]   walker           The walker to use
+ * @param[in]       path             The path to resolve.
+ * @param[in]       path_len         The length of the path.
+ * @param[in]       follow_symlinks  Whether to follow symlinks.
+ *
+ * @return the inode of the current entry.
+ */
+SQSH_NO_UNUSED int sqsh__path_resolver_resolve_len(
+		struct SqshPathResolver *walker, const char *path, size_t path_len,
+		bool follow_symlinks);
 
 /**
  * @internal
@@ -118,6 +152,7 @@ struct SqshTreeTraversal {
 	const char *current_name;
 	size_t current_name_size;
 	uint64_t current_inode_ref;
+	uint32_t current_dir_inode;
 	enum SqshFileType current_type;
 };
 

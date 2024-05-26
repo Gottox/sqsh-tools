@@ -271,10 +271,27 @@ sqsh_open(struct SqshArchive *archive, const char *path, int *err);
  *
  * @param archive The sqsh context to use.
  * @param inode_ref The inode reference to initialize the context with.
+ * @param dir_inode The inode reference of the parent directory.
  * @param[out] err Pointer to an int where the error code will be stored.
  *
  * @return a pointer to the sqsh context or NULL if an error occurred.
  */
+SQSH_NO_UNUSED struct SqshFile *sqsh_open_by_ref2(
+		struct SqshArchive *archive, uint64_t inode_ref, uint32_t dir_inode,
+		int *err);
+
+/**
+ * @deprecated Since 1.4.0. Use sqsh_tree_traversal_new2() instead.
+ * @memberof SqshFile
+ * @brief Initializes a file context in heap
+ *
+ * @param archive The sqsh context to use.
+ * @param inode_ref The inode reference to initialize the context with.
+ * @param[out] err Pointer to an int where the error code will be stored.
+ *
+ * @return a pointer to the sqsh context or NULL if an error occurred.
+ */
+__attribute__((deprecated("Since 1.4.0. Use sqsh_open_by_ref2() instead.")))
 SQSH_NO_UNUSED struct SqshFile *
 sqsh_open_by_ref(struct SqshArchive *archive, uint64_t inode_ref, int *err);
 
@@ -474,6 +491,17 @@ bool sqsh_file_has_fragment(const struct SqshFile *context);
  * @return the type of the file.
  */
 enum SqshFileType sqsh_file_type(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief resolves the symlink target. After calling this function the file is
+ * in place changed to the target of the symlink.
+ *
+ * @param[in] context The file context.
+ *
+ * @return int 0 on success, less than 0 on error.
+ */
+int sqsh_file_symlink_resolve(struct SqshFile *context);
 
 /**
  * @memberof SqshFile

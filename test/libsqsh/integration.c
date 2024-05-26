@@ -125,7 +125,8 @@ UTEST(integration, sqsh_ls) {
 
 	superblock = sqsh_archive_superblock(&sqsh);
 	rv = sqsh__file_init(
-			&file, &sqsh, sqsh_superblock_inode_root_ref(superblock));
+			&file, &sqsh, sqsh_superblock_inode_root_ref(superblock),
+			/* TODO */ 0);
 	ASSERT_EQ(0, rv);
 
 	iter = sqsh_directory_iterator_new(&file, &rv);
@@ -352,7 +353,8 @@ UTEST(integration, sqsh_test_uid_and_gid) {
 
 	superblock = sqsh_archive_superblock(&sqsh);
 	rv = sqsh__file_init(
-			&file, &sqsh, sqsh_superblock_inode_root_ref(superblock));
+			&file, &sqsh, sqsh_superblock_inode_root_ref(superblock),
+			/* TODO */ 0);
 	ASSERT_EQ(0, rv);
 
 	uid = sqsh_file_uid(&file);

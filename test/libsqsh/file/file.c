@@ -59,7 +59,7 @@ UTEST(file, load_file) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint64_t inode_ref = sqsh_address_ref_create(15, 3);
-	rv = sqsh__file_init(&file, &archive, inode_ref);
+	rv = sqsh__file_init(&file, &archive, inode_ref, /* TODO */ 0);
 	ASSERT_EQ(0, rv);
 
 	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
@@ -72,6 +72,52 @@ UTEST(file, load_file) {
 	ASSERT_EQ((uint32_t)42, sqsh_file_block_size(&file, 0));
 
 	sqsh__file_cleanup(&file);
+	sqsh__archive_cleanup(&archive);
+}
+
+UTEST(file, resolve_file) {
+	int rv = 0;
+	struct SqshArchive archive = {0};
+	uint8_t payload[] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			[1024] = '1', '2', '3', '4', '5', '6', '7', '8',
+			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
+			INODE_HEADER(1, 0, 0, 0, 0, 1),
+			INODE_BASIC_DIR(0, 1024, 0, 0),
+			[INODE_TABLE_OFFSET+2+128] =
+			INODE_HEADER(3, 0, 0, 0, 0, 2),
+			INODE_BASIC_SYMLINK(3),
+			't', 'g', 't',
+			[INODE_TABLE_OFFSET+2+256] =
+			INODE_HEADER(2, 0, 0, 0, 0, 3),
+			INODE_BASIC_FILE(1024, 0xFFFFFFFF, 0, 8),
+			DATA_BLOCK_REF(8, 0),
+			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			DIRECTORY_HEADER(2, 0, 0),
+			DIRECTORY_ENTRY(128, 2, 3, 3),
+			's', 'r', 'c',
+			DIRECTORY_ENTRY(256, 3, 2, 3),
+			't', 'g', 't',
+			[FRAGMENT_TABLE_OFFSET] = 0,
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	uint64_t ref = sqsh_address_ref_create(0, 128);
+	struct SqshFile symlink = {0};
+	rv = sqsh__file_init(&symlink, &archive, ref, /* TODO */ 0);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(SQSH_FILE_TYPE_SYMLINK, sqsh_file_type(&symlink));
+
+	rv = sqsh_file_symlink_resolve(&symlink);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&symlink));
+	ASSERT_EQ((uint32_t)3, sqsh_file_inode(&symlink));
+
+	sqsh__file_cleanup(&symlink);
+
 	sqsh__archive_cleanup(&archive);
 }
 

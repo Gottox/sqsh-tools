@@ -61,7 +61,7 @@ UTEST(directory_iterator, iter_invalid_file_name_with_0) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshFile file = {0};
-	rv = sqsh__file_init(&file, &archive, 0);
+	rv = sqsh__file_init(&file, &archive, 0, /* TODO */ 0);
 	ASSERT_EQ(0, rv);
 
 	struct SqshDirectoryIterator iter = {0};
@@ -97,7 +97,7 @@ UTEST(directory_iterator, iter_invalid_file_name_with_slash) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshFile file = {0};
-	rv = sqsh__file_init(&file, &archive, 0);
+	rv = sqsh__file_init(&file, &archive, 0, /* TODO */ 0);
 	ASSERT_EQ(0, rv);
 
 	struct SqshDirectoryIterator iter = {0};
@@ -142,7 +142,7 @@ UTEST(directory_iterator, iter_two_files) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshFile file = {0};
-	rv = sqsh__file_init(&file, &archive, 0);
+	rv = sqsh__file_init(&file, &archive, 0, /* TODO */ 0);
 	ASSERT_EQ(0, rv);
 
 	struct SqshDirectoryIterator iter = {0};
@@ -194,7 +194,7 @@ UTEST(directory_iterator, iter_invalid_file_type) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshFile file = {0};
-	rv = sqsh__file_init(&file, &archive, 0);
+	rv = sqsh__file_init(&file, &archive, 0, /* TODO */ 0);
 	ASSERT_EQ(0, rv);
 
 	struct SqshDirectoryIterator *iter =
@@ -231,7 +231,7 @@ UTEST(directory_iterator, iter_inconsistent_file_type) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshFile file = {0};
-	rv = sqsh__file_init(&file, &archive, 0);
+	rv = sqsh__file_init(&file, &archive, 0, /* TODO */ 0);
 	ASSERT_EQ(0, rv);
 
 	struct SqshDirectoryIterator *iter =
@@ -273,7 +273,7 @@ UTEST(directory_iterator, iter_over_corrupt_header_too_small) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshFile file = {0};
-	rv = sqsh__file_init(&file, &archive, 0);
+	rv = sqsh__file_init(&file, &archive, 0, /* TODO */ 0);
 	ASSERT_EQ(0, rv);
 
 	struct SqshDirectoryIterator iter = {0};
@@ -309,7 +309,7 @@ UTEST(directory_iterator, iter_inode_overflow) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshFile file = {0};
-	rv = sqsh__file_init(&file, &archive, 0);
+	rv = sqsh__file_init(&file, &archive, 0, /* TODO */ 0);
 	ASSERT_EQ(0, rv);
 
 	struct SqshDirectoryIterator iter = {0};
@@ -345,7 +345,7 @@ UTEST(directory_iterator, iter_inode_underflow) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshFile file = {0};
-	rv = sqsh__file_init(&file, &archive, 0);
+	rv = sqsh__file_init(&file, &archive, 0, /* TODO */ 0);
 	ASSERT_EQ(0, rv);
 
 	struct SqshDirectoryIterator iter = {0};
@@ -381,7 +381,7 @@ UTEST(directory_iterator, iter_inode_to_zero) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshFile file = {0};
-	rv = sqsh__file_init(&file, &archive, 0);
+	rv = sqsh__file_init(&file, &archive, 0, /* TODO */ 0);
 	ASSERT_EQ(0, rv);
 
 	struct SqshDirectoryIterator iter = {0};

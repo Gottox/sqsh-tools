@@ -191,6 +191,26 @@ SQSH_NO_UNUSED struct SqshFile *
 sqsh_path_resolver_open_file(const struct SqshPathResolver *walker, int *err);
 
 /**
+ * @brief Returns the inode of the current working directory.
+ * @memberof SqshPathResolver
+ *
+ * @param[in]   walker  The walker to use
+ *
+ * @return the inode of the current entry.
+ */
+uint32_t sqsh_path_resolver_dir_inode(const struct SqshPathResolver *walker);
+
+/**
+ * @brief Returns the inode reference of the current entry.
+ * @memberof SqshPathResolver
+ *
+ * @param[in]   walker  The walker to use
+ *
+ * @return the inode reference of the current item the resolver is pointing to.
+ */
+uint64_t sqsh_path_resolver_inode_ref(const struct SqshPathResolver *walker);
+
+/**
  * @memberof SqshPathResolver
  * @brief Resolve a path with the tree walker.
  *

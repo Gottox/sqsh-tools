@@ -59,7 +59,7 @@ UTEST(file_reader, load_file_from_compressed_data_block) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 3);
-	rv = sqsh__file_init(&file, &archive, inode_ref);
+	rv = sqsh__file_init(&file, &archive, inode_ref, /* TODO */ 0);
 	ASSERT_EQ(0, rv);
 
 	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
@@ -104,7 +104,7 @@ UTEST(file_reader, load_file_from_compressed_data_block_with_offset) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint64_t inode_ref = sqsh_address_ref_create(256, 3);
-	rv = sqsh__file_init(&file, &archive, inode_ref);
+	rv = sqsh__file_init(&file, &archive, inode_ref, /* TODO */ 0);
 	ASSERT_EQ(0, rv);
 
 	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
@@ -146,7 +146,7 @@ UTEST(file_reader, load_file_from_uncompressed_data_block) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint64_t inode_ref = sqsh_address_ref_create(256, 0);
-	rv = sqsh__file_init(&file, &archive, inode_ref);
+	rv = sqsh__file_init(&file, &archive, inode_ref, /* TODO */ 0);
 	ASSERT_EQ(0, rv);
 
 	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
@@ -193,7 +193,7 @@ UTEST(file_reader, skip_over_zero_page) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint64_t inode_ref = sqsh_address_ref_create(256, 0);
-	rv = sqsh__file_init(&file, &archive, inode_ref);
+	rv = sqsh__file_init(&file, &archive, inode_ref, /* TODO */ 0);
 	ASSERT_EQ(0, rv);
 
 	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));

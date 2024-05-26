@@ -31,7 +31,6 @@
  * @file         file.c
  */
 
-#include "sqsh_file.h"
 #include <sqsh_file_private.h>
 
 #include <cextras/memory.h>
@@ -134,10 +133,40 @@ inode_load(struct SqshFile *context) {
 	return rv;
 }
 
+static int
+check_file_consistency(struct SqshFile *file) {
+	const uint32_t inode = sqsh_file_inode(file);
+	const uint32_t dir_inode = file->dir_inode;
+
+	// TODO: The checks are currently disabled when dir_inode is 0. This is
+	// because we want to keep the API stable and there is no way to retrieve
+	// the dir inode when opening a file by sqsh_open_by_ref. Remove this early
+	// return when v2 of libsqsh is released.
+	if (dir_inode == 0) {
+		return 0;
+	}
+
+	if (inode == dir_inode) {
+		return -SQSH_ERROR_INODE_PARENT_MISMATCH;
+	}
+
+	if (sqsh_file_type(file) != SQSH_FILE_TYPE_DIRECTORY) {
+		return 0;
+	}
+	/* directory specific checks */
+
+	const uint32_t parent_inode = sqsh_file_directory_parent_inode(file);
+	if (parent_inode != dir_inode) {
+		return -SQSH_ERROR_INODE_PARENT_MISMATCH;
+	}
+
+	return 0;
+}
+
 int
 sqsh__file_init(
-		struct SqshFile *inode, struct SqshArchive *archive,
-		uint64_t inode_ref) {
+		struct SqshFile *inode, struct SqshArchive *archive, uint64_t inode_ref,
+		uint32_t dir_inode) {
 	const uint64_t outer_offset = sqsh_address_ref_outer_offset(inode_ref);
 	const uint16_t inner_offset = sqsh_address_ref_inner_offset(inode_ref);
 	uint64_t address_outer;
@@ -174,11 +203,27 @@ sqsh__file_init(
 	if (rv < 0) {
 		goto out;
 	}
+
+	if (dir_inode == 0 && sqsh_file_type(inode) == SQSH_FILE_TYPE_DIRECTORY) {
+		inode->dir_inode = sqsh_file_directory_parent_inode(inode);
+	} else {
+		inode->dir_inode = dir_inode;
+	}
+
 	rv = sqsh_archive_inode_map(archive, &inode_map);
 	if (rv < 0) {
 		goto out;
 	}
+
 	rv = sqsh_inode_map_set2(inode_map, sqsh_file_inode(inode), inode_ref);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = check_file_consistency(inode);
+	if (rv < 0) {
+		goto out;
+	}
 
 out:
 	if (rv < 0) {
@@ -189,7 +234,15 @@ out:
 
 struct SqshFile *
 sqsh_open_by_ref(struct SqshArchive *archive, uint64_t inode_ref, int *err) {
-	SQSH_NEW_IMPL(sqsh__file_init, struct SqshFile, archive, inode_ref);
+	return sqsh_open_by_ref2(archive, inode_ref, 0, err);
+}
+
+struct SqshFile *
+sqsh_open_by_ref2(
+		struct SqshArchive *archive, uint64_t inode_ref, uint32_t dir_inode,
+		int *err) {
+	SQSH_NEW_IMPL(
+			sqsh__file_init, struct SqshFile, archive, inode_ref, dir_inode);
 }
 
 bool
@@ -303,6 +356,64 @@ sqsh_file_has_fragment(const struct SqshFile *inode) {
 enum SqshFileType
 sqsh_file_type(const struct SqshFile *context) {
 	return context->type;
+}
+
+static int
+symlink_resolve_inode_ref(
+		const struct SqshFile *context, uint64_t *inode_ref,
+		uint32_t *dir_inode) {
+	int rv = 0;
+	struct SqshPathResolver resolver = {0};
+	uint32_t old_dir_inode = context->dir_inode;
+	if (sqsh_file_type(context) != SQSH_FILE_TYPE_SYMLINK) {
+		rv = -SQSH_ERROR_NOT_A_SYMLINK;
+		goto out;
+	}
+
+	struct SqshInodeMap *inode_map = NULL;
+	rv = sqsh_archive_inode_map(context->archive, &inode_map);
+	if (rv < 0) {
+		goto out;
+	}
+
+	uint64_t dir_inode_ref = sqsh_inode_map_get2(inode_map, old_dir_inode, &rv);
+
+	rv = sqsh__path_resolver_init_from_inode_ref(
+			&resolver, context->archive, dir_inode_ref);
+	if (rv < 0) {
+		goto out;
+	}
+
+	const char *target = sqsh_file_symlink(context);
+	size_t target_len = sqsh_file_symlink_size(context);
+	rv = sqsh__path_resolver_resolve_len(&resolver, target, target_len, true);
+	if (rv < 0) {
+		goto out;
+	}
+
+	*inode_ref = sqsh_path_resolver_inode_ref(&resolver);
+	*dir_inode = sqsh_path_resolver_dir_inode(&resolver);
+out:
+	sqsh__path_resolver_cleanup(&resolver);
+	return rv;
+}
+
+int
+sqsh_file_symlink_resolve(struct SqshFile *context) {
+	int rv = 0;
+	struct SqshArchive *archive = context->archive;
+	uint32_t dir_inode = 0;
+	uint64_t inode_ref = 0;
+	rv = symlink_resolve_inode_ref(context, &inode_ref, &dir_inode);
+	if (rv < 0) {
+		goto out;
+	}
+
+	sqsh__file_cleanup(context);
+	rv = sqsh__file_init(context, archive, inode_ref, dir_inode);
+
+out:
+	return rv;
 }
 
 const char *
