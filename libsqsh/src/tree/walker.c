@@ -48,7 +48,11 @@
 
 static int
 tree_walker_init(struct SqshTreeWalker *walker, struct SqshArchive *archive) {
-	return sqsh__path_resolver_init(&walker->inner, archive);
+	int rv = sqsh__path_resolver_init(&walker->inner, archive);
+	if (rv < 0) {
+		return rv;
+	}
+	return sqsh_path_resolver_to_root(&walker->inner);
 }
 
 struct SqshTreeWalker *

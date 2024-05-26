@@ -68,6 +68,9 @@ UTEST(integration, sqsh_get_nonexistant) {
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
 	ASSERT_EQ(0, rv);
 
+	rv = sqsh_path_resolver_to_root(&resolver);
+	ASSERT_EQ(0, rv);
+
 	rv = sqsh_path_resolver_resolve(&resolver, "/nonexistant", false);
 	ASSERT_GT(0, rv);
 
@@ -89,6 +92,9 @@ UTEST(integration, path_resolver) {
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
+	ASSERT_EQ(0, rv);
+
+	rv = sqsh_path_resolver_to_root(&resolver);
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_resolve(&resolver, "/large_dir", false);
@@ -205,6 +211,9 @@ UTEST(integration, sqsh_cat_fragment) {
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
 	ASSERT_EQ(0, rv);
 
+	rv = sqsh_path_resolver_to_root(&resolver);
+	ASSERT_EQ(0, rv);
+
 	rv = sqsh_path_resolver_resolve(&resolver, "a", false);
 	ASSERT_EQ(0, rv);
 
@@ -254,6 +263,9 @@ UTEST(integration, sqsh_cat_datablock_and_fragment) {
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
+	ASSERT_EQ(0, rv);
+
+	rv = sqsh_path_resolver_to_root(&resolver);
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_resolve(&resolver, "b", false);
@@ -307,6 +319,9 @@ UTEST(integration, sqsh_cat_size_overflow) {
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
+	ASSERT_EQ(0, rv);
+
+	rv = sqsh_path_resolver_to_root(&resolver);
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_resolve(&resolver, "b", false);
@@ -383,6 +398,9 @@ UTEST(integration, sqsh_test_extended_dir) {
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__path_resolver_init(&resolver, &sqsh);
+	ASSERT_EQ(0, rv);
+
+	rv = sqsh_path_resolver_to_root(&resolver);
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_resolve(&resolver, "/large_dir/999", false);

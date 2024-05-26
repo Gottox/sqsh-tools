@@ -66,6 +66,9 @@ UTEST(path_resolver, resolver_symlink_recursion) {
 	rv = sqsh__path_resolver_init(&resolver, &archive);
 	ASSERT_EQ(0, rv);
 
+	rv = sqsh_path_resolver_to_root(&resolver);
+	ASSERT_EQ(0, rv);
+
 	rv = sqsh_path_resolver_resolve(&resolver, "src", true);
 	ASSERT_EQ(-SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED, rv);
 
@@ -105,6 +108,9 @@ UTEST(path_resolver, resolver_symlink_alternating_recursion) {
 	rv = sqsh__path_resolver_init(&resolver, &archive);
 	ASSERT_EQ(0, rv);
 
+	rv = sqsh_path_resolver_to_root(&resolver);
+	ASSERT_EQ(0, rv);
+
 	rv = sqsh_path_resolver_resolve(&resolver, "src1", true);
 	ASSERT_EQ(-SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED, rv);
 
@@ -142,6 +148,9 @@ UTEST(path_resolver, resolver_symlink_open) {
 
 	struct SqshPathResolver resolver = {0};
 	rv = sqsh__path_resolver_init(&resolver, &archive);
+	ASSERT_EQ(0, rv);
+
+	rv = sqsh_path_resolver_to_root(&resolver);
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_resolve(&resolver, "src", true);
@@ -199,6 +208,9 @@ UTEST(path_resolver, resolver_directory_enter) {
 	rv = sqsh__path_resolver_init(&resolver, &archive);
 	ASSERT_EQ(0, rv);
 
+	rv = sqsh_path_resolver_to_root(&resolver);
+	ASSERT_EQ(0, rv);
+
 	rv = sqsh_path_resolver_resolve(&resolver, "dir", true);
 	ASSERT_EQ(0, rv);
 	expect_inode(&resolver, 2);
@@ -234,6 +246,9 @@ UTEST(path_resolver, resolver_uninitialized_up) {
 	rv = sqsh__path_resolver_init(&resolver, &archive);
 	ASSERT_EQ(0, rv);
 
+	rv = sqsh_path_resolver_to_root(&resolver);
+	ASSERT_EQ(0, rv);
+
 	rv = sqsh_path_resolver_up(&resolver);
 	ASSERT_EQ(-SQSH_ERROR_WALKER_CANNOT_GO_UP, rv);
 
@@ -262,6 +277,9 @@ UTEST(path_resolver, resolver_uninitialized_down) {
 
 	struct SqshPathResolver resolver = {0};
 	rv = sqsh__path_resolver_init(&resolver, &archive);
+	ASSERT_EQ(0, rv);
+
+	rv = sqsh_path_resolver_to_root(&resolver);
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh_path_resolver_down(&resolver);

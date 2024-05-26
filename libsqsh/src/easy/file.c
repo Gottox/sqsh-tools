@@ -35,9 +35,7 @@
 
 #include <sqsh_easy.h>
 
-#include <errno.h>
 #include <pthread.h>
-#include <stdatomic.h>
 #include <stdlib.h>
 #include <string.h>
 

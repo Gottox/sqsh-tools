@@ -105,18 +105,16 @@ UTEST(file, resolve_file) {
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	uint64_t ref = sqsh_address_ref_create(0, 128);
-	struct SqshFile symlink = {0};
-	rv = sqsh__file_init(&symlink, &archive, ref, /* TODO */ 0);
+	struct SqshFile *symlink = sqsh_lopen(&archive, "/src", &rv);
 	ASSERT_EQ(0, rv);
-	ASSERT_EQ(SQSH_FILE_TYPE_SYMLINK, sqsh_file_type(&symlink));
+	ASSERT_EQ(SQSH_FILE_TYPE_SYMLINK, sqsh_file_type(symlink));
 
-	rv = sqsh_file_symlink_resolve(&symlink);
+	rv = sqsh_file_symlink_resolve(symlink);
 	ASSERT_EQ(0, rv);
-	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&symlink));
-	ASSERT_EQ((uint32_t)3, sqsh_file_inode(&symlink));
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(symlink));
+	ASSERT_EQ((uint32_t)3, sqsh_file_inode(symlink));
 
-	sqsh__file_cleanup(&symlink);
+	sqsh_close(symlink);
 
 	sqsh__archive_cleanup(&archive);
 }

@@ -267,6 +267,20 @@ sqsh_open(struct SqshArchive *archive, const char *path, int *err);
 
 /**
  * @memberof SqshFile
+ * @brief Initialize the file context from a path. This function is identical to
+ * `sqsh_open()` but if the path is a symlink, the symlink target not resolved.
+ *
+ * @param[in] archive The sqsh archive context.
+ * @param[in] path The path the file or directory.
+ * @param[out] err Pointer to an int where the error code will be stored.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED struct SqshFile *
+sqsh_lopen(struct SqshArchive *archive, const char *path, int *err);
+
+/**
+ * @memberof SqshFile
  * @brief Initializes a file context in heap
  *
  * @param archive The sqsh context to use.

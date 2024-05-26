@@ -207,6 +207,8 @@ SQSH_NO_EXPORT int sqsh__file_reader_cleanup(struct SqshFileReader *reader);
  * file/file.c
  */
 
+#define SQSH_AUTO_DIR_INODE UINT32_MAX
+
 /**
  * @brief The file type implementation
  */
@@ -269,6 +271,16 @@ struct SqshFile {
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_init(
 		struct SqshFile *context, struct SqshArchive *sqsh, uint64_t inode_ref,
 		uint32_t dir_inode);
+
+/**
+ * @internal
+ * @memberof SqshFile
+ * @brief Retrieves the inode of the parent directory.
+ *
+ * @param context The file context.
+ * @return uint32_t The inode number.
+ */
+SQSH_NO_EXPORT uint32_t sqsh__file_dir_inode(const struct SqshFile *context);
 
 /**
  * @internal
