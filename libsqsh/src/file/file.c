@@ -188,23 +188,8 @@ out:
 }
 
 struct SqshFile *
-sqsh_open_by_ref(struct SqshArchive *sqsh, uint64_t inode_ref, int *err) {
-	int rv = 0;
-	struct SqshFile *inode = calloc(1, sizeof(struct SqshFile));
-	if (inode == NULL) {
-		rv = -SQSH_ERROR_MALLOC_FAILED;
-		goto out;
-	}
-	rv = sqsh__file_init(inode, sqsh, inode_ref);
-	if (rv < 0) {
-		free(inode);
-		inode = NULL;
-	}
-out:
-	if (err != NULL) {
-		*err = rv;
-	}
-	return inode;
+sqsh_open_by_ref(struct SqshArchive *archive, uint64_t inode_ref, int *err) {
+	SQSH_NEW_IMPL(sqsh__file_init, struct SqshFile, archive, inode_ref);
 }
 
 bool
@@ -416,10 +401,5 @@ out:
 
 int
 sqsh_close(struct SqshFile *file) {
-	if (file == NULL) {
-		return 0;
-	}
-	int rv = sqsh__file_cleanup(file);
-	free(file);
-	return rv;
+	SQSH_FREE_IMPL(sqsh__file_cleanup, file);
 }
