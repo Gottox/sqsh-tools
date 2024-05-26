@@ -31,7 +31,6 @@
  * @file         file.c
  */
 
-#include "sqsh_file.h"
 #include <sqsh_file_private.h>
 
 #include <cextras/memory.h>

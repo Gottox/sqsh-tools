@@ -48,29 +48,61 @@ SQSH_NO_UNUSED static int path_resolve(
 		struct SqshPathResolver *walker, const char *path, size_t path_len,
 		int recursion);
 
+SQSH_NO_UNUSED static bool
+is_beginning(const struct SqshPathResolver *walker) {
+	return walker->current_inode_ref == sqsh_file_inode_ref(&walker->cwd);
+}
+
 SQSH_NO_UNUSED static int
 update_inode_from_iterator(struct SqshPathResolver *walker) {
 	// TODO: this should be done from sqsh__file_init.
 	struct SqshDirectoryIterator *iterator = &walker->iterator;
-	uint32_t inode_number = sqsh_directory_iterator_inode(iterator);
-	uint64_t inode_ref = sqsh_directory_iterator_inode_ref(iterator);
+	const uint32_t inode_number = sqsh_directory_iterator_inode(iterator);
+	const uint64_t inode_ref = sqsh_directory_iterator_inode_ref(iterator);
 
+	if (sqsh_file_inode(&walker->cwd) == inode_number) {
+		return -SQSH_ERROR_CORRUPTED_INODE;
+	}
+	if (sqsh_file_inode_ref(&walker->cwd) == inode_ref) {
+		return -SQSH_ERROR_CORRUPTED_INODE;
+	}
 	walker->current_inode_ref = inode_ref;
 	return sqsh_inode_map_set2(walker->inode_map, inode_number, inode_ref);
+}
+
+SQSH_NO_UNUSED static int
+update_inode_from_cwd(struct SqshPathResolver *walker) {
+	int rv = 0;
+	struct SqshDirectoryIterator *iterator = &walker->iterator;
+	struct SqshFile *cwd = &walker->cwd;
+	const uint32_t inode_number = sqsh_file_inode(cwd);
+	const uint64_t inode_ref = sqsh_file_inode_ref(cwd);
+
+	rv = sqsh__directory_iterator_cleanup(iterator);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = sqsh__directory_iterator_init(iterator, cwd);
+	if (rv < 0) {
+		goto out;
+	}
+
+	walker->current_inode_ref = inode_ref;
+	rv = sqsh_inode_map_set2(walker->inode_map, inode_number, inode_ref);
+	if (rv < 0) {
+		goto out;
+	}
+out:
+	return rv;
 }
 
 SQSH_NO_UNUSED static int
 enter_directory(struct SqshPathResolver *walker, uint64_t inode_ref) {
 	int rv = 0;
 	struct SqshFile *cwd = &walker->cwd;
-	struct SqshDirectoryIterator *iterator = &walker->iterator;
 
 	rv = sqsh__file_cleanup(cwd);
-	if (rv < 0) {
-		goto out;
-	}
-
-	rv = sqsh__directory_iterator_cleanup(iterator);
 	if (rv < 0) {
 		goto out;
 	}
@@ -85,16 +117,10 @@ enter_directory(struct SqshPathResolver *walker, uint64_t inode_ref) {
 		goto out;
 	}
 
-	walker->begin_iterator = true;
-	rv = sqsh__directory_iterator_init(iterator, cwd);
+	rv = update_inode_from_cwd(walker);
 	if (rv < 0) {
 		goto out;
 	}
-
-	const uint32_t inode_number = sqsh_file_inode(cwd);
-	walker->current_inode_ref = inode_ref;
-	rv = sqsh_inode_map_set2(walker->inode_map, inode_number, inode_ref);
-
 out:
 	return rv;
 }
@@ -110,7 +136,6 @@ sqsh__path_resolver_init(
 			config->max_symlink_depth, SQSH_DEFAULT_MAX_SYMLINKS_FOLLOWED);
 	walker->archive = archive;
 	walker->root_inode_ref = sqsh_superblock_inode_root_ref(superblock);
-	walker->begin_iterator = true;
 	rv = sqsh_archive_inode_map(archive, &walker->inode_map);
 	if (rv < 0) {
 		goto out;
@@ -162,7 +187,6 @@ bool
 sqsh_path_resolver_next(struct SqshPathResolver *walker, int *err) {
 	struct SqshDirectoryIterator *iterator = &walker->iterator;
 	int rv = 0;
-	walker->begin_iterator = false;
 
 	bool has_next = sqsh_directory_iterator_next(iterator, &rv);
 	if (rv < 0) {
@@ -188,7 +212,7 @@ out:
 
 enum SqshFileType
 sqsh_path_resolver_type(const struct SqshPathResolver *walker) {
-	if (walker->begin_iterator == true) {
+	if (is_beginning(walker)) {
 		return sqsh_file_type(&walker->cwd);
 	} else {
 		return sqsh_directory_iterator_file_type(&walker->iterator);
@@ -198,7 +222,7 @@ sqsh_path_resolver_type(const struct SqshPathResolver *walker) {
 const char *
 sqsh_path_resolver_name(const struct SqshPathResolver *walker) {
 	size_t size;
-	if (walker->begin_iterator == true) {
+	if (is_beginning(walker)) {
 		return NULL;
 	} else {
 		return sqsh_directory_iterator_name2(&walker->iterator, &size);
@@ -208,7 +232,7 @@ sqsh_path_resolver_name(const struct SqshPathResolver *walker) {
 uint16_t
 sqsh_path_resolver_name_size(const struct SqshPathResolver *walker) {
 	size_t size;
-	if (walker->begin_iterator == true) {
+	if (is_beginning(walker)) {
 		return 0;
 	} else {
 		sqsh_directory_iterator_name2(&walker->iterator, &size);
@@ -218,7 +242,7 @@ sqsh_path_resolver_name_size(const struct SqshPathResolver *walker) {
 
 char *
 sqsh_path_resolver_name_dup(const struct SqshPathResolver *walker) {
-	if (walker->begin_iterator == true) {
+	if (is_beginning(walker)) {
 		return NULL;
 	} else {
 		return sqsh_directory_iterator_name_dup(&walker->iterator);
@@ -227,12 +251,7 @@ sqsh_path_resolver_name_dup(const struct SqshPathResolver *walker) {
 
 int
 sqsh_path_resolver_revert(struct SqshPathResolver *walker) {
-	struct SqshFile *inode = &walker->cwd;
-	struct SqshDirectoryIterator *iterator = &walker->iterator;
-
-	sqsh__directory_iterator_cleanup(iterator);
-	walker->begin_iterator = true;
-	return sqsh__directory_iterator_init(iterator, inode);
+	return update_inode_from_cwd(walker);
 }
 
 int
@@ -249,14 +268,13 @@ sqsh_path_resolver_lookup(
 	if (rv < 0) {
 		return rv;
 	}
-	walker->begin_iterator = false;
 
 	return update_inode_from_iterator(walker);
 }
 
 int
 sqsh_path_resolver_down(struct SqshPathResolver *walker) {
-	if (walker->begin_iterator == true) {
+	if (is_beginning(walker)) {
 		return -SQSH_ERROR_WALKER_CANNOT_GO_DOWN;
 	}
 	const uint64_t child_inode_ref =

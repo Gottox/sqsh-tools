@@ -152,6 +152,8 @@ sqsh_error_str(int error_code) {
 		return "No such element";
 	case SQSH_ERROR_DIRECTORY_RECURSION:
 		return "Directory recursion";
+	case SQSH_ERROR_INODE_PARENT_MISMATCH:
+		return "Inode parent mismatch";
 	}
 	snprintf(err_str, sizeof(err_str), UNKNOWN_ERROR_FORMAT, error_code);
 	return err_str;
