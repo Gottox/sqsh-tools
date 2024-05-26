@@ -107,7 +107,7 @@ enter_directory(struct SqshPathResolver *walker, uint64_t inode_ref) {
 		goto out;
 	}
 
-	rv = sqsh__file_init(cwd, walker->archive, inode_ref);
+	rv = sqsh__file_init(cwd, walker->archive, inode_ref, /* TODO */ 0);
 	if (rv < 0) {
 		goto out;
 	}
@@ -324,7 +324,8 @@ path_resolver_follow_symlink(struct SqshPathResolver *walker, int recursion) {
 		return -SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED;
 	}
 
-	rv = sqsh__file_init(&inode, walker->archive, walker->current_inode_ref);
+	rv = sqsh__file_init(
+			&inode, walker->archive, walker->current_inode_ref, /* TODO */ 0);
 	if (rv < 0) {
 		goto out;
 	}

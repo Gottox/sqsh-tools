@@ -117,6 +117,7 @@ struct SqshTreeTraversal {
 	const char *current_name;
 	size_t current_name_size;
 	uint64_t current_inode_ref;
+	uint32_t current_dir_inode;
 	enum SqshFileType current_type;
 };
 

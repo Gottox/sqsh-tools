@@ -133,10 +133,40 @@ inode_load(struct SqshFile *context) {
 	return rv;
 }
 
+static int
+check_file_consistency(struct SqshFile *file) {
+	const uint32_t inode = sqsh_file_inode(file);
+	const uint32_t dir_inode = file->dir_inode;
+
+	// TODO: The checks are currently disabled when dir_inode is 0. This is
+	// because we want to keep the API stable and there is no way to retrieve
+	// the dir inode when opening a file by sqsh_open_by_ref. Remove this early
+	// return when v2 of libsqsh is released.
+	if (dir_inode == 0) {
+		return 0;
+	}
+
+	if (inode == dir_inode) {
+		return -SQSH_ERROR_INODE_PARENT_MISMATCH;
+	}
+
+	if (sqsh_file_type(file) != SQSH_FILE_TYPE_DIRECTORY) {
+		return 0;
+	}
+	/* directory specific checks */
+
+	const uint32_t parent_inode = sqsh_file_directory_parent_inode(file);
+	if (parent_inode != dir_inode) {
+		return -SQSH_ERROR_INODE_PARENT_MISMATCH;
+	}
+
+	return 0;
+}
+
 int
 sqsh__file_init(
-		struct SqshFile *inode, struct SqshArchive *archive,
-		uint64_t inode_ref) {
+		struct SqshFile *inode, struct SqshArchive *archive, uint64_t inode_ref,
+		uint32_t dir_inode) {
 	const uint64_t outer_offset = sqsh_address_ref_outer_offset(inode_ref);
 	const uint16_t inner_offset = sqsh_address_ref_inner_offset(inode_ref);
 	uint64_t address_outer;
@@ -168,16 +198,27 @@ sqsh__file_init(
 
 	inode->archive = archive;
 	inode->inode_ref = inode_ref;
+	inode->dir_inode = dir_inode;
 
 	rv = inode_load(inode);
 	if (rv < 0) {
 		goto out;
 	}
+
 	rv = sqsh_archive_inode_map(archive, &inode_map);
 	if (rv < 0) {
 		goto out;
 	}
+
 	rv = sqsh_inode_map_set2(inode_map, sqsh_file_inode(inode), inode_ref);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = check_file_consistency(inode);
+	if (rv < 0) {
+		goto out;
+	}
 
 out:
 	if (rv < 0) {
@@ -188,7 +229,7 @@ out:
 
 struct SqshFile *
 sqsh_open_by_ref(struct SqshArchive *archive, uint64_t inode_ref, int *err) {
-	SQSH_NEW_IMPL(sqsh__file_init, struct SqshFile, archive, inode_ref);
+	SQSH_NEW_IMPL(sqsh__file_init, struct SqshFile, archive, inode_ref, 0);
 }
 
 bool

@@ -59,7 +59,7 @@ UTEST(file, load_file) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint64_t inode_ref = sqsh_address_ref_create(15, 3);
-	rv = sqsh__file_init(&file, &archive, inode_ref);
+	rv = sqsh__file_init(&file, &archive, inode_ref, /* TODO */ 0);
 	ASSERT_EQ(0, rv);
 
 	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));

@@ -117,7 +117,8 @@ stack_add(struct SqshTreeTraversal *traversal) {
 	element = STACK_PEEK(traversal);
 
 	rv = sqsh__file_init(
-			&element->file, traversal->base_file->archive, inode_ref);
+			&element->file, traversal->base_file->archive, inode_ref,
+			/* TODO */ 0);
 	if (rv < 0) {
 		goto out;
 	}
