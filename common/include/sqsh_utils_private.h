@@ -102,7 +102,7 @@ SQSH_NO_EXPORT int sqsh__mutex_destroy(sqsh__mutex_t *mutex);
  * utils/math.c
  */
 
-SQSH_NO_UNUSED unsigned long sqsh__log2(unsigned long x);
+SQSH_NO_EXPORT unsigned long sqsh__log2(unsigned long x);
 
 #ifdef __cplusplus
 }
