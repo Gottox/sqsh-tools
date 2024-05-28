@@ -638,4 +638,31 @@ UTEST(integration, test_tree_traversal) {
 	ASSERT_EQ(0, rv);
 }
 
+UTEST(integration, test_easy_traversal) {
+	int rv;
+	struct SqshArchive sqsh = {0};
+	struct SqshFile *file = NULL;
+	char **traversal = NULL;
+
+	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	config.archive_offset = 1010;
+	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
+	ASSERT_EQ(0, rv);
+
+	traversal = sqsh_easy_tree_traversal(&sqsh, "/", &rv);
+	ASSERT_EQ(0, rv);
+
+	ASSERT_STREQ("a", traversal[0]);
+	ASSERT_STREQ("b", traversal[1]);
+	ASSERT_STREQ("large_dir", traversal[2]);
+	ASSERT_STREQ("large_dir/1", traversal[3]);
+	ASSERT_STREQ("large_dir/10", traversal[4]);
+
+	free(traversal);
+	rv = sqsh_close(file);
+
+	rv = sqsh__archive_cleanup(&sqsh);
+	ASSERT_EQ(0, rv);
+}
+
 UTEST_MAIN()

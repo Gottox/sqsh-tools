@@ -312,7 +312,9 @@ sqsh_tree_traversal_path_dup(const struct SqshTreeTraversal *traversal) {
 
 	const size_t count = sqsh_tree_traversal_depth(traversal);
 	for (sqsh_index_t i = 0; i < count; i++) {
-		rv = cx_buffer_append(&buffer, (const uint8_t *)"/", 1);
+		if (i > 0) {
+			rv = cx_buffer_append(&buffer, (const uint8_t *)"/", 1);
+		}
 		if (rv < 0) {
 			goto out;
 		}

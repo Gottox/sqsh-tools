@@ -11,6 +11,12 @@ executable(
     dependencies: libsqsh_dep,
 )
 executable(
+    'traverse_dir',
+    'traverse_dir.c',
+    install: false,
+    dependencies: libsqsh_dep,
+)
+executable(
     'traverse_dir_ll',
     'traverse_dir_ll.c',
     install: false,
