@@ -176,6 +176,45 @@ expect_inode(struct SqshPathResolver *resolver, uint32_t inode_number) {
 	sqsh_close(file);
 }
 
+UTEST(path_resolver, resolver_inconsistent_file_type) {
+	int rv;
+	struct SqshArchive archive = {0};
+	uint8_t payload[] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
+			INODE_HEADER(1, 0, 0, 0, 0, 1),
+			INODE_BASIC_DIR(0, 1024, 0, 0),
+
+			[INODE_TABLE_OFFSET+2+128] = 
+			INODE_HEADER(2, 0, 0, 0, 0, 3),
+			INODE_BASIC_FILE(0, 0xFFFFFFFF, 0, 0),
+
+			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			DIRECTORY_HEADER(1, 0, 0),
+			DIRECTORY_ENTRY(128, 2, /* wrong file type */ 1, 4),
+			'f', 'i', 'l', 'e',
+
+			[FRAGMENT_TABLE_OFFSET] = 0,
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	struct SqshPathResolver resolver = {0};
+	rv = sqsh__path_resolver_init(&resolver, &archive);
+	ASSERT_EQ(0, rv);
+
+	rv = sqsh_path_resolver_to_root(&resolver);
+	ASSERT_EQ(0, rv);
+
+	rv = sqsh_path_resolver_resolve(&resolver, "file", true);
+	ASSERT_EQ(-SQSH_ERROR_CORRUPTED_INODE, rv);
+
+	sqsh__path_resolver_cleanup(&resolver);
+	sqsh__archive_cleanup(&archive);
+}
+
 UTEST(path_resolver, resolver_directory_enter) {
 	int rv;
 	struct SqshArchive archive = {0};
