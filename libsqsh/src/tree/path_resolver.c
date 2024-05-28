@@ -31,8 +31,6 @@
  * @file         path_resolver.c
  */
 
-#include "sqsh_archive.h"
-#include "sqsh_file.h"
 #include <sqsh_tree_private.h>
 
 #include <sqsh_archive_private.h>
@@ -193,6 +191,11 @@ sqsh__path_resolver_to_ref(
 		goto out;
 	}
 
+	if (sqsh_file_type(&resolver->cwd) != SQSH_FILE_TYPE_DIRECTORY) {
+		rv = -SQSH_ERROR_NOT_A_DIRECTORY;
+		goto out;
+	}
+
 	rv = update_inode_from_cwd(resolver);
 out:
 	return rv;
@@ -219,13 +222,28 @@ sqsh_path_resolver_to_root(struct SqshPathResolver *resolver) {
 
 int
 sqsh_path_resolver_down(struct SqshPathResolver *resolver) {
+	int rv = 0;
 	if (is_beginning(resolver)) {
 		return -SQSH_ERROR_WALKER_CANNOT_GO_DOWN;
+	} else if (sqsh__path_resolver_type(resolver) != SQSH_FILE_TYPE_DIRECTORY) {
+		return -SQSH_ERROR_NOT_A_DIRECTORY;
 	}
 	const uint64_t child_inode_ref =
 			sqsh_directory_iterator_inode_ref(&resolver->iterator);
 
-	return sqsh__path_resolver_to_ref(resolver, child_inode_ref);
+	rv = sqsh__path_resolver_to_ref(resolver, child_inode_ref);
+
+	if (rv == -SQSH_ERROR_NOT_A_DIRECTORY) {
+		// We checked above if the directory iterator was pointing to a
+		// directory if we get this error here, it means that either the inode
+		// or the directory is corrupted.
+		rv = -SQSH_ERROR_CORRUPTED_INODE;
+	} else if (rv < 0) {
+		goto out;
+	}
+
+out:
+	return rv;
 }
 
 int
