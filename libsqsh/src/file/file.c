@@ -43,6 +43,8 @@
 #include <sqsh_tree_private.h>
 #include <stdint.h>
 
+#define SQSH_DEFAULT_MAX_SYMLINKS_FOLLOWED 100
+
 static const struct SqshDataInode *
 get_inode(const struct SqshFile *inode) {
 	return (const struct SqshDataInode *)sqsh__metablock_reader_data(
@@ -160,6 +162,14 @@ check_file_consistency(struct SqshFile *file) {
 		return -SQSH_ERROR_INODE_PARENT_MISMATCH;
 	}
 
+	if (sqsh__file_dir_inode(file) == 0) {
+		const struct SqshSuperblock *superblock =
+				sqsh_archive_superblock(file->archive);
+		if (file->inode_ref != sqsh_superblock_inode_root_ref(superblock)) {
+			return -SQSH_ERROR_INODE_PARENT_MISMATCH;
+		}
+	}
+
 	return 0;
 }
 
@@ -204,11 +214,15 @@ sqsh__file_init(
 		goto out;
 	}
 
-	if (dir_inode == 0 && sqsh_file_type(inode) == SQSH_FILE_TYPE_DIRECTORY) {
-		inode->dir_inode = sqsh_file_directory_parent_inode(inode);
-	} else {
-		inode->dir_inode = dir_inode;
+	if (dir_inode == SQSH_AUTO_DIR_INODE) {
+		if (sqsh_file_type(inode) == SQSH_FILE_TYPE_DIRECTORY) {
+			dir_inode = sqsh_file_directory_parent_inode(inode);
+		} else {
+			rv = -SQSH_ERROR_NOT_A_DIRECTORY;
+			goto out;
+		}
 	}
+	inode->dir_inode = dir_inode;
 
 	rv = sqsh_archive_inode_map(archive, &inode_map);
 	if (rv < 0) {
@@ -243,6 +257,11 @@ sqsh_open_by_ref2(
 		int *err) {
 	SQSH_NEW_IMPL(
 			sqsh__file_init, struct SqshFile, archive, inode_ref, dir_inode);
+}
+
+uint32_t
+sqsh__file_dir_inode(const struct SqshFile *context) {
+	return context->dir_inode;
 }
 
 bool
@@ -359,40 +378,40 @@ sqsh_file_type(const struct SqshFile *context) {
 }
 
 static int
-symlink_resolve_inode_ref(
-		const struct SqshFile *context, uint64_t *inode_ref,
-		uint32_t *dir_inode) {
+symlink_resolve(struct SqshFile *context, bool follow_symlinks) {
 	int rv = 0;
-	struct SqshPathResolver resolver = {0};
-	uint32_t old_dir_inode = context->dir_inode;
 	if (sqsh_file_type(context) != SQSH_FILE_TYPE_SYMLINK) {
-		rv = -SQSH_ERROR_NOT_A_SYMLINK;
-		goto out;
+		return -SQSH_ERROR_NOT_A_SYMLINK;
 	}
 
-	struct SqshInodeMap *inode_map = NULL;
-	rv = sqsh_archive_inode_map(context->archive, &inode_map);
+	struct SqshPathResolver resolver = {0};
+	rv = sqsh__path_resolver_init(&resolver, context->archive);
 	if (rv < 0) {
 		goto out;
 	}
 
-	uint64_t dir_inode_ref = sqsh_inode_map_get2(inode_map, old_dir_inode, &rv);
-
-	rv = sqsh__path_resolver_init_from_inode_ref(
-			&resolver, context->archive, dir_inode_ref);
+	uint32_t old_dir_inode = sqsh__file_dir_inode(context);
+	rv = sqsh__path_resolver_to_inode(&resolver, old_dir_inode);
 	if (rv < 0) {
 		goto out;
 	}
 
 	const char *target = sqsh_file_symlink(context);
-	size_t target_len = sqsh_file_symlink_size(context);
-	rv = sqsh__path_resolver_resolve_len(&resolver, target, target_len, true);
+	const size_t target_size = sqsh_file_symlink_size(context);
+	rv = sqsh__path_resolver_resolve_nt(
+			&resolver, target, target_size, follow_symlinks);
 	if (rv < 0) {
 		goto out;
 	}
 
-	*inode_ref = sqsh_path_resolver_inode_ref(&resolver);
-	*dir_inode = sqsh_path_resolver_dir_inode(&resolver);
+	const uint64_t inode_ref = sqsh_path_resolver_inode_ref(&resolver);
+	const uint32_t dir_inode = sqsh_path_resolver_dir_inode(&resolver);
+	sqsh__file_cleanup(context);
+	rv = sqsh__file_init(context, context->archive, inode_ref, dir_inode);
+	if (rv < 0) {
+		goto out;
+	}
+
 out:
 	sqsh__path_resolver_cleanup(&resolver);
 	return rv;
@@ -400,20 +419,12 @@ out:
 
 int
 sqsh_file_symlink_resolve(struct SqshFile *context) {
-	int rv = 0;
-	struct SqshArchive *archive = context->archive;
-	uint32_t dir_inode = 0;
-	uint64_t inode_ref = 0;
-	rv = symlink_resolve_inode_ref(context, &inode_ref, &dir_inode);
-	if (rv < 0) {
-		goto out;
-	}
+	return symlink_resolve(context, false);
+}
 
-	sqsh__file_cleanup(context);
-	rv = sqsh__file_init(context, archive, inode_ref, dir_inode);
-
-out:
-	return rv;
+int
+sqsh_file_symlink_resolve_all(struct SqshFile *context) {
+	return symlink_resolve(context, true);
 }
 
 const char *
@@ -482,8 +493,10 @@ sqsh__file_cleanup(struct SqshFile *inode) {
 	return sqsh__metablock_reader_cleanup(&inode->metablock);
 }
 
-struct SqshFile *
-sqsh_open(struct SqshArchive *archive, const char *path, int *err) {
+static struct SqshFile *
+open_file(
+		struct SqshArchive *archive, const char *path, int *err,
+		bool follow_symlink) {
 	int rv;
 	struct SqshPathResolver resolver = {0};
 	struct SqshFile *inode = NULL;
@@ -492,7 +505,12 @@ sqsh_open(struct SqshArchive *archive, const char *path, int *err) {
 		goto out;
 	}
 
-	rv = sqsh_path_resolver_resolve(&resolver, path, true);
+	rv = sqsh_path_resolver_to_root(&resolver);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = sqsh_path_resolver_resolve(&resolver, path, follow_symlink);
 	if (rv < 0) {
 		goto out;
 	}
@@ -508,6 +526,16 @@ out:
 	}
 	sqsh__path_resolver_cleanup(&resolver);
 	return inode;
+}
+
+struct SqshFile *
+sqsh_open(struct SqshArchive *archive, const char *path, int *err) {
+	return open_file(archive, path, err, true);
+}
+
+struct SqshFile *
+sqsh_lopen(struct SqshArchive *archive, const char *path, int *err) {
+	return open_file(archive, path, err, false);
 }
 
 int

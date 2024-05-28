@@ -62,14 +62,13 @@ UTEST(tree_walker, walker_symlink_recursion) {
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	struct SqshTreeWalker walker = {0};
-	rv = sqsh__path_resolver_init(&walker.inner, &archive);
+	struct SqshTreeWalker *walker = sqsh_tree_walker_new(&archive, &rv);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_tree_walker_resolve(&walker, "src", true);
+	rv = sqsh_tree_walker_resolve(walker, "src", true);
 	ASSERT_EQ(-SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED, rv);
 
-	sqsh__path_resolver_cleanup(&walker.inner);
+	sqsh_tree_walker_free(walker);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -101,14 +100,13 @@ UTEST(tree_walker, walker_symlink_alternating_recursion) {
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	struct SqshTreeWalker walker = {0};
-	rv = sqsh__path_resolver_init(&walker.inner, &archive);
+	struct SqshTreeWalker *walker = sqsh_tree_walker_new(&archive, &rv);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_tree_walker_resolve(&walker, "src1", true);
+	rv = sqsh_tree_walker_resolve(walker, "src1", true);
 	ASSERT_EQ(-SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED, rv);
 
-	sqsh__path_resolver_cleanup(&walker.inner);
+	sqsh_tree_walker_free(walker);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -140,19 +138,18 @@ UTEST(tree_walker, walker_symlink_open) {
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	struct SqshTreeWalker walker = {0};
-	rv = sqsh__path_resolver_init(&walker.inner, &archive);
+	struct SqshTreeWalker *walker = sqsh_tree_walker_new(&archive, &rv);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_tree_walker_resolve(&walker, "src", true);
+	rv = sqsh_tree_walker_resolve(walker, "src", true);
 	ASSERT_EQ(0, rv);
 
-	const char *name = sqsh_tree_walker_name(&walker);
-	size_t name_size = sqsh_tree_walker_name_size(&walker);
+	const char *name = sqsh_tree_walker_name(walker);
+	size_t name_size = sqsh_tree_walker_name_size(walker);
 	ASSERT_EQ((size_t)3, name_size);
 	ASSERT_EQ(0, memcmp(name, "tgt", name_size));
 
-	sqsh__path_resolver_cleanup(&walker.inner);
+	sqsh_tree_walker_free(walker);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -195,19 +192,18 @@ UTEST(tree_walker, walker_directory_enter) {
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	struct SqshTreeWalker walker = {0};
-	rv = sqsh__path_resolver_init(&walker.inner, &archive);
+	struct SqshTreeWalker *walker = sqsh_tree_walker_new(&archive, &rv);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_tree_walker_resolve(&walker, "dir", true);
+	rv = sqsh_tree_walker_resolve(walker, "dir", true);
 	ASSERT_EQ(0, rv);
-	expect_inode(&walker, 2);
+	expect_inode(walker, 2);
 
-	rv = sqsh_tree_walker_up(&walker);
+	rv = sqsh_tree_walker_up(walker);
 	ASSERT_EQ(0, rv);
-	expect_inode(&walker, 1);
+	expect_inode(walker, 1);
 
-	sqsh__path_resolver_cleanup(&walker.inner);
+	sqsh_tree_walker_free(walker);
 	sqsh__archive_cleanup(&archive);
 }
 
