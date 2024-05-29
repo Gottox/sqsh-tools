@@ -20,6 +20,3 @@ configure:
   #- -Dfuzzer_timeout=10
 default:
   - test
-env:
-  # gdwarf-4 is required to make abi-dumper work
-  CFLAGS: -gdwarf-4 -O0 -Og
