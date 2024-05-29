@@ -519,6 +519,18 @@ int sqsh_file_symlink_resolve(struct SqshFile *context);
 
 /**
  * @memberof SqshFile
+ * @brief resolves all symlink target targets until a file is hit. This function
+ * is similar to sqsh_file_symlink_resolve() but resolves symlinks recursively
+ * until a file is hit.
+ *
+ * @param[in] context The file context.
+ *
+ * @return int 0 on success, less than 0 on error.
+ */
+int sqsh_file_symlink_resolve_all(struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
  * @brief returns the target of a symbolic link. Be aware that the returned
  * value is not zero terminated.
  *
