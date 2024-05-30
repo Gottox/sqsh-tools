@@ -33,7 +33,6 @@ libsqsh_sources = files(
     'mapper/map_reader.c',
     'mapper/map_slice.c',
     'mapper/mapper.c',
-    'mapper/mmap_mapper.c',
     'mapper/static_mapper.c',
     'metablock/metablock_iterator.c',
     'metablock/metablock_reader.c',
@@ -46,6 +45,13 @@ libsqsh_sources = files(
     'tree/traversal.c',
     'tree/walker.c',
     'utils/error.c',
-    'utils/posix.c',
     'xattr/xattr_iterator.c',
 )
+
+if get_option('posix').allowed()
+    libsqsh_sources += files(
+        'posix/file_ext.c',
+        'posix/mmap_mapper.c',
+    )
+endif
+

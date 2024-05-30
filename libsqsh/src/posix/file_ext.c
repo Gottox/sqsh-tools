@@ -38,7 +38,6 @@
 
 #include <errno.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 int
 sqsh_file_to_stream(const struct SqshFile *file, FILE *stream) {
