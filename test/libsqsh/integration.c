@@ -418,6 +418,7 @@ UTEST(integration, sqsh_test_extended_dir) {
 	ASSERT_EQ(0, rv);
 }
 
+#ifndef __OpenBSD__
 UTEST(integration, sqsh_test_xattr) {
 	const char *expected_value = "1234567891234567891234567890001234567890";
 	int rv;
@@ -523,6 +524,7 @@ UTEST(integration, sqsh_test_xattr) {
 	rv = sqsh__archive_cleanup(&sqsh);
 	ASSERT_EQ(0, rv);
 }
+#endif
 
 struct Walker {
 	struct SqshArchive *sqsh;

@@ -13,11 +13,15 @@ cat > $tmp/pf <<EOF
 "a" F 0 777 2020 202020 echo a
 "b" F 0 777 2020 202020 seq 1 1050000 | head -1050000 | tr -cd "\n" | tr '\n' b
 "large_dir" D 0 777 2020 202020
+"large_dir/link" s 777 2020 202020 ..
+EOF
+if [ `uname` != "OpenBSD" ]; then
+	cat >> $tmp/pf <<EOF
 "large_dir" x user.force_extended=true
 "a" x user.foo=1234567891234567891234567890001234567890
 "b" x user.bar=1234567891234567891234567890001234567890
-"large_dir/link" s 777 2020 202020 ..
 EOF
+fi
 
 for i in $(seq 1 1000); do
 	printf '"large_dir/%i" I 0 777 2020 202020 f\n' "$i" >> $tmp/pf
