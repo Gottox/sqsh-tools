@@ -194,11 +194,11 @@ jobs:
           - arm64
     steps:
     - uses: actions/checkout@v4
-    - uses: "cross-platform-actions/action@v0.19.0"
+    - uses: "cross-platform-actions/action@v0.24.0"
       with:
         operating_system: openbsd
         architecture: ${{ matrix.arch }}
-        version: 7.2
+        version: 7.5
         run: |
           sudo pkg_add git meson squashfs-tools curl lz4 xz zstd
           CC=clang meson setup /tmp/build \
