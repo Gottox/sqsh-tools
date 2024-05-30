@@ -13,12 +13,10 @@ mkdir -p "$tmp/large_dir"
 seq 1 1050 | sed "s#.*#$tmp/large_dir/&#" | xargs touch
 ln -s .. "$tmp/large_dir/link"
 [ -e "$out" ] && rm "$out"
-# xattr integration tests are disabled because they are not supported on all
-# platforms, notably OpenBSD which is used as baseline test.
-#	-p '"large_dir" x user.force_extended=true' \
-#	-p '"a" x user.foo=1234567891234567891234567890001234567890' \
-#	-p '"b" x user.bar=1234567891234567891234567890001234567890' \
 $MKSQUASHFS "$tmp" "$out.tmp" \
+	-p '"large_dir" x user.force_extended=true' \
+	-p '"a" x user.foo=1234567891234567891234567890001234567890' \
+	-p '"b" x user.bar=1234567891234567891234567890001234567890' \
 	-nopad \
 	-force-uid 2020 \
 	-force-gid 202020 \
