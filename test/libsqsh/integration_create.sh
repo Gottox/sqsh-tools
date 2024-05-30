@@ -4,21 +4,29 @@ in=$1
 out=$2
 tmp=$3
 
-mkdir -p "$tmp"
-echo a > "$tmp/a"
-# OpenBSD uses floating point for seq, so it may no precise about the number
-# of lines.  Use head to make sure we have the right number of lines.
-seq 1 1050000 | head -1050000 | tr -cd "\n" | tr '\n' b > "$tmp/b"
-mkdir -p "$tmp/large_dir"
-seq 1 1050 | sed "s#.*#$tmp/large_dir/&#" | xargs touch
-ln -s .. "$tmp/large_dir/link"
-[ -e "$out" ] && rm "$out"
-# xattr integration tests are disabled because they are not supported on all
-# platforms, notably OpenBSD which is used as baseline test.
-#	-p '"large_dir" x user.force_extended=true' \
-#	-p '"a" x user.foo=1234567891234567891234567890001234567890' \
-#	-p '"b" x user.bar=1234567891234567891234567890001234567890' \
-$MKSQUASHFS "$tmp" "$out.tmp" \
+mkdir -p "$tmp/empty"
+
+# Check if the directory is actually empty
+[ -z "$(find "$tmp/empty" -mindepth 1)" ]
+
+cat > $tmp/pf <<EOF
+"a" F 0 777 2020 202020 echo a
+"b" F 0 777 2020 202020 seq 1 1050000 | head -1050000 | tr -cd "\n" | tr '\n' b
+"large_dir" D 0 777 2020 202020
+"large_dir" x user.force_extended=true
+"a" x user.foo=1234567891234567891234567890001234567890
+"b" x user.bar=1234567891234567891234567890001234567890
+"large_dir/link" s 777 2020 202020 ..
+EOF
+
+for i in $(seq 1 1000); do
+	printf '"large_dir/%i" I 0 777 2020 202020 f\n' "$i" >> $tmp/pf
+done
+
+[ -e "$tmp/image" ] && rm "$tmp/image"
+$MKSQUASHFS "$tmp/empty" "$tmp/image" \
+	-pf "$tmp/pf" \
+	-noappend \
 	-nopad \
 	-force-uid 2020 \
 	-force-gid 202020 \
@@ -27,5 +35,4 @@ $MKSQUASHFS "$tmp" "$out.tmp" \
 	-quiet -no-progress
 
 dd if=/dev/zero of="$out" bs=1 count=0 seek=1010 2>/dev/null
-cat "$out.tmp" >> "$out"
-rm "$out.tmp"
+cat "$tmp/image" >> "$out"

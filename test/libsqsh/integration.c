@@ -418,8 +418,6 @@ UTEST(integration, sqsh_test_extended_dir) {
 	ASSERT_EQ(0, rv);
 }
 
-#if 0
-
 UTEST(integration, sqsh_test_xattr) {
 	const char *expected_value = "1234567891234567891234567890001234567890";
 	int rv;
@@ -429,7 +427,6 @@ UTEST(integration, sqsh_test_xattr) {
 	struct SqshDirectoryIterator *dir_iter = NULL;
 	struct SqshXattrIterator *xattr_iter = NULL;
 	struct SqshArchive sqsh = {0};
-	const struct SqshSuperblock *superblock;
 	struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = TEST_SQUASHFS_IMAGE_LEN,
@@ -438,15 +435,15 @@ UTEST(integration, sqsh_test_xattr) {
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	ASSERT_EQ(0, rv);
 
-	superblock = sqsh_archive_superblock(&sqsh);
-	file = sqsh_file_new(
-			&sqsh, sqsh_superblock_inode_root_ref(superblock), &rv);
+	file = sqsh_open(&sqsh, "/", &rv);
 	ASSERT_EQ(0, rv);
 
+	bool has_next;
 	xattr_iter = sqsh_xattr_iterator_new(file, &rv);
 	ASSERT_NE(NULL, xattr_iter);
 	ASSERT_EQ(0, rv);
-	rv = sqsh_xattr_iterator_next(xattr_iter);
+	has_next = sqsh_xattr_iterator_next(xattr_iter, &rv);
+	ASSERT_FALSE(has_next);
 	ASSERT_EQ(0, rv);
 	rv = sqsh_xattr_iterator_free(xattr_iter);
 	ASSERT_EQ(0, rv);
@@ -455,8 +452,9 @@ UTEST(integration, sqsh_test_xattr) {
 	ASSERT_NE(NULL, dir_iter);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_directory_iterator_next(dir_iter);
-	assert(rv > 0);
+	has_next = sqsh_directory_iterator_next(dir_iter, &rv);
+	ASSERT_TRUE(has_next);
+	ASSERT_EQ(0, rv);
 	name = sqsh_directory_iterator_name_dup(dir_iter);
 	ASSERT_NE(NULL, name);
 	ASSERT_EQ(0, strcmp("a", name));
@@ -466,8 +464,9 @@ UTEST(integration, sqsh_test_xattr) {
 	xattr_iter = sqsh_xattr_iterator_new(entry_file, &rv);
 	ASSERT_NE(NULL, xattr_iter);
 	ASSERT_EQ(0, rv);
-	rv = sqsh_xattr_iterator_next(xattr_iter);
-	assert(rv > 0);
+	has_next = sqsh_xattr_iterator_next(xattr_iter, &rv);
+	ASSERT_TRUE(has_next);
+	ASSERT_EQ(0, rv);
 	ASSERT_EQ(false, sqsh_xattr_iterator_is_indirect(xattr_iter));
 	name = sqsh_xattr_iterator_fullname_dup(xattr_iter);
 	ASSERT_NE(NULL, name);
@@ -477,15 +476,17 @@ UTEST(integration, sqsh_test_xattr) {
 	ASSERT_NE(NULL, value);
 	ASSERT_EQ(0, strcmp(expected_value, value));
 	free(value);
-	rv = sqsh_xattr_iterator_next(xattr_iter);
+	has_next = sqsh_xattr_iterator_next(xattr_iter, &rv);
+	ASSERT_FALSE(has_next);
 	ASSERT_EQ(0, rv);
 	rv = sqsh_xattr_iterator_free(xattr_iter);
 	ASSERT_EQ(0, rv);
 	rv = sqsh_close(entry_file);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_directory_iterator_next(dir_iter);
-	assert(rv >= 0);
+	has_next = sqsh_directory_iterator_next(dir_iter, &rv);
+	ASSERT_TRUE(has_next);
+	ASSERT_EQ(0, rv);
 	name = sqsh_directory_iterator_name_dup(dir_iter);
 	ASSERT_NE(NULL, name);
 	ASSERT_EQ(0, strcmp("b", name));
@@ -495,8 +496,8 @@ UTEST(integration, sqsh_test_xattr) {
 	xattr_iter = sqsh_xattr_iterator_new(entry_file, &rv);
 	ASSERT_NE(NULL, xattr_iter);
 	ASSERT_EQ(0, rv);
-	rv = sqsh_xattr_iterator_next(xattr_iter);
-	assert(rv > 0);
+	has_next = sqsh_xattr_iterator_next(xattr_iter, &rv);
+	ASSERT_EQ(0, rv);
 	ASSERT_EQ(true, sqsh_xattr_iterator_is_indirect(xattr_iter));
 	name = sqsh_xattr_iterator_fullname_dup(xattr_iter);
 	ASSERT_NE(NULL, name);
@@ -506,7 +507,7 @@ UTEST(integration, sqsh_test_xattr) {
 	ASSERT_NE(NULL, value);
 	ASSERT_EQ(0, strcmp(expected_value, value));
 	free(value);
-	rv = sqsh_xattr_iterator_next(xattr_iter);
+	has_next = sqsh_xattr_iterator_next(xattr_iter, &rv);
 	ASSERT_EQ(0, rv);
 	rv = sqsh_xattr_iterator_free(xattr_iter);
 	ASSERT_EQ(0, rv);
@@ -516,13 +517,12 @@ UTEST(integration, sqsh_test_xattr) {
 	rv = sqsh_directory_iterator_free(dir_iter);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_file_cleanup(file);
+	rv = sqsh_close(file);
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__archive_cleanup(&sqsh);
 	ASSERT_EQ(0, rv);
 }
-#endif
 
 struct Walker {
 	struct SqshArchive *sqsh;
