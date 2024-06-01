@@ -95,7 +95,7 @@ sqsh_easy_tree_traversal(
 		goto out;
 	}
 
-	rv = sqsh__tree_traversal_init(&iterator.traversal, 0, file);
+	rv = sqsh__tree_traversal_init(&iterator.traversal, file);
 	if (rv < 0) {
 		goto out;
 	}

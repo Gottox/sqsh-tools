@@ -39,13 +39,18 @@ if fuse3_dep.found()
 endif
 
 if fuse2_dep.found()
+    if tools.has_key('sqshfs')
+        tool_name = 'sqshfs2'
+    else
+        tool_name = 'sqshfs'
+    endif
     tool = executable(
-        'sqshfs2',
+        tool_name,
         ['src/fs2.c', 'src/common.c', 'src/fs-common.c'],
         c_args: c_args,
         include_directories: tools_private_include,
         install: not meson.is_subproject() and not fuse3_dep.found(),
         dependencies: [libsqsh_dep, fuse2_dep],
     )
-    tools += {'sqshfs2': tool}
+    tools += {tool_name: tool}
 endif

@@ -43,7 +43,7 @@ main(int argc, char *argv[]) {
 	}
 
 	struct SqshTreeTraversal *traversal =
-			sqsh_tree_traversal_new2(file, 0, &error_code);
+			sqsh_tree_traversal_new(file, &error_code);
 	if (error_code != 0) {
 		sqsh_perror(error_code, "sqsh_directory_iterator_new");
 		return 1;

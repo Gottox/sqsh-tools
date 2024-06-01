@@ -9,6 +9,10 @@ tools_manpages = [
 conf_data = configuration_data()
 conf_data.set('VERSION', meson.project_version())
 
+if fuse3_dep.found() or fuse2_dep.found()
+    tools_manpages += ['sqshfs.1']
+endif
+
 foreach template : tools_manpages
     manpage = configure_file(
         input: template + '.in',
@@ -17,12 +21,3 @@ foreach template : tools_manpages
     )
     install_man(manpage)
 endforeach
-
-if fuse3_dep.found() or fuse2_dep.found()
-    manpage = configure_file(
-        input: 'sqshfs.1.in',
-        output: 'sqshfs.1',
-        configuration: conf_data,
-    )
-    install_man(manpage)
-endif
