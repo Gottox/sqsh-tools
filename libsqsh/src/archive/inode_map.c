@@ -85,9 +85,14 @@ out:
 static int
 export_table_set(
 		struct SqshInodeMap *map, uint32_t inode_number, uint64_t inode_ref) {
-	(void)map;
-	(void)inode_number;
-	(void)inode_ref;
+	int rv = 0;
+	uint64_t actual_ref = export_table_get(map, inode_number, &rv);
+
+	if (rv < 0) {
+		return rv;
+	} else if (actual_ref != inode_ref) {
+		return -SQSH_ERROR_INODE_MAP_IS_INCONSISTENT;
+	}
 	return 0;
 }
 
