@@ -295,7 +295,7 @@ SQSH_NO_UNUSED struct SqshFile *sqsh_open_by_ref2(
 		int *err);
 
 /**
- * @deprecated Since 1.4.0. Use sqsh_tree_traversal_new2() instead.
+ * @deprecated Since 1.4.0. Use sqsh_open_by_ref2() instead.
  * @memberof SqshFile
  * @brief Initializes a file context in heap
  *
