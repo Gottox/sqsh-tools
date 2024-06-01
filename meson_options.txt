@@ -53,3 +53,9 @@ option(
     value: 'auto',
     description: 'Build with thread support.',
 )
+option(
+    'posix',
+    type: 'feature',
+    value: 'enabled',
+    description: 'Build with thread support.',
+)
