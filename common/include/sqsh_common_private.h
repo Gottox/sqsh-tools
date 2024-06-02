@@ -36,6 +36,7 @@
 
 #include <sqsh_common.h>
 
+#include <cextras/memory.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -66,30 +67,9 @@ extern "C" {
 #define SQSH_CONFIG_DEFAULT(x, d) (size_t)(x == 0 ? (d) : SQSH_MAX(x, 0))
 
 #define SQSH_NEW_IMPL(init, type, ...) \
-	int rv = 0; \
-	type *obj = calloc(1, sizeof(type)); \
-	if (obj == NULL) { \
-		rv = -SQSH_ERROR_MALLOC_FAILED; \
-		goto out; \
-	} \
-	rv = init(obj, __VA_ARGS__); \
-	if (rv < 0) { \
-		free(obj); \
-		obj = NULL; \
-	} \
-out: \
-	if (err != NULL) { \
-		*err = rv; \
-	} \
-	return obj
+	CX_NEW_IMPL(init, type, -SQSH_ERROR_MALLOC_FAILED, __VA_ARGS__)
 
-#define SQSH_FREE_IMPL(cleanup, obj) \
-	if (obj == NULL) { \
-		return 0; \
-	} \
-	int rv = cleanup(obj); \
-	free(obj); \
-	return rv
+#define SQSH_FREE_IMPL(cleanup, obj) CX_FREE_IMPL(cleanup, obj)
 
 SQSH_NO_UNUSED static inline uint64_t
 sqsh_address_ref_outer_offset(uint64_t ref) {
