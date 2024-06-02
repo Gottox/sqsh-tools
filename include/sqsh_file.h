@@ -285,29 +285,24 @@ sqsh_lopen(struct SqshArchive *archive, const char *path, int *err);
  *
  * @param archive The sqsh context to use.
  * @param inode_ref The inode reference to initialize the context with.
- * @param dir_inode The inode reference of the parent directory.
  * @param[out] err Pointer to an int where the error code will be stored.
  *
  * @return a pointer to the sqsh context or NULL if an error occurred.
  */
-SQSH_NO_UNUSED struct SqshFile *sqsh_open_by_ref2(
-		struct SqshArchive *archive, uint64_t inode_ref, uint32_t dir_inode,
-		int *err);
-
-/**
- * @deprecated Since 1.4.0. Use sqsh_open_by_ref2() instead.
- * @memberof SqshFile
- * @brief Initializes a file context in heap
- *
- * @param archive The sqsh context to use.
- * @param inode_ref The inode reference to initialize the context with.
- * @param[out] err Pointer to an int where the error code will be stored.
- *
- * @return a pointer to the sqsh context or NULL if an error occurred.
- */
-__attribute__((deprecated("Since 1.4.0. Use sqsh_open_by_ref2() instead.")))
 SQSH_NO_UNUSED struct SqshFile *
 sqsh_open_by_ref(struct SqshArchive *archive, uint64_t inode_ref, int *err);
+
+/**
+ * @memberof SqshFile
+ * @brief returns whether the file is an extended structure.
+ *
+ * @param[in] context The file context.
+ * @param[in] dir_inode The inode of the parent directory.
+ *
+ * @return int 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int
+sqsh__file_set_dir_inode(struct SqshFile *context, uint32_t dir_inode);
 
 /**
  * @memberof SqshFile

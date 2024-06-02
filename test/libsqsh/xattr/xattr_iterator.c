@@ -78,7 +78,7 @@ UTEST(xattr_iterator, load_xattr) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
-	rv = sqsh__file_init(&file, &archive, inode_ref, /* TODO */ 0);
+	rv = sqsh__file_init(&file, &archive, inode_ref);
 	ASSERT_EQ(0, rv);
 
 	ASSERT_EQ(SQSH_FILE_TYPE_DIRECTORY, sqsh_file_type(&file));
@@ -172,7 +172,7 @@ UTEST(xattr_iterator, load_xattr_indirect) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	uint64_t inode_ref = sqsh_address_ref_create(0, 0);
-	rv = sqsh__file_init(&file, &archive, inode_ref, /* TODO */ 0);
+	rv = sqsh__file_init(&file, &archive, inode_ref);
 	ASSERT_EQ(0, rv);
 
 	ASSERT_EQ(SQSH_FILE_TYPE_DIRECTORY, sqsh_file_type(&file));

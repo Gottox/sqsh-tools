@@ -62,7 +62,7 @@ sqsh__directory_index_iterator_init(
 	int rv;
 	struct SqshFile *file = &iterator->file;
 
-	rv = sqsh__file_init(file, sqsh, inode_ref, /* TODO */ 0);
+	rv = sqsh__file_init(file, sqsh, inode_ref);
 	if (rv < 0) {
 		goto out;
 	}

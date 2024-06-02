@@ -120,22 +120,18 @@ UTEST(integration, path_resolver) {
 UTEST(integration, sqsh_ls) {
 	int rv;
 	char *name;
-	struct SqshFile file = {0};
+	struct SqshFile *file = NULL;
 	struct SqshDirectoryIterator *iter = NULL;
 	struct SqshArchive sqsh = {0};
-	const struct SqshSuperblock *superblock;
 	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
 	config.archive_offset = 1010;
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	ASSERT_EQ(0, rv);
 
-	superblock = sqsh_archive_superblock(&sqsh);
-	rv = sqsh__file_init(
-			&file, &sqsh, sqsh_superblock_inode_root_ref(superblock),
-			/* TODO */ 0);
+	file = sqsh_open(&sqsh, "/", &rv);
 	ASSERT_EQ(0, rv);
 
-	iter = sqsh_directory_iterator_new(&file, &rv);
+	iter = sqsh_directory_iterator_new(file, &rv);
 	ASSERT_NE(NULL, iter);
 	ASSERT_EQ(0, rv);
 
@@ -171,7 +167,7 @@ UTEST(integration, sqsh_ls) {
 	rv = sqsh_directory_iterator_free(iter);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh__file_cleanup(&file);
+	rv = sqsh_close(file);
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__archive_cleanup(&sqsh);
@@ -355,9 +351,8 @@ UTEST(integration, sqsh_cat_size_overflow) {
 UTEST(integration, sqsh_test_uid_and_gid) {
 	int rv;
 	uint32_t uid, gid;
-	struct SqshFile file = {0};
+	struct SqshFile *file = NULL;
 	struct SqshArchive sqsh = {0};
-	const struct SqshSuperblock *superblock;
 	const struct SqshConfig config = {
 			.source_mapper = sqsh_mapper_impl_static,
 			.source_size = TEST_SQUASHFS_IMAGE_LEN,
@@ -366,18 +361,15 @@ UTEST(integration, sqsh_test_uid_and_gid) {
 	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
 	ASSERT_EQ(0, rv);
 
-	superblock = sqsh_archive_superblock(&sqsh);
-	rv = sqsh__file_init(
-			&file, &sqsh, sqsh_superblock_inode_root_ref(superblock),
-			/* TODO */ 0);
+	file = sqsh_open(&sqsh, "/", &rv);
 	ASSERT_EQ(0, rv);
 
-	uid = sqsh_file_uid(&file);
+	uid = sqsh_file_uid(file);
 	ASSERT_EQ((uint32_t)2020, uid);
-	gid = sqsh_file_gid(&file);
+	gid = sqsh_file_gid(file);
 	ASSERT_EQ((uint32_t)202020, gid);
 
-	rv = sqsh__file_cleanup(&file);
+	rv = sqsh_close(file);
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__archive_cleanup(&sqsh);

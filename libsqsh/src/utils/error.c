@@ -156,6 +156,8 @@ sqsh_error_str(int error_code) {
 		return "Inode parent mismatch";
 	case SQSH_ERROR_NOT_A_SYMLINK:
 		return "Not a symlink";
+	case SQSH_ERROR_INODE_PARENT_UNSET:
+		return "Inode parent unset";
 	}
 	snprintf(err_str, sizeof(err_str), UNKNOWN_ERROR_FORMAT, error_code);
 	return err_str;
