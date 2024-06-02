@@ -192,15 +192,14 @@ dyn_map_set(
 		const uint64_t old_value = ~inner_inode_refs[inner_index];
 		inner_inode_refs[inner_index] = ~inode_ref;
 		if (old_value != EMPTY_INODE_REF && old_value != inode_ref) {
-			return -SQSH_ERROR_INODE_MAP_IS_INCONSISTENT;
+			rv = -SQSH_ERROR_INODE_MAP_IS_INCONSISTENT;
+			goto out;
 		}
 	}
 
-	rv = sqsh__mutex_unlock(map->mutex);
-	if (rv < 0) {
-		return rv;
-	}
-	return 0;
+out:
+	sqsh__mutex_unlock(map->mutex);
+	return rv;
 }
 
 static int
