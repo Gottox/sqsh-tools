@@ -113,11 +113,8 @@ dyn_map_init(struct SqshInodeMap *map, struct SqshArchive *archive) {
 	}
 	pthread_mutex_init(map->mutex, NULL);
 	map->export_table = NULL;
-	map->inode_refs = calloc(inode_count, sizeof(uint_fast64_t));
-	if (map->inode_refs == NULL) {
-		rv = -SQSH_ERROR_MALLOC_FAILED;
-		goto out;
-	}
+
+	cx_radix_tree_init(&map->inode_refs, sizeof(uint64_t[256]));
 out:
 	return rv;
 }
@@ -127,7 +124,6 @@ static uint64_t
 dyn_map_get(const struct SqshInodeMap *map, uint32_t inode_number, int *err) {
 	int rv = 0;
 	uint64_t inode_ref = 0;
-	uint_fast64_t *inode_refs = map->inode_refs;
 
 	if (inode_number == 0 || inode_number - 1 >= map->inode_count) {
 		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
@@ -137,7 +133,18 @@ dyn_map_get(const struct SqshInodeMap *map, uint32_t inode_number, int *err) {
 	if (rv < 0) {
 		goto out;
 	}
-	inode_ref = ~inode_refs[inode_number - 1];
+
+	sqsh_index_t index = inode_number - 1;
+	sqsh_index_t inner_index = index & 0xff;
+	sqsh_index_t outer_index = index >> 8;
+
+	uint_fast64_t *inner_inode_refs =
+			cx_radix_tree_get(&map->inode_refs, outer_index);
+	if (inner_inode_refs == NULL) {
+		rv = -SQSH_ERROR_NO_SUCH_ELEMENT;
+		goto out;
+	}
+	inode_ref = ~inner_inode_refs[inner_index];
 	if (inode_ref == EMPTY_INODE_REF) {
 		rv = -SQSH_ERROR_NO_SUCH_ELEMENT;
 		inode_ref = 0;
@@ -159,8 +166,6 @@ static int
 dyn_map_set(
 		struct SqshInodeMap *map, uint32_t inode_number, uint64_t inode_ref) {
 	int rv = 0;
-	uint64_t old_value;
-	uint_fast64_t *inode_refs = map->inode_refs;
 
 	if (inode_ref == EMPTY_INODE_REF) {
 		return -SQSH_ERROR_INVALID_ARGUMENT;
@@ -172,11 +177,25 @@ dyn_map_set(
 	if (rv < 0) {
 		return rv;
 	}
-	old_value = ~inode_refs[inode_number - 1];
-	inode_refs[inode_number - 1] = ~inode_ref;
-	if (old_value != EMPTY_INODE_REF && old_value != inode_ref) {
-		return -SQSH_ERROR_INODE_MAP_IS_INCONSISTENT;
+
+	sqsh_index_t index = inode_number - 1;
+	sqsh_index_t inner_index = index & 0xff;
+	sqsh_index_t outer_index = index >> 8;
+
+	uint_fast64_t *inner_inode_refs =
+			cx_radix_tree_get(&map->inode_refs, outer_index);
+	if (inner_inode_refs == NULL) {
+		uint64_t new_inner_inode_refs[256] = {0};
+		new_inner_inode_refs[inner_index] = ~inode_ref;
+		cx_radix_tree_put(&map->inode_refs, outer_index, new_inner_inode_refs);
+	} else {
+		const uint64_t old_value = ~inner_inode_refs[inner_index];
+		inner_inode_refs[inner_index] = ~inode_ref;
+		if (old_value != EMPTY_INODE_REF && old_value != inode_ref) {
+			return -SQSH_ERROR_INODE_MAP_IS_INCONSISTENT;
+		}
 	}
+
 	rv = sqsh__mutex_unlock(map->mutex);
 	if (rv < 0) {
 		return rv;
@@ -192,7 +211,7 @@ export_table_cleanup(struct SqshInodeMap *map) {
 
 static int
 dyn_map_cleanup(struct SqshInodeMap *map) {
-	free(map->inode_refs);
+	cx_radix_tree_cleanup(&map->inode_refs);
 	pthread_mutex_destroy(map->mutex);
 	free(map->mutex);
 	return 0;
