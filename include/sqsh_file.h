@@ -361,7 +361,7 @@ uint32_t sqsh_file_inode(const struct SqshFile *context);
 
 /**
  * @memberof SqshFile
- * @brief Getter for the file modification time.
+ * @brief Getter for the file modification time in seconds since epoch.
  *
  * @param[in] context The file context.
  *
