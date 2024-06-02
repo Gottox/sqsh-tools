@@ -49,7 +49,7 @@ fs_impl = []
 if tools.has_key('sqshfs') and host_machine.system() != 'darwin'
     fs_impl += tools['sqshfs']
 endif
-if tools.has_key('sqshfs') and host_machine.system() != 'darwin'
+if tools.has_key('sqshfs2') and host_machine.system() != 'darwin'
     fs_impl += tools['sqshfs2']
 endif
 

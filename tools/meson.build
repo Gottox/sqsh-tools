@@ -52,5 +52,5 @@ if fuse2_dep.found()
         install: not meson.is_subproject() and not fuse3_dep.found(),
         dependencies: [libsqsh_dep, fuse2_dep],
     )
-    tools += {tool_name: tool}
+    tools += {'sqshfs2': tool}
 endif
