@@ -295,7 +295,7 @@ SQSH_NO_UNUSED struct SqshFile *sqsh_open_by_ref2(
 		int *err);
 
 /**
- * @deprecated Since 1.4.0. Use sqsh_tree_traversal_new2() instead.
+ * @deprecated Since 1.4.0. Use sqsh_open_by_ref2() instead.
  * @memberof SqshFile
  * @brief Initializes a file context in heap
  *
@@ -361,7 +361,7 @@ uint32_t sqsh_file_inode(const struct SqshFile *context);
 
 /**
  * @memberof SqshFile
- * @brief Getter for the file modification time.
+ * @brief Getter for the file modification time in seconds since epoch.
  *
  * @param[in] context The file context.
  *

@@ -62,17 +62,16 @@ UTEST(path_resolver, resolver_symlink_recursion) {
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	struct SqshPathResolver resolver = {0};
-	rv = sqsh__path_resolver_init(&resolver, &archive);
+	struct SqshPathResolver *resolver = sqsh_path_resolver_new(&archive, &rv);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_path_resolver_to_root(&resolver);
+	rv = sqsh_path_resolver_to_root(resolver);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_path_resolver_resolve(&resolver, "src", true);
+	rv = sqsh_path_resolver_resolve(resolver, "src", true);
 	ASSERT_EQ(-SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED, rv);
 
-	sqsh__path_resolver_cleanup(&resolver);
+	sqsh_path_resolver_free(resolver);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -104,17 +103,14 @@ UTEST(path_resolver, resolver_symlink_alternating_recursion) {
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	struct SqshPathResolver resolver = {0};
-	rv = sqsh__path_resolver_init(&resolver, &archive);
+	struct SqshPathResolver *resolver = sqsh_path_resolver_new(&archive, &rv);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_path_resolver_to_root(&resolver);
-	ASSERT_EQ(0, rv);
-
-	rv = sqsh_path_resolver_resolve(&resolver, "src1", true);
+	rv = sqsh_path_resolver_to_root(resolver);
+	rv = sqsh_path_resolver_resolve(resolver, "src1", true);
 	ASSERT_EQ(-SQSH_ERROR_TOO_MANY_SYMLINKS_FOLLOWED, rv);
 
-	sqsh__path_resolver_cleanup(&resolver);
+	sqsh_path_resolver_free(resolver);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -146,22 +142,21 @@ UTEST(path_resolver, resolver_symlink_open) {
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	struct SqshPathResolver resolver = {0};
-	rv = sqsh__path_resolver_init(&resolver, &archive);
+	struct SqshPathResolver *resolver = sqsh_path_resolver_new(&archive, &rv);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_path_resolver_to_root(&resolver);
+	rv = sqsh_path_resolver_to_root(resolver);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_path_resolver_resolve(&resolver, "src", true);
+	rv = sqsh_path_resolver_resolve(resolver, "src", true);
 	ASSERT_EQ(0, rv);
 
-	const char *name = sqsh_path_resolver_name(&resolver);
-	size_t name_size = sqsh_path_resolver_name_size(&resolver);
+	const char *name = sqsh_path_resolver_name(resolver);
+	size_t name_size = sqsh_path_resolver_name_size(resolver);
 	ASSERT_EQ((size_t)3, name_size);
 	ASSERT_EQ(0, memcmp(name, "tgt", name_size));
 
-	sqsh__path_resolver_cleanup(&resolver);
+	sqsh_path_resolver_free(resolver);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -201,17 +196,16 @@ UTEST(path_resolver, resolver_inconsistent_file_type) {
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	struct SqshPathResolver resolver = {0};
-	rv = sqsh__path_resolver_init(&resolver, &archive);
+	struct SqshPathResolver *resolver = sqsh_path_resolver_new(&archive, &rv);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_path_resolver_to_root(&resolver);
+	rv = sqsh_path_resolver_to_root(resolver);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_path_resolver_resolve(&resolver, "file", true);
+	rv = sqsh_path_resolver_resolve(resolver, "file", true);
 	ASSERT_EQ(-SQSH_ERROR_CORRUPTED_INODE, rv);
 
-	sqsh__path_resolver_cleanup(&resolver);
+	sqsh_path_resolver_free(resolver);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -240,17 +234,16 @@ UTEST(path_resolver, resolver_file_enter) {
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	struct SqshPathResolver resolver = {0};
-	rv = sqsh__path_resolver_init(&resolver, &archive);
+	struct SqshPathResolver *resolver = sqsh_path_resolver_new(&archive, &rv);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_path_resolver_to_root(&resolver);
+	rv = sqsh_path_resolver_to_root(resolver);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_path_resolver_resolve(&resolver, "file/", true);
+	rv = sqsh_path_resolver_resolve(resolver, "file/", true);
 	ASSERT_EQ(-SQSH_ERROR_NOT_A_DIRECTORY, rv);
 
-	sqsh__path_resolver_cleanup(&resolver);
+	sqsh_path_resolver_free(resolver);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -282,22 +275,21 @@ UTEST(path_resolver, resolver_directory_enter) {
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	struct SqshPathResolver resolver = {0};
-	rv = sqsh__path_resolver_init(&resolver, &archive);
+	struct SqshPathResolver *resolver = sqsh_path_resolver_new(&archive, &rv);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_path_resolver_to_root(&resolver);
+	rv = sqsh_path_resolver_to_root(resolver);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_path_resolver_resolve(&resolver, "dir", true);
+	rv = sqsh_path_resolver_resolve(resolver, "dir", true);
 	ASSERT_EQ(0, rv);
-	expect_inode(&resolver, 2);
+	expect_inode(resolver, 2);
 
-	rv = sqsh_path_resolver_up(&resolver);
+	rv = sqsh_path_resolver_up(resolver);
 	ASSERT_EQ(0, rv);
-	expect_inode(&resolver, 1);
+	expect_inode(resolver, 1);
 
-	sqsh__path_resolver_cleanup(&resolver);
+	sqsh_path_resolver_free(resolver);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -320,17 +312,16 @@ UTEST(path_resolver, resolver_uninitialized_up) {
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	struct SqshPathResolver resolver = {0};
-	rv = sqsh__path_resolver_init(&resolver, &archive);
+	struct SqshPathResolver *resolver = sqsh_path_resolver_new(&archive, &rv);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_path_resolver_to_root(&resolver);
+	rv = sqsh_path_resolver_to_root(resolver);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_path_resolver_up(&resolver);
+	rv = sqsh_path_resolver_up(resolver);
 	ASSERT_EQ(-SQSH_ERROR_WALKER_CANNOT_GO_UP, rv);
 
-	sqsh__path_resolver_cleanup(&resolver);
+	sqsh_path_resolver_free(resolver);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -353,17 +344,16 @@ UTEST(path_resolver, resolver_uninitialized_down) {
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	struct SqshPathResolver resolver = {0};
-	rv = sqsh__path_resolver_init(&resolver, &archive);
+	struct SqshPathResolver *resolver = sqsh_path_resolver_new(&archive, &rv);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_path_resolver_to_root(&resolver);
+	rv = sqsh_path_resolver_to_root(resolver);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_path_resolver_down(&resolver);
+	rv = sqsh_path_resolver_down(resolver);
 	ASSERT_EQ(-SQSH_ERROR_WALKER_CANNOT_GO_DOWN, rv);
 
-	sqsh__path_resolver_cleanup(&resolver);
+	sqsh_path_resolver_free(resolver);
 	sqsh__archive_cleanup(&archive);
 }
 
@@ -391,33 +381,32 @@ UTEST(path_resolver, resolver_next) {
 	};
 	mk_stub(&archive, payload, sizeof(payload));
 
-	struct SqshPathResolver resolver = {0};
-	rv = sqsh__path_resolver_init(&resolver, &archive);
+	struct SqshPathResolver *resolver = sqsh_path_resolver_new(&archive, &rv);
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh_path_resolver_to_root(&resolver);
+	rv = sqsh_path_resolver_to_root(resolver);
 	ASSERT_EQ(0, rv);
 
-	bool has_next = sqsh_path_resolver_next(&resolver, &rv);
-	ASSERT_EQ(0, rv);
-	assert(has_next);
-
-	has_next = sqsh_path_resolver_next(&resolver, &rv);
+	bool has_next = sqsh_path_resolver_next(resolver, &rv);
 	ASSERT_EQ(0, rv);
 	assert(has_next);
 
-	has_next = sqsh_path_resolver_next(&resolver, &rv);
+	has_next = sqsh_path_resolver_next(resolver, &rv);
 	ASSERT_EQ(0, rv);
 	assert(has_next);
 
-	has_next = sqsh_path_resolver_next(&resolver, &rv);
+	has_next = sqsh_path_resolver_next(resolver, &rv);
+	ASSERT_EQ(0, rv);
+	assert(has_next);
+
+	has_next = sqsh_path_resolver_next(resolver, &rv);
 	ASSERT_EQ(0, rv);
 	ASSERT_EQ(false, has_next);
 
-	rv = sqsh_path_resolver_next(&resolver, &rv);
+	rv = sqsh_path_resolver_next(resolver, &rv);
 	ASSERT_EQ(0, rv);
 
-	sqsh__path_resolver_cleanup(&resolver);
+	sqsh_path_resolver_free(resolver);
 	sqsh__archive_cleanup(&archive);
 }
 

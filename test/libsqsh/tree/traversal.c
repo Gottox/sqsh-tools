@@ -48,13 +48,63 @@ UTEST(traversal, test_recursive_directory) {
 			/* clang-format off */
 			SQSH_HEADER,
 			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			INODE_HEADER(1, 0, 0, 0, 0, 1),
+			INODE_BASIC_DIR(0, 1024, 0, 2),
+
+			[INODE_TABLE_OFFSET + 128] = METABLOCK_HEADER(0, 128),
+			INODE_HEADER(1, 0, 0, 0, 0, 2),
+			INODE_BASIC_DIR(128, 1024, 0, 1),
+
+			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			DIRECTORY_HEADER(1, 128, 2),
+			DIRECTORY_ENTRY(0, 0, 1, 1),
+			'r',
+
+			[DIRECTORY_TABLE_OFFSET + 128] = METABLOCK_HEADER(0, 128),
+			DIRECTORY_HEADER(1, 0, 1),
+			DIRECTORY_ENTRY(0, 0, 1, 1),
+			'r',
+
+			[FRAGMENT_TABLE_OFFSET] = 0,
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	struct SqshFile file = {0};
+	rv = sqsh__file_init(&file, &archive, 0, SQSH_AUTO_DIR_INODE);
+	ASSERT_EQ(0, rv);
+
+	struct SqshTreeTraversal traversal = {0};
+	rv = sqsh__tree_traversal_init(&traversal, &file);
+	ASSERT_EQ(0, rv);
+
+	for (int i = 0; i < 128; i++) {
+		bool has_next = sqsh_tree_traversal_next(&traversal, &rv);
+		ASSERT_EQ(0, rv);
+		ASSERT_TRUE(has_next);
+	}
+	bool has_next = sqsh_tree_traversal_next(&traversal, &rv);
+	ASSERT_EQ(-SQSH_ERROR_DIRECTORY_RECURSION, rv);
+	assert(!has_next);
+
+	sqsh__tree_traversal_cleanup(&traversal);
+	sqsh__file_cleanup(&file);
+	sqsh__archive_cleanup(&archive);
+}
+
+UTEST(traversal, test_empty_dir) {
+	int rv;
+	struct SqshArchive archive = {0};
+	uint8_t payload[] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* inode */
 			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
 			INODE_HEADER(1, 0, 0, 0, 0, 1),
-			INODE_BASIC_DIR(0, 1024, 0, 0),
+			INODE_BASIC_DIR(0, 3, 0, 0),
 			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
 			DIRECTORY_HEADER(1, 0, 0),
-			DIRECTORY_ENTRY(0, 2, 1, 1),
-			'r',
 			[FRAGMENT_TABLE_OFFSET] = 0,
 			/* clang-format on */
 	};
@@ -65,20 +115,28 @@ UTEST(traversal, test_recursive_directory) {
 	ASSERT_EQ(0, rv);
 
 	struct SqshTreeTraversal traversal = {0};
-	rv = sqsh__tree_traversal_init(&traversal, 0, &file);
+	rv = sqsh__tree_traversal_init(&traversal, &file);
 	ASSERT_EQ(0, rv);
 
-	for (int i = 0;; i++) {
-		bool has_next = sqsh_tree_traversal_next(&traversal, &rv);
-		if (i < 128) {
-			assert(has_next);
-			ASSERT_EQ(0, rv);
-		} else {
-			assert(!has_next);
-			ASSERT_EQ(-SQSH_ERROR_DIRECTORY_RECURSION, rv);
-			break;
-		}
-	}
+	bool has_next = sqsh_tree_traversal_next(&traversal, &rv);
+	ASSERT_EQ(0, rv);
+	ASSERT_TRUE(has_next);
+	ASSERT_EQ(
+			(enum SqshTreeTraversalState)
+					SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN,
+			sqsh_tree_traversal_state(&traversal));
+
+	has_next = sqsh_tree_traversal_next(&traversal, &rv);
+	ASSERT_EQ(0, rv);
+	ASSERT_TRUE(has_next);
+	ASSERT_EQ(
+			(enum SqshTreeTraversalState)
+					SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END,
+			sqsh_tree_traversal_state(&traversal));
+
+	has_next = sqsh_tree_traversal_next(&traversal, &rv);
+	ASSERT_EQ(0, rv);
+	ASSERT_FALSE(has_next);
 
 	sqsh__tree_traversal_cleanup(&traversal);
 	sqsh__file_cleanup(&file);

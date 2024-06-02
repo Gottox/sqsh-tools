@@ -234,9 +234,13 @@ ls_path(struct SqshArchive *archive, char *path) {
 		goto out;
 	}
 
-	traversal = sqsh_tree_traversal_new2(file, recursive ? 0 : 1, &rv);
+	traversal = sqsh_tree_traversal_new(file, &rv);
 	if (rv < 0) {
 		goto out;
+	}
+
+	if (!recursive) {
+		sqsh_tree_traversal_set_max_depth(traversal, 1);
 	}
 
 	while (sqsh_tree_traversal_next(traversal, &rv)) {
@@ -246,12 +250,12 @@ ls_path(struct SqshArchive *archive, char *path) {
 		enum SqshTreeTraversalState state =
 				sqsh_tree_traversal_state(traversal);
 		size_t depth = sqsh_tree_traversal_depth(traversal);
+
 		if (depth == 0 && state == SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN) {
 			continue;
 		} else if (state == SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END) {
 			continue;
 		}
-
 		rv = print_item(path, traversal);
 		if (rv < 0) {
 			goto out;

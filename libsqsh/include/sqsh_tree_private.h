@@ -35,7 +35,9 @@
 #define SQSH_TREE_PRIVATE_H
 
 #include "sqsh_directory_private.h"
-#include "sqsh_tree.h"
+#include <sqsh_tree.h>
+
+#include <cextras/memory.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -99,6 +101,7 @@ sqsh__path_resolver_cleanup(struct SqshPathResolver *resolver);
 struct SqshTreeTraversalStackElement {
 	struct SqshDirectoryIterator iterator;
 	struct SqshFile file;
+	struct SqshTreeTraversalStackElement *next;
 };
 
 /**
@@ -109,18 +112,19 @@ struct SqshTreeTraversal {
 	 * @privatesection
 	 */
 
-	enum SqshTreeTraversalState state;
-	const struct SqshFile *base_file;
-	struct SqshTreeTraversalStackElement **stack;
+	struct CxPreallocPool stack_pool;
+	struct SqshTreeTraversalStackElement *stack;
 	size_t stack_size;
-	size_t stack_capacity;
+
+	size_t depth;
 	size_t max_depth;
+
+	const struct SqshFile *base_file;
+	struct SqshDirectoryIterator base_iterator;
+
+	const struct SqshFile *current_file;
 	struct SqshDirectoryIterator *current_iterator;
-	const char *current_name;
-	size_t current_name_size;
-	uint64_t current_inode_ref;
-	uint32_t current_dir_inode;
-	enum SqshFileType current_type;
+	enum SqshTreeTraversalState state;
 };
 
 /**
@@ -129,14 +133,12 @@ struct SqshTreeTraversal {
  * @brief Initializes a SqshTreeTraversal struct.
  *
  * @param[out] traversal  The file traversal to initialize.
- * @param[in]  max_depth  The maximum depth to traverse
  * @param[in]  file       the file to start traversal at
  *
  * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__tree_traversal_init(
-		struct SqshTreeTraversal *traversal, size_t max_depth,
-		const struct SqshFile *file);
+		struct SqshTreeTraversal *traversal, const struct SqshFile *file);
 
 /**
  * @internal

@@ -478,7 +478,6 @@ enum SqshTreeTraversalState {
 struct SqshTreeTraversal;
 
 /**
- * @deprecated Since 1.4.0. Use sqsh_tree_traversal_new2() instead.
  * @brief Creates a new SqshTreeTraversal object at the root inode.
  * @memberof SqshTreeTraversal
  *
@@ -488,23 +487,18 @@ struct SqshTreeTraversal;
  *
  * @return a new file reader.
  */
-__attribute__((deprecated("Since 1.4.0. Use sqsh_tree_traversal_new2() "
-						  "instead."))) struct SqshTreeTraversal *
+struct SqshTreeTraversal *
 sqsh_tree_traversal_new(const struct SqshFile *file, int *err);
 
 /**
- * @brief Creates a new SqshTreeTraversal object at the root inode.
+ * @brief Sets the maximum depth of the traversal.
  * @memberof SqshTreeTraversal
  *
- * @param[in]   file     the base inode to start from.
- * @param[in]   max_depth the maximum depth to traverse.
- * @param[out]  err      Pointer to an int where the error code will be
- * stored.
- *
- * @return a new file reader.
+ * @param[in]   traversal  The traversal to use
+ * @param[in]   max_depth  The maximum depth to traverse.
  */
-struct SqshTreeTraversal *sqsh_tree_traversal_new2(
-		const struct SqshFile *file, size_t max_depth, int *err);
+void sqsh_tree_traversal_set_max_depth(
+		struct SqshTreeTraversal *traversal, size_t max_depth);
 
 /**
  * @memberof SqshTreeTraversal
