@@ -186,7 +186,7 @@ sqsh__path_resolver_to_ref(
 	int rv = 0;
 	rv = sqsh__file_cleanup(&resolver->cwd);
 
-	rv = sqsh__file_init(&resolver->cwd, resolver->archive, inode_ref, 0);
+	rv = sqsh__file_init(&resolver->cwd, resolver->archive, inode_ref);
 	if (rv < 0) {
 		goto out;
 	}
@@ -311,9 +311,28 @@ sqsh_path_resolver_dir_inode(const struct SqshPathResolver *resolver) {
 struct SqshFile *
 sqsh_path_resolver_open_file(
 		const struct SqshPathResolver *resolver, int *err) {
+	int rv = 0;
+	struct SqshFile *file = NULL;
 	uint32_t dir_inode = sqsh_path_resolver_dir_inode(resolver);
 	uint64_t inode_ref = resolver->current_inode_ref;
-	return sqsh_open_by_ref2(resolver->archive, inode_ref, dir_inode, err);
+	file = sqsh_open_by_ref(resolver->archive, inode_ref, &rv);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh__file_set_dir_inode(file, dir_inode);
+	if (rv < 0) {
+		goto out;
+	}
+
+out:
+	if (rv < 0) {
+		sqsh__file_cleanup(file);
+		file = NULL;
+	}
+	if (err != NULL) {
+		*err = rv;
+	}
+	return file;
 }
 
 enum SqshFileType
@@ -343,7 +362,11 @@ sqsh__path_resolver_follow_symlink(struct SqshPathResolver *resolver) {
 	}
 
 	struct SqshFile file = {0};
-	rv = sqsh__file_init(&file, resolver->archive, inode_ref, dir_inode);
+	rv = sqsh__file_init(&file, resolver->archive, inode_ref);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh__file_set_dir_inode(&file, dir_inode);
 	if (rv < 0) {
 		goto out;
 	}

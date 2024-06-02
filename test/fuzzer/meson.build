@@ -1,4 +1,5 @@
 fuzzer_repro = files(
+    'crash-cabfb77fc6783dc1021720ca328e923aa2cc834b',
     'crash_0c006fc7bbbab8ba82abca1f01cc1f95714aaf98',
     'crash_0f300b1e2028a520e74e06b9d598b97d15b34062',
     'crash_1938b2d283474afb40ccd2be49000bea75774c48',

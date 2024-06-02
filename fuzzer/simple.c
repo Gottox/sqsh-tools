@@ -84,7 +84,7 @@ LLVMFuzzerTestOneInput(char *data, size_t size) {
 
 	superblock = sqsh_archive_superblock(archive);
 	uint64_t inode_ref = sqsh_superblock_inode_root_ref(superblock);
-	inode = sqsh_open_by_ref2(archive, inode_ref, 0, &rv);
+	inode = sqsh_open_by_ref(archive, inode_ref, &rv);
 	if (rv < 0) {
 		goto out;
 	}

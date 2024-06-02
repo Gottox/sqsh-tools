@@ -80,7 +80,11 @@ push_stack(struct SqshTreeTraversal *traversal) {
 	const uint32_t dir_inode = sqsh_file_inode(traversal->current_file);
 	const uint64_t inode_ref =
 			sqsh_directory_iterator_inode_ref(traversal->current_iterator);
-	rv = sqsh__file_init(&element->file, archive, inode_ref, dir_inode);
+	rv = sqsh__file_init(&element->file, archive, inode_ref);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh__file_set_dir_inode(&element->file, dir_inode);
 	if (rv < 0) {
 		goto out;
 	}
@@ -337,15 +341,32 @@ sqsh_tree_traversal_name_dup(const struct SqshTreeTraversal *traversal) {
 struct SqshFile *
 sqsh_tree_traversal_open_file(
 		const struct SqshTreeTraversal *traversal, int *err) {
+	int rv = 0;
+	struct SqshFile *file = NULL;
 	if (traversal->current_iterator == NULL) {
 		uint64_t inode_ref = sqsh_file_inode_ref(traversal->base_file);
-		uint32_t dir_inode = sqsh__file_dir_inode(traversal->base_file);
-		return sqsh_open_by_ref2(
-				traversal->base_file->archive, inode_ref, dir_inode, err);
+		file = sqsh_open_by_ref(traversal->base_file->archive, inode_ref, &rv);
+		if (rv < 0) {
+			goto out;
+		}
+		if (sqsh__file_has_dir_inode(traversal->base_file)) {
+			const uint32_t dir_inode =
+					sqsh__file_dir_inode(traversal->base_file);
+			rv = sqsh__file_set_dir_inode(file, dir_inode);
+		}
 	} else {
-		return sqsh_directory_iterator_open_file(
-				traversal->current_iterator, err);
+		file = sqsh_directory_iterator_open_file(
+				traversal->current_iterator, &rv);
 	}
+out:
+	if (err != NULL) {
+		*err = rv;
+	}
+	if (rv < 0) {
+		sqsh_close(file);
+		return NULL;
+	}
+	return file;
 }
 
 int

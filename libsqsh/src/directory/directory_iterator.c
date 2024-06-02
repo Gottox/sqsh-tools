@@ -409,8 +409,13 @@ sqsh_directory_iterator_open_file(
 	const uint32_t dir_inode = sqsh_file_inode(iterator->file);
 	struct SqshArchive *archive = iterator->file->archive;
 
-	file = sqsh_open_by_ref2(archive, inode_ref, dir_inode, &rv);
-	if (file == NULL) {
+	file = sqsh_open_by_ref(archive, inode_ref, &rv);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = sqsh__file_set_dir_inode(file, dir_inode);
+	if (rv < 0) {
 		goto out;
 	}
 

@@ -249,6 +249,7 @@ struct SqshFile {
 	struct SqshArchive *archive;
 	const struct SqshInodeImpl *impl;
 	enum SqshFileType type;
+	bool has_dir_inode;
 	uint32_t dir_inode;
 };
 
@@ -262,13 +263,11 @@ struct SqshFile {
  * @param context The file context to initialize.
  * @param sqsh The sqsh context.
  * @param inode_ref The inode reference.
- * @param dir_inode The inode number of the parent directory.
  *
  * @return int 0 on success, less than 0 on error.
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_init(
-		struct SqshFile *context, struct SqshArchive *sqsh, uint64_t inode_ref,
-		uint32_t dir_inode);
+		struct SqshFile *context, struct SqshArchive *sqsh, uint64_t inode_ref);
 
 /**
  * @internal
@@ -276,9 +275,19 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_init(
  * @brief Retrieves the inode of the parent directory.
  *
  * @param context The file context.
- * @return uint32_t The inode number.
+ * @return The inode number.
  */
 SQSH_NO_EXPORT uint32_t sqsh__file_dir_inode(const struct SqshFile *context);
+
+/**
+ * @internal
+ * @memberof SqshFile
+ * @brief Retrieves if the inode of the parent directory is set.
+ *
+ * @param context The file context.
+ * @return true if the dir_inode is set, false otherwise.
+ */
+bool sqsh__file_has_dir_inode(const struct SqshFile *context);
 
 /**
  * @internal
