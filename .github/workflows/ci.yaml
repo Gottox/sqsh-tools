@@ -84,6 +84,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: gottox/sqsh-build:x86_64
+      volumes:
+      - /tmp/build:/tmp/build
     steps:
     - uses: actions/checkout@v4
     - name: configure
@@ -103,6 +105,12 @@ jobs:
     - name: fuzzer
       run: |
          ninja -C /tmp/build test
+    - name: Upload Failing Inputs
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: failing-inputs
+        path: /tmp/build/fuzzer/inputs
 
   build:
     needs:
