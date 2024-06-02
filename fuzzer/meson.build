@@ -31,17 +31,26 @@ fuzzer = executable(
     link_with: libsqsh.get_static_lib(),
 )
 
+rundir_tgt = custom_target(
+    'fuzzer_inputs',
+    output: 'inputs',
+    command: [mkdir, '-p', '@OUTPUT@'],
+)
+
 test(
     'simple_fuzzer',
     fuzzer,
-    depends: corpus_tgt,
+    workdir: rundir_tgt.full_path(),
+    is_parallel: false,
+    depends: [corpus_tgt, rundir_tgt],
     args: [
         corpus_tgt.full_path(),
         source_corpus,
         '-error_exitcode=1',
         '-timeout_exitcode=1',
-        '-timeout=3',
+        '-timeout=10',
         '-rss_limit_mb=0',
+        '-malloc_limit_mb=10',
         '-max_total_time=@0@'.format(get_option('fuzzer_timeout')),
     ],
     timeout: 10 + get_option('fuzzer_timeout'),

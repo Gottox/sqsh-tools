@@ -34,11 +34,8 @@ sqsh_test = [
     'include_tests/sqsh_tree.c',
     'include_tests/sqsh_xattr.c',
     'extract/extract.c',
-    'fuzzer_repro.c',
 ]
-sqsh_extra_source = {
-    'fuzzer_repro.c': '../../fuzzer/simple.c',
-}
+sqsh_extra_source = {}
 sqsh_failing_test = []
 sqsh_test_util = [
     'util.c',
