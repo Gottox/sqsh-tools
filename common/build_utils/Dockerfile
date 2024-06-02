@@ -3,6 +3,7 @@ ARG BASE_IMAGE=alpine
 FROM ${BASE_IMAGE}:3.20
 
 RUN apk add --no-cache \
+	jq \
 	gcc \
 	g++ \
 	clang17 \
