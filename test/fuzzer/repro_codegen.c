@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <ctype.h>
 #include <libgen.h>
 #include <stdio.h>
 
@@ -26,9 +27,16 @@ main(int argc, char *argv[]) {
 		 "");
 	puts(HEADER);
 	for (int i = 1; i < argc; i++) {
-		printf(TEST_PRE_FORMAT, basename(argv[i]));
 		FILE *f = fopen(argv[i], "rb");
 		assert(f);
+
+		char *name = basename(argv[i]);
+		for (char *p = name; *p; p++) {
+			if (!isalnum(*p)) {
+				*p = '_';
+			}
+		}
+		printf(TEST_PRE_FORMAT, name);
 		int c;
 		while ((c = fgetc(f)) != EOF) {
 			printf("0x%02x, ", c);
