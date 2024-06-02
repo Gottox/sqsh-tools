@@ -197,7 +197,7 @@ out:
 static int
 extract(const char *path, const struct SqshFile *file) {
 	int rv = 0;
-	struct utimbuf times;
+	struct timespec times[2] = {0};
 
 	if (path[0] == 0) {
 		path = ".";
@@ -228,20 +228,18 @@ extract(const char *path, const struct SqshFile *file) {
 		goto out;
 	}
 
-	if (type != SQSH_FILE_TYPE_SYMLINK) {
-		times.actime = times.modtime = sqsh_file_modified_time(file);
-		rv = utime(path, &times);
-		if (rv < 0) {
-			perror(path);
-			goto out;
-		}
+	times[0].tv_sec = times[1].tv_sec = sqsh_file_modified_time(file);
+	rv = utimensat(AT_FDCWD, path, times, AT_SYMLINK_NOFOLLOW);
+	if (rv < 0) {
+		perror(path);
+		goto out;
+	}
 
-		uint16_t mode = sqsh_file_permission(file);
-		rv = fchmodat(AT_FDCWD, path, mode, AT_SYMLINK_NOFOLLOW);
-		if (rv < 0) {
-			perror(path);
-			goto out;
-		}
+	uint16_t mode = sqsh_file_permission(file);
+	rv = fchmodat(AT_FDCWD, path, mode, AT_SYMLINK_NOFOLLOW);
+	if (rv < 0) {
+		perror(path);
+		goto out;
 	}
 
 	if (do_chown) {
