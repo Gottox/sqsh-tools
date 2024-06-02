@@ -207,8 +207,6 @@ SQSH_NO_EXPORT int sqsh__file_reader_cleanup(struct SqshFileReader *reader);
  * file/file.c
  */
 
-#define SQSH_AUTO_DIR_INODE UINT32_MAX
-
 /**
  * @brief The file type implementation
  */

@@ -214,14 +214,6 @@ sqsh__file_init(
 		goto out;
 	}
 
-	if (dir_inode == SQSH_AUTO_DIR_INODE) {
-		if (sqsh_file_type(inode) == SQSH_FILE_TYPE_DIRECTORY) {
-			dir_inode = sqsh_file_directory_parent_inode(inode);
-		} else {
-			rv = -SQSH_ERROR_NOT_A_DIRECTORY;
-			goto out;
-		}
-	}
 	inode->dir_inode = dir_inode;
 
 	rv = sqsh_archive_inode_map(archive, &inode_map);

@@ -72,7 +72,7 @@ UTEST(traversal, test_recursive_directory) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	struct SqshFile file = {0};
-	rv = sqsh__file_init(&file, &archive, 0, SQSH_AUTO_DIR_INODE);
+	rv = sqsh__file_init(&file, &archive, 0, 2);
 	ASSERT_EQ(0, rv);
 
 	struct SqshTreeTraversal traversal = {0};
