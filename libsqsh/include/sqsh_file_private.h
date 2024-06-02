@@ -270,6 +270,18 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_init(
 		struct SqshFile *context, struct SqshArchive *sqsh, uint64_t inode_ref);
 
 /**
+ * @memberof SqshFile
+ * @brief returns whether the file is an extended structure.
+ *
+ * @param[in] context The file context.
+ * @param[in] dir_inode The inode of the parent directory.
+ *
+ * @return int 0 on success, less than 0 on error.
+ */
+SQSH_NO_EXPORT SQSH_NO_UNUSED int
+sqsh__file_set_dir_inode(struct SqshFile *context, uint32_t dir_inode);
+
+/**
  * @internal
  * @memberof SqshFile
  * @brief Retrieves the inode of the parent directory.
@@ -287,7 +299,7 @@ SQSH_NO_EXPORT uint32_t sqsh__file_dir_inode(const struct SqshFile *context);
  * @param context The file context.
  * @return true if the dir_inode is set, false otherwise.
  */
-bool sqsh__file_has_dir_inode(const struct SqshFile *context);
+SQSH_NO_EXPORT bool sqsh__file_has_dir_inode(const struct SqshFile *context);
 
 /**
  * @internal

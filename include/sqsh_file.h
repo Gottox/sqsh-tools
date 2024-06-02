@@ -297,18 +297,6 @@ sqsh_open_by_ref(struct SqshArchive *archive, uint64_t inode_ref, int *err);
  * @brief returns whether the file is an extended structure.
  *
  * @param[in] context The file context.
- * @param[in] dir_inode The inode of the parent directory.
- *
- * @return int 0 on success, less than 0 on error.
- */
-SQSH_NO_UNUSED int
-sqsh__file_set_dir_inode(struct SqshFile *context, uint32_t dir_inode);
-
-/**
- * @memberof SqshFile
- * @brief returns whether the file is an extended structure.
- *
- * @param[in] context The file context.
  *
  * @return true if the file is an extended structure.
  */
