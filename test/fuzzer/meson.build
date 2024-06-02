@@ -22,6 +22,7 @@ fuzzer_repro = files(
     'crash_e770c992b26a129aaeea42993b2a9b06ba91faca',
     'crash_f7bc33d88bbc6a270c32bc6969059a0c44c49dd4',
     'leak_2f97e04d5e7167856ba0827c10939690d203cb54',
+    'timeout-ed751e8e6821ce6ef7947a1133b8845f27e28ebd',
 )
 
 utest_dep = dependency('utest')
