@@ -75,6 +75,8 @@ push_stack(struct SqshTreeTraversal *traversal) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
+	element->next = traversal->stack;
+	traversal->stack = element;
 
 	struct SqshArchive *archive = traversal->base_file->archive;
 	const uint32_t dir_inode = sqsh_file_inode(traversal->current_file);
@@ -88,9 +90,6 @@ push_stack(struct SqshTreeTraversal *traversal) {
 	if (rv < 0) {
 		goto out;
 	}
-	element->next = traversal->stack;
-	traversal->stack = element;
-
 	traversal->current_file = &element->file;
 	traversal->state = SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN;
 out:
