@@ -62,13 +62,13 @@ usage(char *arg0) {
 
 static void
 print_mode(
-		int mode, int r_mask, int w_mask, int x_mask, int s_mask,
+		char *buffer, int mode, int r_mask, int w_mask, int x_mask, int s_mask,
 		const char *s_chars) {
 	const char *x_chars = (mode & s_mask) ? s_chars : "-x";
 
-	putchar((mode & r_mask) ? 'r' : '-');
-	putchar((mode & w_mask) ? 'w' : '-');
-	putchar((mode & x_mask) ? x_chars[1] : x_chars[0]);
+	buffer[0] = (mode & r_mask) ? 'r' : '-';
+	buffer[1] = (mode & w_mask) ? 'w' : '-';
+	buffer[2] = (mode & x_mask) ? x_chars[1] : x_chars[0];
 }
 
 static void
@@ -177,7 +177,7 @@ print_detail(const char *path, const struct SqshTreeTraversal *traversal) {
 	time_t mtime = sqsh_file_modified_time(file);
 	struct tm tm_info_buf = {0};
 	const struct tm *tm_info;
-	char time_buffer[128] = {0};
+	char buffer[128] = "";
 	tm_info = utc ? gmtime_r(&mtime, &tm_info_buf)
 				  : localtime_r(&mtime, &tm_info_buf);
 	if (tm_info == NULL) {
@@ -186,47 +186,52 @@ print_detail(const char *path, const struct SqshTreeTraversal *traversal) {
 
 	switch (sqsh_file_type(file)) {
 	case SQSH_FILE_TYPE_UNKNOWN:
-		putchar('?');
+		buffer[0] = '?';
 		break;
 	case SQSH_FILE_TYPE_DIRECTORY:
-		putchar('d');
+		buffer[0] = 'd';
 		break;
 	case SQSH_FILE_TYPE_FILE:
-		putchar('-');
+		buffer[0] = '-';
 		break;
 	case SQSH_FILE_TYPE_SYMLINK:
-		putchar('l');
+		buffer[0] = 'l';
 		break;
 	case SQSH_FILE_TYPE_BLOCK:
-		putchar('b');
+		buffer[0] = 'b';
 		break;
 	case SQSH_FILE_TYPE_CHAR:
-		putchar('c');
+		buffer[0] = 'c';
 		break;
 	case SQSH_FILE_TYPE_FIFO:
-		putchar('p');
+		buffer[0] = 'p';
 		break;
 	case SQSH_FILE_TYPE_SOCKET:
-		putchar('s');
+		buffer[0] = 's';
 		break;
 	}
 
 	mode = sqsh_file_permission(file);
-	print_mode(mode, S_IRUSR, S_IWUSR, S_IXUSR, S_ISUID, "Ss");
-	print_mode(mode, S_IRGRP, S_IWGRP, S_IXGRP, S_ISGID, "Ss");
-	print_mode(mode, S_IROTH, S_IWOTH, S_IXOTH, S_ISVTX, "Tt");
+	print_mode(&buffer[1], mode, S_IRUSR, S_IWUSR, S_IXUSR, S_ISUID, "Ss");
+	print_mode(&buffer[4], mode, S_IRGRP, S_IWGRP, S_IXGRP, S_ISGID, "Ss");
+	print_mode(&buffer[7], mode, S_IROTH, S_IWOTH, S_IXOTH, S_ISVTX, "Tt");
 
-	strftime(time_buffer, sizeof(time_buffer), "%a, %d %b %Y %T %z", tm_info);
+	sqsh_index_t index = 10;
+	snprintf(
+			&buffer[index], sizeof(buffer) - index, " %6u %6u %10" PRIu64,
+			sqsh_file_uid(file), sqsh_file_gid(file), sqsh_file_size(file));
 
-	printf(" %6u %6u %10" PRIu64 " %s ", sqsh_file_uid(file),
-		   sqsh_file_gid(file), sqsh_file_size(file), time_buffer);
+	index = strlen(buffer);
+	strftime(
+			&buffer[index], sizeof(buffer) - index, " %a, %d %b %Y %T %z ",
+			tm_info);
+	fputs(buffer, stdout);
 
 	print_path(path, traversal);
 
 	if (sqsh_file_type(file) == SQSH_FILE_TYPE_SYMLINK) {
 		fputs(" -> ", stdout);
-		fwrite(sqsh_file_symlink(file), sqsh_file_symlink_size(file),
-			   sizeof(char), stdout);
+		print_segment(sqsh_file_symlink(file), sqsh_file_symlink_size(file));
 	}
 
 	putchar('\n');
