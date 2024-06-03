@@ -29,7 +29,11 @@ fuzzer_repro = files(
 
 utest_dep = dependency('utest')
 
-fuzzer_repro_codegen = executable('repro_codegen', 'repro_codegen.c')
+fuzzer_repro_codegen = executable(
+    'repro_codegen',
+    'repro_codegen.c',
+    native: true,
+)
 
 fuzzer_repro_tgt = custom_target(
     'repro_test',
