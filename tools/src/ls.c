@@ -44,15 +44,18 @@
 
 static int
 print_simple(const char *path, const struct SqshTreeTraversal *traversal);
+static void print_segment_raw(const char *segment, size_t segment_size);
 
 static bool recursive = false;
 static bool utc = false;
 static int (*print_item)(const char *, const struct SqshTreeTraversal *) =
 		print_simple;
+static void (*print_segment)(const char *segment, size_t segment_size) =
+		print_segment_raw;
 
 static int
 usage(char *arg0) {
-	printf("usage: %s [-o OFFSET] [-r] [-l] [-u] FILESYSTEM [PATH]\n", arg0);
+	printf("usage: %s [-o OFFSET] [-rluRe] FILESYSTEM [PATH]\n", arg0);
 	printf("       %s -v\n", arg0);
 	return EXIT_FAILURE;
 }
@@ -69,7 +72,7 @@ print_mode(
 }
 
 static void
-print_segment(const char *segment, size_t segment_size) {
+print_segment_escaped(const char *segment, size_t segment_size) {
 	for (size_t i = 0; i < segment_size; i++) {
 		switch (segment[i]) {
 		case '\n':
@@ -123,6 +126,11 @@ print_segment(const char *segment, size_t segment_size) {
 			break;
 		}
 	}
+}
+
+static void
+print_segment_raw(const char *segment, size_t segment_size) {
+	fwrite(segment, segment_size, sizeof(char), stdout);
 }
 
 static void
@@ -271,7 +279,7 @@ out:
 	return rv;
 }
 
-static const char opts[] = "o:vrhlu";
+static const char opts[] = "o:vrhluRe";
 static const struct option long_opts[] = {
 		{"offset", required_argument, NULL, 'o'},
 		{"version", no_argument, NULL, 'v'},
@@ -279,6 +287,8 @@ static const struct option long_opts[] = {
 		{"help", no_argument, NULL, 'h'},
 		{"long", no_argument, NULL, 'l'},
 		{"utc", no_argument, NULL, 'u'},
+		{"raw", no_argument, NULL, 'R'},
+		{"escape", no_argument, NULL, 'e'},
 		{0},
 };
 
@@ -290,6 +300,10 @@ main(int argc, char *argv[]) {
 	const char *image_path;
 	struct SqshArchive *archive;
 	uint64_t offset = 0;
+
+	if (isatty(fileno(stdout))) {
+		print_segment = print_segment_escaped;
+	}
 
 	while ((opt = getopt_long(argc, argv, opts, long_opts, NULL)) != -1) {
 		switch (opt) {
@@ -307,6 +321,12 @@ main(int argc, char *argv[]) {
 			break;
 		case 'u':
 			utc = true;
+			break;
+		case 'R':
+			print_segment = print_segment_raw;
+			break;
+		case 'e':
+			print_segment = print_segment_escaped;
 			break;
 		default:
 			return usage(argv[0]);
