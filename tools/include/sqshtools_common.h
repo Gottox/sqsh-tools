@@ -50,4 +50,8 @@
 struct SqshArchive *
 open_archive(const char *image_path, uint64_t offset, int *err);
 
+void print_raw(const char *segment, size_t segment_size);
+
+void print_escaped(const char *segment, size_t segment_size);
+
 #endif /* TOOLS_COMMON_H */

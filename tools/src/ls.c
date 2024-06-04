@@ -44,14 +44,13 @@
 
 static int
 print_simple(const char *path, const struct SqshTreeTraversal *traversal);
-static void print_segment_raw(const char *segment, size_t segment_size);
 
 static bool recursive = false;
 static bool utc = false;
 static int (*print_item)(const char *, const struct SqshTreeTraversal *) =
 		print_simple;
 static void (*print_segment)(const char *segment, size_t segment_size) =
-		print_segment_raw;
+		print_raw;
 
 static int
 usage(char *arg0) {
@@ -72,81 +71,8 @@ print_mode(
 }
 
 static void
-print_segment_escaped(const char *segment, size_t segment_size) {
-	while (segment_size > 0) {
-		char buffer[8];
-		const char *ptr = NULL;
-		size_t index = 0;
-		for (; index < segment_size && ptr == NULL; index++) {
-			switch (segment[index]) {
-			case '\n':
-				ptr = "\\n";
-				break;
-			case '\r':
-				ptr = "\\r";
-				break;
-			case '\t':
-				ptr = "\\t";
-				break;
-			case '\\':
-				ptr = "\\\\";
-				break;
-			case '\x1b':
-				ptr = "\\e";
-				break;
-			case 0x01:
-			case 0x02:
-			case 0x03:
-			case 0x04:
-			case 0x05:
-			case 0x06:
-			case 0x07:
-			case 0x08:
-			case 0x0b:
-			case 0x0c:
-			case 0x0e:
-			case 0x0f:
-			case 0x10:
-			case 0x11:
-			case 0x12:
-			case 0x13:
-			case 0x14:
-			case 0x15:
-			case 0x16:
-			case 0x17:
-			case 0x18:
-			case 0x19:
-			case 0x1a:
-			case 0x1c:
-			case 0x1d:
-			case 0x1e:
-			case 0x1f:
-			case 0x20:
-			case 0x7f:
-				ptr = buffer;
-				snprintf(buffer, sizeof(buffer), "\\x%02x", segment[index]);
-				break;
-			default:
-				break;
-			}
-		}
-		if (ptr != NULL) {
-			fputs(ptr, stdout);
-		}
-		fwrite(segment, index, sizeof(char), stdout);
-		segment += index;
-		segment_size -= index;
-	}
-}
-
-static void
-print_segment_raw(const char *segment, size_t segment_size) {
-	fwrite(segment, segment_size, sizeof(char), stdout);
-}
-
-static void
 print_path(const char *path, const struct SqshTreeTraversal *traversal) {
-	fputs(path, stdout);
+	print_segment(path, strlen(path));
 	size_t segment_count = sqsh_tree_traversal_depth(traversal);
 	const char *segment;
 	size_t segment_size;
@@ -318,7 +244,7 @@ main(int argc, char *argv[]) {
 	uint64_t offset = 0;
 
 	if (isatty(fileno(stdout))) {
-		print_segment = print_segment_escaped;
+		print_segment = print_escaped;
 	}
 
 	while ((opt = getopt_long(argc, argv, opts, long_opts, NULL)) != -1) {
@@ -339,10 +265,10 @@ main(int argc, char *argv[]) {
 			utc = true;
 			break;
 		case 'R':
-			print_segment = print_segment_raw;
+			print_segment = print_raw;
 			break;
 		case 'e':
-			print_segment = print_segment_escaped;
+			print_segment = print_escaped;
 			break;
 		default:
 			return usage(argv[0]);
