@@ -47,21 +47,26 @@ bool do_chown = false;
 bool verbose = false;
 const char *image_path;
 
+static void (*print_segment)(const char *segment, size_t segment_size) =
+		print_raw;
+
 static int
 usage(char *arg0) {
-	printf("usage: %s [-o OFFSET] [-cV] FILESYSTEM [PATH] [TARGET DIR]\n",
+	printf("usage: %s [-o OFFSET] [-cVRe] FILESYSTEM [PATH] [TARGET DIR]\n",
 		   arg0);
 	printf("       %s -v\n", arg0);
 	return EXIT_FAILURE;
 }
 
-static const char opts[] = "co:vVh";
+static const char opts[] = "co:vVhRe";
 static const struct option long_opts[] = {
 		{"chown", no_argument, NULL, 'c'},
 		{"offset", required_argument, NULL, 'o'},
 		{"version", no_argument, NULL, 'v'},
 		{"verbose", no_argument, NULL, 'V'},
 		{"help", no_argument, NULL, 'h'},
+		{"raw", no_argument, NULL, 'R'},
+		{"escape", no_argument, NULL, 'e'},
 		{0},
 };
 
@@ -266,12 +271,12 @@ extract_from_traversal(
 	struct SqshFile *file = NULL;
 
 	if (verbose && state != SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END) {
-		fputs(target_path, stdout);
+		print_segment(target_path, strlen(target_path));
 		if (path[0] != 0) {
-			fputc('/', stdout);
-			fputs(path, stdout);
+			print_segment("/", 1);
+			print_segment(path, strlen(path));
 		}
-		fputc('\n', stdout);
+		print_segment("\1", 1);
 	}
 
 	if (state == SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN) {
@@ -354,6 +359,9 @@ main(int argc, char *argv[]) {
 	struct SqshArchive *sqsh;
 	struct SqshFile *src_root = NULL;
 	uint64_t offset = 0;
+	if (isatty(STDOUT_FILENO)) {
+		print_segment = print_escaped;
+	}
 
 	while ((opt = getopt_long(argc, argv, opts, long_opts, NULL)) != -1) {
 		switch (opt) {
@@ -368,6 +376,12 @@ main(int argc, char *argv[]) {
 			return 0;
 		case 'V':
 			verbose = true;
+			break;
+		case 'R':
+			print_segment = print_raw;
+			break;
+		case 'e':
+			print_segment = print_escaped;
 			break;
 		default:
 			return usage(argv[0]);
