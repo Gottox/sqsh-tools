@@ -28,23 +28,83 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh.h
+ * @file         sqsh_utils.h
  */
 
-#ifndef SQSH_H
-#define SQSH_H
+#ifndef SQSH_UTILS_H
+#define SQSH_UTILS_H
 
-#include "sqsh_archive.h"
 #include "sqsh_common.h"
-#include "sqsh_directory.h"
-#include "sqsh_easy.h"
-#include "sqsh_error.h"
-#include "sqsh_file.h"
-#include "sqsh_mapper.h"
-#include "sqsh_posix.h"
-#include "sqsh_table.h"
-#include "sqsh_tree.h"
-#include "sqsh_utils.h"
-#include "sqsh_xattr.h"
 
-#endif /* SQSH_H */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/***************************************
+ * utils/version.c
+ */
+
+/**
+ * @brief Get the version of the library that was used to compile the program as
+ * a string.
+ *
+ * @return Version string
+ */
+#define SQSH_VERSION "1.4.0"
+
+/**
+ * @brief Get the major version of the library that was used to compile the
+ * program.
+ *
+ * @return Major version
+ */
+#define SQSH_VERSION_MAJOR 1
+
+/**
+ * @brief Get the minor version of the library that was used to compile the
+ * program.
+ *
+ * @return Minor version
+ */
+#define SQSH_VERSION_MINOR 4
+
+/**
+ * @brief Get the patch version of the library that was used to compile the
+ * program.
+ *
+ * @return Patch version
+ */
+#define SQSH_VERSION_PATCH 0
+
+/**
+ * @brief Get the version of the currently running library as a string.
+ *
+ * @return Version string
+ */
+const char *sqsh_version(void);
+
+/**
+ * @brief Get the major version of the currently running library.
+ *
+ * @return Major version
+ */
+uint16_t sqsh_version_major(void);
+
+/**
+ * @brief Get the minor version of the currently running library.
+ *
+ * @return Minor version
+ */
+uint16_t sqsh_version_minor(void);
+
+/**
+ * @brief Get the patch version of the currently running library.
+ *
+ * @return Patch version
+ */
+uint16_t sqsh_version_patch(void);
+
+#ifdef __cplusplus
+}
+#endif
+#endif /* SQSH_UTILS_H */

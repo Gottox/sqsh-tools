@@ -11,6 +11,7 @@ headers = files(
     'sqsh_posix.h',
     'sqsh_table.h',
     'sqsh_tree.h',
+    'sqsh_utils.h',
     'sqsh_xattr.h',
 )
 

@@ -28,23 +28,27 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh.h
+ * @file         version.c
  */
 
-#ifndef SQSH_H
-#define SQSH_H
+#include <sqsh_utils.h>
 
-#include "sqsh_archive.h"
-#include "sqsh_common.h"
-#include "sqsh_directory.h"
-#include "sqsh_easy.h"
-#include "sqsh_error.h"
-#include "sqsh_file.h"
-#include "sqsh_mapper.h"
-#include "sqsh_posix.h"
-#include "sqsh_table.h"
-#include "sqsh_tree.h"
-#include "sqsh_utils.h"
-#include "sqsh_xattr.h"
+const char *
+sqsh_version(void) {
+	return SQSH_VERSION;
+}
 
-#endif /* SQSH_H */
+uint16_t
+sqsh_version_major(void) {
+	return SQSH_VERSION_MAJOR;
+}
+
+uint16_t
+sqsh_version_minor(void) {
+	return SQSH_VERSION_MINOR;
+}
+
+uint16_t
+sqsh_version_patch(void) {
+	return SQSH_VERSION_PATCH;
+}
