@@ -28,23 +28,28 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh.h
+ * @file         nasty.c
  */
 
-#ifndef SQSH_H
-#define SQSH_H
+#include <sqsh_utils.h>
+#include <utest.h>
 
-#include "sqsh_archive.h"
-#include "sqsh_common.h"
-#include "sqsh_directory.h"
-#include "sqsh_easy.h"
-#include "sqsh_error.h"
-#include "sqsh_file.h"
-#include "sqsh_mapper.h"
-#include "sqsh_posix.h"
-#include "sqsh_table.h"
-#include "sqsh_tree.h"
-#include "sqsh_utils.h"
-#include "sqsh_xattr.h"
+UTEST(version, version_defines_are_correct) {
+	char *version = getenv("VERSION");
 
-#endif /* SQSH_H */
+	ASSERT_NE(NULL, version);
+	ASSERT_STREQ(SQSH_VERSION, version);
+	ASSERT_STREQ(SQSH_VERSION, sqsh_version());
+
+	int major, minor, patch;
+	ASSERT_EQ(3, sscanf(version, "%d.%d.%d", &major, &minor, &patch));
+
+	ASSERT_EQ(SQSH_VERSION_MAJOR, major);
+	ASSERT_EQ(SQSH_VERSION_MAJOR, sqsh_version_major());
+	ASSERT_EQ(SQSH_VERSION_MINOR, minor);
+	ASSERT_EQ(SQSH_VERSION_MINOR, sqsh_version_minor());
+	ASSERT_EQ(SQSH_VERSION_PATCH, patch);
+	ASSERT_EQ(SQSH_VERSION_PATCH, sqsh_version_patch());
+}
+
+UTEST_MAIN()

@@ -1,6 +1,7 @@
 add_languages('cpp', native: false)
 
 sqsh_test = [
+    'check_version.c',
     'cpp-test.cpp',
     'archive/compression_options.c',
     'archive/inode_map.c',
@@ -101,5 +102,5 @@ foreach p : sqsh_test
         link_with: [libsqsh.get_static_lib(), libmksqsh.get_static_lib()],
         dependencies: [threads_dep, utest_dep, cextras_dep],
     )
-    test(p, t, env: {})
+    test(p, t, env: {'VERSION': meson.project_version()})
 endforeach

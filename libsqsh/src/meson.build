@@ -45,6 +45,7 @@ libsqsh_sources = files(
     'tree/traversal.c',
     'tree/walker.c',
     'utils/error.c',
+    'utils/version.c',
     'xattr/xattr_iterator.c',
 )
 
