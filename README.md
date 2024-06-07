@@ -122,6 +122,13 @@ In the next major (at the time of writing v2.0.0) version, the `...2`
 functions will be renamed to their original names, and the deprecated
 functions will be removed.
 
+### users of libsqsh
+
+* [radare2](https://www.radare.org/) - A reverse engineering framework.
+  Integrates libsqsh into their virtual filesystem framework to explore inline squashfs archives.
+* [Filer](https://github.com/probonopd/Filer) - A file manager for Unix systems.
+  Uses libsqsh to show previews of AppImages without mounting them first.
+
 ### LZO2
 
 LZO2 is a fast compression algorithm. Unfortunately the current implementation
@@ -141,4 +148,3 @@ LZO2 there's and independent glue library called [libsqsh-lzo](https://github.co
   filesystem.
 * https://github.com/wcampbell0x2a/backhand - A Rust implementation of the
   squashfs filesystem.
-
