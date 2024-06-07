@@ -79,17 +79,15 @@ push_stack(struct SqshTreeTraversal *traversal) {
 	traversal->stack = element;
 
 	struct SqshArchive *archive = traversal->base_file->archive;
-	const uint32_t dir_inode = sqsh_file_inode(traversal->current_file);
+	const uint64_t parent_inode_ref =
+			sqsh_file_inode_ref(traversal->current_file);
 	const uint64_t inode_ref =
 			sqsh_directory_iterator_inode_ref(traversal->current_iterator);
 	rv = sqsh__file_init(&element->file, archive, inode_ref);
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__file_set_dir_inode(&element->file, dir_inode);
-	if (rv < 0) {
-		goto out;
-	}
+	sqsh__file_set_parent_inode_ref(&element->file, parent_inode_ref);
 	traversal->current_file = &element->file;
 	traversal->state = SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN;
 out:
@@ -348,11 +346,8 @@ sqsh_tree_traversal_open_file(
 		if (rv < 0) {
 			goto out;
 		}
-		if (sqsh__file_has_dir_inode(traversal->base_file)) {
-			const uint32_t dir_inode =
-					sqsh__file_dir_inode(traversal->base_file);
-			rv = sqsh__file_set_dir_inode(file, dir_inode);
-		}
+		sqsh__file_set_parent_inode_ref(
+				file, traversal->base_file->parent_inode_ref);
 	} else {
 		file = sqsh_directory_iterator_open_file(
 				traversal->current_iterator, &rv);

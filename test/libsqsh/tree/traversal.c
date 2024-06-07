@@ -74,8 +74,6 @@ UTEST(traversal, test_recursive_directory) {
 	struct SqshFile file = {0};
 	rv = sqsh__file_init(&file, &archive, 0);
 	ASSERT_EQ(0, rv);
-	rv = sqsh__file_set_dir_inode(&file, 2);
-	ASSERT_EQ(0, rv);
 
 	struct SqshTreeTraversal traversal = {0};
 	rv = sqsh__tree_traversal_init(&traversal, &file);

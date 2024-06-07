@@ -313,17 +313,16 @@ sqsh_path_resolver_open_file(
 		const struct SqshPathResolver *resolver, int *err) {
 	int rv = 0;
 	struct SqshFile *file = NULL;
-	uint32_t dir_inode = sqsh_path_resolver_dir_inode(resolver);
 	uint64_t inode_ref = resolver->current_inode_ref;
 	file = sqsh_open_by_ref(resolver->archive, inode_ref, &rv);
 	if (rv < 0) {
 		goto out;
 	}
-	rv = sqsh__file_set_dir_inode(file, dir_inode);
-	if (rv < 0) {
-		goto out;
-	}
 
+	if (!is_beginning(resolver)) {
+		uint64_t parent_inode_ref = sqsh_file_inode_ref(&resolver->cwd);
+		sqsh__file_set_parent_inode_ref(file, parent_inode_ref);
+	}
 out:
 	if (rv < 0) {
 		sqsh__file_cleanup(file);
@@ -353,8 +352,8 @@ sqsh__path_resolver_follow_symlink(struct SqshPathResolver *resolver) {
 	}
 	resolver->current_symlink_depth++;
 
-	uint64_t inode_ref = sqsh_directory_iterator_inode_ref(&resolver->iterator);
-	uint32_t dir_inode = sqsh_path_resolver_dir_inode(resolver);
+	const uint64_t inode_ref =
+			sqsh_directory_iterator_inode_ref(&resolver->iterator);
 
 	rv = update_inode_from_cwd(resolver);
 	if (rv < 0) {
@@ -363,10 +362,6 @@ sqsh__path_resolver_follow_symlink(struct SqshPathResolver *resolver) {
 
 	struct SqshFile file = {0};
 	rv = sqsh__file_init(&file, resolver->archive, inode_ref);
-	if (rv < 0) {
-		goto out;
-	}
-	rv = sqsh__file_set_dir_inode(&file, dir_inode);
 	if (rv < 0) {
 		goto out;
 	}

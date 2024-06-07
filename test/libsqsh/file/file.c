@@ -152,8 +152,7 @@ UTEST(file, resolve_unkown_dir_inode) {
 	struct SqshFile *symlink = sqsh_lopen(&archive, "/src", &rv);
 	ASSERT_EQ(0, rv);
 	ASSERT_EQ(SQSH_FILE_TYPE_SYMLINK, sqsh_file_type(symlink));
-	symlink->dir_inode = 0;
-	symlink->has_dir_inode = false;
+	symlink->parent_inode_ref = UINT64_MAX;
 
 	rv = sqsh_file_symlink_resolve(symlink);
 	ASSERT_EQ(-SQSH_ERROR_INODE_PARENT_UNSET, rv);

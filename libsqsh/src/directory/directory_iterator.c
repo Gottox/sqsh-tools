@@ -406,7 +406,7 @@ sqsh_directory_iterator_open_file(
 	int rv = 0;
 	struct SqshFile *file = NULL;
 	const uint64_t inode_ref = sqsh_directory_iterator_inode_ref(iterator);
-	const uint32_t dir_inode = sqsh_file_inode(iterator->file);
+	const uint64_t parent_inode_ref = sqsh_file_inode_ref(iterator->file);
 	struct SqshArchive *archive = iterator->file->archive;
 
 	file = sqsh_open_by_ref(archive, inode_ref, &rv);
@@ -414,10 +414,7 @@ sqsh_directory_iterator_open_file(
 		goto out;
 	}
 
-	rv = sqsh__file_set_dir_inode(file, dir_inode);
-	if (rv < 0) {
-		goto out;
-	}
+	sqsh__file_set_parent_inode_ref(file, parent_inode_ref);
 
 	rv = check_file_consistency(iterator, file);
 
