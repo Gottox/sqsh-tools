@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         nasty.c
+ * @file         check_version.c
  */
 
 #include <sqsh_utils.h>
