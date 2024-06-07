@@ -207,6 +207,8 @@ SQSH_NO_EXPORT int sqsh__file_reader_cleanup(struct SqshFileReader *reader);
  * file/file.c
  */
 
+#define SQSH_INODE_REF_NULL UINT64_MAX
+
 /**
  * @brief The file type implementation
  */
@@ -249,8 +251,7 @@ struct SqshFile {
 	struct SqshArchive *archive;
 	const struct SqshInodeImpl *impl;
 	enum SqshFileType type;
-	bool has_dir_inode;
-	uint32_t dir_inode;
+	uint64_t parent_inode_ref;
 };
 
 /**
@@ -271,35 +272,24 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_init(
 
 /**
  * @memberof SqshFile
- * @brief returns whether the file is an extended structure.
+ * @brief sets the parent inode reference.
  *
  * @param[in] context The file context.
- * @param[in] dir_inode The inode of the parent directory.
+ * @param[in] parent_inode_ref The inode reference of the parent directory.
+ */
+SQSH_NO_EXPORT void sqsh__file_set_parent_inode_ref(
+		struct SqshFile *context, uint64_t parent_inode_ref);
+
+/**
+ * @memberof SqshFile
+ * @brief returns the parent inode reference if possible.
+ *
+ * @param[in] context The file context.
+ * @param[out] err Pointer to an int where the error code will be stored.
  *
  * @return int 0 on success, less than 0 on error.
  */
-SQSH_NO_EXPORT SQSH_NO_UNUSED int
-sqsh__file_set_dir_inode(struct SqshFile *context, uint32_t dir_inode);
-
-/**
- * @internal
- * @memberof SqshFile
- * @brief Retrieves the inode of the parent directory.
- *
- * @param context The file context.
- * @return The inode number.
- */
-SQSH_NO_EXPORT uint32_t sqsh__file_dir_inode(const struct SqshFile *context);
-
-/**
- * @internal
- * @memberof SqshFile
- * @brief Retrieves if the inode of the parent directory is set.
- *
- * @param context The file context.
- * @return true if the dir_inode is set, false otherwise.
- */
-SQSH_NO_EXPORT bool sqsh__file_has_dir_inode(const struct SqshFile *context);
+uint64_t sqsh__file_parent_inode_ref(struct SqshFile *context, int *err);
 
 /**
  * @internal

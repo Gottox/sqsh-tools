@@ -38,8 +38,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define EMPTY_INODE_REF UINT64_MAX
-
 // Funfact: In older versions of this library, the inode map used `0` as the
 // sentinal value for empty inodes. It turned out that this was a bad idea,
 // because `0` is a valid inode_ref (even if it is an invalid inode number
@@ -145,7 +143,7 @@ dyn_map_get(const struct SqshInodeMap *map, uint32_t inode_number, int *err) {
 		goto out;
 	}
 	inode_ref = ~inner_inode_refs[inner_index];
-	if (inode_ref == EMPTY_INODE_REF) {
+	if (inode_ref == SQSH_INODE_REF_NULL) {
 		rv = -SQSH_ERROR_NO_SUCH_ELEMENT;
 		inode_ref = 0;
 		goto out;
@@ -167,7 +165,7 @@ dyn_map_set(
 		struct SqshInodeMap *map, uint32_t inode_number, uint64_t inode_ref) {
 	int rv = 0;
 
-	if (inode_ref == EMPTY_INODE_REF) {
+	if (inode_ref == SQSH_INODE_REF_NULL) {
 		return -SQSH_ERROR_INVALID_ARGUMENT;
 	} else if (inode_number == 0 || inode_number - 1 >= map->inode_count) {
 		return -SQSH_ERROR_OUT_OF_BOUNDS;
@@ -191,7 +189,7 @@ dyn_map_set(
 	} else {
 		const uint64_t old_value = ~inner_inode_refs[inner_index];
 		inner_inode_refs[inner_index] = ~inode_ref;
-		if (old_value != EMPTY_INODE_REF && old_value != inode_ref) {
+		if (old_value != SQSH_INODE_REF_NULL && old_value != inode_ref) {
 			rv = -SQSH_ERROR_INODE_MAP_IS_INCONSISTENT;
 			goto out;
 		}
