@@ -49,85 +49,30 @@ static bool recursive = false;
 static bool utc = false;
 static int (*print_item)(const char *, const struct SqshTreeTraversal *) =
 		print_simple;
+static void (*print_segment)(const char *segment, size_t segment_size) =
+		print_raw;
 
 static int
 usage(char *arg0) {
-	printf("usage: %s [-o OFFSET] [-r] [-l] [-u] FILESYSTEM [PATH]\n", arg0);
+	printf("usage: %s [-o OFFSET] [-rluRe] FILESYSTEM [PATH]\n", arg0);
 	printf("       %s -v\n", arg0);
 	return EXIT_FAILURE;
 }
 
 static void
 print_mode(
-		int mode, int r_mask, int w_mask, int x_mask, int s_mask,
+		char *buffer, int mode, int r_mask, int w_mask, int x_mask, int s_mask,
 		const char *s_chars) {
 	const char *x_chars = (mode & s_mask) ? s_chars : "-x";
 
-	putchar((mode & r_mask) ? 'r' : '-');
-	putchar((mode & w_mask) ? 'w' : '-');
-	putchar((mode & x_mask) ? x_chars[1] : x_chars[0]);
-}
-
-static void
-print_segment(const char *segment, size_t segment_size) {
-	for (size_t i = 0; i < segment_size; i++) {
-		switch (segment[i]) {
-		case '\n':
-			fputs("\\n", stdout);
-			break;
-		case '\r':
-			fputs("\\r", stdout);
-			break;
-		case '\t':
-			fputs("\\t", stdout);
-			break;
-		case '\\':
-			fputs("\\\\", stdout);
-			break;
-		case '\x1b':
-			fputs("\\e", stdout);
-			break;
-		case 0x01:
-		case 0x02:
-		case 0x03:
-		case 0x04:
-		case 0x05:
-		case 0x06:
-		case 0x07:
-		case 0x08:
-		case 0x0b:
-		case 0x0c:
-		case 0x0e:
-		case 0x0f:
-		case 0x10:
-		case 0x11:
-		case 0x12:
-		case 0x13:
-		case 0x14:
-		case 0x15:
-		case 0x16:
-		case 0x17:
-		case 0x18:
-		case 0x19:
-		case 0x1a:
-		case 0x1c:
-		case 0x1d:
-		case 0x1e:
-		case 0x1f:
-		case 0x20:
-		case 0x7f:
-			printf("\\x%02x", segment[i]);
-			break;
-		default:
-			putchar(segment[i]);
-			break;
-		}
-	}
+	buffer[0] = (mode & r_mask) ? 'r' : '-';
+	buffer[1] = (mode & w_mask) ? 'w' : '-';
+	buffer[2] = (mode & x_mask) ? x_chars[1] : x_chars[0];
 }
 
 static void
 print_path(const char *path, const struct SqshTreeTraversal *traversal) {
-	fputs(path, stdout);
+	print_segment(path, strlen(path));
 	size_t segment_count = sqsh_tree_traversal_depth(traversal);
 	const char *segment;
 	size_t segment_size;
@@ -158,7 +103,7 @@ print_detail(const char *path, const struct SqshTreeTraversal *traversal) {
 	time_t mtime = sqsh_file_modified_time(file);
 	struct tm tm_info_buf = {0};
 	const struct tm *tm_info;
-	char time_buffer[128] = {0};
+	char buffer[128] = "";
 	tm_info = utc ? gmtime_r(&mtime, &tm_info_buf)
 				  : localtime_r(&mtime, &tm_info_buf);
 	if (tm_info == NULL) {
@@ -167,47 +112,52 @@ print_detail(const char *path, const struct SqshTreeTraversal *traversal) {
 
 	switch (sqsh_file_type(file)) {
 	case SQSH_FILE_TYPE_UNKNOWN:
-		putchar('?');
+		buffer[0] = '?';
 		break;
 	case SQSH_FILE_TYPE_DIRECTORY:
-		putchar('d');
+		buffer[0] = 'd';
 		break;
 	case SQSH_FILE_TYPE_FILE:
-		putchar('-');
+		buffer[0] = '-';
 		break;
 	case SQSH_FILE_TYPE_SYMLINK:
-		putchar('l');
+		buffer[0] = 'l';
 		break;
 	case SQSH_FILE_TYPE_BLOCK:
-		putchar('b');
+		buffer[0] = 'b';
 		break;
 	case SQSH_FILE_TYPE_CHAR:
-		putchar('c');
+		buffer[0] = 'c';
 		break;
 	case SQSH_FILE_TYPE_FIFO:
-		putchar('p');
+		buffer[0] = 'p';
 		break;
 	case SQSH_FILE_TYPE_SOCKET:
-		putchar('s');
+		buffer[0] = 's';
 		break;
 	}
 
 	mode = sqsh_file_permission(file);
-	print_mode(mode, S_IRUSR, S_IWUSR, S_IXUSR, S_ISUID, "Ss");
-	print_mode(mode, S_IRGRP, S_IWGRP, S_IXGRP, S_ISGID, "Ss");
-	print_mode(mode, S_IROTH, S_IWOTH, S_IXOTH, S_ISVTX, "Tt");
+	print_mode(&buffer[1], mode, S_IRUSR, S_IWUSR, S_IXUSR, S_ISUID, "Ss");
+	print_mode(&buffer[4], mode, S_IRGRP, S_IWGRP, S_IXGRP, S_ISGID, "Ss");
+	print_mode(&buffer[7], mode, S_IROTH, S_IWOTH, S_IXOTH, S_ISVTX, "Tt");
 
-	strftime(time_buffer, sizeof(time_buffer), "%a, %d %b %Y %T %z", tm_info);
+	sqsh_index_t index = 10;
+	snprintf(
+			&buffer[index], sizeof(buffer) - index, " %6u %6u %10" PRIu64,
+			sqsh_file_uid(file), sqsh_file_gid(file), sqsh_file_size(file));
 
-	printf(" %6u %6u %10" PRIu64 " %s ", sqsh_file_uid(file),
-		   sqsh_file_gid(file), sqsh_file_size(file), time_buffer);
+	index = strlen(buffer);
+	strftime(
+			&buffer[index], sizeof(buffer) - index, " %a, %d %b %Y %T %z ",
+			tm_info);
+	fputs(buffer, stdout);
 
 	print_path(path, traversal);
 
 	if (sqsh_file_type(file) == SQSH_FILE_TYPE_SYMLINK) {
 		fputs(" -> ", stdout);
-		fwrite(sqsh_file_symlink(file), sqsh_file_symlink_size(file),
-			   sizeof(char), stdout);
+		print_segment(sqsh_file_symlink(file), sqsh_file_symlink_size(file));
 	}
 
 	putchar('\n');
@@ -271,7 +221,7 @@ out:
 	return rv;
 }
 
-static const char opts[] = "o:vrhlu";
+static const char opts[] = "o:vrhluRe";
 static const struct option long_opts[] = {
 		{"offset", required_argument, NULL, 'o'},
 		{"version", no_argument, NULL, 'v'},
@@ -279,6 +229,8 @@ static const struct option long_opts[] = {
 		{"help", no_argument, NULL, 'h'},
 		{"long", no_argument, NULL, 'l'},
 		{"utc", no_argument, NULL, 'u'},
+		{"raw", no_argument, NULL, 'R'},
+		{"escape", no_argument, NULL, 'e'},
 		{0},
 };
 
@@ -290,6 +242,10 @@ main(int argc, char *argv[]) {
 	const char *image_path;
 	struct SqshArchive *archive;
 	uint64_t offset = 0;
+
+	if (isatty(fileno(stdout))) {
+		print_segment = print_escaped;
+	}
 
 	while ((opt = getopt_long(argc, argv, opts, long_opts, NULL)) != -1) {
 		switch (opt) {
@@ -307,6 +263,12 @@ main(int argc, char *argv[]) {
 			break;
 		case 'u':
 			utc = true;
+			break;
+		case 'R':
+			print_segment = print_raw;
+			break;
+		case 'e':
+			print_segment = print_escaped;
 			break;
 		default:
 			return usage(argv[0]);

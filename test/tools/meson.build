@@ -8,6 +8,7 @@ sqsh_extended_test = [
     'ls/large-tree.sh',
     'ls/large-tree-lookup.sh',
     'ls/utc.sh',
+    'ls/escape.sh',
 ]
 sqsh_extended_fs_test = [
     'fs/large-file.sh',
