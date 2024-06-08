@@ -24,13 +24,13 @@ cd "$WORK_DIR"
 
 mkdir -p "$PWD/empty"
 
-printf "dir\x1b d 777 0 0\n" > "$PWD/escape.pseudo";
+printf "dir\e d 777 0 0\n"  > "$PWD/escape.pseudo";
 
 # shellcheck disable=SC2086
 $MKSQUASHFS "$PWD/empty" "$PWD/escape.squashfs" -pf "$PWD/escape.pseudo" \
 	$MKSQUASHFS_OPTS
-result=$($SQSH_LS -r --escape "$PWD/escape.squashfs")
-[ "$result" = "/dir\e" ]
+result="$($SQSH_LS -r --escape "$PWD/escape.squashfs")"
+[ "$result" = "$(printf "%s" "/dir\e")" ]
 
-result=$($SQSH_LS -r --raw "$PWD/escape.squashfs")
+result="$($SQSH_LS -r --raw "$PWD/escape.squashfs")"
 [ "$result" = "$(printf "/dir\e")" ]
