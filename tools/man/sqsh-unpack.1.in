@@ -42,6 +42,14 @@ group ID of the current user.
 .BR \-V ", " \fB\-\-verbose\fR
 Print more verbose output during unpacking.
 
+.TP
+.BR \-R ", " \fB\-\-raw
+When in verbose do not escape filenames, even if the output is a terminal.
+
+.TP
+.BR \-R ", " \fB\-\-escape
+When in verbose escape filenames, even if the output is not a terminal.
+
 .SH ARGUMENTS
 .TP
 .BR FILESYSTEM
