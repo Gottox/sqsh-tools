@@ -2,8 +2,7 @@
  * @author Enno Boland (mail@eboland.de)
  * @file list_dir.c
  *
- * This is an example program that lists the top level files in a squashfs
- * archive.
+ * This is an example program that traverses a directory in a SquashFS archive.
  */
 
 #include <assert.h>
