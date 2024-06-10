@@ -111,9 +111,6 @@ print_detail(const char *path, const struct SqshTreeTraversal *traversal) {
 	}
 
 	switch (sqsh_file_type(file)) {
-	case SQSH_FILE_TYPE_UNKNOWN:
-		buffer[0] = '?';
-		break;
 	case SQSH_FILE_TYPE_DIRECTORY:
 		buffer[0] = 'd';
 		break;

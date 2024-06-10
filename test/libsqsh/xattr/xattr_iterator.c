@@ -81,7 +81,7 @@ UTEST(xattr_iterator, load_xattr) {
 	rv = sqsh__file_init(&file, &archive, inode_ref);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_EQ(SQSH_FILE_TYPE_DIRECTORY, sqsh_file_type(&file));
+	ASSERT_EQ(SQSH_FILE_TYPE_DIRECTORY, (int)sqsh_file_type(&file));
 	ASSERT_EQ(true, sqsh_file_is_extended(&file));
 
 	struct SqshXattrIterator *iterator = sqsh_xattr_iterator_new(&file, &rv);
@@ -175,7 +175,7 @@ UTEST(xattr_iterator, load_xattr_indirect) {
 	rv = sqsh__file_init(&file, &archive, inode_ref);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_EQ(SQSH_FILE_TYPE_DIRECTORY, sqsh_file_type(&file));
+	ASSERT_EQ(SQSH_FILE_TYPE_DIRECTORY, (int)sqsh_file_type(&file));
 	ASSERT_EQ(true, sqsh_file_is_extended(&file));
 
 	struct SqshXattrIterator *iterator = sqsh_xattr_iterator_new(&file, &rv);

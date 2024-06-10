@@ -62,7 +62,7 @@ UTEST(file_reader, load_file_from_compressed_data_block) {
 	rv = sqsh__file_init(&file, &archive, inode_ref);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, (int)sqsh_file_type(&file));
 	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileReader reader = {0};
@@ -107,7 +107,7 @@ UTEST(file_reader, load_file_from_compressed_data_block_with_offset) {
 	rv = sqsh__file_init(&file, &archive, inode_ref);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, (int)sqsh_file_type(&file));
 	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileReader reader = {0};
@@ -149,7 +149,7 @@ UTEST(file_reader, load_file_from_uncompressed_data_block) {
 	rv = sqsh__file_init(&file, &archive, inode_ref);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, (int)sqsh_file_type(&file));
 	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileReader reader = {0};
@@ -196,7 +196,7 @@ UTEST(file_reader, skip_over_zero_page) {
 	rv = sqsh__file_init(&file, &archive, inode_ref);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, (int)sqsh_file_type(&file));
 	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileReader reader = {0};

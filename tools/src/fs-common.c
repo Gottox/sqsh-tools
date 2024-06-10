@@ -87,8 +87,6 @@ fs_common_mode_type(enum SqshFileType type) {
 		return S_IFIFO;
 	case SQSH_FILE_TYPE_SOCKET:
 		return S_IFSOCK;
-	case SQSH_FILE_TYPE_UNKNOWN:
-		return 0;
 	}
 	return 0;
 }

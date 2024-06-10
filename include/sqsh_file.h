@@ -237,11 +237,13 @@ int sqsh_file_iterator_free(struct SqshFileIterator *iterator);
  */
 #define SQSH_INODE_NO_XATTR 0xFFFFFFFF
 
+__attribute__((deprecated(
+		"Since 1.5.0. libsqsh should never return this."))) static const int
+		SQSH_FILE_TYPE_UNKNOWN = -1;
 /**
  * @brief enum that represents the file type.
  */
 enum SqshFileType {
-	SQSH_FILE_TYPE_UNKNOWN = -1,
 	/* avoid overlapping with the types in inode_data.h */
 	SQSH_FILE_TYPE_DIRECTORY = 1 + (1 << 8),
 	SQSH_FILE_TYPE_FILE,
