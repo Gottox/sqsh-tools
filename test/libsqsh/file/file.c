@@ -62,7 +62,7 @@ UTEST(file, load_file) {
 	rv = sqsh__file_init(&file, &archive, inode_ref);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, (int)sqsh_file_type(&file));
 	ASSERT_EQ(0666, sqsh_file_permission(&file));
 	ASSERT_EQ((uint32_t)4242, sqsh_file_modified_time(&file));
 	ASSERT_EQ((uint32_t)1024, sqsh_file_blocks_start(&file));
@@ -107,11 +107,11 @@ UTEST(file, resolve_file) {
 
 	struct SqshFile *symlink = sqsh_lopen(&archive, "/src", &rv);
 	ASSERT_EQ(0, rv);
-	ASSERT_EQ(SQSH_FILE_TYPE_SYMLINK, sqsh_file_type(symlink));
+	ASSERT_EQ(SQSH_FILE_TYPE_SYMLINK, (int)sqsh_file_type(symlink));
 
 	rv = sqsh_file_symlink_resolve(symlink);
 	ASSERT_EQ(0, rv);
-	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(symlink));
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, (int)sqsh_file_type(symlink));
 	ASSERT_EQ((uint32_t)3, sqsh_file_inode(symlink));
 
 	sqsh_close(symlink);
@@ -151,7 +151,7 @@ UTEST(file, resolve_unkown_dir_inode) {
 
 	struct SqshFile *symlink = sqsh_lopen(&archive, "/src", &rv);
 	ASSERT_EQ(0, rv);
-	ASSERT_EQ(SQSH_FILE_TYPE_SYMLINK, sqsh_file_type(symlink));
+	ASSERT_EQ(SQSH_FILE_TYPE_SYMLINK, (int)sqsh_file_type(symlink));
 	symlink->parent_inode_ref = UINT64_MAX;
 
 	rv = sqsh_file_symlink_resolve(symlink);

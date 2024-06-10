@@ -239,10 +239,23 @@ out:
 }
 
 static int
-check_entry_name_consistency(const struct SqshDirectoryIterator *iterator) {
+check_entry_consistency(const struct SqshDirectoryIterator *iterator) {
 	size_t name_len;
 	const char *name = sqsh_directory_iterator_name2(iterator, &name_len);
 
+	switch (sqsh__data_directory_entry_type(get_entry(iterator))) {
+	case SQSH_INODE_TYPE_BASIC_DIRECTORY:
+	case SQSH_INODE_TYPE_BASIC_FILE:
+	case SQSH_INODE_TYPE_BASIC_SYMLINK:
+	case SQSH_INODE_TYPE_BASIC_BLOCK:
+	case SQSH_INODE_TYPE_BASIC_CHAR:
+	case SQSH_INODE_TYPE_BASIC_FIFO:
+	case SQSH_INODE_TYPE_BASIC_SOCKET:
+		// Valid types
+		break;
+	default:
+		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
+	}
 	if (memchr(name, '\0', name_len) != NULL) {
 		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
 	} else if (memchr(name, '/', name_len) != NULL) {
@@ -273,7 +286,7 @@ static int
 directory_iterator_next_finalize(struct SqshDirectoryIterator *iterator) {
 	int rv;
 
-	rv = check_entry_name_consistency(iterator);
+	rv = check_entry_consistency(iterator);
 	if (rv < 0) {
 		goto out;
 	}
@@ -397,7 +410,7 @@ sqsh_directory_iterator_file_type(
 	case SQSH_INODE_TYPE_BASIC_SOCKET:
 		return SQSH_FILE_TYPE_SOCKET;
 	}
-	return SQSH_FILE_TYPE_UNKNOWN;
+	__builtin_unreachable();
 }
 
 struct SqshFile *

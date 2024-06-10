@@ -65,7 +65,7 @@ UTEST(file_iterator, load_segment_from_compressed_data_block) {
 	rv = sqsh__file_init(&file, &archive, inode_ref);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, (int)sqsh_file_type(&file));
 	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileIterator iter = {0};
@@ -122,7 +122,7 @@ UTEST(file_iterator, load_two_segments_from_uncompressed_data_block) {
 	rv = sqsh__file_init(&file, &archive, inode_ref);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, (int)sqsh_file_type(&file));
 	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileIterator iter = {0};
@@ -207,7 +207,7 @@ UTEST(file_iterator, load_segment_from_uncompressed_data_block) {
 	rv = sqsh__file_init(&file, &archive, inode_ref);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, (int)sqsh_file_type(&file));
 	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileIterator iter = {0};
@@ -262,7 +262,7 @@ UTEST(file_iterator, load_zero_padding) {
 	rv = sqsh__file_init(&file, &archive, inode_ref);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, (int)sqsh_file_type(&file));
 	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileIterator iter = {0};
@@ -329,7 +329,7 @@ UTEST(file_iterator, load_zero_big_padding) {
 	rv = sqsh__file_init(&file, &archive, inode_ref);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, (int)sqsh_file_type(&file));
 	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileIterator iter = {0};
@@ -395,7 +395,7 @@ UTEST(file_iterator, load_zero_block) {
 	rv = sqsh__file_init(&file, &archive, inode_ref);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, (int)sqsh_file_type(&file));
 	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileIterator iter = {0};
@@ -441,7 +441,7 @@ UTEST(file_iterator, load_two_zero_blocks) {
 	rv = sqsh__file_init(&file, &archive, inode_ref);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, (int)sqsh_file_type(&file));
 	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileIterator iter = {0};
@@ -496,7 +496,7 @@ UTEST(file_iterator, load_two_sparse_blocks) {
 	rv = sqsh__file_init(&file, &archive, inode_ref);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_EQ(SQSH_FILE_TYPE_FILE, sqsh_file_type(&file));
+	ASSERT_EQ(SQSH_FILE_TYPE_FILE, (int)sqsh_file_type(&file));
 	ASSERT_EQ(false, sqsh_file_has_fragment(&file));
 
 	struct SqshFileIterator iter = {0};
@@ -568,7 +568,7 @@ UTEST(file_iterator, open_directory_with_file_iterator) {
 	rv = sqsh__file_init(&file, &archive, inode_ref);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_EQ(SQSH_FILE_TYPE_DIRECTORY, sqsh_file_type(&file));
+	ASSERT_EQ(SQSH_FILE_TYPE_DIRECTORY, (int)sqsh_file_type(&file));
 
 	struct SqshFileIterator iter = {0};
 	rv = sqsh__file_iterator_init(&iter, &file);
