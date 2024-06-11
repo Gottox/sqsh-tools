@@ -2,10 +2,6 @@
 configure:
   - -Dwerror=true
   - -Ddefault_library=static
-  - -Dexamples=true
-  - -Db_lundef=false
-  - -Dtest=true
-  - -Ddoc=internal
   - -Dcurl=enabled
   - -Dzlib=enabled
   - -Dlz4=enabled
@@ -13,10 +9,36 @@ configure:
   - -Dzstd=enabled
   - -Dfuse=enabled
   - -Dfuse-old=enabled
-  - -Db_coverage=true
-  - -Db_sanitize=address,undefined
-  #- -Dtest=extended
-  #- -Dfuzzer=true
-  #- -Dfuzzer_timeout=10
-default:
-  - test
+
+mode:
+  default:
+    configure:
+      - -Db_lundef=false
+      - -Dtest=true
+      - -Ddoc=internal
+      - -Dexamples=true
+      - -Db_coverage=true
+      - -Db_sanitize=address,undefined
+    default:
+      - test
+  bench:
+    configure:
+      - --optimization=3
+      - -Ddebug=true
+      - -Dtest=false
+      - -Dexamples=false
+      - -Dfuzzer=false
+      - -Ddoc=false
+      - -Db_coverage=false
+      - -Db_sanitize=none
+      - -Db_lto=true
+  fuzz:
+    configure:
+      - -Dfuzzer=true
+      - -Dfuzzer_timeout=300
+  extended:
+    configure:
+      - -Dtest=extended
+  clang:
+    env:
+      CC: clang
