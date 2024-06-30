@@ -21,8 +21,8 @@ a command-line interface and a C library interface.
 
 * **Safe**: While we cannot guarantee that libsqsh is bug-free, we have a test
   suite that covers lots of edge cases and fuzz the library regularly. We trust it
-  enough to use libsqsh to open untrusted squashfs archives. libsqsh runs consistently
-  checks over the squashfs archive to catch loops in the directory tree, invalid file
+  enough to use libsqsh to open untrusted squashfs archives. libsqsh runs consistency 
+  checks over the squashfs archive to catch loops in the directory trees, invalid file
   names and a few other error states that are not covered by other implementations.
 
 * **Fast**: while we need to keep a trade off between safety and speed, we try to
