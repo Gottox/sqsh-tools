@@ -203,7 +203,8 @@ out:
 
 static bool
 init_next(struct SqshTreeTraversal *traversal) {
-	if (sqsh_file_type(traversal->base_file) == SQSH_FILE_TYPE_DIRECTORY) {
+	if (traversal->max_depth != 0 &&
+		sqsh_file_type(traversal->base_file) == SQSH_FILE_TYPE_DIRECTORY) {
 		traversal->state = SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN;
 	} else {
 		traversal->state = SQSH_TREE_TRAVERSAL_STATE_FILE;

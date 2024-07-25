@@ -728,6 +728,51 @@ UTEST(integration, test_easy_traversal) {
 	ASSERT_EQ(0, rv);
 }
 
+UTEST(integration, test_traversal_zero_max_depth) {
+	int rv;
+	struct SqshArchive sqsh = {0};
+	struct SqshFile *file = NULL;
+	struct SqshTreeTraversal *traversal = NULL;
+
+	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	config.archive_offset = 1010;
+	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
+	ASSERT_EQ(0, rv);
+
+	file = sqsh_open(&sqsh, "/", &rv);
+	ASSERT_EQ(0, rv);
+
+	traversal = sqsh_tree_traversal_new(file, &rv);
+	ASSERT_EQ(0, rv);
+
+	bool has_next;
+	const char *name;
+	size_t size;
+
+	sqsh_tree_traversal_set_max_depth(traversal, 0);
+
+	has_next = sqsh_tree_traversal_next(traversal, &rv);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(true, has_next);
+	name = sqsh_tree_traversal_name(traversal, &size);
+	ASSERT_EQ(0, strcmp("", name));
+	ASSERT_EQ(
+			(enum SqshTreeTraversalState)SQSH_TREE_TRAVERSAL_STATE_FILE,
+			sqsh_tree_traversal_state(traversal));
+
+	has_next = sqsh_tree_traversal_next(traversal, &rv);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(false, has_next);
+
+	rv = sqsh_tree_traversal_free(traversal);
+	ASSERT_EQ(0, rv);
+
+	rv = sqsh_close(file);
+
+	rv = sqsh__archive_cleanup(&sqsh);
+	ASSERT_EQ(0, rv);
+}
+
 UTEST(integration, mmap) {
 	int rv;
 	struct SqshArchive sqsh = {0};
