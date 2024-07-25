@@ -458,19 +458,22 @@ enum SqshTreeTraversalState {
 	 */
 	SQSH_TREE_TRAVERSAL_STATE_INIT,
 	/**
-	 * The traversal iterator is currently pointing at a file object. This
-	 * includes special files like named pipes, symlinks, or devices but not
-	 * directories.
+	 * The traversal iterator is currently pointing at an object it will visit
+	 * only once. This includes regular files, special files like named pipes,
+	 * symlinks, or devices, and directories that will not be descended into
+	 * because of a configured max depth.
 	 */
 	SQSH_TREE_TRAVERSAL_STATE_FILE,
 	/**
 	 * The traversal iterator is currently pointing at a directory object, right
-	 * before SqshTreeTraversal is about to descend into it.
+	 * before SqshTreeTraversal is about to descend into it. The traversal
+	 * iterator will eventually visit the same object with state
+	 * SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END
 	 */
 	SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN,
 	/**
 	 * The traversal iterator is currently pointing at a directory object, after
-	 * SqshTreeTraversal has finised iterating over it.
+	 * SqshTreeTraversal has finished iterating over it.
 	 */
 	SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END,
 };
@@ -478,14 +481,20 @@ enum SqshTreeTraversalState {
 struct SqshTreeTraversal;
 
 /**
- * @brief Creates a new SqshTreeTraversal object at the root inode.
+ * @brief Creates a new SqshTreeTraversal object rooted at the specified inode.
  * @memberof SqshTreeTraversal
+ *
+ * The returned traversal iterator object borrows the passed file object.
+ * The returned traversal iterator object will visit all entries recursively
+ * located below the passed inode (which can be limited with
+ * `sqsh_tree_traversal_set_max_depth`). If the passed inode is not a directory,
+ * only the passed inode itself will be visited.
  *
  * @param[in]   file     the base inode to start from.
  * @param[out]  err      Pointer to an int where the error code will be
  * stored.
  *
- * @return a new file reader.
+ * @return a new tree traversal object.
  */
 struct SqshTreeTraversal *
 sqsh_tree_traversal_new(const struct SqshFile *file, int *err);
@@ -507,7 +516,8 @@ void sqsh_tree_traversal_set_max_depth(
  * @param[in,out]   traversal  The traversal to use
  * @param[out]      err Pointer to an int where the error code will be stored.
  *
- * @return 0 on success, less than 0 on error.
+ * @return true if the traversal was moved to the next entry, false if the
+ *     traversal has no more entries to move to or an error occurred.
  */
 SQSH_NO_UNUSED bool
 sqsh_tree_traversal_next(struct SqshTreeTraversal *traversal, int *err);
@@ -527,18 +537,19 @@ sqsh_tree_traversal_type(const struct SqshTreeTraversal *traversal);
  * @memberof SqshTreeTraversal
  * @brief returns the state of the traversal.
  *
- * @param[in,out]   traversal  The traversal to use
+ * @param[in]   traversal  The traversal to use
  *
- * @return 0 on success, less than 0 on error.
+ * @return The current state of the traversal.
  */
 enum SqshTreeTraversalState
 sqsh_tree_traversal_state(const struct SqshTreeTraversal *traversal);
 
 /**
  * @memberof SqshTreeTraversal
- * @brief Returns the name of the current entry. This entry is not zero
- * terminated. The function will return an emptry string for the uppermost
- * object.
+ * @brief Returns the name of the current entry.
+ *
+ * This entry is not zero terminated. The function will return an empty string
+ * for the uppermost object.
  *
  * @param[in]   traversal  The traversal to use
  * @param[out]  len        Pointer to a size_t where the length of the name will
@@ -550,13 +561,18 @@ const char *sqsh_tree_traversal_name(
 		const struct SqshTreeTraversal *traversal, size_t *len);
 
 /**
- * @brief Returns the name of the current entry. This entry is not zero
- * terminated.
+ * @brief Creates a heap allocated copy of the path to the current entry
+ *
+ * The caller is responsible for calling free() on the returned pointer.
+ *
+ * The returned string is 0 terminated.
+ *
  * @memberof SqshTreeTraversal
  *
  * @param[in]   traversal  The traversal to use
  *
- * @return the name of the current entry.
+ * @return a newly heap allocated string containing the path to the current
+ *         entry
  */
 char *sqsh_tree_traversal_path_dup(const struct SqshTreeTraversal *traversal);
 
@@ -586,8 +602,21 @@ sqsh_tree_traversal_name_dup(const struct SqshTreeTraversal *traversal);
 size_t sqsh_tree_traversal_depth(const struct SqshTreeTraversal *traversal);
 
 /**
- * @brief Returns the length of the path segment at a given index.
+ * @brief Get a segment of the path of the current entry.
  * @memberof SqshTreeTraversal
+ *
+ * A path segment is a part of the path that is separated by a path separator
+ * (`/`). The segments are indexed starting at 0, and there are `depth`
+ * segments in total (0 <= index < depth). The last segment is the name of the
+ * current entry.
+ *
+ * The root of the traversal is considered at depth 0, and so has no path
+ * segments (or name).
+ *
+ * If the traversal is rooted at `/a/b`, and the traversal iterator is
+ * pointing at `/a/b/c/d.txt`, the path segments will be [`c`, `d.txt`].
+ *
+ * The returned pointer is not zero terminated.
  *
  * @param[in,out]   traversal  The traversal to use
  * @param[out]      len        Pointer to a size_t where the length of the name
@@ -605,7 +634,8 @@ const char *sqsh_tree_traversal_path_segment(
  *
  * @param[in]   traversal  The traversal to use
  *
- * @return the inode of the current entry.
+ * @return The directory iterator pointing to the current entry, iterating the
+ *   parent directory, or NULL if the traversal is at its root entry
  */
 const struct SqshDirectoryIterator *
 sqsh_tree_traversal_iterator(const struct SqshTreeTraversal *traversal);
@@ -617,7 +647,7 @@ sqsh_tree_traversal_iterator(const struct SqshTreeTraversal *traversal);
  * @param[in,out]   traversal  The traversal to use
  * @param[out]      err     Pointer to an int where the error code will be
  *
- * @return the inode of the current entry.
+ * @return a newly allocated SqshFile for the current entry.
  */
 SQSH_NO_UNUSED struct SqshFile *sqsh_tree_traversal_open_file(
 		const struct SqshTreeTraversal *traversal, int *err);
