@@ -114,7 +114,6 @@ struct SqshTreeTraversal {
 
 	struct CxPreallocPool stack_pool;
 	struct SqshTreeTraversalStackElement *stack;
-	size_t stack_size;
 
 	size_t depth;
 	size_t max_depth;

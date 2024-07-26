@@ -47,7 +47,6 @@ sqsh__tree_traversal_init(
 			&traversal->stack_pool, 8,
 			sizeof(struct SqshTreeTraversalStackElement));
 	traversal->stack = NULL;
-	traversal->stack_size = 0;
 	traversal->base_file = file;
 	traversal->state = SQSH_TREE_TRAVERSAL_STATE_INIT;
 	traversal->max_depth = SIZE_MAX;
