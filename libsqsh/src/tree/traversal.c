@@ -296,6 +296,10 @@ total_path_length(const struct SqshTreeTraversal *traversal) {
 	size_t length = 0;
 	size_t segment_len = 0;
 
+	if (traversal->depth == 0) {
+		return 0;
+	}
+
 	struct SqshTreeTraversalStackElement *element = traversal->stack;
 	if (traversal->state == SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN) {
 		element = element->next;
@@ -326,6 +330,10 @@ sqsh_tree_traversal_path_dup(const struct SqshTreeTraversal *traversal) {
 	// fill in the buffer in reverse
 	buffer[length] = '\0';
 	size_t end = length;
+
+	if (traversal->depth == 0) {
+		return buffer;
+	}
 
 	struct SqshTreeTraversalStackElement *element = traversal->stack;
 	if (traversal->state == SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN) {
