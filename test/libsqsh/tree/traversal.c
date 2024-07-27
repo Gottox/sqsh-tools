@@ -96,6 +96,7 @@ UTEST(traversal, test_recursive_directory) {
 UTEST(traversal, test_empty_dir) {
 	int rv;
 	struct SqshArchive archive = {0};
+	char *path;
 	uint8_t payload[] = {
 			/* clang-format off */
 			SQSH_HEADER,
@@ -125,6 +126,9 @@ UTEST(traversal, test_empty_dir) {
 			(enum SqshTreeTraversalState)
 					SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN,
 			sqsh_tree_traversal_state(&traversal));
+	path = sqsh_tree_traversal_path_dup(&traversal);
+	ASSERT_STREQ("", path);
+	free(path);
 
 	has_next = sqsh_tree_traversal_next(&traversal, &rv);
 	ASSERT_EQ(0, rv);
@@ -133,6 +137,9 @@ UTEST(traversal, test_empty_dir) {
 			(enum SqshTreeTraversalState)
 					SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END,
 			sqsh_tree_traversal_state(&traversal));
+	path = sqsh_tree_traversal_path_dup(&traversal);
+	ASSERT_STREQ("", path);
+	free(path);
 
 	has_next = sqsh_tree_traversal_next(&traversal, &rv);
 	ASSERT_EQ(0, rv);

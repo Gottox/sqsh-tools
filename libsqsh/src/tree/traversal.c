@@ -33,6 +33,7 @@
 
 #include <sqsh_tree_private.h>
 
+#include <assert.h>
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
 #include <stdbool.h>
@@ -279,13 +280,10 @@ sqsh_tree_traversal_path_segment(
 	if (traversal->state == SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN) {
 		element = element->next;
 	}
-	for (size_t i = traversal->depth - 1; i > 0; i--) {
-		if (index == i) {
-			return sqsh_directory_iterator_name2(&element->iterator, len);
-		}
+	for (size_t i = traversal->depth - 1; i > index; i--) {
 		element = element->next;
 	}
-	__builtin_unreachable();
+	return sqsh_directory_iterator_name2(&element->iterator, len);
 }
 
 size_t
@@ -293,42 +291,71 @@ sqsh_tree_traversal_depth(const struct SqshTreeTraversal *traversal) {
 	return traversal->depth;
 }
 
+static size_t
+total_path_length(const struct SqshTreeTraversal *traversal) {
+	size_t length = 0;
+	size_t segment_len = 0;
+
+	if (traversal->depth == 0) {
+		return 0;
+	}
+
+	struct SqshTreeTraversalStackElement *element = traversal->stack;
+	if (traversal->state == SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN) {
+		element = element->next;
+	}
+	for (size_t i = traversal->depth; i > 1; i--) {
+		// Ignore the value, we just want to know the length
+		sqsh_directory_iterator_name2(&element->iterator, &segment_len);
+		// Add one for the separator
+		length += segment_len + 1;
+		element = element->next;
+	}
+
+	// Get the 0th path element
+	sqsh_directory_iterator_name2(&traversal->base_iterator, &segment_len);
+	length += segment_len;
+
+	return length;
+}
+
 char *
 sqsh_tree_traversal_path_dup(const struct SqshTreeTraversal *traversal) {
-	struct CxBuffer buffer = {0};
-	int rv = 0;
-
-	rv = cx_buffer_init(&buffer);
-	if (rv < 0) {
-		goto out;
-	}
-
-	const size_t count = sqsh_tree_traversal_depth(traversal);
-	for (sqsh_index_t i = 0; i < count; i++) {
-		if (i > 0) {
-			rv = cx_buffer_append(&buffer, (const uint8_t *)"/", 1);
-		}
-		if (rv < 0) {
-			goto out;
-		}
-		size_t size = 0;
-		const char *name =
-				sqsh_tree_traversal_path_segment(traversal, &size, i);
-		rv = cx_buffer_append(&buffer, (const uint8_t *)name, size);
-		if (rv < 0) {
-			goto out;
-		}
-	}
-
-	// append null byte
-	rv = cx_buffer_append(&buffer, (const uint8_t *)"", 1);
-out:
-	if (rv < 0) {
-		cx_buffer_cleanup(&buffer);
+	size_t length = total_path_length(traversal);
+	char *buffer = malloc(length + 1);
+	if (buffer == NULL) {
 		return NULL;
-	} else {
-		return (char *)cx_buffer_unwrap(&buffer);
 	}
+
+	// fill in the buffer in reverse
+	buffer[length] = '\0';
+	size_t end = length;
+
+	if (traversal->depth == 0) {
+		return buffer;
+	}
+
+	struct SqshTreeTraversalStackElement *element = traversal->stack;
+	if (traversal->state == SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN) {
+		element = element->next;
+	}
+	size_t segment_len = 0;
+	for (size_t i = traversal->depth; i > 1; i--) {
+		const char *segment =
+				sqsh_directory_iterator_name2(&element->iterator, &segment_len);
+		end -= segment_len;
+		memcpy(buffer + end, segment, segment_len);
+		end--;
+		buffer[end] = '/';
+		element = element->next;
+	}
+
+	const char *segment = sqsh_directory_iterator_name2(
+			&traversal->base_iterator, &segment_len);
+	assert(segment_len == end);
+	memcpy(buffer, segment, segment_len);
+
+	return buffer;
 }
 
 char *
