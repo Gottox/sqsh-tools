@@ -71,6 +71,10 @@ sqsh_easy_xattr_get(
 	}
 
 	xattr_value = sqsh_xattr_iterator_value_dup(&iterator);
+	if (xattr_value == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
+	}
 
 out:
 	sqsh__xattr_iterator_cleanup(&iterator);
