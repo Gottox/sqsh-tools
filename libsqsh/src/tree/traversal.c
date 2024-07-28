@@ -109,6 +109,7 @@ pop_stack(struct SqshTreeTraversal *traversal) {
 		sqsh__file_cleanup(&element->file);
 		sqsh__directory_iterator_cleanup(&element->iterator);
 		traversal->stack = element->next;
+		cx_prealloc_pool_recycle(&traversal->stack_pool, element);
 		element = traversal->stack;
 
 		if (traversal->stack == NULL) {
