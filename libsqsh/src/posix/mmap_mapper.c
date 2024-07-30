@@ -33,14 +33,12 @@
 
 #define _LARGEFILE64_SOURCE
 
-#include <sqsh_common_private.h>
 #include <sqsh_error.h>
-#include <sqsh_mapper_private.h>
+#include <sqsh_mapper.h>
 
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/mman.h>
-#include <sys/stat.h>
 #include <unistd.h>
 
 #define TO_PTR(x) ((void *)(uintptr_t)(x))
