@@ -44,6 +44,7 @@ content of a directory.
 ```c
 struct SqshArchive *archive =
 		sqsh_archive_open("/path/to/archive.squashfs", NULL, NULL);
+assert(archive != NULL);
 
 uint8_t *contents = sqsh_easy_file_content(archive, "/path/to/file", NULL);
 assert(contents != NULL);
