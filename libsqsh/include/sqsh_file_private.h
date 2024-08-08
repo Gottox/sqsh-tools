@@ -289,7 +289,8 @@ SQSH_NO_EXPORT void sqsh__file_set_parent_inode_ref(
  *
  * @return int 0 on success, less than 0 on error.
  */
-uint64_t sqsh__file_parent_inode_ref(struct SqshFile *context, int *err);
+SQSH_NO_EXPORT uint64_t
+sqsh__file_parent_inode_ref(struct SqshFile *context, int *err);
 
 /**
  * @internal
