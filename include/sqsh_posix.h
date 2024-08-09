@@ -43,6 +43,9 @@ extern "C" {
 
 struct SqshFile;
 
+typedef int (*sqsh_file_to_stream_mt_cb)(
+		const struct SqshFile *file, int err, void *data);
+
 /**
  * @memberof SqshFile
  * @brief writes data to a file descriptor.
