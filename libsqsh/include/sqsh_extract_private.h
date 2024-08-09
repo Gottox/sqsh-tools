@@ -193,12 +193,13 @@ struct SqshExtractManager {
  * @param[in]     archive     The archive to use.
  * @param[in]     block_size  The block size to use.
  * @param[in]     size        The size of the manager.
+ * @param[in]     lru_size    The size of the lru cache.
  *
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__extract_manager_init(
 		struct SqshExtractManager *manager, struct SqshArchive *archive,
-		uint32_t block_size, size_t size);
+		uint32_t block_size, size_t size, size_t lru_size);
 
 /**
  * @internal

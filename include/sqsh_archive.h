@@ -420,10 +420,16 @@ struct SqshConfig {
 	int mapper_lru_size;
 
 	/**
+	 * @deprecated Since 1.5.0. data_lru_size or metablock_lru_size instead.
 	 * @brief the size of the LRU cache used to cache chunks of data from the
 	 * compression algorithm. If unset or 0, the LRU defaults to 128. if set to
 	 * -1, the LRU will be disabled.
 	 */
+#ifndef SQSH__NO_DEPRECATED_FIELD
+	__attribute__((
+			deprecated("Since 1.5.0. data_lru_size or metablock_lru_size "
+					   "instead.")))
+#endif
 	int compression_lru_size;
 
 	/**
@@ -431,6 +437,20 @@ struct SqshConfig {
 	 * 0, the max symlink depth will be 100.
 	 */
 	size_t max_symlink_depth;
+
+	/**
+	 * @brief the size of the LRU cache used to cache chunks of data from the
+	 * data blocks. If unset or 0, the LRU defaults to 128. if set to -1, the
+	 * LRU will be disabled.
+	 */
+	int data_lru_size;
+
+	/**
+	 * @brief the size of the LRU cache used to cache chunks of data from the
+	 * metablocks. If unset or 0, the LRU defaults to 128. if set to -1, the LRU
+	 * will be disabled.
+	 */
+	int metablock_lru_size;
 
 	/**
 	 * @privatesection

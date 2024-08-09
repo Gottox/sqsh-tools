@@ -82,11 +82,8 @@ buffer_cleanup(void *buffer) {
 SQSH_NO_UNUSED int
 sqsh__extract_manager_init(
 		struct SqshExtractManager *manager, struct SqshArchive *archive,
-		uint32_t block_size, size_t size) {
+		uint32_t block_size, size_t size, size_t lru_size) {
 	int rv;
-	const struct SqshConfig *config = sqsh_archive_config(archive);
-	const size_t lru_size =
-			SQSH_CONFIG_DEFAULT(config->compression_lru_size, 128);
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 	enum SqshSuperblockCompressionId compression_id =
 			sqsh_superblock_compression_id(superblock);

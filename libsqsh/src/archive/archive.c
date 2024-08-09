@@ -31,6 +31,7 @@
  * @file         archive.c
  */
 
+#define SQSH__NO_DEPRECATED_FIELD
 #define _DEFAULT_SOURCE
 
 #include <sqsh_archive_private.h>
@@ -127,6 +128,10 @@ sqsh__archive_init(
 	}
 
 	config = sqsh_archive_config(archive);
+	const int default_lru_size =
+			(int)SQSH_CONFIG_DEFAULT(config->compression_lru_size, 128);
+	const size_t metablock_lru_size =
+			SQSH_CONFIG_DEFAULT(config->metablock_lru_size, default_lru_size);
 
 	rv = sqsh__map_manager_init(&archive->map_manager, source, config);
 	if (rv < 0) {
@@ -161,7 +166,7 @@ sqsh__archive_init(
 
 	rv = sqsh__extract_manager_init(
 			&archive->metablock_extract_manager, archive,
-			SQSH_METABLOCK_BLOCK_SIZE, metablock_capacity);
+			SQSH_METABLOCK_BLOCK_SIZE, metablock_capacity, metablock_lru_size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -192,6 +197,11 @@ sqsh__archive_data_extract_manager(
 		struct SqshArchive *archive,
 		struct SqshExtractManager **data_extract_manager) {
 	int rv = 0;
+	const struct SqshConfig *config = sqsh_archive_config(archive);
+	const int default_lru_size =
+			(int)SQSH_CONFIG_DEFAULT(config->compression_lru_size, 128);
+	const size_t data_lru_size =
+			SQSH_CONFIG_DEFAULT(config->data_lru_size, default_lru_size);
 
 	rv = sqsh__mutex_lock(&archive->lock);
 	if (rv < 0) {
@@ -208,7 +218,7 @@ sqsh__archive_data_extract_manager(
 
 		rv = sqsh__extract_manager_init(
 				&archive->data_extract_manager, archive, datablock_blocksize,
-				capacity);
+				capacity, data_lru_size);
 		if (rv < 0) {
 			goto out;
 		}
