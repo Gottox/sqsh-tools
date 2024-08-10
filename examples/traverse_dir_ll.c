@@ -23,7 +23,8 @@ main(int argc, char *argv[]) {
 			.source_size = 0,
 			.mapper_block_size = 0,
 			.mapper_lru_size = 0,
-			.compression_lru_size = 0,
+			.metablock_lru_size = 0,
+			.data_lru_size = 0,
 			.archive_offset = 0,
 			.max_symlink_depth = 0,
 	};
