@@ -46,5 +46,6 @@
 #include "sqsh_tree.h"
 #include "sqsh_utils.h"
 #include "sqsh_xattr.h"
+#include "sqsh_posix.h"
 
 #endif /* SQSH_H */

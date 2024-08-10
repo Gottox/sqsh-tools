@@ -162,6 +162,17 @@ SQSH_NO_UNUSED bool sqsh_file_iterator_next(
 		struct SqshFileIterator *iterator, size_t desired_size, int *err);
 
 /**
+ * @brief Checks if the current block is a zero block.
+ * @memberof SqshFileIterator
+ *
+ * @param[in] iterator The file iterator to check.
+ *
+ * @return true if the current block is a zero block, false otherwise.
+ */
+SQSH_NO_UNUSED bool
+sqsh_file_iterator_is_zero_block(const struct SqshFileIterator *iterator);
+
+/**
  * @deprecated Since 1.5.0. Use sqsh_file_iterator_skip2() instead.
  * @memberof SqshFileIterator
  * @brief Skips blocks until the block containing the offset is reached.

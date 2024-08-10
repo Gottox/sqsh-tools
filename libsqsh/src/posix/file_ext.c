@@ -32,18 +32,19 @@
  */
 
 #define _DEFAULT_SOURCE
+#define _LARGEFILE64_SOURCE
 
+#include <assert.h>
 #include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <unistd.h>
 
 #include <sqsh_archive.h>
+#include <sqsh_common_private.h>
 #include <sqsh_error.h>
 #include <sqsh_file_private.h>
-#include <sqsh_posix.h>
-
-#include <cextras/concurrency.h>
+#include <sqsh_posix_private.h>
 
 int
 sqsh_file_to_stream(const struct SqshFile *file, FILE *stream) {
@@ -70,154 +71,197 @@ out:
 	return rv;
 }
 
-struct FileData {
+struct FileIteratorMtBlock {
+	struct FileIteratorMt *mt;
+	uint64_t block_offset;
+};
+
+struct FileIteratorMt {
 	struct SqshFile file;
-	sqsh__mutex_t mutex;
-	bool owned_thread_pool;
-	FILE *target_stream;
-	struct CxThreadpool *thread_pool;
+	sqsh_file_iterator_mt_cb cb;
+	uint32_t chunk_size;
+	void *data;
+	atomic_int rv;
+	atomic_size_t remaining_blocks;
+
+	struct FileIteratorMtBlock *blocks;
+};
+
+struct FileToStreamMt {
+	struct FileIteratorMt mt;
 	sqsh_file_to_stream_mt_cb cb;
-	void *userdata;
-};
-
-struct BlockData {
-	uint64_t offset;
-	struct FileData *file_data;
+	void *data;
+	FILE *stream;
 };
 
 static void
-extract_worker(void *user) {
-	int rv = 0;
-	struct BlockData *block_data = user;
-	struct FileData *file_data = block_data->file_data;
-
-	rv = sqsh__mutex_lock(&file_data->mutex);
-	if (rv < 0) {
-	}
-
-	sqsh__mutex_unlock(&file_data->mutex);
+file_iterator_mt_cleanup(struct FileIteratorMt *mt, int rv) {
+	mt->cb(&mt->file, NULL, 0, mt->data, rv);
+	sqsh__file_cleanup(&mt->file);
+	free(mt->blocks);
+	free(mt);
 }
 
 static void
-file_data_free(struct FileData *file_data) {
-	if (file_data->owned_thread_pool) {
-		cx_threadpool_destroy(file_data->thread_pool);
-	}
-	sqsh__file_cleanup(&file_data->file);
-	fclose(file_data->target_stream);
-	free(file_data);
-}
+iterator_worker(void *data) {
+	int rv = 0, rv2 = 0;
+	struct SqshFileIterator iterator = {0};
 
-static struct FileData *
-file_data_new(
-		const struct SqshFile *file, FILE *stream, void *thread_pool,
-		sqsh_file_to_stream_mt_cb cb, void *userdata, int *err) {
-	int rv = 0;
-	struct FileData *file_data = calloc(1, sizeof(struct FileData));
-	if (file_data == NULL) {
-		rv = -SQSH_ERROR_INTERNAL;
-		goto out;
-	}
-	file_data->target_stream = stream;
-	file_data->cb = cb;
-	file_data->userdata = userdata;
+	struct FileIteratorMtBlock *block = data;
+	struct FileIteratorMt *mt = block->mt;
 
-	if (thread_pool != NULL) {
-		file_data->owned_thread_pool = false;
-		file_data->thread_pool = thread_pool;
-	} else {
-		file_data->owned_thread_pool = true;
-		file_data->thread_pool = cx_threadpool_init(0);
-		if (thread_pool == NULL) {
-			rv = -SQSH_ERROR_INTERNAL;
-			goto out;
-		}
-	}
-
-	rv = sqsh__mutex_init(&file_data->mutex);
+	rv = sqsh__file_iterator_init(&iterator, &mt->file);
 	if (rv < 0) {
 		goto out;
 	}
-	struct SqshArchive *const archive = file->archive;
-	const uint64_t inode_ref = sqsh_file_inode_ref(file);
-	rv = sqsh__file_init(&file_data->file, archive, inode_ref);
+
+	sqsh_index_t offset = block->block_offset;
+	rv = sqsh_file_iterator_skip(&iterator, &offset, 1);
 	if (rv < 0) {
 		goto out;
 	}
+	assert(offset == 0);
+
+	mt->cb(&mt->file, &iterator, block->block_offset, mt->data, rv);
+
 out:
-	*err = rv;
+	sqsh__file_iterator_cleanup(&iterator);
+
+	assert(rv2 == 0);
+
+	const size_t remaining_blocks = atomic_fetch_sub(&mt->remaining_blocks, 1);
 	if (rv < 0) {
-		file_data_free(file_data);
-		file_data = NULL;
+		atomic_store(&mt->rv, rv);
 	}
-	return file_data;
+
+	if (remaining_blocks == 1) {
+		file_iterator_mt_cleanup(mt, atomic_load(&mt->rv));
+	}
 }
 
-static int
-prepare_file(struct FileData *file_data) {
-	const uint64_t file_size = sqsh_file_size(&file_data->file);
-	int fd = fileno(file_data->target_stream);
-	// Make sure the file is empty:
-	if (ftruncate(fd, 0) < 0) {
-		return -errno;
+static void
+file_iterator_mt(
+		struct FileIteratorMt *mt, const struct SqshFile *file,
+		struct SqshThreadpool *threadpool, sqsh_file_iterator_mt_cb cb,
+		void *data, int rv) {
+	if (rv < 0) {
+		goto out;
 	}
-	// Make sure the file is the right size:
-	if (ftruncate(fd, (off_t)file_size) < 0) {
-		return -errno;
+	const uint64_t inode_ref = sqsh_file_inode_ref(file);
+	const struct SqshSuperblock *superblock =
+			sqsh_archive_superblock(file->archive);
+	uint32_t chunk_size = sqsh_superblock_block_size(superblock);
+
+	const size_t block_count =
+			SQSH_DIVIDE_CEIL(sqsh_file_size(file), chunk_size);
+
+	mt->cb = cb;
+	mt->data = data;
+	mt->chunk_size = chunk_size;
+	atomic_init(&mt->remaining_blocks, block_count);
+	atomic_init(&mt->rv, 0);
+
+	if (block_count == 0) {
+		goto out;
 	}
 
-	return 0;
-}
+	rv = sqsh__file_init(&mt->file, file->archive, inode_ref);
+	if (rv < 0) {
+		goto out;
+	}
 
-int
-sqsh_file_to_stream_mt(
-		const struct SqshFile *file, FILE *stream, void *thread_pool,
-		sqsh_file_to_stream_mt_cb cb, void *data) {
-	int rv = 0;
-	struct FileData *file_data = NULL;
-	struct SqshArchive *archive = file->archive;
-	const uint32_t block_count = sqsh_file_block_count(file);
-	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
-	const uint64_t block_size = sqsh_superblock_block_size(superblock);
-	struct BlockData *block_data =
-			calloc(block_count, sizeof(struct SqshFile *));
-	if (block_data == NULL) {
+	mt->blocks = calloc(sizeof(struct FileIteratorMtBlock), block_count);
+	if (mt->blocks == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
 
-	file_data = file_data_new(file, stream, thread_pool, cb, data, &rv);
-	if (rv < 0) {
-		goto out;
-	}
-
-	rv = prepare_file(file_data);
-	if (rv < 0) {
-		goto out;
-	}
-
-	uint64_t block_offset = 0;
-	for (uint64_t i = 0; i < block_count; i++) {
-		block_data[i].offset = block_offset;
-		block_data[i].file_data = file_data;
+	size_t block_offset = 0;
+	for (sqsh_index_t i = 0; i < block_count; i++) {
+		mt->blocks[i].mt = mt;
+		mt->blocks[i].block_offset = block_offset;
 		rv = cx_threadpool_schedule(
-				thread_pool, (uintptr_t)stream, extract_worker, &block_data[i]);
+				&threadpool->pool, iterator_worker, &mt->blocks[i]);
 		if (rv < 0) {
-			rv = -SQSH_ERROR_INTERNAL;
 			goto out;
 		}
-		block_offset += block_size;
-	}
-
-	if (cb == NULL) {
-		rv = cx_threadpool_wait(thread_pool, (uintptr_t)stream);
-		if (rv < 0) {
-			rv = -SQSH_ERROR_INTERNAL;
-		}
-		free(block_data);
-		file_data_free(file_data);
+		block_offset += chunk_size;
 	}
 
 out:
-	return rv;
+	if (rv < 0 || block_count == 0) {
+		file_iterator_mt_cleanup(mt, rv);
+	}
+}
+
+void
+sqsh_file_iterator_mt(
+		const struct SqshFile *file, struct SqshThreadpool *threadpool,
+		sqsh_file_iterator_mt_cb cb, void *data) {
+	int rv = 0;
+
+	struct FileIteratorMt *mt = calloc(sizeof(struct FileIteratorMt), 1);
+	if (mt == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+	}
+
+	file_iterator_mt(mt, file, threadpool, cb, data, rv);
+}
+
+static void
+stream_worker(
+		const struct SqshFile *file, const struct SqshFileIterator *iterator,
+		sqsh_index_t offset, void *data, int err) {
+	int rv = 0, rv2 = 0;
+	FILE *stream = NULL;
+	struct FileToStreamMt *mt = data;
+	if (iterator == NULL) {
+		mt->cb(file, mt->stream, mt->data, err);
+		return;
+	}
+
+	int fd = dup(fileno(mt->stream));
+	stream = fdopen(fd, "r+");
+	if (stream == NULL) {
+		close(fd);
+		rv = -errno;
+		goto out;
+	}
+
+	rv = fseeko64(stream, (off_t)offset, SEEK_SET);
+	const uint8_t *iterator_data = sqsh_file_iterator_data(iterator);
+	const size_t iterator_size = sqsh_file_iterator_size(iterator);
+	const size_t written =
+			fwrite(iterator_data, sizeof(uint8_t), iterator_size, stream);
+	if (written != iterator_size) {
+		rv = -errno;
+		goto out;
+	}
+
+out:
+	if (stream != NULL) {
+		fclose(stream);
+	}
+	assert(rv2 == 0);
+
+	if (rv < 0) {
+		atomic_store(&mt->mt.rv, rv);
+	}
+}
+
+void
+sqsh_file_to_stream_mt(
+		const struct SqshFile *file, struct SqshThreadpool *threadpool,
+		FILE *stream, sqsh_file_to_stream_mt_cb cb, void *data) {
+	int rv = 0;
+
+	struct FileToStreamMt *mt = calloc(sizeof(struct FileToStreamMt), 1);
+	if (mt == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+	}
+	mt->stream = stream;
+	mt->cb = cb;
+	mt->data = data;
+
+	file_iterator_mt(&mt->mt, file, threadpool, stream_worker, mt, rv);
 }
