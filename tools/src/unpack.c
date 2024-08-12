@@ -351,7 +351,8 @@ extract(const char *path, const struct SqshFile *file, extract_fn func) {
 
 static int
 extract_from_traversal(
-		const char *target_path, const struct SqshTreeTraversal *iter, extract_fn func) {
+		const char *target_path, const struct SqshTreeTraversal *iter,
+		extract_fn func) {
 	int rv;
 	char *path = sqsh_tree_traversal_path_dup(iter);
 	enum SqshTreeTraversalState state = sqsh_tree_traversal_state(iter);
@@ -391,7 +392,8 @@ out:
 }
 
 static int
-extract_all(const char *target_path, const struct SqshFile *base, extract_fn func) {
+extract_all(
+		const char *target_path, const struct SqshFile *base, extract_fn func) {
 	char *path = NULL;
 	int rv = 0;
 	struct SqshTreeTraversal *iter = NULL;

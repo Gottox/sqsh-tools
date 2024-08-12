@@ -51,9 +51,9 @@ libsqsh_sources = files(
 
 if get_option('posix').allowed()
     libsqsh_sources += files(
-        'posix/threadpool.c',
         'posix/file_ext.c',
         'posix/mmap_mapper.c',
+        'posix/threadpool.c',
     )
 endif
 
