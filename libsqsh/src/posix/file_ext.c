@@ -116,7 +116,7 @@ iterator_worker(void *data) {
 	}
 
 	sqsh_index_t offset = block->block_offset;
-	rv = sqsh_file_iterator_skip(&iterator, &offset, 1);
+	rv = sqsh_file_iterator_skip2(&iterator, &offset, 1);
 	if (rv < 0) {
 		goto out;
 	}
