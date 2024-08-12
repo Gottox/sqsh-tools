@@ -39,15 +39,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/resource.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <utime.h>
 
-#define EXTRACT_BARRIER_INTERVAL (1024 * 1)
-
 typedef int (*extract_fn)(
 		const char *, enum SqshFileType, const struct SqshFile *);
 
+size_t max_open_files = 0;
 size_t extracted_files = 0;
 bool do_chown = false;
 bool verbose = false;
@@ -234,7 +234,7 @@ extract_file(const char *path, const struct SqshFile *file) {
 	fd = -1;
 
 	extracted_files++;
-	if (extracted_files % EXTRACT_BARRIER_INTERVAL == 0) {
+	if (extracted_files % max_open_files == 0) {
 		rv = sqsh_threadpool_wait(threadpool);
 		if (rv < 0) {
 			goto out;
@@ -448,6 +448,7 @@ main(int argc, char *argv[]) {
 	struct SqshArchive *sqsh;
 	struct SqshFile *src_root = NULL;
 	uint64_t offset = 0;
+	struct rlimit limits = {0};
 	if (isatty(STDOUT_FILENO)) {
 		print_segment = print_escaped;
 	}
@@ -497,7 +498,15 @@ main(int argc, char *argv[]) {
 		goto out;
 	}
 
-	threadpool = sqsh_threadpool_new(1, &rv);
+	threadpool = sqsh_threadpool_new(0, &rv);
+
+	rv = getrlimit(RLIMIT_NOFILE, &limits);
+	if (rv < 0) {
+		perror("getrlimit");
+		rv = EXIT_FAILURE;
+		goto out;
+	}
+	max_open_files = limits.rlim_cur / 2;
 
 	src_root = sqsh_lopen(sqsh, src_path, &rv);
 	if (rv < 0) {
@@ -518,6 +527,11 @@ main(int argc, char *argv[]) {
 	} else {
 		rv = extract_all(target_path, src_root, extract_first_pass);
 	}
+	if (rv < 0) {
+		rv = EXIT_FAILURE;
+		goto out;
+	}
+	rv = sqsh_threadpool_wait(threadpool);
 	if (rv < 0) {
 		rv = EXIT_FAILURE;
 		goto out;
