@@ -41,14 +41,10 @@
 #include <sqsh_common_private.h>
 #include <sqsh_extract_private.h>
 
-static size_t
+static sqsh_index_t
 address_to_index(const struct SqshMapIterator *iterator, uint64_t address) {
-	return address / sqsh__map_manager_block_size(iterator->map_manager);
-}
-
-static size_t
-index_to_address(const struct SqshMapIterator *iterator, uint64_t index) {
-	return index * sqsh__map_manager_block_size(iterator->map_manager);
+	return (sqsh_index_t)address /
+			sqsh__map_manager_block_size(iterator->map_manager);
 }
 
 int
@@ -56,7 +52,7 @@ sqsh__map_iterator_init(
 		struct SqshMapIterator *iterator, struct SqshMapManager *manager,
 		uint64_t start_address) {
 	const size_t block_size = sqsh__map_manager_block_size(manager);
-	const size_t archive_size = sqsh__map_manager_size(manager);
+	const uint64_t archive_size = sqsh__map_manager_size(manager);
 
 	if (start_address >= archive_size) {
 		return -SQSH_ERROR_OUT_OF_BOUNDS;
@@ -151,11 +147,6 @@ sqsh__map_iterator_data(const struct SqshMapIterator *iterator) {
 size_t
 sqsh__map_iterator_block_size(const struct SqshMapIterator *iterator) {
 	return sqsh__map_manager_block_size(iterator->map_manager);
-}
-
-sqsh_index_t
-sqsh__map_iterator_address(const struct SqshMapIterator *iterator) {
-	return index_to_address(iterator, iterator->next_index);
 }
 
 size_t

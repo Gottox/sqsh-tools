@@ -51,7 +51,7 @@
 
 static int
 sqsh_mapper_mmap_init(
-		struct SqshMapper *mapper, const void *input, size_t *size) {
+		struct SqshMapper *mapper, const void *input, uint64_t *size) {
 	(void)size;
 	(void)mapper;
 	int rv = 0;
@@ -81,7 +81,7 @@ out:
 }
 static int
 sqsh_mapping_mmap_map(
-		const struct SqshMapper *mapper, sqsh_index_t offset, size_t size,
+		const struct SqshMapper *mapper, uint64_t offset, size_t size,
 		uint8_t **data) {
 	const int fd = FROM_PTR(sqsh_mapper_user_data(mapper));
 	const long page_size = sysconf(_SC_PAGESIZE);
@@ -129,8 +129,8 @@ static const struct SqshMemoryMapperImpl impl = {
 		/* 100 MiB */
 		.block_size_hint = 100 * 1024 * 1024,
 #endif
-		.init = sqsh_mapper_mmap_init,
-		.map = sqsh_mapping_mmap_map,
+		.init2 = sqsh_mapper_mmap_init,
+		.map2 = sqsh_mapping_mmap_map,
 		.unmap = sqsh_mapping_mmap_unmap,
 		.cleanup = sqsh_mapper_mmap_cleanup,
 };

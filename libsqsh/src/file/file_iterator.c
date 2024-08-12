@@ -139,7 +139,7 @@ map_block_uncompressed(
 	uint32_t block_index = iterator->block_index;
 	struct SqshMapReader *reader = &iterator->map_reader;
 	const uint64_t block_count = sqsh_file_block_count(file);
-	uint64_t outer_size = 0;
+	size_t outer_size = 0;
 	const size_t remaining_direct = sqsh__map_reader_remaining_direct(reader);
 
 	for (; iterator->sparse_size == 0 && block_index < block_count;
@@ -157,7 +157,7 @@ map_block_uncompressed(
 			iterator->sparse_size = iterator->block_size - data_block_size;
 		}
 
-		uint64_t new_outer_size;
+		size_t new_outer_size;
 		if (SQSH_ADD_OVERFLOW(outer_size, data_block_size, &new_outer_size)) {
 			rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 			goto out;
@@ -212,7 +212,7 @@ map_block(struct SqshFileIterator *iterator, size_t desired_size) {
 	const uint32_t block_index = iterator->block_index;
 	const size_t block_size = iterator->block_size;
 	const bool is_compressed = sqsh_file_block_is_compressed(file, block_index);
-	const size_t file_size = sqsh_file_size(file);
+	const uint64_t file_size = sqsh_file_size(file);
 	const size_t data_block_size = sqsh_file_block_size(file, block_index);
 	const sqsh_index_t next_offset =
 			sqsh__map_reader_size(&iterator->map_reader);
@@ -221,7 +221,7 @@ map_block(struct SqshFileIterator *iterator, size_t desired_size) {
 		if (is_last_block(iterator) == false || file_size % block_size == 0) {
 			iterator->sparse_size = block_size;
 		} else {
-			iterator->sparse_size = file_size % block_size;
+			iterator->sparse_size = (size_t)file_size % block_size;
 		}
 		rv = map_zero_block(iterator);
 		iterator->block_index++;

@@ -38,7 +38,7 @@
 
 #include <stdlib.h>
 
-static const uint64_t INODE_HEADER_SIZE = sizeof(struct SqshDataInodeHeader) +
+static const size_t INODE_HEADER_SIZE = sizeof(struct SqshDataInodeHeader) +
 		sizeof(struct SqshDataInodeDirectoryExt);
 
 static const struct SqshDataInodeDirectoryIndex *

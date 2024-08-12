@@ -37,8 +37,6 @@
 #include <sqsh_common_private.h>
 #include <sqsh_error.h>
 
-#include <assert.h>
-
 static void
 map_cleanup_cb(void *data) {
 	struct SqshMapSlice *mapping = data;
@@ -53,9 +51,9 @@ load_mapping(
 
 	const size_t block_size = sqsh_mapper_block_size(&manager->mapper);
 	const size_t block_count = sqsh__map_manager_block_count(manager);
-	const size_t mapper_size = sqsh__map_manager_size(manager);
+	const uint64_t mapper_size = sqsh__map_manager_size(manager);
 	size_t size = block_size;
-	sqsh_index_t offset;
+	uint64_t offset;
 	if (SQSH_MULT_OVERFLOW(index, block_size, &offset)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
@@ -64,7 +62,7 @@ load_mapping(
 	 * read past the end of the file, so cap the size to the remaining bytes.
 	 */
 	if (index == block_count - 1 && mapper_size % block_size != 0) {
-		size = mapper_size % block_size;
+		size = (size_t)mapper_size % block_size;
 	}
 
 	if (SQSH_ADD_OVERFLOW(offset, manager->archive_offset, &offset)) {
@@ -85,7 +83,7 @@ sqsh__map_manager_init(
 		struct SqshMapManager *manager, const void *input,
 		const struct SqshConfig *config) {
 	int rv;
-	size_t map_size;
+	uint64_t map_size;
 	const size_t lru_size = SQSH_CONFIG_DEFAULT(config->mapper_lru_size, 32);
 	const uint64_t archive_offset = config->archive_offset;
 
@@ -98,7 +96,7 @@ sqsh__map_manager_init(
 		goto out;
 	}
 
-	const size_t mapper_size = sqsh_mapper_size(&manager->mapper);
+	const uint64_t mapper_size = sqsh_mapper_size2(&manager->mapper);
 
 	if (mapper_size < archive_offset) {
 		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
@@ -107,10 +105,14 @@ sqsh__map_manager_init(
 	map_size = SQSH_DIVIDE_CEIL(
 			mapper_size - archive_offset,
 			sqsh_mapper_block_size(&manager->mapper));
+	if (map_size > SIZE_MAX) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
 
 	manager->archive_offset = archive_offset;
 	rv = cx_rc_map_init(
-			&manager->maps, map_size, sizeof(struct SqshMapSlice),
+			&manager->maps, (size_t)map_size, sizeof(struct SqshMapSlice),
 			map_cleanup_cb);
 	if (rv < 0) {
 		goto out;
@@ -126,7 +128,7 @@ out:
 
 uint64_t
 sqsh__map_manager_size(const struct SqshMapManager *manager) {
-	return sqsh_mapper_size(&manager->mapper) - manager->archive_offset;
+	return sqsh_mapper_size2(&manager->mapper) - manager->archive_offset;
 }
 
 size_t

@@ -31,6 +31,7 @@
  * @file         map_slice.c
  */
 
+#define SQSH__NO_DEPRECATED_FIELD
 #include <sqsh_mapper_private.h>
 
 #include <sqsh_archive.h>
@@ -40,9 +41,9 @@
 int
 sqsh__map_slice_init(
 		struct SqshMapSlice *mapping, struct SqshMapper *mapper,
-		sqsh_index_t offset, size_t size) {
+		uint64_t offset, size_t size) {
 	size_t end_offset;
-	size_t archive_size = sqsh_mapper_size(mapper);
+	uint64_t archive_size = sqsh_mapper_size2(mapper);
 	if (offset > archive_size) {
 		return -SQSH_ERROR_SIZE_MISMATCH;
 	}
@@ -54,7 +55,14 @@ sqsh__map_slice_init(
 	}
 	mapping->mapper = mapper;
 	mapping->size = size;
-	return mapper->impl->map(mapper, offset, size, &mapping->data);
+	if (mapper->impl->map == NULL) {
+		return mapper->impl->map2(mapper, offset, size, &mapping->data);
+	} else {
+		if (offset > SIZE_MAX) {
+			return -SQSH_ERROR_INTEGER_OVERFLOW;
+		}
+		return mapper->impl->map(mapper, (size_t)offset, size, &mapping->data);
+	}
 }
 
 const uint8_t *

@@ -61,7 +61,7 @@ struct SqshMapper {
 	 */
 	const struct SqshMemoryMapperImpl *impl;
 	size_t block_size;
-	size_t archive_size;
+	uint64_t archive_size;
 	void *user_data;
 };
 
@@ -154,7 +154,7 @@ SQSH_NO_EXPORT int sqsh__map_slice_cleanup(struct SqshMapSlice *mapping);
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__map_slice_init(
 		struct SqshMapSlice *mapping, struct SqshMapper *mapper,
-		sqsh_index_t offset, size_t size);
+		uint64_t offset, size_t size);
 
 /***************************************
  * mapper/map_manager.c
@@ -276,7 +276,7 @@ struct SqshMapIterator {
 	 * @privatesection
 	 */
 	sqsh_index_t next_index;
-	sqsh_index_t segment_count;
+	uint64_t segment_count;
 	struct SqshMapManager *map_manager;
 	const struct SqshMapSlice *mapping;
 	const uint8_t *data;
@@ -349,17 +349,6 @@ sqsh__map_iterator_data(const struct SqshMapIterator *iterator);
  */
 SQSH_NO_EXPORT size_t
 sqsh__map_iterator_block_size(const struct SqshMapIterator *iterator);
-
-/**
- * @internal
- * @memberof SqshMapIterator
- * @brief returns the address of the current chunk.
- *
- * @param[in] iterator The SqshMapIterator instance.
- * @return the address of the current chunk.
- */
-SQSH_NO_EXPORT sqsh_index_t
-sqsh__map_iterator_address(const struct SqshMapIterator *iterator);
 
 /**
  * @internal

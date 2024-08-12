@@ -110,7 +110,7 @@ sqsh_table_get(
 	struct SqshArchive *sqsh = table->sqsh;
 	struct SqshMetablockReader metablock = {0};
 	size_t lookup_table_bytes = sqsh__map_reader_size(&table->lookup_table);
-	uint64_t lookup_index =
+	sqsh_index_t lookup_index =
 			index * table->element_size / SQSH_METABLOCK_BLOCK_SIZE;
 	if (lookup_index >= table->element_count ||
 		lookup_index * sizeof(uint64_t) >= lookup_table_bytes) {
@@ -131,8 +131,9 @@ sqsh_table_get(
 		goto out;
 	}
 
+	// TODO: move *readers* to uint64_t offsets and remove this cast
 	rv = sqsh__metablock_reader_advance(
-			&metablock, element_offset, table->element_size);
+			&metablock, (sqsh_index_t)element_offset, table->element_size);
 	if (rv < 0) {
 		goto out;
 	}

@@ -31,6 +31,7 @@
  * @file         mapper.c
  */
 
+#define SQSH__NO_DEPRECATED_FIELD
 #include <sqsh_mapper_private.h>
 
 #include <sqsh_archive.h>
@@ -42,7 +43,7 @@ sqsh__mapper_init(
 		struct SqshMapper *mapper, const void *source,
 		const struct SqshConfig *config) {
 	int rv = 0;
-	size_t size = config->source_size;
+	uint64_t size = config->source_size;
 	if (config->source_mapper) {
 		mapper->impl = config->source_mapper;
 	} else {
@@ -55,13 +56,24 @@ sqsh__mapper_init(
 		mapper->block_size = mapper->impl->block_size_hint;
 	}
 
-	rv = mapper->impl->init(mapper, source, &size);
+	if (mapper->impl->init == NULL) {
+		rv = mapper->impl->init2(mapper, source, &size);
+	} else {
+		if (size > SIZE_MAX) {
+			rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+			goto out;
+		}
+		size_t small_size = (size_t)size;
+		rv = mapper->impl->init(mapper, source, &small_size);
+		size = small_size;
+	}
 	if (rv < 0) {
-		return rv;
+		goto out;
 	}
 
 	mapper->archive_size = size;
 
+out:
 	return rv;
 }
 
@@ -72,6 +84,11 @@ sqsh_mapper_block_size(const struct SqshMapper *mapper) {
 
 size_t
 sqsh_mapper_size(const struct SqshMapper *mapper) {
+	return (size_t)mapper->archive_size;
+}
+
+uint64_t
+sqsh_mapper_size2(const struct SqshMapper *mapper) {
 	return mapper->archive_size;
 }
 

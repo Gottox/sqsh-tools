@@ -153,7 +153,7 @@ configure_handle(struct SqshCurlMapper *mapper) {
 
 static int
 curl_download(
-		CURL *handle, sqsh_index_t offset, size_t size, uint8_t **data,
+		CURL *handle, uint64_t offset, size_t size, uint8_t **data,
 		uint64_t *file_size, uint64_t *file_time) {
 	*data = calloc(size, sizeof(uint8_t));
 	if (*data == NULL) {
@@ -175,7 +175,7 @@ curl_download(
 	long http_code = 0;
 
 	rv = snprintf(
-			range_buffer, sizeof(range_buffer), "%zu-%" PRIu64, offset,
+			range_buffer, sizeof(range_buffer), "%" PRIu64 "-%" PRIu64, offset,
 			end_offset);
 	if (rv >= (int)sizeof(range_buffer)) {
 		rv = -SQSH_ERROR_MAPPER_MAP;
@@ -212,7 +212,7 @@ out:
 
 static int
 sqsh_mapper_curl_init(
-		struct SqshMapper *mapper, const void *input, size_t *size) {
+		struct SqshMapper *mapper, const void *input, uint64_t *size) {
 	(void)size;
 	int rv = 0;
 	curl_global_init(CURL_GLOBAL_ALL);
@@ -254,7 +254,7 @@ out:
 
 static int
 sqsh_mapper_curl_map(
-		const struct SqshMapper *mapper, sqsh_index_t offset, size_t size,
+		const struct SqshMapper *mapper, uint64_t offset, size_t size,
 		uint8_t **data) {
 	struct SqshCurlMapper *curl_mapper = sqsh_mapper_user_data(mapper);
 	int rv = 0;
@@ -282,7 +282,7 @@ sqsh_mapper_curl_map(
 			goto out;
 		}
 
-		if (file_size != sqsh_mapper_size(mapper)) {
+		if (file_size != sqsh_mapper_size2(mapper)) {
 			rv = -SQSH_ERROR_MAPPER_MAP;
 			goto out;
 		}
@@ -315,8 +315,8 @@ sqsh_mapping_curl_unmap(
 
 static const struct SqshMemoryMapperImpl impl = {
 		/* 40kb */
-		.block_size_hint = 40 * 1024,     .init = sqsh_mapper_curl_init,
-		.map = sqsh_mapper_curl_map,      .cleanup = sqsh_mapper_curl_cleanup,
+		.block_size_hint = 40 * 1024,     .init2 = sqsh_mapper_curl_init,
+		.map2 = sqsh_mapper_curl_map,     .cleanup = sqsh_mapper_curl_cleanup,
 		.unmap = sqsh_mapping_curl_unmap,
 };
 const struct SqshMemoryMapperImpl *const sqsh_mapper_impl_curl = &impl;

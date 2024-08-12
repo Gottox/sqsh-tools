@@ -22,7 +22,7 @@ main(int argc, char *argv[]) {
 
 	uint8_t *content = sqsh_easy_file_content(archive, argv[2], NULL);
 	assert(content != NULL);
-	size_t size = sqsh_easy_file_size(archive, argv[2], NULL);
+	size_t size = sqsh_easy_file_size2(archive, argv[2], NULL);
 
 	fwrite(content, size, 1, stdout);
 
