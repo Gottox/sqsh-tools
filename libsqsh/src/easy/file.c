@@ -89,8 +89,12 @@ sqsh_easy_file_content(
 		goto out;
 	}
 
-	size_t file_size = sqsh_file_size(file);
-	content = calloc(file_size + 1, sizeof(*content));
+	uint64_t file_size = sqsh_file_size(file);
+	if (file_size > SIZE_MAX - 1) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
+	content = calloc((size_t)file_size + 1, sizeof(*content));
 	if (content == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
@@ -117,11 +121,11 @@ out:
 	return content;
 }
 
-size_t
-sqsh_easy_file_size(struct SqshArchive *archive, const char *path, int *err) {
+uint64_t
+sqsh_easy_file_size2(struct SqshArchive *archive, const char *path, int *err) {
 	int rv = 0;
 	struct SqshFile *file = NULL;
-	size_t file_size = 0;
+	uint64_t file_size = 0;
 
 	file = sqsh_open(archive, path, &rv);
 	if (rv < 0) {
@@ -136,6 +140,24 @@ out:
 		*err = rv;
 	}
 	return file_size;
+}
+
+size_t
+sqsh_easy_file_size(struct SqshArchive *archive, const char *path, int *err) {
+	int rv = 0;
+	uint64_t file_size = sqsh_easy_file_size2(archive, path, &rv);
+	if (rv < 0) {
+		goto out;
+	}
+	if (file_size > SIZE_MAX - 1) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
+out:
+	if (err != NULL) {
+		*err = rv;
+	}
+	return (size_t)file_size;
 }
 
 mode_t
@@ -160,11 +182,11 @@ out:
 	return permission;
 }
 
-time_t
-sqsh_easy_file_mtime(struct SqshArchive *archive, const char *path, int *err) {
+uint32_t
+sqsh_easy_file_mtime2(struct SqshArchive *archive, const char *path, int *err) {
 	int rv = 0;
 	struct SqshFile *file = NULL;
-	time_t modified = 0;
+	uint32_t modified = 0;
 
 	file = sqsh_open(archive, path, &rv);
 	if (rv < 0) {
@@ -179,4 +201,9 @@ out:
 		*err = rv;
 	}
 	return modified;
+}
+
+time_t
+sqsh_easy_file_mtime(struct SqshArchive *archive, const char *path, int *err) {
+	return (time_t)sqsh_easy_file_mtime2(archive, path, err);
 }

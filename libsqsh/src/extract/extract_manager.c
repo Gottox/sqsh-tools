@@ -66,7 +66,7 @@ maybe_prime(uint64_t n) {
 	return mod_power(a, n - 1, n) == 1;
 }
 
-static uint64_t
+static size_t
 find_next_maybe_prime(size_t n) {
 	for (; maybe_prime(n) == false; n++) {
 	}

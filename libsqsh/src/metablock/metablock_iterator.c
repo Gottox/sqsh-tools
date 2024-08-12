@@ -156,7 +156,7 @@ out:
 
 int
 sqsh__metablock_iterator_skip(
-		struct SqshMetablockIterator *iterator, sqsh_index_t *offset) {
+		struct SqshMetablockIterator *iterator, uint64_t *offset) {
 	int rv = 0;
 
 	size_t current_size = sqsh__metablock_iterator_size(iterator);

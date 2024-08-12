@@ -33,9 +33,7 @@
 
 #include <sqshtools_common.h>
 
-#include <assert.h>
 #include <inttypes.h>
-#include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -294,8 +292,9 @@ stat_file(struct SqshArchive *archive, const char *path) {
 			printf("    fragment offset: %i\n",
 				   sqsh_file_fragment_block_offset(file));
 		}
-		printf("   number of blocks: %i\n", sqsh_file_block_count(file));
-		for (uint32_t i = 0; i < sqsh_file_block_count(file); i++) {
+		printf("   number of blocks: %" PRIu64 "\n",
+			   sqsh_file_block_count2(file));
+		for (uint32_t i = 0; i < sqsh_file_block_count2(file); i++) {
 			bool is_compressed = sqsh_file_block_is_compressed(file, i);
 			uint32_t size = sqsh_file_block_size(file, i);
 

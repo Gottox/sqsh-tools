@@ -19,7 +19,7 @@ main(int argc, char *argv[]) {
 
 	uint8_t *contents = sqsh_easy_file_content(archive, "/path/to/file", NULL);
 	assert(contents != NULL);
-	const size_t size = sqsh_easy_file_size(archive, "/path/to/file", NULL);
+	const size_t size = sqsh_easy_file_size2(archive, "/path/to/file", NULL);
 	fwrite(contents, 1, size, stdout);
 	free(contents);
 

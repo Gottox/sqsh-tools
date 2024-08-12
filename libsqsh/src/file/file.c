@@ -282,16 +282,15 @@ sqsh_file_blocks_start(const struct SqshFile *context) {
 	return context->impl->blocks_start(get_inode(context));
 }
 
-// TODO: reconsider the return type of this function.
-uint32_t
-sqsh_file_block_count(const struct SqshFile *context) {
+uint64_t
+sqsh_file_block_count2(const struct SqshFile *context) {
 	const struct SqshSuperblock *superblock =
 			sqsh_archive_superblock(context->archive);
 	uint64_t file_size = sqsh_file_size(context);
 	uint32_t block_size = sqsh_superblock_block_size(superblock);
 
 	if (file_size == UINT64_MAX) {
-		return UINT32_MAX;
+		return UINT64_MAX;
 	} else if (file_size == 0) {
 		return 0;
 	} else if (sqsh_file_has_fragment(context)) {
@@ -299,6 +298,15 @@ sqsh_file_block_count(const struct SqshFile *context) {
 	} else {
 		return (uint32_t)SQSH_DIVIDE_CEIL(file_size, block_size);
 	}
+}
+
+uint32_t
+sqsh_file_block_count(const struct SqshFile *context) {
+	uint64_t block_count = sqsh_file_block_count2(context);
+	if (block_count > UINT32_MAX) {
+		return UINT32_MAX;
+	}
+	return (uint32_t)block_count;
 }
 
 uint32_t

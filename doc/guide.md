@@ -49,7 +49,7 @@ struct SqshArchive *archive = sqsh_archive_open("archive.squashfs", NULL, NULL);
 assert(archive != NULL);
 
 uint8_t *content = sqsh_easy_file_content(archive, "/path/to/file.txt", NULL);
-size_t size = sqsh_easy_file_size(archive, "/path/to/file.txt", NULL);
+uint64_t size = sqsh_easy_file_size2(archive, "/path/to/file.txt", NULL);
 fwrite(content, 1, size, stdout);
 free(content);
 
@@ -96,7 +96,7 @@ struct SqshFile *file = sqsh_open(archive, "/path/to/file.txt", &err);
 assert(err == 0);
 struct SqshFileReader *reader = sqsh_file_reader_new(file, &err);
 assert(err == 0);
-err = sqsh_file_reader_advance(reader, 0, 10);
+err = sqsh_file_reader_advance2(reader, 0, 10);
 assert(err == 0);
 
 const uint8_t *data = sqsh_file_reader_data(reader);

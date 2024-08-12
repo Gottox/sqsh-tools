@@ -60,7 +60,7 @@ struct SqshXattrIterator {
 	size_t remaining_entries;
 	size_t remaining_size;
 	uint64_t upper_limit;
-	sqsh_index_t next_offset;
+	uint64_t next_offset;
 	sqsh_index_t value_index;
 };
 

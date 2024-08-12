@@ -152,7 +152,7 @@ fs_common_read(
 		return 0;
 	}
 
-	rv = sqsh_file_reader_advance(*reader, offset, size);
+	rv = sqsh_file_reader_advance2(*reader, offset, size);
 	if (rv < 0) {
 		goto out;
 	}

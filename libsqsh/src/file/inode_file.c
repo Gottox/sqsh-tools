@@ -57,10 +57,11 @@ calc_block_count(
 	const uint32_t block_size = sqsh_superblock_block_size(superblock);
 	const bool has_fragment = fragment_index != SQSH_INODE_NO_FRAGMENT;
 
+	// TODO: integer overflows on 32bit?
 	if (has_fragment) {
-		return file_size / block_size;
+		return (size_t)file_size / block_size;
 	} else {
-		return SQSH_DIVIDE_CEIL(file_size, block_size);
+		return (size_t)SQSH_DIVIDE_CEIL(file_size, block_size);
 	}
 }
 

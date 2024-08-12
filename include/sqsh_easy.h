@@ -87,6 +87,20 @@ sqsh_easy_file_content(struct SqshArchive *archive, const char *path, int *err);
  *
  * @return The size of the file on success, 0 on error.
  */
+uint64_t
+sqsh_easy_file_size2(struct SqshArchive *archive, const char *path, int *err);
+
+/**
+ * @deprecated Since 1.5.0. Use sqsh_easy_file_size2() instead.
+ * @brief retrieves the size of a file.
+ *
+ * @param[in] archive  The sqsh archive context.
+ * @param[in] path     The path the file or directory.
+ * @param[out] err     Pointer to an int where the error code will be stored.
+ *
+ * @return The size of the file on success, 0 on error.
+ */
+__attribute__((deprecated("Since 1.5.0. Use sqsh_easy_file_size2() instead.")))
 size_t
 sqsh_easy_file_size(struct SqshArchive *archive, const char *path, int *err);
 
@@ -111,6 +125,20 @@ mode_t sqsh_easy_file_permission(
  *
  * @return The modification time of the file on success, 0 on error.
  */
+uint32_t
+sqsh_easy_file_mtime2(struct SqshArchive *archive, const char *path, int *err);
+
+/**
+ * @deprecated Since 1.5.0. Use sqsh_easy_file_mtime2() instead.
+ * @brief retrieves the modification time of a file.
+ *
+ * @param[in] archive  The sqsh archive context.
+ * @param[in] path     The path the file or directory.
+ * @param[out] err     Pointer to an int where the error code will be stored.
+ *
+ * @return The modification time of the file on success, 0 on error.
+ */
+__attribute__((deprecated("Since 1.5.0. Use sqsh_easy_file_mtime2() instead.")))
 time_t
 sqsh_easy_file_mtime(struct SqshArchive *archive, const char *path, int *err);
 

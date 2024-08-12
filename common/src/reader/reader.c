@@ -119,7 +119,7 @@ out:
 }
 
 static int
-handle_buffered(struct SqshReader *reader, sqsh_index_t offset, size_t size) {
+handle_buffered(struct SqshReader *reader, uint64_t offset, size_t size) {
 	int rv = 0;
 	struct CxBuffer new_buffer = {0};
 	sqsh_index_t iterator_offset = reader->iterator_offset;
@@ -127,7 +127,7 @@ handle_buffered(struct SqshReader *reader, sqsh_index_t offset, size_t size) {
 	struct CxBuffer *buffer = &reader->buffer;
 	const uint8_t *buffer_data = cx_buffer_data(buffer);
 	size_t buffer_size = cx_buffer_size(buffer);
-	const size_t copy_size = buffer_size - offset;
+	const size_t copy_size = buffer_size - (size_t)offset;
 
 	if (offset != 0) {
 		rv = cx_buffer_init(&new_buffer);
@@ -152,7 +152,7 @@ out:
 }
 
 static int
-handle_mapped(struct SqshReader *reader, sqsh_index_t offset, size_t size) {
+handle_mapped(struct SqshReader *reader, uint64_t offset, size_t size) {
 	int rv = 0;
 	void *iterator = reader->iterator;
 	const struct SqshReaderIteratorImpl *impl = reader->iterator_impl;
@@ -168,8 +168,8 @@ handle_mapped(struct SqshReader *reader, sqsh_index_t offset, size_t size) {
 	}
 	reader->iterator_size = impl->size(iterator);
 
-	reader->offset = offset;
-	sqsh_index_t end_offset;
+	reader->offset = (size_t)offset;
+	size_t end_offset;
 	if (SQSH_ADD_OVERFLOW(offset, size, &end_offset)) {
 		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
@@ -189,8 +189,7 @@ out:
 }
 
 int
-sqsh__reader_advance(
-		struct SqshReader *reader, sqsh_index_t offset, size_t size) {
+sqsh__reader_advance(struct SqshReader *reader, uint64_t offset, size_t size) {
 	if (offset >= reader->iterator_offset) {
 		offset -= reader->iterator_offset;
 		reader->iterator_offset = 0;

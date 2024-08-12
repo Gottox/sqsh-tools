@@ -57,13 +57,21 @@ struct SqshMemoryMapperImpl {
 	 */
 	size_t block_size_hint;
 	/**
+	 * @deprecated Since 1.5.0. Use SqshMemoryMapperImpl::init2() instead.
 	 * @brief The initialization function for the mapper. Use
 	 * sqsh_mapper_set_user_data() to set custom user data.
 	 */
+#ifndef SQSH__NO_DEPRECATED_FIELD
+	__attribute__((deprecated("Since 1.5.0. Use init2() instead.")))
+#endif
 	int (*init)(struct SqshMapper *mapper, const void *input, size_t *size);
 	/**
+	 * @deprecated Since 1.5.0. Use SqshMemoryMapperImpl::map2() instead.
 	 * @brief The function that maps a block of data into memory.
 	 */
+#ifndef SQSH__NO_DEPRECATED_FIELD
+	__attribute__((deprecated("Since 1.5.0. Use init2() instead.")))
+#endif
 	int (*map)(
 			const struct SqshMapper *mapper, sqsh_index_t offset, size_t size,
 			uint8_t **data);
@@ -75,6 +83,18 @@ struct SqshMemoryMapperImpl {
 	 * @brief The cleanup function for the mapper.
 	 */
 	int (*cleanup)(struct SqshMapper *mapper);
+	/**
+	 * @brief The initialization function for the mapper. Use
+	 * sqsh_mapper_set_user_data() to set custom user data.
+	 */
+
+	int (*init2)(struct SqshMapper *mapper, const void *input, uint64_t *size);
+	/**
+	 * @brief The function that maps a block of data into memory.
+	 */
+	int (*map2)(
+			const struct SqshMapper *mapper, uint64_t offset, size_t size,
+			uint8_t **data);
 };
 
 /**
@@ -97,6 +117,7 @@ void sqsh_mapper_set_user_data(struct SqshMapper *mapper, void *user_data);
 void *sqsh_mapper_user_data(const struct SqshMapper *mapper);
 
 /**
+ * @deprecated Since 1.5.0. Use sqsh_mapper_size2() instead.
  * @internal
  * @memberof SqshMapper
  * @brief Retrieves the size of the input data in a mapper.
@@ -105,7 +126,20 @@ void *sqsh_mapper_user_data(const struct SqshMapper *mapper);
  *
  * @return The size of the input data in the mapper.
  */
-size_t sqsh_mapper_size(const struct SqshMapper *mapper);
+__attribute__((deprecated("Since 1.5.0. Use sqsh_mapper_size2() instead.")))
+size_t
+sqsh_mapper_size(const struct SqshMapper *mapper);
+
+/**
+ * @internal
+ * @memberof SqshMapper
+ * @brief Retrieves the size of the input data in a mapper.
+ *
+ * @param[in] mapper The mapper to retrieve the size from.
+ *
+ * @return The size of the input data in the mapper.
+ */
+uint64_t sqsh_mapper_size2(const struct SqshMapper *mapper);
 
 /**
  * @internal

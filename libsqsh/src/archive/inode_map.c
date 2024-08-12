@@ -67,7 +67,7 @@ export_table_get(
 		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
 		goto out;
 	}
-	rv = sqsh_export_table_resolve_inode(
+	rv = sqsh_export_table_resolve_inode2(
 			map->export_table, inode_number, &inode_ref);
 	if (rv < 0) {
 		goto out;

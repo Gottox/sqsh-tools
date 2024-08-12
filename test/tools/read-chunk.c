@@ -38,7 +38,7 @@ main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	rv = sqsh_file_reader_advance(reader, atoi(argv[3]), atoi(argv[4]));
+	rv = sqsh_file_reader_advance2(reader, atoi(argv[3]), atoi(argv[4]));
 	if (rv < 0) {
 		sqsh_perror(rv, "sqsh_file_reader_advance");
 		return EXIT_FAILURE;

@@ -110,7 +110,7 @@ sqsh_table_get(
 	struct SqshArchive *sqsh = table->sqsh;
 	struct SqshMetablockReader metablock = {0};
 	size_t lookup_table_bytes = sqsh__map_reader_size(&table->lookup_table);
-	uint64_t lookup_index =
+	sqsh_index_t lookup_index =
 			index * table->element_size / SQSH_METABLOCK_BLOCK_SIZE;
 	if (lookup_index >= table->element_count ||
 		lookup_index * sizeof(uint64_t) >= lookup_table_bytes) {

@@ -42,7 +42,7 @@ map_iterator_next(void *iterator, size_t desired_size, int *err) {
 	return sqsh__map_iterator_next(iterator, err);
 }
 static int
-map_iterator_skip(void *iterator, sqsh_index_t *offset, size_t desired_size) {
+map_iterator_skip(void *iterator, uint64_t *offset, size_t desired_size) {
 	(void)desired_size;
 	return sqsh__map_iterator_skip(iterator, offset);
 }
@@ -64,7 +64,7 @@ static const struct SqshReaderIteratorImpl map_reader_impl = {
 
 static sqsh_index_t
 get_offset(const struct SqshMapReader *reader, uint64_t address) {
-	return address % sqsh__map_iterator_block_size(&reader->iterator);
+	return (size_t)address % sqsh__map_iterator_block_size(&reader->iterator);
 }
 
 int
@@ -73,7 +73,7 @@ sqsh__map_reader_init(
 		uint64_t start_address, const uint64_t upper_limit) {
 	int rv;
 	sqsh_index_t offset =
-			start_address % sqsh__map_manager_block_size(map_manager);
+			(size_t)start_address % sqsh__map_manager_block_size(map_manager);
 
 	rv = sqsh__map_iterator_init(
 			&reader->iterator, map_manager, start_address - offset);
@@ -110,15 +110,18 @@ sqsh__map_reader_address(const struct SqshMapReader *reader) {
 
 int
 sqsh__map_reader_advance(
-		struct SqshMapReader *reader, sqsh_index_t offset, size_t size) {
+		struct SqshMapReader *reader, uint64_t offset, size_t size) {
 	reader->address += offset;
 	return sqsh__reader_advance(&reader->reader, offset, size);
 }
 
 int
 sqsh__map_reader_all(struct SqshMapReader *reader) {
-	return sqsh__map_reader_advance(
-			reader, 0, reader->upper_limit - reader->address);
+	uint64_t size = reader->upper_limit - reader->address;
+	if (size > SIZE_MAX) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+	return sqsh__map_reader_advance(reader, 0, (size_t)size);
 }
 
 const uint8_t *

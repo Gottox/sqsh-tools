@@ -94,7 +94,24 @@ struct SqshExportTable;
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh_export_table_resolve_inode(
+int sqsh_export_table_resolve_inode2(
+		const struct SqshExportTable *table, uint32_t inode,
+		uint64_t *inode_ref);
+
+/**
+ * @deprecated Since 1.5.0. Use sqsh_export_table_resolve_inode2 instead.
+ * @memberof SqshTable
+ * @brief Retrieves an element from the table.
+ *
+ * @param[in]  table The table to retrieve the element from.
+ * @param[in]  inode The index of the element to retrieve.
+ * @param[out] inode_ref A pointer to a uint64_t to store the inode reference
+ *
+ * @return 0 on success, a negative value on error.
+ */
+__attribute__((deprecated(
+		"Since 1.5.0. Use sqsh_export_table_resolve_inode2 instead."))) int
+sqsh_export_table_resolve_inode(
 		const struct SqshExportTable *table, uint64_t inode,
 		uint64_t *inode_ref);
 

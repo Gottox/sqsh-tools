@@ -35,7 +35,7 @@
 
 static int
 sqsh_mapper_static_mem_init(
-		struct SqshMapper *mapper, const void *input, size_t *size) {
+		struct SqshMapper *mapper, const void *input, uint64_t *size) {
 	(void)size;
 
 	sqsh_mapper_set_user_data(mapper, (void *)input);
@@ -44,10 +44,9 @@ sqsh_mapper_static_mem_init(
 }
 static int
 sqsh_mapper_static_mem_map(
-		const struct SqshMapper *mapper, sqsh_index_t offset, size_t size,
+		const struct SqshMapper *mapper, uint64_t offset, size_t size,
 		uint8_t **data) {
 	(void)size;
-	/* Cast to remove const qualifier. */
 	uint8_t *global_data = sqsh_mapper_user_data(mapper);
 	*data = &global_data[offset];
 	return 0;
@@ -68,8 +67,8 @@ sqsh_mapping_static_mem_unmap(
 
 static const struct SqshMemoryMapperImpl impl = {
 		.block_size_hint = SIZE_MAX,
-		.init = sqsh_mapper_static_mem_init,
-		.map = sqsh_mapper_static_mem_map,
+		.init2 = sqsh_mapper_static_mem_init,
+		.map2 = sqsh_mapper_static_mem_map,
 		.cleanup = sqsh_mapper_static_mem_cleanup,
 		.unmap = sqsh_mapping_static_mem_unmap,
 };

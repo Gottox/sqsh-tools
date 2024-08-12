@@ -160,13 +160,17 @@ sqsh__archive_init(
 		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
-	const size_t metablock_capacity = SQSH_DIVIDE_CEIL(
+	const uint64_t metablock_capacity = SQSH_DIVIDE_CEIL(
 			range,
 			sizeof(struct SqshDataMetablock) + SQSH_METABLOCK_BLOCK_SIZE);
-
+	if (metablock_capacity > SIZE_MAX) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
 	rv = sqsh__extract_manager_init(
 			&archive->metablock_extract_manager, archive,
-			SQSH_METABLOCK_BLOCK_SIZE, metablock_capacity, metablock_lru_size);
+			SQSH_METABLOCK_BLOCK_SIZE, (size_t)metablock_capacity,
+			metablock_lru_size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -211,14 +215,18 @@ sqsh__archive_data_extract_manager(
 		const struct SqshSuperblock *superblock =
 				sqsh_archive_superblock(archive);
 		const uint64_t range = get_data_segment_size(superblock);
-		const size_t capacity =
+		const uint64_t capacity =
 				SQSH_DIVIDE_CEIL(range, sqsh_superblock_block_size(superblock));
 		const uint32_t datablock_blocksize =
 				sqsh_superblock_block_size(superblock);
+		if (capacity > SIZE_MAX) {
+			rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+			goto out;
+		}
 
 		rv = sqsh__extract_manager_init(
 				&archive->data_extract_manager, archive, datablock_blocksize,
-				capacity, data_lru_size);
+				(size_t)capacity, data_lru_size);
 		if (rv < 0) {
 			goto out;
 		}

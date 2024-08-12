@@ -75,7 +75,7 @@ test_iter_next(void *data, size_t desired_size, int *err) {
 }
 
 static int
-test_iter_skip(void *iterator, sqsh_index_t *offset, size_t desired_size) {
+test_iter_skip(void *iterator, uint64_t *offset, size_t desired_size) {
 	int rv = 0;
 
 	size_t current_size = test_iter_size(iterator);
