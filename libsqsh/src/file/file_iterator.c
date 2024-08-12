@@ -46,7 +46,7 @@ is_last_block(const struct SqshFileIterator *iterator) {
 	const struct SqshFile *file = iterator->file;
 	const bool has_fragment = sqsh_file_has_fragment(file);
 	const sqsh_index_t block_index = iterator->block_index;
-	const size_t block_count = sqsh_file_block_count(file);
+	const uint64_t block_count = sqsh_file_block_count2(file);
 
 	if (has_fragment) {
 		return block_index == block_count;
@@ -138,7 +138,7 @@ map_block_uncompressed(
 	const struct SqshFile *file = iterator->file;
 	uint32_t block_index = iterator->block_index;
 	struct SqshMapReader *reader = &iterator->map_reader;
-	const uint64_t block_count = sqsh_file_block_count(file);
+	const uint64_t block_count = sqsh_file_block_count2(file);
 	size_t outer_size = 0;
 	const size_t remaining_direct = sqsh__map_reader_remaining_direct(reader);
 
@@ -265,7 +265,7 @@ sqsh_file_iterator_next(
 		struct SqshFileIterator *iterator, size_t desired_size, int *err) {
 	int rv = 0;
 	const struct SqshFile *file = iterator->file;
-	size_t block_count = sqsh_file_block_count(file);
+	const uint64_t block_count = sqsh_file_block_count2(file);
 	const bool has_fragment = sqsh_file_has_fragment(file);
 	bool has_next = true;
 
@@ -338,7 +338,7 @@ sqsh_file_iterator_skip2(
 
 	sqsh_index_t reader_forward = 0;
 	uint32_t block_index = iterator->block_index;
-	const size_t block_count = sqsh_file_block_count(iterator->file);
+	const uint64_t block_count = sqsh_file_block_count2(iterator->file);
 	for (sqsh_index_t i = 0; i < skip_index && block_index < block_count; i++) {
 		reader_forward += sqsh_file_block_size(iterator->file, block_index);
 		block_index += 1;

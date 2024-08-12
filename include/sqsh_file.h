@@ -425,6 +425,7 @@ uint32_t sqsh_file_modified_time(const struct SqshFile *context);
 uint64_t sqsh_file_blocks_start(const struct SqshFile *context);
 
 /**
+ * @deprecated Since 1.5.0. Use sqsh_file_blockcount2() instead.
  * @memberof SqshFile
  * @brief Getter for the amount of blocks of the file content. This is only
  * internally used and will be used while retrieving the file content.
@@ -434,7 +435,21 @@ uint64_t sqsh_file_blocks_start(const struct SqshFile *context);
  * @return the amount of blocks of the file content. If the file is not of
  * of type SQSH_FILE_TYPE_FILE, UINT32_MAX will be returned.
  */
-uint32_t sqsh_file_block_count(const struct SqshFile *context);
+__attribute__((deprecated("Since 1.5.0. Use sqsh_file_blockcount2() instead.")))
+uint32_t
+sqsh_file_block_count(const struct SqshFile *context);
+
+/**
+ * @memberof SqshFile
+ * @brief Getter for the amount of blocks of the file content. This is only
+ * internally used and will be used while retrieving the file content.
+ *
+ * @param[in] context The file context.
+ *
+ * @return the amount of blocks of the file content. If the file is not of
+ * of type SQSH_FILE_TYPE_FILE, UINT32_MAX will be returned.
+ */
+uint64_t sqsh_file_block_count2(const struct SqshFile *context);
 
 /**
  * @memberof SqshFile
