@@ -68,12 +68,10 @@ sqsh__map_iterator_init(
 	return 0;
 }
 
-#include <stdio.h>
 int
-sqsh__map_iterator_skip(
-		struct SqshMapIterator *iterator, sqsh_index_t *offset) {
+sqsh__map_iterator_skip(struct SqshMapIterator *iterator, uint64_t *offset) {
 	int rv = 0;
-	sqsh_index_t index;
+	uint64_t index;
 	size_t block_size = sqsh__map_manager_block_size(iterator->map_manager);
 
 	size_t current_size = sqsh__map_iterator_size(iterator);
@@ -88,8 +86,12 @@ sqsh__map_iterator_skip(
 		 */
 		index--;
 	}
+	if (index > SIZE_MAX) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
 
-	iterator->next_index = index;
+	iterator->next_index = (size_t)index;
 	bool has_next = sqsh__map_iterator_next(iterator, &rv);
 	if (rv < 0) {
 		goto out;

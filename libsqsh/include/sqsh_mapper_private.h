@@ -326,7 +326,7 @@ sqsh__map_iterator_next(struct SqshMapIterator *iterator, int *err);
  * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int
-sqsh__map_iterator_skip(struct SqshMapIterator *iterator, sqsh_index_t *offset);
+sqsh__map_iterator_skip(struct SqshMapIterator *iterator, uint64_t *offset);
 
 /**
  * @internal
@@ -437,7 +437,7 @@ sqsh__map_reader_address(const struct SqshMapReader *reader);
  * @return 0 on success, negative on error
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__map_reader_advance(
-		struct SqshMapReader *reader, sqsh_index_t offset, size_t size);
+		struct SqshMapReader *reader, uint64_t offset, size_t size);
 
 /**
  * @internal

@@ -305,6 +305,16 @@ int
 sqsh_file_iterator_skip(
 		struct SqshFileIterator *iterator, sqsh_index_t *offset,
 		size_t desired_size) {
+	uint64_t offset64 = *offset;
+	int rv = sqsh_file_iterator_skip2(iterator, &offset64, desired_size);
+	*offset = (size_t)offset64;
+	return rv;
+}
+
+int
+sqsh_file_iterator_skip2(
+		struct SqshFileIterator *iterator, uint64_t *offset,
+		size_t desired_size) {
 	int rv = 0;
 	const size_t block_size = iterator->block_size;
 	const size_t current_block_size = sqsh_file_iterator_size(iterator);
@@ -315,7 +325,7 @@ sqsh_file_iterator_skip(
 
 	*offset -= current_block_size;
 
-	sqsh_index_t skip_index = *offset / block_size;
+	uint64_t skip_index = *offset / block_size;
 	if (current_block_size != 0) {
 		skip_index += 1;
 	}

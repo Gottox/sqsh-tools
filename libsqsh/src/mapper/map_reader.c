@@ -42,7 +42,7 @@ map_iterator_next(void *iterator, size_t desired_size, int *err) {
 	return sqsh__map_iterator_next(iterator, err);
 }
 static int
-map_iterator_skip(void *iterator, sqsh_index_t *offset, size_t desired_size) {
+map_iterator_skip(void *iterator, uint64_t *offset, size_t desired_size) {
 	(void)desired_size;
 	return sqsh__map_iterator_skip(iterator, offset);
 }
@@ -110,7 +110,7 @@ sqsh__map_reader_address(const struct SqshMapReader *reader) {
 
 int
 sqsh__map_reader_advance(
-		struct SqshMapReader *reader, sqsh_index_t offset, size_t size) {
+		struct SqshMapReader *reader, uint64_t offset, size_t size) {
 	reader->address += offset;
 	return sqsh__reader_advance(&reader->reader, offset, size);
 }

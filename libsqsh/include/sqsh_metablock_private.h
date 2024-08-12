@@ -106,7 +106,7 @@ sqsh__metablock_iterator_next(struct SqshMetablockIterator *iterator, int *err);
  * @return 0 on success, less than 0 on error.
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__metablock_iterator_skip(
-		struct SqshMetablockIterator *iterator, sqsh_index_t *offset);
+		struct SqshMetablockIterator *iterator, uint64_t *offset);
 
 /**
  * @internal
@@ -184,7 +184,7 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__metablock_reader_init(
  * @return 0 on success, less than zero on error.
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__metablock_reader_advance(
-		struct SqshMetablockReader *reader, sqsh_index_t offset, size_t size);
+		struct SqshMetablockReader *reader, uint64_t offset, size_t size);
 
 /**
  * @internal

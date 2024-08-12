@@ -66,6 +66,7 @@ struct SqshFileReader *
 sqsh_file_reader_new(const struct SqshFile *file, int *err);
 
 /**
+ * @deprecated Since 1.5.0. Use sqsh_file_reader_advance2() instead.
  * @brief Advances the file reader by a certain amount of data and presents
  * `size` bytes of data to the user.
  * @memberof SqshFileReader
@@ -76,8 +77,24 @@ sqsh_file_reader_new(const struct SqshFile *file, int *err);
  *
  * @return 0 on success, less than 0 on error.
  */
-int sqsh_file_reader_advance(
+__attribute__((deprecated(
+		"Since 1.5.0. Use sqsh_file_reader_advance2() instead."))) int
+sqsh_file_reader_advance(
 		struct SqshFileReader *reader, sqsh_index_t offset, size_t size);
+
+/**
+ * @brief Advances the file reader by a certain amount of data and presents
+ * `size` bytes of data to the user.
+ * @memberof SqshFileReader
+ *
+ * @param[in,out] reader The file reader to skip data in.
+ * @param[in] offset The offset to skip.
+ * @param[in] size The size of the data to skip.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+int sqsh_file_reader_advance2(
+		struct SqshFileReader *reader, uint64_t offset, size_t size);
 
 /**
  * @brief Gets a pointer to the current data in the file reader.
@@ -145,6 +162,7 @@ SQSH_NO_UNUSED bool sqsh_file_iterator_next(
 		struct SqshFileIterator *iterator, size_t desired_size, int *err);
 
 /**
+ * @deprecated Since 1.5.0. Use sqsh_file_iterator_skip2() instead.
  * @memberof SqshFileIterator
  * @brief Skips blocks until the block containing the offset is reached.
  * Note that calling this function will invalidate the data pointer returned by
@@ -177,8 +195,48 @@ SQSH_NO_UNUSED bool sqsh_file_iterator_next(
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_UNUSED int sqsh_file_iterator_skip(
+__attribute__((
+		deprecated("Since 1.5.0. Use sqsh_file_iterator_skip2() instead.")))
+SQSH_NO_UNUSED int
+sqsh_file_iterator_skip(
 		struct SqshFileIterator *iterator, sqsh_index_t *offset,
+		size_t desired_size);
+
+/**
+ * @memberof SqshFileIterator
+ * @brief Skips blocks until the block containing the offset is reached.
+ * Note that calling this function will invalidate the data pointer returned by
+ * sqsh_file_iterator_data().
+ *
+ * The offset is relative to the beginning of the current block or, if the
+ * iterator hasn't been forwarded with previous calls to
+ * sqsh_file_iterator_skip() or sqsh_file_iterator_next() the beginning of the
+ * first block.
+ *
+ * After calling this function `offset` is updated to the same position relative
+ * to the new block. See this visualisation:
+ *
+ * ```
+ * current_block: |<--- block 8000 --->|
+ *                           offset = 10000 --^
+ * -->  sqsh_file_iterator_skip(i, &offset, 1)
+ * current_block:                      |<--- block 8000 --->|
+ *                            offset = 2000 --^
+ * ```
+ *
+ * If libsqsh can map more than one block at once, it will do so until
+ * `desired_size` is reached. Note that `desired_size` is only a hint and
+ * libsqsh may return more or less data than requested.
+ *
+ * @param[in,out] iterator      The file iterator to skip data in.
+ * @param[in,out] offset        The offset that is contained in the block to
+ * skip to.
+ * @param[in] desired_size      The desired size of the data to read.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_UNUSED int sqsh_file_iterator_skip2(
+		struct SqshFileIterator *iterator, uint64_t *offset,
 		size_t desired_size);
 
 /**

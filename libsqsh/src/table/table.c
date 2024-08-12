@@ -131,9 +131,8 @@ sqsh_table_get(
 		goto out;
 	}
 
-	// TODO: move *readers* to uint64_t offsets and remove this cast
 	rv = sqsh__metablock_reader_advance(
-			&metablock, (sqsh_index_t)element_offset, table->element_size);
+			&metablock, element_offset, table->element_size);
 	if (rv < 0) {
 		goto out;
 	}

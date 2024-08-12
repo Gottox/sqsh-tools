@@ -96,7 +96,7 @@ struct SqshFile *file = sqsh_open(archive, "/path/to/file.txt", &err);
 assert(err == 0);
 struct SqshFileReader *reader = sqsh_file_reader_new(file, &err);
 assert(err == 0);
-err = sqsh_file_reader_advance(reader, 0, 10);
+err = sqsh_file_reader_advance2(reader, 0, 10);
 assert(err == 0);
 
 const uint8_t *data = sqsh_file_reader_data(reader);

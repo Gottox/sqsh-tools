@@ -46,8 +46,7 @@ metablock_iterator_next(void *iterator, size_t desired_size, int *err) {
 	return sqsh__metablock_iterator_next(iterator, err);
 }
 static int
-metablock_iterator_skip(
-		void *iterator, sqsh_index_t *offset, size_t desired_size) {
+metablock_iterator_skip(void *iterator, uint64_t *offset, size_t desired_size) {
 	(void)desired_size;
 	return sqsh__metablock_iterator_skip(iterator, offset);
 }
@@ -85,7 +84,7 @@ out:
 
 int
 sqsh__metablock_reader_advance(
-		struct SqshMetablockReader *reader, sqsh_index_t offset, size_t size) {
+		struct SqshMetablockReader *reader, uint64_t offset, size_t size) {
 	return sqsh__reader_advance(&reader->reader, offset, size);
 }
 

@@ -187,9 +187,8 @@ sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator, int *err) {
 	}
 
 	/* Load Key Header */
-	// TODO: move *readers* to uint64_t offsets and remove this cast
 	rv = sqsh__metablock_reader_advance(
-			&iterator->metablock, (size_t)iterator->next_offset,
+			&iterator->metablock, iterator->next_offset,
 			sizeof(struct SqshDataXattrKey));
 	if (rv < 0) {
 		goto out;

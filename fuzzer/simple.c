@@ -36,7 +36,7 @@ read_file(const struct SqshTreeTraversal *traversal) {
 		if (chunk_size > size) {
 			chunk_size = size;
 		}
-		rv = sqsh_file_reader_advance(file, advance, chunk_size);
+		rv = sqsh_file_reader_advance2(file, advance, chunk_size);
 		if (rv < 0) {
 			goto out;
 		}

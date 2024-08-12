@@ -44,8 +44,8 @@ file_iterator_next(void *iterator, size_t desired_size, int *err) {
 	return sqsh_file_iterator_next(iterator, desired_size, err);
 }
 static int
-file_iterator_skip(void *iterator, sqsh_index_t *offset, size_t desired_size) {
-	return sqsh_file_iterator_skip(iterator, offset, desired_size);
+file_iterator_skip(void *iterator, uint64_t *offset, size_t desired_size) {
+	return sqsh_file_iterator_skip2(iterator, offset, desired_size);
 }
 static const uint8_t *
 file_iterator_data(const void *iterator) {
@@ -85,6 +85,12 @@ sqsh_file_reader_new(const struct SqshFile *file, int *err) {
 int
 sqsh_file_reader_advance(
 		struct SqshFileReader *reader, sqsh_index_t offset, size_t size) {
+	return sqsh__reader_advance(&reader->reader, offset, size);
+}
+
+int
+sqsh_file_reader_advance2(
+		struct SqshFileReader *reader, uint64_t offset, size_t size) {
 	return sqsh__reader_advance(&reader->reader, offset, size);
 }
 
