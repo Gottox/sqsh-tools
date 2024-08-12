@@ -184,7 +184,7 @@ jobs:
       run: |
         echo "$CROSS_FILE" > cross-file.txt
         meson setup --cross-file cross-file.txt /tmp/build \
-          -Dwerror=false \
+          -Dwerror=true \
           -Dexamples=true \
           -Dtest=false \
           -Ddoc=false
