@@ -125,58 +125,88 @@ out:
 	return rv;
 }
 
+static int
+extract(struct SqshExtractManager *manager, const struct SqshMapReader *reader,
+		struct CxBuffer *buffer) {
+	int rv = 0;
+	struct SqshExtractor extractor = {0};
+	const struct SqshExtractorImpl *extractor_impl = manager->extractor_impl;
+	const uint32_t block_size = manager->block_size;
+	const size_t size = sqsh__map_reader_size(reader);
+
+	rv = cx_buffer_init(buffer);
+	if (rv < 0) {
+		goto out;
+	}
+	const uint8_t *data = sqsh__map_reader_data(reader);
+
+	rv = sqsh__extractor_init(&extractor, buffer, extractor_impl, block_size);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = sqsh__extractor_write(&extractor, data, size);
+	if (rv < 0) {
+		goto out;
+	}
+
+	rv = sqsh__extractor_finish(&extractor);
+	if (rv < 0) {
+		goto out;
+	}
+
+out:
+	if (rv < 0) {
+		cx_buffer_cleanup(buffer);
+	}
+	sqsh__extractor_cleanup(&extractor);
+	return rv;
+}
+
 int
 sqsh__extract_manager_uncompress(
 		struct SqshExtractManager *manager, const struct SqshMapReader *reader,
 		const struct CxBuffer **target) {
 	int rv = 0;
-	struct SqshExtractor extractor = {0};
-	const struct SqshExtractorImpl *extractor_impl = manager->extractor_impl;
-	const uint32_t block_size = manager->block_size;
+	bool locked = false;
 
 	rv = sqsh__mutex_lock(&manager->lock);
 	if (rv < 0) {
 		goto out;
 	}
+	locked = true;
 
 	const uint64_t address = sqsh__map_reader_address(reader);
-	const size_t size = sqsh__map_reader_size(reader);
 
 	*target = cx_rc_radix_tree_retain(&manager->cache, address);
 
 	if (*target == NULL) {
 		struct CxBuffer buffer = {0};
-		rv = cx_buffer_init(&buffer);
+		rv = sqsh__mutex_unlock(&manager->lock);
 		if (rv < 0) {
 			goto out;
 		}
-		const uint8_t *data = sqsh__map_reader_data(reader);
+		locked = false;
 
-		rv = sqsh__extractor_init(
-				&extractor, &buffer, extractor_impl, block_size);
+		rv = extract(manager, reader, &buffer);
 		if (rv < 0) {
-			goto out;
-		}
-
-		rv = sqsh__extractor_write(&extractor, data, size);
-		if (rv < 0) {
-			cx_buffer_cleanup(&buffer);
 			goto out;
 		}
 
-		rv = sqsh__extractor_finish(&extractor);
+		rv = sqsh__mutex_lock(&manager->lock);
 		if (rv < 0) {
-			cx_buffer_cleanup(&buffer);
 			goto out;
 		}
+		locked = true;
 
 		*target = cx_rc_radix_tree_put(&manager->cache, address, &buffer);
 	}
 	rv = cx_lru_touch(&manager->lru, address);
 
 out:
-	sqsh__extractor_cleanup(&extractor);
-	sqsh__mutex_unlock(&manager->lock);
+	if (locked) {
+		sqsh__mutex_unlock(&manager->lock);
+	}
 	return rv;
 }
 
