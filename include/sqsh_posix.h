@@ -35,6 +35,7 @@
 #define SQSH_POSIX_H
 
 #include "sqsh_common.h"
+#include <stdint.h>
 #include <stdio.h>
 
 #ifdef __cplusplus
@@ -48,7 +49,7 @@ struct SqshThreadpool;
 
 typedef void (*sqsh_file_iterator_mt_cb)(
 		const struct SqshFile *file, const struct SqshFileIterator *iterator,
-		sqsh_index_t offset, void *data, int err);
+		uint64_t offset, void *data, int err);
 typedef void (*sqsh_file_to_stream_mt_cb)(
 		const struct SqshFile *file, FILE *stream, void *data, int err);
 

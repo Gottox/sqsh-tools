@@ -115,7 +115,7 @@ iterator_worker(void *data) {
 		goto out;
 	}
 
-	sqsh_index_t offset = block->block_offset;
+	uint64_t offset = block->block_offset;
 	rv = sqsh_file_iterator_skip2(&iterator, &offset, 1);
 	if (rv < 0) {
 		goto out;
@@ -129,11 +129,12 @@ out:
 
 	assert(rv2 == 0);
 
-	const size_t remaining_blocks = atomic_fetch_sub(&mt->remaining_blocks, 1);
 	if (rv < 0) {
 		atomic_store(&mt->rv, rv);
 	}
 
+	size_t remaining_blocks = atomic_fetch_sub(&mt->remaining_blocks, 1);
+	assert(remaining_blocks > 0);
 	if (remaining_blocks == 1) {
 		file_iterator_mt_cleanup(mt, atomic_load(&mt->rv));
 	}
@@ -150,15 +151,19 @@ file_iterator_mt(
 	const uint64_t inode_ref = sqsh_file_inode_ref(file);
 	const struct SqshSuperblock *superblock =
 			sqsh_archive_superblock(file->archive);
-	uint32_t chunk_size = sqsh_superblock_block_size(superblock);
+	uint32_t block_size = sqsh_superblock_block_size(superblock);
 
-	const size_t block_count =
-			SQSH_DIVIDE_CEIL(sqsh_file_size(file), chunk_size);
+	const uint64_t block_count =
+			SQSH_DIVIDE_CEIL(sqsh_file_size(file), block_size);
+	if (block_count > SIZE_MAX) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
 
 	mt->cb = cb;
 	mt->data = data;
-	mt->chunk_size = chunk_size;
-	atomic_init(&mt->remaining_blocks, block_count);
+	mt->chunk_size = block_size;
+	atomic_init(&mt->remaining_blocks, (size_t)block_count);
 	atomic_init(&mt->rv, 0);
 
 	if (block_count == 0) {
@@ -170,7 +175,8 @@ file_iterator_mt(
 		goto out;
 	}
 
-	mt->blocks = calloc(sizeof(struct FileIteratorMtBlock), block_count);
+	mt->blocks =
+			calloc(sizeof(struct FileIteratorMtBlock), (size_t)block_count);
 	if (mt->blocks == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
@@ -185,7 +191,7 @@ file_iterator_mt(
 		if (rv < 0) {
 			goto out;
 		}
-		block_offset += chunk_size;
+		block_offset += block_size;
 	}
 
 out:
@@ -211,7 +217,7 @@ sqsh_file_iterator_mt(
 static void
 stream_worker(
 		const struct SqshFile *file, const struct SqshFileIterator *iterator,
-		sqsh_index_t offset, void *data, int err) {
+		uint64_t offset, void *data, int err) {
 	int rv = 0, rv2 = 0;
 	FILE *stream = NULL;
 	struct FileToStreamMt *mt = data;
