@@ -42,7 +42,6 @@ sqsh__extract_view_init(
 		const struct SqshMapReader *reader) {
 	int rv = 0;
 	view->manager = manager;
-	view->offset = 0;
 	view->buffer = NULL;
 
 	rv = sqsh__extract_manager_uncompress(manager, reader, &view->buffer);
@@ -61,8 +60,7 @@ out:
 
 const uint8_t *
 sqsh__extract_view_data(const struct SqshExtractView *view) {
-	const uint8_t *data = cx_buffer_data(view->buffer);
-	return &data[view->offset];
+	return cx_buffer_data(view->buffer);
 }
 
 size_t
@@ -79,6 +77,5 @@ sqsh__extract_view_cleanup(struct SqshExtractView *view) {
 	}
 	view->buffer = NULL;
 	view->size = 0;
-	view->offset = 0;
 	return rv;
 }

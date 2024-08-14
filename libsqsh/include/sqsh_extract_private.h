@@ -254,7 +254,6 @@ struct SqshExtractView {
 	 */
 	struct SqshExtractManager *manager;
 	const struct CxBuffer *buffer;
-	size_t offset;
 	size_t size;
 };
 
