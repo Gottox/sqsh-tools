@@ -176,7 +176,7 @@ struct SqshExtractManager {
 	/**
 	 * @privatesection
 	 */
-	struct CxRcHashMap hash_map;
+	struct CxRcRadixTree cache;
 	const struct SqshExtractorImpl *extractor_impl;
 	uint32_t block_size;
 	struct SqshMapManager *map_manager;
@@ -222,12 +222,12 @@ SQSH_NO_EXPORT int sqsh__extract_manager_uncompress(
  * @brief releases a buffer retrieved by sqsh__extract_manager_uncompress.
  *
  * @param[in] manager The manager to use.
- * @param[in] buffer  The buffer to release.
+ * @param[in] address The address of the buffer to release.
  *
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_EXPORT int sqsh__extract_manager_release(
-		struct SqshExtractManager *manager, const struct CxBuffer *buffer);
+		struct SqshExtractManager *manager, uint64_t address);
 
 /**
  * @internal
@@ -254,6 +254,7 @@ struct SqshExtractView {
 	 */
 	struct SqshExtractManager *manager;
 	const struct CxBuffer *buffer;
+	uint64_t address;
 	size_t size;
 };
 
