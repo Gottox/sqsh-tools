@@ -60,23 +60,6 @@ is_initialized(const struct SqshArchive *archive, enum InitializedBitmap mask) {
 	return archive->initialized & mask;
 }
 
-static uint64_t
-get_data_segment_size(const struct SqshSuperblock *superblock) {
-	const uint64_t inode_table_start =
-			sqsh_superblock_inode_table_start(superblock);
-	uint64_t res;
-	/* BUG: This function does not return exact results. It may report values
-	 * that are too large, as it does not take into account the size of the
-	 * compression options. This is not a problem for the current implementation
-	 * as this size is only used for finding upper limits for the extract
-	 * manager. */
-	if (SQSH_SUB_OVERFLOW(
-				inode_table_start, sizeof(struct SqshDataSuperblock), &res)) {
-		return inode_table_start;
-	}
-	return res;
-}
-
 struct SqshArchive *
 sqsh_archive_open(
 		const void *source, const struct SqshConfig *config, int *err) {
@@ -153,24 +136,9 @@ sqsh__archive_init(
 		goto out;
 	}
 
-	uint64_t range;
-	if (SQSH_SUB_OVERFLOW(
-				sqsh_superblock_bytes_used(&archive->superblock),
-				get_data_segment_size(&archive->superblock), &range)) {
-		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
-		goto out;
-	}
-	const uint64_t metablock_capacity = SQSH_DIVIDE_CEIL(
-			range,
-			sizeof(struct SqshDataMetablock) + SQSH_METABLOCK_BLOCK_SIZE);
-	if (metablock_capacity > SIZE_MAX) {
-		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
-		goto out;
-	}
 	rv = sqsh__extract_manager_init(
 			&archive->metablock_extract_manager, archive,
-			SQSH_METABLOCK_BLOCK_SIZE, (size_t)metablock_capacity,
-			metablock_lru_size);
+			SQSH_METABLOCK_BLOCK_SIZE, metablock_lru_size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -214,19 +182,12 @@ sqsh__archive_data_extract_manager(
 	if (!is_initialized(archive, INITIALIZED_DATA_COMPRESSION_MANAGER)) {
 		const struct SqshSuperblock *superblock =
 				sqsh_archive_superblock(archive);
-		const uint64_t range = get_data_segment_size(superblock);
-		const uint64_t capacity =
-				SQSH_DIVIDE_CEIL(range, sqsh_superblock_block_size(superblock));
 		const uint32_t datablock_blocksize =
 				sqsh_superblock_block_size(superblock);
-		if (capacity > SIZE_MAX) {
-			rv = -SQSH_ERROR_INTEGER_OVERFLOW;
-			goto out;
-		}
 
 		rv = sqsh__extract_manager_init(
 				&archive->data_extract_manager, archive, datablock_blocksize,
-				(size_t)capacity, data_lru_size);
+				data_lru_size);
 		if (rv < 0) {
 			goto out;
 		}

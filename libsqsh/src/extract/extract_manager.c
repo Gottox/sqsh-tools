@@ -41,39 +41,6 @@
 #include <sqsh_mapper.h>
 #include <sqsh_mapper_private.h>
 
-/**
- * Calculates pow(x,y) % mod
- */
-static uint64_t
-mod_power(uint64_t x, uint64_t y, uint64_t mod) {
-	uint64_t res = 1;
-
-	for (; y; y = y >> 1) {
-		if (y & 1) {
-			res = (res * x) % mod;
-		}
-
-		x = (x * x) % mod;
-	}
-
-	return res;
-}
-
-static bool
-maybe_prime(uint64_t n) {
-	static const uint64_t a = 2;
-
-	return mod_power(a, n - 1, n) == 1;
-}
-
-static size_t
-find_next_maybe_prime(size_t n) {
-	for (; maybe_prime(n) == false; n++) {
-	}
-
-	return n;
-}
-
 static void
 buffer_cleanup(void *buffer) {
 	cx_buffer_cleanup(buffer);
@@ -82,7 +49,7 @@ buffer_cleanup(void *buffer) {
 SQSH_NO_UNUSED int
 sqsh__extract_manager_init(
 		struct SqshExtractManager *manager, struct SqshArchive *archive,
-		uint32_t block_size, size_t size, size_t lru_size) {
+		uint32_t block_size, size_t lru_size) {
 	int rv;
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 	enum SqshSuperblockCompressionId compression_id =
@@ -92,13 +59,6 @@ sqsh__extract_manager_init(
 	if (manager->extractor_impl == NULL) {
 		return -SQSH_ERROR_COMPRESSION_UNSUPPORTED;
 	}
-
-	if (size == 0) {
-		return -SQSH_ERROR_SIZE_MISMATCH;
-	}
-
-	/* Give a bit of room to avoid too many key hash collisions */
-	size = find_next_maybe_prime(2 * size);
 
 	rv = sqsh__mutex_init(&manager->lock);
 	if (rv < 0) {

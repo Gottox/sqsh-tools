@@ -59,7 +59,7 @@ UTEST(directory_iterator, decompress) {
 	rv = sqsh__map_reader_advance(&reader, 0, CHUNK_SIZE(ZLIB_ABCD));
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh__extract_manager_init(&manager, &archive, 8192, 10, 128);
+	rv = sqsh__extract_manager_init(&manager, &archive, 8192, 128);
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__extract_manager_uncompress(&manager, &reader, &buffer);
@@ -94,7 +94,7 @@ UTEST(directory_iterator, decompress_and_cached) {
 	rv = sqsh__map_reader_advance(&reader, 0, CHUNK_SIZE(ZLIB_ABCD));
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh__extract_manager_init(&manager, &archive, 8192, 10, 128);
+	rv = sqsh__extract_manager_init(&manager, &archive, 8192, 128);
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__extract_manager_uncompress(&manager, &reader, &buffer);
