@@ -33,10 +33,10 @@
 
 #include <sqshtools_common.h>
 
+#include <cextras/concurrency.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <libgen.h>
-#include <semaphore.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -48,7 +48,7 @@
 typedef int (*extract_fn)(
 		const char *, enum SqshFileType, const struct SqshFile *);
 
-sem_t file_descriptor_sem;
+struct CxSemaphore file_descriptor_sem;
 size_t extracted_files = 0;
 bool do_chown = false;
 bool verbose = false;
@@ -189,7 +189,7 @@ extract_file_after(
 	fclose(stream);
 	rv = update_metadata(data->path, file);
 out:
-	sem_post(&file_descriptor_sem);
+	cx_semaphore_post(&file_descriptor_sem);
 	if (rv < 0) {
 		sqsh_perror(rv, data->path);
 	}
@@ -214,7 +214,7 @@ extract_file(const char *path, const struct SqshFile *file) {
 	}
 	strcpy(data->tmp_filename, ".sqsh-unpack-XXXXXX");
 
-	rv = sem_wait(&file_descriptor_sem);
+	rv = cx_semaphore_wait(&file_descriptor_sem);
 	if (rv < 0) {
 		rv = -errno;
 		perror(path);
@@ -508,9 +508,9 @@ main(int argc, char *argv[]) {
 		goto out;
 	}
 	// Leave some file descriptors for the rest of the system
-	rv = sem_init(&file_descriptor_sem, 0, limits.rlim_cur - 32);
+	rv = cx_semaphore_init(&file_descriptor_sem, limits.rlim_cur - 32);
 	if (rv < 0) {
-		perror("sem_init");
+		perror("cx_semaphore_init");
 		rv = EXIT_FAILURE;
 		goto out;
 	}
@@ -552,7 +552,7 @@ main(int argc, char *argv[]) {
 		rv = extract_all(target_path, src_root, extract_second_pass);
 	}
 out:
-	sem_destroy(&file_descriptor_sem);
+	cx_semaphore_destroy(&file_descriptor_sem);
 	sqsh_threadpool_free(threadpool);
 	sqsh_close(src_root);
 	sqsh_archive_close(sqsh);

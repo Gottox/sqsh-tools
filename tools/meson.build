@@ -10,6 +10,11 @@ tool_sources = [
     'src/unpack.c',
 ]
 
+tool_dependencies = [
+    libsqsh_dep,
+    cextras_dep,
+]
+
 c_args = ['-DVERSION="@0@"'.format(meson.project_version())]
 
 tools = {}
@@ -21,7 +26,7 @@ foreach src : tool_sources
         c_args: c_args,
         include_directories: tools_private_include,
         install: not meson.is_subproject(),
-        dependencies: libsqsh_dep,
+        dependencies: tool_dependencies,
     )
     tools += {tool_name: tool}
 endforeach
@@ -33,7 +38,7 @@ if fuse3_dep.found()
         c_args: c_args,
         include_directories: tools_private_include,
         install: not meson.is_subproject(),
-        dependencies: [libsqsh_dep, fuse3_dep],
+        dependencies: tool_dependencies + [fuse3_dep],
     )
     tools += {'sqshfs': tool}
 endif
@@ -50,7 +55,7 @@ if fuse2_dep.found()
         c_args: c_args,
         include_directories: tools_private_include,
         install: not meson.is_subproject() and not fuse3_dep.found(),
-        dependencies: [libsqsh_dep, fuse2_dep],
+        dependencies: tool_dependencies + [fuse2_dep],
     )
     tools += {'sqshfs2': tool}
 endif
