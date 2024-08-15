@@ -256,11 +256,14 @@ sqsh_file_to_stream_mt(
 	struct FileToStreamMt *mt = calloc(sizeof(struct FileToStreamMt), 1);
 	if (mt == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
 	}
-	mt->stream = stream;
 	mt->cb = cb;
 	mt->data = data;
+	mt->stream = stream;
 	mt->fd = fileno(stream);
-
 	file_iterator_mt(&mt->mt, file, threadpool, stream_worker, mt, rv);
+
+out:
+	return rv;
 }
