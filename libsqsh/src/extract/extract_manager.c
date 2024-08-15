@@ -169,6 +169,7 @@ sqsh__extract_manager_uncompress(
 		const struct CxBuffer **target) {
 	int rv = 0;
 	bool locked = false;
+	struct CxBuffer *buffer = NULL;
 
 	rv = sqsh__mutex_lock(&manager->lock);
 	if (rv < 0) {
@@ -178,17 +179,17 @@ sqsh__extract_manager_uncompress(
 
 	const uint64_t address = sqsh__map_reader_address(reader);
 
-	*target = cx_rc_radix_tree_retain(&manager->cache, address);
+	buffer = cx_rc_radix_tree_retain(&manager->cache, address);
 
-	if (*target == NULL) {
-		struct CxBuffer buffer = {0};
+	if (buffer == NULL) {
+		struct CxBuffer tmp_buffer = {0};
 		rv = sqsh__mutex_unlock(&manager->lock);
 		if (rv < 0) {
 			goto out;
 		}
 		locked = false;
 
-		rv = extract(manager, reader, &buffer);
+		rv = extract(manager, reader, &tmp_buffer);
 		if (rv < 0) {
 			goto out;
 		}
@@ -199,9 +200,10 @@ sqsh__extract_manager_uncompress(
 		}
 		locked = true;
 
-		*target = cx_rc_radix_tree_put(&manager->cache, address, &buffer);
+		buffer = cx_rc_radix_tree_put(&manager->cache, address, &tmp_buffer);
 	}
-	rv = cx_lru_touch(&manager->lru, address);
+	rv = cx_lru_touch_value(&manager->lru, address, buffer);
+	*target = buffer;
 
 out:
 	if (locked) {
