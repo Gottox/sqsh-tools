@@ -74,7 +74,7 @@ int sqsh_file_to_stream(const struct SqshFile *file, FILE *stream);
  * @param[in] cb The callback to call when the operation is done.
  * @param[in] data The data to pass to the callback.
  */
-void sqsh_file_to_stream_mt(
+SQSH_NO_UNUSED int sqsh_file_to_stream_mt(
 		const struct SqshFile *file, struct SqshThreadpool *threadpool,
 		FILE *stream, sqsh_file_to_stream_mt_cb cb, void *data);
 

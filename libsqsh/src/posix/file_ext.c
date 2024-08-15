@@ -247,7 +247,7 @@ out:
 	}
 }
 
-void
+int
 sqsh_file_to_stream_mt(
 		const struct SqshFile *file, struct SqshThreadpool *threadpool,
 		FILE *stream, sqsh_file_to_stream_mt_cb cb, void *data) {

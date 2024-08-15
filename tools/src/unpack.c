@@ -243,12 +243,11 @@ extract_file(const char *path, const struct SqshFile *file) {
 	}
 	fd = -1;
 
-	sqsh_file_to_stream_mt(file, threadpool, stream, extract_file_after, data);
-	// rv = sqsh_file_to_stream(file, stream);
-	// if (rv < 0) {
-	//	goto out;
-	// }
-	// extract_file_after(file, stream, data, rv);
+	rv = sqsh_file_to_stream_mt(
+			file, threadpool, stream, extract_file_after, data);
+	if (rv < 0) {
+		goto out;
+	}
 out:
 	if (rv < 0) {
 		sqsh_perror(rv, path);
