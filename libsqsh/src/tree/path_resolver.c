@@ -185,6 +185,9 @@ sqsh__path_resolver_to_ref(
 		struct SqshPathResolver *resolver, uint64_t inode_ref) {
 	int rv = 0;
 	rv = sqsh__file_cleanup(&resolver->cwd);
+	if (rv < 0) {
+		goto out;
+	}
 
 	rv = sqsh__file_init(&resolver->cwd, resolver->archive, inode_ref);
 	if (rv < 0) {
