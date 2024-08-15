@@ -36,6 +36,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <libgen.h>
+#include <semaphore.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,7 +48,7 @@
 typedef int (*extract_fn)(
 		const char *, enum SqshFileType, const struct SqshFile *);
 
-size_t max_open_files = 0;
+sem_t file_descriptor_sem;
 size_t extracted_files = 0;
 bool do_chown = false;
 bool verbose = false;
@@ -188,6 +189,7 @@ extract_file_after(
 	fclose(stream);
 	rv = update_metadata(data->path, file);
 out:
+	sem_post(&file_descriptor_sem);
 	if (rv < 0) {
 		sqsh_perror(rv, data->path);
 	}
@@ -211,6 +213,13 @@ extract_file(const char *path, const struct SqshFile *file) {
 	}
 	strcpy(data->tmp_filename, ".sqsh-unpack-XXXXXX");
 
+	rv = sem_wait(&file_descriptor_sem);
+	if (rv < 0) {
+		rv = -errno;
+		perror(path);
+		goto out;
+	}
+
 	int fd = mkstemp(data->tmp_filename);
 	if (fd < 0) {
 		rv = -errno;
@@ -232,14 +241,6 @@ extract_file(const char *path, const struct SqshFile *file) {
 		goto out;
 	}
 	fd = -1;
-
-	extracted_files++;
-	if (extracted_files % max_open_files == 0) {
-		rv = sqsh_threadpool_wait(threadpool);
-		if (rv < 0) {
-			goto out;
-		}
-	}
 
 	sqsh_file_to_stream_mt(file, threadpool, stream, extract_file_after, data);
 	// rv = sqsh_file_to_stream(file, stream);
@@ -506,7 +507,13 @@ main(int argc, char *argv[]) {
 		rv = EXIT_FAILURE;
 		goto out;
 	}
-	max_open_files = limits.rlim_cur / 2;
+	// Leave some file descriptors for the rest of the system
+	rv = sem_init(&file_descriptor_sem, 0, limits.rlim_cur - 32);
+	if (rv < 0) {
+		perror("sem_init");
+		rv = EXIT_FAILURE;
+		goto out;
+	}
 
 	src_root = sqsh_lopen(sqsh, src_path, &rv);
 	if (rv < 0) {
@@ -545,6 +552,7 @@ main(int argc, char *argv[]) {
 		rv = extract_all(target_path, src_root, extract_second_pass);
 	}
 out:
+	sem_destroy(&file_descriptor_sem);
 	sqsh_threadpool_free(threadpool);
 	sqsh_close(src_root);
 	sqsh_archive_close(sqsh);
