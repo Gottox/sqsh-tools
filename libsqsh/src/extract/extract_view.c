@@ -31,10 +31,10 @@
  * @file         extract_view.c
  */
 
-#include <sqsh_extract_private.h>
-
 #include <sqsh_common_private.h>
 #include <sqsh_error.h>
+#include <sqsh_extract_private.h>
+#include <sqsh_mapper_private.h>
 
 int
 sqsh__extract_view_init(
@@ -43,6 +43,7 @@ sqsh__extract_view_init(
 	int rv = 0;
 	view->manager = manager;
 	view->buffer = NULL;
+	view->address = sqsh__map_reader_address(reader);
 
 	rv = sqsh__extract_manager_uncompress(manager, reader, &view->buffer);
 	if (rv < 0) {
@@ -73,7 +74,7 @@ sqsh__extract_view_cleanup(struct SqshExtractView *view) {
 	int rv = 0;
 
 	if (view->manager != NULL) {
-		rv = sqsh__extract_manager_release(view->manager, view->buffer);
+		rv = sqsh__extract_manager_release(view->manager, view->address);
 	}
 	view->buffer = NULL;
 	view->size = 0;

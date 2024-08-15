@@ -59,7 +59,7 @@ UTEST(directory_iterator, decompress) {
 	rv = sqsh__map_reader_advance(&reader, 0, CHUNK_SIZE(ZLIB_ABCD));
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh__extract_manager_init(&manager, &archive, 8192, 10, 128);
+	rv = sqsh__extract_manager_init(&manager, &archive, 8192, 128);
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__extract_manager_uncompress(&manager, &reader, &buffer);
@@ -69,7 +69,7 @@ UTEST(directory_iterator, decompress) {
 	ASSERT_EQ(0, memcmp(cx_buffer_data(buffer), "abcd", 4));
 
 	sqsh__map_reader_cleanup(&reader);
-	sqsh__extract_manager_release(&manager, buffer);
+	sqsh__extract_manager_release(&manager, sizeof(struct SqshDataSuperblock));
 	sqsh__extract_manager_cleanup(&manager);
 	sqsh__archive_cleanup(&archive);
 }
@@ -94,7 +94,7 @@ UTEST(directory_iterator, decompress_and_cached) {
 	rv = sqsh__map_reader_advance(&reader, 0, CHUNK_SIZE(ZLIB_ABCD));
 	ASSERT_EQ(0, rv);
 
-	rv = sqsh__extract_manager_init(&manager, &archive, 8192, 10, 128);
+	rv = sqsh__extract_manager_init(&manager, &archive, 8192, 128);
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__extract_manager_uncompress(&manager, &reader, &buffer);
@@ -108,8 +108,8 @@ UTEST(directory_iterator, decompress_and_cached) {
 	ASSERT_EQ(cached_buffer, buffer);
 
 	sqsh__map_reader_cleanup(&reader);
-	sqsh__extract_manager_release(&manager, buffer);
-	sqsh__extract_manager_release(&manager, cached_buffer);
+	sqsh__extract_manager_release(&manager, sizeof(struct SqshDataSuperblock));
+	sqsh__extract_manager_release(&manager, sizeof(struct SqshDataSuperblock));
 	sqsh__extract_manager_cleanup(&manager);
 	sqsh__archive_cleanup(&archive);
 }

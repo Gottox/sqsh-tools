@@ -28,79 +28,36 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_posix.h
+ * @file         thread_pool.c
  */
 
-#ifndef SQSH_POSIX_H
-#define SQSH_POSIX_H
+#define _DEFAULT_SOURCE
 
-#include "sqsh_common.h"
-#include <stdint.h>
-#include <stdio.h>
+#include <sqsh_common_private.h>
+#include <sqsh_error.h>
+#include <sqsh_posix_private.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-struct SqshFile;
-struct SqshFileIterator;
-
-struct SqshThreadpool;
-
-typedef void (*sqsh_file_iterator_mt_cb)(
-		const struct SqshFile *file, const struct SqshFileIterator *iterator,
-		uint64_t offset, void *data, int err);
-typedef void (*sqsh_file_to_stream_mt_cb)(
-		const struct SqshFile *file, FILE *stream, void *data, int err);
-
-/**
- * @memberof SqshFile
- * @brief writes data to a file descriptor.
- *
- * @param[in] file The file context.
- * @param[in] stream The descriptor to write the file contents to.
- *
- * @return The number of bytes read on success, less than 0 on error.
- */
-int sqsh_file_to_stream(const struct SqshFile *file, FILE *stream);
-
-/**
- * @memberof SqshFile
- * @brief writes data to a file descriptor.
- *
- * @param[in] file The file context.
- * @param[in] threadpool The threadpool to use.
- * @param[in] stream The descriptor to write the file contents to.
- * @param[in] cb The callback to call when the operation is done.
- * @param[in] data The data to pass to the callback.
- */
-SQSH_NO_UNUSED int sqsh_file_to_stream_mt(
-		const struct SqshFile *file, struct SqshThreadpool *threadpool,
-		FILE *stream, sqsh_file_to_stream_mt_cb cb, void *data);
-
-struct SqshThreadpool *sqsh_threadpool_new(size_t threads, int *err);
-
-int sqsh_threadpool_wait(struct SqshThreadpool *pool);
-
-/**
- * @memberof SqshThreadpool
- * @brief cleans up a threadpool.
- *
- * @param[in] pool The threadpool to uclean.
- * @return The threadpool on success, NULL on error.
- */
-int sqsh__threadpool_cleanup(struct SqshThreadpool *pool);
-
-/**
- * @memberof SqshThreadpool
- * @brief creates a new threadpool.
- *
- * @param[in] pool The threadpool to free.
- * @return 0 on success, less than 0 on error.
- */
-int sqsh_threadpool_free(struct SqshThreadpool *pool);
-
-#ifdef __cplusplus
+int
+sqsh__threadpool_init(struct SqshThreadpool *pool, size_t threads) {
+	return cx_threadpool_init(&pool->pool, threads);
 }
-#endif
-#endif /* SQSH_POSIX_H */
+
+struct SqshThreadpool *
+sqsh_threadpool_new(size_t threads, int *err) {
+	SQSH_NEW_IMPL(sqsh__threadpool_init, struct SqshThreadpool, threads);
+}
+
+int
+sqsh__threadpool_cleanup(struct SqshThreadpool *pool) {
+	return cx_threadpool_cleanup(&pool->pool);
+}
+
+int
+sqsh_threadpool_wait(struct SqshThreadpool *pool) {
+	return cx_threadpool_wait(&pool->pool);
+}
+
+int
+sqsh_threadpool_free(struct SqshThreadpool *pool) {
+	SQSH_FREE_IMPL(sqsh__threadpool_cleanup, pool);
+}

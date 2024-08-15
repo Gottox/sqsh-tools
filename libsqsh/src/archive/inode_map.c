@@ -122,6 +122,7 @@ static uint64_t
 dyn_map_get(const struct SqshInodeMap *map, uint32_t inode_number, int *err) {
 	int rv = 0;
 	uint64_t inode_ref = 0;
+	bool locked = false;
 
 	if (inode_number == 0 || inode_number - 1 >= map->inode_count) {
 		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
@@ -131,6 +132,7 @@ dyn_map_get(const struct SqshInodeMap *map, uint32_t inode_number, int *err) {
 	if (rv < 0) {
 		goto out;
 	}
+	locked = true;
 
 	sqsh_index_t index = inode_number - 1;
 	sqsh_index_t inner_index = index & 0xff;
@@ -148,12 +150,10 @@ dyn_map_get(const struct SqshInodeMap *map, uint32_t inode_number, int *err) {
 		inode_ref = 0;
 		goto out;
 	}
-	rv = sqsh__mutex_unlock(map->mutex);
-	if (rv < 0) {
-		goto out;
-	}
-
 out:
+	if (locked) {
+		sqsh__mutex_unlock(map->mutex);
+	}
 	if (err != NULL) {
 		*err = rv;
 	}

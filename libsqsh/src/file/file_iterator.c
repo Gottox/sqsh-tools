@@ -261,6 +261,11 @@ out:
 }
 
 bool
+sqsh_file_iterator_is_zero_block(const struct SqshFileIterator *iterator) {
+	return iterator->sparse_size > 0;
+}
+
+bool
 sqsh_file_iterator_next(
 		struct SqshFileIterator *iterator, size_t desired_size, int *err) {
 	int rv = 0;
@@ -279,7 +284,7 @@ sqsh_file_iterator_next(
 		desired_size = 1;
 	}
 
-	if (iterator->sparse_size > 0) {
+	if (sqsh_file_iterator_is_zero_block(iterator)) {
 		rv = map_zero_block(iterator);
 	} else if (iterator->block_index < block_count) {
 		rv = map_block(iterator, desired_size);

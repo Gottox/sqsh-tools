@@ -32,12 +32,19 @@
  */
 
 #define _DEFAULT_SOURCE
+#define _FILE_OFFSET_BITS 64
 
-#include <sqsh_file_private.h>
-#include <sqsh_posix.h>
-
+#include <assert.h>
 #include <errno.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <unistd.h>
+
+#include <sqsh_archive.h>
+#include <sqsh_common_private.h>
+#include <sqsh_error.h>
+#include <sqsh_file_private.h>
+#include <sqsh_posix_private.h>
 
 int
 sqsh_file_to_stream(const struct SqshFile *file, FILE *stream) {
@@ -61,5 +68,202 @@ sqsh_file_to_stream(const struct SqshFile *file, FILE *stream) {
 
 out:
 	sqsh__file_iterator_cleanup(&iterator);
+	return rv;
+}
+
+struct FileIteratorMtBlock {
+	struct FileIteratorMt *mt;
+	uint64_t block_offset;
+};
+
+struct FileIteratorMt {
+	struct SqshFile file;
+	sqsh_file_iterator_mt_cb cb;
+	uint32_t chunk_size;
+	void *data;
+	atomic_int rv;
+	atomic_size_t remaining_blocks;
+
+	struct FileIteratorMtBlock *blocks;
+};
+
+struct FileToStreamMt {
+	struct FileIteratorMt mt;
+	sqsh_file_to_stream_mt_cb cb;
+	void *data;
+	FILE *stream;
+	int fd;
+};
+
+static void
+file_iterator_mt_cleanup(struct FileIteratorMt *mt, int rv) {
+	mt->cb(&mt->file, NULL, 0, mt->data, rv);
+	sqsh__file_cleanup(&mt->file);
+	free(mt->blocks);
+	free(mt);
+}
+
+static void
+iterator_worker(void *data) {
+	int rv = 0, rv2 = 0;
+	struct SqshFileIterator iterator = {0};
+
+	struct FileIteratorMtBlock *block = data;
+	struct FileIteratorMt *mt = block->mt;
+
+	rv = sqsh__file_iterator_init(&iterator, &mt->file);
+	if (rv < 0) {
+		goto out;
+	}
+
+	uint64_t offset = block->block_offset;
+	rv = sqsh_file_iterator_skip2(&iterator, &offset, 1);
+	if (rv < 0) {
+		goto out;
+	}
+	assert(offset == 0);
+
+	mt->cb(&mt->file, &iterator, block->block_offset, mt->data, rv);
+
+out:
+	sqsh__file_iterator_cleanup(&iterator);
+
+	assert(rv2 == 0);
+
+	if (rv < 0) {
+		atomic_store(&mt->rv, rv);
+	}
+
+	size_t remaining_blocks = atomic_fetch_sub(&mt->remaining_blocks, 1);
+	assert(remaining_blocks > 0);
+	if (remaining_blocks == 1) {
+		file_iterator_mt_cleanup(mt, atomic_load(&mt->rv));
+	}
+}
+
+static void
+file_iterator_mt(
+		struct FileIteratorMt *mt, const struct SqshFile *file,
+		struct SqshThreadpool *threadpool, sqsh_file_iterator_mt_cb cb,
+		void *data, int rv) {
+	if (rv < 0) {
+		goto out;
+	}
+	const uint64_t inode_ref = sqsh_file_inode_ref(file);
+	const struct SqshSuperblock *superblock =
+			sqsh_archive_superblock(file->archive);
+	uint32_t block_size = sqsh_superblock_block_size(superblock);
+
+	const uint64_t block_count =
+			SQSH_DIVIDE_CEIL(sqsh_file_size(file), block_size);
+	if (block_count > SIZE_MAX) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
+
+	mt->cb = cb;
+	mt->data = data;
+	mt->chunk_size = block_size;
+	atomic_init(&mt->remaining_blocks, (size_t)block_count);
+	atomic_init(&mt->rv, 0);
+
+	if (block_count == 0) {
+		goto out;
+	}
+
+	rv = sqsh__file_init(&mt->file, file->archive, inode_ref);
+	if (rv < 0) {
+		goto out;
+	}
+
+	mt->blocks =
+			calloc(sizeof(struct FileIteratorMtBlock), (size_t)block_count);
+	if (mt->blocks == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
+	}
+
+	size_t block_offset = 0;
+	for (sqsh_index_t i = 0; i < block_count; i++) {
+		mt->blocks[i].mt = mt;
+		mt->blocks[i].block_offset = block_offset;
+		rv = cx_threadpool_schedule(
+				&threadpool->pool, iterator_worker, &mt->blocks[i]);
+		if (rv < 0) {
+			goto out;
+		}
+		block_offset += block_size;
+	}
+
+out:
+	if (rv < 0 || block_count == 0) {
+		file_iterator_mt_cleanup(mt, rv);
+	}
+}
+
+void
+sqsh_file_iterator_mt(
+		const struct SqshFile *file, struct SqshThreadpool *threadpool,
+		sqsh_file_iterator_mt_cb cb, void *data) {
+	int rv = 0;
+
+	struct FileIteratorMt *mt = calloc(sizeof(struct FileIteratorMt), 1);
+	if (mt == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+	}
+
+	file_iterator_mt(mt, file, threadpool, cb, data, rv);
+}
+
+static void
+stream_worker(
+		const struct SqshFile *file, const struct SqshFileIterator *iterator,
+		uint64_t offset, void *data, int err) {
+	int rv = 0;
+	struct FileToStreamMt *mt = data;
+	if (iterator == NULL) {
+		mt->cb(file, mt->stream, mt->data, err);
+		return;
+	}
+
+	off_t written = 0;
+	const uint8_t *iterator_data = sqsh_file_iterator_data(iterator);
+	const size_t iterator_size = sqsh_file_iterator_size(iterator);
+
+	while ((uint64_t)written != iterator_size) {
+		ssize_t chunk_written = pwrite(
+				mt->fd, iterator_data + written,
+				iterator_size - (size_t)written, (off_t)offset + written);
+		if (chunk_written < 0) {
+			rv = -errno;
+			goto out;
+		}
+		written += chunk_written;
+	}
+
+out:
+	if (rv < 0) {
+		atomic_store(&mt->mt.rv, rv);
+	}
+}
+
+int
+sqsh_file_to_stream_mt(
+		const struct SqshFile *file, struct SqshThreadpool *threadpool,
+		FILE *stream, sqsh_file_to_stream_mt_cb cb, void *data) {
+	int rv = 0;
+
+	struct FileToStreamMt *mt = calloc(sizeof(struct FileToStreamMt), 1);
+	if (mt == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
+	}
+	mt->cb = cb;
+	mt->data = data;
+	mt->stream = stream;
+	mt->fd = fileno(stream);
+	file_iterator_mt(&mt->mt, file, threadpool, stream_worker, mt, rv);
+
+out:
 	return rv;
 }

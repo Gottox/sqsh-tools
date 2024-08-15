@@ -36,16 +36,24 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <libgen.h>
+#include <semaphore.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/resource.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <utime.h>
 
+typedef int (*extract_fn)(
+		const char *, enum SqshFileType, const struct SqshFile *);
+
+sem_t file_descriptor_sem;
+size_t extracted_files = 0;
 bool do_chown = false;
 bool verbose = false;
 const char *image_path;
+struct SqshThreadpool *threadpool;
 
 static void (*print_segment)(const char *segment, size_t segment_size) =
 		print_raw;
@@ -71,7 +79,41 @@ static const struct option long_opts[] = {
 };
 
 static int
-prepare_dir(const char *path) {
+update_metadata(const char *path, const struct SqshFile *file) {
+	int rv = 0;
+	struct timespec times[2] = {0};
+
+	times[0].tv_sec = times[1].tv_sec = sqsh_file_modified_time(file);
+	rv = utimensat(AT_FDCWD, path, times, AT_SYMLINK_NOFOLLOW);
+	if (rv < 0) {
+		perror(path);
+		goto out;
+	}
+
+	uint16_t mode = sqsh_file_permission(file);
+	rv = fchmodat(AT_FDCWD, path, mode, AT_SYMLINK_NOFOLLOW);
+	if (rv < 0) {
+		perror(path);
+		goto out;
+	}
+
+	if (do_chown) {
+		const uint32_t uid = sqsh_file_uid(file);
+		const uint32_t gid = sqsh_file_gid(file);
+
+		rv = chown(path, uid, gid);
+		if (rv < 0) {
+			perror(path);
+			goto out;
+		}
+	}
+
+out:
+	return rv;
+}
+
+static int
+extract_dir(const char *path) {
 	int rv = 0;
 	rv = mkdir(path, 0700);
 	if (rv < 0 && errno == EEXIST) {
@@ -97,7 +139,7 @@ out:
 }
 
 static int
-extract_dir(const char *path, const struct SqshFile *file) {
+update_metadata_dir(const char *path, const struct SqshFile *file) {
 	// The directory should already be created by prepare_dir(), so we just
 	// apply the permissions.
 	int rv = 0;
@@ -107,46 +149,112 @@ extract_dir(const char *path, const struct SqshFile *file) {
 		goto out;
 	}
 
+	rv = update_metadata(path, file);
 out:
 	return rv;
+}
+
+struct ExtractFileData {
+	char tmp_filename[32];
+	char *path;
+};
+
+static void
+extract_file_cleanup(struct ExtractFileData *data, FILE *stream) {
+	if (data == NULL) {
+		return;
+	}
+	if (stream != NULL) {
+		fclose(stream);
+	}
+	free(data->path);
+	free(data);
+}
+static void
+extract_file_after(
+		const struct SqshFile *file, FILE *stream, void *d, int err) {
+	(void)stream;
+	int rv = 0;
+	struct ExtractFileData *data = d;
+	if (err < 0) {
+		sqsh_perror(err, data->path);
+	}
+
+	rv = rename(data->tmp_filename, data->path);
+	if (rv < 0) {
+		rv = -errno;
+		goto out;
+	}
+
+	fclose(stream);
+	rv = update_metadata(data->path, file);
+out:
+	sem_post(&file_descriptor_sem);
+	if (rv < 0) {
+		sqsh_perror(rv, data->path);
+	}
+	extract_file_cleanup(data, NULL);
 }
 
 static int
 extract_file(const char *path, const struct SqshFile *file) {
 	int rv = 0;
+	int fd = -1;
 	FILE *stream = NULL;
-	char tmp_filename[] = ".sqsh-unpack-XXXXXX";
+	struct ExtractFileData *data = calloc(1, sizeof(struct ExtractFileData));
+	if (data == NULL) {
+		rv = -errno;
+		goto out;
+	}
+	data->path = strdup(path);
+	if (data->path == NULL) {
+		rv = -errno;
+		perror(path);
+		goto out;
+	}
+	strcpy(data->tmp_filename, ".sqsh-unpack-XXXXXX");
 
-	int fd = mkstemp(tmp_filename);
+	rv = sem_wait(&file_descriptor_sem);
+	if (rv < 0) {
+		rv = -errno;
+		perror(path);
+		goto out;
+	}
+
+	fd = mkstemp(data->tmp_filename);
 	if (fd < 0) {
 		rv = -errno;
 		perror(path);
 		goto out;
 	}
+
+	rv = ftruncate(fd, sqsh_file_size(file));
+	if (rv < 0) {
+		rv = -errno;
+		perror(path);
+		goto out;
+	}
+
 	stream = fdopen(fd, "w");
 	if (stream == NULL) {
+		rv = -errno;
 		perror(path);
 		goto out;
 	}
 	fd = -1;
 
-	rv = sqsh_file_to_stream(file, stream);
+	rv = sqsh_file_to_stream_mt(
+			file, threadpool, stream, extract_file_after, data);
 	if (rv < 0) {
-		sqsh_perror(rv, path);
-		goto out;
-	}
-
-	rv = rename(tmp_filename, path);
-	if (rv < 0) {
-		perror(path);
 		goto out;
 	}
 out:
-	if (stream != NULL) {
-		fclose(stream);
-	}
-	if (fd > 0) {
-		close(fd);
+	if (rv < 0) {
+		sqsh_perror(rv, path);
+		extract_file_cleanup(data, stream);
+		if (fd > 0) {
+			close(fd);
+		}
 	}
 	return rv;
 }
@@ -162,6 +270,7 @@ extract_symlink(const char *path, const struct SqshFile *file) {
 		goto out;
 	}
 
+	rv = update_metadata(path, file);
 out:
 	free(target);
 	return rv;
@@ -195,76 +304,56 @@ extract_device(const char *path, const struct SqshFile *file) {
 		perror(path);
 		goto out;
 	}
+
+	rv = update_metadata(path, file);
 out:
 	return rv;
 }
 
 static int
-extract(const char *path, const struct SqshFile *file) {
-	int rv = 0;
-	struct timespec times[2] = {0};
+extract_first_pass(
+		const char *path, enum SqshFileType type, const struct SqshFile *file) {
+	switch (type) {
+	case SQSH_FILE_TYPE_DIRECTORY:
+		return 0;
+	case SQSH_FILE_TYPE_FILE:
+		return extract_file(path, file);
+	case SQSH_FILE_TYPE_SYMLINK:
+		return extract_symlink(path, file);
+	case SQSH_FILE_TYPE_BLOCK:
+	case SQSH_FILE_TYPE_CHAR:
+	case SQSH_FILE_TYPE_FIFO:
+	case SQSH_FILE_TYPE_SOCKET:
+		return extract_device(path, file);
+	default:
+		__builtin_unreachable();
+	}
+}
 
+static int
+extract_second_pass(
+		const char *path, enum SqshFileType type, const struct SqshFile *file) {
+	if (type == SQSH_FILE_TYPE_DIRECTORY) {
+		return update_metadata_dir(path, file);
+	} else {
+		return 0;
+	}
+}
+
+static int
+extract(const char *path, const struct SqshFile *file, extract_fn func) {
 	if (path[0] == 0) {
 		path = ".";
 	}
 
 	enum SqshFileType type = sqsh_file_type(file);
-	switch (type) {
-	case SQSH_FILE_TYPE_DIRECTORY:
-		rv = extract_dir(path, file);
-		break;
-	case SQSH_FILE_TYPE_FILE:
-		rv = extract_file(path, file);
-		break;
-	case SQSH_FILE_TYPE_SYMLINK:
-		rv = extract_symlink(path, file);
-		break;
-	case SQSH_FILE_TYPE_BLOCK:
-	case SQSH_FILE_TYPE_CHAR:
-	case SQSH_FILE_TYPE_FIFO:
-	case SQSH_FILE_TYPE_SOCKET:
-		rv = extract_device(path, file);
-		break;
-	default:
-		__builtin_unreachable();
-	}
-	if (rv < 0) {
-		sqsh_perror(rv, path);
-		goto out;
-	}
-
-	times[0].tv_sec = times[1].tv_sec = sqsh_file_modified_time(file);
-	rv = utimensat(AT_FDCWD, path, times, AT_SYMLINK_NOFOLLOW);
-	if (rv < 0) {
-		perror(path);
-		goto out;
-	}
-
-	uint16_t mode = sqsh_file_permission(file);
-	rv = fchmodat(AT_FDCWD, path, mode, AT_SYMLINK_NOFOLLOW);
-	if (rv < 0) {
-		perror(path);
-		goto out;
-	}
-
-	if (do_chown) {
-		const uint32_t uid = sqsh_file_uid(file);
-		const uint32_t gid = sqsh_file_gid(file);
-
-		rv = chown(path, uid, gid);
-		if (rv < 0) {
-			perror(path);
-			goto out;
-		}
-	}
-
-out:
-	return rv;
+	return func(path, type, file);
 }
 
 static int
 extract_from_traversal(
-		const char *target_path, const struct SqshTreeTraversal *iter) {
+		const char *target_path, const struct SqshTreeTraversal *iter,
+		extract_fn func) {
 	int rv;
 	char *path = sqsh_tree_traversal_path_dup(iter);
 	enum SqshTreeTraversalState state = sqsh_tree_traversal_state(iter);
@@ -276,13 +365,13 @@ extract_from_traversal(
 			print_segment("/", 1);
 			print_segment(path, strlen(path));
 		}
-		print_segment("\1", 1);
+		puts("");
 	}
 
 	if (state == SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN) {
 		// In case we hit a directory, we create it first. The directory meta
 		// data will be set later
-		rv = prepare_dir(path);
+		rv = extract_dir(path);
 		if (rv < 0) {
 			goto out;
 		}
@@ -293,7 +382,7 @@ extract_from_traversal(
 			goto out;
 		}
 
-		rv = extract(path, file);
+		rv = extract(path, file, func);
 		// Ignore errors, we want to extract as much as possible.
 		rv = 0;
 	}
@@ -304,7 +393,8 @@ out:
 }
 
 static int
-extract_all(const char *target_path, const struct SqshFile *base) {
+extract_all(
+		const char *target_path, const struct SqshFile *base, extract_fn func) {
 	char *path = NULL;
 	int rv = 0;
 	struct SqshTreeTraversal *iter = NULL;
@@ -334,7 +424,7 @@ extract_all(const char *target_path, const struct SqshFile *base) {
 	}
 
 	while (sqsh_tree_traversal_next(iter, &rv)) {
-		rv = extract_from_traversal(target_path, iter);
+		rv = extract_from_traversal(target_path, iter, func);
 		if (rv < 0) {
 			goto out;
 		}
@@ -359,6 +449,7 @@ main(int argc, char *argv[]) {
 	struct SqshArchive *sqsh;
 	struct SqshFile *src_root = NULL;
 	uint64_t offset = 0;
+	struct rlimit limits = {0};
 	if (isatty(STDOUT_FILENO)) {
 		print_segment = print_escaped;
 	}
@@ -408,6 +499,22 @@ main(int argc, char *argv[]) {
 		goto out;
 	}
 
+	threadpool = sqsh_threadpool_new(0, &rv);
+
+	rv = getrlimit(RLIMIT_NOFILE, &limits);
+	if (rv < 0) {
+		perror("getrlimit");
+		rv = EXIT_FAILURE;
+		goto out;
+	}
+	// Leave some file descriptors for the rest of the system
+	rv = sem_init(&file_descriptor_sem, 0, limits.rlim_cur - 32);
+	if (rv < 0) {
+		perror("sem_init");
+		rv = EXIT_FAILURE;
+		goto out;
+	}
+
 	src_root = sqsh_lopen(sqsh, src_path, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, src_path);
@@ -423,15 +530,30 @@ main(int argc, char *argv[]) {
 	}
 
 	if (sqsh_file_type(src_root) != SQSH_FILE_TYPE_DIRECTORY) {
-		rv = extract(target_path, src_root);
+		rv = extract(target_path, src_root, extract_first_pass);
 	} else {
-		rv = extract_all(target_path, src_root);
+		rv = extract_all(target_path, src_root, extract_first_pass);
 	}
 	if (rv < 0) {
 		rv = EXIT_FAILURE;
 		goto out;
 	}
+	rv = sqsh_threadpool_wait(threadpool);
+	if (rv < 0) {
+		rv = EXIT_FAILURE;
+		goto out;
+	}
+	sqsh_threadpool_free(threadpool);
+	threadpool = NULL;
+
+	if (sqsh_file_type(src_root) != SQSH_FILE_TYPE_DIRECTORY) {
+		rv = extract(target_path, src_root, extract_second_pass);
+	} else {
+		rv = extract_all(target_path, src_root, extract_second_pass);
+	}
 out:
+	sem_destroy(&file_descriptor_sem);
+	sqsh_threadpool_free(threadpool);
 	sqsh_close(src_root);
 	sqsh_archive_close(sqsh);
 	return rv;

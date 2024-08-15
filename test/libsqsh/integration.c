@@ -490,6 +490,7 @@ UTEST(integration, sqsh_test_xattr) {
 	ASSERT_NE(NULL, xattr_iter);
 	ASSERT_EQ(0, rv);
 	has_next = sqsh_xattr_iterator_next(xattr_iter, &rv);
+	ASSERT_TRUE(has_next);
 	ASSERT_EQ(0, rv);
 	ASSERT_EQ(true, sqsh_xattr_iterator_is_indirect(xattr_iter));
 	name = sqsh_xattr_iterator_fullname_dup(xattr_iter);
@@ -501,6 +502,7 @@ UTEST(integration, sqsh_test_xattr) {
 	ASSERT_EQ(0, strcmp(expected_value, value));
 	free(value);
 	has_next = sqsh_xattr_iterator_next(xattr_iter, &rv);
+	ASSERT_FALSE(has_next);
 	ASSERT_EQ(0, rv);
 	rv = sqsh_xattr_iterator_free(xattr_iter);
 	ASSERT_EQ(0, rv);
