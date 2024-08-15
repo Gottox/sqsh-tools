@@ -32,7 +32,7 @@
  */
 
 #define _DEFAULT_SOURCE
-#define _LARGEFILE64_SOURCE
+#define _FILE_OFFSET_BITS 64
 
 #include <assert.h>
 #include <errno.h>
@@ -92,6 +92,7 @@ struct FileToStreamMt {
 	sqsh_file_to_stream_mt_cb cb;
 	void *data;
 	FILE *stream;
+	int fd;
 };
 
 static void
@@ -218,38 +219,29 @@ static void
 stream_worker(
 		const struct SqshFile *file, const struct SqshFileIterator *iterator,
 		uint64_t offset, void *data, int err) {
-	int rv = 0, rv2 = 0;
-	FILE *stream = NULL;
+	int rv = 0;
 	struct FileToStreamMt *mt = data;
 	if (iterator == NULL) {
 		mt->cb(file, mt->stream, mt->data, err);
 		return;
 	}
 
-	int fd = dup(fileno(mt->stream));
-	stream = fdopen(fd, "r+");
-	if (stream == NULL) {
-		close(fd);
-		rv = -errno;
-		goto out;
-	}
-
-	rv = fseeko64(stream, (off_t)offset, SEEK_SET);
+	off_t written = 0;
 	const uint8_t *iterator_data = sqsh_file_iterator_data(iterator);
 	const size_t iterator_size = sqsh_file_iterator_size(iterator);
-	const size_t written =
-			fwrite(iterator_data, sizeof(uint8_t), iterator_size, stream);
-	if (written != iterator_size) {
-		rv = -errno;
-		goto out;
+
+	while ((uint64_t)written != iterator_size) {
+		ssize_t chunk_written = pwrite(
+				mt->fd, iterator_data + written,
+				iterator_size - (size_t)written, (off_t)offset + written);
+		if (chunk_written < 0) {
+			rv = -errno;
+			goto out;
+		}
+		written += chunk_written;
 	}
 
 out:
-	if (stream != NULL) {
-		fclose(stream);
-	}
-	assert(rv2 == 0);
-
 	if (rv < 0) {
 		atomic_store(&mt->mt.rv, rv);
 	}
@@ -268,6 +260,7 @@ sqsh_file_to_stream_mt(
 	mt->stream = stream;
 	mt->cb = cb;
 	mt->data = data;
+	mt->fd = fileno(stream);
 
 	file_iterator_mt(&mt->mt, file, threadpool, stream_worker, mt, rv);
 }
