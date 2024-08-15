@@ -199,6 +199,7 @@ out:
 static int
 extract_file(const char *path, const struct SqshFile *file) {
 	int rv = 0;
+	int fd = -1;
 	FILE *stream = NULL;
 	struct ExtractFileData *data = calloc(1, sizeof(struct ExtractFileData));
 	if (data == NULL) {
@@ -220,7 +221,7 @@ extract_file(const char *path, const struct SqshFile *file) {
 		goto out;
 	}
 
-	int fd = mkstemp(data->tmp_filename);
+	fd = mkstemp(data->tmp_filename);
 	if (fd < 0) {
 		rv = -errno;
 		perror(path);
