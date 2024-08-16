@@ -38,6 +38,7 @@
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
 #include <sqsh_error.h>
+#include <sys/types.h>
 
 static int
 apply_fragment(
@@ -153,6 +154,47 @@ sqsh__fragment_view_init(
 	}
 
 out:
+	return rv;
+}
+
+int
+sqsh__fragment_view_copy(
+		struct SqshFragmentView *target,
+		const struct SqshFragmentView *source) {
+	int rv = 0;
+	target->fragment_table = source->fragment_table;
+	rv = sqsh__map_reader_copy(&target->map_reader, &source->map_reader);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh__extract_view_copy(&target->extract_view, &source->extract_view);
+	if (rv < 0) {
+		goto out;
+	}
+	const uint8_t *map_data = sqsh__map_reader_data(&target->map_reader);
+	size_t map_size = sqsh__map_reader_size(&target->map_reader);
+	const uint8_t *extract_data =
+			sqsh__extract_view_data(&target->extract_view);
+	size_t extract_size = sqsh__extract_view_size(&target->extract_view);
+
+	// Check if the data field is within the map or extract data
+	// and adjust the pointer accordingly
+	if (source->data >= map_data &&
+		(size_t)(source->data - map_data) < map_size) {
+		target->data = &map_data[source->data - map_data];
+	} else if (
+			source->data >= extract_data &&
+			(size_t)(source->data - extract_data) < extract_size) {
+		target->data = &extract_data[source->data - extract_data];
+	} else {
+		rv = -SQSH_ERROR_INVALID_ARGUMENT;
+		goto out;
+	}
+	target->size = source->size;
+out:
+	if (rv < 0) {
+		sqsh__fragment_view_cleanup(target);
+	}
 	return rv;
 }
 

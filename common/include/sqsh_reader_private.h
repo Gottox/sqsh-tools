@@ -143,6 +143,20 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__reader_init(
 /**
  * @internal
  * @memberof SqshReader
+ * @brief Creates a copy of an extractor reader.
+ *
+ * @param[out] target The reader to copy to.
+ * @param[in]  source The reader to copy from.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__reader_copy(
+		struct SqshReader *target, const struct SqshReader *source,
+		void *copied_iterator);
+
+/**
+ * @internal
+ * @memberof SqshReader
  * @brief Advances the reader by the given offset and size.
  *
  * @param[in,out] reader  Pointer to the metablock reader to be advanced.

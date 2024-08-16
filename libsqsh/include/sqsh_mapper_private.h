@@ -266,12 +266,12 @@ struct SqshMapIterator {
 	/**
 	 * @privatesection
 	 */
-	sqsh_index_t next_index;
-	uint64_t segment_count;
 	struct SqshMapManager *map_manager;
 	const struct SqshMapSlice *mapping;
 	const uint8_t *data;
 	size_t size;
+	sqsh_index_t next_index;
+	uint64_t segment_count;
 };
 
 /**
@@ -287,6 +287,19 @@ struct SqshMapIterator {
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__map_iterator_init(
 		struct SqshMapIterator *iterator, struct SqshMapManager *manager,
 		uint64_t address);
+
+/**
+ * @internal
+ * @memberof SqshMapIterator
+ * @brief Copies the content of a iterator to another iterator
+ *
+ * @param target The iterator to copy to
+ * @param source The iterator to copy from
+ *
+ * @return 0 on success, negative on error
+ */
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__map_iterator_copy(
+		struct SqshMapIterator *target, const struct SqshMapIterator *source);
 
 /**
  * @internal
@@ -393,6 +406,19 @@ struct SqshMapReader {
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__map_reader_init(
 		struct SqshMapReader *reader, struct SqshMapManager *mapper,
 		const uint64_t start_address, uint64_t upper_limit);
+
+/**
+ * @internal
+ * @memberof SqshMapReader
+ * @brief Copies the content of a reader to another reader
+ *
+ * @param target The reader to copy to
+ * @param source The reader to copy from
+ *
+ * @return 0 on success, negative on error
+ */
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__map_reader_copy(
+		struct SqshMapReader *target, const struct SqshMapReader *source);
 
 /**
  * @internal

@@ -173,6 +173,13 @@ out:
 }
 
 int
+sqsh__extract_manager_retain_buffer(
+		struct SqshExtractManager *manager, const struct CxBuffer *buffer) {
+	cx_rc_radix_tree_retain_value(&manager->cache, (void *)buffer);
+	return 0;
+}
+
+int
 sqsh__extract_manager_release(
 		struct SqshExtractManager *manager, uint64_t address) {
 	int rv = sqsh__mutex_lock(&manager->lock);

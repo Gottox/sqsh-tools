@@ -96,6 +96,27 @@ out:
 	return rv;
 }
 
+int
+sqsh__map_reader_copy(
+		struct SqshMapReader *target, const struct SqshMapReader *source) {
+	int rv;
+	rv = sqsh__map_iterator_copy(&target->iterator, &source->iterator);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh__reader_copy(&target->reader, &source->reader, &target->iterator);
+	if (rv < 0) {
+		goto out;
+	}
+	target->address = source->address;
+	target->upper_limit = source->upper_limit;
+out:
+	if (rv < 0) {
+		sqsh__map_reader_cleanup(target);
+	}
+	return rv;
+}
+
 size_t
 sqsh__map_reader_remaining_direct(const struct SqshMapReader *reader) {
 	size_t block_size = sqsh__map_iterator_block_size(&reader->iterator);

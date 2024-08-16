@@ -59,6 +59,28 @@ out:
 	return rv;
 }
 
+int
+sqsh__extract_view_copy(
+		struct SqshExtractView *target, const struct SqshExtractView *source) {
+	int rv = 0;
+
+	target->manager = source->manager;
+	if (source->buffer) {
+		rv = sqsh__extract_manager_retain_buffer(
+				source->manager, source->buffer);
+		if (rv < 0) {
+			goto out;
+		}
+	}
+	target->buffer = source->buffer;
+	target->size = source->size;
+out:
+	if (rv < 0) {
+		sqsh__extract_view_cleanup(target);
+	}
+	return rv;
+}
+
 const uint8_t *
 sqsh__extract_view_data(const struct SqshExtractView *view) {
 	return cx_buffer_data(view->buffer);
