@@ -15,7 +15,7 @@ containing a set of command line tools and a C library.
 * [Filer](https://github.com/probonopd/Filer) - A file manager for Unix systems.
   Uses [libsqsh](./libsqsh/README.md) to show previews of AppImages without
   mounting them first.
-* [sqsh-rs](https://github.com/Dr-Emann/sqsh-rs) - Rust bindings for libsqsh.
+* [sqsh-rs](https://github.com/Dr-Emann/sqsh-rs) - Rust bindings for [libsqsh](./libsqsh/README.md).
 
 ## Building
 
