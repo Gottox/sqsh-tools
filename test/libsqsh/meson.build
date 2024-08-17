@@ -3,6 +3,7 @@ add_languages('cpp', native: false)
 sqsh_test = [
     'check_version.c',
     'cpp-test.cpp',
+    'archive/archive.c',
     'archive/compression_options.c',
     'archive/inode_map.c',
     'directory/directory_iterator.c',
