@@ -92,7 +92,8 @@ sqsh__archive_init(
 	memset(&archive->map_manager, 0, sizeof(struct SqshMapManager));
 
 	if (config != NULL) {
-		memcpy(&archive->config, config, sizeof(struct SqshConfig));
+		memcpy(&archive->config, config,
+			   offsetof(struct SqshConfig, _reserved));
 	} else {
 		memset(&archive->config, 0, sizeof(struct SqshConfig));
 	}
