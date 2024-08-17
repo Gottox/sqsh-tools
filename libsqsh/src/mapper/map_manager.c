@@ -50,7 +50,7 @@ load_mapping(
 	int rv = 0;
 
 	const size_t block_size = sqsh_mapper_block_size(&manager->mapper);
-	const size_t block_count = sqsh__map_manager_block_count(manager);
+	const uint64_t block_count = manager->block_count;
 	const uint64_t mapper_size = sqsh__map_manager_size(manager);
 	size_t size = block_size;
 	uint64_t offset;
@@ -69,7 +69,7 @@ load_mapping(
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 
-	rv = sqsh__map_slice_init(mapping, &manager->mapper, offset, size);
+	rv = sqsh__map_slice_init(mapping, &manager->mapper, index, offset, size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -83,7 +83,6 @@ sqsh__map_manager_init(
 		struct SqshMapManager *manager, const void *input,
 		const struct SqshConfig *config) {
 	int rv;
-	uint64_t map_size;
 	const size_t lru_size = SQSH_CONFIG_DEFAULT(config->mapper_lru_size, 32);
 	const uint64_t archive_offset = config->archive_offset;
 
@@ -102,23 +101,19 @@ sqsh__map_manager_init(
 		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
 		goto out;
 	}
-	map_size = SQSH_DIVIDE_CEIL(
+	manager->block_count = SQSH_DIVIDE_CEIL(
 			mapper_size - archive_offset,
 			sqsh_mapper_block_size(&manager->mapper));
-	if (map_size > SIZE_MAX) {
-		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
-		goto out;
-	}
 
 	manager->archive_offset = archive_offset;
-	rv = cx_rc_map_init(
-			&manager->maps, (size_t)map_size, sizeof(struct SqshMapSlice),
-			map_cleanup_cb);
+	rv = cx_rc_radix_tree_init(
+			&manager->maps, sizeof(struct SqshMapSlice), map_cleanup_cb);
 	if (rv < 0) {
 		goto out;
 	}
 
-	rv = cx_lru_init(&manager->lru, lru_size, &cx_lru_rc_map, &manager->maps);
+	rv = cx_lru_init(
+			&manager->lru, lru_size, &cx_lru_rc_radix_tree, &manager->maps);
 out:
 	if (rv < 0) {
 		sqsh__map_manager_cleanup(manager);
@@ -136,11 +131,6 @@ sqsh__map_manager_block_size(const struct SqshMapManager *manager) {
 	return sqsh_mapper_block_size(&manager->mapper);
 }
 
-size_t
-sqsh__map_manager_block_count(const struct SqshMapManager *manager) {
-	return cx_rc_map_size(&manager->maps);
-}
-
 int
 sqsh__map_manager_get(
 		struct SqshMapManager *manager, sqsh_index_t index,
@@ -152,7 +142,7 @@ sqsh__map_manager_get(
 		goto out;
 	}
 
-	*target = cx_rc_map_retain(&manager->maps, index);
+	*target = cx_rc_radix_tree_retain(&manager->maps, index);
 
 	if (*target == NULL) {
 		struct SqshMapSlice mapping = {0};
@@ -167,7 +157,7 @@ sqsh__map_manager_get(
 			goto out;
 		}
 
-		*target = cx_rc_map_set(&manager->maps, index, &mapping);
+		*target = cx_rc_radix_tree_put(&manager->maps, index, &mapping);
 	}
 	rv = cx_lru_touch(&manager->lru, index);
 
@@ -179,7 +169,7 @@ out:
 int
 sqsh__map_manager_release(
 		struct SqshMapManager *manager, const struct SqshMapSlice *mapping) {
-	if (manager == NULL) {
+	if (manager == NULL || mapping == NULL) {
 		return 0;
 	}
 	int rv = sqsh__mutex_lock(&manager->lock);
@@ -187,7 +177,7 @@ sqsh__map_manager_release(
 		goto out;
 	}
 
-	rv = cx_rc_map_release(&manager->maps, mapping);
+	cx_rc_radix_tree_release(&manager->maps, mapping->index);
 
 	sqsh__mutex_unlock(&manager->lock);
 out:
@@ -197,7 +187,7 @@ out:
 int
 sqsh__map_manager_cleanup(struct SqshMapManager *manager) {
 	cx_lru_cleanup(&manager->lru);
-	cx_rc_map_cleanup(&manager->maps);
+	cx_rc_radix_tree_cleanup(&manager->maps);
 	sqsh__mapper_cleanup(&manager->mapper);
 
 	sqsh__mutex_destroy(&manager->lock);
