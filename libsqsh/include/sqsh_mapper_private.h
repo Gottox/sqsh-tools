@@ -103,8 +103,9 @@ struct SqshMapSlice {
 	 * @privatesection
 	 */
 	struct SqshMapper *mapper;
-	size_t size;
+	uint64_t index;
 	uint8_t *data;
+	size_t size;
 };
 
 /**
@@ -147,6 +148,7 @@ SQSH_NO_EXPORT int sqsh__map_slice_cleanup(struct SqshMapSlice *mapping);
  *
  * @param[out] mapping The mapping to store the mapped data.
  * @param[in]  mapper The mapper to use for the mapping.
+ * @param[in]  address The address in the input data to start the mapping.
  * @param[in]  offset The offset in the input data to start the mapping.
  * @param[in]  size The size of the mapped data.
  *
@@ -154,7 +156,7 @@ SQSH_NO_EXPORT int sqsh__map_slice_cleanup(struct SqshMapSlice *mapping);
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__map_slice_init(
 		struct SqshMapSlice *mapping, struct SqshMapper *mapper,
-		uint64_t offset, size_t size);
+		uint64_t address, uint64_t offset, size_t size);
 
 /***************************************
  * mapper/map_manager.c
@@ -169,8 +171,9 @@ struct SqshMapManager {
 	 */
 	struct SqshMapper mapper;
 	struct CxLru lru;
-	struct CxRcMap maps;
+	struct CxRcRadixTree maps;
 	uint64_t archive_offset;
+	uint64_t block_count;
 	sqsh__mutex_t lock;
 };
 
@@ -212,18 +215,6 @@ sqsh__map_manager_size(const struct SqshMapManager *manager);
  */
 SQSH_NO_EXPORT size_t
 sqsh__map_manager_block_size(const struct SqshMapManager *manager);
-
-/**
- * @internal
- * @memberof SqshMapManager
- * @brief Gets the number of chunks in the file.
- *
- * @param[in] manager The SqshMapManager instance.
- *
- * @return Returns the number of chunks in the file.
- */
-SQSH_NO_EXPORT size_t
-sqsh__map_manager_block_count(const struct SqshMapManager *manager);
 
 /**
  * @internal
