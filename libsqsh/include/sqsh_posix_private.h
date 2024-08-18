@@ -46,9 +46,10 @@ struct SqshThreadpool {
 	struct CxThreadpool pool;
 };
 
-int sqsh__threadpool_init(struct SqshThreadpool *pool, size_t threads);
+SQSH_NO_EXPORT int
+sqsh__threadpool_init(struct SqshThreadpool *pool, size_t threads);
 
-int sqsh__threadpool_cleanup(struct SqshThreadpool *pool);
+SQSH_NO_EXPORT int sqsh__threadpool_cleanup(struct SqshThreadpool *pool);
 
 #ifdef __cplusplus
 }
