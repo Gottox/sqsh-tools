@@ -43,6 +43,13 @@ mkdir -p "$PWD/mnt"
 
 $SQSHFS "$PWD/original.squashfs" "$PWD/mnt"
 
+for _ in 1 2 3 4 5; do
+	if [ -f "$PWD/mnt/file.orig" ]; then
+		break
+	fi
+	sleep 0.5
+done
+
 cat "$PWD/mnt/file.orig" > "$PWD/file.extracted"
 
 unmount "$PWD/mnt"
