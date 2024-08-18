@@ -15,7 +15,7 @@ cat > $tmp/pf <<EOF
 "large_dir" D 0 777 2020 202020
 "large_dir/link" s 777 2020 202020 ..
 EOF
-if [ `uname` != "OpenBSD" ]; then
+if [ `uname` != "OpenBSD" ] && [ `uname` != "FreeBSD" ]; then
 	cat >> $tmp/pf <<EOF
 "large_dir" x user.force_extended=true
 "a" x user.foo=1234567891234567891234567890001234567890

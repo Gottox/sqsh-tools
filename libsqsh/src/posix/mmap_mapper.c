@@ -31,7 +31,7 @@
  * @file         mmap_mapper.c
  */
 
-#define _LARGEFILE64_SOURCE
+#define _FILE_OFFSET_BITS 64
 
 #include <sqsh_error.h>
 #include <sqsh_mapper.h>
@@ -44,11 +44,6 @@
 #define TO_PTR(x) ((void *)(uintptr_t)(x))
 #define FROM_PTR(x) ((int)(uintptr_t)(x))
 
-#if defined(__APPLE__) || defined(__OpenBSD__)
-#	define off64_t off_t
-#	define lseek64 lseek
-#endif
-
 static int
 sqsh_mapper_mmap_init(
 		struct SqshMapper *mapper, const void *input, uint64_t *size) {
@@ -56,7 +51,7 @@ sqsh_mapper_mmap_init(
 	(void)mapper;
 	int rv = 0;
 	int fd = -1;
-	off64_t pos = 0;
+	off_t pos = 0;
 
 	fd = open(input, 0);
 	if (fd < 0) {
@@ -64,7 +59,7 @@ sqsh_mapper_mmap_init(
 		goto out;
 	}
 
-	pos = lseek64(fd, 0, SEEK_END);
+	pos = lseek(fd, 0, SEEK_END);
 	if (pos < 0) {
 		rv = -errno;
 		goto out;
@@ -79,6 +74,7 @@ out:
 	}
 	return rv;
 }
+
 static int
 sqsh_mapping_mmap_map(
 		const struct SqshMapper *mapper, uint64_t offset, size_t size,

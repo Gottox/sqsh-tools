@@ -410,7 +410,7 @@ UTEST(integration, sqsh_test_extended_dir) {
 	ASSERT_EQ(0, rv);
 }
 
-#ifndef __OpenBSD__
+#if !defined(__OpenBSD__) && !defined(__FreeBSD__)
 UTEST(integration, sqsh_test_xattr) {
 	const char *expected_value = "1234567891234567891234567890001234567890";
 	int rv;
