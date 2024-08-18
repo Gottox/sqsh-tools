@@ -18,7 +18,7 @@
 // initialized from SqshConfig::source_size and expected to be set to actual
 // size of the input file.
 static int
-mapper_init(struct SqshMapper *mapper, const void *input, size_t *size) {
+mapper_init(struct SqshMapper *mapper, const void *input, uint64_t *size) {
 	(void)size;
 	int rv = 0;
 	FILE *file;
@@ -51,7 +51,7 @@ out:
 // to be set to a buffer of `size` bytes.
 static int
 mapper_map(
-		const struct SqshMapper *mapper, sqsh_index_t offset, size_t size,
+		const struct SqshMapper *mapper, uint64_t offset, size_t size,
 		uint8_t **data) {
 	int rv = 0;
 	FILE *file = sqsh_mapper_user_data(mapper);
@@ -104,8 +104,8 @@ static const struct SqshMemoryMapperImpl custom_mapper = {
 		// from the mapper at once. This field must be set as it is used as
 		// default value. Setting it to 0 is undefined behavior.
 		.block_size_hint = 1024 * 1024,
-		.init = mapper_init,
-		.map = mapper_map,
+		.init2 = mapper_init,
+		.map2 = mapper_map,
 		.unmap = mapper_unmap,
 		.cleanup = mapper_cleanup,
 };
