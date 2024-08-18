@@ -1,0 +1,29 @@
+env:
+  CIRRUS_CLONE_DEPTH: 1
+
+freebsd_task:
+  freebsd_instance:
+    image_family: freebsd-14-0
+  setup_script:
+    - pkg install -y autoconf automake libtool pkgconf fusefs-libs
+    - pkg install -y lzo2 liblz4 zstd meson git
+    - pkg install -y squashfs-tools coreutils
+    - kldload fusefs
+    - sysctl vfs.usermount=1
+  build_script:
+    - |
+      meson setup build \
+          -Dwerror=true \
+          -Dexamples=true  \
+          -Dzlib=enabled \
+          -Dlz4=enabled \
+          -Dlzma=enabled  \
+          -Dzstd=enabled  \
+          -Dthreads=enabled \
+          -Dfuse-old=enabled \
+          -Dtest=extended
+    - meson compile -C build
+  test_script:
+    - MESON_TESTTHREADS=1 meson test --verbose -C build
+  install_script:
+    - meson install -C build
