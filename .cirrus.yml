@@ -2,6 +2,7 @@ env:
   CIRRUS_CLONE_DEPTH: 1
 
 freebsd_task:
+  only_if: $CIRRUS_BRANCH == "main"
   freebsd_instance:
     image_family: freebsd-14-0
   setup_script:
