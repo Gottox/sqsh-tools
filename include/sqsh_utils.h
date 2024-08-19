@@ -50,7 +50,7 @@ extern "C" {
  *
  * @return Version string
  */
-#define SQSH_VERSION "1.5.0"
+#define SQSH_VERSION "1.5.1"
 
 /**
  * @brief Get the major version of the library that was used to compile the
@@ -74,7 +74,7 @@ extern "C" {
  *
  * @return Patch version
  */
-#define SQSH_VERSION_PATCH 0
+#define SQSH_VERSION_PATCH 1
 
 /**
  * @brief Get the version of the currently running library as a string.
