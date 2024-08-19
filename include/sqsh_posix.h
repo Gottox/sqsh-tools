@@ -78,6 +78,29 @@ SQSH_NO_UNUSED int sqsh_file_to_stream_mt(
 		const struct SqshFile *file, struct SqshThreadpool *threadpool,
 		FILE *stream, sqsh_file_to_stream_mt_cb cb, void *data);
 
+/**
+ * @memberof SqshFile
+ * @brief creates a file descriptor from a file and calls a callback for each
+ * block.
+ *
+ * @param[in] file The file context.
+ * @param[in] threadpool The threadpool to use.
+ * @param[in] cb The callback to call for each block.
+ * @param[in] data The data to pass to the callback.
+ */
+void sqsh_file_iterator_mt(
+		const struct SqshFile *file, struct SqshThreadpool *threadpool,
+		sqsh_file_iterator_mt_cb cb, void *data);
+
+/**
+ * @memberof SqshThreadpool
+ * @brief creates a new threadpool.
+ *
+ * @param[in] threads The number of threads to use. Use 0 to use the number of
+ * available cores.
+ * @param[out] err The error code.
+ * @return The threadpool on success, NULL on error.
+ */
 struct SqshThreadpool *sqsh_threadpool_new(size_t threads, int *err);
 
 int sqsh_threadpool_wait(struct SqshThreadpool *pool);
