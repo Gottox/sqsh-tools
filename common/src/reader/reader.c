@@ -71,31 +71,38 @@ sqsh__reader_copy(
 		void *copied_iterator) {
 	int rv = 0;
 
+	const struct SqshReaderIteratorImpl *impl = source->iterator_impl;
+	if (impl == NULL) {
+		goto out;
+	}
 	target->iterator = copied_iterator;
-	target->iterator_impl = source->iterator_impl;
+	target->iterator_impl = impl;
 	target->iterator_offset = source->iterator_offset;
 	target->offset = source->offset;
+
 	const uint8_t *buffer_data = cx_buffer_data(&source->buffer);
 	const size_t buffer_size = cx_buffer_size(&source->buffer);
 	rv = cx_buffer_init(&target->buffer);
 	if (rv < 0) {
 		goto out;
 	}
-	rv = cx_buffer_append(
-			&target->buffer, cx_buffer_data(&source->buffer),
-			cx_buffer_size(&source->buffer));
-	if (rv < 0) {
-		goto out;
+	if (buffer_size > 0) {
+		rv = cx_buffer_append(
+				&target->buffer, cx_buffer_data(&source->buffer),
+				cx_buffer_size(&source->buffer));
+		if (rv < 0) {
+			goto out;
+		}
 	}
-	buffer_data = cx_buffer_data(&target->buffer);
-	const uint8_t *iterator_data = target->iterator_impl->data(copied_iterator);
-	const size_t iterator_size = target->iterator_impl->size(copied_iterator);
+	const uint8_t *iterator_data = impl->data(copied_iterator);
+	const size_t iterator_size = impl->size(copied_iterator);
 	const uint8_t *data = source->data;
 
 	if (data == NULL) {
 		target->data = NULL;
 	} else if (data >= buffer_data && data < buffer_data + buffer_size) {
-		target->data = &buffer_data[data - buffer_data];
+		const uint8_t *target_buffer_data = cx_buffer_data(&target->buffer);
+		target->data = &target_buffer_data[data - buffer_data];
 	} else if (data >= iterator_data && data < iterator_data + iterator_size) {
 		target->data = &iterator_data[data - iterator_data];
 	} else {

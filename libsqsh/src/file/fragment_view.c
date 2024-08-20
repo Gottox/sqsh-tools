@@ -163,6 +163,9 @@ sqsh__fragment_view_copy(
 		const struct SqshFragmentView *source) {
 	int rv = 0;
 	target->fragment_table = source->fragment_table;
+	if (target->fragment_table == NULL) {
+		goto out;
+	}
 	rv = sqsh__map_reader_copy(&target->map_reader, &source->map_reader);
 	if (rv < 0) {
 		goto out;

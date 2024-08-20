@@ -73,8 +73,7 @@ sqsh__map_iterator_copy(
 		struct SqshMapIterator *target, const struct SqshMapIterator *source) {
 	int rv = 0;
 	target->map_manager = source->map_manager;
-	// TODO
-	// rv = sqsh__map_slice_copy(target->mapping, source->mapping);
+	rv = sqsh__map_manager_retain(target->map_manager, target->mapping);
 	if (rv < 0) {
 		goto out;
 	}

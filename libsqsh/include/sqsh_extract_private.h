@@ -213,7 +213,7 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__extract_manager_init(
  */
 SQSH_NO_EXPORT int sqsh__extract_manager_uncompress(
 		struct SqshExtractManager *manager, const struct SqshMapReader *reader,
-		const struct CxBuffer **target);
+		struct CxBuffer **target);
 
 /**
  * @internal
@@ -226,7 +226,7 @@ SQSH_NO_EXPORT int sqsh__extract_manager_uncompress(
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_EXPORT int sqsh__extract_manager_retain_buffer(
-		struct SqshExtractManager *manager, const struct CxBuffer *buffer);
+		struct SqshExtractManager *manager, struct CxBuffer *buffer);
 
 /**
  * @internal
@@ -265,7 +265,7 @@ struct SqshExtractView {
 	 * @privatesection
 	 */
 	struct SqshExtractManager *manager;
-	const struct CxBuffer *buffer;
+	struct CxBuffer *buffer;
 	uint64_t address;
 	size_t size;
 };

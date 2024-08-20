@@ -74,6 +74,7 @@ sqsh__extract_view_copy(
 	}
 	target->buffer = source->buffer;
 	target->size = source->size;
+	target->address = source->address;
 out:
 	if (rv < 0) {
 		sqsh__extract_view_cleanup(target);

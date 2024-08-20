@@ -168,6 +168,19 @@ SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_iterator_init(
 /**
  * @internal
  * @memberof SqshFileIterator
+ * @brief Creates a copy of a file iterator.
+ *
+ * @param[out] target The iterator to copy to.
+ * @param[in] source The iterator to copy from.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_iterator_copy(
+		struct SqshFileIterator *target, const struct SqshFileIterator *source);
+
+/**
+ * @internal
+ * @memberof SqshFileIterator
  * @brief Cleans up resources used by a file iterator.
  *
  * @param[in] iterator The file iterator to clean up.

@@ -167,9 +167,9 @@ out:
 }
 
 int
-sqsh__map_manager_retain_slice(
+sqsh__map_manager_retain(
 		struct SqshMapManager *manager, const struct SqshMapSlice *mapping) {
-	if (manager == NULL) {
+	if (manager == NULL || mapping == NULL) {
 		return 0;
 	}
 	int rv = sqsh__mutex_lock(&manager->lock);

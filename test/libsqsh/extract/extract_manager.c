@@ -44,7 +44,7 @@ UTEST(directory_iterator, decompress) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshExtractManager manager = {0};
-	const struct CxBuffer *buffer = NULL;
+	struct CxBuffer *buffer = NULL;
 	uint8_t payload[8192] = {SQSH_HEADER, ZLIB_ABCD};
 
 	mk_stub(&archive, payload, sizeof(payload));
@@ -78,8 +78,8 @@ UTEST(directory_iterator, decompress_and_cached) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshExtractManager manager = {0};
-	const struct CxBuffer *buffer = NULL;
-	const struct CxBuffer *cached_buffer = NULL;
+	struct CxBuffer *buffer = NULL;
+	struct CxBuffer *cached_buffer = NULL;
 	uint8_t payload[8192] = {SQSH_HEADER, ZLIB_ABCD};
 
 	mk_stub(&archive, payload, sizeof(payload));
