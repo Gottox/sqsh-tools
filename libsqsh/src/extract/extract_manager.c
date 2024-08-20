@@ -126,7 +126,7 @@ out:
 int
 sqsh__extract_manager_uncompress(
 		struct SqshExtractManager *manager, const struct SqshMapReader *reader,
-		const struct CxBuffer **target) {
+		struct CxBuffer **target) {
 	int rv = 0;
 	bool locked = false;
 	struct CxBuffer *buffer = NULL;
@@ -170,6 +170,13 @@ out:
 		sqsh__mutex_unlock(&manager->lock);
 	}
 	return rv;
+}
+
+int
+sqsh__extract_manager_retain_buffer(
+		struct SqshExtractManager *manager, struct CxBuffer *buffer) {
+	cx_rc_radix_tree_retain_value(&manager->cache, buffer);
+	return 0;
 }
 
 int

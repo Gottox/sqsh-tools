@@ -84,6 +84,19 @@ SQSH_NO_EXPORT int sqsh__fragment_view_init(
 /**
  * @internal
  * @memberof SqshFragmentView
+ * @brief Creates a copy of an fragment view.
+ *
+ * @param[out] target The view to copy to.
+ * @param[in]  source The view to copy from.
+ *
+ * @return 0 on success, a negative value on error.
+ */
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__fragment_view_copy(
+		struct SqshFragmentView *target, const struct SqshFragmentView *source);
+
+/**
+ * @internal
+ * @memberof SqshFragmentView
  * @brief Retrieves the fragment data.
  *
  * @param[in] view The fragment view to retrieve the data from.
@@ -151,6 +164,19 @@ struct SqshFileIterator {
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_iterator_init(
 		struct SqshFileIterator *iterator, const struct SqshFile *file);
+
+/**
+ * @internal
+ * @memberof SqshFileIterator
+ * @brief Creates a copy of a file iterator.
+ *
+ * @param[out] target The iterator to copy to.
+ * @param[in] source The iterator to copy from.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_iterator_copy(
+		struct SqshFileIterator *target, const struct SqshFileIterator *source);
 
 /**
  * @internal
@@ -269,6 +295,9 @@ struct SqshFile {
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_init(
 		struct SqshFile *context, struct SqshArchive *sqsh, uint64_t inode_ref);
+
+SQSH_NO_EXPORT SQSH_NO_UNUSED int
+sqsh__file_copy(struct SqshFile *context, const struct SqshFile *other);
 
 /**
  * @memberof SqshFile

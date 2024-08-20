@@ -223,7 +223,7 @@ UTEST(integration, sqsh_cat_fragment) {
 	size = sqsh_file_size(file);
 	ASSERT_EQ((size_t)2, size);
 
-	rv = sqsh_file_reader_advance(&reader, 0, size);
+	rv = sqsh_file_reader_advance2(&reader, 0, size);
 	ASSERT_EQ(0, rv);
 
 	data = sqsh_file_reader_data(&reader);
@@ -546,7 +546,7 @@ multithreaded_resolver(void *arg) {
 	} else {
 		struct SqshFileReader *reader = sqsh_file_reader_new(file, &rv);
 		size_t size = sqsh_file_size(file);
-		rv = sqsh_file_reader_advance(reader, 0, size);
+		rv = sqsh_file_reader_advance2(reader, 0, size);
 		assert(rv == 0);
 		sqsh_file_reader_free(reader);
 	}
@@ -799,6 +799,73 @@ UTEST(integration, mmap) {
 
 	free(traversal);
 	rv = sqsh_close(file);
+
+	rv = sqsh__archive_cleanup(&sqsh);
+	ASSERT_EQ(0, rv);
+}
+
+UTEST(integration, copy_iterator_newly) {
+	int rv;
+	struct SqshArchive sqsh = {0};
+	struct SqshFile *file = NULL;
+	struct SqshFileIterator iter = {0};
+	struct SqshFileIterator copy_iter = {0};
+
+	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	config.archive_offset = 1010;
+	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
+	ASSERT_EQ(0, rv);
+
+	file = sqsh_open(&sqsh, "/b", &rv);
+	ASSERT_EQ(0, rv);
+
+	rv = sqsh__file_iterator_init(&iter, file);
+	ASSERT_EQ(0, rv);
+
+	rv = sqsh__file_iterator_copy(&copy_iter, &iter);
+	ASSERT_EQ(0, rv);
+
+	rv = sqsh_close(file);
+	ASSERT_EQ(0, rv);
+
+	rv = sqsh__archive_cleanup(&sqsh);
+	ASSERT_EQ(0, rv);
+}
+
+UTEST(integration, copy_iterator_iterated) {
+	int rv;
+	struct SqshArchive sqsh = {0};
+	struct SqshFile *file = NULL;
+	struct SqshFileIterator iter = {0};
+	struct SqshFileIterator copy_iter = {0};
+
+	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	config.archive_offset = 1010;
+	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
+	ASSERT_EQ(0, rv);
+
+	file = sqsh_open(&sqsh, "/b", &rv);
+	ASSERT_EQ(0, rv);
+
+	rv = sqsh__file_iterator_init(&iter, file);
+	ASSERT_EQ(0, rv);
+
+	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
+	ASSERT_LE(0, rv);
+	ASSERT_TRUE(has_next);
+	rv = 0;
+
+	rv = sqsh__file_iterator_copy(&copy_iter, &iter);
+	ASSERT_EQ(0, rv);
+
+	rv = sqsh__file_iterator_cleanup(&iter);
+	ASSERT_EQ(0, rv);
+
+	rv = sqsh__file_iterator_cleanup(&copy_iter);
+	ASSERT_EQ(0, rv);
+
+	rv = sqsh_close(file);
+	ASSERT_EQ(0, rv);
 
 	rv = sqsh__archive_cleanup(&sqsh);
 	ASSERT_EQ(0, rv);

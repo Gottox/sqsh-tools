@@ -69,6 +69,30 @@ sqsh__map_iterator_init(
 }
 
 int
+sqsh__map_iterator_copy(
+		struct SqshMapIterator *target, const struct SqshMapIterator *source) {
+	int rv = 0;
+	target->map_manager = source->map_manager;
+	rv = sqsh__map_manager_retain(target->map_manager, target->mapping);
+	if (rv < 0) {
+		goto out;
+	}
+	target->mapping = NULL;
+	target->next_index = source->next_index;
+	target->segment_count = source->segment_count;
+	if (source->data != NULL) {
+		target->data = sqsh__map_slice_data(source->mapping);
+		target->size = sqsh__map_slice_size(source->mapping);
+	} else {
+		target->data = NULL;
+		target->size = 0;
+	}
+
+out:
+	return rv;
+}
+
+int
 sqsh__map_iterator_skip(struct SqshMapIterator *iterator, uint64_t *offset) {
 	int rv = 0;
 	uint64_t index;

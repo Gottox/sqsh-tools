@@ -90,6 +90,38 @@ out:
 	return rv;
 }
 
+int
+sqsh__file_iterator_copy(
+		struct SqshFileIterator *target,
+		const struct SqshFileIterator *source) {
+	int rv = 0;
+	target->file = source->file;
+	target->compression_manager = source->compression_manager;
+	rv = sqsh__map_reader_copy(&target->map_reader, &source->map_reader);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh__extract_view_copy(&target->extract_view, &source->extract_view);
+	if (rv < 0) {
+		goto out;
+	}
+	rv = sqsh__fragment_view_copy(
+			&target->fragment_view, &source->fragment_view);
+	if (rv < 0) {
+		goto out;
+	}
+	target->sparse_size = source->sparse_size;
+	target->block_size = source->block_size;
+	target->block_index = source->block_index;
+	target->data = source->data;
+	target->size = source->size;
+out:
+	if (rv < 0) {
+		sqsh__file_iterator_cleanup(target);
+	}
+	return rv;
+}
+
 struct SqshFileIterator *
 sqsh_file_iterator_new(const struct SqshFile *file, int *err) {
 	SQSH_NEW_IMPL(sqsh__file_iterator_init, struct SqshFileIterator, file);

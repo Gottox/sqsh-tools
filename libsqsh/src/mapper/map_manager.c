@@ -167,6 +167,24 @@ out:
 }
 
 int
+sqsh__map_manager_retain(
+		struct SqshMapManager *manager, const struct SqshMapSlice *mapping) {
+	if (manager == NULL || mapping == NULL) {
+		return 0;
+	}
+	int rv = sqsh__mutex_lock(&manager->lock);
+	if (rv < 0) {
+		goto out;
+	}
+
+	cx_rc_radix_tree_retain_value(&manager->maps, mapping);
+
+	sqsh__mutex_unlock(&manager->lock);
+out:
+	return rv;
+}
+
+int
 sqsh__map_manager_release(
 		struct SqshMapManager *manager, const struct SqshMapSlice *mapping) {
 	if (manager == NULL || mapping == NULL) {
