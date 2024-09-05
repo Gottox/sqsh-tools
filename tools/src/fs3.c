@@ -325,7 +325,7 @@ out:
 static void
 fs_release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 	(void)ino;
-	struct SqshFile *file = (void *)fi->fh;
+	struct SqshFile *file = (struct SqshFile *)(uintptr_t)fi->fh;
 
 	sqsh_close(file);
 	fuse_reply_err(req, 0);
@@ -335,7 +335,7 @@ static void
 fs_read(fuse_req_t req, fuse_ino_t ino, size_t size, off_t offset,
 		struct fuse_file_info *fi) {
 	(void)ino;
-	struct SqshFile *file = (void *)fi->fh;
+	struct SqshFile *file = (struct SqshFile *)(uintptr_t)fi->fh;
 	int rv = 0;
 	struct SqshFileReader *reader = NULL;
 

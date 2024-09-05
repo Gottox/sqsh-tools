@@ -249,7 +249,7 @@ struct SqshInodeImpl {
 
 	uint64_t (*blocks_start)(const struct SqshDataInode *inode);
 	uint32_t (*block_size_info)(
-			const struct SqshDataInode *inode, sqsh_index_t index);
+			const struct SqshDataInode *inode, uint64_t index);
 	uint32_t (*fragment_block_index)(const struct SqshDataInode *inode);
 	uint32_t (*fragment_block_offset)(const struct SqshDataInode *inode);
 
@@ -384,7 +384,7 @@ SQSH_NO_EXPORT uint64_t
 sqsh__file_inode_null_blocks_start(const struct SqshDataInode *inode);
 
 SQSH_NO_EXPORT uint32_t sqsh__file_inode_null_block_size_info(
-		const struct SqshDataInode *inode, sqsh_index_t index);
+		const struct SqshDataInode *inode, uint64_t index);
 
 SQSH_NO_EXPORT uint32_t
 sqsh__file_inode_null_fragment_block_index(const struct SqshDataInode *inode);

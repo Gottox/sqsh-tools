@@ -165,7 +165,7 @@ fs_open(const char *path, struct fuse_file_info *fi) {
 		goto out;
 	}
 
-	fi->fh = (uint64_t)file;
+	fi->fh = (uintptr_t)file;
 
 out:
 	if (rv < 0) {
@@ -179,7 +179,7 @@ fs_read(const char *path, char *buf, size_t size, off_t offset,
 		struct fuse_file_info *fi) {
 	(void)path;
 	int rv = 0;
-	struct SqshFile *file = (struct SqshFile *)fi->fh;
+	struct SqshFile *file = (struct SqshFile *)(uintptr_t)fi->fh;
 	struct SqshFileReader *reader = NULL;
 
 	rv = fs_common_read(&reader, file, offset, size);
@@ -201,7 +201,7 @@ out:
 static int
 fs_release(const char *path, struct fuse_file_info *fi) {
 	(void)path;
-	struct SqshFile *file = (struct SqshFile *)fi->fh;
+	struct SqshFile *file = (struct SqshFile *)(uintptr_t)fi->fh;
 
 	sqsh_close(file);
 	return 0;

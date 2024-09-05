@@ -117,15 +117,14 @@ inode_file_ext_blocks_start(const struct SqshDataInode *inode) {
 }
 
 static uint32_t
-inode_file_block_size_info(
-		const struct SqshDataInode *inode, sqsh_index_t index) {
+inode_file_block_size_info(const struct SqshDataInode *inode, uint64_t index) {
 	return sqsh__data_inode_file_block_size_info(
 			sqsh__data_inode_file(inode), index);
 }
 
 static uint32_t
 inode_file_ext_block_size_info(
-		const struct SqshDataInode *inode, sqsh_index_t index) {
+		const struct SqshDataInode *inode, uint64_t index) {
 	return sqsh__data_inode_file_ext_block_size_info(
 			sqsh__data_inode_file_ext(inode), index);
 }

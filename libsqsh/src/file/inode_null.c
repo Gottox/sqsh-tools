@@ -70,7 +70,7 @@ sqsh__file_inode_null_blocks_start(const struct SqshDataInode *inode) {
 
 uint32_t
 sqsh__file_inode_null_block_size_info(
-		const struct SqshDataInode *inode, sqsh_index_t index) {
+		const struct SqshDataInode *inode, uint64_t index) {
 	(void)inode;
 	(void)index;
 	return UINT32_MAX;

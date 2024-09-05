@@ -45,7 +45,7 @@ static bool
 is_last_block(const struct SqshFileIterator *iterator) {
 	const struct SqshFile *file = iterator->file;
 	const bool has_fragment = sqsh_file_has_fragment(file);
-	const sqsh_index_t block_index = iterator->block_index;
+	const uint64_t block_index = iterator->block_index;
 	const uint64_t block_count = sqsh_file_block_count2(file);
 
 	if (has_fragment) {

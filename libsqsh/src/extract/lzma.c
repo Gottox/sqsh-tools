@@ -109,7 +109,7 @@ sqsh_lzma_finish(void *context, uint8_t *target, size_t *target_size) {
 
 	lzma_ret ret = lzma_code(stream, LZMA_FINISH);
 
-	*target_size = stream->total_out;
+	*target_size = (size_t)stream->total_out;
 	lzma_end(stream);
 
 	if (ret == LZMA_STREAM_END) {
