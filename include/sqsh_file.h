@@ -472,7 +472,36 @@ uint64_t sqsh_file_block_count2(const struct SqshFile *context);
  *
  * @return the size of the block with the index.
  */
-uint32_t sqsh_file_block_size(const struct SqshFile *context, uint32_t index);
+uint32_t sqsh_file_block_size2(const struct SqshFile *context, uint64_t index);
+
+/**
+ * @deprecated Since 1.6.0. Use sqsh_file_block_size2() instead.
+ * @memberof SqshFile
+ * @brief Getter the size of a block of the file content. This is only
+ * internally used and will be used while retrieving the file content.
+ *
+ * @param[in] context The file context.
+ * @param index The index of the block.
+ *
+ * @return the size of the block with the index.
+ */
+__attribute__((deprecated("Since 1.6.0. Use sqsh_file_block_size2() instead.")))
+uint32_t
+sqsh_file_block_size(const struct SqshFile *context, uint32_t index);
+
+/**
+ * @deprecated Since 1.6.0. Use sqsh_file_block_is_compressed2() instead.
+ * @memberof SqshFile
+ * @brief Checks whether a certain block is compressed.
+ *
+ * @param[in] context The file context.
+ * @param index The index of the block.
+ *
+ * @return true if the block is compressed, false otherwise.
+ */
+__attribute__((deprecated(
+		"Since 1.6.0. Use sqsh_file_block_is_compressed2() instead."))) bool
+sqsh_file_block_is_compressed(const struct SqshFile *context, uint32_t index);
 
 /**
  * @memberof SqshFile
@@ -484,7 +513,7 @@ uint32_t sqsh_file_block_size(const struct SqshFile *context, uint32_t index);
  * @return true if the block is compressed, false otherwise.
  */
 bool
-sqsh_file_block_is_compressed(const struct SqshFile *context, uint32_t index);
+sqsh_file_block_is_compressed2(const struct SqshFile *context, uint64_t index);
 
 /**
  * @memberof SqshFile
