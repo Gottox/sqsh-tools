@@ -358,7 +358,7 @@ sqsh__data_inode_file_block_offset(const struct SqshDataInodeFile *file);
 SQSH_NO_EXPORT uint32_t
 sqsh__data_inode_file_size(const struct SqshDataInodeFile *file);
 SQSH_NO_EXPORT uint32_t sqsh__data_inode_file_block_size_info(
-		const struct SqshDataInodeFile *file, sqsh_index_t index);
+		const struct SqshDataInodeFile *file, uint64_t index);
 
 SQSH_NO_EXPORT uint64_t sqsh__data_inode_file_ext_blocks_start(
 		const struct SqshDataInodeFileExt *file_ext);
@@ -375,7 +375,7 @@ SQSH_NO_EXPORT uint32_t sqsh__data_inode_file_ext_block_offset(
 SQSH_NO_EXPORT uint32_t sqsh__data_inode_file_ext_xattr_idx(
 		const struct SqshDataInodeFileExt *file_ext);
 SQSH_NO_EXPORT uint32_t sqsh__data_inode_file_ext_block_size_info(
-		const struct SqshDataInodeFileExt *file_ext, sqsh_index_t index);
+		const struct SqshDataInodeFileExt *file_ext, uint64_t index);
 
 SQSH_NO_EXPORT uint32_t sqsh__data_inode_symlink_hard_link_count(
 		const struct SqshDataInodeSymlink *directory);

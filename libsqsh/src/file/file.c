@@ -310,11 +310,27 @@ sqsh_file_block_count(const struct SqshFile *context) {
 }
 
 uint32_t
+sqsh_file_block_size2(const struct SqshFile *context, uint64_t index) {
+	const uint32_t size_info =
+			context->impl->block_size_info(get_inode(context), index);
+
+	return sqsh_datablock_size(size_info);
+}
+
+uint32_t
 sqsh_file_block_size(const struct SqshFile *context, uint32_t index) {
 	const uint32_t size_info =
 			context->impl->block_size_info(get_inode(context), index);
 
 	return sqsh_datablock_size(size_info);
+}
+
+bool
+sqsh_file_block_is_compressed2(const struct SqshFile *context, uint64_t index) {
+	const uint32_t size_info =
+			context->impl->block_size_info(get_inode(context), index);
+
+	return sqsh_datablock_is_compressed(size_info);
 }
 
 bool

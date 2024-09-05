@@ -45,7 +45,7 @@ static bool
 is_last_block(const struct SqshFileIterator *iterator) {
 	const struct SqshFile *file = iterator->file;
 	const bool has_fragment = sqsh_file_has_fragment(file);
-	const sqsh_index_t block_index = iterator->block_index;
+	const uint64_t block_index = iterator->block_index;
 	const uint64_t block_count = sqsh_file_block_count2(file);
 
 	if (has_fragment) {
@@ -135,9 +135,8 @@ map_block_compressed(
 			iterator->compression_manager;
 	const struct SqshFile *file = iterator->file;
 	struct SqshExtractView *extract_view = &iterator->extract_view;
-	const uint32_t block_index = iterator->block_index;
-	const sqsh_index_t data_block_size =
-			sqsh_file_block_size(file, block_index);
+	const uint64_t block_index = iterator->block_index;
+	const uint32_t data_block_size = sqsh_file_block_size2(file, block_index);
 
 	rv = sqsh__map_reader_advance(
 			&iterator->map_reader, next_offset, data_block_size);
@@ -168,7 +167,7 @@ map_block_uncompressed(
 		size_t desired_size) {
 	int rv = 0;
 	const struct SqshFile *file = iterator->file;
-	uint32_t block_index = iterator->block_index;
+	uint64_t block_index = iterator->block_index;
 	struct SqshMapReader *reader = &iterator->map_reader;
 	const uint64_t block_count = sqsh_file_block_count2(file);
 	size_t outer_size = 0;
@@ -176,14 +175,14 @@ map_block_uncompressed(
 
 	for (; iterator->sparse_size == 0 && block_index < block_count;
 		 block_index++) {
-		if (sqsh_file_block_is_compressed(file, block_index)) {
+		if (sqsh_file_block_is_compressed2(file, block_index)) {
 			break;
 		}
 		if (outer_size >= desired_size) {
 			break;
 		}
 		const uint32_t data_block_size =
-				sqsh_file_block_size(file, block_index);
+				sqsh_file_block_size2(file, block_index);
 		/* Set the sparse size only if we are not at the last block. */
 		if (block_index + 1 != block_count) {
 			iterator->sparse_size = iterator->block_size - data_block_size;
@@ -241,11 +240,12 @@ map_block(struct SqshFileIterator *iterator, size_t desired_size) {
 	int rv = 0;
 	const struct SqshFile *file = iterator->file;
 
-	const uint32_t block_index = iterator->block_index;
+	const uint64_t block_index = iterator->block_index;
 	const size_t block_size = iterator->block_size;
-	const bool is_compressed = sqsh_file_block_is_compressed(file, block_index);
+	const bool is_compressed =
+			sqsh_file_block_is_compressed2(file, block_index);
 	const uint64_t file_size = sqsh_file_size(file);
-	const size_t data_block_size = sqsh_file_block_size(file, block_index);
+	const size_t data_block_size = sqsh_file_block_size2(file, block_index);
 	const sqsh_index_t next_offset =
 			sqsh__map_reader_size(&iterator->map_reader);
 
@@ -374,10 +374,10 @@ sqsh_file_iterator_skip2(
 	}
 
 	sqsh_index_t reader_forward = 0;
-	uint32_t block_index = iterator->block_index;
+	uint64_t block_index = iterator->block_index;
 	const uint64_t block_count = sqsh_file_block_count2(iterator->file);
 	for (sqsh_index_t i = 0; i < skip_index && block_index < block_count; i++) {
-		reader_forward += sqsh_file_block_size(iterator->file, block_index);
+		reader_forward += sqsh_file_block_size2(iterator->file, block_index);
 		block_index += 1;
 	}
 	rv = sqsh__map_reader_advance(&iterator->map_reader, reader_forward, 0);

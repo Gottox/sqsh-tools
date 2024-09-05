@@ -294,11 +294,11 @@ stat_file(struct SqshArchive *archive, const char *path) {
 		}
 		printf("   number of blocks: %" PRIu64 "\n",
 			   sqsh_file_block_count2(file));
-		for (uint32_t i = 0; i < sqsh_file_block_count2(file); i++) {
-			bool is_compressed = sqsh_file_block_is_compressed(file, i);
-			uint32_t size = sqsh_file_block_size(file, i);
+		for (uint64_t i = 0; i < sqsh_file_block_count2(file); i++) {
+			bool is_compressed = sqsh_file_block_is_compressed2(file, i);
+			uint32_t size = sqsh_file_block_size2(file, i);
 
-			printf("          % 9i - %i (compressed: %s)\n", i, size,
+			printf("          % 9" PRIi64 " - %i (compressed: %s)\n", i, size,
 				   is_compressed ? "yes" : "no");
 		}
 		break;

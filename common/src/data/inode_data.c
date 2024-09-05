@@ -78,7 +78,7 @@ sqsh__data_inode_file_size(const struct SqshDataInodeFile *file) {
 }
 uint32_t
 sqsh__data_inode_file_block_size_info(
-		const struct SqshDataInodeFile *file, sqsh_index_t index) {
+		const struct SqshDataInodeFile *file, uint64_t index) {
 	const struct {
 		uint32_t b;
 	} SQSH_UNALIGNED *block_sizes = (const void *)&file[1];
@@ -120,7 +120,7 @@ sqsh__data_inode_file_ext_xattr_idx(
 }
 uint32_t
 sqsh__data_inode_file_ext_block_size_info(
-		const struct SqshDataInodeFileExt *file_ext, sqsh_index_t index) {
+		const struct SqshDataInodeFileExt *file_ext, uint64_t index) {
 	const struct {
 		uint32_t b;
 	} SQSH_UNALIGNED *block_sizes = (const void *)&file_ext[1];
