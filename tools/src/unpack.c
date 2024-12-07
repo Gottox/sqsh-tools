@@ -48,6 +48,8 @@
 typedef int (*extract_fn)(
 		const char *, enum SqshFileType, const struct SqshFile *);
 
+static const char *TMP_SUFFIX = "-XXXXXX";
+
 struct CxSemaphore file_descriptor_sem;
 size_t extracted_files = 0;
 bool do_chown = false;
@@ -155,7 +157,7 @@ out:
 }
 
 struct ExtractFileData {
-	char tmp_filename[32];
+	char *tmp_filename;
 	char *path;
 };
 
@@ -168,6 +170,7 @@ extract_file_cleanup(struct ExtractFileData *data, FILE *stream) {
 		fclose(stream);
 	}
 	free(data->path);
+	free(data->tmp_filename);
 	free(data);
 }
 static void
@@ -212,7 +215,15 @@ extract_file(const char *path, const struct SqshFile *file) {
 		perror(path);
 		goto out;
 	}
-	strcpy(data->tmp_filename, ".sqsh-unpack-XXXXXX");
+
+	data->tmp_filename = calloc(1, strlen(path) + sizeof(TMP_SUFFIX));
+	if (data->tmp_filename == NULL) {
+		rv = -errno;
+		perror(path);
+		goto out;
+	}
+	strcpy(data->tmp_filename, path);
+	strcat(data->tmp_filename, TMP_SUFFIX);
 
 	rv = cx_semaphore_wait(&file_descriptor_sem);
 	if (rv < 0) {
