@@ -4,6 +4,7 @@ sqsh_extended_test = [
     'cat/large-file-uncompressed.sh',
     'read-chunk/tail.sh',
     'unpack/repack.sh',
+    'unpack/empty_file.sh',
     'unpack/pathtraversal/pathtraversal.sh',
     'ls/large-tree.sh',
     'ls/large-tree-lookup.sh',
