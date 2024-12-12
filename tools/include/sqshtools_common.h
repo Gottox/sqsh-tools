@@ -54,4 +54,17 @@ void print_raw(const char *segment, size_t segment_size);
 
 void print_escaped(const char *segment, size_t segment_size);
 
+void locked_perror(const char *msg);
+
+void locked_sqsh_perror(int error_code, const char *msg);
+
+void locked_perror(const char *msg);
+
+__attribute__((__format__(__printf__, 2, 0))) void
+locked_fprintf(FILE *stream, const char *format, ...);
+
+void locked_fputs(const char *s, FILE *stream);
+
+int locked_fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream);
+
 #endif /* TOOLS_COMMON_H */

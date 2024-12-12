@@ -32,7 +32,52 @@
  * @created  Wednesday Jun 07, 2023 15:41:30 CEST
  */
 
+#include "sqsh_error.h"
+#include <pthread.h>
 #include <sqshtools_common.h>
+#include <stdarg.h>
+
+pthread_mutex_t output_lock = PTHREAD_MUTEX_INITIALIZER;
+
+void
+locked_perror(const char *msg) {
+	pthread_mutex_lock(&output_lock);
+	perror(msg);
+	pthread_mutex_unlock(&output_lock);
+}
+
+void
+locked_fprintf(FILE *stream, const char *format, ...) {
+	va_list args;
+	va_start(args, format);
+	pthread_mutex_lock(&output_lock);
+	vfprintf(stream, format, args);
+	pthread_mutex_unlock(&output_lock);
+	va_end(args);
+}
+
+void
+locked_fputs(const char *s, FILE *stream) {
+	pthread_mutex_lock(&output_lock);
+	fputs(s, stream);
+	pthread_mutex_unlock(&output_lock);
+}
+
+int
+locked_fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream) {
+	int ret;
+	pthread_mutex_lock(&output_lock);
+	ret = fwrite(ptr, size, nmemb, stream);
+	pthread_mutex_unlock(&output_lock);
+	return ret;
+}
+
+void
+locked_sqsh_perror(int error_code, const char *msg) {
+	pthread_mutex_lock(&output_lock);
+	sqsh_perror(error_code, msg);
+	pthread_mutex_unlock(&output_lock);
+}
 
 struct SqshArchive *
 open_archive(const char *image_path, uint64_t offset, int *err) {
@@ -55,7 +100,7 @@ open_archive(const char *image_path, uint64_t offset, int *err) {
 
 void
 print_raw(const char *segment, size_t segment_size) {
-	fwrite(segment, 1, segment_size, stdout);
+	locked_fwrite(segment, 1, segment_size, stdout);
 }
 
 void
@@ -63,19 +108,19 @@ print_escaped(const char *segment, size_t segment_size) {
 	for (size_t i = 0; i < segment_size; i++) {
 		switch (segment[i]) {
 		case '\n':
-			fputs("\\n", stdout);
+			locked_fputs("\\n", stdout);
 			break;
 		case '\r':
-			fputs("\\r", stdout);
+			locked_fputs("\\r", stdout);
 			break;
 		case '\t':
-			fputs("\\t", stdout);
+			locked_fputs("\\t", stdout);
 			break;
 		case '\\':
-			fputs("\\\\", stdout);
+			locked_fputs("\\\\", stdout);
 			break;
 		case '\x1b':
-			fputs("\\e", stdout);
+			locked_fputs("\\e", stdout);
 			break;
 		case 0x01:
 		case 0x02:
@@ -106,10 +151,10 @@ print_escaped(const char *segment, size_t segment_size) {
 		case 0x1f:
 		case 0x20:
 		case 0x7f:
-			printf("\\x%02x", segment[i]);
+			locked_fprintf(stdout, "\\x%02x", segment[i]);
 			break;
 		default:
-			putchar(segment[i]);
+			locked_fputs((char[2]){segment[i], 0}, stdout);
 			break;
 		}
 	}
