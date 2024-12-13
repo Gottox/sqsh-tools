@@ -37,7 +37,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <libgen.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/resource.h>
@@ -88,14 +87,14 @@ update_metadata(const char *path, const struct SqshFile *file) {
 	times[0].tv_sec = times[1].tv_sec = sqsh_file_modified_time(file);
 	rv = utimensat(AT_FDCWD, path, times, AT_SYMLINK_NOFOLLOW);
 	if (rv < 0) {
-		perror(path);
+		locked_perror(path);
 		goto out;
 	}
 
 	uint16_t mode = sqsh_file_permission(file);
 	rv = fchmodat(AT_FDCWD, path, mode, AT_SYMLINK_NOFOLLOW);
 	if (rv < 0) {
-		perror(path);
+		locked_perror(path);
 		goto out;
 	}
 
@@ -105,7 +104,7 @@ update_metadata(const char *path, const struct SqshFile *file) {
 
 		rv = chown(path, uid, gid);
 		if (rv < 0) {
-			perror(path);
+			locked_perror(path);
 			goto out;
 		}
 	}
@@ -122,17 +121,17 @@ extract_dir(const char *path) {
 		struct stat st;
 		rv = stat(path, &st);
 		if (rv < 0) {
-			perror(path);
+			locked_perror(path);
 			goto out;
 		}
 		if (!S_ISDIR(st.st_mode)) {
 			errno = EEXIST;
-			perror(path);
+			locked_perror(path);
 			goto out;
 		}
 
 	} else if (rv < 0) {
-		perror(path);
+		locked_perror(path);
 		goto out;
 	}
 
@@ -147,7 +146,7 @@ update_metadata_dir(const char *path, const struct SqshFile *file) {
 	int rv = 0;
 	rv = chmod(path, sqsh_file_permission(file));
 	if (rv < 0) {
-		perror(path);
+		locked_perror(path);
 		goto out;
 	}
 
@@ -180,7 +179,7 @@ extract_file_after(
 	int rv = 0;
 	struct ExtractFileData *data = d;
 	if (err < 0) {
-		sqsh_perror(err, data->path);
+		locked_sqsh_perror(err, data->path);
 	}
 
 	rv = rename(data->tmp_filename, data->path);
@@ -194,7 +193,7 @@ extract_file_after(
 out:
 	cx_semaphore_post(&file_descriptor_sem);
 	if (rv < 0) {
-		sqsh_perror(rv, data->path);
+		locked_sqsh_perror(rv, data->path);
 	}
 	extract_file_cleanup(data, NULL);
 }
@@ -261,7 +260,7 @@ extract_file(const char *path, const struct SqshFile *file) {
 	}
 out:
 	if (rv < 0) {
-		sqsh_perror(rv, path);
+		locked_sqsh_perror(rv, path);
 		extract_file_cleanup(data, stream);
 		if (fd > 0) {
 			close(fd);
@@ -389,7 +388,7 @@ extract_from_traversal(
 	} else {
 		file = sqsh_tree_traversal_open_file(iter, &rv);
 		if (rv < 0) {
-			sqsh_perror(rv, path);
+			locked_sqsh_perror(rv, path);
 			goto out;
 		}
 
@@ -423,14 +422,14 @@ extract_all(
 
 	iter = sqsh_tree_traversal_new(base, &rv);
 	if (rv < 0) {
-		sqsh_perror(rv, image_path);
+		locked_sqsh_perror(rv, image_path);
 		goto out;
 	}
 
 	bool has_next = sqsh_tree_traversal_next(iter, &rv);
 	if (!has_next) {
 		rv = -SQSH_ERROR_INTERNAL;
-		sqsh_perror(rv, image_path);
+		locked_sqsh_perror(rv, image_path);
 		goto out;
 	}
 
@@ -441,7 +440,7 @@ extract_all(
 		}
 	}
 	if (rv < 0) {
-		sqsh_perror(rv, image_path);
+		locked_sqsh_perror(rv, image_path);
 		goto out;
 	}
 
@@ -505,7 +504,7 @@ main(int argc, char *argv[]) {
 
 	sqsh = open_archive(image_path, offset, &rv);
 	if (rv < 0) {
-		sqsh_perror(rv, image_path);
+		locked_sqsh_perror(rv, image_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
@@ -528,7 +527,7 @@ main(int argc, char *argv[]) {
 
 	src_root = sqsh_lopen(sqsh, src_path, &rv);
 	if (rv < 0) {
-		sqsh_perror(rv, src_path);
+		locked_sqsh_perror(rv, src_path);
 		rv = EXIT_FAILURE;
 		goto out;
 	}
