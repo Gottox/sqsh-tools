@@ -34,6 +34,7 @@
 #ifndef SQSH_EXTRACT_PRIVATE_H
 #define SQSH_EXTRACT_PRIVATE_H
 
+#include "sqsh_collection_private.h"
 #include <cextras/collection.h>
 
 #include <sqsh_data.h>
@@ -178,7 +179,7 @@ struct SqshExtractManager {
 	 */
 	const struct SqshExtractorImpl *extractor_impl;
 	struct SqshMapManager *map_manager;
-	struct CxRcRadixTree cache;
+	struct SqshRadixList cache;
 	uint32_t block_size;
 	struct CxLru lru;
 	sqsh__mutex_t lock;

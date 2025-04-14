@@ -31,4 +31,61 @@
  * @file         compression_options_data.c
  */
 
+#include "cextras/collection.h"
 #include <sqsh_collection_private.h>
+
+int
+sqsh_radix_list_init(
+		struct SqshRadixList *list, size_t element_size,
+		sqsh_rc_map_cleanup_t cleanup) {
+	return cx_rc_radix_tree_init(&list->tree, element_size, cleanup);
+}
+
+void *
+sqsh_radix_list_put(struct SqshRadixList *list, uint64_t key, void *value) {
+	return cx_rc_radix_tree_put(&list->tree, key, value);
+}
+
+int
+sqsh_radix_list_release(struct SqshRadixList *list, uint64_t key) {
+	return cx_rc_radix_tree_release(&list->tree, key);
+}
+
+void *
+sqsh_radix_list_retain(struct SqshRadixList *list, uint64_t key) {
+	return cx_rc_radix_tree_retain(&list->tree, key);
+}
+
+void
+sqsh_radix_list_retain_value(struct SqshRadixList *list, const void *value) {
+	cx_rc_radix_tree_retain_value(&list->tree, value);
+}
+
+int
+sqsh_radix_list_cleanup(struct SqshRadixList *list) {
+	return cx_rc_radix_tree_cleanup(&list->tree);
+}
+
+static void *
+lru_radix_list_retain(void *backend, uint64_t index) {
+	struct SqshRadixList *list = backend;
+	return cx_rc_radix_tree_retain(&list->tree, index);
+}
+
+static void
+lru_radix_list_retain_value(void *backend, void *value) {
+	struct SqshRadixList *list = backend;
+	cx_rc_radix_tree_retain_value(&list->tree, value);
+}
+
+static int
+lru_radix_list_release(void *backend, uint64_t index) {
+	struct SqshRadixList *list = backend;
+	return cx_rc_radix_tree_release(&list->tree, index);
+}
+
+const struct CxLruBackendImpl sqsh_lru_radix_list = {
+		.retain = lru_radix_list_retain,
+		.retain_value = lru_radix_list_retain_value,
+		.release = lru_radix_list_release,
+};

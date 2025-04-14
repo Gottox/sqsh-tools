@@ -3,7 +3,13 @@ sqsh_doc_src = ['guide.md']
 doxygen = find_program('doxygen')
 git = find_program('git')
 git_version = run_command(
-    [git, '-C', meson.project_source_root(), 'describe', '--always', '--tags'],
+    [
+        git,
+        '-C', meson.project_source_root(),
+        'describe',
+        '--always',
+        '--tags',
+    ],
     capture: true,
     check: true,
 ).stdout()

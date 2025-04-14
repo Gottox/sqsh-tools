@@ -43,13 +43,25 @@ extern "C" {
 
 struct SqshRadixList {
 	struct CxRcRadixTree tree;
-	struct CxPreallocPool element_pool;
 };
 
-struct SqshRadixListElement {
-	struct SqshRadixListElement *next;
-	uint16_t key;
-};
+int sqsh_radix_list_init(
+		struct SqshRadixList *tree, size_t element_size,
+		sqsh_rc_map_cleanup_t cleanup);
+
+void *
+sqsh_radix_list_put(struct SqshRadixList *tree, uint64_t key, void *value);
+
+void *sqsh_radix_list_retain(struct SqshRadixList *tree, uint64_t key);
+
+void
+sqsh_radix_list_retain_value(struct SqshRadixList *tree, const void *value);
+
+int sqsh_radix_list_release(struct SqshRadixList *tree, uint64_t key);
+
+int sqsh_radix_list_cleanup(struct SqshRadixList *tree);
+
+extern const struct CxLruBackendImpl sqsh_lru_radix_list;
 
 #ifdef __cplusplus
 }

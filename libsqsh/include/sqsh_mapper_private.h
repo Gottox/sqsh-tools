@@ -36,6 +36,7 @@
 
 #include <sqsh_mapper.h>
 
+#include "sqsh_collection_private.h"
 #include "sqsh_reader_private.h"
 #include "sqsh_utils_private.h"
 
@@ -171,7 +172,7 @@ struct SqshMapManager {
 	 */
 	struct SqshMapper mapper;
 	struct CxLru lru;
-	struct CxRcRadixTree maps;
+	struct SqshRadixList maps;
 	uint64_t archive_offset;
 	uint64_t block_count;
 	sqsh__mutex_t lock;
