@@ -177,7 +177,7 @@ file_iterator_mt(
 	}
 
 	mt->blocks =
-			calloc(sizeof(struct FileIteratorMtBlock), (size_t)block_count);
+			calloc((size_t)block_count, sizeof(struct FileIteratorMtBlock));
 	if (mt->blocks == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
@@ -207,7 +207,7 @@ sqsh_file_iterator_mt(
 		sqsh_file_iterator_mt_cb cb, void *data) {
 	int rv = 0;
 
-	struct FileIteratorMt *mt = calloc(sizeof(struct FileIteratorMt), 1);
+	struct FileIteratorMt *mt = calloc(1, sizeof(struct FileIteratorMt));
 	if (mt == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 	}
@@ -253,7 +253,7 @@ sqsh_file_to_stream_mt(
 		FILE *stream, sqsh_file_to_stream_mt_cb cb, void *data) {
 	int rv = 0;
 
-	struct FileToStreamMt *mt = calloc(sizeof(struct FileToStreamMt), 1);
+	struct FileToStreamMt *mt = calloc(1, sizeof(struct FileToStreamMt));
 	if (mt == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
