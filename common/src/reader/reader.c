@@ -100,10 +100,14 @@ sqsh__reader_copy(
 
 	if (data == NULL) {
 		target->data = NULL;
-	} else if (data >= buffer_data && data < buffer_data + buffer_size) {
+	} else if (
+			buffer_data != NULL && data >= buffer_data &&
+			data < buffer_data + buffer_size) {
 		const uint8_t *target_buffer_data = cx_buffer_data(&target->buffer);
 		target->data = &target_buffer_data[data - buffer_data];
-	} else if (data >= iterator_data && data < iterator_data + iterator_size) {
+	} else if (
+			iterator_data != NULL && data >= iterator_data &&
+			data < iterator_data + iterator_size) {
 		target->data = &iterator_data[data - iterator_data];
 	} else {
 		rv = -SQSH_ERROR_INTERNAL;
