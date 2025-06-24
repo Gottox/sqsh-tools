@@ -37,6 +37,7 @@
 #include <sqsh_directory_private.h>
 #include <sqsh_easy.h>
 #include <sqsh_file_private.h>
+#include <sqsh_posix.h>
 #include <sqsh_tree.h>
 #include <sqsh_tree_private.h>
 #include <utest.h>
@@ -862,6 +863,74 @@ UTEST(integration, copy_iterator_iterated) {
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__file_iterator_cleanup(&copy_iter);
+	ASSERT_EQ(0, rv);
+
+	rv = sqsh_close(file);
+	ASSERT_EQ(0, rv);
+
+	rv = sqsh__archive_cleanup(&sqsh);
+	ASSERT_EQ(0, rv);
+}
+
+struct MtCollectData {
+	char *buf;
+	size_t size;
+	size_t processed;
+	int err;
+	int blocks;
+};
+
+static void
+iterator_mt_collect(
+		const struct SqshFile *file, const struct SqshFileIterator *iter,
+		uint64_t offset, void *data, int err) {
+	(void)file;
+	struct MtCollectData *d = data;
+	if (iter == NULL) {
+		d->err = err;
+		return;
+	}
+
+	const uint8_t *block_data = sqsh_file_iterator_data(iter);
+	size_t block_size = sqsh_file_iterator_size(iter);
+	memcpy(d->buf + offset, block_data, block_size);
+	d->processed += block_size;
+	d->blocks++;
+}
+
+UTEST(integration, file_iterator_mt_basic) {
+	int rv;
+	struct SqshArchive sqsh = {0};
+	struct SqshThreadpool *tp = NULL;
+	struct SqshFile *file = NULL;
+
+	struct SqshConfig config = DEFAULT_CONFIG(TEST_SQUASHFS_IMAGE_LEN);
+	config.archive_offset = 1010;
+	rv = sqsh__archive_init(&sqsh, (char *)TEST_SQUASHFS_IMAGE, &config);
+	ASSERT_EQ(0, rv);
+
+	tp = sqsh_threadpool_new(1, &rv);
+	ASSERT_TRUE(tp != NULL);
+	ASSERT_EQ(0, rv);
+
+	file = sqsh_open(&sqsh, "/b", &rv);
+	ASSERT_EQ(0, rv);
+
+	struct MtCollectData data = {0};
+	data.size = sqsh_file_size(file);
+	data.buf = calloc(data.size, 1);
+	ASSERT_NE(NULL, data.buf);
+
+	sqsh_file_iterator_mt(file, tp, iterator_mt_collect, &data);
+	rv = sqsh_threadpool_wait(tp);
+	ASSERT_EQ(0, rv);
+
+	ASSERT_EQ(0, data.err);
+	ASSERT_EQ(data.size, data.processed);
+	ASSERT_EQ(9, data.blocks);
+
+	free(data.buf);
+	rv = sqsh_threadpool_free(tp);
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh_close(file);
