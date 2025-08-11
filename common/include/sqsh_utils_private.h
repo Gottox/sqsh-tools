@@ -31,8 +31,8 @@
  * @file         sqsh_utils_private.h
  */
 
-#ifndef SQSH_THREAD_PRIVATE_H
-#define SQSH_THREAD_PRIVATE_H
+#ifndef SQSH_UTILS_PRIVATE_H
+#define SQSH_UTILS_PRIVATE_H
 
 #include <pthread.h>
 

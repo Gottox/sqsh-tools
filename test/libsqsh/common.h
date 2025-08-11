@@ -174,4 +174,4 @@ void test_sqsh_init_archive(
 		struct SqshArchive *sqsh, FILE *farchive, uint8_t *payload,
 		size_t payload_size);
 
-#endif /* !COMMON_H */
+#endif /* COMMON_H */

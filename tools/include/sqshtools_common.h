@@ -31,9 +31,9 @@
  * @file        sqshtools_common.h
  */
 
-#ifndef TOOLS_COMMON_H
+#ifndef SQSHTOOLS_COMMON_H
 
-#define TOOLS_COMMON_H
+#define SQSHTOOLS_COMMON_H
 
 #define _GNU_SOURCE
 
@@ -67,4 +67,4 @@ void locked_fputs(const char *s, FILE *stream);
 
 int locked_fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream);
 
-#endif /* TOOLS_COMMON_H */
+#endif /* SQSHTOOLS_COMMON_H */

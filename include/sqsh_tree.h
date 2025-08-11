@@ -664,4 +664,4 @@ int sqsh_tree_traversal_free(struct SqshTreeTraversal *traversal);
 #ifdef __cplusplus
 }
 #endif
-#endif // SQSH_TREE_H
+#endif /* SQSH_TREE_H */

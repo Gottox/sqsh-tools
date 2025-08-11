@@ -31,8 +31,8 @@
  * @file         sqsh_easy.h
  */
 
-#ifndef SQSH_CHROME_H
-#define SQSH_CHROME_H
+#ifndef SQSH_EASY_H
+#define SQSH_EASY_H
 
 #include "sqsh_common.h"
 
@@ -218,4 +218,4 @@ char *sqsh_easy_xattr_get(
 #ifdef __cplusplus
 }
 #endif
-#endif /* SQSH_CHROME_H */
+#endif /* SQSH_EASY_H */

@@ -31,8 +31,8 @@
  * @file         sqsh_directory_private.h
  */
 
-#ifndef SQSH_ITERATOR_PRIVATE_H
-#define SQSH_ITERATOR_PRIVATE_H
+#ifndef SQSH_DIRECTORY_PRIVATE_H
+#define SQSH_DIRECTORY_PRIVATE_H
 
 #include "sqsh_directory.h"
 
@@ -201,4 +201,4 @@ SQSH_NO_EXPORT int sqsh__directory_index_iterator_cleanup(
 #ifdef __cplusplus
 }
 #endif
-#endif /* SQSH_ITERATOR_PRIVATE_H */
+#endif /* SQSH_DIRECTORY_PRIVATE_H */
