@@ -31,14 +31,18 @@
  * @file         mksqsh_archive.h
  */
 
-#ifndef SQSH_ARCHIVE_BUILDER_H
-#define SQSH_ARCHIVE_BUILDER_H
+#ifndef MKSQSH_ARCHIVE_H
+#define MKSQSH_ARCHIVE_H
 
 #include <cextras/collection.h>
 #include <sqsh_data.h>
 #include <sqsh_data_set.h>
 
 #include <stdio.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /***************************************
  * archive/superblock_builder.c
@@ -120,7 +124,21 @@ int mksqsh__superblock_write(struct MksqshSuperblock *superblock, FILE *output);
 
 int mksqsh__superblock_cleanup(struct MksqshSuperblock *superblock);
 
+/***************************************
+ * archive/archive_builder.c
+ */
+
+struct MksqshArchive;
+
+int mksqsh_archive_init(struct MksqshArchive *archive);
+
+struct MksqshFile *mksqsh_archive_root(struct MksqshArchive *archive);
+
+int mksqsh_archive_write(struct MksqshArchive *archive, const char *path);
+
+int mksqsh_archive_cleanup(struct MksqshArchive *archive);
+
 #ifdef __cplusplus
 }
 #endif
-#endif /* SQSH_ARCHIVE_BUILDER_H */
+#endif /* MKSQSH_ARCHIVE_H */

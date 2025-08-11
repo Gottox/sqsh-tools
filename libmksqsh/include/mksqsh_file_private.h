@@ -28,47 +28,46 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         mksqsh_metablock.h
+ * @file         mksqsh_file_private.h
  */
 
-#ifndef MKSQSH_METABLOCK_H
-#define MKSQSH_METABLOCK_H
+#ifndef MKSQSH_FILE_PRIVATE_H
+#define MKSQSH_FILE_PRIVATE_H
 
-#include <sqsh_data.h>
-#include <sqsh_data_set.h>
-
+#include <cextras/memory.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
+
+#include "mksqsh_file.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/***************************************
- * metablock/metablock_builder.c
- */
-
-struct MksqshMetablock {
-	uint8_t buffer[8192];
-	uint64_t outer_ref;
-	size_t buffer_size;
-	FILE *out;
-	bool flushed;
+enum MksqshFileContentType {
+	MKSQSH_FILE_CONTENT_NONE,
+	MKSQSH_FILE_CONTENT_MEMORY,
+	MKSQSH_FILE_CONTENT_FD,
+	MKSQSH_FILE_CONTENT_PATH,
 };
 
-int mksqsh__metablock_init(struct MksqshMetablock *metablock, FILE *out);
-
-uint64_t mksqsh__metablock_ref(const struct MksqshMetablock *metablock);
-
-int mksqsh__metablock_write(
-		struct MksqshMetablock *metablock, const uint8_t *data, size_t size);
-
-bool mksqsh__metablock_was_flushed(const struct MksqshMetablock *metablock);
-
-int mksqsh__metablock_flush(struct MksqshMetablock *metablock);
-
-int mksqsh__metablock_cleanup(struct MksqshMetablock *metablock);
+struct MksqshFile {
+	struct CxRc rc;
+	enum MksqshFileType type;
+	struct MksqshArchive *archive;
+	char *name;
+	enum MksqshFileContentType content_type;
+	uint8_t *data;
+	size_t size;
+	FILE *fd;
+	char *path;
+	struct MksqshFile **children;
+	size_t child_count;
+};
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* MKSQSH_METABLOCK_H */
+
+#endif /* MKSQSH_FILE_PRIVATE_H */

@@ -19,6 +19,7 @@ sqsh_test = [
     'metablock/metablock_reader.c',
     'mapper/map_iterator.c',
     'mapper/map_reader.c',
+    'mksqsh.c',
     'nasty.c',
     'reader/reader.c',
     'tree/path_resolver.c',
