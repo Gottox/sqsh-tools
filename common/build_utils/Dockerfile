@@ -1,14 +1,14 @@
 ARG BASE_IMAGE=alpine
 #ARG BASE_IMAGE=i386/alpine
-FROM ${BASE_IMAGE}:3.20
+FROM ${BASE_IMAGE}:3.21
 
 RUN apk add --no-cache \
 	jq \
 	gcc \
 	g++ \
-	clang17 \
-	clang17-extra-tools \
-	clang17-analyzer \
+	clang19 \
+	clang19-extra-tools \
+	clang19-analyzer \
 	meson \
 	musl-dev \
 	git \
@@ -29,6 +29,7 @@ RUN apk add --no-cache \
 RUN apk add --no-cache \
 	--repository https://dl-cdn.alpinelinux.org/alpine/edge/main \
 	--repository https://dl-cdn.alpinelinux.org/alpine/edge/testing \
+	--repository https://dl-cdn.alpinelinux.org/alpine/edge/community \
 	pkgconf \
 	muon
 
