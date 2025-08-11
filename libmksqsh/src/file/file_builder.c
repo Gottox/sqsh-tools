@@ -76,6 +76,7 @@ mksqsh_file_new(
 		file->type = type;
 		file->archive = archive;
 		file->content_type = MKSQSH_FILE_CONTENT_NONE;
+		file->children = NULL;
 	}
 	if (err != NULL) {
 		*err = rv;
@@ -91,22 +92,26 @@ mksqsh_file_add(
 		return -SQSH_ERROR_INTERNAL;
 	}
 
+	struct MksqshNode *node = calloc(1, sizeof(*node));
+	if (node == NULL) {
+		return -SQSH_ERROR_MALLOC_FAILED;
+	}
+	mksqsh__node_init(node, child);
+
 	char *dup = strdup(file_name);
 	if (dup == NULL) {
+		mksqsh__node_release(node);
 		return -SQSH_ERROR_MALLOC_FAILED;
 	}
+	node->name = dup;
+	node->next = NULL;
 
-	struct MksqshFile **tmp = reallocarray(
-			directory->children, directory->child_count + 1, sizeof(*tmp));
-	if (tmp == NULL) {
-		free(dup);
-		return -SQSH_ERROR_MALLOC_FAILED;
+	struct MksqshNode **curr = &directory->children;
+	while (*curr != NULL && strcmp((*curr)->name, node->name) < 0) {
+		curr = &(*curr)->next;
 	}
-
-	free(child->name);
-	child->name = dup;
-	directory->children = tmp;
-	directory->children[directory->child_count++] = mksqsh_file_retain(child);
+	node->next = *curr;
+	*curr = node;
 	return 0;
 }
 
@@ -186,12 +191,29 @@ mksqsh_file_release(struct MksqshFile *file) {
 	if (!cx_rc_release(&file->rc)) {
 		return;
 	}
-	for (size_t i = 0; i < file->child_count; i++) {
-		mksqsh_file_release(file->children[i]);
+	struct MksqshNode *child = file->children;
+	file->children = NULL;
+	while (child != NULL) {
+		struct MksqshNode *next = child->next;
+		mksqsh__node_release(child);
+		child = next;
 	}
-	free(file->children);
 	mksqsh_file_reset_content(file);
-	free(file->name);
 	struct CxPreallocPool *pool = mksqsh__archive_file_pool(file->archive);
 	cx_prealloc_pool_recycle(pool, file);
+}
+
+void
+mksqsh__node_release(struct MksqshNode *node) {
+	if (node == NULL) {
+		return;
+	}
+	if (!cx_rc_release(&node->rc)) {
+		return;
+	}
+	if (node->file != NULL) {
+		mksqsh_file_release(node->file);
+	}
+	free(node->name);
+	free(node);
 }

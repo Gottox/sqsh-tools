@@ -34,6 +34,7 @@
 #define _GNU_SOURCE
 #include <mksqsh_archive_private.h>
 #include <mksqsh_file.h>
+#include <mksqsh_file_private.h>
 #include <sqsh.h>
 #include <testlib.h>
 
@@ -96,6 +97,88 @@ create_and_read(void) {
 	unlink(path);
 }
 
+static void
+children_sorted(void) {
+	struct MksqshArchive archive = {0};
+	int rv = mksqsh_archive_init(&archive);
+	ASSERT_EQ(0, rv);
+
+	struct MksqshFile *root = mksqsh_archive_root(&archive);
+	ASSERT_NE(root, NULL);
+
+	struct MksqshFile *a = mksqsh_file_new(&archive, MKSQSH_FILE_TYPE_REG, &rv);
+	ASSERT_NE(a, NULL);
+	ASSERT_EQ(0, rv);
+
+	struct MksqshFile *b = mksqsh_file_new(&archive, MKSQSH_FILE_TYPE_REG, &rv);
+	ASSERT_NE(b, NULL);
+	ASSERT_EQ(0, rv);
+
+	rv = mksqsh_file_add(root, "b.txt", b);
+	ASSERT_EQ(0, rv);
+	rv = mksqsh_file_add(root, "a.txt", a);
+	ASSERT_EQ(0, rv);
+
+	ASSERT_NE(root->children, NULL);
+	ASSERT_EQ(root->children->file, a);
+	ASSERT_EQ(root->children->next->file, b);
+
+	mksqsh_file_release(root);
+	mksqsh_file_release(a);
+	mksqsh_file_release(b);
+	mksqsh_archive_cleanup(&archive);
+}
+
+static void
+duplicate_file(void) {
+	struct MksqshArchive archive = {0};
+	int rv = mksqsh_archive_init(&archive);
+	ASSERT_EQ(0, rv);
+
+	struct MksqshFile *root = mksqsh_archive_root(&archive);
+	ASSERT_NE(root, NULL);
+
+	struct MksqshFile *a = mksqsh_file_new(&archive, MKSQSH_FILE_TYPE_REG, &rv);
+	ASSERT_NE(a, NULL);
+	ASSERT_EQ(0, rv);
+
+	mksqsh_file_content(a, "data", 4);
+
+	rv = mksqsh_file_add(root, "a1.txt", a);
+	ASSERT_EQ(0, rv);
+	rv = mksqsh_file_add(root, "a2.txt", a);
+	ASSERT_EQ(0, rv);
+
+	mksqsh_file_release(root);
+	mksqsh_file_release(a);
+
+	char path[] = "/tmp/mksqshXXXXXX";
+	int fd = mkstemp(path);
+	ASSERT(fd >= 0);
+	close(fd);
+
+	rv = mksqsh_archive_write(&archive, path);
+	ASSERT_EQ(0, rv);
+	mksqsh_archive_cleanup(&archive);
+
+	struct SqshArchive *sqsh = sqsh_archive_open(path, NULL, &rv);
+	ASSERT_EQ(0, rv);
+	ASSERT_TRUE(sqsh != NULL);
+
+	uint8_t *c1 = sqsh_easy_file_content(sqsh, "/a1.txt", &rv);
+	ASSERT_EQ(0, rv);
+	uint8_t *c2 = sqsh_easy_file_content(sqsh, "/a2.txt", &rv);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(0, memcmp(c1, c2, 4));
+
+	free(c1);
+	free(c2);
+	sqsh_archive_close(sqsh);
+	unlink(path);
+}
+
 DECLARE_TESTS
 TEST(create_and_read)
+TEST(children_sorted)
+TEST(duplicate_file)
 END_TESTS

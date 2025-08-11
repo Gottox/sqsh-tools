@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Copyright (c) 2023-2024, Enno Boland <g@s01.de>                            *
+ * Copyright (c) 2024, Enno Boland <g@s01.de>                                 *
  *                                                                            *
  * Redistribution and use in source and binary forms, with or without         *
  * modification, are permitted provided that the following conditions are     *
@@ -28,54 +28,44 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         mksqsh_file.h
+ * @file         simple_archive.c
+ *
+ * This file implements a very small SquashFS writer that is only capable of
+ * creating archives that contain a handful of files in the root directory.
+ * The implementation is deliberately tiny and only implements what is needed
+ * for the unit tests in this repository.  It should not be used as a full
+ * featured replacement for mksquashfs.
  */
 
-#ifndef MKSQSH_FILE_H
-#define MKSQSH_FILE_H
+#define _DEFAULT_SOURCE
 
-#include "mksqsh_archive.h"
+#include <mksqsh_archive_private.h>
+#include <mksqsh_metablock.h>
+
+#include <sqsh_common_private.h>
+#include <sqsh_data_private.h>
+#include <sqsh_error.h>
+
 #include <cextras/memory.h>
-#include <stddef.h>
+#include <endian.h>
+#include <mksqsh_file_private.h>
+#include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/**
- * @brief The type of a file entry in the archive builder.
- */
-enum MksqshFileType {
-	/** Directory file type */
-	MKSQSH_FILE_TYPE_DIR,
-	/** Regular file type */
-	MKSQSH_FILE_TYPE_REG,
-};
-
-struct MksqshFile *mksqsh_file_new(
-		struct MksqshArchive *archive, enum MksqshFileType type, int *err);
-
-int mksqsh_file_add(
-		struct MksqshFile *parent, const char *file_name,
-		struct MksqshFile *child);
-
-void
-mksqsh_file_content_from_fd(struct MksqshFile *file, FILE *source, int *err);
-
-void mksqsh_file_content_from_path(
-		struct MksqshFile *file, const char *path, int *err);
-
-void
-mksqsh_file_content(struct MksqshFile *file, const char *content, size_t size);
-
-struct MksqshFile *mksqsh_file_retain(struct MksqshFile *file);
-
-void mksqsh_file_release(struct MksqshFile *file);
-
-#ifdef __cplusplus
+struct MksqshNode *
+mksqsh__node_retain(struct MksqshNode *node) {
+	if (node != NULL) {
+		cx_rc_retain(&node->rc);
+	}
+	return node;
 }
-#endif
 
-#endif /* MKSQSH_FILE_H */
+int
+mksqsh__node_init(struct MksqshNode *node, struct MksqshFile *file) {
+	memset(node, 0, sizeof(*node));
+	cx_rc_init(&node->rc);
+	node->file = mksqsh_file_retain(file);
+	return 0;
+}
