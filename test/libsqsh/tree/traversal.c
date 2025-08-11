@@ -34,14 +34,15 @@
 
 #include "../common.h"
 #include <stdint.h>
-#include <utest.h>
+#include <testlib.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_data_private.h>
 #include <sqsh_tree.h>
 #include <sqsh_tree_private.h>
 
-UTEST(traversal, test_recursive_directory) {
+static void
+traversal__test_recursive_directory(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -93,7 +94,8 @@ UTEST(traversal, test_recursive_directory) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(traversal, test_empty_dir) {
+static void
+traversal__test_empty_dir(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	char *path;
@@ -127,7 +129,7 @@ UTEST(traversal, test_empty_dir) {
 					SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN,
 			sqsh_tree_traversal_state(&traversal));
 	path = sqsh_tree_traversal_path_dup(&traversal);
-	ASSERT_STREQ("", path);
+	ASSERT_STREQ("", path, strlen(path) + 1);
 	free(path);
 
 	has_next = sqsh_tree_traversal_next(&traversal, &rv);
@@ -138,7 +140,7 @@ UTEST(traversal, test_empty_dir) {
 					SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END,
 			sqsh_tree_traversal_state(&traversal));
 	path = sqsh_tree_traversal_path_dup(&traversal);
-	ASSERT_STREQ("", path);
+	ASSERT_STREQ("", path, strlen(path) + 1);
 	free(path);
 
 	has_next = sqsh_tree_traversal_next(&traversal, &rv);
@@ -150,4 +152,7 @@ UTEST(traversal, test_empty_dir) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(traversal__test_recursive_directory)
+TEST(traversal__test_empty_dir)
+END_TESTS

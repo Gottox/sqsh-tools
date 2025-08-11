@@ -40,7 +40,10 @@
 #include <sqsh_posix.h>
 #include <sqsh_tree.h>
 #include <sqsh_tree_private.h>
-#include <utest.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <testlib.h>
 
 extern uint8_t squashfs_image[];
 extern size_t squashfs_image_size;
@@ -48,7 +51,8 @@ extern size_t squashfs_image_size;
 #define TEST_SQUASHFS_IMAGE_LEN squashfs_image_size
 #define TEST_SQUASHFS_IMAGE squashfs_image
 
-UTEST(integration, sqsh_empty) {
+static void
+sqsh_empty(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshConfig config = DEFAULT_CONFIG(0);
@@ -56,7 +60,8 @@ UTEST(integration, sqsh_empty) {
 	ASSERT_EQ(-SQSH_ERROR_SUPERBLOCK_TOO_SMALL, rv);
 }
 
-UTEST(integration, sqsh_get_nonexistant) {
+static void
+sqsh_get_nonexistant(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshPathResolver resolver = {0};
@@ -82,7 +87,8 @@ UTEST(integration, sqsh_get_nonexistant) {
 	ASSERT_EQ(0, rv);
 }
 
-UTEST(integration, path_resolver) {
+static void
+path_resolver(void) {
 	int rv;
 	struct SqshPathResolver resolver = {0};
 	struct SqshArchive sqsh = {0};
@@ -118,7 +124,8 @@ UTEST(integration, path_resolver) {
 	ASSERT_EQ(0, rv);
 }
 
-UTEST(integration, sqsh_ls) {
+static void
+sqsh_ls(void) {
 	int rv;
 	char *name;
 	struct SqshFile *file = NULL;
@@ -175,7 +182,8 @@ UTEST(integration, sqsh_ls) {
 	ASSERT_EQ(0, rv);
 }
 
-UTEST(integration, sqsh_read_content) {
+static void
+sqsh_read_content(void) {
 	int rv;
 	char *data;
 	struct SqshArchive archive = {0};
@@ -192,7 +200,8 @@ UTEST(integration, sqsh_read_content) {
 	ASSERT_EQ(0, rv);
 }
 
-UTEST(integration, sqsh_cat_fragment) {
+static void
+sqsh_cat_fragment(void) {
 	int rv;
 	const uint8_t *data;
 	size_t size;
@@ -243,7 +252,8 @@ UTEST(integration, sqsh_cat_fragment) {
 	ASSERT_EQ(0, rv);
 }
 
-UTEST(integration, sqsh_cat_datablock_and_fragment) {
+static void
+sqsh_cat_datablock_and_fragment(void) {
 	int rv;
 	const uint8_t *data;
 	size_t size;
@@ -300,7 +310,8 @@ UTEST(integration, sqsh_cat_datablock_and_fragment) {
 	ASSERT_EQ(0, rv);
 }
 
-UTEST(integration, sqsh_cat_size_overflow) {
+static void
+sqsh_cat_size_overflow(void) {
 	int rv;
 	size_t size;
 	struct SqshFile *file = NULL;
@@ -349,7 +360,8 @@ UTEST(integration, sqsh_cat_size_overflow) {
 	ASSERT_EQ(0, rv);
 }
 
-UTEST(integration, sqsh_test_uid_and_gid) {
+static void
+sqsh_test_uid_and_gid(void) {
 	int rv;
 	uint32_t uid, gid;
 	struct SqshFile *file = NULL;
@@ -377,7 +389,8 @@ UTEST(integration, sqsh_test_uid_and_gid) {
 	ASSERT_EQ(0, rv);
 }
 
-UTEST(integration, sqsh_test_extended_dir) {
+static void
+sqsh_test_extended_dir(void) {
 	int rv;
 	struct SqshFile *file = NULL;
 	struct SqshArchive sqsh = {0};
@@ -411,8 +424,8 @@ UTEST(integration, sqsh_test_extended_dir) {
 	ASSERT_EQ(0, rv);
 }
 
-#if !defined(__OpenBSD__) && !defined(__FreeBSD__)
-UTEST(integration, sqsh_test_xattr) {
+static void
+sqsh_test_xattr(void) {
 	const char *expected_value = "1234567891234567891234567890001234567890";
 	int rv;
 	char *name, *value;
@@ -519,7 +532,6 @@ UTEST(integration, sqsh_test_xattr) {
 	rv = sqsh__archive_cleanup(&sqsh);
 	ASSERT_EQ(0, rv);
 }
-#endif
 
 struct Walker {
 	struct SqshArchive *sqsh;
@@ -557,7 +569,8 @@ multithreaded_resolver(void *arg) {
 	return 0;
 }
 
-UTEST(integration, multithreaded) {
+static void
+multithreaded(void) {
 	int rv;
 	pthread_t threads[16] = {0};
 	struct SqshArchive sqsh = {0};
@@ -587,7 +600,8 @@ UTEST(integration, multithreaded) {
 	ASSERT_EQ(0, rv);
 }
 
-UTEST(integration, test_follow_symlink) {
+static void
+test_follow_symlink(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 
@@ -610,7 +624,8 @@ UTEST(integration, test_follow_symlink) {
 	ASSERT_EQ(0, rv);
 }
 
-UTEST(integration, test_tree_traversal) {
+static void
+test_tree_traversal(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshFile *file = NULL;
@@ -635,38 +650,36 @@ UTEST(integration, test_tree_traversal) {
 	ASSERT_EQ(0, rv);
 	ASSERT_EQ(true, has_next);
 	name = sqsh_tree_traversal_name(traversal, &size);
-	ASSERT_EQ(0, strcmp("", name));
+	ASSERT_STREQ("", name, size);
 	ASSERT_EQ(
-			(enum SqshTreeTraversalState)
-					SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN,
+			SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN,
 			sqsh_tree_traversal_state(traversal));
 
 	has_next = sqsh_tree_traversal_next(traversal, &rv);
 	ASSERT_EQ(0, rv);
 	ASSERT_EQ(true, has_next);
 	name = sqsh_tree_traversal_name(traversal, &size);
-	ASSERT_STRNEQ("a", name, size);
+	ASSERT_STREQ("a", name, size);
 	ASSERT_EQ(
-			(enum SqshTreeTraversalState)SQSH_TREE_TRAVERSAL_STATE_FILE,
+			SQSH_TREE_TRAVERSAL_STATE_FILE,
 			sqsh_tree_traversal_state(traversal));
 
 	has_next = sqsh_tree_traversal_next(traversal, &rv);
 	ASSERT_EQ(0, rv);
 	ASSERT_EQ(true, has_next);
 	name = sqsh_tree_traversal_name(traversal, &size);
-	ASSERT_STRNEQ("b", name, size);
+	ASSERT_STREQ("b", name, size);
 	ASSERT_EQ(
-			(enum SqshTreeTraversalState)SQSH_TREE_TRAVERSAL_STATE_FILE,
+			SQSH_TREE_TRAVERSAL_STATE_FILE,
 			sqsh_tree_traversal_state(traversal));
 
 	has_next = sqsh_tree_traversal_next(traversal, &rv);
 	ASSERT_EQ(0, rv);
 	ASSERT_EQ(true, has_next);
 	name = sqsh_tree_traversal_name(traversal, &size);
-	ASSERT_STRNEQ("large_dir", name, size);
+	ASSERT_STREQ("large_dir", name, size);
 	ASSERT_EQ(
-			(enum SqshTreeTraversalState)
-					SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN,
+			SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN,
 			sqsh_tree_traversal_state(traversal));
 
 	while (sqsh_tree_traversal_next(traversal, &rv)) {
@@ -680,7 +693,7 @@ UTEST(integration, test_tree_traversal) {
 	ASSERT_EQ(0, rv);
 	ASSERT_EQ(true, has_next);
 	name = sqsh_tree_traversal_name(traversal, &size);
-	ASSERT_STRNEQ("large_dir", name, size);
+	ASSERT_STREQ("large_dir", name, size);
 	ASSERT_EQ(
 			(enum SqshTreeTraversalState)
 					SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END,
@@ -690,7 +703,7 @@ UTEST(integration, test_tree_traversal) {
 	ASSERT_EQ(0, rv);
 	ASSERT_EQ(true, has_next);
 	name = sqsh_tree_traversal_name(traversal, &size);
-	ASSERT_STRNEQ("", name, size);
+	ASSERT_STREQ("", name, size);
 	ASSERT_EQ(
 			(enum SqshTreeTraversalState)
 					SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END,
@@ -704,7 +717,8 @@ UTEST(integration, test_tree_traversal) {
 	ASSERT_EQ(0, rv);
 }
 
-UTEST(integration, test_easy_traversal) {
+static void
+test_easy_traversal(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshFile *file = NULL;
@@ -718,11 +732,11 @@ UTEST(integration, test_easy_traversal) {
 	traversal = sqsh_easy_tree_traversal(&sqsh, "/", &rv);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_STREQ("a", traversal[0]);
-	ASSERT_STREQ("b", traversal[1]);
-	ASSERT_STREQ("large_dir", traversal[2]);
-	ASSERT_STREQ("large_dir/1", traversal[3]);
-	ASSERT_STREQ("large_dir/10", traversal[4]);
+	ASSERT_STREQ("a", traversal[0], 2);
+	ASSERT_STREQ("b", traversal[1], 2);
+	ASSERT_STREQ("large_dir", traversal[2], 10);
+	ASSERT_STREQ("large_dir/1", traversal[3], 12);
+	ASSERT_STREQ("large_dir/10", traversal[4], 13);
 
 	free(traversal);
 	rv = sqsh_close(file);
@@ -731,7 +745,8 @@ UTEST(integration, test_easy_traversal) {
 	ASSERT_EQ(0, rv);
 }
 
-UTEST(integration, test_traversal_zero_max_depth) {
+static void
+test_traversal_zero_max_depth(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshFile *file = NULL;
@@ -776,7 +791,8 @@ UTEST(integration, test_traversal_zero_max_depth) {
 	ASSERT_EQ(0, rv);
 }
 
-UTEST(integration, mmap) {
+static void
+test_mmap(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshFile *file = NULL;
@@ -792,11 +808,11 @@ UTEST(integration, mmap) {
 	traversal = sqsh_easy_tree_traversal(&sqsh, "/", &rv);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_STREQ("a", traversal[0]);
-	ASSERT_STREQ("b", traversal[1]);
-	ASSERT_STREQ("large_dir", traversal[2]);
-	ASSERT_STREQ("large_dir/1", traversal[3]);
-	ASSERT_STREQ("large_dir/10", traversal[4]);
+	ASSERT_STREQ("a", traversal[0], 2);
+	ASSERT_STREQ("b", traversal[1], 2);
+	ASSERT_STREQ("large_dir", traversal[2], 10);
+	ASSERT_STREQ("large_dir/1", traversal[3], 12);
+	ASSERT_STREQ("large_dir/10", traversal[4], 13);
 
 	free(traversal);
 	rv = sqsh_close(file);
@@ -805,7 +821,8 @@ UTEST(integration, mmap) {
 	ASSERT_EQ(0, rv);
 }
 
-UTEST(integration, copy_iterator_newly) {
+static void
+copy_iterator_newly(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshFile *file = NULL;
@@ -833,7 +850,8 @@ UTEST(integration, copy_iterator_newly) {
 	ASSERT_EQ(0, rv);
 }
 
-UTEST(integration, copy_iterator_iterated) {
+static void
+copy_iterator_iterated(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshFile *file = NULL;
@@ -852,7 +870,7 @@ UTEST(integration, copy_iterator_iterated) {
 	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	ASSERT_LE(0, rv);
+	ASSERT(0 <= rv);
 	ASSERT_TRUE(has_next);
 	rv = 0;
 
@@ -898,7 +916,8 @@ iterator_mt_collect(
 	d->blocks++;
 }
 
-UTEST(integration, file_iterator_mt_basic) {
+static void
+file_iterator_mt_basic(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshThreadpool *tp = NULL;
@@ -940,4 +959,29 @@ UTEST(integration, file_iterator_mt_basic) {
 	ASSERT_EQ(0, rv);
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(sqsh_empty)
+TEST(sqsh_get_nonexistant)
+TEST(path_resolver)
+TEST(sqsh_ls)
+TEST(sqsh_read_content)
+TEST(sqsh_cat_fragment)
+TEST(sqsh_cat_datablock_and_fragment)
+TEST(sqsh_cat_size_overflow)
+TEST(sqsh_test_uid_and_gid)
+TEST(sqsh_test_extended_dir)
+#if !defined(__OpenBSD__) && !defined(__FreeBSD__)
+TEST(sqsh_test_xattr)
+#else
+NO_TEST(sqsh_test_xattr)
+#endif
+TEST(multithreaded)
+TEST(test_follow_symlink)
+TEST(test_tree_traversal)
+TEST(test_easy_traversal)
+TEST(test_traversal_zero_max_depth)
+TEST(test_mmap)
+TEST(copy_iterator_newly)
+TEST(copy_iterator_iterated)
+TEST(file_iterator_mt_basic)
+END_TESTS

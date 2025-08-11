@@ -33,14 +33,15 @@
  */
 
 #include "../common.h"
-#include <utest.h>
+#include <testlib.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
 #include <sqsh_file_private.h>
 #include <sqsh_xattr.h>
 
-UTEST(xattr_iterator, load_xattr) {
+static void
+load_xattr(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -139,7 +140,8 @@ UTEST(xattr_iterator, load_xattr) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(xattr_iterator, load_xattr_indirect) {
+static void
+load_xattr_indirect(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -203,4 +205,7 @@ UTEST(xattr_iterator, load_xattr_indirect) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(load_xattr)
+TEST(load_xattr_indirect)
+END_TESTS

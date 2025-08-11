@@ -40,9 +40,10 @@
 #include <sqsh_directory.h>
 #include <sqsh_error.h>
 #include <sqsh_mapper.h>
-#include <utest.h>
+#include <testlib.h>
 
-UTEST(cpp_test, sqsh_empty) {
+static void
+sqsh_empty(void) {
 	int rv;
 	struct SqshArchive *archive = NULL;
 	struct SqshConfig config = {};
@@ -56,4 +57,6 @@ UTEST(cpp_test, sqsh_empty) {
 	ASSERT_TRUE(archive == NULL);
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(sqsh_empty)
+END_TESTS

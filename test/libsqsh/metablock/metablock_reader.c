@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include <utest.h>
+#include <testlib.h>
 
 #include <mksqsh_metablock.h>
 #include <sqsh_archive_private.h>
@@ -41,7 +41,8 @@
 #include <sqsh_metablock_private.h>
 #include <stdint.h>
 
-UTEST(map_iterator, advance_once) {
+static void
+map_iterator__advance_once(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor = {0};
@@ -77,7 +78,8 @@ UTEST(map_iterator, advance_once) {
 	sqsh__archive_cleanup(&sqsh);
 }
 
-UTEST(map_iterator, advance_twice) {
+static void
+map_iterator__advance_twice(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor = {0};
@@ -126,7 +128,8 @@ UTEST(map_iterator, advance_twice) {
 	sqsh__archive_cleanup(&sqsh);
 }
 
-UTEST(map_iterator, advance_overlapping) {
+static void
+map_iterator__advance_overlapping(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor;
@@ -178,7 +181,8 @@ UTEST(map_iterator, advance_overlapping) {
 	sqsh__archive_cleanup(&sqsh);
 }
 
-UTEST(map_iterator, advance_overlapping_2) {
+static void
+map_iterator__advance_overlapping_2(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor;
@@ -218,7 +222,8 @@ UTEST(map_iterator, advance_overlapping_2) {
 	sqsh__archive_cleanup(&sqsh);
 }
 
-UTEST(map_iterator, advance_overlapping_3) {
+static void
+map_iterator__advance_overlapping_3(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor;
@@ -261,7 +266,8 @@ UTEST(map_iterator, advance_overlapping_3) {
 	sqsh__archive_cleanup(&sqsh);
 }
 
-UTEST(map_iterator, advance_skip) {
+static void
+map_iterator__advance_skip(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor;
@@ -293,7 +299,8 @@ UTEST(map_iterator, advance_skip) {
 	sqsh__archive_cleanup(&sqsh);
 }
 
-UTEST(map_iterator, advance_skip_2) {
+static void
+map_iterator__advance_skip_2(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor;
@@ -336,7 +343,8 @@ UTEST(map_iterator, advance_skip_2) {
 	sqsh__archive_cleanup(&sqsh);
 }
 
-UTEST(map_iterator, advance_overflow) {
+static void
+map_iterator__advance_overflow(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockReader cursor;
@@ -364,4 +372,13 @@ UTEST(map_iterator, advance_overflow) {
 	sqsh__archive_cleanup(&sqsh);
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(map_iterator__advance_once)
+TEST(map_iterator__advance_twice)
+TEST(map_iterator__advance_overlapping)
+TEST(map_iterator__advance_overlapping_2)
+TEST(map_iterator__advance_overlapping_3)
+TEST(map_iterator__advance_skip)
+TEST(map_iterator__advance_skip_2)
+TEST(map_iterator__advance_overflow)
+END_TESTS

@@ -33,13 +33,14 @@
  */
 
 #include "../common.h"
-#include <utest.h>
+#include <testlib.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
 #include <sqsh_easy.h>
 
-UTEST(ease_directory, list_two_files) {
+static void
+ease_directory__list_two_files(void) {
 	int rv = 0;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -79,7 +80,8 @@ UTEST(ease_directory, list_two_files) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(ease_directory, list_two_paths) {
+static void
+ease_directory__list_two_paths(void) {
 	int rv = 0;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -119,4 +121,7 @@ UTEST(ease_directory, list_two_paths) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(ease_directory__list_two_files)
+TEST(ease_directory__list_two_paths)
+END_TESTS

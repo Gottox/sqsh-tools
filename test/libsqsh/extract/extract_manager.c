@@ -33,14 +33,15 @@
  */
 
 #include "../common.h"
-#include <utest.h>
+#include <testlib.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_data_private.h>
 #include <sqsh_extract_private.h>
 #include <sqsh_mapper_private.h>
 
-UTEST(directory_iterator, decompress) {
+static void
+directory_iterator__decompress(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshExtractManager manager = {0};
@@ -74,7 +75,8 @@ UTEST(directory_iterator, decompress) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(directory_iterator, decompress_and_cached) {
+static void
+directory_iterator__decompress_and_cached(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshExtractManager manager = {0};
@@ -114,4 +116,7 @@ UTEST(directory_iterator, decompress_and_cached) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(directory_iterator__decompress)
+TEST(directory_iterator__decompress_and_cached)
+END_TESTS

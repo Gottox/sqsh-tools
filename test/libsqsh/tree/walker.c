@@ -33,13 +33,14 @@
  */
 
 #include "../common.h"
-#include <utest.h>
+#include <testlib.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_data_private.h>
 #include <sqsh_tree_private.h>
 
-UTEST(tree_walker, walker_symlink_recursion) {
+static void
+walker_symlink_recursion(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -72,7 +73,8 @@ UTEST(tree_walker, walker_symlink_recursion) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(tree_walker, walker_symlink_alternating_recursion) {
+static void
+walker_symlink_alternating_recursion(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -110,7 +112,8 @@ UTEST(tree_walker, walker_symlink_alternating_recursion) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(tree_walker, walker_symlink_open) {
+static void
+walker_symlink_open(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -164,7 +167,8 @@ expect_inode(struct SqshTreeWalker *walker, uint32_t inode_number) {
 	sqsh_close(file);
 }
 
-UTEST(tree_walker, walker_directory_enter) {
+static void
+walker_directory_enter(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -207,7 +211,8 @@ UTEST(tree_walker, walker_directory_enter) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(tree_walker, walker_uninitialized_up) {
+static void
+walker_uninitialized_up(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -237,7 +242,8 @@ UTEST(tree_walker, walker_uninitialized_up) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(tree_walker, walker_uninitialized_down) {
+static void
+walker_uninitialized_down(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -267,7 +273,8 @@ UTEST(tree_walker, walker_uninitialized_down) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(tree_walker, walker_next) {
+static void
+walker_next(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -314,4 +321,12 @@ UTEST(tree_walker, walker_next) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(walker_symlink_recursion)
+TEST(walker_symlink_alternating_recursion)
+TEST(walker_symlink_open)
+TEST(walker_directory_enter)
+TEST(walker_uninitialized_up)
+TEST(walker_uninitialized_down)
+TEST(walker_next)
+END_TESTS

@@ -33,14 +33,15 @@
  */
 
 #include "../common.h"
-#include <utest.h>
+#include <testlib.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
 #include <sqsh_easy.h>
 #include <sqsh_tree_private.h>
 
-UTEST(ease_file, test_file_get_content_through_symlink) {
+static void
+ease_file__test_file_get_content_through_symlink(void) {
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
 			/* clang-format off */
@@ -77,7 +78,8 @@ UTEST(ease_file, test_file_get_content_through_symlink) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(ease_file, test_file_exists_through_dead_symlink) {
+static void
+ease_file__test_file_exists_through_dead_symlink(void) {
 	int rv = 0;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -108,7 +110,8 @@ UTEST(ease_file, test_file_exists_through_dead_symlink) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(ease_file, test_file_exists_through_symlink) {
+static void
+ease_file__test_file_exists_through_symlink(void) {
 	struct SqshArchive archive = {0};
 	int rv = 0;
 	uint8_t payload[] = {
@@ -149,7 +152,8 @@ UTEST(ease_file, test_file_exists_through_symlink) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(ease_file, test_file_size) {
+static void
+ease_file__test_file_size(void) {
 	struct SqshArchive archive = {0};
 	int rv = 0;
 	uint8_t payload[] = {
@@ -183,7 +187,8 @@ UTEST(ease_file, test_file_size) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(ease_file, test_file_permission) {
+static void
+ease_file__test_file_permission(void) {
 	struct SqshArchive archive = {0};
 	int rv = 0;
 	uint8_t payload[] = {
@@ -217,7 +222,8 @@ UTEST(ease_file, test_file_permission) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(ease_file, test_file_mtime) {
+static void
+ease_file__test_file_mtime(void) {
 	struct SqshArchive archive = {0};
 	int rv = 0;
 	uint8_t payload[] = {
@@ -251,4 +257,11 @@ UTEST(ease_file, test_file_mtime) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(ease_file__test_file_get_content_through_symlink)
+TEST(ease_file__test_file_exists_through_dead_symlink)
+TEST(ease_file__test_file_exists_through_symlink)
+TEST(ease_file__test_file_size)
+TEST(ease_file__test_file_permission)
+TEST(ease_file__test_file_mtime)
+END_TESTS

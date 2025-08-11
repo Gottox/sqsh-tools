@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include <utest.h>
+#include <testlib.h>
 
 #include <mksqsh_metablock.h>
 #include <sqsh_archive_private.h>
@@ -41,7 +41,8 @@
 #include <sqsh_metablock_private.h>
 #include <stdint.h>
 
-UTEST(map_iterator, next_once) {
+static void
+map_iterator__next_once(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
@@ -77,7 +78,8 @@ UTEST(map_iterator, next_once) {
 	sqsh__archive_cleanup(&sqsh);
 }
 
-UTEST(map_iterator, next_failing_with_overflow) {
+static void
+map_iterator__next_failing_with_overflow(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
@@ -98,7 +100,8 @@ UTEST(map_iterator, next_failing_with_overflow) {
 	sqsh__archive_cleanup(&sqsh);
 }
 
-UTEST(map_iterator, next_failing_with_size_too_big) {
+static void
+map_iterator__next_failing_with_size_too_big(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
@@ -119,7 +122,8 @@ UTEST(map_iterator, next_failing_with_size_too_big) {
 	sqsh__archive_cleanup(&sqsh);
 }
 
-UTEST(map_iterator, next_failing_with_no_compression) {
+static void
+map_iterator__next_failing_with_no_compression(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
@@ -142,7 +146,8 @@ UTEST(map_iterator, next_failing_with_no_compression) {
 	sqsh__archive_cleanup(&sqsh);
 }
 
-UTEST(map_iterator, next_twice) {
+static void
+map_iterator__next_twice(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
@@ -190,7 +195,8 @@ UTEST(map_iterator, next_twice) {
 	sqsh__archive_cleanup(&sqsh);
 }
 
-UTEST(map_iterator, next_compressed) {
+static void
+map_iterator__next_compressed(void) {
 	int rv;
 	struct SqshArchive sqsh = {0};
 	struct SqshMetablockIterator iter;
@@ -233,4 +239,11 @@ UTEST(map_iterator, next_compressed) {
 	sqsh__archive_cleanup(&sqsh);
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(map_iterator__next_once)
+TEST(map_iterator__next_failing_with_overflow)
+TEST(map_iterator__next_failing_with_size_too_big)
+TEST(map_iterator__next_failing_with_no_compression)
+TEST(map_iterator__next_twice)
+TEST(map_iterator__next_compressed)
+END_TESTS

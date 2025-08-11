@@ -39,8 +39,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define SQSHFS_OPT(t, p, v) \
-	{ t, offsetof(struct SqshfsOptions, p), v }
+#define SQSHFS_OPT(t, p, v) {t, offsetof(struct SqshfsOptions, p), v}
 struct fuse_opt fs_common_opts[] = {
 		SQSHFS_OPT("archive=%s", archive, 0),
 		SQSHFS_OPT("offset=%s", offset, 0),

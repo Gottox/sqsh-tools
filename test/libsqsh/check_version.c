@@ -32,14 +32,18 @@
  */
 
 #include <sqsh_utils.h>
-#include <utest.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <testlib.h>
 
-UTEST(version, version_defines_are_correct) {
+static void
+version__version_defines_are_correct(void) {
 	char *version = getenv("VERSION");
 
 	ASSERT_NE(NULL, version);
-	ASSERT_STREQ(SQSH_VERSION, version);
-	ASSERT_STREQ(SQSH_VERSION, sqsh_version());
+	ASSERT_STREQ(SQSH_VERSION, version, strlen(version) + 1);
+	ASSERT_STREQ(SQSH_VERSION, sqsh_version(), strlen(version) + 1);
 
 	int major, minor, patch;
 	ASSERT_EQ(3, sscanf(version, "%d.%d.%d", &major, &minor, &patch));
@@ -52,4 +56,6 @@ UTEST(version, version_defines_are_correct) {
 	ASSERT_EQ(SQSH_VERSION_PATCH, sqsh_version_patch());
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(version__version_defines_are_correct)
+END_TESTS

@@ -5,12 +5,11 @@
 
 #define HEADER \
 	"#include <sqsh.h>\n" \
-	"#include <utest.h>\n" \
+	"#include <testlib.h>\n" \
 	"int LLVMFuzzerTestOneInput(char *data, size_t size);"
 
 #define TEST_PRE_FORMAT \
-	"UTEST(fuzzer_repro, %s) {\n" \
-	"	(void)utest_result;\n" \
+	"static void %s(void) {\n" \
 	"	unsigned char input[] = {\n"
 
 #define TEST_POST \
@@ -19,23 +18,27 @@
 	"	LLVMFuzzerTestOneInput((char *)input, sizeof(input));\n" \
 	"}\n"
 
-#define FOOTER "UTEST_MAIN()"
+static char *
+test_name(const char *path) {
+	char *name = basename((char *)path);
+	for (char *p = name; *p; p++) {
+		if (!isalnum(*p)) {
+			*p = '_';
+		}
+	}
+	return name;
+}
 
 int
 main(int argc, char *argv[]) {
-	puts("#include <utest.h>\n"
+	puts("#include <testlib.h>\n"
 		 "");
 	puts(HEADER);
 	for (int i = 1; i < argc; i++) {
 		FILE *f = fopen(argv[i], "rb");
 		assert(f);
 
-		char *name = basename(argv[i]);
-		for (char *p = name; *p; p++) {
-			if (!isalnum(*p)) {
-				*p = '_';
-			}
-		}
+		char *name = test_name(argv[i]);
 		printf(TEST_PRE_FORMAT, name);
 		int c;
 		while ((c = fgetc(f)) != EOF) {
@@ -44,6 +47,12 @@ main(int argc, char *argv[]) {
 		fclose(f);
 		puts(TEST_POST);
 	}
-	puts(FOOTER);
+
+	puts("DECLARE_TESTS");
+	for (int i = 1; i < argc; i++) {
+		char *name = test_name(argv[i]);
+		printf("TEST(%s)\n", name);
+	}
+	puts("END_TESTS");
 	return 0;
 }
