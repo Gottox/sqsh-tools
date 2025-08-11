@@ -56,4 +56,3 @@ if get_option('posix').allowed()
         'posix/threadpool.c',
     )
 endif
-

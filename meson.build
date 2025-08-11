@@ -43,8 +43,8 @@ endforeach
 
 if extractor_count == 0
     warning(
-        'No compression library has been enabled. Please make sure you enable at least on of them:' +
-        extractors_str,
+        'No compression library has been enabled. Please make sure you enable at least on of them:'
+        + extractors_str,
     )
 endif
 
