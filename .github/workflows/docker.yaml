@@ -14,9 +14,9 @@ jobs:
           - base_image: alpine
             tag_suffix: x86_64
             extra_tags: latest x86_64
-          - base_image: i386/alpine
-            tag_suffix: i386
-            extra_tags: i386
+          #- base_image: i386/alpine
+          #  tag_suffix: i386
+          #  extra_tags: i386
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
