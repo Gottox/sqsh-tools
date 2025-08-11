@@ -26,3 +26,8 @@ libmksqsh = both_libraries(
     dependencies: libmksqsh_dependencies,
     version: meson.project_version(),
 )
+
+libmksqsh_dep = declare_dependency(
+    link_with: libmksqsh,
+    include_directories: [libmksqsh_include, libsqsh_common_include],
+)

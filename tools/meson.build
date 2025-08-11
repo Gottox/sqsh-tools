@@ -8,6 +8,7 @@ tool_sources = [
     'src/stat.c',
     'src/xattr.c',
     'src/unpack.c',
+    'src/mk.c',
 ]
 
 tool_dependencies = [
@@ -20,13 +21,17 @@ c_args = ['-DVERSION="@0@"'.format(meson.project_version())]
 tools = {}
 foreach src : tool_sources
     tool_name = 'sqsh-' + src.split('.')[0].split('/')[-1]
+    deps = tool_dependencies + []
+    if src == 'src/mk.c'
+        deps += libmksqsh_dep
+    endif
     tool = executable(
         tool_name,
         [src, 'src/common.c'],
         c_args: c_args,
         include_directories: tools_private_include,
         install: not meson.is_subproject(),
-        dependencies: tool_dependencies,
+        dependencies: deps,
     )
     tools += {tool_name: tool}
 endforeach

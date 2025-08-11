@@ -60,6 +60,7 @@ archives.
   a directory.
 * [`sqsh-xattr`](./tools/man/sqsh-xattr.1.in): Prints the extended attributes of
   a file or directory.
+* [`sqsh-mk`](./tools/man/sqsh-mk.1.in): Creates a squashfs archive from files.
 * [`sqshfs`](./tools/man/sqshfs.1.in): Mounts a squashfs archive to a directory.
   There are two versions of this tool, one for fuse3 and one for fuse2.
 

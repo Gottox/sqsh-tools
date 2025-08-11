@@ -1,0 +1,35 @@
+.TH sqsh-mk 1 "May 27, 2024" "Version @VERSION@" "User Commands"
+
+.SH NAME
+sqsh-mk \- create a squashfs archive
+
+.SH SYNOPSIS
+.B sqsh-mk
+[\fB-v\fR]
+\fIFILE...\fR \fIARCHIVE\fR
+
+.SH DESCRIPTION
+.B sqsh-mk
+creates a squashfs archive from one or more files. The last argument
+specifies the output archive. Each preceding file is stored in the root of the
+archive using its basename.
+
+.SH OPTIONS
+.TP
+.BR -v ", " --version
+Print the version of \fBsqsh-mk\fR and exit.
+
+.SH EXIT STATUS
+The \fBsqsh-mk\fR command exits with 0 on success and non-zero on failure.
+
+.SH SEE ALSO
+.BR sqsh-cat (1),
+.BR sqsh-ls (1)
+
+.SH AUTHOR
+Written by Enno Boland.
+
+.SH COPYRIGHT
+Copyright (C) 2024 Enno Boland. This is free software; see the source
+for copying conditions. There is NO warranty; not even for
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

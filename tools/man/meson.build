@@ -4,6 +4,7 @@ tools_manpages = [
     'sqsh-stat.1',
     'sqsh-unpack.1',
     'sqsh-xattr.1',
+    'sqsh-mk.1',
 ]
 
 conf_data = configuration_data()
