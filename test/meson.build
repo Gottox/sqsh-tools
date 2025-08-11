@@ -1,7 +1,5 @@
 add_languages('cpp', native: false)
 
-utest_dep = dependency('utest')
-
 subdir('libsqsh')
 
 subdir('fuzzer')

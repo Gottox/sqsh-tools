@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include <utest.h>
+#include <testlib.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
@@ -43,7 +43,8 @@ static const size_t BLOCK_SIZE = 32768;
 #define ZERO_BLOCK_SIZE (size_t)16384
 uint8_t ZERO_BLOCK[ZERO_BLOCK_SIZE] = {0};
 
-UTEST(file_iterator, load_segment_from_compressed_data_block) {
+static void
+load_segment_from_compressed_data_block(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -98,7 +99,8 @@ UTEST(file_iterator, load_segment_from_compressed_data_block) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(file_iterator, load_two_segments_from_uncompressed_data_block) {
+static void
+load_two_segments_from_uncompressed_data_blockm(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -185,7 +187,8 @@ UTEST(file_iterator, load_two_segments_from_uncompressed_data_block) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(file_iterator, load_segment_from_uncompressed_data_block) {
+static void
+load_segment_from_uncompressed_data_block(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -241,7 +244,8 @@ UTEST(file_iterator, load_segment_from_uncompressed_data_block) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(file_iterator, load_zero_padding) {
+static void
+load_zero_padding(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -308,7 +312,8 @@ UTEST(file_iterator, load_zero_padding) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(file_iterator, load_zero_big_padding) {
+static void
+load_zero_big_padding(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -375,7 +380,8 @@ UTEST(file_iterator, load_zero_big_padding) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(file_iterator, load_zero_block) {
+static void
+load_zero_block(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -421,7 +427,8 @@ UTEST(file_iterator, load_zero_block) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(file_iterator, load_two_zero_blocks) {
+static void
+load_two_zero_blocks(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -476,7 +483,8 @@ UTEST(file_iterator, load_two_zero_blocks) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(file_iterator, load_two_sparse_blocks) {
+static void
+load_two_sparse_blocks(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -549,7 +557,8 @@ UTEST(file_iterator, load_two_sparse_blocks) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(file_iterator, open_directory_with_file_iterator) {
+static void
+open_directory_with_file_iterator(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -579,4 +588,14 @@ UTEST(file_iterator, open_directory_with_file_iterator) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(load_segment_from_compressed_data_block)
+TEST(load_two_segments_from_uncompressed_data_blockm)
+TEST(load_segment_from_uncompressed_data_block)
+TEST(load_zero_padding)
+TEST(load_zero_big_padding)
+TEST(load_zero_block)
+TEST(load_two_zero_blocks)
+TEST(load_two_sparse_blocks)
+TEST(open_directory_with_file_iterator)
+END_TESTS

@@ -33,11 +33,12 @@
  */
 
 #include "../common.h"
-#include <utest.h>
+#include <testlib.h>
 
 #include <sqsh_archive_private.h>
 
-UTEST(inode_map, insert_inode_ref) {
+static void
+inode_map__insert_inode_ref(void) {
 	int rv = 0;
 	uint64_t inode_ref = 0;
 	uint8_t payload[8192] = {
@@ -62,7 +63,8 @@ UTEST(inode_map, insert_inode_ref) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(inode_map, insert_invalid_inode) {
+static void
+inode_map__insert_invalid_inode(void) {
 	int rv = 0;
 	uint8_t payload[8192] = {
 			SQSH_HEADER,
@@ -85,7 +87,8 @@ UTEST(inode_map, insert_invalid_inode) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(inode_map, insert_invalid_inode_ref) {
+static void
+inode_map__insert_invalid_inode_ref(void) {
 	int rv = 0;
 	uint8_t payload[8192] = {
 			SQSH_HEADER,
@@ -105,7 +108,8 @@ UTEST(inode_map, insert_invalid_inode_ref) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(inode_map, get_invalid_inode) {
+static void
+inode_map__get_invalid_inode(void) {
 	int rv = 0;
 	uint64_t inode_ref = 4242;
 	uint8_t payload[8192] = {
@@ -131,7 +135,8 @@ UTEST(inode_map, get_invalid_inode) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(inode_map, get_unknown_inode_ref) {
+static void
+inode_map__get_unknown_inode_ref(void) {
 	int rv = 0;
 	uint64_t inode_ref = 4242;
 	uint8_t payload[8192] = {
@@ -153,7 +158,8 @@ UTEST(inode_map, get_unknown_inode_ref) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(inode_map, insert_inconsistent_mapping) {
+static void
+inode_map__insert_inconsistent_mapping(void) {
 	int rv = 0;
 	uint8_t payload[8192] = {
 			SQSH_HEADER,
@@ -179,4 +185,11 @@ UTEST(inode_map, insert_inconsistent_mapping) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(inode_map__insert_inode_ref)
+TEST(inode_map__insert_invalid_inode)
+TEST(inode_map__insert_invalid_inode_ref)
+TEST(inode_map__get_invalid_inode)
+TEST(inode_map__get_unknown_inode_ref)
+TEST(inode_map__insert_inconsistent_mapping)
+END_TESTS

@@ -1,7 +1,0 @@
-[wrap-git]
-url = https://github.com/Gottox/utest.h.git
-revision = 7ebc08121e0eab6c1481f2b353263c078205a6f0
-depth = 1
-
-[provide]
-utest=utest_dep

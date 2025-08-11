@@ -134,7 +134,7 @@
 	UINT32_BYTES(count - 1), UINT32_BYTES(start), UINT32_BYTES(inode_number)
 #define DIRECTORY_ENTRY(offset, inode_offset, type, name_size) \
 	UINT16_BYTES(offset), UINT16_BYTES(inode_offset), UINT16_BYTES(type), \
-			UINT16_BYTES((name_size)-1)
+			UINT16_BYTES((name_size) - 1)
 
 #define XATTR_LOOKUP_HEADER(kv_start, count) \
 	UINT64_BYTES(kv_start), UINT32_BYTES(count), UINT32_BYTES(0)

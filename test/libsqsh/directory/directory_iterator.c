@@ -34,14 +34,15 @@
 
 #include "../common.h"
 #include <stdint.h>
-#include <utest.h>
+#include <testlib.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_data_private.h>
 #include <sqsh_directory.h>
 #include <sqsh_directory_private.h>
 
-UTEST(directory_iterator, iter_invalid_file_name_with_0) {
+static void
+directory_iterator__iter_invalid_file_name_with_0(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -77,7 +78,8 @@ UTEST(directory_iterator, iter_invalid_file_name_with_0) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(directory_iterator, iter_invalid_file_name_with_slash) {
+static void
+directory_iterator__iter_invalid_file_name_with_slash(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -113,7 +115,8 @@ UTEST(directory_iterator, iter_invalid_file_name_with_slash) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(directory_iterator, iter_two_files) {
+static void
+directory_iterator__iter_two_files(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -176,7 +179,8 @@ UTEST(directory_iterator, iter_two_files) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(directory_iterator, iter_invalid_file_type) {
+static void
+directory_iterator__iter_invalid_file_type(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -207,7 +211,8 @@ UTEST(directory_iterator, iter_invalid_file_type) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(directory_iterator, iter_inconsistent_file_type) {
+static void
+directory_iterator__iter_inconsistent_file_type(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -251,7 +256,8 @@ UTEST(directory_iterator, iter_inconsistent_file_type) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(directory_iterator, iter_over_corrupt_header_too_small) {
+static void
+directory_iterator__iter_over_corrupt_header_too_small(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -289,7 +295,8 @@ UTEST(directory_iterator, iter_over_corrupt_header_too_small) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(directory_iterator, iter_inode_overflow) {
+static void
+directory_iterator__iter_inode_overflow(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -325,7 +332,8 @@ UTEST(directory_iterator, iter_inode_overflow) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(directory_iterator, iter_inode_underflow) {
+static void
+directory_iterator__iter_inode_underflow(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -361,7 +369,8 @@ UTEST(directory_iterator, iter_inode_underflow) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(directory_iterator, iter_inode_to_zero) {
+static void
+directory_iterator__iter_inode_to_zero(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -397,4 +406,14 @@ UTEST(directory_iterator, iter_inode_to_zero) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(directory_iterator__iter_invalid_file_name_with_0)
+TEST(directory_iterator__iter_invalid_file_name_with_slash)
+TEST(directory_iterator__iter_two_files)
+TEST(directory_iterator__iter_invalid_file_type)
+TEST(directory_iterator__iter_inconsistent_file_type)
+TEST(directory_iterator__iter_over_corrupt_header_too_small)
+TEST(directory_iterator__iter_inode_overflow)
+TEST(directory_iterator__iter_inode_underflow)
+TEST(directory_iterator__iter_inode_to_zero)
+END_TESTS

@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include <utest.h>
+#include <testlib.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
@@ -51,7 +51,8 @@
 // to init the archive.
 const struct SqshExtractorImpl *const volatile sqsh__impl_lzo = (void *)0x1;
 
-UTEST(compression_options, load_compression_options_gzip) {
+static void
+compression_options__load_compression_options_gzip(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[8192] = {
@@ -96,7 +97,8 @@ UTEST(compression_options, load_compression_options_gzip) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(compression_options, load_compression_options_xz) {
+static void
+compression_options__load_compression_options_xz(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[8192] = {
@@ -144,7 +146,8 @@ UTEST(compression_options, load_compression_options_xz) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(compression_options, load_compression_options_lz4) {
+static void
+compression_options__load_compression_options_lz4(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[8192] = {
@@ -188,7 +191,8 @@ UTEST(compression_options, load_compression_options_lz4) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(compression_options, load_compression_options_zstd) {
+static void
+compression_options__load_compression_options_zstd(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[8192] = {
@@ -232,7 +236,8 @@ UTEST(compression_options, load_compression_options_zstd) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(compression_options, load_compression_options_lzo) {
+static void
+compression_options__load_compression_options_lzo(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[8192] = {
@@ -281,4 +286,10 @@ UTEST(compression_options, load_compression_options_lzo) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(compression_options__load_compression_options_gzip)
+TEST(compression_options__load_compression_options_xz)
+TEST(compression_options__load_compression_options_lz4)
+TEST(compression_options__load_compression_options_zstd)
+TEST(compression_options__load_compression_options_lzo)
+END_TESTS

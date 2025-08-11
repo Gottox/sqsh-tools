@@ -33,14 +33,15 @@
  */
 
 #include "../common.h"
-#include <utest.h>
+#include <testlib.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
 #include <sqsh_data_private.h>
 #include <sqsh_file_private.h>
 
-UTEST(file, load_file) {
+static void
+file__load_file(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -75,7 +76,8 @@ UTEST(file, load_file) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(file, resolve_file) {
+static void
+file__resolve_file(void) {
 	int rv = 0;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -119,7 +121,8 @@ UTEST(file, resolve_file) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(file, resolve_unkown_dir_inode) {
+static void
+file__resolve_unkown_dir_inode(void) {
 	int rv = 0;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -162,4 +165,8 @@ UTEST(file, resolve_unkown_dir_inode) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(file__load_file)
+TEST(file__resolve_file)
+TEST(file__resolve_unkown_dir_inode)
+END_TESTS

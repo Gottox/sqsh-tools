@@ -30,6 +30,7 @@ lzma_dep = dependency('liblzma', required: get_option('lzma'))
 zlib_dep = dependency('zlib', required: get_option('zlib'))
 zstd_dep = dependency('libzstd', required: get_option('zstd'))
 cextras_dep = subproject('cextras').get_variable('cextras_dep')
+testlib_dep = subproject('cextras').get_variable('testlib_dep')
 
 extractor_count = 0
 extractors = [lz4_dep, lzma_dep, zlib_dep, zstd_dep]

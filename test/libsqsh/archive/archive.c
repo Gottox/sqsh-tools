@@ -33,7 +33,7 @@
  */
 
 #include "../common.h"
-#include <utest.h>
+#include <testlib.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
@@ -54,7 +54,8 @@ struct SqshConfigV1_0 {
 	char _reserved[128];
 };
 
-UTEST(config, config_compat_check_v1_0) {
+static void
+config__config_compat_check_v1_0(void) {
 	ASSERT_EQ(
 			offsetof(struct SqshConfig, archive_offset),
 			offsetof(struct SqshConfigV1_0, archive_offset));
@@ -82,4 +83,6 @@ UTEST(config, config_compat_check_v1_0) {
 			sizeof(struct SqshConfigV1_0));
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(config__config_compat_check_v1_0)
+END_TESTS

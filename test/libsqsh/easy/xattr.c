@@ -33,12 +33,13 @@
  */
 
 #include "../common.h"
-#include <utest.h>
+#include <testlib.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_easy.h>
 
-UTEST(ease_xattr, load_easy_xattr) {
+static void
+ease_xattr__load_easy_xattr(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[8192] = {
@@ -105,4 +106,6 @@ UTEST(ease_xattr, load_easy_xattr) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(ease_xattr__load_easy_xattr)
+END_TESTS

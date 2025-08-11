@@ -33,13 +33,14 @@
  */
 
 #include "../common.h"
-#include <utest.h>
+#include <testlib.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_data_private.h>
 #include <sqsh_tree_private.h>
 
-UTEST(path_resolver, resolver_symlink_recursion) {
+static void
+path_resolver__resolver_symlink_recursion(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -75,7 +76,8 @@ UTEST(path_resolver, resolver_symlink_recursion) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(path_resolver, resolver_symlink_alternating_recursion) {
+static void
+path_resolver__resolver_symlink_alternating_recursion(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -114,7 +116,8 @@ UTEST(path_resolver, resolver_symlink_alternating_recursion) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(path_resolver, resolver_symlink_open) {
+static void
+path_resolver__resolver_symlink_open(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -171,7 +174,8 @@ expect_inode(struct SqshPathResolver *resolver, uint32_t inode_number) {
 	sqsh_close(file);
 }
 
-UTEST(path_resolver, resolver_inconsistent_file_type) {
+static void
+path_resolver__resolver_inconsistent_file_type(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -209,7 +213,8 @@ UTEST(path_resolver, resolver_inconsistent_file_type) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(path_resolver, resolver_file_enter) {
+static void
+path_resolver__resolver_file_enter(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -247,7 +252,8 @@ UTEST(path_resolver, resolver_file_enter) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(path_resolver, resolver_directory_enter) {
+static void
+path_resolver__resolver_directory_enter(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -293,7 +299,8 @@ UTEST(path_resolver, resolver_directory_enter) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(path_resolver, resolver_uninitialized_up) {
+static void
+path_resolver__resolver_uninitialized_up(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -325,7 +332,8 @@ UTEST(path_resolver, resolver_uninitialized_up) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(path_resolver, resolver_uninitialized_down) {
+static void
+path_resolver__resolver_uninitialized_down(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -357,7 +365,8 @@ UTEST(path_resolver, resolver_uninitialized_down) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(path_resolver, resolver_next) {
+static void
+path_resolver__resolver_next(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	uint8_t payload[] = {
@@ -410,4 +419,14 @@ UTEST(path_resolver, resolver_next) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(path_resolver__resolver_symlink_recursion)
+TEST(path_resolver__resolver_symlink_alternating_recursion)
+TEST(path_resolver__resolver_symlink_open)
+TEST(path_resolver__resolver_inconsistent_file_type)
+TEST(path_resolver__resolver_file_enter)
+TEST(path_resolver__resolver_directory_enter)
+TEST(path_resolver__resolver_uninitialized_up)
+TEST(path_resolver__resolver_uninitialized_down)
+TEST(path_resolver__resolver_next)
+END_TESTS

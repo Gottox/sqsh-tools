@@ -35,7 +35,7 @@
 #include <sqsh_error.h>
 #include <sqsh_reader_private.h>
 #include <sys/wait.h>
-#include <utest.h>
+#include <testlib.h>
 
 struct TestIterator {
 	char *data;
@@ -103,7 +103,8 @@ static const struct SqshReaderIteratorImpl test_iter = {
 		.size = test_iter_size,
 };
 
-UTEST(reader, test_reader_init) {
+static void
+test_reader_init(void) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -116,7 +117,8 @@ UTEST(reader, test_reader_init) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST(reader, test_reader_advance_with_offset) {
+static void
+test_reader_advance_with_offset(void) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -137,7 +139,8 @@ UTEST(reader, test_reader_advance_with_offset) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST(reader, test_reader_advance_to_block) {
+static void
+test_reader_advance_to_block(void) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -158,7 +161,8 @@ UTEST(reader, test_reader_advance_to_block) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST(reader, test_reader_advance_to_two_blocks) {
+static void
+test_reader_advance_to_two_blocks(void) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -179,7 +183,8 @@ UTEST(reader, test_reader_advance_to_two_blocks) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST(reader, test_reader_advance_to_two_blocks_with_offset) {
+static void
+test_reader_advance_to_two_blocks_with_offset(void) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -200,7 +205,8 @@ UTEST(reader, test_reader_advance_to_two_blocks_with_offset) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST(reader, test_reader_from_buffered_to_mapped) {
+static void
+test_reader_from_buffered_to_mapped(void) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -231,7 +237,8 @@ UTEST(reader, test_reader_from_buffered_to_mapped) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST(reader, test_reader_from_buffered_to_buffered) {
+static void
+test_reader_from_buffered_to_buffered(void) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -262,7 +269,8 @@ UTEST(reader, test_reader_from_buffered_to_buffered) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST(reader, test_reader_advance_inside_buffered) {
+static void
+test_reader_advance_inside_buffered(void) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -293,7 +301,8 @@ UTEST(reader, test_reader_advance_inside_buffered) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST(reader, test_reader_advance_with_zero_size) {
+static void
+test_reader_advance_with_zero_size(void) {
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
 			.data = "test",
@@ -321,7 +330,8 @@ UTEST(reader, test_reader_advance_with_zero_size) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST(reader, test_reader_advance_once) {
+static void
+test_reader_advance_once(void) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
@@ -339,7 +349,8 @@ UTEST(reader, test_reader_advance_once) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST(reader, test_reader_advance_once_with_offset) {
+static void
+test_reader_advance_once_with_offset(void) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
@@ -356,7 +367,8 @@ UTEST(reader, test_reader_advance_once_with_offset) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST(reader, test_reader_advance_twice_with_offset) {
+static void
+test_reader_advance_twice_with_offset(void) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
@@ -380,7 +392,8 @@ UTEST(reader, test_reader_advance_twice_with_offset) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST(reader, test_reader_initial_advance) {
+static void
+test_reader_initial_advance(void) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
@@ -398,7 +411,8 @@ UTEST(reader, test_reader_initial_advance) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST(reader, test_reader_advance_to_out_of_bounds) {
+static void
+test_reader_advance_to_out_of_bounds(void) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {
@@ -413,7 +427,8 @@ UTEST(reader, test_reader_advance_to_out_of_bounds) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST(reader, test_reader_advance_over_boundary) {
+static void
+test_reader_advance_over_boundary(void) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {.data = "0123456789", .remaining = 2};
@@ -430,7 +445,8 @@ UTEST(reader, test_reader_advance_over_boundary) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST(reader, test_reader_initial_advance_2) {
+static void
+test_reader_initial_advance_2(void) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {.data = "ABCD", .remaining = 10};
@@ -448,7 +464,8 @@ UTEST(reader, test_reader_initial_advance_2) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST(reader, test_reader_error_1) {
+static void
+test_reader_error_1(void) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {.data = "AB", .remaining = 10};
@@ -474,7 +491,8 @@ UTEST(reader, test_reader_error_1) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST(reader, test_reader_map_into_buffer) {
+static void
+test_reader_map_into_buffer(void) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {.data = "0123456789", .remaining = 2};
@@ -499,7 +517,8 @@ UTEST(reader, test_reader_map_into_buffer) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST(reader, test_reader_map_into_buffer_twice) {
+static void
+test_reader_map_into_buffer_twice(void) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {.data = "0123456789", .remaining = 3};
@@ -524,7 +543,8 @@ UTEST(reader, test_reader_map_into_buffer_twice) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST(reader, test_reader_extend_size_till_end) {
+static void
+test_reader_extend_size_till_end(void) {
 	int rv;
 	struct SqshReader reader = {0};
 	struct TestIterator iter = {.data = "0123456789", .remaining = 2};
@@ -560,4 +580,25 @@ UTEST(reader, test_reader_extend_size_till_end) {
 	sqsh__reader_cleanup(&reader);
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(test_reader_init)
+TEST(test_reader_advance_with_offset)
+TEST(test_reader_advance_to_block)
+TEST(test_reader_advance_to_two_blocks)
+TEST(test_reader_advance_to_two_blocks_with_offset)
+TEST(test_reader_from_buffered_to_mapped)
+TEST(test_reader_from_buffered_to_buffered)
+TEST(test_reader_advance_inside_buffered)
+TEST(test_reader_advance_with_zero_size)
+TEST(test_reader_advance_once)
+TEST(test_reader_advance_once_with_offset)
+TEST(test_reader_advance_twice_with_offset)
+TEST(test_reader_initial_advance)
+TEST(test_reader_advance_to_out_of_bounds)
+TEST(test_reader_advance_over_boundary)
+TEST(test_reader_initial_advance_2)
+TEST(test_reader_error_1)
+TEST(test_reader_map_into_buffer)
+TEST(test_reader_map_into_buffer_twice)
+TEST(test_reader_extend_size_till_end)
+END_TESTS

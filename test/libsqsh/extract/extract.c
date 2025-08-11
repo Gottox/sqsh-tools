@@ -35,12 +35,12 @@
 #include "../common.h"
 #include <sqsh_extract_private.h>
 #include <stdint.h>
-#include <utest.h>
+#include <testlib.h>
 
-void
+static void
 decompress_test(
-		const struct SqshExtractorImpl *impl, uint8_t *input, size_t input_size,
-		int *utest_result) {
+		const struct SqshExtractorImpl *impl, uint8_t *input,
+		size_t input_size) {
 	int rv;
 	uint8_t output[16];
 	size_t output_size = sizeof(output);
@@ -62,10 +62,10 @@ decompress_test(
 	ASSERT_EQ(0, memcmp(output, "abcd", 4));
 }
 
-void
+static void
 decompress_test_split(
-		const struct SqshExtractorImpl *impl, uint8_t *input, size_t input_size,
-		int *utest_result) {
+		const struct SqshExtractorImpl *impl, uint8_t *input,
+		size_t input_size) {
 	int rv;
 	uint8_t output[16];
 	size_t output_size = sizeof(output);
@@ -93,24 +93,28 @@ decompress_test_split(
 	}
 }
 
-UTEST(extract, decompress_lzma) {
+static void
+extract__decompress_lzma(void) {
 	uint8_t input[] = {0x5d, 0x00, 0x00, 0x80, 0x00, 0xff, 0xff, 0xff, 0xff,
 					   0xff, 0xff, 0xff, 0xff, 0x00, 0x30, 0x98, 0x88, 0x98,
 					   0x46, 0x7e, 0x1e, 0xb2, 0xff, 0xfa, 0x1c, 0x80, 0x00};
 
-	decompress_test(sqsh__impl_lzma, input, sizeof(input), utest_result);
+	decompress_test(sqsh__impl_lzma, input, sizeof(input));
 }
 
-UTEST(extract, decompress_lzma_split) {
+static void
+extract__decompress_lzma_split(void) {
 	uint8_t input[] = {0x5d, 0x00, 0x00, 0x80, 0x00, 0xff, 0xff, 0xff, 0xff,
 					   0xff, 0xff, 0xff, 0xff, 0x00, 0x30, 0x98, 0x88, 0x98,
 					   0x46, 0x7e, 0x1e, 0xb2, 0xff, 0xfa, 0x1c, 0x80, 0x00};
-	UTEST_SKIP("lzma split not supported yet");
+	puts("skipping: lzma split not supported yet");
+	return;
 
-	decompress_test_split(sqsh__impl_lzma, input, sizeof(input), utest_result);
+	decompress_test_split(sqsh__impl_lzma, input, sizeof(input));
 }
 
-UTEST(extract, decompress_xz) {
+static void
+extract__decompress_xz(void) {
 	uint8_t input[] = {0xfd, 0x37, 0x7a, 0x58, 0x5a, 0x00, 0x00, 0x04, 0xe6,
 					   0xd6, 0xb4, 0x46, 0x02, 0x00, 0x21, 0x01, 0x16, 0x00,
 					   0x00, 0x00, 0x74, 0x2f, 0xe5, 0xa3, 0x01, 0x00, 0x03,
@@ -119,10 +123,11 @@ UTEST(extract, decompress_xz) {
 					   0x2c, 0x9c, 0xc1, 0x1f, 0xb6, 0xf3, 0x7d, 0x01, 0x00,
 					   0x00, 0x00, 0x00, 0x04, 0x59, 0x5a};
 
-	decompress_test(sqsh__impl_xz, input, sizeof(input), utest_result);
+	decompress_test(sqsh__impl_xz, input, sizeof(input));
 }
 
-UTEST(extract, decompress_xz_split) {
+static void
+extract__decompress_xz_split(void) {
 	uint8_t input[] = {0xfd, 0x37, 0x7a, 0x58, 0x5a, 0x00, 0x00, 0x04, 0xe6,
 					   0xd6, 0xb4, 0x46, 0x02, 0x00, 0x21, 0x01, 0x16, 0x00,
 					   0x00, 0x00, 0x74, 0x2f, 0xe5, 0xa3, 0x01, 0x00, 0x03,
@@ -131,50 +136,68 @@ UTEST(extract, decompress_xz_split) {
 					   0x2c, 0x9c, 0xc1, 0x1f, 0xb6, 0xf3, 0x7d, 0x01, 0x00,
 					   0x00, 0x00, 0x00, 0x04, 0x59, 0x5a};
 
-	decompress_test_split(sqsh__impl_xz, input, sizeof(input), utest_result);
+	decompress_test_split(sqsh__impl_xz, input, sizeof(input));
 }
 
-UTEST(extract, decompress_lz4) {
+static void
+extract__decompress_lz4(void) {
 	uint8_t input[] = {0x40, 0x61, 0x62, 0x63, 0x64};
 
-	decompress_test(sqsh__impl_lz4, input, sizeof(input), utest_result);
+	decompress_test(sqsh__impl_lz4, input, sizeof(input));
 }
 
-UTEST(extract, decompress_lz4_split) {
+static void
+extract__decompress_lz4_split(void) {
 	uint8_t input[] = {0x40, 0x61, 0x62, 0x63, 0x64};
-	UTEST_SKIP("lz4 split not supported yet");
+	puts("skipping: lz4 split not supported yet");
+	return;
 
-	decompress_test_split(sqsh__impl_lz4, input, sizeof(input), utest_result);
+	decompress_test_split(sqsh__impl_lz4, input, sizeof(input));
 }
 
-UTEST(extract, decompress_zlib) {
+static void
+extract__decompress_zlib(void) {
 	uint8_t input[] = {
 			ZLIB_ABCD,
 	};
 
-	decompress_test(sqsh__impl_zlib, input, sizeof(input), utest_result);
+	decompress_test(sqsh__impl_zlib, input, sizeof(input));
 }
 
-UTEST(extract, decompress_zlib_split) {
+static void
+extract__decompress_zlib_split(void) {
 	uint8_t input[] = {
 			ZLIB_ABCD,
 	};
 
-	decompress_test_split(sqsh__impl_zlib, input, sizeof(input), utest_result);
+	decompress_test_split(sqsh__impl_zlib, input, sizeof(input));
 }
 
-UTEST(extract, decompress_zstd) {
+static void
+extract__decompress_zstd(void) {
 	uint8_t input[] = {0x28, 0xb5, 0x2f, 0xfd, 0x20, 0x04, 0x21,
 					   0x00, 0x00, 0x61, 0x62, 0x63, 0x64};
 
-	decompress_test(sqsh__impl_zstd, input, sizeof(input), utest_result);
+	decompress_test(sqsh__impl_zstd, input, sizeof(input));
 }
 
-UTEST(extract, decompress_zstd_split) {
+static void
+extract__decompress_zstd_split(void) {
 	uint8_t input[] = {0x28, 0xb5, 0x2f, 0xfd, 0x20, 0x04, 0x21,
 					   0x00, 0x00, 0x61, 0x62, 0x63, 0x64};
 
-	decompress_test_split(sqsh__impl_zstd, input, sizeof(input), utest_result);
+	decompress_test_split(sqsh__impl_zstd, input, sizeof(input));
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(extract__decompress_lzma)
+TEST(extract__decompress_lzma_split)
+TEST(extract__decompress_xz)
+TEST(extract__decompress_xz_split)
+TEST(extract__decompress_lz4)
+TEST(extract__decompress_lz4_split)
+TEST(extract__decompress_zlib)
+TEST(extract__decompress_zlib_split)
+TEST(extract__decompress_zstd)
+TEST(extract__decompress_zstd_split)
+END_TESTS

@@ -27,8 +27,6 @@ fuzzer_repro = files(
     'timeout-ed751e8e6821ce6ef7947a1133b8845f27e28ebd',
 )
 
-utest_dep = dependency('utest')
-
 fuzzer_repro_codegen = executable(
     'repro_codegen',
     'repro_codegen.c',
@@ -59,7 +57,7 @@ fuzzer_repro_test = executable(
         libmksqsh_include,
     ],
     link_with: [libsqsh.get_static_lib(), libmksqsh.get_static_lib()],
-    dependencies: [threads_dep, utest_dep, cextras_dep],
+    dependencies: [threads_dep, testlib_dep, cextras_dep],
 
 )
 

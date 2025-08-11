@@ -33,14 +33,15 @@
  */
 
 #include "../common.h"
-#include <utest.h>
+#include <testlib.h>
 
 #include <sqsh_archive_private.h>
 #include <sqsh_common_private.h>
 #include <sqsh_data_private.h>
 #include <sqsh_file.h>
 
-UTEST(file_reader, load_file_from_compressed_data_block) {
+static void
+file_reader__load_file_from_compressed_data_block(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -85,7 +86,8 @@ UTEST(file_reader, load_file_from_compressed_data_block) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(file_reader, load_file_from_compressed_data_block_with_offset) {
+static void
+file_reader__load_file_from_compressed_data_block_with_offset(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -128,7 +130,8 @@ UTEST(file_reader, load_file_from_compressed_data_block_with_offset) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(file_reader, load_file_from_uncompressed_data_block) {
+static void
+file_reader__load_file_from_uncompressed_data_block(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -173,7 +176,8 @@ UTEST(file_reader, load_file_from_uncompressed_data_block) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST(file_reader, skip_over_zero_page) {
+static void
+file_reader__skip_over_zero_page(void) {
 	int rv;
 	struct SqshArchive archive = {0};
 	struct SqshFile file = {0};
@@ -216,4 +220,9 @@ UTEST(file_reader, skip_over_zero_page) {
 	sqsh__archive_cleanup(&archive);
 }
 
-UTEST_MAIN()
+DECLARE_TESTS
+TEST(file_reader__load_file_from_compressed_data_block)
+TEST(file_reader__load_file_from_compressed_data_block_with_offset)
+TEST(file_reader__load_file_from_uncompressed_data_block)
+TEST(file_reader__skip_over_zero_page)
+END_TESTS
