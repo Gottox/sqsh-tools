@@ -31,8 +31,8 @@
  * @file         sqsh_common_private.h
  */
 
-#ifndef SQSH_UTILS_H
-#define SQSH_UTILS_H
+#ifndef SQSH_COMMON_PRIVATE_H
+#define SQSH_COMMON_PRIVATE_H
 
 #include <sqsh_common.h>
 
@@ -99,4 +99,4 @@ sqsh_datablock_is_compressed(uint32_t size_info) {
 #ifdef __cplusplus
 }
 #endif
-#endif /* end of include guard SQSH_UTILS_H */
+#endif /* SQSH_COMMON_PRIVATE_H */

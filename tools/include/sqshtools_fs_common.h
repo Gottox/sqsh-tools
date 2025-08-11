@@ -32,9 +32,9 @@
  * @created  Wednesday Jun 07, 2023 13:33:20 CEST
  */
 
-#ifndef TOOLS_FS_COMMON_H
+#ifndef SQSHTOOLS_FS_COMMON_H
 
-#define TOOLS_FS_COMMON_H
+#define SQSHTOOLS_FS_COMMON_H
 
 #include "sqshtools_common.h"
 
@@ -82,4 +82,4 @@ void fs_common_getattr(
 		struct SqshFile *file, const struct SqshSuperblock *superblock,
 		struct stat *st);
 
-#endif // TOOLS_COMMON_H
+#endif /* SQSHTOOLS_FS_COMMON_H */

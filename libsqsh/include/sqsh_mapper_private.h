@@ -31,8 +31,8 @@
  * @file         sqsh_mapper_private.h
  */
 
-#ifndef SQSH_PRIVATE_MAPPER_H
-#define SQSH_PRIVATE_MAPPER_H
+#ifndef SQSH_MAPPER_PRIVATE_H
+#define SQSH_MAPPER_PRIVATE_H
 
 #include <sqsh_mapper.h>
 
@@ -514,4 +514,4 @@ SQSH_NO_EXPORT int sqsh__map_reader_cleanup(struct SqshMapReader *reader);
 #ifdef __cplusplus
 }
 #endif
-#endif /* SQSH_PRIVATE_MAPPER_H */
+#endif /* SQSH_MAPPER_PRIVATE_H */
