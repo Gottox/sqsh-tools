@@ -21,6 +21,7 @@ sqsh_test = [
     'mapper/map_reader.c',
     'nasty.c',
     'reader/reader.c',
+    'table/export_table.c',
     'tree/path_resolver.c',
     'tree/traversal.c',
     'tree/walker.c',
