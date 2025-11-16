@@ -1,5 +1,12 @@
 #!/bin/sh -ex
 
+case "$(uname -s)" in
+	# openbsd or macos do not support extended attributes in squashfs
+	OpenBSD|Darwin)
+		echo "Skipping test on $(uname -s)"
+		;;
+esac
+
 : "${BUILD_DIR:?BUILD_DIR is not set}"
 : "${MKSQUASHFS:?MKSQUASHFS is not set}"
 : "${SOURCE_ROOT:?SOURCE_ROOT is not set}"
