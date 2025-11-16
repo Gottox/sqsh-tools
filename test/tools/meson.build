@@ -10,6 +10,7 @@ sqsh_extended_test = [
     'ls/large-tree-lookup.sh',
     'ls/utc.sh',
     'ls/escape.sh',
+    'xattr/multi-xattr.sh',
 ]
 sqsh_extended_fs_test = [
     'fs/large-file.sh',
@@ -34,6 +35,7 @@ foreach p : sqsh_extended_test
             tools['sqsh-ls'],
             tools['sqsh-cat'],
             tools['sqsh-unpack'],
+            tools['sqsh-xattr'],
         ],
         env: {
             'BUILD_DIR': meson.current_build_dir(),
@@ -43,6 +45,7 @@ foreach p : sqsh_extended_test
             'SQSH_CAT': tools['sqsh-cat'].full_path(),
             'SQSH_LS': tools['sqsh-ls'].full_path(),
             'SQSH_UNPACK': tools['sqsh-unpack'].full_path(),
+            'SQSH_XATTR': tools['sqsh-xattr'].full_path(),
         },
     )
 endforeach
