@@ -129,7 +129,7 @@ traversal__test_empty_dir(void) {
 					SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN,
 			sqsh_tree_traversal_state(&traversal));
 	path = sqsh_tree_traversal_path_dup(&traversal);
-	ASSERT_STREQ("", path, strlen(path) + 1);
+	ASSERT_STREQS("", path, strlen(path) + 1);
 	free(path);
 
 	has_next = sqsh_tree_traversal_next(&traversal, &rv);
@@ -140,7 +140,7 @@ traversal__test_empty_dir(void) {
 					SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END,
 			sqsh_tree_traversal_state(&traversal));
 	path = sqsh_tree_traversal_path_dup(&traversal);
-	ASSERT_STREQ("", path, strlen(path) + 1);
+	ASSERT_STREQS("", path, strlen(path) + 1);
 	free(path);
 
 	has_next = sqsh_tree_traversal_next(&traversal, &rv);

@@ -42,8 +42,8 @@ version__version_defines_are_correct(void) {
 	char *version = getenv("VERSION");
 
 	ASSERT_NE(NULL, version);
-	ASSERT_STREQ(SQSH_VERSION, version, strlen(version) + 1);
-	ASSERT_STREQ(SQSH_VERSION, sqsh_version(), strlen(version) + 1);
+	ASSERT_STREQS(SQSH_VERSION, version, strlen(version) + 1);
+	ASSERT_STREQS(SQSH_VERSION, sqsh_version(), strlen(version) + 1);
 
 	int major, minor, patch;
 	ASSERT_EQ(3, sscanf(version, "%d.%d.%d", &major, &minor, &patch));

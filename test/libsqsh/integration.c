@@ -650,7 +650,7 @@ test_tree_traversal(void) {
 	ASSERT_EQ(0, rv);
 	ASSERT_EQ(true, has_next);
 	name = sqsh_tree_traversal_name(traversal, &size);
-	ASSERT_STREQ("", name, size);
+	ASSERT_STREQS("", name, size);
 	ASSERT_EQ(
 			SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN,
 			sqsh_tree_traversal_state(traversal));
@@ -659,7 +659,7 @@ test_tree_traversal(void) {
 	ASSERT_EQ(0, rv);
 	ASSERT_EQ(true, has_next);
 	name = sqsh_tree_traversal_name(traversal, &size);
-	ASSERT_STREQ("a", name, size);
+	ASSERT_STREQS("a", name, size);
 	ASSERT_EQ(
 			SQSH_TREE_TRAVERSAL_STATE_FILE,
 			sqsh_tree_traversal_state(traversal));
@@ -668,7 +668,7 @@ test_tree_traversal(void) {
 	ASSERT_EQ(0, rv);
 	ASSERT_EQ(true, has_next);
 	name = sqsh_tree_traversal_name(traversal, &size);
-	ASSERT_STREQ("b", name, size);
+	ASSERT_STREQS("b", name, size);
 	ASSERT_EQ(
 			SQSH_TREE_TRAVERSAL_STATE_FILE,
 			sqsh_tree_traversal_state(traversal));
@@ -677,7 +677,7 @@ test_tree_traversal(void) {
 	ASSERT_EQ(0, rv);
 	ASSERT_EQ(true, has_next);
 	name = sqsh_tree_traversal_name(traversal, &size);
-	ASSERT_STREQ("large_dir", name, size);
+	ASSERT_STREQS("large_dir", name, size);
 	ASSERT_EQ(
 			SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN,
 			sqsh_tree_traversal_state(traversal));
@@ -693,7 +693,7 @@ test_tree_traversal(void) {
 	ASSERT_EQ(0, rv);
 	ASSERT_EQ(true, has_next);
 	name = sqsh_tree_traversal_name(traversal, &size);
-	ASSERT_STREQ("large_dir", name, size);
+	ASSERT_STREQS("large_dir", name, size);
 	ASSERT_EQ(
 			(enum SqshTreeTraversalState)
 					SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END,
@@ -703,7 +703,7 @@ test_tree_traversal(void) {
 	ASSERT_EQ(0, rv);
 	ASSERT_EQ(true, has_next);
 	name = sqsh_tree_traversal_name(traversal, &size);
-	ASSERT_STREQ("", name, size);
+	ASSERT_STREQS("", name, size);
 	ASSERT_EQ(
 			(enum SqshTreeTraversalState)
 					SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END,
@@ -732,11 +732,11 @@ test_easy_traversal(void) {
 	traversal = sqsh_easy_tree_traversal(&sqsh, "/", &rv);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_STREQ("a", traversal[0], 2);
-	ASSERT_STREQ("b", traversal[1], 2);
-	ASSERT_STREQ("large_dir", traversal[2], 10);
-	ASSERT_STREQ("large_dir/1", traversal[3], 12);
-	ASSERT_STREQ("large_dir/10", traversal[4], 13);
+	ASSERT_STREQS("a", traversal[0], 2);
+	ASSERT_STREQS("b", traversal[1], 2);
+	ASSERT_STREQS("large_dir", traversal[2], 10);
+	ASSERT_STREQS("large_dir/1", traversal[3], 12);
+	ASSERT_STREQS("large_dir/10", traversal[4], 13);
 
 	free(traversal);
 	rv = sqsh_close(file);
@@ -808,11 +808,11 @@ test_mmap(void) {
 	traversal = sqsh_easy_tree_traversal(&sqsh, "/", &rv);
 	ASSERT_EQ(0, rv);
 
-	ASSERT_STREQ("a", traversal[0], 2);
-	ASSERT_STREQ("b", traversal[1], 2);
-	ASSERT_STREQ("large_dir", traversal[2], 10);
-	ASSERT_STREQ("large_dir/1", traversal[3], 12);
-	ASSERT_STREQ("large_dir/10", traversal[4], 13);
+	ASSERT_STREQS("a", traversal[0], 2);
+	ASSERT_STREQS("b", traversal[1], 2);
+	ASSERT_STREQS("large_dir", traversal[2], 10);
+	ASSERT_STREQS("large_dir/1", traversal[3], 12);
+	ASSERT_STREQS("large_dir/10", traversal[4], 13);
 
 	free(traversal);
 	rv = sqsh_close(file);
