@@ -56,9 +56,6 @@ sqsh__metablock_iterator_init(
 	iterator->compression_manager =
 			sqsh__archive_metablock_extract_manager(sqsh);
 	memset(&iterator->extract_view, 0, sizeof(iterator->extract_view));
-	if (rv < 0) {
-		goto out;
-	}
 	rv = sqsh__map_reader_init(
 			&iterator->reader, map_manager, start_address, upper_limit);
 	if (rv < 0) {
