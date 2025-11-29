@@ -2,7 +2,7 @@
 
 case "$(uname -s)" in
 	# openbsd or macos do not support extended attributes in squashfs
-	OpenBSD|Darwin)
+	OpenBSD|Darwin|FreeBSD)
 		echo "Skipping test on $(uname -s)"
 		exit 0;
 		;;
