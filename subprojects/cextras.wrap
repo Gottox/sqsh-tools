@@ -1,6 +1,6 @@
 [wrap-git]
 directory = cextras
-revision = 5e2a215c1624c181c5d5846abd7249ab4f246c82
+revision = 3c85c9b7d851e16df8416c8712da3fd720a9fcd1
 url = https://github.com/Gottox/cextras.git
 depth = 1
 
