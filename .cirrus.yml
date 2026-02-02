@@ -4,7 +4,7 @@ env:
 freebsd_task:
   only_if: $CIRRUS_BRANCH == "main"
   freebsd_instance:
-    image_family: freebsd-14-2
+    image_family: freebsd-15-0-amd64-ufs
   setup_script:
     - pkg install -y autoconf automake libtool pkgconf fusefs-libs
     - pkg install -y lzo2 liblz4 zstd meson git
