@@ -112,7 +112,10 @@ dyn_map_init(struct SqshInodeMap *map, struct SqshArchive *archive) {
 	pthread_mutex_init(map->mutex, NULL);
 	map->export_table = NULL;
 
-	cx_radix_tree_init(&map->inode_refs, sizeof(uint64_t[256]));
+	rv = cx_hash_map_init(&map->inode_refs, 32, sizeof(uint64_t[256]));
+	if (rv < 0) {
+		goto out;
+	}
 out:
 	return rv;
 }
@@ -139,7 +142,7 @@ dyn_map_get(const struct SqshInodeMap *map, uint32_t inode_number, int *err) {
 	sqsh_index_t outer_index = index >> 8;
 
 	uint_fast64_t *inner_inode_refs =
-			cx_radix_tree_get(&map->inode_refs, outer_index);
+			cx_hash_map_get(&map->inode_refs, outer_index);
 	if (inner_inode_refs == NULL) {
 		rv = -SQSH_ERROR_NO_SUCH_ELEMENT;
 		goto out;
@@ -181,11 +184,11 @@ dyn_map_set(
 	sqsh_index_t outer_index = index >> 8;
 
 	uint_fast64_t *inner_inode_refs =
-			cx_radix_tree_get(&map->inode_refs, outer_index);
+			cx_hash_map_get(&map->inode_refs, outer_index);
 	if (inner_inode_refs == NULL) {
 		uint64_t new_inner_inode_refs[256] = {0};
 		new_inner_inode_refs[inner_index] = ~inode_ref;
-		cx_radix_tree_put(&map->inode_refs, outer_index, new_inner_inode_refs);
+		cx_hash_map_put(&map->inode_refs, outer_index, new_inner_inode_refs);
 	} else {
 		const uint64_t old_value = ~inner_inode_refs[inner_index];
 		inner_inode_refs[inner_index] = ~inode_ref;
@@ -208,7 +211,7 @@ export_table_cleanup(struct SqshInodeMap *map) {
 
 static int
 dyn_map_cleanup(struct SqshInodeMap *map) {
-	cx_radix_tree_cleanup(&map->inode_refs);
+	cx_hash_map_cleanup(&map->inode_refs);
 	pthread_mutex_destroy(map->mutex);
 	free(map->mutex);
 	return 0;

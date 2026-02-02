@@ -8,6 +8,7 @@ project(
     ],
     version: '1.5.0',
     license: 'BSD-2-Clause',
+    meson_version: '>=1.4.0',
 )
 
 threads_dep = dependency('threads', required: get_option('threads'))

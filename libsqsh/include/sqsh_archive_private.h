@@ -110,7 +110,7 @@ struct SqshInodeMap {
 	 */
 	const struct SqshInodeMapImpl *impl;
 	sqsh__mutex_t *mutex;
-	struct CxRadixTree inode_refs;
+	struct CxHashMap inode_refs;
 	size_t inode_count;
 	struct SqshExportTable *export_table;
 };
