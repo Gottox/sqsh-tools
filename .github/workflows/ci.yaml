@@ -21,6 +21,7 @@ jobs:
       image: gottox/sqsh-build:x86_64
     steps:
     - uses: actions/checkout@v4
+    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: configure
       run: |
         meson setup /tmp/build \
@@ -62,6 +63,7 @@ jobs:
       options: --privileged
     steps:
     - uses: actions/checkout@v4
+    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: configure
       run: |
         CC=gcc meson setup /tmp/build \
@@ -90,6 +92,7 @@ jobs:
       - /tmp/build:/tmp/build
     steps:
     - uses: actions/checkout@v4
+    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: configure
       run: |
         CC=clang meson setup /tmp/build \
@@ -133,6 +136,7 @@ jobs:
           - x86_64
     steps:
     - uses: actions/checkout@v4
+    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: configure
       run: |
         meson wrap update-db
@@ -157,6 +161,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: install dependencies
       run: |
         sudo apt update
@@ -204,6 +209,7 @@ jobs:
           - arm64
     steps:
     - uses: actions/checkout@v4
+    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - uses: "cross-platform-actions/action@v0.24.0"
       with:
         operating_system: openbsd
@@ -233,6 +239,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     steps:
     - uses: actions/checkout@v4
+    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - run: |
           brew install git meson squashfs lz4 xz zstd macfuse
     - run: |
@@ -262,6 +269,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: configure
       run: |
         git config --global --add safe.directory $PWD
@@ -304,6 +312,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: configure
       run: |
         git config --global --add safe.directory $PWD
