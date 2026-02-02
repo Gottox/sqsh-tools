@@ -48,6 +48,15 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Install tools
+      run: |
+        sudo apt update
+        sudo apt install --yes \
+          python3-pip \
+          python3-venv
+        python -m pip install --upgrade pip
+        python -m pip install meson ninja
+
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2

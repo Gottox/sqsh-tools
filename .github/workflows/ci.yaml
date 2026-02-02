@@ -165,7 +165,9 @@ jobs:
     - name: install dependencies
       run: |
         sudo apt update
-        sudo apt install --yes meson build-essential gcc-multilib g++-multilib
+        sudo apt install --yes build-essential gcc-multilib g++-multilib python3-pip python3-venv
+        python -m pip install --upgrade pip
+        python -m pip install meson ninja
     - name: configure
       env:
         CROSS_FILE: |

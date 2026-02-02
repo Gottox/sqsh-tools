@@ -19,7 +19,6 @@ jobs:
           git \
           build-essential \
           gcovr \
-          meson \
           pkg-config \
           libfuse-dev \
           libfuse3-dev \
@@ -27,7 +26,11 @@ jobs:
           liblzma-dev \
           zlib1g-dev \
           libzstd-dev \
-          squashfs-tools
+          squashfs-tools\
+          python3-pip \
+          python3-venv
+        python -m pip install --upgrade pip
+        python -m pip install meson ninja
     - name: Configure
       run: |
         CC=gcc meson setup build \
