@@ -171,7 +171,7 @@ struct SqshMapManager {
 	 */
 	struct SqshMapper mapper;
 	struct CxLru lru;
-	struct CxRcRadixTree maps;
+	struct CxRcHashMap maps;
 	uint64_t archive_offset;
 	uint64_t block_count;
 	sqsh__mutex_t lock;
