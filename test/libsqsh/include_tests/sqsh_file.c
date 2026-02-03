@@ -32,10 +32,12 @@
  */
 
 #include <sqsh_file.h>
+#include <stdio.h>
 
 int
 main(int argc, char *argv[]) {
 	(void)argc;
 	(void)argv;
+	puts("ok");
 	return 0;
 }
