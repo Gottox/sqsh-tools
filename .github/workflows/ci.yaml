@@ -203,7 +203,7 @@ jobs:
     needs:
     - format-check
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
+    #if: ${{ github.ref == 'refs/heads/main' }}
     strategy:
       matrix:
         arch:
@@ -212,11 +212,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-    - uses: "cross-platform-actions/action@v0.24.0"
+    - uses: "cross-platform-actions/action@v0.32.0"
       with:
         operating_system: openbsd
         architecture: ${{ matrix.arch }}
-        version: 7.5
+        version: 7.8
         run: |
           sudo pkg_add git meson squashfs-tools curl lz4 xz zstd
           CC=clang meson setup /tmp/build \
