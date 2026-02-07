@@ -105,7 +105,7 @@ file_iterator_mt_cleanup(struct FileIteratorMt *mt, int rv) {
 
 static void
 iterator_worker(void *data) {
-	int rv = 0, rv2 = 0;
+	int rv = 0;
 	struct SqshFileIterator iterator = {0};
 
 	struct FileIteratorMtBlock *block = data;
@@ -127,8 +127,6 @@ iterator_worker(void *data) {
 
 out:
 	sqsh__file_iterator_cleanup(&iterator);
-
-	assert(rv2 == 0);
 
 	if (rv < 0) {
 		atomic_store(&mt->rv, rv);
@@ -201,7 +199,7 @@ out:
 	}
 }
 
-void
+int
 sqsh_file_iterator_mt(
 		const struct SqshFile *file, struct SqshThreadpool *threadpool,
 		sqsh_file_iterator_mt_cb cb, void *data) {
@@ -210,9 +208,12 @@ sqsh_file_iterator_mt(
 	struct FileIteratorMt *mt = calloc(1, sizeof(struct FileIteratorMt));
 	if (mt == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
 	}
 
 	file_iterator_mt(mt, file, threadpool, cb, data, rv);
+out:
+	return rv;
 }
 
 static void
