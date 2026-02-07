@@ -201,7 +201,7 @@ out:
 	}
 }
 
-void
+int
 sqsh_file_iterator_mt(
 		const struct SqshFile *file, struct SqshThreadpool *threadpool,
 		sqsh_file_iterator_mt_cb cb, void *data) {
@@ -210,9 +210,12 @@ sqsh_file_iterator_mt(
 	struct FileIteratorMt *mt = calloc(1, sizeof(struct FileIteratorMt));
 	if (mt == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
 	}
 
 	file_iterator_mt(mt, file, threadpool, cb, data, rv);
+out:
+	return rv;
 }
 
 static void
