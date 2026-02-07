@@ -105,7 +105,7 @@ file_iterator_mt_cleanup(struct FileIteratorMt *mt, int rv) {
 
 static void
 iterator_worker(void *data) {
-	int rv = 0, rv2 = 0;
+	int rv = 0;
 	struct SqshFileIterator iterator = {0};
 
 	struct FileIteratorMtBlock *block = data;
@@ -127,8 +127,6 @@ iterator_worker(void *data) {
 
 out:
 	sqsh__file_iterator_cleanup(&iterator);
-
-	assert(rv2 == 0);
 
 	if (rv < 0) {
 		atomic_store(&mt->rv, rv);
