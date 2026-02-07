@@ -87,7 +87,7 @@ SQSH_NO_UNUSED int sqsh_file_to_stream_mt(
  * @param[in] threadpool The threadpool to use.
  * @param[in] cb The callback to call for each block.
  * @param[in] data The data to pass to the callback.
- * 
+ *
  * @return 0 on success, less than 0 on error.
  */
 int sqsh_file_iterator_mt(
