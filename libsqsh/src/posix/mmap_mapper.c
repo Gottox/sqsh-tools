@@ -64,7 +64,7 @@ sqsh_mapper_mmap_init(
 		rv = -errno;
 		goto out;
 	}
-	*size = (size_t)pos;
+	*size = (uint64_t)pos;
 
 	sqsh_mapper_set_user_data(mapper, TO_PTR(fd));
 

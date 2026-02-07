@@ -43,8 +43,8 @@
 
 static sqsh_index_t
 address_to_index(const struct SqshMapIterator *iterator, uint64_t address) {
-	return (sqsh_index_t)address /
-			sqsh__map_manager_block_size(iterator->map_manager);
+	return (sqsh_index_t)(address /
+						  sqsh__map_manager_block_size(iterator->map_manager));
 }
 
 int

@@ -57,9 +57,8 @@ calc_block_count(
 	const uint32_t block_size = sqsh_superblock_block_size(superblock);
 	const bool has_fragment = fragment_index != SQSH_INODE_NO_FRAGMENT;
 
-	// TODO: integer overflows on 32bit?
 	if (has_fragment) {
-		return (size_t)file_size / block_size;
+		return (size_t)(file_size / block_size);
 	} else {
 		return (size_t)SQSH_DIVIDE_CEIL(file_size, block_size);
 	}
@@ -71,7 +70,11 @@ inode_file_payload_size(
 	const size_t block_count = calc_block_count(
 			archive, inode_file_size(inode),
 			inode_file_fragment_block_index(inode));
-	return block_count * sizeof(uint32_t);
+	size_t result;
+	if (SQSH_MULT_OVERFLOW(block_count, sizeof(uint32_t), &result)) {
+		return SIZE_MAX;
+	}
+	return result;
 }
 
 static size_t
@@ -80,7 +83,11 @@ inode_file_ext_payload_size(
 	const size_t block_count = calc_block_count(
 			archive, inode_file_ext_size(inode),
 			inode_file_ext_fragment_block_index(inode));
-	return block_count * sizeof(uint32_t);
+	size_t result;
+	if (SQSH_MULT_OVERFLOW(block_count, sizeof(uint32_t), &result)) {
+		return SIZE_MAX;
+	}
+	return result;
 }
 
 static uint32_t

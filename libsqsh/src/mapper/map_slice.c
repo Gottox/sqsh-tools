@@ -42,7 +42,7 @@ int
 sqsh__map_slice_init(
 		struct SqshMapSlice *mapping, struct SqshMapper *mapper, uint64_t index,
 		uint64_t offset, size_t size) {
-	size_t end_offset;
+	uint64_t end_offset;
 	uint64_t archive_size = sqsh_mapper_size2(mapper);
 	if (offset > archive_size) {
 		return -SQSH_ERROR_SIZE_MISMATCH;

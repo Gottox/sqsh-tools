@@ -11,6 +11,7 @@ sqsh_extended_test = [
     'ls/utc.sh',
     'ls/escape.sh',
     'xattr/multi-xattr.sh',
+    'stat/large-file.sh',
 ]
 sqsh_extended_fs_test = [
     'fs/large-file.sh',
@@ -34,6 +35,7 @@ foreach p : sqsh_extended_test
             read_chunk,
             tools['sqsh-ls'],
             tools['sqsh-cat'],
+            tools['sqsh-stat'],
             tools['sqsh-unpack'],
             tools['sqsh-xattr'],
         ],
@@ -44,6 +46,7 @@ foreach p : sqsh_extended_test
             'READ_CHUNK': read_chunk.full_path(),
             'SQSH_CAT': tools['sqsh-cat'].full_path(),
             'SQSH_LS': tools['sqsh-ls'].full_path(),
+            'SQSH_STAT': tools['sqsh-stat'].full_path(),
             'SQSH_UNPACK': tools['sqsh-unpack'].full_path(),
             'SQSH_XATTR': tools['sqsh-xattr'].full_path(),
         },
