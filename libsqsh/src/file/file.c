@@ -294,9 +294,9 @@ sqsh_file_block_count2(const struct SqshFile *context) {
 	} else if (file_size == 0) {
 		return 0;
 	} else if (sqsh_file_has_fragment(context)) {
-		return (uint32_t)file_size / block_size;
+		return file_size / block_size;
 	} else {
-		return (uint32_t)SQSH_DIVIDE_CEIL(file_size, block_size);
+		return SQSH_DIVIDE_CEIL(file_size, block_size);
 	}
 }
 
