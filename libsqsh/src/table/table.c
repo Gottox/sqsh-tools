@@ -110,15 +110,18 @@ sqsh_table_get(
 	struct SqshArchive *sqsh = table->sqsh;
 	struct SqshMetablockReader metablock = {0};
 	size_t lookup_table_bytes = sqsh__map_reader_size(&table->lookup_table);
+	uint64_t byte_offset;
+	if (SQSH_MULT_OVERFLOW(index, table->element_size, &byte_offset)) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
 	sqsh_index_t lookup_index =
-			index * table->element_size / SQSH_METABLOCK_BLOCK_SIZE;
+			(sqsh_index_t)(byte_offset / SQSH_METABLOCK_BLOCK_SIZE);
 	if (lookup_index >= table->element_count ||
-		lookup_index * sizeof(uint64_t) >= lookup_table_bytes) {
+		lookup_index >= lookup_table_bytes / sizeof(uint64_t)) {
 		return -SQSH_ERROR_OUT_OF_BOUNDS;
 	}
 	uint64_t metablock_address = lookup_table_get(table, lookup_index);
-	uint64_t element_offset =
-			(index * table->element_size) % SQSH_METABLOCK_BLOCK_SIZE;
+	uint64_t element_offset = byte_offset % SQSH_METABLOCK_BLOCK_SIZE;
 
 	uint64_t upper_limit = SQSH_METABLOCK_BLOCK_SIZE;
 	if (SQSH_ADD_OVERFLOW(metablock_address, upper_limit, &upper_limit)) {
