@@ -328,7 +328,7 @@ sqsh_path_resolver_open_file(
 	}
 out:
 	if (rv < 0) {
-		sqsh__file_cleanup(file);
+		sqsh_close(file);
 		file = NULL;
 	}
 	if (err != NULL) {
