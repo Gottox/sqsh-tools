@@ -181,6 +181,7 @@ extract_file_after(
 	fclose(stream);
 	if (err < 0) {
 		locked_sqsh_perror(err, data->path);
+		goto out;
 	}
 
 	rv = rename(data->tmp_filename, data->path);
