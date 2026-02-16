@@ -213,7 +213,7 @@ map_reader__initial_advance_2(void) {
 
 	const uint8_t *data = sqsh__map_reader_data(&cursor);
 	ASSERT_EQ((size_t)4, sqsh__map_reader_size(&cursor));
-	ASSERT_EQ(0, memcmp(data, "1234", 2));
+	ASSERT_EQ(0, memcmp(data, "1234", 4));
 
 	sqsh__map_reader_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);

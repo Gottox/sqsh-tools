@@ -142,7 +142,7 @@ ease_file__test_file_exists_through_symlink(void) {
 	mk_stub(&archive, payload, sizeof(payload));
 
 	bool exists = sqsh_easy_file_exists(&archive, "/src", &rv);
-	assert(exists);
+	ASSERT_TRUE(exists);
 	ASSERT_EQ(0, rv);
 
 	exists = sqsh_easy_file_exists(&archive, "/file_not_found", &rv);
