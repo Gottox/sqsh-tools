@@ -273,6 +273,11 @@ static int
 extract_symlink(const char *path, const struct SqshFile *file) {
 	int rv;
 	char *target = sqsh_file_symlink_dup(file);
+	if (target == NULL) {
+		rv = -errno;
+		perror(path);
+		goto out;
+	}
 
 	rv = symlink(target, path);
 	if (rv < 0) {
