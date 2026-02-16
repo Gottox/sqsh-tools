@@ -187,11 +187,11 @@ extract__decompress_zstd_split(void) {
 
 DECLARE_TESTS
 TEST(extract__decompress_lzma)
-NO_TEST(extract__decompress_lzma_split) // lzma does not support split input
+NO_TEST(extract__decompress_lzma_split)
 TEST(extract__decompress_xz)
 TEST(extract__decompress_xz_split)
 TEST(extract__decompress_lz4)
-NO_TEST(extract__decompress_lz4_split) // lz4 does not support split input
+NO_TEST(extract__decompress_lz4_split)
 TEST(extract__decompress_zlib)
 TEST(extract__decompress_zlib_split)
 TEST(extract__decompress_zstd)
