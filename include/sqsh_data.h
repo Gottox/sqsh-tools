@@ -107,7 +107,10 @@ enum SqshXzFilters {
  * @brief definitions of lz4 flags
  */
 enum SqshLz4Flags {
-	SQS_LZ4_FLAG_NONE = 0x0,
+	SQSH_LZ4_FLAG_NONE = 0x0,
+	SQS_LZ4_FLAG_NONE
+	__attribute__((deprecated("Since 1.6.0. Use SQSH_LZ4_FLAG_NONE instead"))) =
+			SQSH_LZ4_FLAG_NONE,
 	SQSH_LZ4_HIGH_COMPRESSION = 0x0001
 };
 
