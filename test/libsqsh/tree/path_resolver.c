@@ -412,8 +412,9 @@ path_resolver__resolver_next(void) {
 	ASSERT_EQ(0, rv);
 	ASSERT_EQ(false, has_next);
 
-	rv = sqsh_path_resolver_next(resolver, &rv);
+	has_next = sqsh_path_resolver_next(resolver, &rv);
 	ASSERT_EQ(0, rv);
+	ASSERT_EQ(false, has_next);
 
 	sqsh_path_resolver_free(resolver);
 	sqsh__archive_cleanup(&archive);
