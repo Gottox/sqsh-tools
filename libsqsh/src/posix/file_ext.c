@@ -60,7 +60,7 @@ sqsh_file_to_stream(const struct SqshFile *file, FILE *stream) {
 		const uint8_t *data = sqsh_file_iterator_data(&iterator);
 		const size_t size = sqsh_file_iterator_size(&iterator);
 		const size_t written = fwrite(data, sizeof(uint8_t), size, stream);
-		if (written > 0 && written != size) {
+		if (written != size) {
 			rv = -errno;
 			goto out;
 		}
