@@ -261,36 +261,46 @@ fs_readdir(
 
 	int rv = 0;
 	struct FsDirHandle *handle = get_dir_handle(fi);
-	char buf[size];
+	char *buf = NULL;
+	size_t result_size = 0;
 
 	bool has_next = sqsh_directory_iterator_next(handle->iterator, &rv);
 	if (rv < 0) {
 		fuse_reply_err(req, -fs_common_map_err(rv));
 		goto out;
 	} else if (has_next == false) {
-		fuse_reply_buf(req, NULL, 0);
+		goto out;
+	}
+
+	buf = malloc(size);
+	if (buf == NULL) {
 		goto out;
 	}
 
 	handle->current_stat.st_ino = fs_common_inode_sqsh_to_ino(
 			sqsh_directory_iterator_inode(handle->iterator));
-
 	handle->current_stat.st_mode = fs_common_mode_type(
 			sqsh_directory_iterator_file_type(handle->iterator));
 	handle->current_name = sqsh_directory_iterator_name_dup(handle->iterator);
 	if (handle->current_name == NULL) {
-		fuse_reply_err(req, ENOMEM);
 		goto out;
 	}
-	size_t result_size = fuse_add_direntry(
+	result_size = fuse_add_direntry(
 			req, buf, size, handle->current_name, &handle->current_stat,
 			offset);
 	free(handle->current_name);
-
-	fuse_reply_buf(req, buf, result_size);
+	if (result_size > size) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
+	}
 
 out:
-	return;
+	if (rv < 0) {
+		fuse_reply_err(req, -fs_common_map_err(rv));
+	} else {
+		fuse_reply_buf(req, buf, result_size);
+	}
+	free(buf);
 }
 
 static void
