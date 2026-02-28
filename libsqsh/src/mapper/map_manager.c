@@ -62,7 +62,7 @@ load_mapping(
 	 * read past the end of the file, so cap the size to the remaining bytes.
 	 */
 	if (index == block_count - 1 && mapper_size % block_size != 0) {
-		size = (size_t)mapper_size % block_size;
+		size = (size_t)(mapper_size % block_size);
 	}
 
 	if (SQSH_ADD_OVERFLOW(offset, manager->archive_offset, &offset)) {
