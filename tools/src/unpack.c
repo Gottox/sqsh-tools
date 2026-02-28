@@ -47,7 +47,7 @@
 typedef int (*extract_fn)(
 		const char *, enum SqshFileType, const struct SqshFile *);
 
-static const char *TMP_SUFFIX = "-XXXXXX";
+static const char TMP_SUFFIX[] = "-XXXXXX";
 
 struct CxSemaphore file_descriptor_sem;
 size_t extracted_files = 0;
