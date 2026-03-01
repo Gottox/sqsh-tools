@@ -175,9 +175,10 @@ extract_file_cleanup(struct ExtractFileData *data, FILE *stream) {
 static void
 extract_file_after(
 		const struct SqshFile *file, FILE *stream, void *d, int err) {
-	(void)stream;
 	int rv = 0;
 	struct ExtractFileData *data = d;
+
+	fclose(stream);
 	if (err < 0) {
 		locked_sqsh_perror(err, data->path);
 	}
@@ -188,7 +189,6 @@ extract_file_after(
 		goto out;
 	}
 
-	fclose(stream);
 	rv = update_metadata(data->path, file);
 out:
 	cx_semaphore_post(&file_descriptor_sem);
