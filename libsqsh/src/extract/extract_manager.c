@@ -174,8 +174,8 @@ out:
 
 int
 sqsh__extract_manager_retain_buffer(
-		struct SqshExtractManager *manager, uint64_t address) {
-	cx_rc_hash_map_retain(&manager->cache, address);
+		struct SqshExtractManager *manager, const struct CxBuffer *buffer) {
+	cx_rc_hash_map_retain_value(&manager->cache, buffer);
 	return 0;
 }
 
