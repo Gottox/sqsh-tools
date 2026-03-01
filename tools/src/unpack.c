@@ -292,10 +292,10 @@ extract_device(const char *path, const struct SqshFile *file) {
 	uint16_t mode = sqsh_file_permission(file);
 	switch (sqsh_file_type(file)) {
 	case SQSH_FILE_TYPE_BLOCK:
-		mode |= S_IFCHR;
+		mode |= S_IFBLK;
 		break;
 	case SQSH_FILE_TYPE_CHAR:
-		mode |= S_IFBLK;
+		mode |= S_IFCHR;
 		break;
 	case SQSH_FILE_TYPE_FIFO:
 		mode |= S_IFIFO;
