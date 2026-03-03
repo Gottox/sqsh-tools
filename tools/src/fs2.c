@@ -375,7 +375,7 @@ parse_args(struct fuse_args *args) {
 		return rv;
 	}
 
-	return fuse_parse_cmdline(
+	rv = fuse_parse_cmdline(
 			args, &options.mountpoint, &options.multithreaded,
 			&options.foreground);
 	if (rv < 0) {
