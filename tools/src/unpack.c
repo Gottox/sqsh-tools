@@ -304,7 +304,8 @@ extract_device(const char *path, const struct SqshFile *file) {
 		mode |= S_IFSOCK;
 		break;
 	default:
-		rv = errno = -EINVAL;
+		errno = EINVAL;
+		rv = -EINVAL;
 		perror(path);
 		goto out;
 	}
