@@ -270,6 +270,10 @@ check_entry_consistency(const struct SqshDirectoryIterator *iterator) {
 		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
 	} else if (memchr(name, '/', name_len) != NULL) {
 		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
+	} else if (memcmp(name, ".", CX_MIN(name_len, 1)) == 0 && name_len == 1) {
+		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
+	} else if (memcmp(name, "..", CX_MIN(name_len, 2)) == 0 && name_len == 2) {
+		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
 	}
 	return 0;
 }

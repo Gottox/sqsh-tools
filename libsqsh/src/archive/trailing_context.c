@@ -44,20 +44,14 @@ sqsh__trailing_init(
 	uint64_t trailing_start = sqsh_superblock_bytes_used(superblock);
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(sqsh);
 	uint64_t archive_size = sqsh__map_manager_size(map_manager);
-	uint64_t trailing_size;
 
 	if (archive_size <= trailing_start) {
 		rv = -SQSH_ERROR_SIZE_MISMATCH;
 		goto out;
 	}
 
-	if (SQSH_SUB_OVERFLOW(archive_size, trailing_start, &trailing_size)) {
-		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
-		goto out;
-	}
-
 	rv = sqsh__map_reader_init(
-			&context->cursor, map_manager, trailing_start, trailing_size);
+			&context->cursor, map_manager, trailing_start, archive_size);
 	if (rv < 0) {
 		goto out;
 	}

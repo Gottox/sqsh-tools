@@ -67,7 +67,7 @@ sqsh__extract_view_copy(
 	target->manager = source->manager;
 	if (source->buffer) {
 		rv = sqsh__extract_manager_retain_buffer(
-				source->manager, source->address);
+				source->manager, source->buffer);
 		if (rv < 0) {
 			goto out;
 		}
