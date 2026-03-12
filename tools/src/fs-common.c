@@ -138,8 +138,10 @@ fs_common_read(
 	}
 
 	uint64_t file_size = sqsh_file_size(inode);
-	if (size > file_size - offset) {
-		size = file_size - offset;
+	if (offset < 0 || (uint64_t)offset >= file_size) {
+		return 0;
+	} else if (size > file_size - (uint64_t)offset) {
+		size = file_size - (uint64_t)offset;
 	}
 
 	// This works around a bug in sqsh_file_reader_advance:
