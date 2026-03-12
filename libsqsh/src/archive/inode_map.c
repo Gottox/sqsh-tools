@@ -272,5 +272,4 @@ sqsh_inode_map_set(
 int
 sqsh__inode_map_cleanup(struct SqshInodeMap *map) {
 	return map->impl->cleanup(map);
-	return 0;
 }
