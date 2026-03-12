@@ -73,11 +73,11 @@ sqsh__map_iterator_copy(
 		struct SqshMapIterator *target, const struct SqshMapIterator *source) {
 	int rv = 0;
 	target->map_manager = source->map_manager;
+	target->mapping = source->mapping;
 	rv = sqsh__map_manager_retain(target->map_manager, target->mapping);
 	if (rv < 0) {
 		goto out;
 	}
-	target->mapping = NULL;
 	target->next_index = source->next_index;
 	target->segment_count = source->segment_count;
 	if (source->data != NULL) {

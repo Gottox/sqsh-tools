@@ -62,7 +62,7 @@ load_mapping(
 	 * read past the end of the file, so cap the size to the remaining bytes.
 	 */
 	if (index == block_count - 1 && mapper_size % block_size != 0) {
-		size = (size_t)mapper_size % block_size;
+		size = (size_t)(mapper_size % block_size);
 	}
 
 	if (SQSH_ADD_OVERFLOW(offset, manager->archive_offset, &offset)) {
@@ -135,12 +135,14 @@ int
 sqsh__map_manager_get(
 		struct SqshMapManager *manager, sqsh_index_t index,
 		const struct SqshMapSlice **target) {
+	bool is_locked = false;
 	int rv = 0;
 
 	rv = sqsh__mutex_lock(&manager->lock);
 	if (rv < 0) {
 		goto out;
 	}
+	is_locked = true;
 
 	*target = cx_rc_hash_map_retain(&manager->maps, index);
 
@@ -151,18 +153,22 @@ sqsh__map_manager_get(
 		if (rv < 0) {
 			goto out;
 		}
+		is_locked = false;
 
 		rv = sqsh__mutex_lock(&manager->lock);
 		if (rv < 0) {
 			goto out;
 		}
+		is_locked = true;
 
 		*target = cx_rc_hash_map_put(&manager->maps, index, &mapping);
 	}
 	rv = cx_lru_touch(&manager->lru, index);
 
 out:
-	sqsh__mutex_unlock(&manager->lock);
+	if (is_locked) {
+		sqsh__mutex_unlock(&manager->lock);
+	}
 	return rv;
 }
 
