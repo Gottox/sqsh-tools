@@ -105,22 +105,23 @@ print_raw(const char *segment, size_t segment_size) {
 
 void
 print_escaped(const char *segment, size_t segment_size) {
+	pthread_mutex_lock(&output_lock);
 	for (size_t i = 0; i < segment_size; i++) {
 		switch (segment[i]) {
 		case '\n':
-			locked_fputs("\\n", stdout);
+			fputs("\\n", stdout);
 			break;
 		case '\r':
-			locked_fputs("\\r", stdout);
+			fputs("\\r", stdout);
 			break;
 		case '\t':
-			locked_fputs("\\t", stdout);
+			fputs("\\t", stdout);
 			break;
 		case '\\':
-			locked_fputs("\\\\", stdout);
+			fputs("\\\\", stdout);
 			break;
 		case '\x1b':
-			locked_fputs("\\e", stdout);
+			fputs("\\e", stdout);
 			break;
 		case 0x01:
 		case 0x02:
@@ -149,13 +150,13 @@ print_escaped(const char *segment, size_t segment_size) {
 		case 0x1d:
 		case 0x1e:
 		case 0x1f:
-		case 0x20:
 		case 0x7f:
-			locked_fprintf(stdout, "\\x%02x", segment[i]);
+			fprintf(stdout, "\\x%02x", segment[i]);
 			break;
 		default:
-			locked_fputs((char[2]){segment[i], 0}, stdout);
+			fputs((char[2]){segment[i], 0}, stdout);
 			break;
 		}
 	}
+	pthread_mutex_unlock(&output_lock);
 }

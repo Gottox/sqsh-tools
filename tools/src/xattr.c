@@ -52,10 +52,10 @@ print_value(const char *value, size_t size) {
 	size_t i = 0;
 
 	for (i = 0; i < size; i++) {
-		if (isprint(value[i])) {
-			putchar(value[i]);
-		} else if (strchr("\"\\", value[i])) {
+		if (strchr("\"\\", value[i])) {
 			printf("\\%c", value[i]);
+		} else if (isprint(value[i])) {
+			putchar(value[i]);
 		} else {
 			printf("\\x%02x", value[i]);
 		}

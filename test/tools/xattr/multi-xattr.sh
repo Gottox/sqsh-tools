@@ -31,7 +31,7 @@ EOF
 "$MKSQUASHFS" "$WORK_DIR/root" "$WORK_DIR/xattr.squashfs" -pf "$WORK_DIR/xattr.pseudo" $MKSQUASHFS_OPTS
 
 expected_output=$(cat <<'EOT' | sort
-trusted.beta="bin\001\002"\trail"
+trusted.beta="bin\\001\\002\"\\trail"
 user.alpha="hello"
 EOT
 )
