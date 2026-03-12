@@ -119,9 +119,19 @@ directory_iterator_index_lookup(
 	}
 
 	sqsh__metablock_reader_cleanup(&iterator->metablock);
-	uint16_t inner_offset =
-			(iterator->next_offset + dir_index) % SQSH_METABLOCK_BLOCK_SIZE;
-	iterator->remaining_size -= dir_index;
+	uint16_t inner_offset = 0;
+	if (SQSH_ADD_OVERFLOW(iterator->next_offset, dir_index, &inner_offset)) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
+	inner_offset %= SQSH_METABLOCK_BLOCK_SIZE;
+
+	if (SQSH_SUB_OVERFLOW(
+				iterator->remaining_size, dir_index,
+				&iterator->remaining_size)) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
 	rv = load_metablock(iterator, outer_offset, inner_offset);
 	iterator->remaining_entries = 0;
 	if (rv < 0) {
