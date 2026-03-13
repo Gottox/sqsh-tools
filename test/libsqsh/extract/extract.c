@@ -107,8 +107,6 @@ extract__decompress_lzma_split(void) {
 	uint8_t input[] = {0x5d, 0x00, 0x00, 0x80, 0x00, 0xff, 0xff, 0xff, 0xff,
 					   0xff, 0xff, 0xff, 0xff, 0x00, 0x30, 0x98, 0x88, 0x98,
 					   0x46, 0x7e, 0x1e, 0xb2, 0xff, 0xfa, 0x1c, 0x80, 0x00};
-	puts("skipping: lzma split not supported yet");
-	return;
 
 	decompress_test_split(sqsh__impl_lzma, input, sizeof(input));
 }
@@ -149,8 +147,6 @@ extract__decompress_lz4(void) {
 static void
 extract__decompress_lz4_split(void) {
 	uint8_t input[] = {0x40, 0x61, 0x62, 0x63, 0x64};
-	puts("skipping: lz4 split not supported yet");
-	return;
 
 	decompress_test_split(sqsh__impl_lz4, input, sizeof(input));
 }
@@ -191,11 +187,11 @@ extract__decompress_zstd_split(void) {
 
 DECLARE_TESTS
 TEST(extract__decompress_lzma)
-TEST(extract__decompress_lzma_split)
+NO_TEST(extract__decompress_lzma_split)
 TEST(extract__decompress_xz)
 TEST(extract__decompress_xz_split)
 TEST(extract__decompress_lz4)
-TEST(extract__decompress_lz4_split)
+NO_TEST(extract__decompress_lz4_split)
 TEST(extract__decompress_zlib)
 TEST(extract__decompress_zlib_split)
 TEST(extract__decompress_zstd)
