@@ -121,6 +121,8 @@ fs_common_map_err(int rv) {
 		return ENOENT;
 	case SQSH_ERROR_NOT_A_DIRECTORY:
 		return ENOTDIR;
+	case SQSH_ERROR_NO_SUCH_XATTR:
+		return ENODATA;
 	default:
 		return EIO;
 	}
