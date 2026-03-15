@@ -81,7 +81,7 @@ fs_init(void *userdata, struct fuse_conn_info *conn) {
 	(void)userdata;
 
 	if (conn->capable & FUSE_CAP_PARALLEL_DIROPS) {
-		conn->want = FUSE_CAP_PARALLEL_DIROPS;
+		conn->want |= FUSE_CAP_PARALLEL_DIROPS;
 	}
 }
 
