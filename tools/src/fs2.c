@@ -225,11 +225,11 @@ fs_readlink(const char *path, char *buf, size_t size) {
 		goto out;
 	}
 
-	if (link_len > size) {
-		link_len = size;
+	if (link_len >= size) {
+		link_len = size - 1;
 	}
 	memcpy(buf, link, link_len);
-	buf[size - 1] = '\0';
+	buf[link_len] = '\0';
 
 out:
 	sqsh_close(file);
