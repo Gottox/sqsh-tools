@@ -416,9 +416,13 @@ fs_listxattr(fuse_req_t req, fuse_ino_t ino, size_t size) {
 	struct SqshFile *file = NULL;
 	struct SqshXattrIterator *iterator = NULL;
 	const char *prefix, *name = NULL;
-	char buf[size];
 	size_t buf_size = 0;
 	char *p;
+	char *buf = calloc(size, sizeof(*buf));
+	if (buf == NULL) {
+		fuse_reply_err(req, ENOMEM);
+		goto out;
+	}
 
 	file = fs_file_open(ino, &rv);
 	if (rv < 0) {
@@ -470,6 +474,7 @@ fs_listxattr(fuse_req_t req, fuse_ino_t ino, size_t size) {
 		fuse_reply_buf(req, buf, buf_size);
 	}
 out:
+	free(buf);
 	sqsh_xattr_iterator_free(iterator);
 	sqsh_close(file);
 }
