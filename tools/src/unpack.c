@@ -94,8 +94,14 @@ update_metadata(const char *path, const struct SqshFile *file) {
 	uint16_t mode = sqsh_file_permission(file);
 	rv = fchmodat(AT_FDCWD, path, mode, AT_SYMLINK_NOFOLLOW);
 	if (rv < 0) {
-		locked_perror(path);
-		goto out;
+		/* Some platforms (e.g. Linux) do not support setting
+		 * permissions on symlinks. */
+		if (errno == ENOTSUP || errno == EOPNOTSUPP) {
+			rv = 0;
+		} else {
+			locked_perror(path);
+			goto out;
+		}
 	}
 
 	if (do_chown) {
