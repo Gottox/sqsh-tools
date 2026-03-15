@@ -36,6 +36,7 @@
 #include <cextras/concurrency.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <stdatomic.h>
 #include <libgen.h>
 #include <stdlib.h>
 #include <string.h>
@@ -51,6 +52,7 @@ static const char TMP_SUFFIX[] = "-XXXXXX";
 
 struct CxSemaphore file_descriptor_sem;
 size_t extracted_files = 0;
+atomic_int extraction_errors = 0;
 bool do_chown = false;
 bool verbose = false;
 const char *image_path;
@@ -94,8 +96,14 @@ update_metadata(const char *path, const struct SqshFile *file) {
 	uint16_t mode = sqsh_file_permission(file);
 	rv = fchmodat(AT_FDCWD, path, mode, AT_SYMLINK_NOFOLLOW);
 	if (rv < 0) {
-		locked_perror(path);
-		goto out;
+		/* Some platforms (e.g. Linux) do not support setting
+		 * permissions on symlinks. */
+		if (errno == ENOTSUP || errno == EOPNOTSUPP) {
+			rv = 0;
+		} else {
+			locked_perror(path);
+			goto out;
+		}
 	}
 
 	if (do_chown) {
@@ -196,6 +204,9 @@ out:
 	if (rv < 0) {
 		locked_sqsh_perror(rv, data->path);
 	}
+	if (err < 0 || rv < 0) {
+		atomic_fetch_add_explicit(&extraction_errors, 1, memory_order_relaxed);
+	}
 	extract_file_cleanup(data, NULL);
 }
 
@@ -263,7 +274,7 @@ out:
 	if (rv < 0) {
 		locked_sqsh_perror(rv, path);
 		extract_file_cleanup(data, stream);
-		if (fd > 0) {
+		if (fd >= 0) {
 			close(fd);
 		}
 	}
@@ -400,8 +411,11 @@ extract_from_traversal(
 		}
 
 		rv = extract(path, file, func);
-		// Ignore errors, we want to extract as much as possible.
-		rv = 0;
+		if (rv < 0) {
+			atomic_fetch_add_explicit(
+					&extraction_errors, 1, memory_order_relaxed);
+			rv = 0;
+		}
 	}
 out:
 	sqsh_close(file);
@@ -412,7 +426,6 @@ out:
 static int
 extract_all(
 		const char *target_path, const struct SqshFile *base, extract_fn func) {
-	char *path = NULL;
 	int rv = 0;
 	struct SqshTreeTraversal *iter = NULL;
 	rv = mkdir(target_path, 0700);
@@ -452,7 +465,6 @@ extract_all(
 	}
 
 out:
-	free(path);
 	sqsh_tree_traversal_free(iter);
 	return rv;
 }
@@ -573,5 +585,9 @@ out:
 	sqsh_threadpool_free(threadpool);
 	sqsh_close(src_root);
 	sqsh_archive_close(sqsh);
+	if (rv == 0 &&
+		atomic_load_explicit(&extraction_errors, memory_order_relaxed) > 0) {
+		rv = EXIT_FAILURE;
+	}
 	return rv;
 }

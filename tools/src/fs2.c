@@ -117,7 +117,7 @@ fs_readdir_item(
 out:
 	free(name);
 	sqsh_close(file);
-	return fs_common_map_err(rv);
+	return -fs_common_map_err(rv);
 }
 
 static int
@@ -171,7 +171,7 @@ out:
 	if (rv < 0) {
 		sqsh_close(file);
 	}
-	return fs_common_map_err(rv);
+	return -fs_common_map_err(rv);
 }
 
 static int
@@ -195,7 +195,10 @@ fs_read(const char *path, char *buf, size_t size, off_t offset,
 out:
 	sqsh_file_reader_free(reader);
 
-	return fs_common_map_err(rv);
+	if (rv < 0) {
+		return -fs_common_map_err(rv);
+	}
+	return rv;
 }
 
 static int
@@ -225,15 +228,15 @@ fs_readlink(const char *path, char *buf, size_t size) {
 		goto out;
 	}
 
-	if (link_len > size) {
-		link_len = size;
+	if (link_len >= size) {
+		link_len = size - 1;
 	}
 	memcpy(buf, link, link_len);
-	buf[size - 1] = '\0';
+	buf[link_len] = '\0';
 
 out:
 	sqsh_close(file);
-	return fs_common_map_err(rv);
+	return -fs_common_map_err(rv);
 }
 
 static int
@@ -309,7 +312,7 @@ fs_getxattr(const char *path, const char *name, char *buf, size_t size) {
 out:
 	sqsh_xattr_iterator_free(iterator);
 	sqsh_close(file);
-	return fs_common_map_err(rv);
+	return -fs_common_map_err(rv);
 }
 
 #ifdef __APPLE__

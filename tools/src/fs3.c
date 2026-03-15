@@ -81,7 +81,7 @@ fs_init(void *userdata, struct fuse_conn_info *conn) {
 	(void)userdata;
 
 	if (conn->capable & FUSE_CAP_PARALLEL_DIROPS) {
-		conn->want = FUSE_CAP_PARALLEL_DIROPS;
+		conn->want |= FUSE_CAP_PARALLEL_DIROPS;
 	}
 }
 
@@ -104,7 +104,7 @@ fs_getattr(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 
 	file = fs_file_open(ino, &rv);
 	if (rv < 0) {
-		fuse_reply_err(req, -fs_common_map_err(rv));
+		fuse_reply_err(req, fs_common_map_err(rv));
 		goto out;
 	}
 
@@ -127,7 +127,7 @@ fs_lookup(fuse_req_t req, fuse_ino_t parent, const char *name) {
 
 	parent_dir = fs_file_open(parent, &rv);
 	if (rv < 0) {
-		fuse_reply_err(req, -fs_common_map_err(rv));
+		fuse_reply_err(req, fs_common_map_err(rv));
 		goto out;
 	}
 
@@ -135,14 +135,14 @@ fs_lookup(fuse_req_t req, fuse_ino_t parent, const char *name) {
 
 	rv = sqsh_directory_iterator_lookup(iterator, name, strlen(name));
 	if (rv < 0) {
-		fuse_reply_err(req, -fs_common_map_err(rv));
+		fuse_reply_err(req, fs_common_map_err(rv));
 		goto out;
 	}
 
 	const uint64_t inode_ref = sqsh_directory_iterator_inode_ref(iterator);
 	file = sqsh_open_by_ref(context.archive, inode_ref, &rv);
 	if (rv < 0) {
-		fuse_reply_err(req, -fs_common_map_err(rv));
+		fuse_reply_err(req, fs_common_map_err(rv));
 		goto out;
 	}
 
@@ -154,7 +154,7 @@ fs_lookup(fuse_req_t req, fuse_ino_t parent, const char *name) {
 
 	rv = sqsh_inode_map_set2(context.inode_map, inode_number, inode_ref);
 	if (rv < 0) {
-		fuse_reply_err(req, -fs_common_map_err(rv));
+		fuse_reply_err(req, fs_common_map_err(rv));
 		goto out;
 	}
 
@@ -181,7 +181,7 @@ fs_access(fuse_req_t req, fuse_ino_t ino, int mask) {
 
 	file = fs_file_open(ino, &rv);
 	if (rv < 0) {
-		fuse_reply_err(req, -fs_common_map_err(rv));
+		fuse_reply_err(req, fs_common_map_err(rv));
 		goto out;
 	}
 
@@ -199,7 +199,7 @@ fs_readlink(fuse_req_t req, fuse_ino_t ino) {
 
 	file = fs_file_open(ino, &rv);
 	if (rv < 0) {
-		fuse_reply_err(req, -fs_common_map_err(rv));
+		fuse_reply_err(req, fs_common_map_err(rv));
 		goto out;
 	}
 	if (sqsh_file_type(file) != SQSH_FILE_TYPE_SYMLINK) {
@@ -234,12 +234,12 @@ fs_opendir(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 
 	handle->file = fs_file_open(ino, &rv);
 	if (rv < 0) {
-		fuse_reply_err(req, -fs_common_map_err(rv));
+		fuse_reply_err(req, fs_common_map_err(rv));
 		goto out;
 	}
 	handle->iterator = sqsh_directory_iterator_new(handle->file, &rv);
 	if (rv < 0) {
-		fuse_reply_err(req, -fs_common_map_err(rv));
+		fuse_reply_err(req, fs_common_map_err(rv));
 		goto out;
 	}
 
@@ -266,7 +266,7 @@ fs_readdir(
 
 	bool has_next = sqsh_directory_iterator_next(handle->iterator, &rv);
 	if (rv < 0) {
-		fuse_reply_err(req, -fs_common_map_err(rv));
+		fuse_reply_err(req, fs_common_map_err(rv));
 		goto out;
 	} else if (has_next == false) {
 		goto out;
@@ -296,7 +296,7 @@ fs_readdir(
 
 out:
 	if (rv < 0) {
-		fuse_reply_err(req, -fs_common_map_err(rv));
+		fuse_reply_err(req, fs_common_map_err(rv));
 	} else {
 		fuse_reply_buf(req, buf, result_size);
 	}
@@ -360,7 +360,7 @@ fs_read(fuse_req_t req, fuse_ino_t ino, size_t size, off_t offset,
 
 out:
 	if (rv < 0) {
-		fuse_reply_err(req, -fs_common_map_err(rv));
+		fuse_reply_err(req, fs_common_map_err(rv));
 	}
 	sqsh_file_reader_free(reader);
 }

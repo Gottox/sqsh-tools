@@ -118,12 +118,13 @@ fs_common_map_err(int rv) {
 	enum SqshError err = -rv;
 	switch (err) {
 	case SQSH_ERROR_NO_SUCH_FILE:
-		return -ENOENT;
-		break;
+		return ENOENT;
 	case SQSH_ERROR_NOT_A_DIRECTORY:
-		return -ENOTDIR;
+		return ENOTDIR;
+	case SQSH_ERROR_NO_SUCH_XATTR:
+		return ENODATA;
 	default:
-		return -EIO;
+		return EIO;
 	}
 }
 
@@ -159,7 +160,7 @@ fs_common_read(
 	}
 out:
 
-	return fs_common_map_err(rv);
+	return rv;
 }
 
 void
