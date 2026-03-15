@@ -322,40 +322,40 @@ sqsh__data_inode_symlink_ext_xattr_idx(
 uint32_t
 sqsh__data_inode_device_hard_link_count(
 		const struct SqshDataInodeDevice *device) {
-	return device->hard_link_count;
+	return CX_LE_2_CPU32(device->hard_link_count);
 }
 uint32_t
 sqsh__data_inode_device_device(const struct SqshDataInodeDevice *device) {
-	return device->device;
+	return CX_LE_2_CPU32(device->device);
 }
 
 uint32_t
 sqsh__data_inode_device_ext_hard_link_count(
 		const struct SqshDataInodeDeviceExt *device) {
-	return device->hard_link_count;
+	return CX_LE_2_CPU32(device->hard_link_count);
 }
 uint32_t
 sqsh__data_inode_device_ext_device(
 		const struct SqshDataInodeDeviceExt *device) {
-	return device->device;
+	return CX_LE_2_CPU32(device->device);
 }
 uint32_t
 sqsh__data_inode_device_ext_xattr_idx(
 		const struct SqshDataInodeDeviceExt *device) {
-	return device->xattr_idx;
+	return CX_LE_2_CPU32(device->xattr_idx);
 }
 
 uint32_t
 sqsh__data_inode_ipc_hard_link_count(const struct SqshDataInodeIpc *ipc) {
-	return ipc->hard_link_count;
+	return CX_LE_2_CPU32(ipc->hard_link_count);
 }
 
 uint32_t
 sqsh__data_inode_ipc_ext_hard_link_count(
 		const struct SqshDataInodeIpcExt *ipc) {
-	return ipc->hard_link_count;
+	return CX_LE_2_CPU32(ipc->hard_link_count);
 }
 uint32_t
 sqsh__data_inode_ipc_ext_xattr_idx(const struct SqshDataInodeIpcExt *ipc) {
-	return ipc->xattr_idx;
+	return CX_LE_2_CPU32(ipc->xattr_idx);
 }
