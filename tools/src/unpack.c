@@ -36,6 +36,7 @@
 #include <cextras/concurrency.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <stdatomic.h>
 #include <libgen.h>
 #include <stdlib.h>
 #include <string.h>
@@ -51,6 +52,7 @@ static const char TMP_SUFFIX[] = "-XXXXXX";
 
 struct CxSemaphore file_descriptor_sem;
 size_t extracted_files = 0;
+atomic_int extraction_errors = 0;
 bool do_chown = false;
 bool verbose = false;
 const char *image_path;
@@ -201,6 +203,9 @@ out:
 	cx_semaphore_post(&file_descriptor_sem);
 	if (rv < 0) {
 		locked_sqsh_perror(rv, data->path);
+	}
+	if (err < 0 || rv < 0) {
+		atomic_fetch_add_explicit(&extraction_errors, 1, memory_order_relaxed);
 	}
 	extract_file_cleanup(data, NULL);
 }
@@ -406,8 +411,11 @@ extract_from_traversal(
 		}
 
 		rv = extract(path, file, func);
-		// Ignore errors, we want to extract as much as possible.
-		rv = 0;
+		if (rv < 0) {
+			atomic_fetch_add_explicit(
+					&extraction_errors, 1, memory_order_relaxed);
+			rv = 0;
+		}
 	}
 out:
 	sqsh_close(file);
@@ -577,5 +585,9 @@ out:
 	sqsh_threadpool_free(threadpool);
 	sqsh_close(src_root);
 	sqsh_archive_close(sqsh);
+	if (rv == 0 &&
+		atomic_load_explicit(&extraction_errors, memory_order_relaxed) > 0) {
+		rv = EXIT_FAILURE;
+	}
 	return rv;
 }
