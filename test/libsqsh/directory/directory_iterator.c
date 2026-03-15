@@ -406,6 +406,49 @@ directory_iterator__iter_inode_to_zero(void) {
 	sqsh__archive_cleanup(&archive);
 }
 
+static void
+directory_iterator__iter_duplicated_file_name(void) {
+	int rv;
+	struct SqshArchive archive = {0};
+	uint8_t payload[] = {
+			/* clang-format off */
+			SQSH_HEADER,
+			/* inode */
+			[INODE_TABLE_OFFSET] = METABLOCK_HEADER(0, 1024),
+			INODE_HEADER(1, 0, 0, 0, 0, 1),
+			INODE_BASIC_DIR(0, 1024, 0, 0),
+			[DIRECTORY_TABLE_OFFSET] = METABLOCK_HEADER(0, 128),
+			DIRECTORY_HEADER(2, 0, 0),
+			DIRECTORY_ENTRY(128, 2, 3, 5),
+			'H', 'e', 'l', 'l', 'o',
+			DIRECTORY_ENTRY(128, 2, 3, 5),
+			'H', 'e', 'l', 'l', 'o',
+			[FRAGMENT_TABLE_OFFSET] = 0,
+			/* clang-format on */
+	};
+	mk_stub(&archive, payload, sizeof(payload));
+
+	struct SqshFile file = {0};
+	rv = sqsh__file_init(&file, &archive, 0);
+	ASSERT_EQ(0, rv);
+
+	struct SqshDirectoryIterator iter = {0};
+	rv = sqsh__directory_iterator_init(&iter, &file);
+	ASSERT_EQ(0, rv);
+
+	bool has_next = sqsh_directory_iterator_next(&iter, &rv);
+	ASSERT_EQ(0, rv);
+	ASSERT_EQ(true, has_next);
+
+	has_next = sqsh_directory_iterator_next(&iter, &rv);
+	ASSERT_EQ(-SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY, rv);
+	ASSERT_EQ(false, has_next);
+
+	sqsh__directory_iterator_cleanup(&iter);
+	sqsh__file_cleanup(&file);
+	sqsh__archive_cleanup(&archive);
+}
+
 DECLARE_TESTS
 TEST(directory_iterator__iter_invalid_file_name_with_0)
 TEST(directory_iterator__iter_invalid_file_name_with_slash)
@@ -416,4 +459,5 @@ TEST(directory_iterator__iter_over_corrupt_header_too_small)
 TEST(directory_iterator__iter_inode_overflow)
 TEST(directory_iterator__iter_inode_underflow)
 TEST(directory_iterator__iter_inode_to_zero)
+TEST(directory_iterator__iter_duplicated_file_name)
 END_TESTS

@@ -249,7 +249,7 @@ out:
 }
 
 static int
-check_entry_consistency(const struct SqshDirectoryIterator *iterator) {
+check_entry_consistency(struct SqshDirectoryIterator *iterator) {
 	size_t name_len;
 	const char *name = sqsh_directory_iterator_name2(iterator, &name_len);
 
@@ -270,11 +270,34 @@ check_entry_consistency(const struct SqshDirectoryIterator *iterator) {
 		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
 	} else if (memchr(name, '/', name_len) != NULL) {
 		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
-	} else if (memcmp(name, ".", CX_MIN(name_len, 1)) == 0 && name_len == 1) {
+	} else if (name_len == 1 && memcmp(name, ".", CX_MIN(name_len, 1)) == 0) {
 		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
-	} else if (memcmp(name, "..", CX_MIN(name_len, 2)) == 0 && name_len == 2) {
+	} else if (name_len == 2 && memcmp(name, "..", CX_MIN(name_len, 2)) == 0) {
 		return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
 	}
+
+	/* Entries must be sorted by name. If they are not, the squashfs archive is
+	 * corrupted. Also check for duplicated entries, which are also not allowed.
+	 */
+	size_t cmp_size = SQSH_MIN(iterator->last_dir_name_size, name_len);
+	if (cmp_size != 0) {
+		int cmp = memcmp(iterator->last_dir_name, name, cmp_size);
+		if (cmp > 0 || (cmp == 0 && iterator->last_dir_name_size == name_len)) {
+			return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
+		}
+	}
+	if (name_len > iterator->last_dir_name_capacity) {
+		free(iterator->last_dir_name);
+		size_t capacity = SQSH_PADDING(name_len, 64);
+		iterator->last_dir_name = calloc(capacity, sizeof(char));
+		if (iterator->last_dir_name == NULL) {
+			return -SQSH_ERROR_MALLOC_FAILED;
+		}
+		iterator->last_dir_name_capacity = capacity;
+	}
+	iterator->last_dir_name_size = name_len;
+	memcpy(iterator->last_dir_name, name, name_len);
+
 	return 0;
 }
 
@@ -326,14 +349,12 @@ sqsh_directory_iterator_lookup(
 		}
 	}
 
-	while (directory_iterator_next(iterator, &rv) > 0) {
+	while (directory_iterator_next(iterator, &rv)) {
 		size_t entry_name_size;
 		const char *entry_name =
 				sqsh_directory_iterator_name2(iterator, &entry_name_size);
-		if (name_len != entry_name_size) {
-			continue;
-		}
-		if (strncmp(name, entry_name, entry_name_size) == 0) {
+		if (entry_name_size == name_len &&
+			memcmp(entry_name, name, name_len) == 0) {
 			return directory_iterator_next_finalize(iterator);
 		}
 	}
@@ -354,6 +375,7 @@ sqsh__directory_iterator_init(
 		return -SQSH_ERROR_NOT_A_DIRECTORY;
 	}
 
+	memset(iterator, 0, sizeof(struct SqshDirectoryIterator));
 	iterator->file = file;
 
 	if (SQSH_SUB_OVERFLOW(sqsh_file_size(file), 3, &iterator->remaining_size)) {
@@ -497,6 +519,8 @@ sqsh_directory_iterator_name_dup(const struct SqshDirectoryIterator *iterator) {
 
 int
 sqsh__directory_iterator_cleanup(struct SqshDirectoryIterator *iterator) {
+	free(iterator->last_dir_name);
+
 	return sqsh__metablock_reader_cleanup(&iterator->metablock);
 }
 

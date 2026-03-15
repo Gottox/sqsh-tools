@@ -62,6 +62,10 @@ struct SqshDirectoryIterator {
 	sqsh_index_t next_offset;
 	uint32_t current_inode;
 
+	char *last_dir_name;
+	size_t last_dir_name_size;
+	size_t last_dir_name_capacity;
+
 	uint32_t start_base;
 	uint32_t inode_base;
 };
