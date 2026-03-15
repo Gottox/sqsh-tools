@@ -107,8 +107,8 @@ directory_iterator_index_lookup(
 				sqsh__directory_index_iterator_name_size(&index_iterator);
 
 		const size_t cmp_size = SQSH_MIN(index_name_size, name_len);
-		/* BUG: the branch could be taken too early when the name is a prefix */
-		if (strncmp(name, index_name, cmp_size) < 0) {
+		const int cmp = strncmp(name, index_name, cmp_size);
+		if (cmp < 0 || (cmp == 0 && name_len < index_name_size)) {
 			break;
 		}
 		outer_offset = sqsh__directory_index_iterator_start(&index_iterator);
