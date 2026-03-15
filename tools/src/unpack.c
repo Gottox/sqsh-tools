@@ -418,7 +418,6 @@ out:
 static int
 extract_all(
 		const char *target_path, const struct SqshFile *base, extract_fn func) {
-	char *path = NULL;
 	int rv = 0;
 	struct SqshTreeTraversal *iter = NULL;
 	rv = mkdir(target_path, 0700);
@@ -458,7 +457,6 @@ extract_all(
 	}
 
 out:
-	free(path);
 	sqsh_tree_traversal_free(iter);
 	return rv;
 }
