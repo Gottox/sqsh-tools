@@ -269,7 +269,7 @@ out:
 	if (rv < 0) {
 		locked_sqsh_perror(rv, path);
 		extract_file_cleanup(data, stream);
-		if (fd > 0) {
+		if (fd >= 0) {
 			close(fd);
 		}
 	}
