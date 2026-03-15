@@ -330,10 +330,8 @@ sqsh_directory_iterator_lookup(
 		size_t entry_name_size;
 		const char *entry_name =
 				sqsh_directory_iterator_name2(iterator, &entry_name_size);
-		if (name_len != entry_name_size) {
-			continue;
-		}
-		if (strncmp(name, entry_name, entry_name_size) == 0) {
+		if (entry_name_size == name_len &&
+			memcmp(entry_name, name, name_len) == 0) {
 			return directory_iterator_next_finalize(iterator);
 		}
 	}
