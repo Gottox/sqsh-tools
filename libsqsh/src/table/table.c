@@ -111,13 +111,14 @@ sqsh_table_get(
 	struct SqshMetablockReader metablock = {0};
 	size_t lookup_table_bytes = sqsh__map_reader_size(&table->lookup_table);
 	uint64_t byte_offset;
-	if (SQSH_MULT_OVERFLOW(index, table->element_size, &byte_offset)) {
+	if (index >= table->element_count) {
+		return -SQSH_ERROR_OUT_OF_BOUNDS;
+	} else if (SQSH_MULT_OVERFLOW(index, table->element_size, &byte_offset)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	sqsh_index_t lookup_index =
 			(sqsh_index_t)(byte_offset / SQSH_METABLOCK_BLOCK_SIZE);
-	if (lookup_index >= table->element_count ||
-		lookup_index >= lookup_table_bytes / sizeof(uint64_t)) {
+	if (lookup_index >= lookup_table_bytes / sizeof(uint64_t)) {
 		return -SQSH_ERROR_OUT_OF_BOUNDS;
 	}
 	uint64_t metablock_address = lookup_table_get(table, lookup_index);
