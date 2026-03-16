@@ -149,19 +149,25 @@ sqsh__map_manager_get(
 	if (*target == NULL) {
 		struct SqshMapSlice mapping = {0};
 		sqsh__mutex_unlock(&manager->lock);
+		is_locked = false;
 		rv = load_mapping(&mapping, manager, index);
 		if (rv < 0) {
 			goto out;
 		}
-		is_locked = false;
 
 		rv = sqsh__mutex_lock(&manager->lock);
 		if (rv < 0) {
+			sqsh__map_slice_cleanup(&mapping);
 			goto out;
 		}
 		is_locked = true;
 
 		*target = cx_rc_hash_map_put(&manager->maps, index, &mapping);
+		if (*target == NULL) {
+			sqsh__map_slice_cleanup(&mapping);
+			rv = -SQSH_ERROR_MALLOC_FAILED;
+			goto out;
+		}
 	}
 	rv = cx_lru_touch(&manager->lru, index);
 
