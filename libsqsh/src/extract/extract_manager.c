@@ -161,6 +161,11 @@ sqsh__extract_manager_uncompress(
 		locked = true;
 
 		buffer = cx_rc_hash_map_put(&manager->cache, address, &tmp_buffer);
+		if (buffer == NULL) {
+			cx_buffer_cleanup(&tmp_buffer);
+			rv = -SQSH_ERROR_MALLOC_FAILED;
+			goto out;
+		}
 	}
 	rv = cx_lru_touch_value(&manager->lru, address, buffer);
 	*target = buffer;
