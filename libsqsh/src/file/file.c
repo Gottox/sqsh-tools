@@ -128,7 +128,11 @@ inode_load(struct SqshFile *context) {
 	 * it again.
 	 */
 	inode = get_inode(context);
-	size += context->impl->payload_size(inode, context->archive);
+	const size_t payload = context->impl->payload_size(inode, context->archive);
+	if (payload == SIZE_MAX) {
+		return -SQSH_ERROR_INTEGER_OVERFLOW;
+	}
+	size += payload;
 
 	rv = sqsh__metablock_reader_advance(&context->metablock, 0, size);
 
@@ -553,6 +557,10 @@ open_file(
 	}
 
 out:
+	if (rv < 0) {
+		sqsh_close(inode);
+		inode = NULL;
+	}
 	if (err != NULL) {
 		*err = rv;
 	}

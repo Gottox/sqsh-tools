@@ -39,7 +39,7 @@
 #include <sqsh_error.h>
 #include <stdint.h>
 
-#define BLOCK_INDEX_FINISHED UINT32_MAX
+#define BLOCK_INDEX_FINISHED UINT64_MAX
 
 static bool
 is_last_block(const struct SqshFileIterator *iterator) {
