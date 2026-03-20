@@ -282,7 +282,7 @@ check_entry_consistency(struct SqshDirectoryIterator *iterator) {
 	size_t cmp_size = SQSH_MIN(iterator->last_dir_name_size, name_len);
 	if (cmp_size != 0) {
 		int cmp = memcmp(iterator->last_dir_name, name, cmp_size);
-		if (cmp > 0 || (cmp == 0 && iterator->last_dir_name_size == name_len)) {
+		if (cmp > 0 || (cmp == 0 && iterator->last_dir_name_size >= name_len)) {
 			return -SQSH_ERROR_CORRUPTED_DIRECTORY_ENTRY;
 		}
 	}
