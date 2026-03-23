@@ -114,6 +114,9 @@ dyn_map_init(struct SqshInodeMap *map, struct SqshArchive *archive) {
 
 	rv = cx_hash_map_init(&map->inode_refs, 32, sizeof(uint64_t[256]));
 	if (rv < 0) {
+		pthread_mutex_destroy(map->mutex);
+		free(map->mutex);
+		map->mutex = NULL;
 		goto out;
 	}
 out:
