@@ -206,6 +206,10 @@ curl_download(
 	}
 
 out:
+	if (rv < 0) {
+		free(*data);
+		*data = NULL;
+	}
 	return rv;
 }
 
@@ -260,11 +264,13 @@ sqsh_mapper_curl_map(
 	uint64_t file_size = 0;
 	uint64_t file_time = 0;
 
+	int locked = 0;
 	sqsh__mutex_t *lock = &curl_mapper->lock;
 	rv = sqsh__mutex_lock(lock);
 	if (rv < 0) {
 		goto out;
 	}
+	locked = 1;
 	if (offset == 0 && curl_mapper->header_cache != NULL) {
 		*data = curl_mapper->header_cache;
 		curl_mapper->header_cache = NULL;
@@ -288,7 +294,9 @@ sqsh_mapper_curl_map(
 	}
 
 out:
-	sqsh__mutex_unlock(lock);
+	if (locked) {
+		sqsh__mutex_unlock(lock);
+	}
 	return rv;
 }
 
@@ -300,6 +308,7 @@ sqsh_mapper_curl_cleanup(struct SqshMapper *mapper) {
 	free(user_data->header_cache);
 	sqsh__mutex_destroy(&user_data->lock);
 	curl_easy_cleanup(user_data->handle);
+	free(user_data);
 	return 0;
 }
 
