@@ -59,7 +59,7 @@ static size_t
 inode_symlink_ext_payload_size(
 		const struct SqshDataInode *inode, const struct SqshArchive *archive) {
 	(void)archive;
-	return inode_symlink_ext_target_size(inode);
+	return inode_symlink_ext_target_size(inode) + 1 + sizeof(uint32_t);
 }
 
 /* hard_link_count */
