@@ -274,6 +274,7 @@ fs_readdir(
 
 	buf = malloc(size);
 	if (buf == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
 
