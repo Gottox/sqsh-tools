@@ -158,6 +158,8 @@ sqsh_error_str(int error_code) {
 		return "Not a symlink";
 	case SQSH_ERROR_INODE_PARENT_UNSET:
 		return "Inode parent unset";
+	case SQSH_ERROR_CORRUPTED_XATTR:
+		return "Corrupted xattr entry";
 	}
 	snprintf(err_str, sizeof(err_str), UNKNOWN_ERROR_FORMAT, error_code);
 	return err_str;

@@ -194,6 +194,11 @@ sqsh_xattr_iterator_next(struct SqshXattrIterator *iterator, int *err) {
 		goto out;
 	}
 
+	if (sqsh_xattr_iterator_prefix(iterator) == NULL) {
+		rv = -SQSH_ERROR_CORRUPTED_XATTR;
+		goto out;
+	}
+
 	/* Load Key Name */
 	const uint16_t name_size = sqsh_xattr_iterator_name_size(iterator);
 	size += name_size;
