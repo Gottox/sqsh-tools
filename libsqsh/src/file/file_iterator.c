@@ -389,10 +389,10 @@ sqsh_file_iterator_skip2(
 		goto out;
 	}
 
-	sqsh_index_t reader_forward = 0;
+	uint64_t reader_forward = 0;
 	uint64_t block_index = iterator->block_index;
 	const uint64_t block_count = sqsh_file_block_count2(iterator->file);
-	for (sqsh_index_t i = 0; i < skip_index && block_index < block_count; i++) {
+	for (uint64_t i = 0; i < skip_index && block_index < block_count; i++) {
 		reader_forward += sqsh_file_block_size2(iterator->file, block_index);
 		block_index += 1;
 	}
