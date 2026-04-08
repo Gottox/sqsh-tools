@@ -200,7 +200,8 @@ map_block_uncompressed(
 		}
 		const uint32_t data_block_size =
 				sqsh_file_block_size2(file, block_index);
-		if (data_block_size > iterator->block_size) {
+		iterator->block_index = block_index;
+		if (data_block_size > get_block_size(iterator)) {
 			rv = -SQSH_ERROR_SIZE_MISMATCH;
 			goto out;
 		} else if (block_index + 1 != block_count) {
