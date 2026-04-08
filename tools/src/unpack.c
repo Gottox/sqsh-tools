@@ -110,7 +110,7 @@ update_metadata(const char *path, const struct SqshFile *file) {
 		const uint32_t uid = sqsh_file_uid(file);
 		const uint32_t gid = sqsh_file_gid(file);
 
-		rv = chown(path, uid, gid);
+		rv = lchown(path, uid, gid);
 		if (rv < 0) {
 			locked_perror(path);
 			goto out;
