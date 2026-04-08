@@ -53,9 +53,9 @@ inode_directory_payload_size(
 static size_t
 inode_directory_ext_payload_size(
 		const struct SqshDataInode *inode, const struct SqshArchive *archive) {
+	(void)inode;
 	(void)archive;
-	return sqsh__data_inode_directory_ext_index_count(
-			sqsh__data_inode_directory_ext(inode));
+	return 0;
 }
 
 static uint32_t
