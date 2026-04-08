@@ -200,8 +200,12 @@ map_block_uncompressed(
 		}
 		const uint32_t data_block_size =
 				sqsh_file_block_size2(file, block_index);
-		/* Set the sparse size only if we are not at the last block. */
-		if (block_index + 1 != block_count) {
+		if (data_block_size > iterator->block_size) {
+			rv = -SQSH_ERROR_SIZE_MISMATCH;
+			goto out;
+		} else if (block_index + 1 != block_count) {
+			/* Set the sparse size only if we are not at the last block or a
+			 * fragment is following. */
 			iterator->sparse_size = iterator->block_size - data_block_size;
 		}
 
