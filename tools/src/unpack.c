@@ -127,7 +127,7 @@ extract_dir(const char *path) {
 	rv = mkdir(path, 0700);
 	if (rv < 0 && errno == EEXIST) {
 		struct stat st;
-		rv = stat(path, &st);
+		rv = lstat(path, &st);
 		if (rv < 0) {
 			locked_perror(path);
 			goto out;
