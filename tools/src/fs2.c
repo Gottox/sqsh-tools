@@ -350,7 +350,7 @@ opt_proc(void *data, const char *arg, int key, struct fuse_args *outargs) {
 	switch (key) {
 	case FUSE_OPT_KEY_NONOPT:
 		if (options.archive == NULL) {
-			options.archive = arg;
+			options.archive = strdup(arg);
 			return 0;
 		}
 		break;
@@ -399,7 +399,8 @@ init_context(struct fuse_args *args) {
 
 	////////////////////////////////////////
 	// Init archive
-	context.archive = open_archive(options.archive, options.offset, &rv);
+	uint64_t offset = options.offset ? strtoull(options.offset, NULL, 0) : 0;
+	context.archive = open_archive(options.archive, offset, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, options.archive);
 		return rv;
@@ -471,5 +472,7 @@ out:
 
 	fuse_opt_free_args(&args);
 	free(options.mountpoint);
+	free(options.archive);
+	free(options.offset);
 	return rv < 0 ? EXIT_FAILURE : EXIT_SUCCESS;
 }

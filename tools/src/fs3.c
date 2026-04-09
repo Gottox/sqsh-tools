@@ -502,7 +502,7 @@ opt_proc(void *data, const char *arg, int key, struct fuse_args *outargs) {
 	(void)outargs;
 	struct SqshfsOptions *fs_common_options = data;
 	if (key == FUSE_OPT_KEY_NONOPT && fs_common_options->archive == NULL) {
-		fs_common_options->archive = arg;
+		fs_common_options->archive = strdup(arg);
 		return 0;
 	}
 	return 1;
@@ -543,7 +543,8 @@ main(int argc, char *argv[]) {
 		goto out;
 	}
 
-	context.archive = open_archive(options.archive, options.offset, &rv);
+	uint64_t offset = options.offset ? strtoull(options.offset, NULL, 0) : 0;
+	context.archive = open_archive(options.archive, offset, &rv);
 	if (rv < 0) {
 		sqsh_perror(rv, options.archive);
 		rv = EXIT_FAILURE;
@@ -595,6 +596,8 @@ out:
 	free(fuse_options.mountpoint);
 	fuse_opt_free_args(&args);
 	sqsh_archive_close(context.archive);
+	free(options.archive);
+	free(options.offset);
 
 	return rv;
 }
