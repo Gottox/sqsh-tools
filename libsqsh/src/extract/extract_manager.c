@@ -131,11 +131,10 @@ sqsh__extract_manager_uncompress(
 	bool locked = false;
 	struct CxBuffer *buffer = NULL;
 
-	rv = sqsh__mutex_lock(&manager->lock);
+	rv = sqsh__mutex_lock(&manager->lock, &locked);
 	if (rv < 0) {
 		goto out;
 	}
-	locked = true;
 
 	const uint64_t address = sqsh__map_reader_address(reader);
 
@@ -143,22 +142,20 @@ sqsh__extract_manager_uncompress(
 
 	if (buffer == NULL) {
 		struct CxBuffer tmp_buffer = {0};
-		rv = sqsh__mutex_unlock(&manager->lock);
+		rv = sqsh__mutex_unlock(&manager->lock, &locked);
 		if (rv < 0) {
 			goto out;
 		}
-		locked = false;
 
 		rv = extract(manager, reader, &tmp_buffer);
 		if (rv < 0) {
 			goto out;
 		}
 
-		rv = sqsh__mutex_lock(&manager->lock);
+		rv = sqsh__mutex_lock(&manager->lock, &locked);
 		if (rv < 0) {
 			goto out;
 		}
-		locked = true;
 
 		buffer = cx_rc_hash_map_put(&manager->cache, address, &tmp_buffer);
 		if (buffer == NULL) {
@@ -171,9 +168,7 @@ sqsh__extract_manager_uncompress(
 	*target = buffer;
 
 out:
-	if (locked) {
-		sqsh__mutex_unlock(&manager->lock);
-	}
+	sqsh__mutex_unlock(&manager->lock, &locked);
 	return rv;
 }
 
@@ -187,15 +182,16 @@ sqsh__extract_manager_retain_buffer(
 int
 sqsh__extract_manager_release(
 		struct SqshExtractManager *manager, uint64_t address) {
-	int rv = sqsh__mutex_lock(&manager->lock);
+	bool locked = false;
+	int rv = sqsh__mutex_lock(&manager->lock, &locked);
 	if (rv < 0) {
 		goto out;
 	}
 
 	rv = cx_rc_hash_map_release_key(&manager->cache, address);
 
-	sqsh__mutex_unlock(&manager->lock);
 out:
+	sqsh__mutex_unlock(&manager->lock, &locked);
 	return rv;
 }
 

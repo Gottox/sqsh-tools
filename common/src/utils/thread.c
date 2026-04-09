@@ -72,17 +72,21 @@ out:
 }
 
 int
-sqsh__mutex_lock(sqsh__mutex_t *mutex) {
+sqsh__mutex_lock(sqsh__mutex_t *mutex, bool *locked) {
 	int rv = pthread_mutex_lock(mutex);
-	if (rv != 0) {
+	*locked = rv == 0;
+	if (!*locked) {
 		return -SQSH_ERROR_MUTEX_LOCK_FAILED;
-	} else {
-		return 0;
 	}
+	return 0;
 }
 
 int
-sqsh__mutex_unlock(sqsh__mutex_t *mutex) {
+sqsh__mutex_unlock(sqsh__mutex_t *mutex, bool *locked) {
+	if (!*locked) {
+		return 0;
+	}
+	*locked = false;
 	int rv = pthread_mutex_unlock(mutex);
 	if (rv != 0) {
 		return -SQSH_ERROR_MUTEX_LOCK_FAILED;
