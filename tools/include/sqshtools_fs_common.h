@@ -49,11 +49,11 @@ enum {
 };
 
 struct SqshfsOptions {
-	const char *archive;
+	char *archive;
 	char *mountpoint;
 	int multithreaded;
 	int foreground;
-	int offset;
+	char *offset;
 };
 
 extern struct fuse_opt fs_common_opts[];
