@@ -520,6 +520,7 @@ sqsh_directory_iterator_name_dup(const struct SqshDirectoryIterator *iterator) {
 int
 sqsh__directory_iterator_cleanup(struct SqshDirectoryIterator *iterator) {
 	free(iterator->last_dir_name);
+	iterator->last_dir_name = NULL;
 
 	return sqsh__metablock_reader_cleanup(&iterator->metablock);
 }

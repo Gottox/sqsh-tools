@@ -98,6 +98,7 @@ sqsh__extract_view_cleanup(struct SqshExtractView *view) {
 
 	if (view->manager != NULL) {
 		rv = sqsh__extract_manager_release(view->manager, view->address);
+		view->manager = NULL;
 	}
 	view->buffer = NULL;
 	view->size = 0;
