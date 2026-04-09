@@ -176,7 +176,8 @@ sqsh__archive_data_extract_manager(
 	const size_t data_lru_size =
 			SQSH_CONFIG_DEFAULT(config->data_lru_size, default_lru_size);
 
-	rv = sqsh__mutex_lock(&archive->lock);
+	bool locked = false;
+	rv = sqsh__mutex_lock(&archive->lock, &locked);
 	if (rv < 0) {
 		goto out;
 	}
@@ -196,7 +197,7 @@ sqsh__archive_data_extract_manager(
 	}
 	*data_extract_manager = &archive->data_extract_manager;
 out:
-	sqsh__mutex_unlock(&archive->lock);
+	sqsh__mutex_unlock(&archive->lock, &locked);
 	return rv;
 }
 
@@ -205,7 +206,8 @@ sqsh_archive_id_table(
 		struct SqshArchive *archive, struct SqshIdTable **id_table) {
 	int rv = 0;
 
-	rv = sqsh__mutex_lock(&archive->lock);
+	bool locked = false;
+	rv = sqsh__mutex_lock(&archive->lock, &locked);
 	if (rv < 0) {
 		goto out;
 	}
@@ -218,7 +220,7 @@ sqsh_archive_id_table(
 	}
 	*id_table = &archive->id_table;
 out:
-	sqsh__mutex_unlock(&archive->lock);
+	sqsh__mutex_unlock(&archive->lock, &locked);
 	return rv;
 }
 
@@ -232,7 +234,8 @@ sqsh_archive_export_table(
 		return -SQSH_ERROR_NO_EXPORT_TABLE;
 	}
 
-	rv = sqsh__mutex_lock(&archive->lock);
+	bool locked = false;
+	rv = sqsh__mutex_lock(&archive->lock, &locked);
 	if (rv < 0) {
 		goto out;
 	}
@@ -246,7 +249,7 @@ sqsh_archive_export_table(
 	*export_table = &archive->export_table;
 
 out:
-	sqsh__mutex_unlock(&archive->lock);
+	sqsh__mutex_unlock(&archive->lock, &locked);
 	return rv;
 }
 
@@ -261,7 +264,8 @@ sqsh_archive_fragment_table(
 		return -SQSH_ERROR_NO_FRAGMENT_TABLE;
 	}
 
-	rv = sqsh__mutex_lock(&archive->lock);
+	bool locked = false;
+	rv = sqsh__mutex_lock(&archive->lock, &locked);
 	if (rv < 0) {
 		goto out;
 	}
@@ -275,7 +279,7 @@ sqsh_archive_fragment_table(
 	}
 	*fragment_table = &archive->fragment_table;
 out:
-	sqsh__mutex_unlock(&archive->lock);
+	sqsh__mutex_unlock(&archive->lock, &locked);
 	return rv;
 }
 
@@ -284,7 +288,8 @@ sqsh_archive_inode_map(
 		struct SqshArchive *archive, struct SqshInodeMap **inode_map) {
 	int rv = 0;
 
-	rv = sqsh__mutex_lock(&archive->lock);
+	bool locked = false;
+	rv = sqsh__mutex_lock(&archive->lock, &locked);
 	if (rv < 0) {
 		goto out;
 	}
@@ -297,7 +302,7 @@ sqsh_archive_inode_map(
 	}
 	*inode_map = &archive->inode_map;
 out:
-	sqsh__mutex_unlock(&archive->lock);
+	sqsh__mutex_unlock(&archive->lock, &locked);
 	return rv;
 }
 
@@ -311,7 +316,8 @@ sqsh_archive_xattr_table(
 		return -SQSH_ERROR_NO_XATTR_TABLE;
 	}
 
-	rv = sqsh__mutex_lock(&archive->lock);
+	bool locked = false;
+	rv = sqsh__mutex_lock(&archive->lock, &locked);
 	if (rv < 0) {
 		goto out;
 	}
@@ -324,7 +330,7 @@ sqsh_archive_xattr_table(
 	}
 	*xattr_table = &archive->xattr_table;
 out:
-	sqsh__mutex_unlock(&archive->lock);
+	sqsh__mutex_unlock(&archive->lock, &locked);
 	return rv;
 }
 

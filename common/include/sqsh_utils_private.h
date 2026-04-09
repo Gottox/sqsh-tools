@@ -75,19 +75,22 @@ sqsh__mutex_init_recursive(sqsh__mutex_t *mutex);
  * @brief sqsh__mutex_lock locks a mutex.
  *
  * @param mutex the mutex to lock.
+ * @param locked set to true if the mutex was successfully locked.
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__mutex_lock(sqsh__mutex_t *mutex);
+SQSH_NO_EXPORT SQSH_NO_UNUSED int
+sqsh__mutex_lock(sqsh__mutex_t *mutex, bool *locked);
 
 /**
- * @brief sqsh__mutex_lock unlocks a mutex.
+ * @brief sqsh__mutex_unlock unlocks a mutex if locked is true.
  *
- * @param mutex the mutex to lock.
+ * @param mutex the mutex to unlock.
+ * @param locked set to false after unlocking.
  *
  * @return 0 on success, less than 0 on error.
  */
-SQSH_NO_EXPORT int sqsh__mutex_unlock(sqsh__mutex_t *mutex);
+SQSH_NO_EXPORT int sqsh__mutex_unlock(sqsh__mutex_t *mutex, bool *locked);
 
 /**
  * @brief sqsh__mutex_unlock unlocks a mutex.

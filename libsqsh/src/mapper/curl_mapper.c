@@ -264,13 +264,12 @@ sqsh_mapper_curl_map(
 	uint64_t file_size = 0;
 	uint64_t file_time = 0;
 
-	int locked = 0;
+	bool locked = false;
 	sqsh__mutex_t *lock = &curl_mapper->lock;
-	rv = sqsh__mutex_lock(lock);
+	rv = sqsh__mutex_lock(lock, &locked);
 	if (rv < 0) {
 		goto out;
 	}
-	locked = 1;
 	if (offset == 0 && curl_mapper->header_cache != NULL) {
 		*data = curl_mapper->header_cache;
 		curl_mapper->header_cache = NULL;
@@ -294,9 +293,7 @@ sqsh_mapper_curl_map(
 	}
 
 out:
-	if (locked) {
-		sqsh__mutex_unlock(lock);
-	}
+	sqsh__mutex_unlock(lock, &locked);
 	return rv;
 }
 

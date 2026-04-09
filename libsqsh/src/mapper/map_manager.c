@@ -138,29 +138,26 @@ sqsh__map_manager_get(
 	bool is_locked = false;
 	int rv = 0;
 
-	rv = sqsh__mutex_lock(&manager->lock);
+	rv = sqsh__mutex_lock(&manager->lock, &is_locked);
 	if (rv < 0) {
 		goto out;
 	}
-	is_locked = true;
 
 	*target = cx_rc_hash_map_retain(&manager->maps, index);
 
 	if (*target == NULL) {
 		struct SqshMapSlice mapping = {0};
-		sqsh__mutex_unlock(&manager->lock);
-		is_locked = false;
+		sqsh__mutex_unlock(&manager->lock, &is_locked);
 		rv = load_mapping(&mapping, manager, index);
 		if (rv < 0) {
 			goto out;
 		}
 
-		rv = sqsh__mutex_lock(&manager->lock);
+		rv = sqsh__mutex_lock(&manager->lock, &is_locked);
 		if (rv < 0) {
 			sqsh__map_slice_cleanup(&mapping);
 			goto out;
 		}
-		is_locked = true;
 
 		*target = cx_rc_hash_map_put(&manager->maps, index, &mapping);
 		if (*target == NULL) {
@@ -172,9 +169,7 @@ sqsh__map_manager_get(
 	rv = cx_lru_touch(&manager->lru, index);
 
 out:
-	if (is_locked) {
-		sqsh__mutex_unlock(&manager->lock);
-	}
+	sqsh__mutex_unlock(&manager->lock, &is_locked);
 	return rv;
 }
 
@@ -184,15 +179,16 @@ sqsh__map_manager_retain(
 	if (manager == NULL || mapping == NULL) {
 		return 0;
 	}
-	int rv = sqsh__mutex_lock(&manager->lock);
+	bool locked = false;
+	int rv = sqsh__mutex_lock(&manager->lock, &locked);
 	if (rv < 0) {
 		goto out;
 	}
 
 	cx_rc_hash_map_retain(&manager->maps, mapping->index);
 
-	sqsh__mutex_unlock(&manager->lock);
 out:
+	sqsh__mutex_unlock(&manager->lock, &locked);
 	return rv;
 }
 
@@ -202,15 +198,16 @@ sqsh__map_manager_release(
 	if (manager == NULL || mapping == NULL) {
 		return 0;
 	}
-	int rv = sqsh__mutex_lock(&manager->lock);
+	bool locked = false;
+	int rv = sqsh__mutex_lock(&manager->lock, &locked);
 	if (rv < 0) {
 		goto out;
 	}
 
 	cx_rc_hash_map_release_key(&manager->maps, mapping->index);
 
-	sqsh__mutex_unlock(&manager->lock);
 out:
+	sqsh__mutex_unlock(&manager->lock, &locked);
 	return rv;
 }
 
