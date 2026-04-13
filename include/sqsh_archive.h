@@ -331,6 +331,18 @@ sqsh_superblock_has_compression_options(const struct SqshSuperblock *context);
 uint32_t sqsh_superblock_block_size(const struct SqshSuperblock *context);
 
 /**
+ * @internal
+ * @memberof SqshSuperblock
+ * @brief Retrieves the block log of a superblock context.
+ *
+ * @param[in] superblock The superblock context.
+ *
+ * @return The block log (i.e. log2 of block size).
+ */
+SQSH_NO_EXPORT uint16_t
+sqsh_superblock_block_log(const struct SqshSuperblock *superblock);
+
+/**
  * @memberof SqshSuperblock
  * @brief Retrieves the modification time of a superblock context.
  *

@@ -102,10 +102,47 @@ SQSH_NO_EXPORT int sqsh__mutex_unlock(sqsh__mutex_t *mutex, bool *locked);
 SQSH_NO_EXPORT int sqsh__mutex_destroy(sqsh__mutex_t *mutex);
 
 /***************************************
- * utils/math.c
+ * utils/block.c
  */
 
-SQSH_NO_EXPORT unsigned long sqsh__log2(unsigned long x);
+/**
+ * @brief Computes the number of full blocks that fit in @p value.
+ *
+ * Equivalent to `value / block_size` where `block_size = 1 << block_log`.
+ *
+ * @param value the value to divide.
+ * @param block_log log2 of the block size.
+ *
+ * @return the number of full blocks.
+ */
+SQSH_NO_EXPORT uint64_t sqsh_block_count(uint64_t value, uint16_t block_log);
+
+/**
+ * @brief Computes the number of blocks needed to cover @p value, rounding up.
+ *
+ * Equivalent to `ceil(value / block_size)` where `block_size = 1 << block_log`.
+ *
+ * @param value the value to divide.
+ * @param block_log log2 of the block size.
+ *
+ * @return the number of blocks, rounded up.
+ */
+SQSH_NO_EXPORT uint64_t
+sqsh_block_count_ceil(uint64_t value, uint16_t block_log);
+
+/**
+ * @brief Computes the remainder of @p value within a block.
+ *
+ * Equivalent to `value % block_size` where `block_size = 1 << block_log`.
+ *
+ * @param value the value to compute the remainder for.
+ * @param block_log log2 of the block size.
+ *
+ * @return the remainder.
+ */
+SQSH_NO_EXPORT uint64_t
+sqsh_block_remainder(uint64_t value, uint16_t block_log);
+
 
 #ifdef __cplusplus
 }

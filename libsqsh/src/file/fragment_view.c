@@ -45,9 +45,10 @@ apply_fragment(
 		struct SqshFragmentView *view, const struct SqshArchive *archive,
 		const struct SqshFile *file, const uint8_t *data, size_t data_size) {
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
-	uint32_t block_size = sqsh_superblock_block_size(superblock);
+	uint16_t block_log = sqsh_superblock_block_log(superblock);
 	uint32_t offset = sqsh_file_fragment_block_offset(file);
-	uint32_t size = (uint32_t)(sqsh_file_size(file) % block_size);
+	uint32_t size =
+			(uint32_t)sqsh_block_remainder(sqsh_file_size(file), block_log);
 	uint32_t end_offset;
 
 	if (SQSH_ADD_OVERFLOW(offset, size, &end_offset)) {

@@ -54,13 +54,13 @@ calc_block_count(
 		const struct SqshArchive *archive, uint64_t file_size,
 		uint32_t fragment_index) {
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
-	const uint32_t block_size = sqsh_superblock_block_size(superblock);
+	const uint16_t block_log = sqsh_superblock_block_log(superblock);
 	const bool has_fragment = fragment_index != SQSH_INODE_NO_FRAGMENT;
 
 	if (has_fragment) {
-		return (size_t)(file_size / block_size);
+		return (size_t)sqsh_block_count(file_size, block_log);
 	} else {
-		return (size_t)SQSH_DIVIDE_CEIL(file_size, block_size);
+		return (size_t)sqsh_block_count_ceil(file_size, block_log);
 	}
 }
 

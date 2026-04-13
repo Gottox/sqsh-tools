@@ -291,16 +291,16 @@ sqsh_file_block_count2(const struct SqshFile *context) {
 	const struct SqshSuperblock *superblock =
 			sqsh_archive_superblock(context->archive);
 	uint64_t file_size = sqsh_file_size(context);
-	uint32_t block_size = sqsh_superblock_block_size(superblock);
+	uint16_t block_log = sqsh_superblock_block_log(superblock);
 
 	if (file_size == UINT64_MAX) {
 		return UINT64_MAX;
 	} else if (file_size == 0) {
 		return 0;
 	} else if (sqsh_file_has_fragment(context)) {
-		return file_size / block_size;
+		return sqsh_block_count(file_size, block_log);
 	} else {
-		return SQSH_DIVIDE_CEIL(file_size, block_size);
+		return sqsh_block_count_ceil(file_size, block_log);
 	}
 }
 
