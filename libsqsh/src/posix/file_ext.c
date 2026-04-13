@@ -150,10 +150,11 @@ file_iterator_mt(
 	const uint64_t inode_ref = sqsh_file_inode_ref(file);
 	const struct SqshSuperblock *superblock =
 			sqsh_archive_superblock(file->archive);
+	uint16_t block_log = sqsh_superblock_block_log(superblock);
 	uint32_t block_size = sqsh_superblock_block_size(superblock);
 
 	const uint64_t block_count =
-			SQSH_DIVIDE_CEIL(sqsh_file_size(file), block_size);
+			sqsh_block_count_ceil(sqsh_file_size(file), block_log);
 	if (block_count > SIZE_MAX) {
 		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;

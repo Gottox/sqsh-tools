@@ -28,23 +28,22 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         math.c
+ * @file         block.c
  */
 
-#include <sqsh_utils_private.h>
+#include <sqsh_common_private.h>
 
-#include <sqsh_error.h>
+uint64_t
+sqsh_block_count(uint64_t value, uint16_t block_log) {
+	return value >> block_log;
+}
 
-#include <errno.h>
-#include <pthread.h>
-#include <stdlib.h>
+uint64_t
+sqsh_block_count_ceil(uint64_t value, uint16_t block_log) {
+	return (value + ((uint64_t)1 << block_log) - 1) >> block_log;
+}
 
-unsigned long
-sqsh__log2(unsigned long x) {
-	if (x == 0) {
-		return UINT16_MAX;
-	} else {
-		const unsigned long clz = (unsigned int)__builtin_clzl(x);
-		return sizeof(unsigned long) * 8 - 1 - clz;
-	}
+uint64_t
+sqsh_block_remainder(uint64_t value, uint16_t block_log) {
+	return value & (((uint64_t)1 << block_log) - 1);
 }

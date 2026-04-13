@@ -57,14 +57,16 @@ is_last_block(const struct SqshFileIterator *iterator) {
 
 static size_t
 get_block_size(const struct SqshFileIterator *iterator) {
+	const uint16_t block_log = iterator->block_log;
+	const size_t block_size = (size_t)1 << block_log;
 	if (is_last_block(iterator) && !sqsh_file_has_fragment(iterator->file)) {
-		const size_t remainder =
-				(size_t)(sqsh_file_size(iterator->file) % iterator->block_size);
+		const size_t remainder = (size_t)sqsh_block_remainder(
+				sqsh_file_size(iterator->file), block_log);
 		if (remainder != 0) {
 			return remainder;
 		}
 	}
-	return iterator->block_size;
+	return block_size;
 }
 
 int
@@ -95,7 +97,7 @@ sqsh__file_iterator_init(
 	}
 
 	iterator->block_index = 0;
-	iterator->block_size = sqsh_superblock_block_size(superblock);
+	iterator->block_log = sqsh_superblock_block_log(superblock);
 	iterator->file = file;
 	iterator->sparse_size = 0;
 out:
@@ -123,7 +125,7 @@ sqsh__file_iterator_copy(
 		goto out;
 	}
 	target->sparse_size = source->sparse_size;
-	target->block_size = source->block_size;
+	target->block_log = source->block_log;
 	target->block_index = source->block_index;
 	target->data = source->data;
 	target->size = source->size;
@@ -207,7 +209,8 @@ map_block_uncompressed(
 		} else if (block_index + 1 != block_count) {
 			/* Set the sparse size only if we are not at the last block or a
 			 * fragment is following. */
-			iterator->sparse_size = iterator->block_size - data_block_size;
+			iterator->sparse_size =
+					((size_t)1 << iterator->block_log) - data_block_size;
 		}
 
 		size_t new_outer_size;
@@ -369,7 +372,7 @@ sqsh_file_iterator_skip2(
 		struct SqshFileIterator *iterator, uint64_t *offset,
 		size_t desired_size) {
 	int rv = 0;
-	const size_t block_size = iterator->block_size;
+	const uint16_t block_log = iterator->block_log;
 	const size_t current_block_size = sqsh_file_iterator_size(iterator);
 
 	if (*offset < current_block_size) {
@@ -378,12 +381,12 @@ sqsh_file_iterator_skip2(
 
 	*offset -= current_block_size;
 
-	uint64_t skip_index = *offset / block_size;
+	uint64_t skip_index = sqsh_block_count(*offset, block_log);
 	if (current_block_size != 0) {
 		skip_index += 1;
 	}
 
-	*offset = *offset % block_size;
+	*offset = sqsh_block_remainder(*offset, block_log);
 
 	if (skip_index == 0 && iterator->block_index != 0) {
 		goto out;
@@ -436,7 +439,7 @@ sqsh_file_iterator_data(const struct SqshFileIterator *iterator) {
 
 size_t
 sqsh_file_iterator_block_size(const struct SqshFileIterator *iterator) {
-	return iterator->block_size;
+	return (size_t)1 << iterator->block_log;
 }
 
 size_t

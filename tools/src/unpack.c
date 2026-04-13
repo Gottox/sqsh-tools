@@ -36,7 +36,6 @@
 #include <cextras/concurrency.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <stdatomic.h>
 #include <libgen.h>
 #include <stdlib.h>
 #include <string.h>

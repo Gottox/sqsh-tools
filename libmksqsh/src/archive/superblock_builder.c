@@ -38,6 +38,23 @@
 
 #include <mksqsh_archive.h>
 
+static int
+block_size_log(size_t block_size) {
+	static const size_t block_sizes[] = {
+			1 << 12, 1 << 13, 1 << 14, 1 << 15, 1 << 16,
+			1 << 17, 1 << 18, 1 << 19, 1 << 20,
+	};
+
+	int len = sizeof(block_sizes) / sizeof(block_sizes[0]);
+	for (int i = 0; i < len; i++) {
+		if (block_sizes[i] == block_size) {
+			return i + 12;
+		}
+	}
+
+	return -SQSH_ERROR_BLOCKSIZE_MISMATCH;
+}
+
 int
 mksqsh__superblock_init(struct MksqshSuperblock *superblock) {
 	sqsh__data_superblock_magic_set(&superblock->data, SQSH_SUPERBLOCK_MAGIC);
@@ -65,7 +82,12 @@ mksqsh__superblock_block_size(
 	}
 
 	sqsh__data_superblock_block_size_set(&superblock->data, block_size);
-	const uint16_t log2_block_size = sqsh__log2(block_size);
+	int rv = block_size_log(block_size);
+	if (rv < 0) {
+		return rv;
+	}
+
+	const uint16_t log2_block_size = (uint16_t)rv;
 	sqsh__data_superblock_block_log_set(&superblock->data, log2_block_size);
 
 	return 0;

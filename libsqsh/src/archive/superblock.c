@@ -76,6 +76,7 @@ sqsh__superblock_init(
 	if (rv < 0) {
 		goto out;
 	}
+
 	rv = sqsh__map_reader_all(&superblock->cursor);
 	if (rv < 0) {
 		goto out;
@@ -87,14 +88,17 @@ sqsh__superblock_init(
 		goto out;
 	}
 
-	uint32_t block_size = sqsh__data_superblock_block_size(header);
-	if (block_size < 4096 || block_size > 1048576) {
+	const uint32_t block_size = sqsh__data_superblock_block_size(header);
+	const uint16_t block_log = sqsh__data_superblock_block_log(header);
+	// We check two things here: first of all, the block log must indicate a
+	// block size between 4 KiB and 1 MiB. Secondly, the block log must be in a
+	// valid range for bitshifting.
+	if (block_log < 12 || block_log > 20) {
 		rv = -SQSH_ERROR_BLOCKSIZE_MISMATCH;
 		goto out;
 	}
 
-	unsigned long block_size_log = sqsh__log2(block_size);
-	if (sqsh__data_superblock_block_log(header) != block_size_log) {
+	if (block_size != (uint64_t)1 << block_log) {
 		rv = -SQSH_ERROR_BLOCKSIZE_MISMATCH;
 		goto out;
 	}
@@ -188,6 +192,11 @@ sqsh_superblock_has_export_table(const struct SqshSuperblock *superblock) {
 bool
 sqsh_superblock_has_xattr_table(const struct SqshSuperblock *superblock) {
 	return !check_flag(superblock, SQSH_SUPERBLOCK_NO_XATTRS);
+}
+
+uint16_t
+sqsh_superblock_block_log(const struct SqshSuperblock *superblock) {
+	return sqsh__data_superblock_block_log(get_header(superblock));
 }
 
 uint32_t
