@@ -103,7 +103,10 @@ sqsh__map_iterator_skip(struct SqshMapIterator *iterator, uint64_t *offset) {
 		goto out;
 	}
 
-	index = iterator->next_index + (*offset / block_size);
+	if (SQSH_ADD_OVERFLOW(iterator->next_index, *offset / block_size, &index)) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
 	if (current_size > 0) {
 		/* If there is a segment currently mapped, we need don't need to skip
 		 * that one, hence reduce the index by one.

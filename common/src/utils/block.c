@@ -40,7 +40,8 @@ sqsh_block_count(uint64_t value, uint16_t block_log) {
 
 uint64_t
 sqsh_block_count_ceil(uint64_t value, uint16_t block_log) {
-	return (value + ((uint64_t)1 << block_log) - 1) >> block_log;
+	const uint64_t mask = ((uint64_t)1 << block_log) - 1;
+	return (value >> block_log) + ((value & mask) != 0);
 }
 
 uint64_t

@@ -143,7 +143,6 @@ sqsh_block_count_ceil(uint64_t value, uint16_t block_log);
 SQSH_NO_EXPORT uint64_t
 sqsh_block_remainder(uint64_t value, uint16_t block_log);
 
-
 #ifdef __cplusplus
 }
 #endif
