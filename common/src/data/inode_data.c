@@ -309,7 +309,7 @@ sqsh__data_inode_symlink_ext_xattr_idx(
 	 *    xattr_idx -----> [n+1]
 	 */
 	const uint32_t target_size =
-			sqsh__data_inode_symlink_ext_target_size(symlink_ext) + 1;
+			sqsh__data_inode_symlink_ext_target_size(symlink_ext);
 	const uint8_t *target_path =
 			sqsh__data_inode_symlink_ext_target_path(symlink_ext);
 	const uint8_t *target_path_end = &target_path[target_size];
