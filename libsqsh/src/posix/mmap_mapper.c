@@ -31,6 +31,7 @@
  * @file         mmap_mapper.c
  */
 
+#define _DEFAULT_SOURCE
 #define _FILE_OFFSET_BITS 64
 
 #include <sqsh_error.h>
@@ -53,7 +54,7 @@ sqsh_mapper_mmap_init(
 	int fd = -1;
 	off_t pos = 0;
 
-	fd = open(input, 0);
+	fd = open(input, O_RDONLY | O_CLOEXEC);
 	if (fd < 0) {
 		rv = -errno;
 		goto out;
