@@ -35,6 +35,7 @@
 
 #include <sqsh_data_private.h>
 #include <sqsh_error.h>
+#include <sqsh_common_private.h>
 
 #include <stdlib.h>
 
@@ -110,7 +111,11 @@ sqsh__directory_index_iterator_next(
 	}
 
 	/* Make sure current index has its name populated */
-	size += sqsh__directory_index_iterator_name_size(iterator);
+	const size_t name_size = sqsh__directory_index_iterator_name_size(iterator);
+	if (SQSH_ADD_OVERFLOW(size, name_size, &size)) {
+		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+		goto out;
+	}
 	rv = sqsh__metablock_reader_advance(&iterator->file.metablock, 0, size);
 	if (rv < 0) {
 		goto out;
@@ -139,12 +144,16 @@ sqsh__directory_index_iterator_start(
 			get_directory_index(iterator);
 	return sqsh__data_inode_directory_index_start(current);
 }
-uint32_t
+size_t
 sqsh__directory_index_iterator_name_size(
 		const struct SqshDirectoryIndexIterator *iterator) {
 	const struct SqshDataInodeDirectoryIndex *current =
 			get_directory_index(iterator);
-	return sqsh__data_inode_directory_index_name_size(current) + 1;
+	size_t name_size = sqsh__data_inode_directory_index_name_size(current);
+	if (SQSH_ADD_OVERFLOW(name_size, 1, &name_size)) {
+		return SIZE_MAX;
+	}
+	return name_size;
 }
 const char *
 sqsh__directory_index_iterator_name(

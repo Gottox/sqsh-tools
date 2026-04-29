@@ -175,7 +175,7 @@ SQSH_NO_EXPORT uint32_t sqsh__directory_index_iterator_start(
  *
  * @return The name size of the current entry
  */
-SQSH_NO_EXPORT uint32_t sqsh__directory_index_iterator_name_size(
+SQSH_NO_EXPORT size_t sqsh__directory_index_iterator_name_size(
 		const struct SqshDirectoryIndexIterator *iterator);
 
 /**

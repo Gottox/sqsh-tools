@@ -103,7 +103,7 @@ directory_iterator_index_lookup(
 	while (sqsh__directory_index_iterator_next(&index_iterator, &rv)) {
 		const char *index_name =
 				sqsh__directory_index_iterator_name(&index_iterator);
-		const uint32_t index_name_size =
+		const size_t index_name_size =
 				sqsh__directory_index_iterator_name_size(&index_iterator);
 
 		const size_t cmp_size = SQSH_MIN(index_name_size, name_len);
