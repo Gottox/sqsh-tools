@@ -41,7 +41,7 @@ jobs:
   test-debian:
     needs:
     - format-check
-    runs-on: tox-debian-pod
+    runs-on: tox-debian-vm
     steps:
     - run: |
         sudo apt update
@@ -72,7 +72,7 @@ jobs:
           -Dzstd=enabled \
           -Dthreads=enabled \
           -Dfuse-old=disabled \
-          -Dtest=true \
+          -Dtest=extended \
           -Ddoc=false \
         && :
     - name: test
@@ -117,3 +117,39 @@ jobs:
     - name: test
       run: |
          ninja -C build test
+
+  test-openbsd:
+    needs:
+    - format-check
+    runs-on: tox-openbsd-vm
+    steps:
+    - run: |
+        sudo pkg_add \
+          meson \
+          squashfs-tools \
+          curl \
+          lz4 \
+          xz \
+          zstd \
+        && :
+    - uses: actions/checkout@v4
+    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+    - name: configure
+      run: |
+        CC=clang meson setup build \
+          -Dwerror=true \
+          -Dexamples=true \
+          -Dcurl=enabled \
+          -Dzlib=enabled \
+          -Dlz4=enabled \
+          -Dlzma=enabled \
+          -Dzstd=enabled \
+          -Dfuse-old=enabled \
+          -Dfuse=disabled \
+          -Dtest=extended \
+          -Ddoc=false \
+        && :
+    - name: test
+      run: |
+        # fuse needs root privileges on OpenBSD
+         sudo ninja -C build test
