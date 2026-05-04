@@ -48,6 +48,7 @@ jobs:
         sudo apt install -y --no-install-recommends \
           meson \
           squashfs-tools \
+          bsdextrautils \
           build-essential \
           libcurl4-openssl-dev \
           libfuse-dev \
@@ -86,6 +87,7 @@ jobs:
     - run: |
         sudo apk add --no-cache \
           meson \
+          hexdump \
           squashfs-tools \
           build-base \
           curl-dev \
