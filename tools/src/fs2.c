@@ -43,11 +43,6 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#ifndef ENODATA
-// On OpenBSD ENODATA is not defined, so lets return ENOATTR instead.
-#	define ENODATA ENOATTR
-#endif
-
 struct Context {
 	struct SqshArchive *archive;
 	struct fuse *fuse;
