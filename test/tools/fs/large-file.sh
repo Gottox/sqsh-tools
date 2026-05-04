@@ -21,6 +21,7 @@ unmount() {
 		fi
 		sleep 0.5
 	done
+	rmdir "$1"
 }
 
 MKSQUASHFS_OPTS="-no-xattrs -noappend -mkfs-time 0 -b 4096"
@@ -39,19 +40,18 @@ seq 1 "$OFFSET" | dd bs=1 count="$OFFSET" > "$PWD/file.orig"
 # shellcheck disable=SC2086
 $MKSQUASHFS "$PWD/file.orig" "$PWD/original.squashfs" $MKSQUASHFS_OPTS
 
-mkdir -p "$PWD/mnt"
-
-$SQSHFS "$PWD/original.squashfs" "$PWD/mnt"
+MOUNT_POINT="$(mktemp -d)"
+$SQSHFS "$PWD/original.squashfs" "$MOUNT_POINT"
 
 for _ in 1 2 3 4 5; do
-	if [ -f "$PWD/mnt/file.orig" ]; then
+	if [ -f "$MOUNT_POINT/file.orig" ]; then
 		break
 	fi
 	sleep 0.5
 done
 
-cat "$PWD/mnt/file.orig" > "$PWD/file.extracted"
+cat "$MOUNT_POINT/file.orig" > "$PWD/file.extracted"
 
-unmount "$PWD/mnt"
+unmount "$MOUNT_POINT"
 
 exec cmp "$PWD/file.orig" "$PWD/file.extracted"

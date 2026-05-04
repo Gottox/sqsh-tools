@@ -21,6 +21,7 @@ unmount() {
 		fi
 		sleep 0.5
 	done
+	rmdir "$1"
 }
 
 MKSQUASHFS_OPTS="-no-xattrs -noappend -mkfs-time 0"
@@ -35,13 +36,12 @@ cd "$WORK_DIR"
 # shellcheck disable=SC2086
 $MKSQUASHFS "$SOURCE_ROOT/libsqsh" "$PWD/original.squashfs" $MKSQUASHFS_OPTS
 
-mkdir -p "mnt"
-
-$SQSHFS "$PWD/original.squashfs" "$PWD/mnt"
+MOUNT_POINT="$(mktemp -d)"
+$SQSHFS "$PWD/original.squashfs" "$MOUNT_POINT"
 
 # shellcheck disable=SC2086
-$MKSQUASHFS "$PWD/mnt" "$PWD/repacked.squashfs" $MKSQUASHFS_OPTS
+$MKSQUASHFS "$MOUNT_POINT" "$PWD/repacked.squashfs" $MKSQUASHFS_OPTS
 
-unmount "mnt"
+unmount "$MOUNT_POINT"
 
 exec cmp "$PWD/original.squashfs" "$PWD/repacked.squashfs"
