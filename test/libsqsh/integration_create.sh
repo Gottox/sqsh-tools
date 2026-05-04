@@ -28,8 +28,14 @@ for i in $(seq 1 1000); do
 done
 
 [ -e "$tmp/image" ] && rm "$tmp/image"
+case "$(uname -s)" in
+	OpenBSD) MKSQUASHFS_OPTS="" ;;
+	*) MKSQUASHFS_OPTS=" -xattrs-exclude security.selinux" ;;
+esac
+
+#shellcheck disable=SC2086
 $MKSQUASHFS "$tmp/empty" "$tmp/image" \
-	-xattrs-exclude security.selinux \
+	$MKSQUASHFS_OPTS \
 	-pf "$tmp/pf" \
 	-noappend \
 	-nopad \
