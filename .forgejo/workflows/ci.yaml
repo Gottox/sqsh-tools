@@ -22,7 +22,6 @@ jobs:
           clang21-extra-tools \
         && :
     - uses: actions/checkout@v4
-    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: muon fmt
       run: |
         if ! find . \( -name meson.build -or -name meson_options.txt \) -print0 \
@@ -59,7 +58,6 @@ jobs:
           libzstd-dev \
         && :
     - uses: actions/checkout@v4
-    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: configure
       run: |
         CC=gcc meson setup build \
@@ -75,9 +73,10 @@ jobs:
           -Dtest=extended \
           -Ddoc=false \
         && :
+    - name: build
+      run: ninja -C build all
     - name: test
-      run: |
-         ninja -C build test
+      run: ninja -C build test
 
   test-alpine:
     needs:
@@ -98,7 +97,6 @@ jobs:
           zstd-dev \
         && :
     - uses: actions/checkout@v4
-    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: configure
       run: |
         CC=gcc meson setup build \
@@ -114,9 +112,10 @@ jobs:
           -Dtest=true \
           -Ddoc=false \
         && :
+    - name: build
+      run: ninja -C build all
     - name: test
-      run: |
-         ninja -C build test
+      run: ninja -C build test
 
   test-openbsd:
     needs:
@@ -133,7 +132,6 @@ jobs:
           zstd \
         && :
     - uses: actions/checkout@v4
-    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: configure
       run: |
         CC=clang meson setup build \
@@ -149,7 +147,8 @@ jobs:
           -Dtest=extended \
           -Ddoc=false \
         && :
+    - name: build
+      run: ninja -C build all
     - name: test
-      run: |
-        # fuse needs root privileges on OpenBSD
-         sudo ninja -C build test
+      # fuse needs root privileges on OpenBSD
+      run: sudo ninja -C build test
