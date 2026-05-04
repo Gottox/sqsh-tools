@@ -1,0 +1,112 @@
+name: CI
+on:
+  push:
+    branches:
+    - "main"
+    - "feat/forgejo-pipelines"
+    tags:
+    - 'v[0-9]*.[0-9]*.[0-9]*'
+  pull_request:
+    branches:
+    - "main"
+    - "release/*"
+
+jobs:
+  format-check:
+    runs-on: tox-alpine-pod
+    steps:
+    - run: >
+        sudo apk add --no-cache
+        meson
+        muon
+        clang21-extra-tools
+    - uses: actions/checkout@v4
+    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+    - name: muon fmt
+      run: |
+        if ! find . \( -name meson.build -or -name meson_options.txt \) -print0 \
+            | xargs -0 muon fmt -q; then
+          find . \( -name meson.build -or -name meson_options.txt \) -print0 \
+            | xargs -0 muon fmt -i;
+          git diff
+          exit 1
+        fi
+    - run: >
+        meson setup build
+    - name: clang-format
+      run: |
+        ninja -C build clang-format-check
+
+  test-debian:
+    needs:
+    - format-check
+    runs-on: tox-debian-pod
+    steps:
+    - run: >
+        sudo apt update &&
+        sudo apt install -y --no-install-recommends
+        meson
+        squashfs-tools
+        build-essential
+        libcurl4-openssl-dev
+        libfuse-dev
+        libfuse3-dev
+        liblz4-dev
+        liblzma-dev
+        zlib1g-dev
+        libzstd-dev
+    - uses: actions/checkout@v4
+    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+    - name: configure
+      run: >
+        CC=gcc meson setup build
+        -Dwerror=false
+        -Dexamples=true
+        -Dcurl=enabled
+        -Dzlib=enabled
+        -Dlz4=enabled
+        -Dlzma=enabled
+        -Dzstd=enabled
+        -Dthreads=enabled
+        -Dfuse-old=disabled
+        -Dtest=true
+        -Ddoc=false
+    - name: test
+      run: |
+         ninja -C build test
+
+  test-alpine:
+    needs:
+    - format-check
+    runs-on: tox-alpine-pod
+    steps:
+    - run: >
+        sudo apk add --no-cache
+        meson
+        squashfs-tools
+        build-base
+        curl-dev
+        fuse-dev
+        lz4-dev
+        xz-dev
+        zlib-dev
+        zstd-dev
+    - uses: actions/checkout@v4
+    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+    - name: configure
+      run: >
+        CC=gcc meson setup build
+        -Dwerror=true
+        -Dexamples=true
+        -Dcurl=enabled
+        -Dzlib=enabled
+        -Dlz4=enabled
+        -Dlzma=enabled
+        -Dzstd=enabled
+        -Dthreads=enabled
+        -Dfuse-old=enabled
+        -Dtest=true
+        -Ddoc=false
+    - name: test
+      run: |
+         ninja -C build test
