@@ -29,6 +29,7 @@ done
 
 [ -e "$tmp/image" ] && rm "$tmp/image"
 $MKSQUASHFS "$tmp/empty" "$tmp/image" \
+	-xattrs-exclude security.selinux \
 	-pf "$tmp/pf" \
 	-noappend \
 	-nopad \

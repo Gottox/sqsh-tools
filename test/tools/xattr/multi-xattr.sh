@@ -13,7 +13,7 @@ esac
 : "${SOURCE_ROOT:?SOURCE_ROOT is not set}"
 : "${SQSH_XATTR:?SQSH_XATTR is not set}"
 
-MKSQUASHFS_OPTS="-noappend -all-root -mkfs-time 0"
+MKSQUASHFS_OPTS="-noappend -all-root -mkfs-time 0 -xattrs-exclude security.selinux"
 
 WORK_DIR="$BUILD_DIR/xattr"
 
