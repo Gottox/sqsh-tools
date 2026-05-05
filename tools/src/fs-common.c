@@ -39,6 +39,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifndef ENODATA
+// On OpenBSD ENODATA is not defined, so lets return ENOATTR instead.
+#	define ENODATA ENOATTR
+#endif
+
 #define SQSHFS_OPT(t, p, v) {t, offsetof(struct SqshfsOptions, p), v}
 struct fuse_opt fs_common_opts[] = {
 		SQSHFS_OPT("archive=%s", archive, 0),

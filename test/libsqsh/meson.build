@@ -56,6 +56,7 @@ elif cc.get_id() == 'clang'
 endif
 
 mksquashfs = find_program('mksquashfs')
+hexdump = find_program('hexdump')
 integration_create = files('integration_create.sh')
 squashfs = custom_target(
     'squashfs.image',
@@ -72,6 +73,9 @@ squashfs_h = custom_target(
     input: squashfs,
     output: 'squashfs_image.c',
     command: [f2h, 'squashfs_image', '@INPUT@', '@OUTPUT@'],
+    env: {
+        'HEXDUMP': hexdump.full_path(),
+    },
 )
 sqsh_extra_source += {
     'integration.c': squashfs_h,

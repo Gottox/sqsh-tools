@@ -87,8 +87,9 @@ const uint8_t *sqsh_trailing_data(const struct SqshTrailingContext *context);
  *
  * @return The inode reference on success, 0 on error.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_inode_map_get2() "
-						  "instead."))) SQSH_NO_UNUSED uint64_t
+__attribute__((deprecated(
+		"Since 1.2.0. Use sqsh_inode_map_get2() "
+		"instead."))) SQSH_NO_UNUSED uint64_t
 sqsh_inode_map_get(const struct SqshInodeMap *map, uint64_t inode_number);
 
 /**
@@ -116,8 +117,9 @@ SQSH_NO_UNUSED uint64_t sqsh_inode_map_get2(
  *
  * @return 0 on success, a negative value on error.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_inode_map_set2() "
-						  "instead."))) SQSH_NO_UNUSED int
+__attribute__((deprecated(
+		"Since 1.2.0. Use sqsh_inode_map_set2() "
+		"instead."))) SQSH_NO_UNUSED int
 sqsh_inode_map_set(
 		struct SqshInodeMap *map, uint64_t inode_number, uint64_t inode_ref);
 
@@ -438,9 +440,9 @@ struct SqshConfig {
 	 * -1, the LRU will be disabled.
 	 */
 #ifndef SQSH__NO_DEPRECATED_FIELD
-	__attribute__((
-			deprecated("Since 1.5.0. data_lru_size or metablock_lru_size "
-					   "instead.")))
+	__attribute__((deprecated(
+			"Since 1.5.0. data_lru_size or metablock_lru_size "
+			"instead.")))
 #endif
 	int compression_lru_size;
 

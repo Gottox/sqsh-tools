@@ -558,9 +558,9 @@ uint32_t sqsh_file_directory_block_start(const struct SqshFile *context);
  *
  * @return the directory block offset.
  */
-__attribute__((
-		deprecated("Since 1.3.0. Use sqsh_file_directory_block_offset2() "
-				   "instead."))) uint32_t
+__attribute__((deprecated(
+		"Since 1.3.0. Use sqsh_file_directory_block_offset2() "
+		"instead."))) uint32_t
 sqsh_file_directory_block_offset(const struct SqshFile *context);
 
 /**

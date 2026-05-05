@@ -96,8 +96,9 @@ SQSH_NO_UNUSED int sqsh_directory_iterator_lookup(
  *
  * @return The size of the name on success, a negative value on error.
  */
-__attribute__((deprecated("Since 1.3.0. Use sqsh_directory_iterator_name2() "
-						  "instead"))) uint16_t
+__attribute__((deprecated(
+		"Since 1.3.0. Use sqsh_directory_iterator_name2() "
+		"instead"))) uint16_t
 sqsh_directory_iterator_name_size(const struct SqshDirectoryIterator *iterator);
 
 /**
@@ -120,8 +121,9 @@ sqsh_directory_iterator_inode(const struct SqshDirectoryIterator *iterator);
  *
  * @return The inode number.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_directory_iterator_inode() "
-						  "instead"))) uint64_t
+__attribute__((deprecated(
+		"Since 1.2.0. Use sqsh_directory_iterator_inode() "
+		"instead"))) uint64_t
 sqsh_directory_iterator_inode_number(
 		const struct SqshDirectoryIterator *iterator);
 /**
@@ -189,8 +191,9 @@ const char *sqsh_directory_iterator_name2(
  *
  * @return The name of the current entry.
  */
-__attribute__((deprecated("Since 1.3.0. Use sqsh_directory_iterator_inode() "
-						  "instead"))) const char *
+__attribute__((deprecated(
+		"Since 1.3.0. Use sqsh_directory_iterator_inode() "
+		"instead"))) const char *
 sqsh_directory_iterator_name(const struct SqshDirectoryIterator *iterator);
 
 /**

@@ -23,7 +23,7 @@ cd "$WORK_DIR"
 # Create a 5 GiB sparse file and append 100 random bytes so that
 # mksquashfs stores the trailing part as a fragment. This triggers the
 # has-fragment code path in sqsh_file_block_count2().
-truncate -s 5G "$PWD/largefile"
+dd if=/dev/null of="$PWD/largefile" bs=1 seek=5G
 dd if=/dev/urandom bs=100 count=1 >> "$PWD/largefile" 2>/dev/null
 
 $MKSQUASHFS "$PWD/largefile" "$PWD/large-file.squashfs" \

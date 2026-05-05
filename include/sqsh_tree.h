@@ -253,8 +253,9 @@ struct SqshTreeWalker;
  *
  * @return a new file reader.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_new() "
-						  "instead."))) struct SqshTreeWalker *
+__attribute__((deprecated(
+		"Since 1.2.0. Use sqsh_path_resolver_new() "
+		"instead."))) struct SqshTreeWalker *
 sqsh_tree_walker_new(struct SqshArchive *archive, int *err);
 
 /**
@@ -266,8 +267,9 @@ sqsh_tree_walker_new(struct SqshArchive *archive, int *err);
  *
  * @return 0 on success, less than 0 on error.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_up() "
-						  "instead."))) SQSH_NO_UNUSED int
+__attribute__((deprecated(
+		"Since 1.2.0. Use sqsh_path_resolver_up() "
+		"instead."))) SQSH_NO_UNUSED int
 sqsh_tree_walker_up(struct SqshTreeWalker *walker);
 
 /**
@@ -282,8 +284,9 @@ sqsh_tree_walker_up(struct SqshTreeWalker *walker);
  *
  * @return 0 on success, less than 0 on error.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_next() "
-						  "instead."))) SQSH_NO_UNUSED int
+__attribute__((deprecated(
+		"Since 1.2.0. Use sqsh_path_resolver_next() "
+		"instead."))) SQSH_NO_UNUSED int
 sqsh_tree_walker_next(struct SqshTreeWalker *walker);
 
 /**
@@ -295,8 +298,9 @@ sqsh_tree_walker_next(struct SqshTreeWalker *walker);
  *
  * @return the inode type of the current entry.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_type() "
-						  "instead."))) enum SqshFileType
+__attribute__((deprecated(
+		"Since 1.2.0. Use sqsh_path_resolver_type() "
+		"instead."))) enum SqshFileType
 sqsh_tree_walker_type(const struct SqshTreeWalker *walker);
 
 /**
@@ -309,8 +313,9 @@ sqsh_tree_walker_type(const struct SqshTreeWalker *walker);
  *
  * @return the name of the current entry.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_name() "
-						  "instead."))) const char *
+__attribute__((deprecated(
+		"Since 1.2.0. Use sqsh_path_resolver_name() "
+		"instead."))) const char *
 sqsh_tree_walker_name(const struct SqshTreeWalker *walker);
 
 /**
@@ -322,8 +327,9 @@ sqsh_tree_walker_name(const struct SqshTreeWalker *walker);
  *
  * @return the size of the name of the current entry.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_name_size() "
-						  "instead."))) uint16_t
+__attribute__((deprecated(
+		"Since 1.2.0. Use sqsh_path_resolver_name_size() "
+		"instead."))) uint16_t
 sqsh_tree_walker_name_size(const struct SqshTreeWalker *walker);
 
 /**
@@ -339,8 +345,9 @@ sqsh_tree_walker_name_size(const struct SqshTreeWalker *walker);
  *
  * @return the name of the current entry.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_name_dup() "
-						  "instead."))) SQSH_NO_UNUSED char *
+__attribute__((deprecated(
+		"Since 1.2.0. Use sqsh_path_resolver_name_dup() "
+		"instead."))) SQSH_NO_UNUSED char *
 sqsh_tree_walker_name_dup(const struct SqshTreeWalker *walker);
 
 /**
@@ -352,8 +359,9 @@ sqsh_tree_walker_name_dup(const struct SqshTreeWalker *walker);
  *
  * @return 0 on success, less than 0 on error.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_revert() "
-						  "instead."))) SQSH_NO_UNUSED int
+__attribute__((deprecated(
+		"Since 1.2.0. Use sqsh_path_resolver_revert() "
+		"instead."))) SQSH_NO_UNUSED int
 sqsh_tree_walker_revert(struct SqshTreeWalker *walker);
 
 /**
@@ -367,8 +375,9 @@ sqsh_tree_walker_revert(struct SqshTreeWalker *walker);
  *
  * @return 0 on success, less than 0 on error.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_lookup() "
-						  "instead."))) SQSH_NO_UNUSED int
+__attribute__((deprecated(
+		"Since 1.2.0. Use sqsh_path_resolver_lookup() "
+		"instead."))) SQSH_NO_UNUSED int
 sqsh_tree_walker_lookup(
 		struct SqshTreeWalker *walker, const char *name,
 		const size_t name_size);
@@ -382,8 +391,9 @@ sqsh_tree_walker_lookup(
  *
  * @return 0 on success, less than 0 on error.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_down() "
-						  "instead."))) SQSH_NO_UNUSED int
+__attribute__((deprecated(
+		"Since 1.2.0. Use sqsh_path_resolver_down() "
+		"instead."))) SQSH_NO_UNUSED int
 sqsh_tree_walker_down(struct SqshTreeWalker *walker);
 
 /**
@@ -395,8 +405,9 @@ sqsh_tree_walker_down(struct SqshTreeWalker *walker);
  *
  * @return 0 on success, less than 0 on error.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_to_root() "
-						  "instead."))) SQSH_NO_UNUSED int
+__attribute__((deprecated(
+		"Since 1.2.0. Use sqsh_path_resolver_to_root() "
+		"instead."))) SQSH_NO_UNUSED int
 sqsh_tree_walker_to_root(struct SqshTreeWalker *walker);
 
 /**
@@ -409,8 +420,9 @@ sqsh_tree_walker_to_root(struct SqshTreeWalker *walker);
  *
  * @return the inode of the current entry.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_open_file() "
-						  "instead."))) SQSH_NO_UNUSED struct SqshFile *
+__attribute__((deprecated(
+		"Since 1.2.0. Use sqsh_path_resolver_open_file() "
+		"instead."))) SQSH_NO_UNUSED struct SqshFile *
 sqsh_tree_walker_open_file(const struct SqshTreeWalker *walker, int *err);
 
 /**
@@ -427,8 +439,9 @@ sqsh_tree_walker_open_file(const struct SqshTreeWalker *walker, int *err);
  *
  * @return the inode of the current entry.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_resolve() "
-						  "instead."))) SQSH_NO_UNUSED int
+__attribute__((deprecated(
+		"Since 1.2.0. Use sqsh_path_resolver_resolve() "
+		"instead."))) SQSH_NO_UNUSED int
 sqsh_tree_walker_resolve(
 		struct SqshTreeWalker *walker, const char *path, bool follow_symlinks);
 
@@ -441,8 +454,9 @@ sqsh_tree_walker_resolve(
  *
  * @return 0 on success, less than 0 on error.
  */
-__attribute__((deprecated("Since 1.2.0. Use sqsh_path_resolver_free() "
-						  "instead."))) int
+__attribute__((deprecated(
+		"Since 1.2.0. Use sqsh_path_resolver_free() "
+		"instead."))) int
 sqsh_tree_walker_free(struct SqshTreeWalker *reader);
 
 /***************************************
