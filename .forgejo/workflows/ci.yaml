@@ -82,6 +82,9 @@ jobs:
     needs:
     - format-check
     runs-on: tox-alpine-pod
+    strategy:
+      matrix:
+        cc: [gcc, clang]
     steps:
     - run: |
         sudo apk add --no-cache \
@@ -95,11 +98,13 @@ jobs:
           xz-dev \
           zlib-dev \
           zstd-dev \
+          gcc \
+          clang \
         && :
     - uses: actions/checkout@v4
     - name: configure
       run: |
-        CC=gcc meson setup build \
+        CC=${{ matrix.cc }} meson setup build \
           -Dwerror=true \
           -Dexamples=true \
           -Dcurl=enabled \
