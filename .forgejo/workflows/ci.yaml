@@ -157,3 +157,45 @@ jobs:
     - name: test
       # fuse needs root privileges on OpenBSD
       run: sudo ninja -C build test
+
+  test-freebsd:
+    needs:
+    - format-check
+    runs-on: tox-freebsd-vm
+    steps:
+    - run: |
+        sudo pkg install -y \
+          pkgconf \
+          fusefs-libs \
+          lzo2 \
+          liblz4 \
+          zstd \
+          meson \
+          git \
+          squashfs-tools \
+          coreutils \
+        && :
+    - run: |
+        sudo kldload fusefs
+        sudo sysctl vfs.usermount=1
+    - uses: actions/checkout@v4
+    - name: configure
+      run: |
+        CC=clang meson setup build \
+          -Dwerror=true \
+          -Dexamples=true \
+          -Dcurl=enabled \
+          -Dzlib=enabled \
+          -Dlz4=enabled \
+          -Dlzma=enabled \
+          -Dzstd=enabled \
+          -Dfuse-old=enabled \
+          -Dfuse=disabled \
+          -Dtest=extended \
+          -Ddoc=false \
+        && :
+    - name: build
+      run: ninja -C build all
+    - name: test
+      # fuse needs root privileges on OpenBSD
+      run: sudo ninja -C build test
