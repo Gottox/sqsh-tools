@@ -21,6 +21,9 @@ if [ `uname` != "OpenBSD" ] && [ `uname` != "FreeBSD" ]; then
 "a" x user.foo=1234567891234567891234567890001234567890
 "b" x user.bar=1234567891234567891234567890001234567890
 EOF
+	MKSQUASHFS_OPTS=" -xattrs-exclude security.selinux"
+else
+	MKSQUASHFS_OPTS=""
 fi
 
 for i in $(seq 1 1000); do
@@ -28,10 +31,6 @@ for i in $(seq 1 1000); do
 done
 
 [ -e "$tmp/image" ] && rm "$tmp/image"
-case "$(uname -s)" in
-	OpenBSD) MKSQUASHFS_OPTS="" ;;
-	*) MKSQUASHFS_OPTS=" -xattrs-exclude security.selinux" ;;
-esac
 
 #shellcheck disable=SC2086
 $MKSQUASHFS "$tmp/empty" "$tmp/image" \
