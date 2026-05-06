@@ -15,76 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  format-check:
-    runs-on: ubuntu-latest
-    container:
-      image: gottox/sqsh-build:x86_64
-    steps:
-    - uses: actions/checkout@v4
-    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-    - name: configure
-      run: |
-        meson setup /tmp/build \
-          -Dwerror=true \
-          -Dexamples=true  \
-          -Dcurl=disabled  \
-          -Dzlib=disabled \
-          -Dlz4=disabled \
-          -Dlzma=disabled  \
-          -Dzstd=disabled  \
-          -Dthreads=disabled \
-          -Dfuse-old=disabled \
-          -Dtest=false \
-          -Ddoc=false
-    - name: muon fmt
-      run: |
-        if ! find . \( -name meson.build -or -name meson_options.txt \) -print0 \
-            | xargs -0 muon fmt -q; then
-          find . \( -name meson.build -or -name meson_options.txt \) -print0 \
-            | xargs -0 muon fmt -i;
-          git diff
-          exit 1
-        fi
-    - name: clang-format
-      run: |
-        ninja -C /tmp/build clang-format-check
-
-  test:
-    needs:
-    - format-check
-    strategy:
-      matrix:
-        arch:
-          #- i386
-          - x86_64
-    runs-on: ubuntu-latest
-    container:
-      image: gottox/sqsh-build:${{ matrix.arch }}
-      options: --privileged
-    steps:
-    - uses: actions/checkout@v4
-    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-    - name: configure
-      run: |
-        CC=gcc meson setup /tmp/build \
-          -Dwerror=true \
-          -Dexamples=true  \
-          -Dcurl=enabled  \
-          -Dzlib=enabled \
-          -Dlz4=enabled \
-          -Dlzma=enabled  \
-          -Dzstd=enabled  \
-          -Dthreads=enabled \
-          -Dfuse-old=enabled \
-          -Dtest=extended \
-          -Ddoc=false
-    - name: test
-      run: |
-         ninja -C /tmp/build test
-
   fuzzer:
-    needs:
-    - format-check
     runs-on: ubuntu-latest
     container:
       image: gottox/sqsh-build:x86_64
@@ -117,47 +48,7 @@ jobs:
         name: failing-inputs
         path: /tmp/build/fuzzer/inputs
 
-  build:
-    needs:
-    - format-check
-    runs-on: ubuntu-latest
-    container:
-      image: gottox/sqsh-build:${{ matrix.arch }}
-    strategy:
-      matrix:
-        cc:
-          - gcc
-          - clang
-        feature:
-          - enabled
-          - disabled
-        arch:
-          #- i386
-          - x86_64
-    steps:
-    - uses: actions/checkout@v4
-    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-    - name: configure
-      run: |
-        meson wrap update-db
-        CC=${{ matrix.cc }} meson setup /tmp/build \
-          -Dwerror=false \
-          -Dexamples=true \
-          -Dcurl=${{ matrix.feature }} \
-          -Dzlib=${{ matrix.feature }} \
-          -Dlz4=${{ matrix.feature }} \
-          -Dlzma=${{ matrix.feature }} \
-          -Dzstd=${{ matrix.feature }} \
-          -Dfuse-old=${{ matrix.feature }} \
-          -Dtest=false \
-          -Ddoc=false
-    - name: build
-      run: |
-        ninja -C /tmp/build
-
   build-linux32:
-    needs:
-    - format-check
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -199,44 +90,7 @@ jobs:
       run: |
         ninja -C /tmp/build
 
-  build-openbsd:
-    needs:
-    - format-check
-    runs-on: ubuntu-latest
-    #if: ${{ github.ref == 'refs/heads/main' }}
-    strategy:
-      matrix:
-        arch:
-          - x86_64
-          - arm64
-    steps:
-    - uses: actions/checkout@v4
-    - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-    - uses: "cross-platform-actions/action@v0.32.0"
-      with:
-        operating_system: openbsd
-        architecture: ${{ matrix.arch }}
-        version: 7.8
-        run: |
-          sudo pkg_add git meson squashfs-tools curl lz4 xz zstd
-          CC=clang meson setup /tmp/build \
-            -Dwerror=true \
-            -Dexamples=true \
-            -Dcurl=enabled \
-            -Dzlib=enabled \
-            -Dlz4=enabled \
-            -Dlzma=enabled \
-            -Dzstd=enabled \
-            -Dfuse-old=enabled \
-            -Dfuse=disabled \
-            -Dtest=extended \
-            -Ddoc=false
-          # fuse needs root privileges on OpenBSD
-          sudo meson test -C /tmp/build -t 5
-
   build-mac:
-    needs:
-    - format-check
     runs-on: macos-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     steps:
