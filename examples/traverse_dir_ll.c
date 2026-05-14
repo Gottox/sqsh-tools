@@ -59,7 +59,7 @@ main(int argc, char *argv[]) {
 		size_t depth = sqsh_tree_traversal_depth(traversal);
 		size_t segment_size;
 		const char *segment;
-		for (sqsh_index_t i = 0; i < depth; i++) {
+		for (size_t i = 0; i < depth; i++) {
 			segment = sqsh_tree_traversal_path_segment(
 					traversal, &segment_size, i);
 			fputc('/', stdout);

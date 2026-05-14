@@ -49,7 +49,7 @@ static int path_resolve(
 
 static size_t
 path_segment_len(const char *path, size_t path_len) {
-	sqsh_index_t len = 0;
+	size_t len = 0;
 	for (; len < path_len && path[len] != '/'; len++) {
 	}
 	return len;
@@ -57,7 +57,7 @@ path_segment_len(const char *path, size_t path_len) {
 
 static const char *
 path_next_segment(const char *path, size_t path_len) {
-	sqsh_index_t current_segment_len = path_segment_len(path, path_len);
+	size_t current_segment_len = path_segment_len(path, path_len);
 	if (current_segment_len == path_len) {
 		return NULL;
 	} else {

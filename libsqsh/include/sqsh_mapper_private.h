@@ -228,7 +228,7 @@ sqsh__map_manager_block_size(const struct SqshMapManager *manager);
  * @return Returns 0 on success, a negative value on error.
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__map_manager_get(
-		struct SqshMapManager *manager, sqsh_index_t index,
+		struct SqshMapManager *manager, size_t index,
 		const struct SqshMapSlice **target);
 
 /**
@@ -282,7 +282,7 @@ struct SqshMapIterator {
 	const struct SqshMapSlice *mapping;
 	const uint8_t *data;
 	size_t size;
-	sqsh_index_t next_index;
+	size_t next_index;
 	uint64_t segment_count;
 };
 

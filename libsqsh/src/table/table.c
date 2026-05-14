@@ -43,7 +43,7 @@
 typedef const __attribute__((aligned(1))) uint64_t unaligned_uint64_t;
 
 static uint64_t
-lookup_table_get(const struct SqshTable *table, sqsh_index_t index) {
+lookup_table_get(const struct SqshTable *table, size_t index) {
 	unaligned_uint64_t *lookup_table =
 			(unaligned_uint64_t *)sqsh__map_reader_data(&table->lookup_table);
 
@@ -104,8 +104,7 @@ out:
 }
 
 int
-sqsh_table_get(
-		const struct SqshTable *table, sqsh_index_t index, void *target) {
+sqsh_table_get(const struct SqshTable *table, size_t index, void *target) {
 	int rv = 0;
 	struct SqshArchive *sqsh = table->sqsh;
 	struct SqshMetablockReader metablock = {0};
@@ -116,8 +115,7 @@ sqsh_table_get(
 	} else if (SQSH_MULT_OVERFLOW(index, table->element_size, &byte_offset)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
-	sqsh_index_t lookup_index =
-			(sqsh_index_t)(byte_offset / SQSH_METABLOCK_BLOCK_SIZE);
+	size_t lookup_index = (size_t)(byte_offset / SQSH_METABLOCK_BLOCK_SIZE);
 	if (lookup_index >= lookup_table_bytes / sizeof(uint64_t)) {
 		return -SQSH_ERROR_OUT_OF_BOUNDS;
 	}

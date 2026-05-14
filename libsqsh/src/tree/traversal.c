@@ -260,8 +260,7 @@ sqsh_tree_traversal_name(
 
 const char *
 sqsh_tree_traversal_path_segment(
-		const struct SqshTreeTraversal *traversal, size_t *len,
-		sqsh_index_t index) {
+		const struct SqshTreeTraversal *traversal, size_t *len, size_t index) {
 	if (traversal->current_iterator == NULL) {
 		*len = 0;
 		return "";

@@ -64,9 +64,11 @@ extern "C" {
 #define SQSH_NO_EXPORT __attribute__((visibility("hidden")))
 
 /**
+ * @deprecated Since 1.6.0. Use size_t instead.
  * @brief typedef used for indexing
  */
-typedef size_t sqsh_index_t;
+__attribute__((deprecated(
+		"Since 1.6.0. Use size_t instead."))) typedef size_t sqsh_index_t;
 
 #ifdef __cplusplus
 }

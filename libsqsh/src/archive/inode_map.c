@@ -139,9 +139,9 @@ dyn_map_get(const struct SqshInodeMap *map, uint32_t inode_number, int *err) {
 		goto out;
 	}
 
-	sqsh_index_t index = inode_number - 1;
-	sqsh_index_t inner_index = index & 0xff;
-	sqsh_index_t outer_index = index >> 8;
+	size_t index = inode_number - 1;
+	size_t inner_index = index & 0xff;
+	size_t outer_index = index >> 8;
 
 	uint_fast64_t *inner_inode_refs =
 			cx_hash_map_get(&map->inode_refs, outer_index);
@@ -180,9 +180,9 @@ dyn_map_set(
 		goto out;
 	}
 
-	sqsh_index_t index = inode_number - 1;
-	sqsh_index_t inner_index = index & 0xff;
-	sqsh_index_t outer_index = index >> 8;
+	size_t index = inode_number - 1;
+	size_t inner_index = index & 0xff;
+	size_t outer_index = index >> 8;
 
 	uint_fast64_t *inner_inode_refs =
 			cx_hash_map_get(&map->inode_refs, outer_index);

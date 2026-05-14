@@ -56,8 +56,7 @@ struct SqshTable;
  *
  * @return 0 on success, a negative value on error.
  */
-int
-sqsh_table_get(const struct SqshTable *table, sqsh_index_t index, void *target);
+int sqsh_table_get(const struct SqshTable *table, size_t index, void *target);
 
 /***************************************
  * table/id_table.c
@@ -75,8 +74,8 @@ struct SqshIdTable;
  *
  * @return 0 on success, a negative value on error.
  */
-int sqsh_id_table_get(
-		const struct SqshIdTable *table, sqsh_index_t index, uint32_t *id);
+int
+sqsh_id_table_get(const struct SqshIdTable *table, size_t index, uint32_t *id);
 
 /***************************************
  * table/export_table.c

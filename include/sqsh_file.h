@@ -80,7 +80,7 @@ sqsh_file_reader_new(const struct SqshFile *file, int *err);
 __attribute__((deprecated(
 		"Since 1.5.0. Use sqsh_file_reader_advance2() instead."))) int
 sqsh_file_reader_advance(
-		struct SqshFileReader *reader, sqsh_index_t offset, size_t size);
+		struct SqshFileReader *reader, size_t offset, size_t size);
 
 /**
  * @brief Advances the file reader by a certain amount of data and presents
@@ -210,8 +210,7 @@ __attribute__((
 		deprecated("Since 1.5.0. Use sqsh_file_iterator_skip2() instead.")))
 SQSH_NO_UNUSED int
 sqsh_file_iterator_skip(
-		struct SqshFileIterator *iterator, sqsh_index_t *offset,
-		size_t desired_size);
+		struct SqshFileIterator *iterator, size_t *offset, size_t desired_size);
 
 /**
  * @memberof SqshFileIterator

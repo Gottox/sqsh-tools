@@ -36,6 +36,7 @@
 #include <cextras/collection.h>
 #include <sqsh_archive.h>
 #include <sqsh_error.h>
+#include <string.h>
 
 // sqsh__impl_lzo needs to be declared `volatile`. Otherwise when compiled with
 // `-O2` this value might get inlined which breaks a) the the tests and b) the
@@ -68,13 +69,13 @@ sqsh__extractor_init(
 		struct SqshExtractor *extractor, struct CxBuffer *buffer,
 		const struct SqshExtractorImpl *impl, size_t block_size) {
 	int rv = 0;
+	memset(extractor, 0, sizeof(*extractor));
+	extractor->block_size = block_size;
+	extractor->buffer = buffer;
 	if (impl == NULL) {
 		rv = -SQSH_ERROR_COMPRESSION_UNSUPPORTED;
 		goto out;
 	}
-	extractor->impl = impl;
-	extractor->block_size = block_size;
-	extractor->buffer = buffer;
 	rv = cx_buffer_add_capacity(buffer, &extractor->target, block_size);
 	if (rv < 0) {
 		goto out;
@@ -84,8 +85,12 @@ sqsh__extractor_init(
 	if (rv < 0) {
 		goto out;
 	}
+	extractor->impl = impl;
 
 out:
+	if (rv < 0) {
+		sqsh__extractor_cleanup(extractor);
+	}
 	return rv;
 }
 
@@ -116,6 +121,7 @@ sqsh__extractor_finish(struct SqshExtractor *extractor) {
 		rv = -SQSH_ERROR_COMPRESSION_FINISHED;
 		goto out;
 	}
+	extractor->impl = NULL;
 
 	rv = impl->finish(context, extractor->target, &size);
 	if (rv < 0) {
@@ -126,7 +132,6 @@ sqsh__extractor_finish(struct SqshExtractor *extractor) {
 	if (rv < 0) {
 		goto out;
 	}
-	extractor->impl = NULL;
 out:
 	return rv;
 }
@@ -136,13 +141,10 @@ sqsh__extractor_cleanup(struct SqshExtractor *extractor) {
 	const struct SqshExtractorImpl *impl = extractor->impl;
 	sqsh__extractor_context_t *context = &extractor->context;
 	int rv = 0;
-	// Make sure we cleanup the compressor in an error case.
 	if (extractor->impl != NULL) {
 		size_t dummy_size = 0;
 		rv = impl->finish(context, extractor->target, &dummy_size);
 	}
-	extractor->impl = NULL;
-	extractor->block_size = 0;
-	extractor->buffer = NULL;
+	memset(extractor, 0, sizeof(*extractor));
 	return rv;
 }
