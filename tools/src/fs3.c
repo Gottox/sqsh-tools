@@ -410,73 +410,40 @@ out:
 
 static void
 fs_listxattr(fuse_req_t req, fuse_ino_t ino, size_t size) {
-	(void)req;
-	(void)ino;
-	(void)size;
 	int rv = 0;
 	struct SqshFile *file = NULL;
-	struct SqshXattrIterator *iterator = NULL;
-	const char *prefix, *name = NULL;
-	size_t buf_size = 0;
-	char *p;
-	char *buf = calloc(size, sizeof(*buf));
-	if (buf == NULL) {
-		fuse_reply_err(req, ENOMEM);
-		goto out;
-	}
+	char *buf = NULL;
 
 	file = fs_file_open(ino, &rv);
 	if (rv < 0) {
-		fuse_reply_err(req, EIO);
 		goto out;
 	}
 
-	iterator = sqsh_xattr_iterator_new(file, &rv);
-	if (rv < 0) {
-		fuse_reply_err(req, EIO);
-		goto out;
-	}
-
-	p = buf;
-	while (sqsh_xattr_iterator_next(iterator, &rv)) {
-		prefix = sqsh_xattr_iterator_prefix(iterator);
-		if (prefix == NULL) {
-			fuse_reply_err(req, EIO);
-			goto out;
-		}
-		name = sqsh_xattr_iterator_name(iterator);
-		if (name == NULL) {
-			fuse_reply_err(req, EIO);
-			goto out;
-		}
-
-		size_t prefix_size = sqsh_xattr_iterator_prefix_size(iterator);
-		buf_size += prefix_size;
-		if (buf_size < size) {
-			memcpy(p, prefix, prefix_size);
-			p = &buf[buf_size];
-		}
-
-		size_t name_size = sqsh_xattr_iterator_name_size(iterator);
-		buf_size += name_size + 1;
-		if (buf_size < size) {
-			memcpy(p, name, name_size);
-			p[name_size] = '\0';
-			p = &buf[buf_size];
-		}
-	}
-	if (rv < 0) {
-		fuse_reply_err(req, EIO);
-		goto out;
-	}
 	if (size == 0) {
-		fuse_reply_xattr(req, buf_size);
+		rv = fs_common_listxattr_size(file, &size);
+		if (rv < 0) {
+			goto out;
+		}
+		fuse_reply_xattr(req, size);
+		goto out;
 	} else {
-		fuse_reply_buf(req, buf, buf_size);
+		buf = calloc(size, sizeof(*buf));
+		if (buf == NULL) {
+			rv = -SQSH_ERROR_MALLOC_FAILED;
+			goto out;
+		}
+		rv = fs_common_listxattr(file, buf, &size);
+		if (rv < 0) {
+			goto out;
+		}
+		fuse_reply_buf(req, buf, size);
 	}
+
 out:
+	if (rv < 0) {
+		fuse_reply_err(req, EIO);
+	}
 	free(buf);
-	sqsh_xattr_iterator_free(iterator);
 	sqsh_close(file);
 }
 

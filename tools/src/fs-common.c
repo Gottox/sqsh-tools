@@ -186,3 +186,76 @@ fs_common_getattr(
 		st->st_blksize = sqsh_superblock_block_size(superblock);
 	}
 }
+
+int
+fs_common_listxattr_size(struct SqshFile *file, size_t *size) {
+	int rv = 0;
+	struct SqshXattrIterator *iterator = NULL;
+
+	iterator = sqsh_xattr_iterator_new(file, &rv);
+	if (rv < 0) {
+		goto out;
+	}
+
+	*size = 0;
+	while (sqsh_xattr_iterator_next(iterator, &rv)) {
+		const size_t prefix_size = sqsh_xattr_iterator_prefix_size(iterator);
+		const size_t name_size = sqsh_xattr_iterator_name_size(iterator);
+		const size_t xattr_size = prefix_size + name_size + 1;
+
+		if (SQSH_ADD_OVERFLOW(*size, xattr_size, size)) {
+			rv = -SQSH_ERROR_INTEGER_OVERFLOW;
+			goto out;
+		}
+	}
+	if (rv < 0) {
+		goto out;
+	}
+
+out:
+	sqsh_xattr_iterator_free(iterator);
+	return rv;
+}
+
+int
+fs_common_listxattr(struct SqshFile *file, char *buf, size_t *size) {
+	int rv = 0;
+	int pos = 0;
+	struct SqshXattrIterator *iterator = NULL;
+
+	iterator = sqsh_xattr_iterator_new(file, &rv);
+	if (rv < 0) {
+		goto out;
+	}
+
+	while (sqsh_xattr_iterator_next(iterator, &rv) > 0) {
+		const char *prefix = sqsh_xattr_iterator_prefix(iterator);
+		const char *name = sqsh_xattr_iterator_name(iterator);
+		size_t prefix_len = sqsh_xattr_iterator_prefix_size(iterator);
+		size_t name_len = sqsh_xattr_iterator_name_size(iterator);
+		size_t new_pos;
+
+		if (SQSH_ADD_OVERFLOW(pos, prefix_len + name_len + 1, &new_pos)) {
+			rv = -ERANGE;
+			goto out;
+		}
+		if (new_pos > *size) {
+			rv = -ERANGE;
+			goto out;
+		}
+		memcpy(&buf[pos], prefix, prefix_len);
+		pos += prefix_len;
+		memcpy(&buf[pos], name, name_len);
+		pos += name_len;
+		buf[pos] = '\0';
+		pos = new_pos;
+	}
+	if (rv < 0) {
+		goto out;
+	}
+
+	*size = pos;
+out:
+	sqsh_xattr_iterator_free(iterator);
+	return rv;
+}

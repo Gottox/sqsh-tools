@@ -82,4 +82,8 @@ void fs_common_getattr(
 		struct SqshFile *file, const struct SqshSuperblock *superblock,
 		struct stat *st);
 
+int fs_common_listxattr_size(struct SqshFile *file, size_t *size);
+
+int fs_common_listxattr(struct SqshFile *file, char *buf, size_t *size);
+
 #endif /* SQSHTOOLS_FS_COMMON_H */

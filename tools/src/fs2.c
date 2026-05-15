@@ -38,6 +38,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <fuse.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -237,39 +238,31 @@ out:
 static int
 fs_listxattr(const char *path, char *buf, size_t size) {
 	int rv = 0;
-	int pos = 0;
-	struct SqshXattrIterator *iterator = NULL;
 
 	struct SqshFile *file = fs_file_open(path, &rv);
 	if (rv < 0) {
 		goto out;
 	}
 
-	iterator = sqsh_xattr_iterator_new(file, &rv);
-	while (sqsh_xattr_iterator_next(iterator, &rv) > 0) {
-		const char *prefix = sqsh_xattr_iterator_prefix(iterator);
-		size_t prefix_len = sqsh_xattr_iterator_prefix_size(iterator);
-		const char *name = sqsh_xattr_iterator_name(iterator);
-		size_t name_len = sqsh_xattr_iterator_name_size(iterator);
-		if (pos + name_len + prefix_len + 1 > size) {
-			rv = -ERANGE;
-			goto out;
-		}
-		memcpy(&buf[pos], prefix, prefix_len);
-		pos += prefix_len;
-		memcpy(&buf[pos], name, name_len);
-		pos += name_len;
-		buf[pos] = '\0';
-		pos++;
+	if (size == 0) {
+		rv = fs_common_listxattr_size(file, &size);
+	} else {
+		rv = fs_common_listxattr(file, buf, &size);
 	}
+
 	if (rv < 0) {
 		goto out;
 	}
-
-	rv = pos;
+	if (size > INT_MAX) {
+		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
+		goto out;
+	}
+	rv = size;
 out:
-	sqsh_xattr_iterator_free(iterator);
 	sqsh_close(file);
+	if (rv < 0) {
+		return -fs_common_map_err(rv);
+	}
 	return rv;
 }
 
