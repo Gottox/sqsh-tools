@@ -87,7 +87,9 @@ sqsh_zstd_decompress(
 
 	while (input.pos < input.size) {
 		size_t rv = ZSTD_decompressStream(ctx->stream, &ctx->output, &input);
-		if (ZSTD_isError(rv)) {
+		if (rv == 0) {
+			break;
+		} else if (ZSTD_isError(rv)) {
 			return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 		}
 	}
