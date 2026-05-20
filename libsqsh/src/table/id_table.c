@@ -45,8 +45,7 @@ sqsh__id_table_init(struct SqshIdTable *table, struct SqshArchive *sqsh) {
 }
 
 int
-sqsh_id_table_get(
-		const struct SqshIdTable *table, sqsh_index_t index, uint32_t *id) {
+sqsh_id_table_get(const struct SqshIdTable *table, size_t index, uint32_t *id) {
 	return sqsh_table_get(&table->table, index, id);
 }
 

@@ -43,7 +43,7 @@ struct SqshLz4Context {
 	LZ4_streamDecode_t *stream;
 	uint8_t *target;
 	size_t target_size;
-	sqsh_index_t offset;
+	size_t offset;
 };
 
 SQSH_STATIC_ASSERT(
@@ -72,7 +72,7 @@ sqsh_lz4_decompress(
 	if (size < 0) {
 		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}
-	ctx->offset += (sqsh_index_t)size;
+	ctx->offset += (size_t)size;
 	return 0;
 }
 

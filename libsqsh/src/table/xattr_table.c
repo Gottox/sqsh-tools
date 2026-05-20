@@ -93,7 +93,7 @@ sqsh__xattr_table_start(struct SqshXattrTable *table) {
 
 int
 sqsh__xattr_table_get(
-		const struct SqshXattrTable *table, sqsh_index_t index,
+		const struct SqshXattrTable *table, size_t index,
 		struct SqshDataXattrLookupTable *target) {
 	return sqsh_table_get(&table->table, index, target);
 }

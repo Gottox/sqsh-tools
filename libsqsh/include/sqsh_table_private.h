@@ -263,7 +263,7 @@ SQSH_NO_EXPORT uint64_t sqsh__xattr_table_start(struct SqshXattrTable *table);
  * @return 0 on success, a negative value on error.
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__xattr_table_get(
-		const struct SqshXattrTable *table, sqsh_index_t index,
+		const struct SqshXattrTable *table, size_t index,
 		struct SqshDataXattrLookupTable *target);
 
 #ifdef __cplusplus

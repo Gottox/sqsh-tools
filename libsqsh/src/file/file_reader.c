@@ -84,7 +84,7 @@ sqsh_file_reader_new(const struct SqshFile *file, int *err) {
 
 int
 sqsh_file_reader_advance(
-		struct SqshFileReader *reader, sqsh_index_t offset, size_t size) {
+		struct SqshFileReader *reader, size_t offset, size_t size) {
 	return sqsh__reader_advance(&reader->reader, offset, size);
 }
 

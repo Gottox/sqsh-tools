@@ -46,7 +46,7 @@ map_cleanup_cb(void *data) {
 SQSH_NO_UNUSED static int
 load_mapping(
 		struct SqshMapSlice *mapping, struct SqshMapManager *manager,
-		sqsh_index_t index) {
+		size_t index) {
 	int rv = 0;
 
 	const size_t block_size = sqsh_mapper_block_size(&manager->mapper);
@@ -133,7 +133,7 @@ sqsh__map_manager_block_size(const struct SqshMapManager *manager) {
 
 int
 sqsh__map_manager_get(
-		struct SqshMapManager *manager, sqsh_index_t index,
+		struct SqshMapManager *manager, size_t index,
 		const struct SqshMapSlice **target) {
 	bool is_locked = false;
 	int rv = 0;

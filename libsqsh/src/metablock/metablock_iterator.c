@@ -172,7 +172,7 @@ sqsh__metablock_iterator_skip(
 			break;
 		}
 
-		sqsh_index_t skip_size;
+		size_t skip_size;
 		if (SQSH_ADD_OVERFLOW(
 					iterator->outer_size, sizeof(struct SqshDataMetablock),
 					&skip_size)) {

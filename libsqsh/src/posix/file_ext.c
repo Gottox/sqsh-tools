@@ -183,7 +183,7 @@ file_iterator_mt(
 	}
 
 	uint64_t block_offset = 0;
-	for (sqsh_index_t i = 0; i < block_count; i++) {
+	for (size_t i = 0; i < block_count; i++) {
 		mt->blocks[i].mt = mt;
 		mt->blocks[i].block_offset = block_offset;
 		rv = cx_threadpool_schedule(

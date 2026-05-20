@@ -640,8 +640,7 @@ size_t sqsh_tree_traversal_depth(const struct SqshTreeTraversal *traversal);
  * @return the inode of the current entry.
  */
 const char *sqsh_tree_traversal_path_segment(
-		const struct SqshTreeTraversal *traversal, size_t *len,
-		sqsh_index_t index);
+		const struct SqshTreeTraversal *traversal, size_t *len, size_t index);
 
 /**
  * @brief Gets the underlying directory iterator pointing to the current entry.

@@ -93,7 +93,7 @@ struct SqshReader {
 	 *
 	 * in this case, the iterator_offset is 6.
 	 */
-	sqsh_index_t iterator_offset;
+	size_t iterator_offset;
 
 	/**
 	 * @brief The offset of mapped data.
@@ -102,7 +102,7 @@ struct SqshReader {
 	 *
 	 * Otherwise is indicates the offset of the data in the iterator.
 	 */
-	sqsh_index_t offset;
+	size_t offset;
 
 	/**
 	 * @brief The buffer to store data in if they cannot be directly mapped.

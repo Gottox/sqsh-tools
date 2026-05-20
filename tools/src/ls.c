@@ -139,7 +139,7 @@ print_detail(const char *path, const struct SqshTreeTraversal *traversal) {
 	print_mode(&buffer[4], mode, S_IRGRP, S_IWGRP, S_IXGRP, S_ISGID, "Ss");
 	print_mode(&buffer[7], mode, S_IROTH, S_IWOTH, S_IXOTH, S_ISVTX, "Tt");
 
-	sqsh_index_t index = 10;
+	size_t index = 10;
 	snprintf(
 			&buffer[index], sizeof(buffer) - index, " %6u %6u %10" PRIu64,
 			sqsh_file_uid(file), sqsh_file_gid(file), sqsh_file_size(file));

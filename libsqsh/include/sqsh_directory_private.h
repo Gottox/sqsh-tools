@@ -59,7 +59,7 @@ struct SqshDirectoryIterator {
 
 	struct SqshMetablockReader metablock;
 	size_t remaining_entries;
-	sqsh_index_t next_offset;
+	size_t next_offset;
 	uint32_t current_inode;
 
 	char *last_dir_name;
@@ -108,7 +108,7 @@ struct SqshDirectoryIndexIterator {
 	 */
 	struct SqshFile file;
 	size_t remaining_entries;
-	sqsh_index_t next_offset;
+	size_t next_offset;
 };
 
 /**

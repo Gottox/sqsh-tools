@@ -134,8 +134,8 @@ reader_fill_buffer(struct SqshReader *reader, size_t size) {
 	void *iterator = reader->iterator;
 	const struct SqshReaderIteratorImpl *impl = reader->iterator_impl;
 	struct CxBuffer *buffer = &reader->buffer;
-	sqsh_index_t offset = reader->offset;
-	sqsh_index_t iterator_offset = reader->iterator_offset;
+	size_t offset = reader->offset;
+	size_t iterator_offset = reader->iterator_offset;
 
 	size_t remaining_size = size - cx_buffer_size(buffer);
 	for (;;) {
@@ -175,7 +175,7 @@ static int
 handle_buffered(struct SqshReader *reader, uint64_t offset, size_t size) {
 	int rv = 0;
 	struct CxBuffer new_buffer = {0};
-	sqsh_index_t iterator_offset = reader->iterator_offset;
+	size_t iterator_offset = reader->iterator_offset;
 
 	struct CxBuffer *buffer = &reader->buffer;
 	const uint8_t *buffer_data = cx_buffer_data(buffer);

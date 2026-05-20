@@ -73,7 +73,7 @@ struct SqshMemoryMapperImpl {
 	__attribute__((deprecated("Since 1.5.0. Use init2() instead.")))
 #endif
 	int (*map)(
-			const struct SqshMapper *mapper, sqsh_index_t offset, size_t size,
+			const struct SqshMapper *mapper, size_t offset, size_t size,
 			uint8_t **data);
 	/**
 	 * @brief The function that unmaps a block of data from memory.
