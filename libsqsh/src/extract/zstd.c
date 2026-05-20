@@ -49,6 +49,7 @@ SQSH_STATIC_ASSERT(
 
 static int
 sqsh_zstd_init(void *context, uint8_t *target, size_t target_size) {
+	int rv = 0;
 	(void)target;
 	(void)target_size;
 	struct SqshZstdContext *ctx = context;
@@ -56,11 +57,21 @@ sqsh_zstd_init(void *context, uint8_t *target, size_t target_size) {
 	if (ctx->stream == NULL) {
 		return -SQSH_ERROR_COMPRESSION_INIT;
 	}
+	size_t zstd_rv =
+			ZSTD_DCtx_setParameter(ctx->stream, ZSTD_d_windowLogMax, 20);
+	if (ZSTD_isError(zstd_rv)) {
+		rv = -SQSH_ERROR_COMPRESSION_INIT;
+		goto out;
+	}
 	ctx->output.dst = target;
 	ctx->output.size = target_size;
 	ctx->output.pos = 0;
 
-	return 0;
+out:
+	if (rv < 0) {
+		ZSTD_freeDCtx(ctx->stream);
+	}
+	return rv;
 }
 
 static int
@@ -76,7 +87,9 @@ sqsh_zstd_decompress(
 
 	while (input.pos < input.size) {
 		size_t rv = ZSTD_decompressStream(ctx->stream, &ctx->output, &input);
-		if (ZSTD_isError(rv)) {
+		if (rv == 0) {
+			break;
+		} else if (ZSTD_isError(rv)) {
 			return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 		}
 	}

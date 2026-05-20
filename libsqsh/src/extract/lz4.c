@@ -53,6 +53,9 @@ static int
 sqsh_lz4_init(void *context, uint8_t *target, size_t target_size) {
 	struct SqshLz4Context *ctx = context;
 	ctx->stream = LZ4_createStreamDecode();
+	if (ctx->stream == NULL) {
+		return -SQSH_ERROR_COMPRESSION_INIT;
+	}
 	ctx->target = target;
 	ctx->target_size = target_size;
 	ctx->offset = 0;
@@ -67,8 +70,9 @@ sqsh_lz4_decompress(
 	struct SqshLz4Context *ctx = context;
 
 	int size = LZ4_decompress_safe_continue(
-			ctx->stream, (const char *)compressed, (char *)ctx->target,
-			(int)compressed_size, (int)(ctx->target_size - ctx->offset));
+			ctx->stream, (const char *)compressed,
+			(char *)&ctx->target[ctx->offset], (int)compressed_size,
+			(int)(ctx->target_size - ctx->offset));
 	if (size < 0) {
 		return -SQSH_ERROR_COMPRESSION_DECOMPRESS;
 	}

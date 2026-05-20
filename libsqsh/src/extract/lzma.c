@@ -42,6 +42,8 @@
 
 SQSH_STATIC_ASSERT(sizeof(sqsh__extractor_context_t) >= sizeof(lzma_stream));
 
+#	define SQSH_LZMA_MEMLIMIT (64u * 1024u * 1024u)
+
 static const lzma_stream proto_stream = LZMA_STREAM_INIT;
 
 enum SqshLzmaType {
@@ -58,9 +60,9 @@ sqsh_lzma_init(
 
 	lzma_ret ret;
 	if (type == LZMA_TYPE_ALONE) {
-		ret = lzma_alone_decoder(stream, UINT64_MAX);
+		ret = lzma_alone_decoder(stream, SQSH_LZMA_MEMLIMIT);
 	} else {
-		ret = lzma_stream_decoder(stream, UINT64_MAX, 0);
+		ret = lzma_stream_decoder(stream, SQSH_LZMA_MEMLIMIT, 0);
 	}
 
 	if (ret != LZMA_OK) {

@@ -132,6 +132,10 @@ fs_lookup(fuse_req_t req, fuse_ino_t parent, const char *name) {
 	}
 
 	iterator = sqsh_directory_iterator_new(parent_dir, &rv);
+	if (rv < 0) {
+		fuse_reply_err(req, fs_common_map_err(rv));
+		goto out;
+	}
 
 	rv = sqsh_directory_iterator_lookup(iterator, name, strlen(name));
 	if (rv < 0) {
