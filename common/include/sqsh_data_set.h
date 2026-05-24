@@ -40,7 +40,7 @@ extern "C" {
  */
 
 void sqsh__data_superblock_magic_set(
-		struct SqshDataSuperblock *superblock, const uint32_t value);
+		struct SqshDataSuperblock *superblock, const uint8_t *value);
 void sqsh__data_superblock_inode_count_set(
 		struct SqshDataSuperblock *superblock, const uint32_t value);
 void sqsh__data_superblock_modification_time_set(

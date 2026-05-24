@@ -34,9 +34,9 @@
 #include <cextras/endian.h>
 #include <sqsh_data_private.h>
 
-uint32_t
+const uint8_t *
 sqsh__data_superblock_magic(const struct SqshDataSuperblock *superblock) {
-	return CX_LE_2_CPU32(superblock->magic);
+	return superblock->magic;
 }
 
 uint32_t
