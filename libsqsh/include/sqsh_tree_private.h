@@ -37,7 +37,7 @@
 #include "sqsh_directory_private.h"
 #include <sqsh_tree.h>
 
-#include <cextras/memory.h>
+#include <cextras/collection.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -101,7 +101,6 @@ sqsh__path_resolver_cleanup(struct SqshPathResolver *resolver);
 struct SqshTreeTraversalStackElement {
 	struct SqshDirectoryIterator iterator;
 	struct SqshFile file;
-	struct SqshTreeTraversalStackElement *next;
 };
 
 /**
@@ -112,14 +111,12 @@ struct SqshTreeTraversal {
 	 * @privatesection
 	 */
 
-	struct CxPreallocPool stack_pool;
-	struct SqshTreeTraversalStackElement *stack;
+	struct CxPinVec stack;
 
 	size_t depth;
 	size_t max_depth;
 
 	const struct SqshFile *base_file;
-	struct SqshDirectoryIterator base_iterator;
 
 	const struct SqshFile *current_file;
 	struct SqshDirectoryIterator *current_iterator;
