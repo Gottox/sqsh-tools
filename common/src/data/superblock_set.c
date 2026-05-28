@@ -33,6 +33,7 @@
 
 #include <cextras/endian.h>
 #include <sqsh_data_set.h>
+#include <string.h>
 
 /***************************************
  * data/superblock_data.c
@@ -40,8 +41,8 @@
 
 void
 sqsh__data_superblock_magic_set(
-		struct SqshDataSuperblock *superblock, const uint32_t value) {
-	superblock->magic = CX_CPU_2_LE32(value);
+		struct SqshDataSuperblock *superblock, const uint8_t *value) {
+	memcpy(superblock->magic, value, 4);
 }
 
 void

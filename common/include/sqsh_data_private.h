@@ -434,10 +434,10 @@ sqsh__data_metablock_size(const struct SqshDataMetablock *metablock);
  * data/superblock_data.c
  */
 
-#define SQSH_SUPERBLOCK_MAGIC 0x73717368
+#define SQSH_SUPERBLOCK_MAGIC (const uint8_t *)"hsqs"
 
 struct SQSH_UNALIGNED SqshDataSuperblock {
-	uint32_t magic;
+	uint8_t magic[4];
 	uint32_t inode_count;
 	uint32_t modification_time;
 	uint32_t block_size;
@@ -458,7 +458,7 @@ struct SQSH_UNALIGNED SqshDataSuperblock {
 	uint64_t export_table_start;
 };
 
-SQSH_NO_EXPORT uint32_t
+SQSH_NO_EXPORT const uint8_t *
 sqsh__data_superblock_magic(const struct SqshDataSuperblock *superblock);
 SQSH_NO_EXPORT uint32_t
 sqsh__data_superblock_inode_count(const struct SqshDataSuperblock *superblock);

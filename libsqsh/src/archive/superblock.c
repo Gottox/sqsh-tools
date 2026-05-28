@@ -83,7 +83,8 @@ sqsh__superblock_init(
 	}
 	const struct SqshDataSuperblock *header = get_header(superblock);
 
-	if (sqsh__data_superblock_magic(header) != SQSH_SUPERBLOCK_MAGIC) {
+	const uint8_t *magic = sqsh__data_superblock_magic(header);
+	if (memcmp(magic, SQSH_SUPERBLOCK_MAGIC, 4) != 0) {
 		rv = -SQSH_ERROR_WRONG_MAGIC;
 		goto out;
 	}
