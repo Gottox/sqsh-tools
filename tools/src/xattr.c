@@ -91,7 +91,7 @@ fattr_path(struct SqshArchive *archive, char *path) {
 		uint16_t value_len = sqsh_xattr_iterator_value_size2(iter);
 
 		fwrite(prefix, prefix_len, 1, stdout);
-		fwrite(name, name_len, 1, stdout);
+		print_escaped(name, name_len);
 		fputs("=\"", stdout);
 		print_value(value, value_len);
 		fputs("\"\n", stdout);
