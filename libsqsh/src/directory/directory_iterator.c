@@ -189,6 +189,11 @@ process_fragment(struct SqshDirectoryIterator *iterator) {
 				&iterator->remaining_size)) {
 		return -SQSH_ERROR_CORRUPTED_DIRECTORY_HEADER;
 	}
+
+	if (iterator->remaining_entries >
+		iterator->remaining_size / sizeof(struct SqshDataDirectoryEntry)) {
+		return -SQSH_ERROR_CORRUPTED_DIRECTORY_HEADER;
+	}
 	return rv;
 }
 
