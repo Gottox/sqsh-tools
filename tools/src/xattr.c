@@ -52,12 +52,12 @@ print_value(const char *value, size_t size) {
 	size_t i = 0;
 
 	for (i = 0; i < size; i++) {
-		if (strchr("\"\\", value[i])) {
-			printf("\\%c", value[i]);
-		} else if (isprint(value[i])) {
-			putchar(value[i]);
+		if (strchr("\"\\", (unsigned char)value[i])) {
+			printf("\\%c", (unsigned char)value[i]);
+		} else if (isprint((unsigned char)value[i])) {
+			putchar((unsigned char)value[i]);
 		} else {
-			printf("\\x%02x", value[i]);
+			printf("\\x%02x", (unsigned char)value[i]);
 		}
 	}
 	return 0;

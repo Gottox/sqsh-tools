@@ -88,7 +88,7 @@ open_archive(const char *image_path, uint64_t offset, int *err) {
 	};
 	if (sqsh_mapper_impl_curl != NULL) {
 		int i;
-		for (i = 0; isalnum(image_path[i]); i++) {
+		for (i = 0; isalnum((unsigned char)image_path[i]); i++) {
 		}
 		if (strncmp(&image_path[i], "://", 3) == 0) {
 			config.source_mapper = sqsh_mapper_impl_curl;
@@ -151,7 +151,7 @@ print_escaped(const char *segment, size_t segment_size) {
 		case 0x1e:
 		case 0x1f:
 		case 0x7f:
-			fprintf(stdout, "\\x%02x", segment[i]);
+			fprintf(stdout, "\\x%02x", (unsigned char)segment[i]);
 			break;
 		default:
 			fputs((char[2]){segment[i], 0}, stdout);
