@@ -52,14 +52,14 @@ sqsh__xattr_table_init(
 	struct SqshMapManager *map_manager = sqsh_archive_map_manager(sqsh);
 	const uint64_t xattr_address =
 			sqsh_superblock_xattr_id_table_start(superblock);
-	uint64_t upper_limit;
+	uint64_t header_size;
 	if (SQSH_ADD_OVERFLOW(
 				xattr_address, sizeof(struct SqshDataXattrIdTable),
-				&upper_limit)) {
+				&header_size)) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
 	}
 	rv = sqsh__map_reader_init(
-			&context->header, map_manager, xattr_address, upper_limit);
+			&context->header, map_manager, xattr_address, header_size);
 	if (rv < 0) {
 		goto out;
 	}
@@ -71,8 +71,7 @@ sqsh__xattr_table_init(
 	const struct SqshDataXattrIdTable *header = get_header(context);
 
 	rv = sqsh__table_init(
-			&context->table, sqsh,
-			xattr_address + sizeof(struct SqshDataXattrIdTable),
+			&context->table, sqsh, header_size,
 			sizeof(struct SqshDataXattrLookupTable),
 			sqsh__data_xattr_id_table_xattr_ids(header));
 	if (rv < 0) {
