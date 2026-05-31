@@ -213,6 +213,7 @@ static int
 extract_file(const char *path, const struct SqshFile *file) {
 	int rv = 0;
 	int fd = -1;
+	bool sem_held = false;
 	FILE *stream = NULL;
 	struct ExtractFileData *data = calloc(1, sizeof(struct ExtractFileData));
 	if (data == NULL) {
@@ -241,6 +242,7 @@ extract_file(const char *path, const struct SqshFile *file) {
 		perror(path);
 		goto out;
 	}
+	sem_held = true;
 
 	fd = mkstemp(data->tmp_filename);
 	if (fd < 0) {
@@ -269,8 +271,12 @@ extract_file(const char *path, const struct SqshFile *file) {
 	if (rv < 0) {
 		goto out;
 	}
+	sem_held = false;
 out:
 	if (rv < 0) {
+		if (sem_held) {
+			cx_semaphore_post(&file_descriptor_sem);
+		}
 		locked_sqsh_perror(rv, path);
 		extract_file_cleanup(data, stream);
 		if (fd >= 0) {
