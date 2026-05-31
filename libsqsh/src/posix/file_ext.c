@@ -144,6 +144,8 @@ file_iterator_mt(
 		struct FileIteratorMt *mt, const struct SqshFile *file,
 		struct SqshThreadpool *threadpool, sqsh_file_iterator_mt_cb cb,
 		void *data, int rv) {
+	size_t scheduled = 0;
+	uint64_t block_count = 0;
 	if (rv < 0) {
 		goto out;
 	}
@@ -153,8 +155,7 @@ file_iterator_mt(
 	uint16_t block_log = sqsh_superblock_block_log(superblock);
 	uint32_t block_size = sqsh_superblock_block_size(superblock);
 
-	const uint64_t block_count =
-			sqsh_block_count_ceil(sqsh_file_size(file), block_log);
+	block_count = sqsh_block_count_ceil(sqsh_file_size(file), block_log);
 	if (block_count > SIZE_MAX) {
 		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
@@ -189,14 +190,25 @@ file_iterator_mt(
 		rv = cx_threadpool_schedule(
 				&threadpool->pool, iterator_worker, &mt->blocks[i]);
 		if (rv < 0) {
-			goto out;
+			break;
 		}
+		scheduled++;
 		block_offset += block_size;
 	}
 
 out:
-	if (rv < 0 || block_count == 0) {
+	if (rv < 0) {
+		atomic_store(&mt->rv, rv);
+	}
+	if (scheduled == 0) {
 		file_iterator_mt_cleanup(mt, rv);
+	} else if (scheduled < block_count) {
+		const size_t unscheduled = block_count - scheduled;
+		const size_t prev =
+				atomic_fetch_sub(&mt->remaining_blocks, unscheduled);
+		if (prev == unscheduled) {
+			file_iterator_mt_cleanup(mt, rv);
+		}
 	}
 }
 
