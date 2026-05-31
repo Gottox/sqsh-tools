@@ -303,8 +303,9 @@ stat_file(struct SqshArchive *archive, const char *path) {
 		}
 		break;
 	case SQSH_FILE_TYPE_SYMLINK:
-		printf("     symlink target: %.*s\n", sqsh_file_symlink_size(file),
-			   sqsh_file_symlink(file));
+		fputs("     symlink target: ", stdout);
+		print_escaped(sqsh_file_symlink(file), sqsh_file_symlink_size(file));
+		fputc('\n', stdout);
 		break;
 	case SQSH_FILE_TYPE_BLOCK:
 	case SQSH_FILE_TYPE_CHAR:
