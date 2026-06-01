@@ -247,6 +247,7 @@ fs_opendir(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 		goto out;
 	}
 
+	fi->cache_readdir = 1;
 	fi->fh = (uintptr_t)handle;
 	fuse_reply_open(req, fi);
 out:
@@ -269,10 +270,7 @@ fs_readdir(
 	size_t result_size = 0;
 
 	bool has_next = sqsh_directory_iterator_next(handle->iterator, &rv);
-	if (rv < 0) {
-		fuse_reply_err(req, fs_common_map_err(rv));
-		goto out;
-	} else if (has_next == false) {
+	if (rv < 0 || has_next == false) {
 		goto out;
 	}
 
@@ -288,12 +286,14 @@ fs_readdir(
 			sqsh_directory_iterator_file_type(handle->iterator));
 	handle->current_name = sqsh_directory_iterator_name_dup(handle->iterator);
 	if (handle->current_name == NULL) {
+		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
 	result_size = fuse_add_direntry(
 			req, buf, size, handle->current_name, &handle->current_stat,
-			offset);
+			offset + 1);
 	free(handle->current_name);
+	handle->current_name = NULL;
 	if (result_size > size) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
