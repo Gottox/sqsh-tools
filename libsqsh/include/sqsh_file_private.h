@@ -275,8 +275,6 @@ struct SqshFile {
 	uint64_t inode_ref;
 	struct SqshMetablockReader metablock;
 	struct SqshArchive *archive;
-	const struct SqshInodeImpl *impl;
-	enum SqshFileType type;
 	uint64_t parent_inode_ref;
 };
 

@@ -49,17 +49,15 @@ inode_file_ext_fragment_block_index(const struct SqshDataInode *inode);
 static uint64_t inode_file_size(const struct SqshDataInode *inode);
 static uint64_t inode_file_ext_size(const struct SqshDataInode *inode);
 
-static size_t
+static uint64_t
 calc_block_count(
 		const struct SqshArchive *archive, uint64_t file_size,
 		uint32_t fragment_index) {
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
 
-	uint64_t block_count = sqsh__block_count(
+	return sqsh__block_count(
 			file_size, sqsh_superblock_block_log(superblock),
 			fragment_index != SQSH_INODE_NO_FRAGMENT);
-
-	return SQSH_MIN(SIZE_MAX, block_count);
 }
 
 static size_t
