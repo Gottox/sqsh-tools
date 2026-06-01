@@ -50,8 +50,6 @@ struct Context {
 struct FsDirHandle {
 	struct SqshFile *file;
 	struct SqshDirectoryIterator *iterator;
-	char *current_name;
-	struct stat current_stat;
 };
 
 static struct Context context = {0};
@@ -267,6 +265,7 @@ fs_readdir(
 	int rv = 0;
 	struct FsDirHandle *handle = get_dir_handle(fi);
 	char *buf = NULL;
+	char *name = NULL;
 	size_t result_size = 0;
 
 	bool has_next = sqsh_directory_iterator_next(handle->iterator, &rv);
@@ -280,20 +279,17 @@ fs_readdir(
 		goto out;
 	}
 
-	handle->current_stat.st_ino = fs_common_inode_sqsh_to_ino(
+	struct stat stbuf = {0};
+	stbuf.st_ino = fs_common_inode_sqsh_to_ino(
 			sqsh_directory_iterator_inode(handle->iterator));
-	handle->current_stat.st_mode = fs_common_mode_type(
+	stbuf.st_mode = fs_common_mode_type(
 			sqsh_directory_iterator_file_type(handle->iterator));
-	handle->current_name = sqsh_directory_iterator_name_dup(handle->iterator);
-	if (handle->current_name == NULL) {
+	name = sqsh_directory_iterator_name_dup(handle->iterator);
+	if (name == NULL) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
 	}
-	result_size = fuse_add_direntry(
-			req, buf, size, handle->current_name, &handle->current_stat,
-			offset + 1);
-	free(handle->current_name);
-	handle->current_name = NULL;
+	result_size = fuse_add_direntry(req, buf, size, name, &stbuf, offset + 1);
 	if (result_size > size) {
 		rv = -SQSH_ERROR_MALLOC_FAILED;
 		goto out;
@@ -305,6 +301,7 @@ out:
 	} else {
 		fuse_reply_buf(req, buf, result_size);
 	}
+	free(name);
 	free(buf);
 }
 
