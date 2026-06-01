@@ -19,6 +19,7 @@ curl_dep = dependency(
 )
 fuse3_dep = dependency(
     'fuse3',
+    version: '>=3.5.0',
     required: get_option('fuse'),
 )
 fuse2_dep = dependency(
