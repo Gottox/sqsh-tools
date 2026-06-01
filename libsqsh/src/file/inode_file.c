@@ -54,20 +54,18 @@ calc_block_count(
 		const struct SqshArchive *archive, uint64_t file_size,
 		uint32_t fragment_index) {
 	const struct SqshSuperblock *superblock = sqsh_archive_superblock(archive);
-	const uint16_t block_log = sqsh_superblock_block_log(superblock);
-	const bool has_fragment = fragment_index != SQSH_INODE_NO_FRAGMENT;
 
-	if (has_fragment) {
-		return (size_t)sqsh_block_count(file_size, block_log);
-	} else {
-		return (size_t)sqsh_block_count_ceil(file_size, block_log);
-	}
+	uint64_t block_count = sqsh__block_count(
+			file_size, sqsh_superblock_block_log(superblock),
+			fragment_index != SQSH_INODE_NO_FRAGMENT);
+
+	return SQSH_MIN(SIZE_MAX, block_count);
 }
 
 static size_t
 inode_file_payload_size(
 		const struct SqshDataInode *inode, const struct SqshArchive *archive) {
-	const size_t block_count = calc_block_count(
+	const uint64_t block_count = calc_block_count(
 			archive, inode_file_size(inode),
 			inode_file_fragment_block_index(inode));
 	size_t result;
@@ -80,7 +78,7 @@ inode_file_payload_size(
 static size_t
 inode_file_ext_payload_size(
 		const struct SqshDataInode *inode, const struct SqshArchive *archive) {
-	const size_t block_count = calc_block_count(
+	const uint64_t block_count = calc_block_count(
 			archive, inode_file_ext_size(inode),
 			inode_file_ext_fragment_block_index(inode));
 	size_t result;

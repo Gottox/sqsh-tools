@@ -32,6 +32,7 @@
  */
 
 #include <sqsh_common_private.h>
+#include <sqsh_error.h>
 
 uint64_t
 sqsh_block_count(uint64_t value, uint16_t block_log) {
@@ -47,4 +48,13 @@ sqsh_block_count_ceil(uint64_t value, uint16_t block_log) {
 uint64_t
 sqsh_block_remainder(uint64_t value, uint16_t block_log) {
 	return value & (((uint64_t)1 << block_log) - 1);
+}
+
+uint64_t
+sqsh__block_count(uint64_t file_size, uint16_t block_log, bool has_fragment) {
+	if (has_fragment) {
+		return sqsh_block_count(file_size, block_log);
+	} else {
+		return sqsh_block_count_ceil(file_size, block_log);
+	}
 }
