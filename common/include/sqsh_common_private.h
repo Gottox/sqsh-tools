@@ -77,6 +77,9 @@ sqsh_datablock_is_compressed(uint32_t size_info) {
 	return !(size_info & (1 << 24));
 }
 
+SQSH_NO_UNUSED uint64_t
+sqsh__block_count(uint64_t file_size, uint16_t block_log, bool has_fragment);
+
 #ifdef __cplusplus
 }
 #endif

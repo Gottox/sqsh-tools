@@ -290,14 +290,9 @@ uint64_t
 sqsh_file_block_count2(const struct SqshFile *context) {
 	const struct SqshSuperblock *superblock =
 			sqsh_archive_superblock(context->archive);
-	uint64_t file_size = sqsh_file_size(context);
-	uint16_t block_log = sqsh_superblock_block_log(superblock);
-
-	if (sqsh_file_has_fragment(context)) {
-		return sqsh_block_count(file_size, block_log);
-	} else {
-		return sqsh_block_count_ceil(file_size, block_log);
-	}
+	return sqsh__block_count(
+			sqsh_file_size(context), sqsh_superblock_block_log(superblock),
+			sqsh_file_has_fragment(context));
 }
 
 uint32_t
