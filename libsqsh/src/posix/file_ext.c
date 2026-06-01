@@ -203,7 +203,7 @@ out:
 	if (scheduled == 0) {
 		file_iterator_mt_cleanup(mt, rv);
 	} else if (scheduled < block_count) {
-		const size_t unscheduled = block_count - scheduled;
+		const size_t unscheduled = (size_t)block_count - scheduled;
 		const size_t prev =
 				atomic_fetch_sub(&mt->remaining_blocks, unscheduled);
 		if (prev == unscheduled) {

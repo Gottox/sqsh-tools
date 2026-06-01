@@ -96,7 +96,6 @@ inode_load(struct SqshFile *context) {
 		return -SQSH_ERROR_UNKNOWN_FILE_TYPE;
 	}
 
-	const struct SqshDataInode *inode = get_inode(context);
 	size_t size = sizeof(struct SqshDataInodeHeader) + impl->header_size;
 	rv = sqsh__metablock_reader_advance(&context->metablock, 0, size);
 	if (rv < 0) {
@@ -106,7 +105,7 @@ inode_load(struct SqshFile *context) {
 	/* The pointer may has been invalidated by reader_advance, so retrieve
 	 * it again.
 	 */
-	inode = get_inode(context);
+	const struct SqshDataInode *inode = get_inode(context);
 	const size_t payload = impl->payload_size(inode, context->archive);
 	if (payload == SIZE_MAX) {
 		return -SQSH_ERROR_INTEGER_OVERFLOW;
