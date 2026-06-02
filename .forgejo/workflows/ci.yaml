@@ -121,6 +121,73 @@ jobs:
     - name: test
       run: ninja -C build test
 
+  build-debian32:
+    needs:
+    - format-check
+    runs-on: tox-debian-vm
+    steps:
+    - run: |
+        sudo dpkg --add-architecture i386
+        sudo apt update
+        sudo apt install -y --no-install-recommends \
+          meson \
+          pkg-config \
+          build-essential \
+          gcc-multilib \
+          g++-multilib \
+          squashfs-tools \
+          bsdextrautils \
+          libcurl4-openssl-dev:i386 \
+          liblz4-dev:i386 \
+          liblzma-dev:i386 \
+          zlib1g-dev:i386 \
+          libzstd-dev:i386 \
+        && :
+    - uses: actions/checkout@v4
+    - name: configure
+      env:
+        CROSS_FILE: |
+          [binaries]
+          c = 'gcc'
+          cpp = 'g++'
+          ar = 'gcc-ar'
+          strip = 'strip'
+          pkg-config = 'pkg-config'
+
+          [built-in options]
+          c_args = ['-m32']
+          c_link_args = ['-m32']
+          cpp_args = ['-m32']
+          cpp_link_args = ['-m32']
+
+          [properties]
+          pkg_config_libdir = '/usr/lib/i386-linux-gnu/pkgconfig:/usr/share/pkgconfig'
+
+          [host_machine]
+          system = 'linux'
+          cpu_family = 'x86'
+          cpu = 'i686'
+          endian = 'little'
+      run: |
+        echo "$CROSS_FILE" > cross-file.txt
+        meson setup --cross-file cross-file.txt build \
+          -Dwerror=true \
+          -Dexamples=true \
+          -Dcurl=enabled \
+          -Dzlib=enabled \
+          -Dlz4=enabled \
+          -Dlzma=enabled \
+          -Dzstd=enabled \
+          -Dfuse=disabled \
+          -Dfuse-old=disabled \
+          -Dtest=true \
+          -Ddoc=false \
+        && :
+    - name: build
+      run: ninja -C build all
+    - name: test
+      run: ninja -C build test
+
   test-openbsd:
     needs:
     - format-check
