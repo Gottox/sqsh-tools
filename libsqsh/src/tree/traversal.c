@@ -42,32 +42,39 @@
 int
 sqsh__tree_traversal_init(
 		struct SqshTreeTraversal *traversal, const struct SqshFile *file) {
-	int rv = cx_pin_vec_init(
-			&traversal->stack, sizeof(struct SqshTreeTraversalStackElement), 8);
+	int rv = 0;
+	cx_pin_vec_init(
+			&traversal->stack, sizeof(struct SqshTreeTraversalStackElement));
+	rv = cx_pin_vec_reserve(&traversal->stack, 8);
 	if (rv < 0) {
-		return -SQSH_ERROR_MALLOC_FAILED;
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
 	}
+
 	traversal->base_file = file;
 	traversal->state = SQSH_TREE_TRAVERSAL_STATE_INIT;
 	traversal->max_depth = SIZE_MAX;
 	traversal->depth = 0;
 	traversal->current_iterator = NULL;
 
-	struct SqshTreeTraversalStackElement zero = {0};
 	struct SqshTreeTraversalStackElement *base =
-			cx_pin_vec_push(&traversal->stack, &zero);
+			cx_pin_vec_push(&traversal->stack, NULL);
 	if (base == NULL) {
-		cx_pin_vec_cleanup(&traversal->stack);
-		return -SQSH_ERROR_MALLOC_FAILED;
+		rv = -SQSH_ERROR_MALLOC_FAILED;
+		goto out;
 	}
 	rv = sqsh__file_init(&base->file, file->archive, sqsh_file_inode_ref(file));
 	if (rv < 0) {
-		cx_pin_vec_cleanup(&traversal->stack);
-		return rv;
+		goto out;
 	}
 	sqsh__file_set_parent_inode_ref(&base->file, file->parent_inode_ref);
 	traversal->current_file = &base->file;
-	return 0;
+
+out:
+	if (rv < 0) {
+		cx_pin_vec_cleanup(&traversal->stack);
+	}
+	return rv;
 }
 
 struct SqshTreeTraversal *
@@ -89,9 +96,8 @@ push_stack(struct SqshTreeTraversal *traversal) {
 	const uint64_t inode_ref =
 			sqsh_directory_iterator_inode_ref(traversal->current_iterator);
 
-	struct SqshTreeTraversalStackElement zero = {0};
 	struct SqshTreeTraversalStackElement *element =
-			cx_pin_vec_push(&traversal->stack, &zero);
+			cx_pin_vec_push(&traversal->stack, NULL);
 	if (element == NULL) {
 		return -SQSH_ERROR_MALLOC_FAILED;
 	}
