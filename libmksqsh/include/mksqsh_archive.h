@@ -34,7 +34,6 @@
 #ifndef SQSH_ARCHIVE_BUILDER_H
 #define SQSH_ARCHIVE_BUILDER_H
 
-#include <cextras/collection.h>
 #include <sqsh_data.h>
 #include <sqsh_data_set.h>
 
