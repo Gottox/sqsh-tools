@@ -50,7 +50,6 @@ typedef int (*extract_fn)(
 static const char TMP_SUFFIX[] = "-XXXXXX";
 
 struct CxSemaphore file_descriptor_sem;
-size_t extracted_files = 0;
 atomic_int extraction_errors = 0;
 bool do_chown = false;
 bool verbose = false;
