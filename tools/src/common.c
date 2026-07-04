@@ -63,13 +63,11 @@ locked_fputs(const char *s, FILE *stream) {
 	pthread_mutex_unlock(&output_lock);
 }
 
-int
+void
 locked_fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream) {
-	int ret;
 	pthread_mutex_lock(&output_lock);
-	ret = fwrite(ptr, size, nmemb, stream);
+	fwrite(ptr, size, nmemb, stream);
 	pthread_mutex_unlock(&output_lock);
-	return ret;
 }
 
 void
