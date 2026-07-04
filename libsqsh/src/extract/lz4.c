@@ -47,7 +47,7 @@ struct SqshLz4Context {
 };
 
 SQSH_STATIC_ASSERT(
-		sizeof(sqsh__extractor_context_t) >= sizeof(LZ4_streamDecode_t));
+		sizeof(sqsh__extractor_context_t) >= sizeof(struct SqshLz4Context));
 
 static int
 sqsh_lz4_init(void *context, uint8_t *target, size_t target_size) {
@@ -83,7 +83,6 @@ sqsh_lz4_decompress(
 static int
 sqsh_lz4_finish(void *context, uint8_t *target, size_t *target_size) {
 	(void)target;
-	(void)target_size;
 	struct SqshLz4Context *ctx = context;
 	LZ4_freeStreamDecode(ctx->stream);
 	*target_size = ctx->offset;
