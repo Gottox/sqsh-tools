@@ -115,7 +115,7 @@ sqsh_easy_tree_traversal(
 out:
 	sqsh__tree_traversal_cleanup(&iterator.traversal);
 	sqsh_close(file);
-	if (err) {
+	if (err != NULL) {
 		*err = rv;
 	}
 	return list;

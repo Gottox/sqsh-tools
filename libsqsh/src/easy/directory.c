@@ -120,7 +120,7 @@ out:
 	cx_buffer_cleanup(&iterator.value);
 	sqsh__directory_iterator_cleanup(&iterator.dir);
 	sqsh_close(file);
-	if (err) {
+	if (err != NULL) {
 		*err = rv;
 	}
 	return list;
@@ -161,7 +161,7 @@ sqsh_easy_directory_list(
 out:
 	sqsh__directory_iterator_cleanup(&iterator);
 	sqsh_close(file);
-	if (err) {
+	if (err != NULL) {
 		*err = rv;
 	}
 	return list;
