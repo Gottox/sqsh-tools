@@ -58,8 +58,6 @@ void locked_perror(const char *msg);
 
 void locked_sqsh_perror(int error_code, const char *msg);
 
-void locked_perror(const char *msg);
-
 __attribute__((__format__(__printf__, 2, 0))) void
 locked_fprintf(FILE *stream, const char *format, ...);
 
