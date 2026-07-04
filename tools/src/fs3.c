@@ -546,9 +546,9 @@ main(int argc, char *argv[]) {
 		goto out;
 	}
 
-	if (fuse_options.singlethread)
+	if (fuse_options.singlethread) {
 		rv = fuse_session_loop(fuse_session);
-	else {
+	} else {
 		config.clone_fd = fuse_options.clone_fd;
 		config.max_idle_threads = fuse_options.max_idle_threads;
 		rv = fuse_session_loop_mt(fuse_session, &config);
