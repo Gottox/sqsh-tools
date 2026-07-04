@@ -31,7 +31,6 @@
  * @file         traversal.c
  */
 
-#include "sqsh_tree.h"
 #define _DEFAULT_SOURCE
 
 #include <sqsh_easy.h>
