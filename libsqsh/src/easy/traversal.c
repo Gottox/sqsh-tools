@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         directory.c
+ * @file         traversal.c
  */
 
 #include "sqsh_tree.h"

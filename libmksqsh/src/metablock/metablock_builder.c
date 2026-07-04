@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         inode_builder.c
+ * @file         metablock_builder.c
  */
 
 #include "sqsh_error.h"

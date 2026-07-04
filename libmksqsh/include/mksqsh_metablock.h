@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         sqsh_archive_builder.h
+ * @file         mksqsh_metablock.h
  */
 
 #ifndef MKSQSH_METABLOCK_H

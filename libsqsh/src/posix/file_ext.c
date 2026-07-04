@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         posix.c
+ * @file         file_ext.c
  */
 
 #define _DEFAULT_SOURCE
