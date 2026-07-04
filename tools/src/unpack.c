@@ -534,6 +534,9 @@ main(int argc, char *argv[]) {
 	}
 
 	threadpool = sqsh_threadpool_new(0, &rv);
+	if (rv < 0) {
+		goto out;
+	}
 
 	rv = getrlimit(RLIMIT_NOFILE, &limits);
 	if (rv < 0) {
