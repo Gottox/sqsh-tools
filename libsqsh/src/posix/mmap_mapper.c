@@ -48,8 +48,6 @@
 static int
 sqsh_mapper_mmap_init(
 		struct SqshMapper *mapper, const void *input, uint64_t *size) {
-	(void)size;
-	(void)mapper;
 	int rv = 0;
 	int fd = -1;
 	off_t pos = 0;

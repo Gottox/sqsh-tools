@@ -28,10 +28,9 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         directory.c
+ * @file         traversal.c
  */
 
-#include "sqsh_tree.h"
 #define _DEFAULT_SOURCE
 
 #include <sqsh_easy.h>
@@ -115,7 +114,7 @@ sqsh_easy_tree_traversal(
 out:
 	sqsh__tree_traversal_cleanup(&iterator.traversal);
 	sqsh_close(file);
-	if (err) {
+	if (err != NULL) {
 		*err = rv;
 	}
 	return list;

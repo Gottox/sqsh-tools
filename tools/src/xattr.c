@@ -33,8 +33,6 @@
 
 #include <sqshtools_common.h>
 
-#include <assert.h>
-#include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>

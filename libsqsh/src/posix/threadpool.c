@@ -28,7 +28,7 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         thread_pool.c
+ * @file         threadpool.c
  */
 
 #define _DEFAULT_SOURCE

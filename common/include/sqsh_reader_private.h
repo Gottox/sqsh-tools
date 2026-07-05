@@ -36,7 +36,6 @@
 
 #include "sqsh_common.h"
 #include <cextras/collection.h>
-#include <sys/wait.h>
 
 #ifdef __cplusplus
 extern "C" {

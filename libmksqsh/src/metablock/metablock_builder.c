@@ -28,15 +28,15 @@
 
 /**
  * @author       Enno Boland (mail@eboland.de)
- * @file         inode_builder.c
+ * @file         metablock_builder.c
  */
 
-#include "sqsh_error.h"
 #define _DEFAULT_SOURCE
 
 #include <mksqsh_metablock.h>
 #include <sqsh_common_private.h>
 #include <sqsh_data_set.h>
+#include <sqsh_error.h>
 #include <string.h>
 
 int

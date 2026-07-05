@@ -146,4 +146,4 @@ sqsh_block_remainder(uint64_t value, uint16_t block_log);
 #ifdef __cplusplus
 }
 #endif
-#endif /* SQSH_THREAD_PRIVATE_H */
+#endif /* SQSH_UTILS_PRIVATE_H */

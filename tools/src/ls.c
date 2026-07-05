@@ -94,6 +94,7 @@ static int
 print_detail(const char *path, const struct SqshTreeTraversal *traversal) {
 	int mode;
 	int rv = 0;
+	const struct tm *tm_info = NULL;
 
 	struct SqshFile *file = sqsh_tree_traversal_open_file(traversal, &rv);
 	if (rv < 0) {
@@ -102,12 +103,16 @@ print_detail(const char *path, const struct SqshTreeTraversal *traversal) {
 
 	time_t mtime = sqsh_file_modified_time(file);
 	struct tm tm_info_buf = {0};
-	const struct tm *tm_info;
 	char buffer[128] = "";
-	tm_info = utc ? gmtime_r(&mtime, &tm_info_buf)
-				  : localtime_r(&mtime, &tm_info_buf);
+	if (!utc) {
+		tm_info = localtime_r(&mtime, &tm_info_buf);
+	}
 	if (tm_info == NULL) {
-		return -errno;
+		tm_info = gmtime_r(&mtime, &tm_info_buf);
+	}
+	if (tm_info == NULL) {
+		rv = -errno;
+		goto out;
 	}
 
 	switch (sqsh_file_type(file)) {

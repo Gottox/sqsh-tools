@@ -79,7 +79,7 @@ sqsh_easy_xattr_get(
 out:
 	sqsh__xattr_iterator_cleanup(&iterator);
 	sqsh_close(file);
-	if (err) {
+	if (err != NULL) {
 		*err = rv;
 	}
 	return xattr_value;
@@ -129,7 +129,7 @@ sqsh_easy_xattr_keys(struct SqshArchive *archive, const char *path, int *err) {
 out:
 	sqsh__xattr_iterator_cleanup(&iterator.iterator);
 	sqsh_close(file);
-	if (err) {
+	if (err != NULL) {
 		*err = rv;
 	}
 	return list;

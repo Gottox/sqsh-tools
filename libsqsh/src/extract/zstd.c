@@ -99,7 +99,6 @@ sqsh_zstd_decompress(
 static int
 sqsh_zstd_finish(void *context, uint8_t *target, size_t *target_size) {
 	(void)target;
-	(void)target_size;
 	struct SqshZstdContext *ctx = context;
 	ZSTD_freeDCtx(ctx->stream);
 	*target_size = ctx->output.pos;
