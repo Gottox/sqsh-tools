@@ -134,6 +134,21 @@ SQSH_NO_EXPORT int sqsh__fragment_view_cleanup(struct SqshFragmentView *view);
  */
 
 /**
+ * @brief The resumable position of a file iterator.
+ *
+ * Captures which data block an iterator starts at and the compressed byte
+ * offset of that block from the start of the file's data blocks. A zeroed
+ * state (`{0}`) denotes the beginning of the file.
+ */
+struct SqshIteratorState {
+	/**
+	 * @privatesection
+	 */
+	uint64_t block_index;
+	uint64_t compressed_offset;
+};
+
+/**
  * @brief An iterator over the contents of a file.
  */
 struct SqshFileIterator {
@@ -164,6 +179,25 @@ struct SqshFileIterator {
  */
 SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_iterator_init(
 		struct SqshFileIterator *iterator, const struct SqshFile *file);
+
+/**
+ * @internal
+ * @memberof SqshFileIterator
+ * @brief Initializes a file iterator positioned at a given resumable state.
+ *
+ * Unlike @ref sqsh__file_iterator_init, which always starts at the first
+ * block, this seeds the iterator directly at `state` in O(1). The next call to
+ * @ref sqsh_file_iterator_next loads the block at `state.block_index`.
+ *
+ * @param[in,out] iterator The file iterator to initialize.
+ * @param[in] file The file to iterate over.
+ * @param[in] state The position to start iterating from.
+ *
+ * @return 0 on success, less than 0 on error.
+ */
+SQSH_NO_EXPORT SQSH_NO_UNUSED int sqsh__file_iterator_init_with_state(
+		struct SqshFileIterator *iterator, const struct SqshFile *file,
+		const struct SqshIteratorState *state);
 
 /**
  * @internal

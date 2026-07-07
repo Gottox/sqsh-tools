@@ -74,7 +74,7 @@ load_segment_from_compressed_data_block(void) {
 	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv > 0);
+	assert(rv == 0);
 	ASSERT_EQ(true, has_next);
 
 	size_t size = sqsh_file_iterator_size(&iter);
@@ -132,7 +132,7 @@ load_two_segments_from_uncompressed_data_blockm(void) {
 	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv > 0);
+	assert(rv == 0);
 	ASSERT_EQ(true, has_next);
 
 	size_t size = sqsh_file_iterator_size(&iter);
@@ -143,7 +143,7 @@ load_two_segments_from_uncompressed_data_blockm(void) {
 	}
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv > 0);
+	assert(rv == 0);
 	ASSERT_EQ(true, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
@@ -152,7 +152,7 @@ load_two_segments_from_uncompressed_data_blockm(void) {
 	ASSERT_EQ(0, memcmp(data, ZERO_BLOCK, size));
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv > 0);
+	assert(rv == 0);
 	ASSERT_EQ(true, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
@@ -161,7 +161,7 @@ load_two_segments_from_uncompressed_data_blockm(void) {
 	ASSERT_EQ(0, memcmp(data, ZERO_BLOCK, size));
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv > 0);
+	assert(rv == 0);
 	ASSERT_EQ(true, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
@@ -218,7 +218,7 @@ load_segment_from_uncompressed_data_block(void) {
 	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv > 0);
+	assert(rv == 0);
 	ASSERT_EQ(true, has_next);
 
 	size_t size = sqsh_file_iterator_size(&iter);
@@ -274,19 +274,19 @@ load_zero_padding(void) {
 	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv > 0);
+	assert(rv == 0);
 	ASSERT_EQ(true, has_next);
 	size_t size = sqsh_file_iterator_size(&iter);
 	ASSERT_EQ(ZERO_BLOCK_SIZE, size);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv > 0);
+	assert(rv == 0);
 	ASSERT_EQ(true, has_next);
 	size = sqsh_file_iterator_size(&iter);
 	ASSERT_EQ(ZERO_BLOCK_SIZE, size);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv > 0);
+	assert(rv == 0);
 	ASSERT_EQ(true, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
@@ -342,19 +342,19 @@ load_zero_big_padding(void) {
 	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv > 0);
+	assert(rv == 0);
 	ASSERT_EQ(true, has_next);
 	size_t size = sqsh_file_iterator_size(&iter);
 	ASSERT_EQ(ZERO_BLOCK_SIZE, size);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv > 0);
+	assert(rv == 0);
 	ASSERT_EQ(true, has_next);
 	size = sqsh_file_iterator_size(&iter);
 	ASSERT_EQ(ZERO_BLOCK_SIZE, size);
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv > 0);
+	assert(rv == 0);
 	ASSERT_EQ(true, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
@@ -409,7 +409,7 @@ load_zero_block(void) {
 	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv > 0);
+	assert(rv == 0);
 	ASSERT_EQ(true, has_next);
 
 	size_t size = sqsh_file_iterator_size(&iter);
@@ -456,7 +456,7 @@ load_two_zero_blocks(void) {
 	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv > 0);
+	assert(rv == 0);
 	ASSERT_EQ(true, has_next);
 
 	size_t size = sqsh_file_iterator_size(&iter);
@@ -466,7 +466,7 @@ load_two_zero_blocks(void) {
 	ASSERT_EQ(0, memcmp(data, ZERO_BLOCK, size));
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv > 0);
+	assert(rv == 0);
 	ASSERT_EQ(true, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
@@ -512,7 +512,7 @@ load_two_sparse_blocks(void) {
 	ASSERT_EQ(0, rv);
 
 	bool has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv > 0);
+	assert(rv == 0);
 	ASSERT_EQ(true, has_next);
 
 	size_t size = sqsh_file_iterator_size(&iter);
@@ -522,7 +522,7 @@ load_two_sparse_blocks(void) {
 	ASSERT_EQ(0, memcmp(data, ZERO_BLOCK, size));
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv > 0);
+	assert(rv == 0);
 	ASSERT_EQ(true, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
@@ -531,7 +531,7 @@ load_two_sparse_blocks(void) {
 	ASSERT_EQ(0, memcmp(data, ZERO_BLOCK, size));
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv > 0);
+	assert(rv == 0);
 	ASSERT_EQ(true, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
@@ -540,7 +540,7 @@ load_two_sparse_blocks(void) {
 	ASSERT_EQ(0, memcmp(data, ZERO_BLOCK, size));
 
 	has_next = sqsh_file_iterator_next(&iter, 1, &rv);
-	assert(rv > 0);
+	assert(rv == 0);
 	ASSERT_EQ(true, has_next);
 
 	size = sqsh_file_iterator_size(&iter);
