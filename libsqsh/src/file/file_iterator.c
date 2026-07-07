@@ -188,7 +188,6 @@ map_block_compressed(struct SqshFileIterator *iterator, size_t next_offset) {
 		goto out;
 	}
 
-	rv = 1;
 out:
 	return rv;
 }
@@ -249,7 +248,6 @@ map_block_uncompressed(
 	iterator->size = outer_size;
 	iterator->block_index = block_index;
 
-	rv = 1;
 out:
 	return rv;
 }
@@ -270,7 +268,7 @@ map_zero_block(struct SqshFileIterator *iterator) {
 	iterator->size = current_sparse_size;
 	iterator->data = sqsh__archive_zero_block(archive);
 
-	return 1;
+	return 0;
 }
 
 static int
@@ -316,11 +314,7 @@ map_fragment(struct SqshFileIterator *iterator) {
 	iterator->size = sqsh__fragment_view_size(fragment_view);
 	iterator->block_index = BLOCK_INDEX_FINISHED;
 out:
-	if (rv < 0) {
-		return rv;
-	} else {
-		return 1;
-	}
+	return rv;
 }
 
 bool
@@ -356,14 +350,14 @@ sqsh_file_iterator_next(
 	} else {
 		iterator->data = NULL;
 		iterator->size = 0;
-		rv = 0;
 		has_next = false;
-	}
-	if (err != NULL) {
-		*err = rv;
 	}
 	if (rv < 0) {
 		has_next = false;
+	}
+
+	if (err != NULL) {
+		*err = rv;
 	}
 	return has_next;
 }
