@@ -74,6 +74,7 @@ out:
 struct FileIteratorMtBlock {
 	struct FileIteratorMt *mt;
 	uint64_t block_offset;
+	struct SqshIteratorState state;
 };
 
 struct FileIteratorMt {
@@ -111,17 +112,20 @@ iterator_worker(void *data) {
 	struct FileIteratorMtBlock *block = data;
 	struct FileIteratorMt *mt = block->mt;
 
-	rv = sqsh__file_iterator_init(&iterator, &mt->file);
+	rv = sqsh__file_iterator_init_with_state(
+			&iterator, &mt->file, &block->state);
 	if (rv < 0) {
 		goto out;
 	}
 
-	uint64_t offset = block->block_offset;
-	rv = sqsh_file_iterator_skip2(&iterator, &offset, 1);
+	bool has_next = sqsh_file_iterator_next(&iterator, 1, &rv);
 	if (rv < 0) {
 		goto out;
 	}
-	assert(offset == 0);
+	if (has_next == false) {
+		rv = -SQSH_ERROR_OUT_OF_BOUNDS;
+		goto out;
+	}
 
 	mt->cb(&mt->file, &iterator, block->block_offset, mt->data, rv);
 
@@ -183,10 +187,17 @@ file_iterator_mt(
 		goto out;
 	}
 
+	/* The fragment (if any) is scheduled as one extra task beyond the data
+	 * blocks; it has no entry in the block-size list, so only data blocks
+	 * contribute to the compressed prefix offset. */
+	const uint64_t num_data_blocks = sqsh_file_block_count2(&mt->file);
 	uint64_t block_offset = 0;
+	uint64_t data_offset = 0;
 	for (size_t i = 0; i < block_count; i++) {
 		mt->blocks[i].mt = mt;
 		mt->blocks[i].block_offset = block_offset;
+		mt->blocks[i].state.block_index = i;
+		mt->blocks[i].state.compressed_offset = data_offset;
 		rv = cx_threadpool_schedule(
 				&threadpool->pool, iterator_worker, &mt->blocks[i]);
 		if (rv < 0) {
@@ -194,6 +205,9 @@ file_iterator_mt(
 		}
 		scheduled++;
 		block_offset += block_size;
+		if (i < num_data_blocks) {
+			data_offset += sqsh_file_block_size2(&mt->file, i);
+		}
 	}
 
 out:
