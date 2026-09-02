@@ -47,8 +47,9 @@ map_reader__init_cursor(void) {
 	const char buffer[] = "SELECT * FROM table";
 	rv = sqsh__map_manager_init(
 			&map_manager, buffer,
-			&(struct SqshConfig){.source_mapper = sqsh_mapper_impl_static,
-								 .source_size = sizeof(buffer) - 1});
+			&(struct SqshConfig){
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_init(&cursor, &map_manager, 0, sizeof(buffer) - 1);
@@ -66,8 +67,9 @@ map_reader__advance_once(void) {
 	const uint8_t buffer[] = "THIS IS A TEST STRING";
 	rv = sqsh__map_manager_init(
 			&mapper, buffer,
-			&(struct SqshConfig){.source_mapper = sqsh_mapper_impl_static,
-								 .source_size = sizeof(buffer) - 1});
+			&(struct SqshConfig){
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_init(&cursor, &mapper, 0, sizeof(buffer) - 1);
@@ -77,7 +79,7 @@ map_reader__advance_once(void) {
 	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__map_reader_data(&cursor);
-	ASSERT_EQ(buffer, data);
+	ASSERT_EQ(&buffer[0], data);
 
 	sqsh__map_reader_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);
@@ -91,8 +93,9 @@ map_reader__advance_once_with_offset(void) {
 	const uint8_t buffer[] = "THIS IS A TEST STRING";
 	rv = sqsh__map_manager_init(
 			&mapper, buffer,
-			&(struct SqshConfig){.source_mapper = sqsh_mapper_impl_static,
-								 .source_size = sizeof(buffer) - 1});
+			&(struct SqshConfig){
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_init(&cursor, &mapper, 0, sizeof(buffer) - 1);
@@ -116,8 +119,9 @@ map_reader__advance_twice_with_offset(void) {
 	const uint8_t buffer[] = "THIS IS A TEST STRING";
 	rv = sqsh__map_manager_init(
 			&mapper, buffer,
-			&(struct SqshConfig){.source_mapper = sqsh_mapper_impl_static,
-								 .source_size = sizeof(buffer) - 1});
+			&(struct SqshConfig){
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_init(&cursor, &mapper, 0, sizeof(buffer) - 1);
@@ -147,9 +151,10 @@ map_reader__initial_advance(void) {
 	const uint8_t buffer[] = "THIS IS A TEST STRING";
 	rv = sqsh__map_manager_init(
 			&mapper, buffer,
-			&(struct SqshConfig){.mapper_block_size = 4,
-								 .source_mapper = sqsh_mapper_impl_static,
-								 .source_size = sizeof(buffer) - 1});
+			&(struct SqshConfig){
+					.mapper_block_size = 4,
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_init(&cursor, &mapper, 5, sizeof(buffer) - 1);
@@ -174,8 +179,9 @@ map_reader__advance_to_out_of_bounds(void) {
 	const uint8_t buffer[] = "THIS IS A TEST STRING";
 	rv = sqsh__map_manager_init(
 			&mapper, buffer,
-			&(struct SqshConfig){.source_mapper = sqsh_mapper_impl_static,
-								 .source_size = sizeof(buffer) - 1});
+			&(struct SqshConfig){
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_init(&cursor, &mapper, 0, sizeof(buffer) - 1);
@@ -200,9 +206,10 @@ map_reader__initial_advance_2(void) {
 	};
 	rv = sqsh__map_manager_init(
 			&mapper, buffer,
-			&(struct SqshConfig){.mapper_block_size = 2,
-								 .source_mapper = sqsh_mapper_impl_static,
-								 .source_size = sizeof(buffer) - 1});
+			&(struct SqshConfig){
+					.mapper_block_size = 2,
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_init(&cursor, &mapper, 96, sizeof(buffer) - 1);
@@ -231,9 +238,10 @@ map_reader__error_1(void) {
 	};
 	rv = sqsh__map_manager_init(
 			&mapper, buffer,
-			&(struct SqshConfig){.mapper_block_size = 2,
-								 .source_mapper = sqsh_mapper_impl_static,
-								 .source_size = sizeof(buffer) - 1});
+			&(struct SqshConfig){
+					.mapper_block_size = 2,
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_init(&cursor, &mapper, 96, sizeof(buffer) - 1);
@@ -269,9 +277,10 @@ map_reader__error_2(void) {
 	};
 	rv = sqsh__map_manager_init(
 			&mapper, buffer,
-			&(struct SqshConfig){.mapper_block_size = 2,
-								 .source_mapper = sqsh_mapper_impl_static,
-								 .source_size = sizeof(buffer) - 1});
+			&(struct SqshConfig){
+					.mapper_block_size = 2,
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_reader_init(&cursor, &mapper, 96, sizeof(buffer) - 1);

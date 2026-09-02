@@ -16,9 +16,11 @@ jobs:
     steps:
     - run: |
         sudo apk add --no-cache \
+          build-base \
           meson \
           muon \
-          clang21-extra-tools \
+          clang22 \
+          clang22-extra-tools \
         && :
     - uses: actions/checkout@v4
     - name: muon fmt
@@ -44,10 +46,12 @@ jobs:
     - run: |
         sudo apt update
         sudo apt install -y --no-install-recommends \
+          gcc \
           meson \
           squashfs-tools \
           bsdextrautils \
           build-essential \
+          fuse3 \
           libcurl4-openssl-dev \
           libfuse-dev \
           libfuse3-dev \
@@ -87,6 +91,7 @@ jobs:
     steps:
     - run: |
         sudo apk add --no-cache \
+          ${{ matrix.cc }} \
           meson \
           hexdump \
           squashfs-tools \
@@ -130,6 +135,7 @@ jobs:
         sudo dpkg --add-architecture i386
         sudo apt update
         sudo apt install -y --no-install-recommends \
+          gcc \
           meson \
           pkg-config \
           build-essential \

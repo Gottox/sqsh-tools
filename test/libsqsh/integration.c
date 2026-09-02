@@ -653,7 +653,7 @@ test_tree_traversal(void) {
 	ASSERT_STREQS("", name, size);
 	ASSERT_EQ(
 			SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN,
-			sqsh_tree_traversal_state(traversal));
+			(int)sqsh_tree_traversal_state(traversal));
 
 	has_next = sqsh_tree_traversal_next(traversal, &rv);
 	ASSERT_EQ(0, rv);
@@ -662,7 +662,7 @@ test_tree_traversal(void) {
 	ASSERT_STREQS("a", name, size);
 	ASSERT_EQ(
 			SQSH_TREE_TRAVERSAL_STATE_FILE,
-			sqsh_tree_traversal_state(traversal));
+			(int)sqsh_tree_traversal_state(traversal));
 
 	has_next = sqsh_tree_traversal_next(traversal, &rv);
 	ASSERT_EQ(0, rv);
@@ -671,7 +671,7 @@ test_tree_traversal(void) {
 	ASSERT_STREQS("b", name, size);
 	ASSERT_EQ(
 			SQSH_TREE_TRAVERSAL_STATE_FILE,
-			sqsh_tree_traversal_state(traversal));
+			(int)sqsh_tree_traversal_state(traversal));
 
 	has_next = sqsh_tree_traversal_next(traversal, &rv);
 	ASSERT_EQ(0, rv);
@@ -680,7 +680,7 @@ test_tree_traversal(void) {
 	ASSERT_STREQS("large_dir", name, size);
 	ASSERT_EQ(
 			SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_BEGIN,
-			sqsh_tree_traversal_state(traversal));
+			(int)sqsh_tree_traversal_state(traversal));
 
 	while (sqsh_tree_traversal_next(traversal, &rv)) {
 		name = sqsh_tree_traversal_name(traversal, &size);
@@ -695,9 +695,8 @@ test_tree_traversal(void) {
 	name = sqsh_tree_traversal_name(traversal, &size);
 	ASSERT_STREQS("large_dir", name, size);
 	ASSERT_EQ(
-			(enum SqshTreeTraversalState)
-					SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END,
-			sqsh_tree_traversal_state(traversal));
+			SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END,
+			(int)sqsh_tree_traversal_state(traversal));
 
 	has_next = sqsh_tree_traversal_next(traversal, &rv);
 	ASSERT_EQ(0, rv);
@@ -705,9 +704,8 @@ test_tree_traversal(void) {
 	name = sqsh_tree_traversal_name(traversal, &size);
 	ASSERT_STREQS("", name, size);
 	ASSERT_EQ(
-			(enum SqshTreeTraversalState)
-					SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END,
-			sqsh_tree_traversal_state(traversal));
+			SQSH_TREE_TRAVERSAL_STATE_DIRECTORY_END,
+			(int)sqsh_tree_traversal_state(traversal));
 
 	rv = sqsh_tree_traversal_free(traversal);
 	ASSERT_EQ(0, rv);
@@ -775,8 +773,8 @@ test_traversal_zero_max_depth(void) {
 	name = sqsh_tree_traversal_name(traversal, &size);
 	ASSERT_EQ(0, strcmp("", name));
 	ASSERT_EQ(
-			(enum SqshTreeTraversalState)SQSH_TREE_TRAVERSAL_STATE_FILE,
-			sqsh_tree_traversal_state(traversal));
+			SQSH_TREE_TRAVERSAL_STATE_FILE,
+			(int)sqsh_tree_traversal_state(traversal));
 
 	has_next = sqsh_tree_traversal_next(traversal, &rv);
 	ASSERT_EQ(0, rv);
