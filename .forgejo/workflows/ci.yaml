@@ -271,3 +271,52 @@ jobs:
     - name: test
       # fuse needs root privileges on OpenBSD
       run: sudo ninja -C build test
+
+  release:
+    needs:
+    - test-debian
+    - test-alpine
+    - build-debian32
+    - test-openbsd
+    - test-freebsd
+    runs-on: tox-alpine-pod
+    steps:
+    - run: |
+        sudo apk add --no-cache \
+          bash \
+          build-base \
+          curl \
+          curl-dev \
+          fuse-dev \
+          git \
+          hexdump \
+          jq \
+          lz4-dev \
+          meson \
+          squashfs-tools \
+          xz \
+          xz-dev \
+          zlib-dev \
+          zstd-dev \
+        && :
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: configure
+      run: |
+        git config --global --add safe.directory "$PWD"
+        meson setup build \
+          -Dtest=true \
+        && :
+    - name: dist
+      run: |
+        meson dist -C build \
+          --formats gztar,xztar \
+          --include-subprojects
+    - name: create release
+      if: ${{ startsWith(github.ref, 'refs/tags/') }}
+      uses: https://code.forgejo.org/actions/forgejo-release@v2
+      with:
+        direction: upload
+        release-dir: build/meson-dist
+        token: ${{ secrets.TOKEN }}
