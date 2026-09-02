@@ -46,8 +46,9 @@ map_iterator__init_cursor(void) {
 	const char buffer[] = "SELECT * FROM table";
 	rv = sqsh__map_manager_init(
 			&map_manager, buffer,
-			&(struct SqshConfig){.source_mapper = sqsh_mapper_impl_static,
-								 .source_size = sizeof(buffer) - 1});
+			&(struct SqshConfig){
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_iterator_init(&cursor, &map_manager, 0);
@@ -65,8 +66,9 @@ map_iterator__next_once(void) {
 	const uint8_t buffer[] = "THIS IS A TEST STRING";
 	rv = sqsh__map_manager_init(
 			&mapper, buffer,
-			&(struct SqshConfig){.source_mapper = sqsh_mapper_impl_static,
-								 .source_size = sizeof(buffer) - 1});
+			&(struct SqshConfig){
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
 	ASSERT_EQ(0, rv);
 
 	rv = sqsh__map_iterator_init(&cursor, &mapper, 0);
@@ -91,9 +93,10 @@ map_iterator__next_twice(void) {
 	const uint8_t buffer[] = "THIS IS A TEST STRING";
 	rv = sqsh__map_manager_init(
 			&mapper, buffer,
-			&(struct SqshConfig){.mapper_block_size = 12,
-								 .source_mapper = sqsh_mapper_impl_static,
-								 .source_size = sizeof(buffer) - 1});
+			&(struct SqshConfig){
+					.mapper_block_size = 12,
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
 
 	ASSERT_EQ(0, rv);
 
@@ -132,9 +135,10 @@ map_iterator__map_iterator_out_of_bounds_inside_blocksize(void) {
 	const uint8_t buffer[] = "12345678901234567890";
 	rv = sqsh__map_manager_init(
 			&mapper, buffer,
-			&(struct SqshConfig){.mapper_block_size = 12,
-								 .source_mapper = sqsh_mapper_impl_static,
-								 .source_size = sizeof(buffer) - 1});
+			&(struct SqshConfig){
+					.mapper_block_size = 12,
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
 
 	ASSERT_EQ(0, rv);
 
@@ -153,9 +157,10 @@ map_iterator__map_iterator_out_of_bounds_outside_blocksize(void) {
 	const uint8_t buffer[] = "12345678901234567890";
 	rv = sqsh__map_manager_init(
 			&mapper, buffer,
-			&(struct SqshConfig){.mapper_block_size = 12,
-								 .source_mapper = sqsh_mapper_impl_static,
-								 .source_size = sizeof(buffer) - 1});
+			&(struct SqshConfig){
+					.mapper_block_size = 12,
+					.source_mapper = sqsh_mapper_impl_static,
+					.source_size = sizeof(buffer) - 1});
 
 	ASSERT_EQ(0, rv);
 
