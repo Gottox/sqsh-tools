@@ -77,7 +77,7 @@ map_reader__advance_once(void) {
 	ASSERT_EQ(0, rv);
 
 	const uint8_t *data = sqsh__map_reader_data(&cursor);
-	ASSERT_EQ(buffer, data);
+	ASSERT_EQ(&buffer[0], data);
 
 	sqsh__map_reader_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);

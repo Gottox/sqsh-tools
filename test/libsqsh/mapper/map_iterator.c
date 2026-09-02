@@ -77,7 +77,7 @@ map_iterator__next_once(void) {
 	assert(has_next);
 
 	const uint8_t *data = sqsh__map_iterator_data(&cursor);
-	ASSERT_EQ(buffer, data);
+	ASSERT_EQ(&buffer[0], data);
 
 	sqsh__map_iterator_cleanup(&cursor);
 	sqsh__map_manager_cleanup(&mapper);
