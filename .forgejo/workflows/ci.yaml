@@ -22,7 +22,7 @@ jobs:
           clang22 \
           clang22-extra-tools \
         && :
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: muon fmt
       run: |
         if ! find . \( -name meson.build -or -name meson_options.txt \) -print0 \
@@ -60,7 +60,7 @@ jobs:
           zlib1g-dev \
           libzstd-dev \
         && :
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: configure
       run: |
         CC=gcc meson setup build \
@@ -105,7 +105,7 @@ jobs:
           gcc \
           clang \
         && :
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: configure
       run: |
         CC=${{ matrix.cc }} meson setup build \
@@ -149,7 +149,7 @@ jobs:
           zlib1g-dev:i386 \
           libzstd-dev:i386 \
         && :
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: configure
       env:
         CROSS_FILE: |
@@ -208,7 +208,7 @@ jobs:
           xz \
           zstd \
         && :
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: configure
       run: |
         CC=clang meson setup build \
@@ -250,7 +250,7 @@ jobs:
     - run: |
         sudo kldload fusefs
         sudo sysctl vfs.usermount=1
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: configure
       run: |
         CC=clang meson setup build \
@@ -299,7 +299,7 @@ jobs:
           zlib-dev \
           zstd-dev \
         && :
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
     - name: configure
