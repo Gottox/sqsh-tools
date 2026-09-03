@@ -18,7 +18,7 @@ jobs:
   build-linux32:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: install dependencies
       run: |
@@ -61,7 +61,7 @@ jobs:
     runs-on: macos-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - run: |
           brew install git meson squashfs lz4 xz zstd macfuse
