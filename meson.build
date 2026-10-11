@@ -9,7 +9,7 @@ project(
         'cextras:collection=true',
         'cextras:concurrency=true',
     ],
-    version: '1.6.0',
+    version: '1.6.1',
     license: 'BSD-2-Clause',
     meson_version: '>=1.4.0',
 )
