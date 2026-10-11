@@ -119,7 +119,7 @@ directory_iterator_index_lookup(
 	}
 
 	sqsh__metablock_reader_cleanup(&iterator->metablock);
-	uint16_t inner_offset = 0;
+	size_t inner_offset = 0;
 	if (SQSH_ADD_OVERFLOW(iterator->next_offset, dir_index, &inner_offset)) {
 		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
@@ -132,7 +132,7 @@ directory_iterator_index_lookup(
 		rv = -SQSH_ERROR_INTEGER_OVERFLOW;
 		goto out;
 	}
-	rv = load_metablock(iterator, outer_offset, inner_offset);
+	rv = load_metablock(iterator, outer_offset, (uint16_t)inner_offset);
 	iterator->remaining_entries = 0;
 	if (rv < 0) {
 		goto out;
