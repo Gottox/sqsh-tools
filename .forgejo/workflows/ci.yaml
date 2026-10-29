@@ -197,7 +197,10 @@ jobs:
   test-openbsd:
     needs:
     - format-check
-    runs-on: tox-openbsd-vm
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        runner: [tox-openbsd-latest, tox-openbsd-latest-arm]
     steps:
     - run: |
         sudo pkg_add \
@@ -233,7 +236,10 @@ jobs:
   test-freebsd:
     needs:
     - format-check
-    runs-on: tox-freebsd-vm
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        runner: [tox-freebsd-latest, tox-freebsd-latest-arm]
     steps:
     - run: |
         sudo pkg install -y \
