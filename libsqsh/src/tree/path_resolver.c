@@ -408,7 +408,9 @@ path_resolve(
 	const char *segment = path;
 	const char *next_segment = NULL;
 	size_t remaining_path_len = path_len;
-	if (segment[0] == '/') {
+	if (path_len == 0) {
+		return 0;
+	} else if (segment[0] == '/') {
 		rv = sqsh_path_resolver_to_root(resolver);
 		if (rv < 0) {
 			goto out;
