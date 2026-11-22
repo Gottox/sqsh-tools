@@ -198,16 +198,19 @@ file_iterator_mt(
 		mt->blocks[i].block_offset = block_offset;
 		mt->blocks[i].state.block_index = i;
 		mt->blocks[i].state.compressed_offset = data_offset;
+		block_offset += block_size;
+		if (i < num_data_blocks) {
+			data_offset += sqsh_file_block_size2(&mt->file, i);
+		}
+	}
+
+	for (size_t i = 0; i < block_count; i++) {
 		rv = cx_threadpool_schedule(
 				&threadpool->pool, iterator_worker, &mt->blocks[i]);
 		if (rv < 0) {
 			break;
 		}
 		scheduled++;
-		block_offset += block_size;
-		if (i < num_data_blocks) {
-			data_offset += sqsh_file_block_size2(&mt->file, i);
-		}
 	}
 
 out:
